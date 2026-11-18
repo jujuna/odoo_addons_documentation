@@ -307,3 +307,107 @@ class TestPayslipMultiContract(TestPayslipContractBase):
         with patch.object(self.registry['hr.payslip'], 'action_refresh_from_work_entries', _refresh):
             version_2.wage = 6000
         self.assertEqual(refreshed_payslips, payslip)
+
+    def _create_validated_march_payslip(self):
+        # these rules read worked_days['002.00'] as a singleton, which breaks on multi-version payslips
+        (self.mv_rule | self.sum_of_alw).active = False
+        employee = self.env['hr.employee'].create({
+            'name': "Corrected Employee",
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'structure_type_id': self.developer_pay_structure.type_id.id,
+            'wage': 10000,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': "March Payslip",
+            'employee_id': employee.id,
+            'date_from': date(2026, 3, 1),
+            'date_to': date(2026, 3, 31),
+            'struct_id': self.developer_pay_structure.id,
+        })
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        return employee, payslip
+
+    def test_correction_uses_retroactive_version(self):
+        employee, payslip = self._create_validated_march_payslip()
+        version_1 = employee.version_id
+        self.assertEqual(payslip.version_id, version_1)
+
+        version_2 = employee.create_version({
+            'date_version': date(2026, 2, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'wage': 5000,
+        })
+
+        correction = payslip._action_correct_payslips()
+        self.assertEqual(correction.version_id, version_2)
+        self.assertEqual(correction.worked_days_line_ids.version_id, version_2)
+        self.assertEqual(correction.line_ids.filtered(lambda l: l.code == 'HRA').total, 2000)
+
+    def test_correction_uses_mid_month_version(self):
+        employee, payslip = self._create_validated_march_payslip()
+        version_1 = employee.version_id
+
+        version_2 = employee.create_version({
+            'date_version': date(2026, 3, 15),
+            'contract_date_start': date(2026, 1, 1),
+            'wage': 5000,
+        })
+
+        correction = payslip._action_correct_payslips()
+        new_payslip = self.env['hr.payslip'].create({
+            'name': "March Payslip",
+            'employee_id': employee.id,
+            'date_from': date(2026, 3, 1),
+            'date_to': date(2026, 3, 31),
+            'struct_id': self.developer_pay_structure.id,
+        })
+        new_payslip.compute_sheet()
+
+        self.assertEqual(correction.version_id, version_1)
+        self.assertEqual(correction.worked_days_line_ids.version_id, version_1 | version_2)
+
+        def worked_days(slip):
+            return sorted(slip.worked_days_line_ids.mapped(
+                lambda w: (w.version_id.id, w.work_entry_type_id.code, w.number_of_days, w.number_of_hours, w.amount)))
+
+        def lines(slip):
+            return sorted(slip.line_ids.mapped(lambda l: (l.code, l.total)))
+
+        self.assertEqual(worked_days(correction), worked_days(new_payslip))
+        self.assertEqual(lines(correction), lines(new_payslip))
+
+    def test_correction_keeps_contract_of_original_payslip(self):
+        # these rules read worked_days['002.00'] as a singleton, which breaks on multi-version payslips
+        (self.mv_rule | self.sum_of_alw).active = False
+        employee = self.env['hr.employee'].create({
+            'name': "Two Contracts Employee",
+            'date_version': date(2026, 3, 1),
+            'contract_date_start': date(2026, 3, 1),
+            'contract_date_end': date(2026, 3, 14),
+            'structure_type_id': self.developer_pay_structure.type_id.id,
+            'wage': 10000,
+        })
+        version_1 = employee.version_id
+        version_2 = employee.create_version({
+            'date_version': date(2026, 3, 15),
+            'contract_date_start': date(2026, 3, 15),
+            'contract_date_end': False,
+            'wage': 5000,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': "March Payslip",
+            'employee_id': employee.id,
+            'version_id': version.id,
+            'date_from': date(2026, 3, 1),
+            'date_to': date(2026, 3, 31),
+            'struct_id': self.developer_pay_structure.id,
+        } for version in (version_1, version_2)])
+        payslips.compute_sheet()
+        payslips.action_payslip_done()
+
+        corrections = payslips._action_correct_payslips()
+        self.assertEqual(corrections.mapped('version_id'), version_1 | version_2)
+        self.assertEqual(corrections[1].version_id, version_2)
+        self.assertEqual(corrections[1].worked_days_line_ids.version_id, version_2)

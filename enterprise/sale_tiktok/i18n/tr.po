@@ -3,14 +3,16 @@
 # * sale_tiktok
 #
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-09-18 05:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-12 13:39+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "sale_tiktok/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -33,12 +35,22 @@ msgid ""
 "  (SKU in TikTok Shop)\n"
 "* Support for Fulfillment by Seller (FBS)\n"
 msgstr ""
+"\n"
+"TikTok Shop siparişlerinizi Odoo'ya aktarın ve teslimatları senkronize edin\n"
+"=================================================================\n"
+"\n"
+"Temel Özellikler\n"
+"------------\n"
+"* Birden fazla mağazadan sipariş aktarımı\n"
+"* Siparişler, Odoo ürünleri ile dahili referanslarına göre eşleştirilir\n"
+"  (TikTok Shop'taki SKU)\n"
+"* Satıcı Tarafından Gönderim (FBS) desteği\n"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_shop_create_wizard.py:0
 msgid "(Pending Authorization)"
-msgstr ""
+msgstr "(Yetkilendirme Bekleniyor)"
 
 #. module: sale_tiktok
 #: model:mail.template,body_html:sale_tiktok.order_sync_failure
@@ -120,6 +132,9 @@ msgid ""
 "                    An unexpected error occurred during authorization. "
 "Please try again."
 msgstr ""
+"<strong>Yetkilendirme Başarısız: </strong>\n"
+"                    Yetkilendirme sırasında beklenmedik bir hata oluştu. "
+"Lütfen tekrar deneyin."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
@@ -132,6 +147,14 @@ msgid ""
 ">\n"
 "                    4. Get your Service ID, App key and App secret<br/>"
 msgstr ""
+"<strong>API kimlik bilgilerinizi nereden bulabilirsiniz:</strong><br/>\n"
+"                    1. TikTok Shop İş Ortağı Merkezi'ne gidin<br/>\n"
+"                    2. Uygulamalar &amp; Hizmeti → Yeni Uygulama Oluştur "
+"seçeneğine gidin veya mevcut bir uygulamayı kullanın<br/>\n"
+"                    3. Uygulamaya mağaza verilerinize erişim izni verin<br/>"
+"\n"
+"                    4. Hizmet Kimliğinizi, Uygulama anahtarınızı ve Uygulama "
+"gizli anahtarınızı alın<br/>"
 
 #. module: sale_tiktok
 #: model:mail.template,body_html:sale_tiktok.inventory_sync_failure
@@ -184,11 +207,11 @@ msgid ""
 "as=\"error\">\n"
 "                            <th>\n"
 "                                <t t-out=\"', '.join(error['default_codes'])"
-"\"/>\n"
+"\"></t>\n"
 "                            </th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
-"out=\"error['message']\"/>\n"
+"out=\"error['message']\"></t>\n"
 "                                <t t-else=\"\">\n"
 "                                    An unknown error occurred during the "
 "synchronisation with TikTok Shop.\n"
@@ -232,156 +255,158 @@ msgstr ""
 "                    padding: 0.5em 0.5em 1em;\n"
 "                    vertical-align: top;\n"
 "                }\n"
-"           </style>\n"
-"            <body> <div>\n"
-"                <p> \n"
-"                    TikTok Shop için Stok senkronizasyonu\n"
-"                   <b><t t-out=\"ctx.get('tiktok_shop') or ''\"> REF</t></b>"
+"            </style>\n"
+"            <body><div>\n"
+"                <p>\n"
+"                    TikTok Mağazası için stok senkronizasyonu\n"
+"                    <b><t t-out=\"ctx.get('tiktok_shop') or ''\">REF</t></b>"
 "\n"
 "                    bazı hatalarla karşılaştı ve tamamlanamadı.\n"
-"               </p>\n"
-"                <p> TikTok Shop tarafından gönderilen hatalar şunlardır:</p>"
-"\n"
+"                </p>\n"
+"                <p>TikTok Mağazası tarafından gönderilen hatalar şunlardır:</"
+"p>\n"
 "                <table class=\"tiktok_table\">\n"
-"                   <thead>\n"
-"                        <tr> \n"
-"                           <th> Ürün İç Referansı/Referansları</th>\n"
+"                    <thead>\n"
+"                        <tr>\n"
+"                            <th>Ürün Dahili Referans(lar)ı</th>\n"
 "                            <th>Mesaj</th>\n"
 "                        </tr>\n"
-"                   </thead>\n"
-"                    <tbody> \n"
-"                       <tr t-foreach=\"ctx.get('error_messages')\" t-"
+"                    </thead>\n"
+"                    <tbody>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th> \n"
-"                               <t t-out=\"', '.join(error['default_codes'])"
-"\"/>\n"
-"                            </th> \n"
-"                           <td>\n"
+"                            <th>\n"
+"                                <t t-out=\"', '.join(error['default_codes'])"
+"\"></t>\n"
+"                            </th>\n"
+"                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
-"out=\"error['message']\"/> \n"
-"                               <t t-else=\"\"> \n"
-"                                    TikTok Shop ile senkronizasyon sırasında "
-"bilinmeyen bir hata oluştu.\n"
-"                                    Maalesef, ürünün mevcut miktarının doğru "
-"olup olmadığını manuel olarak kontrol etmeniz gerekiyor.\n"
-"                                    Sorun devam ederse,\n"
-"                                   <a href=\"https://www.odoo.com/help/\"> "
-"Odoo destek ekibiyle</a> iletişime geçin.\n"
-"                               </t>\n"
-"                            </td> \n"
-"                       </tr>\n"
-"                    </tbody> \n"
-"               </table>\n"
-"            </div> \n"
-"       </body>"
+"out=\"error['message']\"></t>\n"
+"                                <t t-else=\"\">\n"
+"                                    TikTok Mağazası ile senkronizasyon "
+"sırasında bilinmeyen bir hata oluştu.\n"
+"                                    Maalesef, ürün için mevcut miktarın "
+"doğru olup olmadığını manuel olarak kontrol etmeniz gerekiyor.\n"
+"                                    Sorun devam ederse, \n"
+"                                    <a href=\"https://www.odoo.com/help/\">"
+"Odoo desteği</a> ile iletişime geçin.\n"
+"                                </t>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            </div>\n"
+"        </body>"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__access_token
 msgid "Access Token"
-msgstr ""
+msgstr "Erişim Anahtarı"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__access_token_expire_datetime
 msgid "Access Token Expiration"
-msgstr ""
+msgstr "Erişim Belirteci Son Kullanma Tarihi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__active
 msgid "Active"
-msgstr ""
+msgstr "Etkin"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "An unexpected error occurred during authorization."
-msgstr ""
+msgstr "Yetkilendirme sırasında beklenmedik bir hata oluştu."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__tiktok_cipher
 msgid "An unique identifier as an input parameter in shop related APIs."
 msgstr ""
+"Mağaza ile ilgili API'lerde bir giriş parametresi olarak benzersiz bir "
+"tanımlayıcı."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "App Credentials"
-msgstr ""
+msgstr "Uygulama Kimlik Bilgileri"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__app_key
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__app_key
 msgid "App key"
-msgstr ""
+msgstr "Uygulama anahtarı"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__app_secret
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__app_secret
 msgid "App secret"
-msgstr ""
+msgstr "Uygulama gizli anahtarı"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_search
 msgid "Archived"
-msgstr ""
+msgstr "Arşivlendi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__confirmed
 msgid "Awaiting Collection on TikTok Shop"
-msgstr ""
+msgstr "TikTok Shop'ta Toplanmayı Bekliyor"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__draft
 msgid "Awaiting Shipment on TikTok Shop"
-msgstr ""
+msgstr "TikTok Shop'ta Gönderilmeyi Bekliyor"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "İptal"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__canceled
 msgid "Canceled on TikTok Shop"
-msgstr ""
+msgstr "TikTok Shop'ta İptal Edildi"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Collection Period"
-msgstr ""
+msgstr "Toplama Dönemi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__company_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__company_id
 msgid "Company"
-msgstr ""
+msgstr "Firma"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_list
 msgid "Connect New Shop"
-msgstr ""
+msgstr "Yeni Mağaza Bağla"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Connect Shop & Authorize"
-msgstr ""
+msgstr "Mağazayı Bağla ve Yetkilendir"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Kontak"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_create_wizard
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Create TikTok Shop"
-msgstr ""
+msgstr "TikTok Mağazası Oluştur"
 
 #. module: sale_tiktok
 #: model:ir.model,website_form_label:sale_tiktok.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "Müşteri Oluşturun"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__create_uid
@@ -389,7 +414,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__create_uid
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Tarafından oluşturuldu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__create_date
@@ -397,27 +422,27 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__create_date
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Oluşturuldu"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Credentials"
-msgstr ""
+msgstr "Kimlik bilgileri"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__team_id
 msgid "Default Sales Team"
-msgstr ""
+msgstr "Varsayılan Satış Ekibi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__user_id
 msgid "Default Salesperson"
-msgstr ""
+msgstr "Varsayılan Satış Personeli"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__done
 msgid "Delivered on TikTok Shop"
-msgstr ""
+msgstr "TikTok Shop'ta Teslim Edildi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_product_product__display_name
@@ -429,17 +454,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__display_name
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "İsim Göster"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.stock_picking_form
 msgid "Download TikTok Label"
-msgstr ""
+msgstr "TikTok Etiketini İndir"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__synchronize_inventory
 msgid "Enable Inventory Synchronization"
-msgstr ""
+msgstr "Stok Senkronizasyonunu Etkinleştir"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__sync_to_tiktok
@@ -447,6 +472,8 @@ msgid ""
 "Enable this to allow pushing the product inventory quantities from Odoo to "
 "TikTok."
 msgstr ""
+"Ürün stok miktarlarının Odoo'dan TikTok'a gönderilmesini sağlamak için bunu "
+"etkinleştirin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__synchronize_inventory
@@ -454,11 +481,13 @@ msgid ""
 "Enable this to keep this shop's product quantities synchronized with TikTok "
 "Shop."
 msgstr ""
+"Bu mağazanın ürün miktarlarını TikTok Shop ile senkronize tutmak için bunu "
+"etkinleştirin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__fbs_warehouse_id
 msgid "FBS Warehouse"
-msgstr ""
+msgstr "FBS Deposu"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -467,6 +496,8 @@ msgid ""
 "Failed to download the shipping label. Use the provided link:\n"
 "%(link)s"
 msgstr ""
+"Gönderim etiketi indirilemedi. Sağlanan bağlantıyı kullanın:\n"
+"%(link)s"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -477,8 +508,14 @@ msgstr ""
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
+msgid "Failed to fetch the detail of TikTok order %(ref)s: %(error)s"
+msgstr "TikTok siparişi ayrıntıları getirilemedi %(ref)s: %(error)s"
+
+#. module: sale_tiktok
+#. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Failed to ship order: %s"
-msgstr ""
+msgstr "Sipariş gönderilemedi: %s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_product_product__id
@@ -490,7 +527,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
@@ -498,6 +535,8 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
+"Satış kesinleştikten sonra, üzerinde değişiklik yapamazsınız. Buna karşın "
+"faturalandırma ve teslim yapabilirsiniz."
 
 #. module: sale_tiktok
 #: model:ir.module.module,summary:base.module_sale_tiktok
@@ -512,6 +551,10 @@ msgid ""
 "TikTok API operation '%(operation)s' with request ID '%(request_id)s':\n"
 "%(error_message)s"
 msgstr ""
+"TikTok Shop '%(shop_name)s' uygulamasında, istek kimliği '%(request_id)s' "
+"olan TikTok API işlemi '%(operation)s' sırasında ' %(error_code)s ' hatası "
+"oluştu:\n"
+"%(error_message)s"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -523,34 +566,34 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Invalid OAuth state."
-msgstr ""
+msgstr "Geçersiz OAuth durumu"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Invalid TikTok document URL"
-msgstr ""
+msgstr "Geçersiz TikTok belge URL'si"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Invalid authorization signature"
-msgstr ""
+msgstr "Geçersiz yetkilendirme imzası"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Inventory Synchronization"
-msgstr ""
+msgstr "Stok Eşitleme"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_item_count
 msgid "Item Count"
-msgstr ""
+msgstr "Öğe Sayısı"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_item_extern_id
 msgid "Item ID"
-msgstr ""
+msgstr "Öğe Kimliği"
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_tiktok_item_unique_tiktok_item_and_sku_external_ids
@@ -561,22 +604,22 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_item_ids
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Items"
-msgstr ""
+msgstr "Öğeler"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__last_product_catalog_sync_date
 msgid "Last Catalog Synchronization"
-msgstr ""
+msgstr "Son Katalog Senkronizasyonu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__last_orders_sync_date
 msgid "Last Order Synchronization"
-msgstr ""
+msgstr "Son Sipariş Senkronizasyonu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__last_inventory_sync_date
 msgid "Last Sync Date"
-msgstr ""
+msgstr "Son Senkronizasyon Tarihi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__write_uid
@@ -584,7 +627,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__write_uid
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Son Güncelleyen"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__write_date
@@ -592,34 +635,34 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__write_date
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Son Güncelleme"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
 msgid "Lock"
-msgstr ""
+msgstr "Kilitle"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Malformed OAuth state."
-msgstr ""
+msgstr "Hatalı OAuth durumu."
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__manual
 msgid "Manual handling required"
-msgstr ""
+msgstr "Manuel işlem gerekli"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Missing OAuth state."
-msgstr ""
+msgstr "OAuth durumu eksik."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__name
 msgid "Name"
-msgstr ""
+msgstr "Adı"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -636,34 +679,34 @@ msgstr ""
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__order_count
 msgid "Order Count"
-msgstr ""
+msgstr "Sipariş Sayımı"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Order Synchronization"
-msgstr ""
+msgstr "Sipariş Senkronizasyonu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__order_ids
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Orders"
-msgstr ""
+msgstr "Siparişler"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Original price: %(price)s"
-msgstr ""
+msgstr "Orijinal fiyat: %(price)s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__picking_id
 msgid "Picking"
-msgstr ""
+msgstr "Toplama"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__pickup_end
 msgid "Pickup End Time"
-msgstr ""
+msgstr "Teslim Alma Bitiş Saati"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -674,7 +717,7 @@ msgstr ""
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__pickup_start
 msgid "Pickup Start Time"
-msgstr ""
+msgstr "Teslim Alma Başlangıç Saati"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -686,147 +729,147 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__product_id
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_search
 msgid "Product"
-msgstr ""
+msgstr "Ürün"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__product_tmpl_id
 msgid "Product Template"
-msgstr ""
+msgstr "Ürün Şablonu"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "Ürün Varyantı"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Rate limit reached. Please try again later."
-msgstr ""
+msgstr "İstek limiti aşıldı. Lütfen daha sonra tekrar deneyin."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Re-authorize Shop"
-msgstr ""
+msgstr "Mağazayı yeniden yetkilendir"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__refresh_token
 msgid "Refresh Token"
-msgstr ""
+msgstr "Token Yenile"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__refresh_token_expire_datetime
 msgid "Refresh Token Expiration"
-msgstr ""
+msgstr "Yenileme Belirteci (Token) Geçerlilik Süresi"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/utils.py:0
 msgid "Request exception during TikTok Shop API operation"
-msgstr ""
+msgstr "TikTok Shop API işlemi sırasında istek istisnası oluştu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_sku_extern_id
 msgid "SKU ID"
-msgstr ""
+msgstr "SKU Kimliği"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Sale Orders"
-msgstr ""
+msgstr "Satış Siparişleri"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "Satış Siparişi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_seller_sku
 msgid "Seller SKU"
-msgstr ""
+msgstr "Satıcı SKU"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__service_extern_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__service_extern_id
 msgid "Service ID"
-msgstr ""
+msgstr "Hizmet Kimliği"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Ship Order"
-msgstr ""
+msgstr "Siparişi Gönder"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Ship Orders Result"
-msgstr ""
+msgstr "Sipariş Gönderme Sonucu"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Ship TikTok Orders"
-msgstr ""
+msgstr "TikTok Siparişlerini Gönder"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.stock_picking_form
 msgid "Ship on TikTok"
-msgstr ""
+msgstr "TikTok Üzerinden Gönder"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "Gönderim: %(carrier)s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__shop_id
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_search
 msgid "Shop"
-msgstr ""
+msgstr "Mağaza"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_shop_ref
 msgid "Shop ID"
-msgstr ""
+msgstr "Mağaza Kimliği"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Information"
-msgstr ""
+msgstr "Mağaza Bilgileri"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Name"
-msgstr ""
+msgstr "Mağaza Adı"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__country_id
 msgid "Shop Region"
-msgstr ""
+msgstr "Mağaza Bölgesi"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Settings"
-msgstr ""
+msgstr "Mağaza Ayarları"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Tokens"
-msgstr ""
+msgstr "Mağaza Belirteçleri (Token)"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Shop not found."
-msgstr ""
+msgstr "Mağaza bulunamadı."
 
 #. module: sale_tiktok
 #: model:ir.ui.menu,name:sale_tiktok.shops_menu
 msgid "Shops"
-msgstr ""
+msgstr "Mağazalar"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_delivery_status
@@ -841,42 +884,51 @@ msgid ""
 "- Manual handling required: Shipment must be rearranged and checked again in "
 "TikTok Shop."
 msgstr ""
+"TikTok Shop'taki teslimat siparişinin durumu:\n"
+"- Sevkiyat Bekleniyor: Sipariş sevkiyata hazır, ancak henüz hiçbir şey "
+"gönderilmedi.\n"
+"- Teslim Alınması Bekleniyor: Sevkiyat ayarlandı ve kargo şirketi tarafından "
+"alınmasını bekliyor.\n"
+"- Teslim Edildi: Paket kargo şirketi tarafından alındı ve gönderildi.\n"
+"- İptal Edildi: Paket iptal edildi.\n"
+"- Manuel işlem gerekiyor: Sevkiyatın TikTok Shop'ta yeniden ayarlanması ve "
+"tekrar kontrol edilmesi gerekiyor."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Successfully shipped orders."
-msgstr ""
+msgstr "Siparişler başarıyla gönderildi."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Catalog"
-msgstr ""
+msgstr "Katalogu Eşitle"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Inventory"
-msgstr ""
+msgstr "Stoğu Senkronize Et"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__sync_to_tiktok
 msgid "Sync Inventory to TikTok"
-msgstr ""
+msgstr "Stoğu TikTok ile Senkronize Et"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Orders"
-msgstr ""
+msgstr "Siparişleri Senkronize Et"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Synchronization Information"
-msgstr ""
+msgstr "Senkronizasyon Bilgileri"
 
 #. module: sale_tiktok
 #: model:mail.template,subject:sale_tiktok.inventory_sync_failure
 msgid "Synchronization of TikTok Shop inventory has failed"
-msgstr ""
+msgstr "TikTok Shop stok senkronizasyonu başarısız oldu"
 
 #. module: sale_tiktok
 #: model:mail.template,subject:sale_tiktok.order_sync_failure
@@ -884,23 +936,25 @@ msgid ""
 "Synchronization of TikTok Shop order {{ ctx.get('tiktok_order_ref') }} has "
 "failed"
 msgstr ""
+"TikTok Shop siparişi {{ ctx.get('tiktok_order_ref') }} senkronizasyonu "
+"başarısız oldu"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_order_ref
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_order_ref
 msgid "The TikTok Shop-defined order reference."
-msgstr ""
+msgstr "TikTok Shop tarafından tanımlanan sipariş referansı."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_packing_ref
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_packing_ref
 msgid "The TikTok Shop-defined packing reference."
-msgstr ""
+msgstr "TikTok Shop tarafından tanımlanan paketleme referansı."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_shop_id
 msgid "The TikTok shop from which the order was placed."
-msgstr ""
+msgstr "Siparişin verildiği TikTok mağazası."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__access_token
@@ -909,17 +963,20 @@ msgid ""
 "needs to be refreshed with the refresh token. You don't have to manage this "
 "field manually."
 msgstr ""
+"TikTok Shop API'si için erişim jetonu. Bu jetonun geçerlilik süresi 7 gündür "
+"ve yenileme jetonu ile yenilenmesi gerekir. Bu alanı manuel olarak "
+"yönetmenize gerek yoktur."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_label_attachment_id
 msgid "The attachment related to the TikTok shipping label."
-msgstr ""
+msgstr "TikTok gönderim etiketi ile ilgili ek."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "The collection of this order was already scheduled."
-msgstr ""
+msgstr "Bu siparişin toplaması zaten planlanmıştı."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
@@ -927,6 +984,8 @@ msgid ""
 "The collection period is optional. Leave empty to follow courier pickup "
 "schedule."
 msgstr ""
+"Toplama süresi isteğe bağlıdır. Kurye teslim alma programını takip etmek "
+"için boş bırakın."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__access_token_expire_datetime
@@ -934,6 +993,8 @@ msgid ""
 "The date when the access token expires. Odoo will automatically refresh the "
 "token before it expires."
 msgstr ""
+"Erişim belirtecinin süresinin dolacağı tarih. Odoo, belirteç süresi dolmadan "
+"önce otomatik olarak yenileyecektir."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__refresh_token_expire_datetime
@@ -941,16 +1002,19 @@ msgid ""
 "The date when the refresh token expires. Odoo will automatically refresh the "
 "token before it expires."
 msgstr ""
+"Yenileme belirtecinin süresinin dolacağı tarih. Odoo, belirteç süresi "
+"dolmadan önce otomatik olarak yenileyecektir."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__team_id
 msgid "The default Sales Team assigned to TikTok Shop orders for reporting"
 msgstr ""
+"Raporlama için TikTok Mağaza siparişlerine atanan varsayılan Satış Ekibi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__user_id
 msgid "The default salesperson assigned to TikTok Shop orders"
-msgstr ""
+msgstr "TikTok Mağaza siparişlerine atanan varsayılan satış temsilcisi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__last_orders_sync_date
@@ -958,11 +1022,13 @@ msgid ""
 "The last time orders were synchronized with TikTok Shop. Orders whose status "
 "has not changed since this date are not created nor updated in Odoo."
 msgstr ""
+"Siparişlerin TikTok Shop ile en son senkronize edildiği tarih. Bu tarihten "
+"bu yana durumu değişmemiş siparişler, Odoo'da oluşturulmaz veya güncellenmez."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__last_product_catalog_sync_date
 msgid "The last time the TikTok Shop catalog was synchronized with Odoo."
-msgstr ""
+msgstr "TikTok Mağaza kataloğunun Odoo ile en son senkronize edildiği zaman."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__refresh_token
@@ -971,6 +1037,9 @@ msgid ""
 "needs to be refreshed with the access token. You don't have to manage this "
 "field manually."
 msgstr ""
+"TikTok Shop API'si için yenileme jetonu. Bu jetonun geçerlilik süresi 30 "
+"gündür ve erişim jetonu ile yenilenmesi gerekir. Bu alanı manuel olarak "
+"yönetmenize gerek yoktur."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_seller_sku
@@ -978,6 +1047,8 @@ msgid ""
 "The seller SKU in TikTok. A Seller SKU in TikTok is equivalent to the "
 "product default code in Odoo."
 msgstr ""
+"TikTok'taki satıcı SKU'su. TikTok'taki bir satıcı SKU'su, Odoo'daki ürün "
+"varsayılan koduna eşdeğerdir."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__service_extern_id
@@ -986,6 +1057,9 @@ msgid ""
 "in the TikTok Shop API. You can find this in your TikTok Partner Center "
 "after creating an application."
 msgstr ""
+"TikTok Mağaza API'si için hizmet kimliği. Bu kimlik, mağazayı TikTok Mağaza "
+"API'sinde tanımlamak için kullanılır. Bunu bir uygulama oluşturduktan sonra "
+"TikTok İş Ortağı Merkezi'nizde bulabilirsiniz."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_sku_extern_id
@@ -993,6 +1067,8 @@ msgid ""
 "The unique identifier for a SKU in TikTok. A SKU in TikTok is equivalent to "
 "a product variant in Odoo."
 msgstr ""
+"TikTok'taki bir Stok Kodu (SKU) için benzersiz tanımlayıcı. TikTok'taki bir "
+"SKU, Odoo'daki bir ürün varyantına eşdeğerdir."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_item_extern_id
@@ -1000,6 +1076,8 @@ msgid ""
 "The unique identifier for an item in TikTok. An item in TikTok is equivalent "
 "to a product in Odoo."
 msgstr ""
+"TikTok'taki bir öğenin benzersiz tanımlayıcısı. TikTok'taki bir öğe, "
+"Odoo'daki bir ürüne eşdeğerdir."
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_sale_order_unique_tiktok_order_ref_tiktok_shop_id
@@ -1007,6 +1085,8 @@ msgid ""
 "There can only exist one sale order for a given TikTok Shop Order Reference "
 "per Shop."
 msgstr ""
+"Mağaza başına belirli bir TikTok Mağaza Sipariş Referansı için yalnızca bir "
+"satış siparişi bulunabilir."
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
@@ -1015,48 +1095,59 @@ msgid ""
 "This order contains unsupported TikTok Shop delivery status.\n"
 "                    Please process the order manually on TikTok Shop."
 msgstr ""
+"Bu sipariş, desteklenmeyen bir TikTok Mağaza teslimat durumu içeriyor.\n"
+"                    Lütfen siparişi TikTok Mağaza üzerinden manuel olarak "
+"işleyin."
+
+#. module: sale_tiktok
+#. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
+msgid "This order has no TikTok package yet. Please try again later."
+msgstr ""
+"Bu siparişin henüz bir TikTok paketi yok. Lütfen daha sonra tekrar deneyin."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "This picking is not linked to a TikTok order."
-msgstr ""
+msgstr "Bu toplama, bir TikTok siparişine bağlı değil."
 
 #. module: sale_tiktok
 #. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "TikTok API rate limit reached. Please try again later."
-msgstr ""
+msgstr "TikTok API hız sınırına ulaşıldı. Lütfen daha sonra tekrar deneyin."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 #: model:product.template,name:sale_tiktok.default_adjustment_product_product_template
 msgid "TikTok Amount Adjustment"
-msgstr ""
+msgstr "TikTok Tutar Düzeltmesi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_res_partner__tiktok_buyer_extern_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_res_users__tiktok_buyer_extern_id
 msgid "TikTok Buyer ID"
-msgstr ""
+msgstr "TikTok Alıcı Kimliği"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_packing_ref
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_packing_ref
 msgid "TikTok Packing Reference"
-msgstr ""
+msgstr "TikTok Paketleme Referansı"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_picking_ship_wizard
 msgid "TikTok Picking Ship Wizard"
-msgstr ""
+msgstr "TikTok Toplama Gönderim Sihirbazı"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_order_ref
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_order_ref
 msgid "TikTok Reference"
-msgstr ""
+msgstr "TikTok Referansı"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_shop
@@ -1066,109 +1157,109 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_search
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "TikTok Shop"
-msgstr ""
+msgstr "TikTok Mağaza"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_authorization_error
 msgid "TikTok Shop Authorization Error"
-msgstr ""
+msgstr "TikTok Mağaza Yetkilendirme Hatası"
 
 #. module: sale_tiktok
 #: model:ir.module.module,shortdesc:base.module_sale_tiktok
 msgid "TikTok Shop Connector"
-msgstr ""
+msgstr "TikTok Shop Bağlayıcısı"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_shop_create_wizard
 msgid "TikTok Shop Creation Wizard"
-msgstr ""
+msgstr "TikTok Shop Oluşturma Sihirbazı"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_item
 msgid "TikTok Shop Item"
-msgstr ""
+msgstr "TikTok Shop Öğesi"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_list
 msgid "TikTok Shop Items"
-msgstr ""
+msgstr "TikTok Shop Öğeleri"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "TikTok Shop Label"
-msgstr ""
+msgstr "TikTok Shop Etiketi"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/tests/test_tiktok.py:0
 msgid "TikTok Shop Order %(order)s"
-msgstr ""
+msgstr "TikTok Shop Siparişi %(order)s"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "TikTok Shop Order %(tiktok_order_ref)s"
-msgstr ""
+msgstr "TikTok Shop Siparişi %(tiktok_order_ref)s"
 
 #. module: sale_tiktok
 #: model:product.template,name:sale_tiktok.default_sale_product_product_template
 msgid "TikTok Shop Sale"
-msgstr ""
+msgstr "TikTok Shop Satışı"
 
 #. module: sale_tiktok
 #: model:product.template,name:sale_tiktok.default_shipping_product_product_template
 msgid "TikTok Shop Shipping"
-msgstr ""
+msgstr "TikTok Shop Nakliyesi"
 
 #. module: sale_tiktok
 #: model:ir.actions.server,name:sale_tiktok.ir_cron_sync_tiktok_inventory_ir_actions_server
 msgid "TikTok Shop: sync inventory"
-msgstr ""
+msgstr "TikTok Shop: stok senkronizasyonu"
 
 #. module: sale_tiktok
 #: model:ir.actions.server,name:sale_tiktok.ir_cron_sync_tiktok_orders_ir_actions_server
 msgid "TikTok Shop: sync orders"
-msgstr ""
+msgstr "TikTok Shop: sipariş senkronizasyonu"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_list
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_list
 msgid "TikTok Shops"
-msgstr ""
+msgstr "TikTok Mağazaları"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_delivery_status
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_delivery_status
 msgid "TikTok Status"
-msgstr ""
+msgstr "TikTok Durumu"
 
 #. module: sale_tiktok
 #: model:mail.template,name:sale_tiktok.inventory_sync_failure
 msgid "TikTok: Inventory Synchronization Failure"
-msgstr ""
+msgstr "TikTok: Stok Senkronizasyon Hatası"
 
 #. module: sale_tiktok
 #: model:mail.template,name:sale_tiktok.order_sync_failure
 msgid "TikTok: Order Synchronization Failure"
-msgstr ""
+msgstr "TikTok: Sipariş Senkronizasyon Hatası"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_cipher
 msgid "Tiktok Cipher"
-msgstr ""
+msgstr "Tiktok Şifrelemesi"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_label_attachment_id
 msgid "Tiktok Label Attachment"
-msgstr ""
+msgstr "Tiktok Etiket Eki"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Aktarım"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__fbs_warehouse_id
@@ -1178,6 +1269,9 @@ msgid ""
 "directly to customers. If not set, your company's default warehouse will be "
 "used."
 msgstr ""
+"Fulfilled by Seller (FBS) programı kapsamında TikTok Shop ile senkronize "
+"edilen depo. Doğrudan müşterilere gönderdiğiniz ürünleri sakladığınız depoyu "
+"seçin. Ayarlanmazsa, şirketinizin varsayılan deposu kullanılır."
 
 #. module: sale_tiktok
 #. odoo-python
@@ -1186,12 +1280,14 @@ msgid ""
 "We do not support syncing services or combo products to TikTok Shop. Only "
 "storable products are supported."
 msgstr ""
+"Hizmetleri veya karma ürünleri TikTok Shop'a senkronize etmeyi "
+"desteklemiyoruz. Yalnızca stoklanabilir ürünler desteklenmektedir."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "You are not allowed to access this page."
-msgstr ""
+msgstr "Bu sayfaya erişiminize izin verilmemektedir."
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_tiktok_shop_unique_active_shop
@@ -1199,6 +1295,8 @@ msgid ""
 "You cannot connect the same shop twice. Consider archiving the existing shop "
 "first."
 msgstr ""
+"Aynı mağazayı iki kez bağlayamazsınız. Öncelikle mevcut mağazayı arşivlemeyi "
+"düşünün."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__app_key
@@ -1207,6 +1305,9 @@ msgid ""
 "Center after creating an application. Enter this before authorizing the "
 "connection."
 msgstr ""
+"TikTok Shop uygulama anahtarınız. Bunu, bir başvuru oluşturduktan sonra "
+"TikTok Ortaklık Merkezi'nde bulabilirsiniz. Bağlantıyı yetkilendirmeden önce "
+"bunu girin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__app_secret
@@ -1215,6 +1316,9 @@ msgid ""
 "Partner Center after creating an application. Enter this before authorizing "
 "the connection."
 msgstr ""
+"TikTok Shop başvuru şifreniz. Bunu, başvurunuzu oluşturduktan sonra TikTok "
+"Ortaklık Merkezi'nde bulabilirsiniz. Bağlantıyı yetkilendirmeden önce bu "
+"şifreyi girin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__app_key
@@ -1223,6 +1327,9 @@ msgid ""
 "Center → Apps/Service after creating an application. Enter this before "
 "authorizing the connection."
 msgstr ""
+"TikTok uygulama anahtarınız. Bunu, bir uygulama oluşturduktan sonra TikTok "
+"Shop İş Ortağı Merkezi → Uygulamalar/Hizmetler bölümünde bulabilirsiniz. "
+"Bağlantıyı yetkilendirmeden önce bunu girin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__app_secret
@@ -1231,6 +1338,9 @@ msgid ""
 "the TikTok Shop Partner Center → Apps/Service. Keep this confidential and "
 "enter it before authorizing the connection."
 msgstr ""
+"TikTok uygulama şifreniz. Bu bilgi, TikTok Shop İş Ortağı Merkezi → "
+"Uygulamalar/Hizmet bölümünde Uygulama Anahtarınızla birlikte verilir. Bu "
+"bilgiyi gizli tutun ve bağlantıyı yetkilendirmeden önce girin."
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__service_extern_id
@@ -1239,26 +1349,169 @@ msgid ""
 "→ Apps/Service at the top of the page called ID. Enter this before "
 "authorizing the connection."
 msgstr ""
+"TikTok hizmet kimliğiniz. Bunu TikTok Shop İş Ortağı Merkezi → Uygulamalar/"
+"Hizmet bölümünde, sayfanın üst kısmında \"Kimlik\" olarak bulabilirsiniz. "
+"Bağlantıyı yetkilendirmeden önce bunu girin."
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "[%(sku)s] %(product_name)s"
-msgstr ""
+msgstr "[%(sku)s] %(product_name)s"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "e.g. Indonesian Shop"
-msgstr ""
+msgstr "örn. Endonezya Mağazası"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "shop_id"
-msgstr ""
+msgstr "shop_id"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "tiktok_shop_id"
-msgstr ""
+msgstr "tiktok_shop_id"
+
+#~ msgid ""
+#~ "<style>\n"
+#~ "                .tiktok_table {\n"
+#~ "                    width: 100%;\n"
+#~ "                    max-width: 900px;\n"
+#~ "                    border-collapse: collapse;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table th,\n"
+#~ "                .tiktok_table td {\n"
+#~ "                    border: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table th {\n"
+#~ "                    white-space: nowrap;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table thead th {\n"
+#~ "                    padding: 0.5em 0.5em;\n"
+#~ "                    text-align: center;\n"
+#~ "                    border-bottom: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table tbody th,\n"
+#~ "                .tiktok_table tbody td {\n"
+#~ "                    padding: 0.5em 0.5em 1em;\n"
+#~ "                    vertical-align: top;\n"
+#~ "                }\n"
+#~ "            </style>\n"
+#~ "            <body><div>\n"
+#~ "                <p>\n"
+#~ "                    The synchronization of the inventory for TikTok Shop\n"
+#~ "                    <b><t t-out=\"ctx.get('tiktok_shop') or ''\">REF</t></"
+#~ "b>\n"
+#~ "                    encountered some errors and was not completed.\n"
+#~ "                </p>\n"
+#~ "                <p>Here are the errors sent by TikTok Shop:</p>\n"
+#~ "                <table class=\"tiktok_table\">\n"
+#~ "                    <thead>\n"
+#~ "                        <tr>\n"
+#~ "                            <th>Product Internal Reference(s)</th>\n"
+#~ "                            <th>Message</th>\n"
+#~ "                        </tr>\n"
+#~ "                    </thead>\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+#~ "as=\"error\">\n"
+#~ "                            <th>\n"
+#~ "                                <t t-out=\"', "
+#~ "'.join(error['default_codes'])\"/>\n"
+#~ "                            </th>\n"
+#~ "                            <td>\n"
+#~ "                                <t t-if=\"error['message']\" t-"
+#~ "out=\"error['message']\"/>\n"
+#~ "                                <t t-else=\"\">\n"
+#~ "                                    An unknown error occurred during the "
+#~ "synchronisation with TikTok Shop.\n"
+#~ "                                    Unfortunately you need to manually "
+#~ "check if the available quantity for the product is correct or not.\n"
+#~ "                                    If the problem persists, contact\n"
+#~ "                                    <a href=\"https://www.odoo.com/help/"
+#~ "\">Odoo support</a>.\n"
+#~ "                                </t>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        </body>"
+#~ msgstr ""
+#~ "<style>\n"
+#~ "                .tiktok_table {\n"
+#~ "                    width: 100%;\n"
+#~ "                    max-width: 900px;\n"
+#~ "                    border-collapse: collapse;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table th,\n"
+#~ "                .tiktok_table td {\n"
+#~ "                    border: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table th {\n"
+#~ "                    white-space: nowrap;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table thead th {\n"
+#~ "                    padding: 0.5em 0.5em;\n"
+#~ "                    text-align: center;\n"
+#~ "                    border-bottom: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .tiktok_table tbody th,\n"
+#~ "                .tiktok_table tbody td {\n"
+#~ "                    padding: 0.5em 0.5em 1em;\n"
+#~ "                    vertical-align: top;\n"
+#~ "                }\n"
+#~ "           </style>\n"
+#~ "            <body> <div>\n"
+#~ "                <p> \n"
+#~ "                    TikTok Shop için Stok senkronizasyonu\n"
+#~ "                   <b><t t-out=\"ctx.get('tiktok_shop') or ''\"> REF</t></"
+#~ "b>\n"
+#~ "                    bazı hatalarla karşılaştı ve tamamlanamadı.\n"
+#~ "               </p>\n"
+#~ "                <p> TikTok Shop tarafından gönderilen hatalar şunlardır:</"
+#~ "p>\n"
+#~ "                <table class=\"tiktok_table\">\n"
+#~ "                   <thead>\n"
+#~ "                        <tr> \n"
+#~ "                           <th> Ürün İç Referansı/Referansları</th>\n"
+#~ "                            <th>Mesaj</th>\n"
+#~ "                        </tr>\n"
+#~ "                   </thead>\n"
+#~ "                    <tbody> \n"
+#~ "                       <tr t-foreach=\"ctx.get('error_messages')\" t-"
+#~ "as=\"error\">\n"
+#~ "                            <th> \n"
+#~ "                               <t t-out=\"', "
+#~ "'.join(error['default_codes'])\"/>\n"
+#~ "                            </th> \n"
+#~ "                           <td>\n"
+#~ "                                <t t-if=\"error['message']\" t-"
+#~ "out=\"error['message']\"/> \n"
+#~ "                               <t t-else=\"\"> \n"
+#~ "                                    TikTok Shop ile senkronizasyon "
+#~ "sırasında bilinmeyen bir hata oluştu.\n"
+#~ "                                    Maalesef, ürünün mevcut miktarının "
+#~ "doğru olup olmadığını manuel olarak kontrol etmeniz gerekiyor.\n"
+#~ "                                    Sorun devam ederse,\n"
+#~ "                                   <a href=\"https://www.odoo.com/help/"
+#~ "\"> Odoo destek ekibiyle</a> iletişime geçin.\n"
+#~ "                               </t>\n"
+#~ "                            </td> \n"
+#~ "                       </tr>\n"
+#~ "                    </tbody> \n"
+#~ "               </table>\n"
+#~ "            </div> \n"
+#~ "       </body>"

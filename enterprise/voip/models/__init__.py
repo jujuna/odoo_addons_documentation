@@ -7,6 +7,7 @@ from . import voip_extension_destination_mixin
 
 from . import voip_provider   # keep this before res_users_settings
 
+from . import iap_account
 from . import ir_config_parameter
 from . import ir_http
 from . import ir_qweb

@@ -227,10 +227,16 @@ class AccountMove(models.Model):
                 operation_type = '30' if move.debit_origin_id else '32'
             move.l10n_co_edi_operation_type = operation_type
 
-    @api.depends('invoice_date_due', 'date')
+    @api.depends('invoice_date_due', 'date', 'move_type', 'l10n_co_edi_is_support_document')
     def _compute_l10n_co_edi_is_direct_payment(self):
         for rec in self:
-            rec.l10n_co_edi_is_direct_payment = (rec.date == rec.invoice_date_due) and rec.company_id.account_fiscal_country_id.code == 'CO'
+            rec.l10n_co_edi_is_direct_payment = (
+                rec.company_id.account_fiscal_country_id.code == 'CO'
+                and (
+                    rec.is_sale_document() or (rec.is_purchase_document() and rec.l10n_co_edi_is_support_document)
+                )
+                and rec.date == rec.invoice_date_due
+            )
 
     @api.depends(
         'move_type',

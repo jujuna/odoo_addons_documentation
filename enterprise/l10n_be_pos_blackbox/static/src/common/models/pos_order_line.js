@@ -78,8 +78,9 @@ patch(PosOrderline.prototype, {
      * - Discount line (not global)
      */
     get blackboxPriceUnit() {
+        // A combo child can have several units per combo (e.g. 2 x the same bao)
         const childLinesPrice = this.combo_line_ids.reduce(
-            (acc, line) => acc + line.displayPriceUnitIncl,
+            (acc, line) => acc + line.displayPriceUnitIncl * (this.qty ? line.qty / this.qty : 1),
             0
         );
         const price = this.combo_line_ids.length ? childLinesPrice : this.displayPriceUnitIncl;
@@ -92,7 +93,8 @@ patch(PosOrderline.prototype, {
      */
     get blackboxPriceUnitNoDiscount() {
         const childLinesPrice = this.combo_line_ids.reduce(
-            (acc, line) => acc + line.priceUnitInclNoDiscount,
+            (acc, line) =>
+                acc + line.priceUnitInclNoDiscount * (this.qty ? line.qty / this.qty : 1),
             0
         );
 

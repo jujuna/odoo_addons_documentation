@@ -8,7 +8,9 @@ export class StreamPostCommentInstagram extends StreamPostComment {
     //--------
 
     get authorPictureSrc() {
-        return `https://graph.facebook.com/v17.0/${encodeURIComponent(this.originalPost.instagram_facebook_author_id.raw_value)}/picture`;
+        return this.isAuthor
+            ? `https://graph.facebook.com/v17.0/${encodeURIComponent(this.originalPost.instagram_facebook_author_id.raw_value)}/picture`
+            : '/social_instagram/static/src/img/instagram_user.png';
     }
 
     get link() {

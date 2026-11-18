@@ -11,32 +11,29 @@
 
             <xpath expr="//div[hasclass('o_payrun_metrics')]/div[.//field[@name='net_sum']]" position="before">
                 <div class="d-flex flex-column align-items-start" invisible="country_code != 'AE'">
-                    <div class="small fw-medium d-flex gap-2 align-items-center">
-                        <i class="oi" data-icon="work"/>
+                    <div class="o_payrun_metric_label small text-muted">
                         <span>Total Cost</span>
                     </div>
-                    <div class="fs-6 fw-medium">
-                        <field name="l10n_ae_total_net_cost"/>
+                    <div class="o_payrun_metric_value">
+                        <field name="l10n_ae_total_net_cost" widget="payrun_kpi"/>
                     </div>
                 </div>
 
                 <div class="d-flex flex-column align-items-start" invisible="country_code != 'AE'">
-                    <div class="small fw-medium d-flex gap-2 align-items-center">
-                        <i class="oi" data-icon="payments"/>
+                    <div class="o_payrun_metric_label small text-muted">
                         <span>Total Static Allowance</span>
                     </div>
-                    <div class="fs-6 fw-medium">
-                        <field name="l10n_ae_total_static_allowance"/>
+                    <div class="o_payrun_metric_value">
+                        <field name="l10n_ae_total_static_allowance" widget="payrun_kpi"/>
                     </div>
                 </div>
 
                 <div class="d-flex flex-column align-items-start" invisible="country_code != 'AE'">
-                    <div class="small fw-medium d-flex gap-2 align-items-center">
-                        <i class="oi" data-icon="payments"/>
+                    <div class="o_payrun_metric_label small text-muted">
                         <span>Total Variable Allowance</span>
                     </div>
-                    <div class="fs-6 fw-medium">
-                        <field name="l10n_ae_total_variable_allowance"/>
+                    <div class="o_payrun_metric_value">
+                        <field name="l10n_ae_total_variable_allowance" widget="payrun_kpi"/>
                     </div>
                 </div>
             </xpath>

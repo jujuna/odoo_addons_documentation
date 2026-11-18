@@ -273,6 +273,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                     'trial_balance_column_block_id': '0',
                     'trial_balance_column_type': 'initial_balance',
                     'trial_balance_block_end_date': '2016-12-31',
+                    'cta_date_to': '2016-12-31',
                     'trial_balance_block_fiscalyear_start': '2016-01-01',
                 },
                 'colspan': 1,
@@ -317,6 +318,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                     'trial_balance_column_block_id': '1',
                     'trial_balance_column_type': 'initial_balance',
                     'trial_balance_block_end_date': '2017-12-31',
+                    'cta_date_to': '2017-12-31',
                     'trial_balance_block_fiscalyear_start': '2017-01-01',
                 },
                 'colspan': 1,
@@ -487,7 +489,8 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 ('600000 Expenses',                               -21000.0,         0.0,          0.0,        -21000.0),
                 ('600010 Expenses',                                    0.0,       200.0,          0.0,           200.0),
                 ('Result Brought Forward - company_1_data',         -100.0,         0.0,          0.0,          -100.0),
-                ('Result Brought Forward - company_2',               -50.0,         0.0,          0.0,           -50.0),
+                ('Result Brought Forward - company_2',               -33.38,        0.0,          0.0,           -33.38),
+                ('Cumulative Translation Adjustments',               -16.62,        0.0,          0.0,           -16.62),
                 ('Total',                                              0.0,       200.0,        200.0,             0.0),
             ],
             options,
@@ -499,6 +502,71 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         general_ledger_lines = general_ledger._get_lines(res['params']['options'])
         unfolded_lines = [line for line in general_ledger_lines if line.unfolded]
         self.assertEqual(len(unfolded_lines), 8)
+
+    def test_action_general_ledger_unfolds_selected_account_without_hierarchy(self):
+        companies = self.company_data['company'] | self.company_data_2['company']
+        account_id = self.company_data['default_account_expense'].id
+        for selected_companies in (companies[:1], companies):
+            with self.subTest(company_count=len(selected_companies)):
+                report = self.report.with_context(allowed_company_ids=selected_companies.ids)
+                options = self._generate_options(
+                    report,
+                    '2017-06-01',
+                    '2017-06-01',
+                    default_options={'hierarchy': False, 'unfold_all': True},
+                )
+                lines = report._get_lines(options)
+                line = next(
+                    line for line in lines
+                    if report._get_res_id_from_line_id(line.id, 'account.account') == account_id
+                )
+                res = report.caret_option_open_general_ledger(options, {'line_id': line.id})
+                general_ledger = report.env.ref('account_reports.general_ledger_report')
+                gl_options = res['params']['options']
+                self.assertEqual(len(general_ledger.get_report_company_ids(gl_options)), len(selected_companies))
+                self.assertFalse(gl_options['consolidation'])
+                general_ledger_lines = general_ledger._get_lines(gl_options)
+                self.assertEqual([
+                    general_ledger._get_res_id_from_line_id(line.id, 'account.account')
+                    for line in general_ledger_lines if line.unfolded
+                ], [account_id])
+
+    def test_action_general_ledger_preserves_other_groupings(self):
+        companies = self.company_data['company'] | self.company_data_2['company']
+        report = self.report.with_context(allowed_company_ids=companies.ids)
+        general_ledger = report.env.ref('account_reports.general_ledger_report')
+        general_ledger_line = report.env.ref('account_reports.general_ledger_custom_engine_line')
+        default_groupby = general_ledger.user_groupby
+        account_id = self.company_data['default_account_expense'].id
+        options = self._generate_options(
+            report, '2017-06-01', '2017-06-01',
+            default_options={'hierarchy': False, 'unfold_all': True},
+        )
+        line = next(
+            line for line in report._get_lines(options)
+            if report._get_res_id_from_line_id(line.id, 'account.account') == account_id
+        )
+
+        for report_groupby, line_groupby, consolidation in (
+            ('partner_id,account_id,id_with_accumulated_balance', False, False),
+            (default_groupby, 'partner_id,account_id,id_with_accumulated_balance', False),
+            (default_groupby, False, True),
+        ):
+            with self.subTest(report_groupby=report_groupby, line_groupby=line_groupby, consolidation=consolidation):
+                general_ledger.user_groupby = report_groupby
+                general_ledger_line.user_groupby = line_groupby
+                res = report.caret_option_open_general_ledger(
+                    {**options, 'consolidation': consolidation}, {'line_id': line.id},
+                )
+                gl_options = res['params']['options']
+                self.assertEqual(gl_options['consolidation'], consolidation)
+                lines = general_ledger._get_lines(gl_options)
+                account_lines = [
+                    line for line in lines
+                    if line.unfoldable and general_ledger._get_res_id_from_line_id(line.id, 'account.account') == account_id
+                ]
+                self.assertTrue(account_lines)
+                self.assertTrue(all(line.unfolded for line in account_lines))
 
     def test_action_general_ledger_unallocated_earnings(self):
         """
@@ -698,6 +766,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
              - expense account in 2024: move must NOT be in
              - unaffected earnings in 2023: move must NOT be in
              - unaffected earnings in 2024: move must be in
+            It also checks that the audit context holds the dates of the audited column.
         """
         move_1 = self.env['account.move'].create([{
             'move_type': 'entry',
@@ -748,6 +817,18 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, unaff_line, column_group_index=end_balance_col_group_2024)
         audit_domain = self.report.dispatch_report_action(options, 'action_audit_cell', params)['domain']
         self.assertTrue(move_1_expense_line.filtered_domain(audit_domain))
+
+        # 5. Audit context of the initial balance, period and end balance columns
+        for column_index, expected_context in (
+            (0, {'date_from': None,         'date_to': '2022-12-31', 'cta_date_to': '2023-12-31'}),  # Initial Balance 2023
+            (1, {'date_from': '2023-01-01', 'date_to': '2023-12-31', 'cta_date_to': '2023-12-31'}),  # 2023
+            (4, {'date_from': None,         'date_to': '2023-12-31', 'cta_date_to': '2024-12-31'}),  # Initial Balance 2024
+            (7, {'date_from': None,         'date_to': '2024-12-31', 'cta_date_to': '2024-12-31'}),  # End Balance 2024
+        ):
+            with self.subTest(column_index=column_index):
+                params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, expense_line, column_group_index=options['columns'][column_index]['column_group_index'])
+                audit_context = self.report.dispatch_report_action(options, 'action_audit_cell', params)['context']
+                self.assertDictEqual({key: audit_context[key] for key in expected_context}, expected_context)
 
     def test_trial_balance_with_horizontal_groupby(self):
         horizontal_group = self.env['account.report.horizontal.group'].create([{
@@ -1086,19 +1167,15 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             self.report._get_lines(options),
             [   0,                                                  1,              2,             3,            4],
             [
-                ['Result Brought Forward - company_1_data',        -100.0,          0.0,           0.0,          -100.0],
-                ['Result Brought Forward - company_2',              -50.0,          0.0,           0.0,           -50.0],
-                ['Total',                                          -150.0,          0.0,           0.0,          -150.0],
+                ['Result Brought Forward - company_1_data',       -100.00,          0.0,           0.0,         -100.00],
+                ['Result Brought Forward - company_2',             -33.38,          0.0,           0.0,          -33.38],
+                ['Total',                                         -133.38,          0.0,           0.0,         -133.38],
             ],
             options,
         )
 
     def test_trial_balance_cta_unaffected_line_on_multiple_year_comparison(self):
-        """Ensure the rate in the initial balance of the 2025 block for the Account Receivable is the
-        rate of 2025 and not the rate of the main options report which is 2026
-
-        Note: this test is still partially incorrect regarding the Result Brought Forward line, it should functionally adapt to
-        the average rate of each respective fiscal year. This is not yet supported. """
+        """ The initial balance of a comparison block uses the closing rate of that block """
         usd = self.env.ref('base.USD')
         eur = self.env.ref('base.EUR')
         eur.active = True
@@ -1124,14 +1201,283 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=2)
         self.assertLinesValues(
             self.report._get_lines(options),
-            #                                           [ Initial ]     [    2024    ]     [ End ]   [Initial]  [    2025    ]     [ End ]   [Initial]  [    2026    ]      [ End ]
-            #    Name                                     Balance      Debit      Credit   Balance    Balance   Debit    Credit    Balance    Balance   Debit     Credit     Balance
-            [0,                                              1,          2,        3,          4,       5,       6,         7,        8,          9,      10,        11,        12],
+            #                                           [ Initial ]   [    2024    ]     [ End ]  [Initial]   [    2025   ]     [ End ]      [Initial] [    2026   ]   [ End ]
+            #    Name                                     Balance    Debit    Credit     Balance    Balance   Debit    Credit    Balance      Balance   Debit  Credit  Balance
+            [0,                                              1,         2,        3,          4,       5,       6,         7,        8,          9,     10,    11,        12],
             [
                 ('Accounts Receivable',                     0.0,     1000.0,      0.0,    1000.0,    500.0,   500.0,      0.0,    1000.0,     500.0,    250.0,      0.0,     750.0),
                 ('Product Sales',                           0.0,        0.0,   1000.0,   -1000.0,      0.0,     0.0,    500.0,    -500.0,       0.0,      0.0,    250.0,    -250.0),
-                ('Result Brought Forward - USD Company',    0.0,        0.0,      0.0,       0.0,  -1000.0,     0.0,      0.0,   -1000.0,   -1000.0,      0.0,      0.0,   -1000.0),
-                ('Total',                                   0.0,     1000.0,   1000.0,       0.0,   -500.0,   500.0,    500.0,    -500.0,    -500.0,    250.0,    250.0,    -500.0),
+                ('Result Brought Forward - USD Company',    0.0,        0.0,      0.0,       0.0,  -1000.0,     0.0,      0.0,   -1000.0,   -1500.0,      0.0,      0.0,   -1500.0),
+                ('Cumulative Translation Adjustments',      0.0,        0.0,      0.0,       0.0,    500.0,     0.0,      0.0,     500.0,    1000.0,      0.0,      0.0,    1000.0),
+                ('Total',                                   0.0,     1000.0,   1000.0,       0.0,      0.0,   500.0,    500.0,       0.0,       0.0,    250.0,    250.0,       0.0),
+            ],
+            options,
+        )
+
+    def test_trial_balance_cta_with_equity_retained_account(self):
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+        self.env.user.write({
+            'company_id': company_usd_data['company'].id,
+            'company_ids': [Command.set([company_usd_data['company'].id])],
+        })
+
+        capital_account = self.env['account.account'].search([('code', '=', '301000')], limit=1)
+        bank_account = self.env['account.account'].search([('code', '=', '101401')], limit=1)
+        retained_earnings_account = self.env['account.account'].search([('code', '=', '999998')], limit=1)
+        pl_appropriation_account = self.env['account.account'].search([('code', '=', '999999')], limit=1)
+
+        self.env['account.move'].create([{
+            'move_type': 'entry',
+            'date': '2025-06-01',
+            'line_ids': [
+                Command.create({'debit':  50000.0, 'account_id': bank_account.id}),
+                Command.create({'credit': 50000.0, 'account_id': capital_account.id}),
+            ],
+        }, {
+            # Retained earnings use the previous fiscal year average, except on the last day of the fiscal year
+            'move_type': 'entry',
+            'date': '2025-12-31',
+            'line_ids': [
+                Command.create({'debit':  11250.0, 'account_id': pl_appropriation_account.id}),
+                Command.create({'credit': 11250.0, 'account_id': retained_earnings_account.id}),
+            ],
+        }]).action_post()
+
+        self.init_invoice("out_invoice", self.partner_a, "2025-12-12", amounts=[11250], taxes=company_usd_data['company'].account_sale_tax_id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2025-01-01", "rate": 1.0, "currency_id": usd.id},
+            {"name": "2025-04-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2025-08-01", "rate": 3.0, "currency_id": usd.id},
+            {"name": "2026-02-01", "rate": 4.0, "currency_id": usd.id},
+            {"name": "2026-06-01", "rate": 4.1, "currency_id": usd.id},
+            {"name": "2026-11-01", "rate": 4.5, "currency_id": usd.id},
+        ])
+
+        options = self._generate_options(self.report, '2026-01-01', '2026-12-31')
+        options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=1)
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                             [ Initial ]       [   2025   ]        [ End ]    [ Initial ]    [     2026     ]      [ End ]
+            #    Name                                       Balance       Debit     Credit       Balance      Balance      Debit      Credit     Balance
+            [0,                                               1,             2,         3,           4,          5,          6,         7,          8],
+            [
+                ('Bank',                                        0.0,    16666.67,        0.00,   16666.67,     11111.11,     0.0,      0.0,     11111.11),
+                ('Accounts Receivable',                         0.0,     4312.50,        0.00,    4312.50,      2875.00,     0.0,      0.0,      2875.00),
+                ('Capital',                                     0.0,        0.00,    25000.00,  -25000.00,    -25000.00,     0.0,      0.0,    -25000.00),
+                ('Accumulated Retained Earnings',               0.0,        0.00,     6226.03,   -6226.03,     -6226.03,     0.0,      0.0,     -6226.03),
+                ('Profit or Loss Appropriation',                0.0,     6226.03,        0.00,    6226.03,         0.00,     0.0,      0.0,         0.00),
+                ('Product Sales',                               0.0,        0.00,     6226.03,   -6226.03,         0.00,     0.0,      0.0,         0.00),
+                ('Tax Received',                                0.0,        0.00,      562.50,    -562.50,      -375.00,     0.0,      0.0,      -375.00),
+                ('Cumulative Translation Adjustments',          0.0,    10809.36,        0.00,   10809.36,     17614.92,     0.0,      0.0,     17614.92),
+                ('Total',                                       0.0,    38014.55,    38014.55,       0.00,         0.00,     0.0,      0.0,         0.00),
+            ],
+            options,
+        )
+
+    def test_trial_balance_cta_initial_balance_uses_period_average_for_single_month(self):
+        """ The initial balance of a single month uses the average rate of the fiscal year up to that month """
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+
+        self.init_invoice("out_invoice", self.partner_a, "2026-02-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2026-01-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2026-03-01", "rate": 4.0, "currency_id": usd.id},
+            {"name": "2026-05-01", "rate": 8.0, "currency_id": usd.id},
+        ])
+
+        # Jan 1 - Feb 28 (59 days) at rate 2.0 --> multiplier 0.5
+        # Mar 1 - Apr 30 (61 days) at rate 4.0 --> multiplier 0.25
+        # Blended average = (59x0.5 + 61x0.25) / 120 = 44.75/120 = 0.372917
+        # May 1 onward: rate 8.0 --> "current" multiplier 0.125
+
+        options = self._generate_options(self.report, '2026-05-01', '2026-05-31')
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                          [Initial]   [    May    ]     [ End ]
+            #    Name                                   Balance    Debit    Credit    Balance
+            [0,                                            1,          2,        3,        4],
+            [
+                ('Accounts Receivable',                   125.00,    0.0,      0.0,     125.00),
+                ('Product Sales',                        -372.92,    0.0,      0.0,    -372.92),
+                ('Cumulative Translation Adjustments',    247.92,    0.0,      0.0,     247.92),
+                ('Total',                                   0.00,    0.0,      0.0,       0.00),
+            ],
+            options,
+        )
+
+    def test_trial_balance_report_window_average_spans_full_period_across_fiscal_years(self):
+        """ A custom period across a fiscal year-end uses a single average rate over the whole period """
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+
+        self.init_invoice("out_invoice", self.partner_a, "2025-12-20", amounts=[1000], company=company_usd_data['company'].id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2025-11-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2026-01-01", "rate": 4.0, "currency_id": usd.id},
+        ])
+
+        # Nov 1 - Dec 31 2025 (61 days) at rate 2.0 --> multiplier 0.5
+        # Jan 1 - Feb 28 2026 (59 days) at rate 4.0 --> multiplier 0.25
+        # report window average = (61x0.5 + 59x0.25) / 120 = 45.25/120 = 0.377083
+
+        options = self._generate_options(self.report, '2025-11-01', '2026-02-28')
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                          [Initial]   [ Nov 2025 - Feb 2026 ]   [ End ]
+            #    Name                                   Balance    Debit       Credit         Balance
+            [0,                                            1,          2,          3,              4],
+            [
+                ('Accounts Receivable',                    0.0,     250.00,      0.00,         250.00),
+                ('Product Sales',                          0.0,       0.00,    377.08,        -377.08),
+                ('Cumulative Translation Adjustments',     0.0,     127.08,      0.00,         127.08),
+                ('Total',                                  0.0,     377.08,    377.08,           0.00),
+            ],
+            options,
+        )
+
+    def test_trial_balance_cta_initial_balance_with_custom_first_fiscal_year(self):
+        """ The P&L of a company started with a custom fiscal year uses the average rate of that fiscal year """
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+
+        self.env['account.fiscal.year'].create({
+            'name': 'First Fiscal Year',
+            'date_from': '2025-06-01',
+            'date_to': '2025-12-31',
+            'company_id': company_usd_data['company'].id,
+        })
+
+        self.init_invoice("out_invoice", self.partner_a, "2025-09-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+        self.init_invoice("out_invoice", self.partner_a, "2026-03-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2025-01-01", "rate": 1.0, "currency_id": usd.id},
+            {"name": "2025-06-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2026-01-01", "rate": 4.0, "currency_id": usd.id},
+        ])
+
+        # First fiscal year: Jun 1 - Dec 31 2025 at rate 2.0 --> average multiplier 0.5
+        # (the calendar year 2025 would give (151x1 + 214x0.5) / 365 = 0.706849)
+        # 2026: rate 4.0 --> average and closing multiplier 0.25
+
+        options = self._generate_options(self.report, '2026-01-01', '2026-12-31')
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                           [Initial]   [    2026    ]     [ End ]
+            #    Name                                    Balance    Debit    Credit     Balance
+            [0,                                             1,          2,       3,          4],
+            [
+                ('Accounts Receivable',                    250.0,    250.0,     0.0,      500.0),
+                ('Product Sales',                            0.0,      0.0,   250.0,     -250.0),
+                ('Result Brought Forward - USD Company',  -500.0,      0.0,     0.0,     -500.0),
+                ('Cumulative Translation Adjustments',     250.0,      0.0,     0.0,      250.0),
+                ('Total',                                    0.0,    250.0,   250.0,        0.0),
+            ],
+            options,
+        )
+
+    def test_trial_balance_cta_subsidiary_with_different_fiscal_year(self):
+        """ The average rates of a subsidiary follow its own fiscal years, the blocks the ones of the main company """
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+        company_usd_data['company'].write({'fiscalyear_last_month': '3', 'fiscalyear_last_day': 31})
+        self.env.user.write({
+            'company_id': company_usd_data['company'].id,
+            'company_ids': [Command.set([company_usd_data['company'].id])],
+        })
+
+        retained_earnings_account = self.env['account.account'].search([('code', '=', '999998')], limit=1)
+        pl_appropriation_account = self.env['account.account'].search([('code', '=', '999999')], limit=1)
+
+        # Allocation of the result of the fiscal year Apr 2024 - Mar 2025 of USD Company
+        self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2025-03-31',
+            'line_ids': [
+                Command.create({'debit':  1000.0, 'account_id': pl_appropriation_account.id}),
+                Command.create({'credit': 1000.0, 'account_id': retained_earnings_account.id}),
+            ],
+        }).action_post()
+
+        self.init_invoice("out_invoice", self.partner_a, "2025-02-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+        self.init_invoice("out_invoice", self.partner_a, "2025-06-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+        self.init_invoice("out_invoice", self.partner_a, "2026-06-15", amounts=[1000], company=company_usd_data['company'].id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2024-01-01", "rate": 0.5, "currency_id": usd.id},
+            {"name": "2024-04-01", "rate": 1.0, "currency_id": usd.id},
+            {"name": "2025-04-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2026-04-01", "rate": 4.0, "currency_id": usd.id},
+        ])
+
+        # USD Company fiscal years: Apr 2024 - Mar 2025 --> multiplier 1.0, Apr 2025 - Mar 2026 --> 0.5, from Apr 2026 --> 0.25
+        # Report periods: 2025 average = (90x1.0 + 275x0.5) / 365 = 0.623288, 2026 average = (90x0.5 + 275x0.25) / 365 = 0.311644
+        # The allocation on the last day of the fiscal year Apr 2024 - Mar 2025 uses its average (1.0) for the retained earnings,
+        # the calendar year 2024 would give (91x2.0 + 275x1.0) / 366 = 1.248634
+        # The 2026 Result Brought Forward uses the averages of the fiscal years of USD Company:
+        # -1000x1.0 (Feb 25) - 1000x0.5 (Jun 25) + 1000x1.0 (allocation on Mar 25) = -500,
+        # while the same lines give -1246.58 + 623.29 = -623.29 in the 2025 End Balance, at the 2025 average
+
+        options = self._generate_options(self.report, '2026-01-01', '2026-12-31')
+        options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=1)
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                             [ Initial ]      [   2025   ]        [ End ]    [ Initial ]    [   2026   ]       [ End ]
+            #    Name                                       Balance      Debit     Credit       Balance      Balance      Debit     Credit     Balance
+            [0,                                               1,            2,         3,           4,          5,          6,         7,          8],
+            [
+                ('Accounts Receivable',                        0.0,     1000.00,      0.00,     1000.00,      500.00,    250.00,      0.00,     750.00),
+                ('Accumulated Retained Earnings',              0.0,        0.00,   1000.00,    -1000.00,    -1000.00,      0.00,      0.00,   -1000.00),
+                ('Profit or Loss Appropriation',               0.0,      623.29,      0.00,      623.29,        0.00,      0.00,      0.00,       0.00),
+                ('Product Sales',                              0.0,        0.00,   1246.58,    -1246.58,        0.00,      0.00,    311.64,    -311.64),
+                ('Result Brought Forward - USD Company',       0.0,        0.00,      0.00,        0.00,     -500.00,      0.00,      0.00,    -500.00),
+                ('Cumulative Translation Adjustments',         0.0,      623.29,      0.00,      623.29,     1000.00,     61.64,      0.00,    1061.64),
+                ('Total',                                      0.0,     2246.58,   2246.58,        0.00,        0.00,    311.64,    311.64,       0.00),
             ],
             options,
         )

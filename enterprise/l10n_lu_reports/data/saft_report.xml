@@ -129,8 +129,10 @@
                 <Description>Taxe sur la valeur ajoutée</Description>
             </t>
         </xpath>
-        <xpath expr="//StandardAccountID" position="after">
-            <t t-if="company.account_fiscal_country_id.code == 'LU'">
+        <xpath expr="//StandardAccountID" position="replace">
+            <t t-if="company.account_fiscal_country_id.code != 'LU'">$0</t>
+            <t t-else="">
+                <StandardAccountID t-out="account_vals['standard_account']"/>
                 <AccountType t-out="account_vals['account_type'][:18]"/>
             </t>
         </xpath>

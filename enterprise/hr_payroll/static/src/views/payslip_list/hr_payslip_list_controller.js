@@ -1,4 +1,4 @@
-import { onMounted, providePlugins, proxy, signal, status, t, usePlugin } from "@odoo/owl";
+import { onWillStart, providePlugins, proxy, signal, status, t, usePlugin } from "@odoo/owl";
 import { useBus } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
@@ -42,7 +42,7 @@ export class PayslipListController extends ListController {
                 this.payslipListPlugin.payRunId.set(newId);
             }
         };
-        onMounted(syncPayRunFromDomain);
+        onWillStart(syncPayRunFromDomain);
         useBus(this.env.searchModel, "update", syncPayRunFromDomain);
     }
 
@@ -51,8 +51,21 @@ export class PayslipListController extends ListController {
         const superOnRootLoaded = params.hooks?.onRootLoaded;
         params.hooks = {
             ...params.hooks,
-            onRootLoaded: (root) => {
+            onRootLoaded: async (root) => {
                 superOnRootLoaded?.(root);
+                // removing the last payslips of a pay run deletes it
+                const payRunId = this.payslipListPlugin.payRunId();
+                if (
+                    payRunId &&
+                    !root.count &&
+                    !(await this.orm.searchCount("hr.payslip.run", [["id", "=", payRunId]], {
+                        context: { active_test: false },
+                    }))
+                ) {
+                    this.payslipListPlugin.payRunId.set(null);
+                    this.actionService.doAction("hr_payroll.action_hr_payslip_run", { clearBreadcrumbs: true });
+                    return;
+                }
                 if (status(this) === "mounted") {
                     // component remounted, payrun may have changed, rerender the payrun
                     this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");

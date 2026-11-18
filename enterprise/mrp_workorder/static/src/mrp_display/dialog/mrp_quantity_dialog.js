@@ -21,12 +21,15 @@ export class MrpQuantityDialog extends ConfirmationDialog {
         await this.props.record.save({ reload: false });
         if (resModel === "stock.move") {
             await model.orm.call(resModel, "action_pass", [[resId]]);
+        } else if (resModel === "stock.move.line") {
+            await model.orm.call(resModel, "action_apply_from_shop_floor", [[resId]]);
         }
         return this._confirm();
     }
 
-    remove() {
-        this.props.record.delete();
+    async remove() {
+        const { resModel, model, resId } = this.props.record;
+        await model.orm.call(resModel, "action_remove_from_shop_floor", [[resId]]);
         return this._confirm();
     }
 

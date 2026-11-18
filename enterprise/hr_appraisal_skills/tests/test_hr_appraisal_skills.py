@@ -3,6 +3,7 @@
 from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 from odoo.tests import Form, TransactionCase, tagged
 
 
@@ -145,8 +146,9 @@ class TestHrAppraisalSkills(TransactionCase):
             'skill_level_id': self.skill_level_1.id,
         })
         appraisals_before = self.env['hr.appraisal'].search([('employee_id', '=', self.hr_employee.id)])
-        self.hr_employee.next_appraisal_date = date.today()
-        self.env['res.company']._run_employee_appraisal_plans()
+        self.hr_employee.next_appraisal_date = date.today() + relativedelta(months=1)
+        with freeze_time(self.hr_employee.next_appraisal_date):
+            self.env['res.company']._run_employee_appraisal_plans()
         appraisals_after = self.env['hr.appraisal'].search([('employee_id', '=', self.hr_employee.id)])
         new_appraisal = appraisals_after - appraisals_before
 

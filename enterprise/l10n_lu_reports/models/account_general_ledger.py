@@ -2,9 +2,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from itertools import groupby
 
-from odoo.tools import get_lang, SQL
-
+from odoo.tools import SQL, float_compare
 from odoo import api, models, _
+from ..models.coa_data import ACCOUNTS_2019, ACCOUNTS_2020
+
+PCN_ACCOUNT_MAPPING = {
+    '513': ('5131', '5132'),
+    '517': ('5171', '5172'),
+    '484': ('484', '485'),
+    '485': ('484', '485'),
+}
 
 
 class AccountGeneralLedgerReportHandler(models.AbstractModel):
@@ -192,6 +199,30 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         values.update(res)
 
     @api.model
+    def _fill_l10n_lu_saft_report_account_values(self, options, values):
+        currency_precision = values['company'].currency_id.decimal_places
+        pcn_field_mapping = ACCOUNTS_2019 if options['date']['date_from'] < '2020-01-01' else ACCOUNTS_2020
+
+        def get_standard_account(code: str):
+            formatted_code = code[:2] + code[2:].rstrip('0')
+            for i in range(len(formatted_code), 2, -1):
+                if formatted_code[:i] in pcn_field_mapping:
+                    return formatted_code[:i]
+            return formatted_code
+
+        # add standard account id
+        for account_vals in values['account_vals_list']:
+            # Determine group
+            standard_account_code = get_standard_account(account_vals['account'].code)
+            if standard_account_code[:3] in PCN_ACCOUNT_MAPPING:
+                account_vals['standard_account'] = (
+                    PCN_ACCOUNT_MAPPING[standard_account_code[:3]][0]
+                    if float_compare(account_vals['closing_balance'], 0, precision_digits=currency_precision) > 0
+                    else PCN_ACCOUNT_MAPPING[standard_account_code[:3]][1])
+            else:
+                account_vals['standard_account'] = standard_account_code
+
+    @api.model
     def _l10n_lu_prepare_saft_report_values(self, report, options):
         template_vals = self._saft_prepare_report_values(report, options)
 
@@ -201,6 +232,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             'accounting_basis': 'Invoice Accounting',
         })
         self._fill_l10n_lu_saft_report_invoices_values(options, template_vals)
+        self._fill_l10n_lu_saft_report_account_values(options, template_vals)
         return template_vals
 
     @api.model

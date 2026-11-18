@@ -64,6 +64,8 @@ class TestPlanningFieldServiceRating(TestPlanningFieldServiceCommon, HttpCase, M
         self.assertFalse(mail, 'No rating request email should have been sent to the partner')
 
     def test_rating_email_sent_on_action_complete(self):
+        self.env['res.config.settings'].create({'group_field_service_allow_customer_report': False}).execute()
+
         with self.mock_mail_gateway():
             self.test_slot.with_user(self.george_user).action_complete()
 

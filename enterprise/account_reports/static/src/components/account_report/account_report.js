@@ -1,11 +1,12 @@
 import { registry } from "@web/core/registry";
 import { useVirtualGrid } from "@web/core/virtual_grid_hook";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
-import { useSetupAction } from "@web/search/action_hook";
+
 import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
+import { useSetupAction } from "@web/search/action_hook";
 import { UIPlugin } from "@web/core/ui/ui_plugin";
 
-import { Component, onWillDestroy, computed, providePlugins, signal, t, usePlugin, useProps, useScope } from "@odoo/owl";
+import { Component, onWillDestroy, computed, providePlugins, signal, t, usePlugin, useProps, useScope, onPatched, useSubEnv } from "@odoo/owl";
 
 import { AccountReportButtonsBar } from "@account_reports/components/account_report/buttons_bar/buttons_bar";
 import { AccountReportChatter } from "@account_reports/components/mail/chatter";
@@ -85,6 +86,47 @@ export class AccountReport extends Component {
 
         this.cssCustomClass = computed(() => this.controller.options().custom_display_config.css_custom_class || "");
         this.tableClasses = computed(() => this.getTableClasses());
+        useSubEnv({
+            controller: this.controller,
+            component: this.getComponent.bind(this),
+            template: this.getTemplate.bind(this),
+        });
+
+        this._focusLineId = this.controller.action?.params?.focus_line_id;
+
+        onPatched(() => {
+            if (!this._focusLineId) return;
+            const el = document.querySelector(`[data-line-id="${CSS.escape(this._focusLineId)}"]`);
+            if (!el) return;
+            this._focusLineId = null;
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            el.classList.add("o_account_report_line_focus");
+        });
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Custom overrides
+    // -----------------------------------------------------------------------------------------------------------------
+    static registerCustomComponent(customComponent) {
+        registry.category("account_reports_custom_components").add(customComponent.name, customComponent);
+    }
+
+    getComponent(name) {
+        const customComponents = this.controller.options.custom_display_config.components;
+
+        if (customComponents && customComponents[name])
+            return registry.category("account_reports_custom_components").get(customComponents[name]);
+
+        return AccountReport.defaultComponentsMap[name];
+    }
+
+    getTemplate(name) {
+        const customTemplates = this.controller.options.custom_display_config.templates;
+
+        if (customTemplates && customTemplates[name])
+            return customTemplates[name];
+
+        return `account_reports.${ name }Customizable`;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -115,7 +157,7 @@ export class AccountReport extends Component {
     }
 
     /**
-     * @param {MouseEvent} ev 
+     * @param {MouseEvent} ev
      */
     onClick(ev) {
         if (this.ui.isSmall() && this.controller.chatterState.id() && !ev.target.closest(".o_account_report_mobile_chatter")) {

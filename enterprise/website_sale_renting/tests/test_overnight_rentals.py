@@ -61,3 +61,19 @@ class TestOvernightRental(WebsiteSaleRentingCommon):
                     self.hotel_room_early_check_in._is_add_to_cart_allowed(),
                     "Overnight product with same period should be addable to cart",
                 )
+
+    @freeze_time("2025-01-01")
+    def test_default_renting_dates_keep_utc_offset_on_product_page(self):
+        """The product page inputs are read in the browser timezone before the daterange picker
+        formats them, so the default renting dates must be rendered with their UTC offset."""
+        self.website.sudo().tz = "Europe/Brussels"
+        with self.mock_request(cookies={"tz": self.website.tz}) as request:
+            combination_info = self.bike_for_a_day.product_tmpl_id.with_context(
+                request.env.context
+            )._get_combination_info()
+            self.assertEqual(
+                str(combination_info["default_start_date"]), "2025-01-01 23:00:00+00:00"
+            )
+            self.assertEqual(
+                str(combination_info["default_end_date"]), "2025-01-02 23:00:00+00:00"
+            )

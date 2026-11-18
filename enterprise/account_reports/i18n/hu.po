@@ -18,14 +18,15 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Krisztián Juhász <juhasz.krisztian@uzletimegoldasok.hu>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Kalman Stipta <stiptak@tech-mobile.hu>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:39+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Hungarian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-13 17:50+0000\n"
+"PO-Revision-Date: 2026-11-11 09:33+0000\n"
+"Last-Translator: Kalman Stipta <stiptak@tech-mobile.hu>\n"
+"Language-Team: Hungarian <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -190,45 +191,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the list of your open invoices.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    Mellékletben megtalálja a nyitott számláinak listáját.\n"
-"                   <br/> \n"
-"                    Kérdés esetén kérjük, forduljon hozzánk bizalommal.\n"
-"                   <br/> \n"
-"                    Üdvözlettel,\n"
-"                    <br/>\n"
-"                    <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_customer_statement
@@ -236,45 +217,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the statement of your account.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                   <t t-if=\"object.id != object.commercial_partner_id.id\"> "
-"Tisztelt <t t-out=\"object.name or ''\"/> (<t t-"
-"out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Tisztelt <t t-out=\"object.name or ''\"/>,"
-"</t>\n"
-"                    <br/>\n"
-"                    Mellékletben megtalálja számlájának kimutatását.\n"
-"                   <br/> \n"
-"                    Kérdés esetén kérjük, forduljon hozzánk bizalommal.\n"
-"                   <br/> \n"
-"                    Üdvözlettel,\n"
-"                   <br/>\n"
-"\t                <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/> \n"
-"               </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_tax_return_deadline
@@ -282,17 +243,18 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    Hi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    The deadline to submit <strong t-out=\"object.name\"/> "
-"is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    The deadline to submit <strong t-out=\"object.name\"></"
+"strong> is <strong t-out=\"format_date(object.date_deadline)\"></strong>."
+"<br>\n"
 "                    To avoid any potential fine, please ensure all remaining "
-"documents are sent over as soon as possible.<br/>\n"
+"documents are sent over as soon as possible.<br>\n"
 "                    If you've already submitted everything but still "
 "received this email, it's likely the tax return hasn't been marked as "
-"submitted in Odoo.<br/>\n"
+"submitted in Odoo.<br>\n"
 "                    Should you have any question or need assistance, feel "
-"free to get in touch.<br/><br/>\n"
-"                    Best regards,<br/>\n"
+"free to get in touch.<br><br>\n"
+"                    Best regards,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -311,12 +273,12 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -324,12 +286,12 @@ msgid ""
 "                        <td>Amount to Pay</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
 "                        <td>Due By</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Kind regards,</p>\n"
@@ -789,7 +751,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_res_company__totals_below_sections
 #: model:ir.model.fields,field_description:account_reports.field_res_config_settings__totals_below_sections
 msgid "Add totals below sections"
-msgstr ""
+msgstr "Összesen sorok megjelenítése a szakaszok alatt"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__additional_action_context
@@ -934,7 +896,7 @@ msgstr "Összes napló"
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "All Ledgers"
-msgstr ""
+msgstr "Főkönyvek"
 
 #. module: account_reports
 #. odoo-javascript
@@ -1146,7 +1108,7 @@ msgstr ""
 #: model:ir.actions.client,name:account_reports.action_account_report_asr
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_annual_statements
 msgid "Annual Statements"
-msgstr ""
+msgstr "Éves jelentés"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__year
@@ -2931,7 +2893,7 @@ msgstr ""
 #: model:ir.actions.client,name:account_reports.action_account_report_sales
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_sales
 msgid "EC Sales List"
-msgstr ""
+msgstr "Közösségi összesítő jelentés (A60)"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.ec_sales_report_generic_line
@@ -3394,7 +3356,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:account_reports.action_account_report_budget_tree
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_budget_tree
 msgid "Financial Budgets"
-msgstr ""
+msgstr "Pénzügyi költségvetések"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_financial_provisions_review
@@ -3775,7 +3737,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_account_report__horizontal_group_ids
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_horizontal_groups
 msgid "Horizontal Groups"
-msgstr ""
+msgstr "Vízszintes csoportok"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_report_horizontal_group
@@ -4260,6 +4222,11 @@ msgstr "Visszaállítható?"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_report_set
 msgid "Is Report Set"
+msgstr ""
+
+#. module: account_reports
+#: model:ir.model.fields,field_description:account_reports.field_account_journal__is_tax_return_journal
+msgid "Is Tax Return Journal"
 msgstr ""
 
 #. module: account_reports
@@ -4817,7 +4784,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_res_company__account_reports_negative_format
 #: model:ir.model.fields,field_description:account_reports.field_res_config_settings__account_reports_negative_format
 msgid "Negative amount display"
-msgstr ""
+msgstr "Negatív összeg megjelenítése"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profit0
@@ -5133,6 +5100,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_search_view
 msgid "Ongoing"
 msgstr "Folyamatban lévő"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/res_partner.py:0
+msgid "Only a partner with a Tax ID can be set as main."
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -5953,7 +5926,7 @@ msgstr "Eredmény frissítése"
 #. module: account_reports
 #: model:ir.ui.menu,name:account_reports.account_audit_regularization_entries_menu
 msgid "Regularization Entries"
-msgstr ""
+msgstr "Rendezési tételek"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_regulatory_compliance
@@ -6098,6 +6071,11 @@ msgid "Return Name"
 msgstr ""
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Return Reminders"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__return_state
 msgid "Return State"
 msgstr ""
@@ -6120,7 +6098,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_account_report__return_type_ids
 #: model:ir.ui.menu,name:account_reports.menu_action_return_types
 msgid "Return Types"
-msgstr ""
+msgstr "Bevallási típusok"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_return_creation_wizard
@@ -6412,6 +6390,11 @@ msgid "Send And Print Values"
 msgstr ""
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Send Copy To"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_customer_statement.py:0
 msgid "Send Customer Statements"
@@ -6467,6 +6450,8 @@ msgid "Service Sales to North-Irish Customers"
 msgstr ""
 
 #. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/widgets/set_as_main_partner/set_as_main_partner.xml:0
 #: model_terms:ir.ui.view,arch_db:account_reports.duplicate_vat_partner_tree_view
 msgid "Set as main"
 msgstr ""
@@ -6884,7 +6869,7 @@ msgstr ""
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.res_config_settings_view_form
 msgid "Tax Return Periodicity"
-msgstr ""
+msgstr "Adóbevallási gyakoriság"
 
 #. module: account_reports
 #. odoo-python
@@ -6905,7 +6890,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:account_reports.action_view_account_return
 #: model:ir.ui.menu,name:account_reports.menu_action_account_return
 msgid "Tax Returns"
-msgstr ""
+msgstr "Adóbevallások"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_tax_unit
@@ -6925,7 +6910,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_res_company__account_tax_unit_ids
 #: model:ir.ui.menu,name:account_reports.menu_view_tax_units
 msgid "Tax Units"
-msgstr ""
+msgstr "Adóegységek"
 
 #. module: account_reports
 #. odoo-python
@@ -7538,7 +7523,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_multicurrency_revaluation
 msgid "Unrealized Currencies"
-msgstr ""
+msgstr "Nem realizált árfolyamkülönbözetek"
 
 #. module: account_reports
 #: model:account.report,name:account_reports.multicurrency_revaluation_report
@@ -7815,7 +7800,7 @@ msgstr "Könyveletlen /Tervezet/ tételekkel"
 #: model:ir.actions.act_window,name:account_reports.action_view_account_audit
 #: model:ir.ui.menu,name:account_reports.menu_action_working_files
 msgid "Working Files"
-msgstr ""
+msgstr "Munkadokumentumok"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
@@ -7938,6 +7923,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "You cannot update this value as it's locked by: %s"
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "You do not have permission to refresh returns."
 msgstr ""
 
 #. module: account_reports
@@ -8215,6 +8206,95 @@ msgstr ""
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the list of your open invoices.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Mellékletben megtalálja a nyitott számláinak "
+#~ "listáját.\n"
+#~ "                   <br/> \n"
+#~ "                    Kérdés esetén kérjük, forduljon hozzánk bizalommal.\n"
+#~ "                   <br/> \n"
+#~ "                    Üdvözlettel,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the statement of your account.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                   <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\"> Tisztelt <t t-out=\"object.name or "
+#~ "''\"/> (<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Tisztelt <t t-out=\"object.name or "
+#~ "''\"/>,</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Mellékletben megtalálja számlájának kimutatását.\n"
+#~ "                   <br/> \n"
+#~ "                    Kérdés esetén kérjük, forduljon hozzánk bizalommal.\n"
+#~ "                   <br/> \n"
+#~ "                    Üdvözlettel,\n"
+#~ "                   <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/> \n"
+#~ "               </p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Bankkivonat sor"

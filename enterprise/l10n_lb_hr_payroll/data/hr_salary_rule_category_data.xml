@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bases: carried by the paid time types and by every rule feeding them -->
+    <record id="LB_REMUNERATION_BASE" model="hr.salary.rule.category">
+        <field name="name">Remuneration Base</field>
+        <field name="code">LB_REMUNERATION_BASE</field>
+        <field name="country_id" ref="base.lb"/>
+        <field name="note">Basic category to compute the net salary: the paid time types and every amount paid to or withheld from the employee.</field>
+    </record>
+
+    <record id="LB_STATUTORY_ALW" model="hr.salary.rule.category">
+        <field name="name">Cost-of-Living Increases and Regular Allowances</field>
+        <field name="code">LB_STATUTORY_ALW</field>
+        <field name="country_id" ref="base.lb"/>
+        <field name="note">Increases and allowances added to the basic wage (Labour Code, art. 57): with the basic salary, they are compared with the official minimum wage and give the wage of the end-of-service indemnity.</field>
+    </record>
+
+    <record id="LB_NSSF_BASE" model="hr.salary.rule.category">
+        <field name="name">NSSF Earnings</field>
+        <field name="code">LB_NSSF_BASE</field>
+        <field name="country_id" ref="base.lb"/>
+        <field name="note">Earnings bearing the NSSF contributions: all the income paid for or on the occasion of the work, wages, paid leaves, allowances, bonuses, overtime and benefits in kind (Social Security Code, art. 68 §1; Regulation No. 11, art. 1). The transport allowance at the statutory amount (Law No. 217 of 2012, §4), the NSSF family allowances paid for the Fund, the education grants, the refund of the expenses and the end-of-service indemnity are left out.</field>
+    </record>
+
+    <record id="LB_TAX_BASE" model="hr.salary.rule.category">
+        <field name="name">Taxable Income</field>
+        <field name="code">LB_TAX_BASE</field>
+        <field name="country_id" ref="base.lb"/>
+        <field name="note">Salaries, wages, allowances, indemnities, bonuses and cash and in-kind benefits (Income Tax Law, art. 49), less the allowances covering the costs of the work, the transport allowance included (art. 50), and the exempt indemnities, the end-of-service indemnity included, and family allowances (art. 47). The NSSF employee contribution is not deducted.</field>
+    </record>
+</odoo>

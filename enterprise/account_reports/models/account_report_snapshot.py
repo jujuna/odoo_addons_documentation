@@ -3,6 +3,8 @@ import json
 from collections import deque
 from datetime import date
 
+from psycopg2.errors import SerializationFailure
+
 from odoo import api, models, fields
 from odoo.exceptions import UserError
 from odoo.fields import Domain
@@ -104,6 +106,13 @@ class AccountReportSnapshot(models.Model):
     def _register_hook(self):
         rslt = super()._register_hook()
 
+        # This config parameter was added in stable ; we create it from here as well for convenience. This should be removed in master.
+        if not self.env.ref('account_reports.snapshot_lock', raise_if_not_found=False):
+            self.env['ir.config_parameter']._load_records([{
+                'xml_id': 'account_reports.snapshot_lock',
+                'values': {'key': 'account_reports.snapshot_lock'},
+            }])
+
         # Clean snapshots made for previous versions of the engines, and trigger the snapshot cron if necessary.
         # With this, we can ensure a fix made in stable in the computation of an engine will trigger the proper recomputation of the snapshots
         outdated_snapshots_domains = []
@@ -134,6 +143,27 @@ class AccountReportSnapshot(models.Model):
                 # The next ones will be run in a future execution of the cron
                 break
 
+        if created_snapshot:
+            # Try acquiring the snapshot lock after generating a snapshot. If we can't get it, it means a concurrent transaction has
+            # modified the snapshots in the meantime. So, the one we just created is possibly corrupt.
+            # In this case, we delete the new snapshot, and reschedule the cron in 5 minutes to let some time to concurrent operations,
+            # giving them priority as they are directly initiated by a user.
+            lock_acquired = False
+            try:
+                with self.env.cr.savepoint():
+                    # The concurrent transaction might still be running (possibly for a long time). In this case, we don't want the cron to
+                    # get stuck waiting. We therefore start by calling try_lock_for_update.
+                    if self.env.ref('account_reports.snapshot_lock').try_lock_for_update():
+                        self._acquire_snapshot_lock()
+                        lock_acquired = True
+            except SerializationFailure:
+                pass
+
+            if not lock_acquired:
+                created_snapshot.unlink()
+                self.env.ref('account_reports.ir_cron_create_snapshots')._trigger(at=fields.Datetime.add(fields.Datetime.now(), minutes=5))
+                return None
+
         # If the iterator still has elements to treat, we possibly have more snapshots left to generate.
         # If the created snapshot's date is not the one that was asked for, it means it was created in the past, because of years_spread. We then
         # need to re-call the cron to fill the gap, until all required snapshots have been generated in the past.
@@ -144,61 +174,21 @@ class AccountReportSnapshot(models.Model):
 
     @api.model
     def _cron_garbage_collect_snapshots(self):
-        generic_tax_report = self.env.ref('account.generic_tax_report')
+        # Deprecated ; the cron will disappear in master.
+        # Snapshots are now unlinked synchronously, after calling _acquire_snapshot_lock.
+        return True
 
-        snapshot_deletion_domains = []
-        for company in self.env['res.company'].search([]).with_context(ignore_exceptions=True):
-            fy_hard_lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
-
-            snapshot_deletion_domains.append([
-                *([('date', '>', fy_hard_lock_date)] if fy_hard_lock_date != date.min else []),
-                ('company_id', '=', company.id),
-                ('report_id.root_report_id', '!=', generic_tax_report.id),
-            ])
-
-            snapshot_deletion_domains.append([
-                *([('date', '>', company.user_tax_lock_date)] if company.user_tax_lock_date != date.min else []),
-                ('company_id', '=', company.id),
-                ('report_id.root_report_id', '=', generic_tax_report.id),
-            ])
-
-        self.env['account.lock_exception'].flush_model()
-        self.env.cr.execute(SQL("""
-            SELECT DISTINCT ON (company_id, lock_date_field)
-                company_id,
-                lock_date_field,
-                lock_date,
-                end_datetime
-            FROM account_lock_exception
-            WHERE
-                lock_date_field IN ('fiscalyear_lock_date', 'tax_lock_date')
-            ORDER BY company_id, lock_date_field, create_date
-        """))
-
-        for (company_id, lock_date_field, lock_date, end_datetime) in self.env.cr.fetchall():
-            # For simplicity, we consider all branches are impacted, and need garbage collection of their snapshots, even if they have a more
-            # restrictive lock date themselves.
-            impacted_branches = self.env['res.company'].search([('id', 'child_of', company_id)])
-
-            exception_violation_domain = [('company_id', 'in', impacted_branches.ids)]
-            if lock_date:
-                exception_violation_domain.append(('date', '>', lock_date))
-
-            if end_datetime:
-                exception_violation_domain.append(('create_date', '<', end_datetime))
-
-            if lock_date_field == 'tax_lock_date':
-                exception_violation_domain.append(('report_id.root_report_id', '=', generic_tax_report.id))
-
-            snapshot_deletion_domains.append(exception_violation_domain)
-
-        snapshots_to_unlink = self.env['account.report.snapshot'].search(Domain.OR(snapshot_deletion_domains))
-        snapshots_to_unlink.unlink()
-
-        refresh_cron = self.env.ref('account_reports.ir_cron_create_snapshots')
-        if not self.env['ir.cron.trigger'].search([('cron_id', '=', refresh_cron.id)], limit=1):
-            # If no call is planned in the future (as it would be the case with lock date exceptions), trigger the refresh
-            refresh_cron._trigger()
+    @api.model
+    def _acquire_snapshot_lock(self):
+        """ Acquires the snapshot lock for the current transaction, making sure any transaction started before this one commited will fail when trying
+        to do the same. For this, we rely on the fact Odoo uses the REPEATABLE READ isolation level. If the lock cannot be acquired, a
+        SerializationFailure exception will be raised, failing the transaction unless a savepoint is used.
+        """
+        self.env.cr.execute(SQL(
+            "UPDATE ir_config_parameter SET value = %s WHERE id = %s",
+            fields.Datetime.to_string(fields.Datetime.now()),
+            self.env.ref('account_reports.snapshot_lock').id,
+        ))
 
     @api.model
     def _get_snapshots_to_create_params(self):

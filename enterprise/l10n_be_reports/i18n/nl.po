@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 18:26+0000\n"
-"PO-Revision-Date: 2026-10-14 11:33+0000\n"
+"POT-Creation-Date: 2026-11-13 18:31+0000\n"
+"PO-Revision-Date: 2026-11-10 15:35+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "l10n_be_reports/nl/>\n"
@@ -60,6 +60,12 @@ msgid ""
 "through API.\n"
 "                    "
 msgstr ""
+"\n"
+"                        Toegangsprobleem: Je hebt geen toestemming om "
+"toelating te geven voor bedrijf %s. Als je een accountantskantoor bent, zorg "
+"er dan voor dat het veld 'Accountantskantoor' is ingesteld in de Intervat-"
+"instellingen. Anders kan alleen de klant de btw-aangifte via API indienen.\n"
+"                    "
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -138,12 +144,25 @@ msgid ""
 "            - Disabled: Disconnected from the Intervat server\n"
 "        "
 msgstr ""
+"\n"
+"            - Productie: Verbonden met de Intervat API in productiemodus\n"
+"            - Test: Verbonden met de Intervat API in testmodus\n"
+"            - Uitgeschakeld: Verbinding met de Intervat-server verbroken\n"
+"        "
 
 #. module: l10n_be_reports
 #: model:ir.module.module,description:base.module_l10n_be_reports
 msgid ""
 "\n"
 "Accounting reports for Belgium\n"
+msgstr ""
+"\n"
+"Boekhoudrapporten voor België\n"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_325_form.py:0
+msgid " (no tag of these amounts)"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -292,14 +311,15 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">BE Company CoA</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></"
+"t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -307,23 +327,24 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p>\n"
-"                    Geachte <t t-out=\"object.company_id.name\">BE Company "
+"                    Beste <t t-out=\"object.company_id.name\">BE Company "
 "CoA</t>,\n"
 "                </p>\n"
 "                <p>\n"
 "                    Op basis van de ontvangen documenten en informatie is de "
 "btw-aangifte van <t t-out=\"object.company_id.name\">BE Company CoA</t>\n"
-"                    over de periode <t t-"
+"                    voor periode <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> ingediend.\n"
+"object.date_to)\"></t> ingediend.\n"
 "                </p>\n"
 "                <p>\n"
-"                    Vastgesteld is dat een bedrag van <t t-"
+"                    Er is vastgesteld dat een bedrag van <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> verschuldigd blijft.\n"
+"object.amount_to_pay_currency_id)\"></t> nog moet worden betaald.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
-"                <p>Met vriendelijke groeten,</p>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></"
+"t>\n"
+"                <p>Met vriendelijke groet,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
 "        "
@@ -339,12 +360,13 @@ msgid ""
 "                <p>\n"
 "                    Your upcoming <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> Advance Tax Payment is due on <t t-"
-"out=\"format_date(object.date_deadline) or ''\"/>\n"
+"object.date_to)\"></t> Advance Tax Payment is due on <t t-"
+"out=\"format_date(object.date_deadline) or ''\"></t>\n"
 "                    To avoid any penalties or interest charges, we recommend "
 "making the payment before this date.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></"
+"t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -352,19 +374,20 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p>\n"
-"                    Geachte <t t-out=\"object.company_id.name\">BE Company "
+"                    Beste <t t-out=\"object.company_id.name\">BE Company "
 "CoA</t>,\n"
 "                </p>\n"
 "                <p>\n"
-"                    Je komende voorafbetaling van belastingen voor <t t-"
+"                    Je komende <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> is verschuldigd op <t t-"
-"out=\"format_date(object.date_deadline) or ''\"/>\n"
-"                    Om boetes of nalatigheidsinteresten te vermijden, raden "
-"wij aan de betaling vóór deze datum uit te voeren.\n"
+"object.date_to)\"></t> voorafbetaling van belastingen vervalt op <t t-"
+"out=\"format_date(object.date_deadline) or ''\"></t>.\n"
+"                    Om boetes of interestkosten te vermijden, raden we je "
+"aan de betaling vóór deze datum uit te voeren.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
-"                <p>Met vriendelijke groeten,</p>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></"
+"t>\n"
+"                <p>Met vriendelijke groet,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
 "        "
@@ -411,6 +434,8 @@ msgid ""
 "A validation rule failed. Intervat may reject your VAT report. Open the "
 "report to view the warning."
 msgstr ""
+"Een validatieregel is mislukt. Intervat kan je btw-aangifte afwijzen. Open "
+"het rapport om de waarschuwing te bekijken."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
@@ -436,7 +461,7 @@ msgstr "Rekeninghouder"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__account_representative_id
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
 msgid "Accounting Firm"
-msgstr ""
+msgstr "Accountantskantoor"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_return
@@ -446,7 +471,7 @@ msgstr "Btw-aangifte"
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_return_check
 msgid "Accounting Return Check"
-msgstr ""
+msgstr "Check boekhoudkundige aangifte"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_return_type
@@ -571,11 +596,9 @@ msgstr "Valuta van te betalen bedrag"
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__paid_amount
 msgid ""
-"Amount paid during the reference year and the preceding year related to the "
-"total remuneration"
+"Amount paid during the reference year, including the amounts related to "
+"other years"
 msgstr ""
-"Bedrag betaald tijdens het referentiejaar en het voorgaande jaar in verband "
-"met de totale vergoeding"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
@@ -600,7 +623,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "An error has occurred when trying to verify your subscription."
-msgstr ""
+msgstr "Er is een fout opgetreden bij het verifiëren van je abonnement."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -824,13 +847,13 @@ msgstr "Auditrekeningen (BE)"
 #. odoo-python
 #: code:addons/l10n_be_reports/controllers/main.py:0
 msgid "Authentication Error: \n"
-msgstr ""
+msgstr "Authenticatiefout: \n"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/controllers/main.py:0
 msgid "Authentication Failed"
-msgstr ""
+msgstr "Authenticatie mislukt"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_bce_number
@@ -838,10 +861,40 @@ msgid "BCE number"
 msgstr "Ondernemingsnummer"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__atn
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - ATN\", VAT included and "
+"minus the contribution of the beneficiary: book the non-deductible VAT of "
+"the benefits on these accounts, and the contribution of the beneficiary as a "
+"credit on them."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__commissions
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Commissions\", excluding "
+"VAT: book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__exposed_expenses
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Exposed Expenses\", "
+"excluding VAT: book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__fees
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Fees\", excluding VAT: "
+"book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.actions.act_window,name:l10n_be_reports.action_account_journal_bank_reconciliation
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.view_bank_journals_list
 msgid "Bank Journals"
-msgstr ""
+msgstr "Bankdagboeken"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
@@ -882,6 +935,11 @@ msgstr "Belgische XBRL-exportwizard"
 #. module: l10n_be_reports
 #: model:ir.module.module,shortdesc:base.module_l10n_be_reports
 msgid "Belgium - Accounting Reports"
+msgstr "België - Boekhoudrapporten"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__form_281_50_eu_vat_partners
+msgid "Beneficiaries with a VAT number of the EEA"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -903,7 +961,7 @@ msgstr "Overgebracht van het vorige tussenblad"
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_certificate_certificate
 msgid "Certificate"
-msgstr ""
+msgstr "Certificaat"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_partner__citizen_identification
@@ -934,13 +992,13 @@ msgstr ""
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "Click here"
-msgstr ""
+msgstr "Klik hier"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_journal.py:0
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__client_nihil
@@ -1009,7 +1067,7 @@ msgstr "Bedrijf: %s"
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Configuratie-instellingen"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_res_partner
@@ -1103,6 +1161,12 @@ msgid "Currency Discrepancy Justification"
 msgstr "Verantwoording van wisselkoersverschillen"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Customers Without Country"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_customers_balance
 msgid "Customers' Balance"
 msgstr "Klantensaldo"
@@ -1187,7 +1251,7 @@ msgstr "Schuldenaar is een natuurlijk persoon"
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_oe_year_end_expense_accruals
 msgid "Deferred expense report"
-msgstr ""
+msgstr "Rapport uitgestelde kosten"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__prorata
@@ -1389,7 +1453,7 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__is_recovered
 msgid "Does this payment recover previous recoverable amounts"
-msgstr ""
+msgstr "Worden met deze betaling eerder terugvorderbare bedragen verrekend"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_bad_debts
@@ -1430,12 +1494,6 @@ msgid "Due By"
 msgstr "Te betalen voor"
 
 #. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
-msgid "Duplicate VAT number"
-msgstr "Duplicaat BTW-nummer"
-
-#. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_form_325__sender_lang_code__1
 msgid "Dutch"
 msgstr "Nederlands"
@@ -1458,6 +1516,8 @@ msgid ""
 "EC Sales taxes report total does not match Tax Report lines 44 + 46L + 46T - "
 "48s44 - 48s46L - 48s46T."
 msgstr ""
+"Het totaal van de intracommunautaire listing komt niet overeen met lijnen 44 "
+"+ 46L + 46T - 48s44 - 48s46L - 48s46T op de btw-aangifte."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -1478,13 +1538,13 @@ msgstr "Ondernemingsnummer:"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Error while contacting IAP."
-msgstr ""
+msgstr "Fout bij het contacteren van IAP."
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Error while generating the certificate."
-msgstr ""
+msgstr "Fout bij het genereren van het certificaat."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__exposed_expenses
@@ -1519,13 +1579,13 @@ msgstr "Vergoedingen"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
 msgid "Fetch from Intervat"
-msgstr ""
+msgstr "Ophalen uit Intervat"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/controllers/main.py:0
 msgid "Fetching Error: \n"
-msgstr ""
+msgstr "Fout bij ophalen: \n"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_final_cash_transaction_balance
@@ -1541,6 +1601,11 @@ msgstr "Boeking van financiële opbrengsten"
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_financial_prod_with_sp_tax_regime
 msgid "Financial Income with Special Tax Regime"
 msgstr "Financiële opbrengsten met een bijzonder belastingstelsel"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__is_first_name_missing
+msgid "First Name Missing"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__partner_first_name
@@ -2233,12 +2298,15 @@ msgid ""
 "tomorrow to fetch the documents. You can still retrieve them from the "
 "Intervat Portal."
 msgstr ""
+"Als je zojuist je aanmelding hebt ingediend, moet je mogelijk tot morgen "
+"wachten om de documenten op te halen. Je kunt ze nog steeds ophalen via het "
+"Intervat-portaal."
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Impossible to check the response signature."
-msgstr ""
+msgstr "Antwoordhandtekening kan niet gecontroleerd worden."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
@@ -2252,6 +2320,11 @@ msgid ""
 "                                You estimate your annual profit, we then "
 "divide the total corporate tax amount into 4 equal installments."
 msgstr ""
+"In België zijn bedrijven die al 3 jaar of langer actief zijn verplicht om "
+"hun vennootschapsbelasting in 4 termijnen gedurende het jaar te betalen. "
+"Voor nieuwere bedrijven is dit niet verplicht, maar het wordt wel aanbevolen."
+"<br/><br/> Je maakt een schatting van je jaarlijkse winst, waarna wij het "
+"totale bedrag aan vennootschapsbelasting in 4 gelijke termijnen verdelen."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__income_debtor_bce_number
@@ -2298,51 +2371,52 @@ msgstr "Intervat"
 #. module: l10n_be_reports
 #: model:ir.actions.server,name:l10n_be_reports.cron_intervat_refresh_token_ir_actions_server
 msgid "Intervat (BE): Update refresh token"
-msgstr ""
+msgstr "Intervat (BE): Verversingstoken updaten"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_client_id
 msgid "Intervat Client ID"
-msgstr ""
+msgstr "Intervat klant-ID"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_certificate_id
 msgid "Intervat JWT Certificate"
-msgstr ""
+msgstr "Intervat JWT-certificaat"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_private_key
 msgid "Intervat Private Key"
-msgstr ""
+msgstr "Intervat privésleutel"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_mode
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_mode
 msgid "Intervat Server Mode"
-msgstr ""
+msgstr "Intervat servermodus"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_ecb
 msgid "Intervat VAT number"
-msgstr ""
+msgstr "Intervat btw-nummer"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Intervat Validation"
-msgstr ""
+msgstr "Intervat-validatie"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_config_settings.py:0
 msgid "Intervat connection closed."
-msgstr ""
+msgstr "Intervatverbinding verbroken."
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Intervat is not activated. You can activate it in the settings."
 msgstr ""
+"Intervat is niet geactiveerd. Je kunt het activeren in de instellingen."
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_inventory_margin
@@ -2368,12 +2442,6 @@ msgstr "Verantwoording kapitaalsubsidie"
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_fixed_assets_investments
 msgid "Investments"
 msgstr "Investeringen"
-
-#. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/account_return.py:0
-msgid "Invoices Without Country"
-msgstr "Facturen zonder land"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_is_follower
@@ -2491,7 +2559,7 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__l10n_be_isoc_payment_form_id
 msgid "Isoc form"
-msgstr ""
+msgstr "Formulier vennootschapsbelasting"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_job_position
@@ -2501,54 +2569,54 @@ msgstr "Beroep"
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_journal
 msgid "Journal"
-msgstr ""
+msgstr "Dagboek"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "Boeking"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_access_token
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_access_token
 msgid "L10N Be Intervat Access Token"
-msgstr ""
+msgstr "L10N Be Intervat toegangstoken"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_code_challenge
 msgid "L10N Be Intervat Code Challenge"
-msgstr ""
+msgstr "L10N Be Intervat Code Challenge"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_code_verifier
 msgid "L10N Be Intervat Code Verifier"
-msgstr ""
+msgstr "L10N Be Intervat Code Verifier"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__l10n_be_intervat_jwk_kid
 msgid "L10N Be Intervat Jwk Kid"
-msgstr ""
+msgstr "L10N Be Intervat Jwk Kid"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__l10n_be_intervat_jwk_token
 msgid "L10N Be Intervat Jwk Token"
-msgstr ""
+msgstr "L10N Be Intervat Jwk Token"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_last_call_date
 msgid "L10N Be Intervat Last Call Date"
-msgstr ""
+msgstr "L10N Be Intervat Datum laatste oproep"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_refresh_token
 msgid "L10N Be Intervat Refresh Token"
-msgstr ""
+msgstr "L10N Be Intervat Vernieuwingstoken"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_show_settings
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_show_settings
 msgid "L10N Be Intervat Show Settings"
-msgstr ""
+msgstr "L10N Be Intervat Instellingen weergeven"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__l10n_be_isoc_mute_buttons
@@ -2700,6 +2768,7 @@ msgstr "AANTAL OPGEMAAKTE FICHES"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_type__name
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_partner_vat_listing_without_country_view_list
 msgid "Name"
 msgstr "Naam"
 
@@ -2719,6 +2788,11 @@ msgid "Natural person"
 msgstr "Natuurlijk persoon"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__form_281_50_missing_first_names
+msgid "Natural persons without first name"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_neg_bank_balance_transfer_liability
 msgid "Negative Bank Balance Reclassification"
 msgstr "Herkwalificatie van negatief banksaldo"
@@ -2727,13 +2801,13 @@ msgstr "Herkwalificatie van negatief banksaldo"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_report.py:0
 msgid "Negative amounts not allowed"
-msgstr ""
+msgstr "Negatieve bedragen zijn niet toegestaan"
 
 #. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/account_325_form_tree/account_325_form_tree.xml:0
 msgid "New"
-msgstr ""
+msgstr "Nieuw"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_other_verify_next_year_allocations
@@ -2763,7 +2837,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_report.py:0
 msgid "No VAT declaration found for this period."
-msgstr ""
+msgstr "Er is geen btw-aangifte gevonden voor deze periode."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2777,6 +2851,12 @@ msgstr "Geen btw-nummer geassocieerd met je bedrijf."
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "No customer without country"
 msgstr "Geen klant zonder land"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "No duplicate VAT numbers"
+msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2865,7 +2945,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Only an accountant can perform this action."
-msgstr ""
+msgstr "Alleen boekhouders kunnen deze handeling uitvoeren."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2989,7 +3069,7 @@ msgstr "Partner met ontbrekende informatie"
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "Partners sharing the same VAT number"
-msgstr ""
+msgstr "Partners met hetzelfde btw-nummer"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_isoc_prepayment_pay_form
@@ -3004,7 +3084,7 @@ msgstr "Betalingsinstructies voor btw"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__pdf_ref
 msgid "Pdf Ref"
-msgstr ""
+msgstr "Pdf-referentie"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_memo
@@ -3048,12 +3128,12 @@ msgstr "Postnr. en gemeente"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_journal.py:0
 msgid "Private"
-msgstr ""
+msgstr "Privé"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_intervat_mode__prod
 msgid "Production"
-msgstr ""
+msgstr "Productie"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -3093,7 +3173,7 @@ msgstr "Pro rata opbrengsten en kosten"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_journal.py:0
 msgid "Provider"
-msgstr ""
+msgstr "Provider"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_oe_provision_balance
@@ -3158,7 +3238,7 @@ msgstr "Herclassificatie van sociale en fiscale schulden"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__rectification_declaration_id
 msgid "Rectification Declaration"
-msgstr ""
+msgstr "Correctieverklaring"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__reference_year
@@ -3194,7 +3274,7 @@ msgstr "Stelt een opgave 325 voor"
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_vat_declaration
 msgid "Represents a declaration sent through the Intervat API"
-msgstr ""
+msgstr "Vertegenwoordigt een aangifte die via de Intervat-API is verzonden"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
@@ -3215,8 +3295,16 @@ msgstr "Retour"
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
-msgid "Review invoices having a customer with no country specified."
-msgstr "Controleer facturen met klanten zonder opgegeven land."
+msgid ""
+"Review customers sharing the same VAT number and set one of them as the main "
+"partner."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Review customers with no country specified."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_bad_debts_provision
@@ -3269,7 +3357,7 @@ msgstr "Afstemming verkoop ↔ btw"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/isoc_prepayment_pay_form.py:0
 msgid "Scan me with your banking app."
-msgstr ""
+msgstr "Scan mij met je bank-app."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
@@ -3286,7 +3374,7 @@ msgstr "Verzenden"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
 msgid "Send Email"
-msgstr ""
+msgstr "E-mail verzenden"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_form_325__sending_type__1
@@ -3348,7 +3436,7 @@ msgstr "Verzendtype"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
 msgid "Server Mode"
-msgstr ""
+msgstr "Servermodus"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3360,13 +3448,13 @@ msgstr "Diensten"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Set Intervat mode"
-msgstr ""
+msgstr "Intervatmodus instellen"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/isoc_prepayment_pay_form.py:0
 msgid "Set your company data"
-msgstr ""
+msgstr "Stel je bedrijfsgegevens in"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__should_display_client_nihil
@@ -3376,7 +3464,7 @@ msgstr "Moet Klant Nihil weergeven"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__should_display_intervat
 msgid "Should Display Intervat"
-msgstr ""
+msgstr "Moet Intervat weergeven"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_equity_capital_notary_fees_allocation_to_legal_reserve
@@ -3435,13 +3523,13 @@ msgstr "Prorata tonen"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__show_vat_balance
 msgid "Show Vat Balance"
-msgstr ""
+msgstr "Btw-saldo weergeven"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__show_warning_missing_vat_number
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__show_warning_missing_vat_number
 msgid "Show Warning Missing Vat Number"
-msgstr ""
+msgstr "Waarschuwing ontbrekend btw-nummer tonen"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3505,6 +3593,8 @@ msgid ""
 "Specify an Accounting Firm that will act as a representative when exporting "
 "reports."
 msgstr ""
+"Geef een accountantskantoor op dat als vertegenwoordiger zal optreden bij "
+"het exporteren van rapportages."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__sportsman_remuneration
@@ -3544,7 +3634,7 @@ msgstr "Fout bij het indienen"
 #: code:addons/l10n_be_reports/controllers/main.py:0
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Submission Error: \n"
-msgstr ""
+msgstr "Fout bij het indienen: \n"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
@@ -3560,11 +3650,12 @@ msgstr "Dien later een btw-klantenlisting in."
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
 msgid "Submit and fetch your VAT returns via Intervat using the API."
 msgstr ""
+"Dien je btw-aangiften in en haal ze op via Intervat met behulp van de API."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Submit to Intervat"
-msgstr ""
+msgstr "Indienen bij Intervat"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__total_remuneration
@@ -3590,7 +3681,7 @@ msgstr "TOTALEN"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Tax codes & deductibility"
-msgstr ""
+msgstr "Btw-codes & aftrekbaarheid"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_partner__form_file
@@ -3601,7 +3692,7 @@ msgstr "Technisch veld om alle formulieren in op te slaan."
 #. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_intervat_mode__test
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__is_test
@@ -3613,7 +3704,7 @@ msgstr "Testformulier"
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "The"
-msgstr ""
+msgstr "De"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3628,13 +3719,13 @@ msgstr ""
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "The VAT balance is"
-msgstr ""
+msgstr "Het btw-saldo is"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "The XML to send to intervat is not generated."
-msgstr ""
+msgstr "De XML om te verzenden naar Intervat is niet gegenereerd."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_325_wizard__sender_id
@@ -3642,10 +3733,31 @@ msgid "The company responsible for sending the form."
 msgstr "Het bedrijf verantwoordelijk voor het verzenden van het formulier."
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__is_first_name_missing
+msgid ""
+"The first name of a natural person (zone 2.114) is found in its name, after "
+"a comma (e.g. \"Doe, John\")"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_view_form
+msgid ""
+"The first name of these natural persons can't be found in their name (e.g. "
+"\"Doe, John\"), the 281.50 will be sent without it:"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_281_50_view_form
+msgid ""
+"The first name of this natural person can't be found in its name (e.g. "
+"\"Doe, John\"), the 281.50 will be sent without it."
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
 msgid "The following controls failed:"
-msgstr ""
+msgstr "De volgende controles zijn mislukt:"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3672,6 +3784,21 @@ msgstr "Regio van het bedrijf (voor export jaarverslag)"
 
 #. module: l10n_be_reports
 #. odoo-python
+#: code:addons/l10n_be_reports/models/account_325_form.py:0
+msgid ""
+"The remunerations of the sportsmen and of the trainers of these "
+"beneficiaries exceed their commissions, fees, benefits in kind and expenses, "
+"which must include them:\n"
+"%(partners)s\n"
+"\n"
+"The accounts tagged for the sportsmen or the trainers must also have one of "
+"the tags of these amounts, and these amounts can't be negative. Accounts "
+"tagged for the sportsmen or the trainers:\n"
+"%(accounts)s"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
 #: code:addons/l10n_be_reports/models/annual_statement_custom_handler.py:0
 msgid "The report used for XBRL export should have a 'balance' column."
 msgstr ""
@@ -3682,7 +3809,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "The signature of the JWT is not matching."
-msgstr ""
+msgstr "De handtekening van de JWT komt niet overeen."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3694,7 +3821,7 @@ msgstr "De som van het pro rata gebruik moet 100% zijn"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "The token is not valid yet."
-msgstr ""
+msgstr "Het token is nog niet geldig."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_company__l10n_be_company_type_id
@@ -3726,6 +3853,14 @@ msgstr ""
 "Er zijn enkele inconsistenties in de koppeling tussen partner en bedrijf. De "
 "volgende partners moeten toegankelijk zijn voor het bedrijf waarmee ze zijn "
 "gekoppeld: %(inconsistencies)s"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_view_form
+msgid ""
+"These beneficiaries have a VAT number of another country of the European "
+"Economic Area: their invoices are usually not declared on a 281.50, check "
+"their 281.50 tag:"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_partner__citizen_identification
@@ -3857,7 +3992,7 @@ msgstr "BTW-betaling"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "VAT Report (BE)"
-msgstr ""
+msgstr "Btw-rapport (BE)"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_vat_rules
@@ -3882,6 +4017,8 @@ msgid ""
 "VAT return of period %(date_from)s -> %(date_to)s has been sent with the "
 "following references"
 msgstr ""
+"De btw-aangifte van de periode %(date_from)s -> %(date_to)s is verzonden met "
+"de volgende referenties"
 
 #. module: l10n_be_reports
 #: model:mail.template,subject:l10n_be_reports.email_template_vat_payment_instructions
@@ -3906,7 +4043,7 @@ msgstr "Valideer de klantenlijst"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__vat_balance
 msgid "Vat Balance"
-msgstr ""
+msgstr "Btw-saldo"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_vat_listing_submission_wizard
@@ -3974,7 +4111,7 @@ msgstr "XML"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__xml_ref
 msgid "Xml Ref"
-msgstr ""
+msgstr "Xml-referentie"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_bank_balance_reco_with_stmt
@@ -3996,6 +4133,7 @@ msgstr "Je hebt al fiches 281.50 gegenereerd voor deze opgave 325."
 #: model:ir.model.fields,help:l10n_be_reports.field_res_config_settings__l10n_be_intervat_ecb
 msgid "You can use '/' to indicate that the customer has no Tax ID."
 msgstr ""
+"Je kunt '/' gebruiken om aan te geven dat de klant geen btw-nummer heeft."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -4017,13 +4155,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "You do not have an Odoo Enterprise subscription."
-msgstr ""
+msgstr "Je hebt geen Odoo Enterprise-abonnement."
 
 #. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "You have"
-msgstr ""
+msgstr "Je hebt"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -4045,19 +4183,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Your database UUID does not exist."
-msgstr ""
+msgstr "Je database-UUID bestaat niet."
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Your database is not used for a production environment."
-msgstr ""
+msgstr "Je database wordt niet gebruikt voor een productieomgeving."
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_company.py:0
 msgid "Your database is not yet activated."
-msgstr ""
+msgstr "Je database is nog niet geactiveerd."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
@@ -4067,7 +4205,7 @@ msgstr "Je aangifte is negatief. Wil je een terugbetaling vragen van"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__declaration_file
 msgid "ZIP File"
-msgstr ""
+msgstr "ZIP-bestand"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_zip
@@ -4101,24 +4239,26 @@ msgid ""
 "[44] < ([00] + [01] + [02] + [03] + [45] + [46] + [47] + [48] + [49]) * 200 "
 "if [44] > 99,999"
 msgstr ""
+"[44] < ([00] + [01] + [02] + [03] + [45] + [46] + [47] + [48] + [49]) * 200 "
+"if [44] > 99,999"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_report.py:0
 msgid "[55] > 0 if [86] > 0 or [88] > 0"
-msgstr ""
+msgstr "[55] > 0 if [86] > 0 or [88] > 0"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_report.py:0
 msgid "[56] + [57] > 0 if [87] > 0"
-msgstr ""
+msgstr "[56] + [57] > 0 if [87] > 0"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_report.py:0
 msgid "[88] < ([81] + [82] + [83] + [84]) * 100 if [88] > 99,999"
-msgstr ""
+msgstr "[88] < ([81] + [82] + [83] + [84]) * 100 if [88] > 99,999"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -4576,7 +4716,7 @@ msgstr "bnf:m5"
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "company"
-msgstr ""
+msgstr "bedrijf"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
@@ -4605,6 +4745,8 @@ msgid ""
 "customers with a turnover of more than 250€ or one or more credit notes in "
 "the selected period who are not included in the report. Click"
 msgstr ""
+"klanten met een omzet van meer dan € 250 of één of meer creditnota's in de "
+"geselecteerde periode die niet in het rapport zijn opgenomen. Klik"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
@@ -4659,7 +4801,7 @@ msgstr "door de staat verschuldigd?"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "due to prior VAT credit."
-msgstr ""
+msgstr "vanwege eerder btw-tegoed."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_wizard_view_form
@@ -5301,13 +5443,13 @@ msgstr "dit jaar"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "to pay this amount."
-msgstr ""
+msgstr "om dit bedrag te betalen."
 
 #. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "to see the list."
-msgstr ""
+msgstr "om de lijst te zien."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
@@ -5384,7 +5526,7 @@ msgstr "met Itsme of kaartlezer"
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "will be grouped in the XML export."
-msgstr ""
+msgstr "worden gegroepeerd in de XML-export."
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
@@ -5409,7 +5551,114 @@ msgstr "wrg:m3"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "xml"
-msgstr ""
+msgstr "xml"
+
+#~ msgid "Duplicate VAT number"
+#~ msgstr "Duplicaat BTW-nummer"
+
+#~ msgid "Invoices Without Country"
+#~ msgstr "Facturen zonder land"
+
+#~ msgid "Review invoices having a customer with no country specified."
+#~ msgstr "Controleer facturen met klanten zonder opgegeven land."
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">BE Company "
+#~ "CoA</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "VAT return of <t t-out=\"object.company_id.name\">BE Company CoA</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Geachte <t t-out=\"object.company_id.name\">BE "
+#~ "Company CoA</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Op basis van de ontvangen documenten en informatie is "
+#~ "de btw-aangifte van <t t-out=\"object.company_id.name\">BE Company CoA</"
+#~ "t>\n"
+#~ "                    over de periode <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> ingediend.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Vastgesteld is dat een bedrag van <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> verschuldigd blijft.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Met vriendelijke groeten,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">BE Company "
+#~ "CoA</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Your upcoming <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> Advance Tax Payment is due on <t t-"
+#~ "out=\"format_date(object.date_deadline) or ''\"/>\n"
+#~ "                    To avoid any penalties or interest charges, we "
+#~ "recommend making the payment before this date.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Geachte <t t-out=\"object.company_id.name\">BE "
+#~ "Company CoA</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Je komende voorafbetaling van belastingen voor <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> is verschuldigd op <t t-"
+#~ "out=\"format_date(object.date_deadline) or ''\"/>\n"
+#~ "                    Om boetes of nalatigheidsinteresten te vermijden, "
+#~ "raden wij aan de betaling vóór deze datum uit te voeren.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Met vriendelijke groeten,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "Amount paid during the reference year and the preceding year related to "
+#~ "the total remuneration"
+#~ msgstr ""
+#~ "Bedrag betaald tijdens het referentiejaar en het voorgaande jaar in "
+#~ "verband met de totale vergoeding"
 
 #~ msgid ""
 #~ "In Belgium, companies that have been operating for 3 years or more are "

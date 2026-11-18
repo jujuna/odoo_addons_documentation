@@ -95,10 +95,19 @@
         <field name="path">payroll-ytd</field>
     </record>
 
+    <record id="l10n_au_payslip_ytd_server_action" model="ir.actions.server">
+        <field name="name">YTD Opening Balances</field>
+        <field name="model_id" ref="model_l10n_au_payslip_ytd"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['l10n_au.payslip.ytd'].action_list_view()
+        </field>
+    </record>
+
     <menuitem
         id="menu_l10n_au_l10n_au_payslip_ytd"
         name="YTD Opening Balances"
-        action="l10n_au_payslip_ytd_action"
+        action="l10n_au_payslip_ytd_server_action"
         parent="l10n_au_hr_payroll.l10n_au_hr_payroll"
         groups="base.group_user"
         sequence="30"

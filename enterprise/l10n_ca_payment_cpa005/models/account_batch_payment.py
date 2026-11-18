@@ -6,10 +6,12 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, RedirectWarning
 from odoo.tools import BinaryBytes, remove_accents
 
-from odoo.addons.l10n_ca_payment_cpa005.models.res_partner_bank import (
-    cpa005_sanitize_account_number,
-    cpa005_sanitize_financial_institution_nr,
-)
+from odoo.addons.l10n_ca_payment_cpa005.models.res_partner_bank import cpa005_sanitize_account_number
+
+# Royal Bank of Canada rejects files that do not start with its File Transmission Routing Record ("File Qualifier").
+# See Appendix 2 of https://www.rbcroyalbank.com/ach/file-451770.pdf.
+RBC_INSTITUTION_NUMBER = '003'
+RBC_FILE_ROUTING_HEADER = '$$AA01CPA1464[PROD[NL$$'
 
 
 class AccountBatchPayment(models.Model):
@@ -70,9 +72,9 @@ class AccountBatchPayment(models.Model):
             journal_bank_account_errors.append(
                 self.env._("- The company bank account needs to be trusted.")
             )
-        if not journal_bank_account.l10n_ca_financial_institution_number:
+        if not journal_bank_account._l10n_ca_cpa005_get_financial_institution_number():
             journal_bank_account_errors.append(
-                self.env._("- The Financial Institution ID Number on the company bank account needs to be set."),
+                self.env._("- The Clearing Number on the company bank account needs to be set."),
             )
         if not cpa005_sanitize_account_number(journal_bank_account.account_number):
             journal_bank_account_errors.append(
@@ -109,8 +111,8 @@ class AccountBatchPayment(models.Model):
                 'help': self.env._("Bank account of both the payor and the payee must be set and made of at most 12 digits."),
             })
         if invalid_financial_institution_payments := self.payment_ids.filtered(lambda p:
-            not cpa005_sanitize_financial_institution_nr(p.partner_bank_id.l10n_ca_financial_institution_number)
-            or not cpa005_sanitize_financial_institution_nr(p.return_partner_bank_id.l10n_ca_financial_institution_number)
+            not p.partner_bank_id._l10n_ca_cpa005_get_financial_institution_number()
+            or not p.return_partner_bank_id._l10n_ca_cpa005_get_financial_institution_number()
         ):
             rslt.append({
                 'title': self.env._("Some bank accounts cannot be encoded in a Canadian CPA 005 file."),
@@ -217,11 +219,11 @@ class AccountBatchPayment(models.Model):
         # The payee or payor depending on the record type, always the "external" res.partner
         counterparty_bank = self._l10n_ca_cpa005_get_counterparty_bank(payment)
         counterparty_account = cpa005_sanitize_account_number(counterparty_bank.account_number)
-        counterparty_account_fin_inst_nr = cpa005_sanitize_financial_institution_nr(counterparty_bank.l10n_ca_financial_institution_number)
+        counterparty_account_fin_inst_nr = counterparty_bank._l10n_ca_cpa005_get_financial_institution_number()
         # The "returns" bank account is the **originator** bank account, the account that generates this file, so always the res.company's
         originator_bank = self._l10n_ca_cpa005_get_company_bank(payment)
         originator_account = cpa005_sanitize_account_number(originator_bank.account_number)
-        originator_account_fin_inst_nr = cpa005_sanitize_financial_institution_nr(originator_bank.l10n_ca_financial_institution_number)
+        originator_account_fin_inst_nr = originator_bank._l10n_ca_cpa005_get_financial_institution_number()
 
         return remove_accents(  # ElementNumber CharacterPosition ElementSize ElementName
             f"{record_type}"  # 01 1 1 "C"/"D" Logical Record Type ID
@@ -291,7 +293,25 @@ class AccountBatchPayment(models.Model):
             records.append(self._l10n_ca_cpa005_transaction_record(file_creation_nr, payment, len(records) + 1))
         records.append(self._l10n_ca_cpa005_generate_footer(file_creation_nr, len(records) + 1))
 
+        # some banks (RBC) require their own File Transmission Routing Record before the A record.
+        # It is not a CPA 005 record, so it does not count as a logical record.
+        if file_routing_header := self._l10n_ca_cpa005_file_routing_header():
+            records.insert(0, file_routing_header)
+
         return "\r\n".join(records)
+
+    def _l10n_ca_cpa005_file_routing_header(self):
+        """ File Transmission Routing Record expected when the journal's bank account is at RBC.
+        The 'l10n_ca_payment_cpa005.rbc_file_routing_header' system parameter overrides the default one.
+        """
+        self.ensure_one()
+        clearing_number = self.journal_id.bank_account_id._l10n_ca_cpa005_get_financial_institution_number()
+        if not clearing_number or clearing_number[1:4] != RBC_INSTITUTION_NUMBER:
+            return ''
+        return self.env['ir.config_parameter'].sudo().get_str(
+            'l10n_ca_payment_cpa005.rbc_file_routing_header',
+            RBC_FILE_ROUTING_HEADER,
+        )
 
     def _get_methods_generating_files(self):
         res = super()._get_methods_generating_files()

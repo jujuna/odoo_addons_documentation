@@ -156,6 +156,28 @@ class L10n_Be281_XX(models.Model):
                 person['bp'] = employee.place_of_birth
         return person
 
+    def _get_belcotax_identification_errors(self, report_key, employee):
+        """Identification data that Belcotax-on-web requires for a beneficiary without national number: a sending
+        with a fiche missing them is refused as a whole. The name and the address are always required by
+        _get_employee_configuration_errors.
+
+        https://finances.belgium.be/fr/E-services/Belcotaxonweb/documentation-technique/faq-bow-2
+        Brochure of the pre-opening of Belcotax-on-web (October 2026), sections 3.5, 6.1.1 and 6.12.2.1
+
+        :return: list of translated messages, each naming the employee
+        """
+        if employee.niss and employee.niss != '/':
+            return []
+        if report_key == '281.20' and employee.private_country_id.code == 'BE':
+            return [self.env._(
+                "Employee %(employee)s lives in Belgium: their national or BIS number is required on the %(form)s "
+                "form.", employee=employee.name, form=report_key)]
+        if report_key in ('281.10', '281.20') and not employee.birthday:
+            return [self.env._(
+                "Employee %(employee)s has no national number: their birth date is required on the %(form)s form.",
+                employee=employee.name, form=report_key)]
+        return []
+
     def _get_belcotax_fiche_key(self, report_key, employee):
         # The same key for the corrections of the fiche: Belcotax-on-web replaces the fiche with the same key
         return f'{self._get_belcotax_key_prefix()}_{self.year}_{report_key.replace(".", "")}_{employee.id}'
@@ -210,10 +232,18 @@ class L10n_Be281_XX(models.Model):
             if other_codes:
                 zones['4020'] = other_codes
         if '4220' in zone_schemas and '2106' in values:
-            # The percentages of the options on shares, like '00,00' in the XML files, are fractions of 1
-            percentages = values.pop('2106')
-            if percentages and str(percentages).strip():
-                zones['4220'] = [{'2106': (Decimal(str(percentages).replace(',', '.')) / 100).quantize(Decimal('0.0001'))}]
+            # The percentages of the options on shares, like '00,00' or '15,00:23,00' in the XML files, are one
+            # item each, as fractions of 1
+            percentages = [percentage.strip() for percentage in str(values.pop('2106') or '').split(':')]
+            try:
+                if items := [
+                    {'2106': (Decimal(percentage.replace(',', '.')) / 100).quantize(Decimal('0.0001'))}
+                    for percentage in percentages if percentage
+                ]:
+                    zones['4220'] = items
+            except ArithmeticError:
+                errors.append(self.env._(
+                    "the value %(value)s of the zone %(zone)s is invalid", value=':'.join(percentages), zone='2106'))
 
         for zone, value in values.items():
             zone_schema = zone_schemas.get(zone)
@@ -242,17 +272,26 @@ class L10n_Be281_XX(models.Model):
     def _get_belcotax_documents(self):
         """:return: tuple (documents, errors), the resources being before the fiches that reference them"""
         self.ensure_one()
-        self._check_company_configuration()
+        # The errors of the company and of the employees of all the forms are listed together
+        company_errors = self._get_company_configuration_errors()
+        errors = [f"- {error}" for error in company_errors]
         fiche_schemas = self._get_belcotax_fiche_schemas()
         resource_schemas = belcotax_schema.get_resource_schemas()
-        contact = self._get_belcotax_contact()
-        debtor = self._get_belcotax_debtor()
-        errors = []
-        for label, document in ((self.env._("Contact"), contact), (self.company_id.name, debtor)):
-            errors += [f"- {label}: {error}" for error in self._get_belcotax_schema_errors(resource_schemas[document['$s']], document)]
+        contact = debtor = {}
+        if not company_errors:
+            contact = self._get_belcotax_contact()
+            debtor = self._get_belcotax_debtor()
+            for label, document in ((self.env._("Contact"), contact), (self.company_id.name, debtor)):
+                errors += [f"- {label}: {error}" for error in self._get_belcotax_schema_errors(resource_schemas[document['$s']], document)]
 
         persons = {}
         fiches = []
+        errors_by_report = {}
+        is_deletion = self.type_sending == '1' and self.type_treatment == '3'
+        # The fiches sent by the corrected declaration: Belcotax-on-web knows them by their key
+        origin = self.origin_id
+        if self.type_sending != '1' or origin.file_format != 'jsonl' or origin.type_treatment == '3':
+            origin = self.browse()
         for report_key, config in REPORT_CONFIG.items():
             if not (self[config['include_field']] and self[config['count_field']]):
                 continue
@@ -261,11 +300,29 @@ class L10n_Be281_XX(models.Model):
                     "The Belcotax-on-web schema of the form %(form)s for the income year %(year)s is not available.",
                     form=report_key, year=self.year))
             report = self[config['relation_field']]
-            result = report._get_rendering_data(report.line_ids.employee_id)
-            errors += [f"- {message}" for message in result['employees_with_error'].values()]
+            result = report._get_employees_rendering_data(report.line_ids.employee_id)
+            for employee_data in result['employees_data']:
+                employee = employee_data['employee']
+                # A deleted fiche is only referenced by its key
+                if not is_deletion and (identification_errors := self._get_belcotax_identification_errors(report_key, employee)):
+                    result['employees_with_error'][employee] = '\n'.join(identification_errors)
+            errors_by_report[report_key] = result['employees_with_error']
+            errors += [
+                f"- {report_key}: {error}"
+                for message in result['employees_with_error'].values() for error in message.splitlines()
+            ]
+            if company_errors:
+                # The documents can't be built without the data of the company
+                continue
             schema = fiche_schemas[report_key]
             for employee_data in result['employees_data']:
                 employee = employee_data['employee']
+                if employee in result['employees_with_error']:
+                    continue
+                key = self._get_belcotax_fiche_key(report_key, employee)
+                if is_deletion:
+                    fiches.append({'$s': belcotax_schema.DELETE_FICHE_SCHEMA, 'k': key})
+                    continue
                 label = f"{report_key} {employee.name}"
                 if employee not in persons:
                     persons[employee] = self._get_belcotax_person(employee)
@@ -273,10 +330,6 @@ class L10n_Be281_XX(models.Model):
                         f"- {employee.name}: {error}"
                         for error in self._get_belcotax_schema_errors(resource_schemas[belcotax_schema.PERSON_SCHEMA], persons[employee])
                     ]
-                key = self._get_belcotax_fiche_key(report_key, employee)
-                if self.type_sending == '1' and self.type_treatment == '3':
-                    fiches.append({'$s': belcotax_schema.DELETE_FICHE_SCHEMA, 'k': key})
-                    continue
                 zones, zone_errors = self._get_belcotax_zones(report_key, schema, employee_data)
                 fiche = {
                     '$s': belcotax_schema.get_schema_id(schema),
@@ -286,12 +339,38 @@ class L10n_Be281_XX(models.Model):
                     'd': debtor['k'],
                     **zones,
                 }
-                # A corrective fiche replaces the original one, all its zones are filled again
-                if self.type_sending == '1' and self.type_treatment == '1' and '2205' in schema['properties']:
+                # A corrective fiche replaces the original one, all its zones are filled again. The fiche of an
+                # employee who wasn't in the corrected declaration is an original one, with an empty zone 2205.
+                if (
+                    self.type_sending == '1' and self.type_treatment == '1' and '2205' in schema['properties']
+                    and (not origin or employee in self._get_belcotax_origin_employees(origin, report_key))
+                ):
                     fiche['2205'] = '3'
                 errors += [f"- {label}: {error}" for error in zone_errors + self._get_belcotax_schema_errors(schema, fiche)]
                 fiches.append(fiche)
+        if origin and self.type_treatment in ('1', '3'):
+            # The fiches of the corrected declaration that this one doesn't replace anymore are cancelled, e.g. the
+            # employees without payslips anymore for the year or now declared on another form
+            sent_keys = {fiche['k'] for fiche in fiches}
+            for report_key, config in REPORT_CONFIG.items():
+                if not self[config['include_field']]:
+                    continue
+                for employee in self._get_belcotax_origin_employees(origin, report_key):
+                    key = self._get_belcotax_fiche_key(report_key, employee)
+                    if key not in sent_keys and employee not in errors_by_report.get(report_key, {}):
+                        fiches.append({'$s': belcotax_schema.DELETE_FICHE_SCHEMA, 'k': key})
+        self._set_declaration_errors(errors_by_report)
+        if company_errors:
+            return [], errors
         return [contact, debtor, *persons.values(), *fiches], errors
+
+    @api.model
+    def _get_belcotax_origin_employees(self, origin, report_key):
+        """:return: the employees whose fiche of the form was sent by the corrected declaration"""
+        config = REPORT_CONFIG[report_key]
+        if not origin[config['include_field']]:
+            return self.env['hr.employee']
+        return origin[config['relation_field']].line_ids.employee_id
 
     def _render_jsonl(self):
         self.ensure_one()

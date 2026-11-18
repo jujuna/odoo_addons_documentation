@@ -12,6 +12,7 @@ from odoo.addons.payment import utils as payment_utils
 from odoo.addons.payment.controllers.portal import PaymentPortal
 from odoo.addons.sale.controllers.portal import CustomerPortal
 from odoo.addons.website_sale.controllers.main import WebsiteSale
+from odoo.addons.website_sale.models.website import CART_SESSION_CACHE_KEY
 
 
 class Cart(PaymentPortal):
@@ -38,21 +39,19 @@ class Cart(PaymentPortal):
                 abandoned_order.access_token, access_token
             ):  # wrong token (or SO has been deleted)
                 raise NotFound
-            if abandoned_order.state not in (
-                "draft",
-                "sent",
-            ) or abandoned_order.get_portal_last_transaction().state in {
-                "pending",
-                "authorized",
-                "done",
-            }:  # abandoned cart already finished, or has an ongoing/confirmed transaction
+            if (
+                abandoned_order.state != "draft"
+                or abandoned_order.get_portal_last_transaction().state
+                in {"pending", "authorized", "done"}
+            ):  # abandoned cart already finished, or has an ongoing/confirmed transaction
                 values.update({"abandoned_proceed": True})
-            elif not request.session.get("sale_order_id"):
-                request.session["sale_order_id"] = abandoned_order.id
-                request.cart = abandoned_order
-                order_sudo = abandoned_order
-            elif abandoned_order.id != request.session.get("sale_order_id"):
-                abandoned_order.order_line.write({"order_id": request.session["sale_order_id"]})
+            elif not request.session.get(CART_SESSION_CACHE_KEY):
+                request.session[CART_SESSION_CACHE_KEY] = abandoned_order.id
+                return request.redirect("/shop/cart")
+            elif abandoned_order.id != request.session.get(CART_SESSION_CACHE_KEY):
+                abandoned_order.order_line.write({
+                    "order_id": request.session[CART_SESSION_CACHE_KEY]
+                })
                 abandoned_order.action_cancel()
 
         values.update({
@@ -114,7 +113,8 @@ class Cart(PaymentPortal):
             of `product.template.attribute.value` ids.
         :param list linked_products: A list of objects representing additional products linked to
             the product added to the cart. Can be combo item or optional products.
-        :param dict kwargs: Optional data. This parameter is not used here.
+        :param dict kwargs: Optional data, given to `_cart_add`. If `skip_order_alert` is set, the
+            warning isn't stored on the order when no line is created.
         :return: The values
         :rtype: dict
         """
@@ -134,6 +134,12 @@ class Cart(PaymentPortal):
             )
         if not product or not product._is_add_to_cart_allowed():
             raise UserError(self._get_product_user_error(product))
+
+        if kwargs.pop("combo_item_id", None):
+            raise UserError(self.env._("You cannot add a combo item separately from its combo."))
+
+        if kwargs.pop("linked_line_id", None):
+            raise UserError(self.env._("Linked lines must be added to the cart with their parent."))
 
         def check_selected_combo_items(combo_product, linked_products):
             combo_item_products = [
@@ -164,7 +170,7 @@ class Cart(PaymentPortal):
         values = order_sudo.with_context(skip_cart_verification=True)._cart_add(
             product_id=product_id,
             quantity=quantity,
-            uom_id=uom_id,
+            uom_id=uom_id if product.type != "combo" else None,
             product_custom_attribute_values=product_custom_attribute_values,
             no_variant_attribute_value_ids=no_variant_attribute_value_ids,
             **kwargs,
@@ -180,6 +186,10 @@ class Cart(PaymentPortal):
 
         if linked_products and values["line_id"]:
             for product_data in linked_products:
+                # Do not allow float values in ecommerce by default
+                product_data["quantity"] = (
+                    product_data["quantity"] and int(product_data["quantity"])
+                ) or 1
                 product_sudo = (
                     self.env["product.product"].sudo().browse(product_data["product_id"]).exists()
                 )
@@ -199,7 +209,9 @@ class Cart(PaymentPortal):
                 product_values = order_sudo.with_context(skip_cart_verification=True)._cart_add(
                     product_id=product_data["product_id"],
                     quantity=product_data["quantity"],
-                    uom_id=product_data.get("uom_id"),
+                    uom_id=product_data.get("uom_id")
+                    if (product_sudo.type != "combo" and not product_data.get("combo_item_id"))
+                    else None,
                     product_custom_attribute_values=product_data["product_custom_attribute_values"],
                     no_variant_attribute_value_ids=[
                         int(value_id) for value_id in product_data["no_variant_attribute_value_ids"]
@@ -279,8 +291,14 @@ class Cart(PaymentPortal):
             notifications.append({"type": "item_added", "data": notification})
 
         if warning:
-            # Store the warning on the order line so the cart page can show its source to the user.
-            (updated_line or order_sudo)._add_warning_alert(warning)
+            if updated_line:
+                # Store the warning on the order line so the cart page can show its source to the
+                # user.
+                updated_line._add_warning_alert(warning)
+            elif not kwargs.pop("skip_order_alert", False):
+                # No line to attach the warning to: keep it on the order so that it is shown on the
+                # cart page for flows redirecting there.
+                order_sudo._add_warning_alert(warning)
             notifications.append({"type": "warning", "data": {"warning_message": warning}})
 
         return {
@@ -298,7 +316,11 @@ class Cart(PaymentPortal):
         route="/shop/cart/quick_add", type="jsonrpc", auth="user", methods=["POST"], website=True
     )
     def quick_add(self, product_template_id, product_id, quantity=1.0, **kwargs):
-        values = self.add_to_cart(product_template_id, product_id, quantity=quantity, **kwargs)
+        # The customer is already on the cart page and gets the warning as a notification, don't
+        # keep it on the order to show it again on the next page load.
+        values = self.add_to_cart(
+            product_template_id, product_id, quantity=quantity, skip_order_alert=True, **kwargs
+        )
 
         order_sudo = request.cart
         values.update(self._get_updated_cart_page_values(order_sudo))
@@ -457,6 +479,10 @@ class Cart(PaymentPortal):
         def is_same_combo(line1_, line2_):
             """Check if two combo lines have the same linked product combination."""
             return line1_.linked_line_ids.product_id.ids == line2_.linked_line_ids.product_id.ids
+
+        # The public partner is shared by all visitors: it has no order history of its own
+        if self.env.website.is_public_user():
+            return {"order_history": []}
 
         # Get the last 10 confirmed orders from the current website user.
         previous_orders_lines_sudo = (

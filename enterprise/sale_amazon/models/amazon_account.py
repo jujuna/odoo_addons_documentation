@@ -473,7 +473,7 @@ class AmazonAccount(models.Model):
                 "lastUpdatedAfter": sync_lower_limit.isoformat(sep="T") + "Z",
                 "lastUpdatedBefore": sync_upper_limit.isoformat(sep="T") + "Z",
                 "marketplaceIds": ",".join(account.active_marketplace_ids.mapped("api_ref")),
-                "includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION"),
+                "includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION,TAX"),
             }
             try:
                 # Orders are pulled in batches of up to 100 orders. If more can be synchronized, the
@@ -563,7 +563,7 @@ class AmazonAccount(models.Model):
         """
         self.ensure_one()
         amazon_utils.ensure_account_is_set_up(self)
-        payload = {"includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION")}
+        payload = {"includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION,TAX")}
         order_data = amazon_utils.make_sp_api_request(
             self, "getOrder", path_parameter=amazon_order_ref, payload=payload
         )["order"]
@@ -709,7 +709,7 @@ class AmazonAccount(models.Model):
             shipping_code, "shipping_product", "Shipping", "service"
         )
         amazon_order_ref = order_data["orderId"]
-        currency_code = order_data["proceeds"].get("grandTotal", {}).get("currencyCode")
+        currency_code = order_data.get("proceeds", {}).get("grandTotal", {}).get("currencyCode")
 
         if currency_code:  # Not included in replacement order data
             currency = (
@@ -810,6 +810,11 @@ class AmazonAccount(models.Model):
             ],
             limit=1,
         )
+        tax_registrations = order_data.get("tax", {}).get("taxRegistrations", [])
+        buyer_tax_registration = next(
+            (reg for reg in tax_registrations if reg.get("entityType") == "BUYER"), {}
+        )
+        vat = buyer_tax_registration.get("taxRegistrationNumber", False)
 
         # German addresses on Amazon are swapped, where AddressLine1 == company/building name, and
         # AddressLine2 == street.
@@ -824,6 +829,7 @@ class AmazonAccount(models.Model):
             "country_id": country.id,
             "state_id": state.id,
             "phone": phone,
+            "vat": vat,
             "customer_rank": 1,
             "company_id": self.company_id.id,
             "email": anonymized_email,
@@ -851,7 +857,12 @@ class AmazonAccount(models.Model):
         )  # Don't match random partners.
         if not contact:
             contact_name = buyer_name or f"Amazon Customer # {amazon_order_ref}"
-            contact = self.env["res.partner"].create({"name": contact_name, **partner_vals})
+            contact = (
+                self
+                .env["res.partner"]
+                .with_context(no_vat_validation=True)
+                .create({"name": contact_name, **partner_vals})
+            )
             if not contact.state_id and state_code and fulfillment_channel == "MERCHANT":
                 contact._amazon_create_activity_set_state(self.user_id.id, state_code)
 
@@ -889,12 +900,17 @@ class AmazonAccount(models.Model):
                 limit=1,
             )
         if not delivery:
-            delivery = self.env["res.partner"].create({
-                "name": shipping_address_name,
-                "type": "delivery",
-                "parent_id": contact.id,
-                **partner_vals,
-            })
+            delivery = (
+                self
+                .env["res.partner"]
+                .with_context(no_vat_validation=True)
+                .create({
+                    "name": shipping_address_name,
+                    "type": "delivery",
+                    "parent_id": contact.id,
+                    **partner_vals,
+                })
+            )
             if not delivery.state_id and state_code and fulfillment_channel == "MERCHANT":
                 delivery._amazon_create_activity_set_state(self.user_id.id, state_code)
 

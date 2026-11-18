@@ -102,6 +102,21 @@ const callPatch = {
         this.store.insert(store_data);
     },
 
+    /**
+     * Rebinds this ongoing call to the party the PBX now connects it to (a new
+     * connected line, e.g. after an attended transfer).
+     *
+     * @param {string} phoneNumber
+     */
+    async updatePhoneNumber(phoneNumber) {
+        const { store_data } = await this.store.env.services.orm.call(
+            "voip.call",
+            "update_phone_number",
+            [[this.id], phoneNumber]
+        );
+        this.store.insert(store_data);
+    },
+
     async start(at = luxon.DateTime.now()) {
         const { store_data } = await this.store.env.services.orm.call(
             "voip.call",

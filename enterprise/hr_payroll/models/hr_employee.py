@@ -163,6 +163,7 @@ class HrEmployee(models.Model):
         return action
 
     def action_archive(self):
+        """Close the running salary attachments of the employees, then archive them."""
         attachments_to_close = self.sudo().salary_attachment_ids.filtered_domain([
             ('state', '=', '1_open')
         ])
@@ -177,6 +178,13 @@ class HrEmployee(models.Model):
 
     @api.model
     def _get_account_holder_employees_data(self):
+        """
+        Return one row per active employee of the allowed companies and bank account (``None``
+        values for an employee without bank account): ``{'id', 'account_number',
+        'allow_out_payment'}``. Empty if the user cannot read employees or bank accounts.
+
+        :rtype: list
+        """
         # as account_type isn't stored we can not use a domain to retrieve the employees
         # bypass orm for performance, we only care about the employee id anyway
 
@@ -202,47 +210,47 @@ class HrEmployee(models.Model):
 
     @api.model
     def _get_untrusted_bank_account_ids(self):
-        """Return a list of bank account IDs linked to employees that are not marked for out payment."""
+        """
+        Return the IDs of untrusted bank accounts used to pay salaries.
+        """
         if (not self.browse().has_access('read') or
                 not self.env['res.partner.bank'].has_access('read')):
             return []
 
-        self.env.cr.execute('''
-            SELECT acc.id
-            FROM res_partner_bank acc
-            JOIN employee_bank_account_rel rel
-                ON rel.bank_account_id = acc.id
-            JOIN hr_employee emp
-                ON emp.id = rel.employee_id
-            WHERE acc.allow_out_payment = FALSE
-            AND emp.company_id IN %s
-            AND emp.active = TRUE
-        ''', (tuple(self.env.companies.ids),))
-        # Return ids of untrusted bank accounts.
-        return [row[0] for row in self.env.cr.fetchall()]
+        companies = self.env.companies
+        employees = self.search([
+            ('company_id', 'in', companies.ids),
+            ('bank_account_ids', '!=', False),
+        ])
+        return employees.bank_account_ids.filtered(
+            lambda acc: not acc.allow_out_payment
+                        and acc.employee_salary_amount > 0
+                        and (not acc.company_id or acc.company_id in companies)
+        ).ids
 
-    def action_add_payslip_to_payrun(self, payrun_id):
+    def action_add_payslip_to_payrun(self, payrun_ids):
+        """
+        Create the payslips of the employee in the pay runs ``payrun_ids`` (see
+        :meth:`hr.payslip.run._add_missing_employee`).
+
+        :param list payrun_ids: ``hr.payslip.run`` ids
+        :return: window action listing the new payslips, or closing the view if no pay run exists
+        """
         self.ensure_one()
-        payrun = self.env['hr.payslip.run'].browse(payrun_id)
-        if not payrun or not payrun.exists():
+        payruns = self.env['hr.payslip.run'].browse(payrun_ids).exists()
+        if not payruns:
             return {'type': 'ir.actions.act_window_close'}
-
-        payslip_vals = {
-            'employee_id': self.id,
-            'company_id': self.company_id.id,
-            'payslip_run_id': payrun_id,
-            'date_from': payrun.date_start,
-            'date_to': payrun.date_end,
-            'struct_id': self.structure_id.id,
-        }
-        payslip = self.env['hr.payslip'].create(payslip_vals)
-        payslip._compute_name()
+        new_payslips = payruns._add_missing_employee(self)
         return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
+            "type": "ir.actions.act_window",
+            "name": self.env._("New Payslips"),
+            "res_model": "hr.payslip",
+            "views": [[False, "list"], [False, "form"]],
+            "domain": [('id', 'in', new_payslips.ids)],
         }
 
     def _recompute_worked_days_lines(self):
+        """Recompute the worked days lines of the draft payslips of these employees."""
         if not self:
             return
         draft_payslips = self.env["hr.payslip"].search([
@@ -317,6 +325,10 @@ class HrEmployee(models.Model):
             super()._track_log(payroll_init_values, payroll_trackings, track_records=track_records)
 
     def _track_log_get_default_subtype(self, track_init_values):
+        """
+        Return the ``hr_payroll.mt_hr_payroll_sensitive`` subtype when a tracked field is
+        restricted to payroll users, the default subtype otherwise.
+        """
         self.ensure_one()
         for fname in track_init_values:
             model_field = self._fields.get(fname)
@@ -334,6 +346,14 @@ class HrEmployee(models.Model):
             employee.off_cycle_invisible = payrun and payrun.state not in ['00_draft', '01_ready']
 
     def get_benefit_fields_value(self, version_id):
+        """
+        Return ``hr.version.get_benefit_fields_value()`` for the version ``version_id``, or for
+        the current version if not set.
+
+        :param int version_id: ``hr.version`` id of the employee
+        :raise ValueError: if the version belongs to another employee
+        :rtype: list
+        """
         if not self.env.user.has_groups('hr_payroll.group_hr_payroll_user'):
             return []
         self.ensure_one()

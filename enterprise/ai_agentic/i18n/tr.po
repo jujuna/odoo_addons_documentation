@@ -2,17 +2,18 @@
 # This file contains the translation of the following modules:
 # * ai_agentic
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 05:33+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-09 16:35+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "ai_agentic/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -69,6 +70,52 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            Daha sonra, tekrar tekrar veya kayıt olayına yanıt olarak "
+"gerçekleştirmeniz gereken eylemler için kalıcı otomasyonlar oluşturun ve "
+"güncelleyin. Bu aracı, kullanıcı sizden gelecekte bir zamanda, yinelenen bir "
+"takvimde veya kayıtlar oluşturulduğunda, değiştirildiğinde, silindiğinde, "
+"mesajlaşıldığında veya belirtilen koşullar karşılandığında bir eylem "
+"gerçekleştirmenizi veya bir hatırlatıcı göndermenizi istediğinde kullanın.\n"
+"            Yeni bir otomasyon oluştururken `name` (ad), `description` "
+"(açıklama), `trigger` (tetikleyici), `ai_action_prompt` (YZ eylem istemi) ve "
+"`explanation` (açıklama) zorunludur.\n"
+"            Mevcut bir otomasyonu düzenlerken `automation_id` ve "
+"`explanation` zorunludur. Diğer parametreler için yalnızca güncellenmesi "
+"gerekenleri sağlayın.\n"
+"            ## Tetikleyici türü\n"
+"            Zaman tabanlı tetikleyicileri (`on_time_created`, "
+"`on_time_updated`, `on_time`), senkron olanlara (`on_create`, "
+"`on_create_or_write`) tercih edin: bunlar kullanıcının kaydı sırasında "
+"değil, olaydan kısa süre sonra çalışır. \"Bir destek talebi "
+"oluşturulduğunda...\" 1 dakikalık gecikmeyle `on_time_created` şeklindedir; "
+"\"bir aday kaydı güncellendiğinde...\" `on_time_updated` şeklindedir. "
+"`on_create` / `on_create_or_write` ı yalnızca kullanıcı açıkça acil, senkron "
+"bir eylem istediğinde veya `filter_pre_domain` gerektiren belirli "
+"alanlardaki geçişler için kullanın.\n"
+"            ## Tetikleyici örnekleri\n"
+"            - Her yeni destek talebini etiketle (tercih edilen oluşturma "
+"tetikleyicisi): `{\"trigger\": {\"type\": \"on_time_created\", "
+"\"target_model\": \"helpdesk.ticket\", \"date_offset_or_interval\": "
+"{\"amount\": 1, \"unit\": \"minutes\"}}}`\n"
+"            - Görevlerime \"Hata\" etiketi eklendiğinde tetikle (bir alan "
+"geçişi, dolayısıyla `on_create_or_write`): `{\"trigger\": {\"type\": "
+"\"on_create_or_write\", \"observed_fields\": [\"tag_ids\"], "
+"\"filter_pre_domain\": \"[('tag_ids', 'not in', ['Bug'])]\", "
+"\"filter_domain\": \"[('tag_ids', 'in', ['Bug']), ('user_id', '=', 3)]\"}}` "
+"(kullanıcı kimliği 3 ise).\n"
+"            - Beklenen kapanış tarihinden bir gün önce tetikle: `"
+"{\"trigger\": {\"type\": \"on_time\", \"observed_fields\": "
+"\"date_deadline\", \"date_offset_or_interval\": {\"direction\": \"before\", "
+"\"amount\": 1, \"unit\": \"day\"}}}`\n"
+"            - Kayıt atanmamışsa oluşturma anında tetikle: `{\"trigger\": "
+"{\"type\": \"on_time_created\", \"filter_domain\": \"[('user_id', '=', False)"
+"]\", \"date_offset_or_interval\": {\"amount\": 5, \"unit\": \"minutes\"}}}`\n"
+"            - Her Pazartesi tetikle: `{\"trigger\": {\"type\": "
+"\"on_schedule\", \"date_offset_or_interval\": {\"amount\": 7, \"unit\": "
+"\"day\", \"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (bir sonraki "
+"Pazartesi 2026-08-24 ise)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -88,6 +135,22 @@ msgid ""
 "instead, that leaves the user without the Run button.\n"
 "        "
 msgstr ""
+"\n"
+"            Zaman tabanlı bir otomasyonu tam olarak planlandığı gibi hemen "
+"çalıştırır: eylem talimatlarını başsız bir çalışmada yürüten temsilcinin bir "
+"kopyasını oluşturur ve sonucunu sohbette gösterir.\n"
+"            Kullanıcı bir otomasyonu hemen çalıştırmak, test etmek veya "
+"denemek istediğinde kullanın; otomasyonun adımlarını sohbet sırasında "
+"kendiniz uygulamayın. Yalnızca zaman tabanlı otomasyonlar (planlanmış "
+"eylemler ve zaman kuralları) isteğe bağlı olarak çalıştırılabilir; olay "
+"tabanlı bir kural, tetikleyicisiyle eşleşen bir kayıt oluşturularak veya "
+"güncellenerek test edilir.\n"
+"            Zaman tabanlı bir otomasyon oluşturduktan sonra, kullanıcıya bu "
+"aracı hemen ÇAĞIRARAK bir kez çalıştırmayı teklif edin: onay kartı "
+"(\"Çalıştır\" / \"Şimdi değil\") tekliftir. Bunun yerine mesaj metninizde "
+"asla \"çalıştırmalı mıyım?\" diye sormayın, bu kullanıcıyı Çalıştır düğmesi "
+"olmadan bırakır.\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.module.module,description:base.module_ai_agentic
@@ -99,6 +162,12 @@ msgid ""
 "* Enhance customer service with AI-powered responses\n"
 "* Automate routine tasks with intelligent workflows\n"
 msgstr ""
+"\n"
+"* Çeşitli iş görevleri için yapay zeka aracıları oluşturun ve yönetin\n"
+"* Popüler yapay zeka modelleri ve hizmetleri ile entegre olun\n"
+"* Belgeleri işleyin ve bilgileri otomatik olarak çıkarın\n"
+"* Yapay zeka destekli yanıtlarla müşteri hizmetlerini geliştirin\n"
+"* Akıllı iş akışları ile rutin görevleri otomatikleştirin\n"
 
 #. module: ai_agentic
 #. odoo-python
@@ -106,27 +175,32 @@ msgstr ""
 msgid ""
 "\"%s\" ran. The full transcript is in its own chat, under the Automation tab."
 msgstr ""
+"\"%s\" çalıştırıldı. Tam döküm, Otomasyon sekmesi altında kendi sohbetinde "
+"bulunur."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/base_automation.py:0
 msgid "%(agent)s: %(automation)s"
-msgstr ""
+msgstr "%(agent)s: %(automation)s"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archive"
 msgstr ""
+"<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Ar\\u015hive Kaldır"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Delete"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Sil"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Unarchive"
 msgstr ""
+"<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Ar\\u015hivden "
+"Çıkar"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -135,6 +209,9 @@ msgid ""
 "focused_model_id) and interface_key != 'systray_ai_button'\">All Models</"
 "span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"(not is_system_default or "
+"focused_model_id) and interface_key != 'systray_ai_button'\">Tüm Modeller</"
+"span>"
 
 #. module: ai_agentic
 #: model:ir.module.module,summary:base.module_ai_agentic
@@ -142,6 +219,8 @@ msgid ""
 "A powerful suite of AI tools and agents integrated directly into your Odoo "
 "environment"
 msgstr ""
+"Odoo ortamınıza doğrudan entegre edilmiş güçlü bir Yapay Zeka araçları ve "
+"aracıları paketi"
 
 #. module: ai_agentic
 #: model:ir.module.module,shortdesc:base.module_ai_agentic
@@ -153,82 +232,82 @@ msgstr "Yapay Zeka"
 #: model:ir.model,name:ai_agentic.model_ai_agent
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "Yapay Zeka Aracısı"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_agent_source
 msgid "AI Agent Source"
-msgstr ""
+msgstr "Yapay Zeka Aracı Kaynağı"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_automation_trigger
 msgid "AI Automation Trigger"
-msgstr ""
+msgstr "Yapay Zeka Otomasyon Tetikleyicisi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_automation_trigger_ids
 msgid "AI Automation Triggers"
-msgstr ""
+msgstr "Yapay Zeka Otomasyon Tetikleyicileri"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "Yapay Zeka Oturumu"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_tool
 msgid "AI Tool"
-msgstr ""
+msgstr "Yapay Zeka Aracı"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "AI Tool: Create or Update Automation"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Otomasyon Oluştur veya Güncelle"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_run_automation
 msgid "AI Tool: Run Automation"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Otomasyonu Çalıştır"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "AI Tools"
-msgstr ""
+msgstr "Yapay Zeka Araçları"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ir_actions_server_view_form
 msgid "Actions"
-msgstr ""
+msgstr "Aksiyonlar"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_list.xml:0
 msgid "Add"
-msgstr ""
+msgstr "Ekle"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Links"
-msgstr ""
+msgstr "Bağlantı Ekle"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Sources"
-msgstr ""
+msgstr "Kaynak Ekleme"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Add a Link"
-msgstr ""
+msgstr "Bağlantı Ekle"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.js:0
 msgid "Add skills to expand what your agent can do."
-msgstr ""
+msgstr "Aracınızın yapabileceklerini genişletmek için beceriler ekleyin."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -236,12 +315,16 @@ msgstr ""
 msgid ""
 "Add sources to give your agent the information it needs to answer accurately."
 msgstr ""
+"Aracınızın doğru yanıt vermesi için ihtiyaç duyduğu bilgileri sağlamak üzere "
+"kaynaklar ekleyin."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add sources to your AI Agent to get answers based on specific content."
 msgstr ""
+"Belirli içeriklere dayalı yanıtlar almak için AI Agent'ınıza kaynaklar "
+"ekleyin."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -250,24 +333,26 @@ msgid ""
 "Add triggers to let your agent run automatically on a schedule or when key "
 "events happen."
 msgstr ""
+"Aracınızın bir programa göre veya önemli Etkinlikler gerçekleştiğinde "
+"otomatik olarak çalışmasını sağlamak için tetikleyiciler ekleyin."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Adding sources..."
-msgstr ""
+msgstr "Kaynak ekleme..."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Creation"
-msgstr ""
+msgstr "Oluşturma Sonrası"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Update"
-msgstr ""
+msgstr "Güncelleme Sonrası"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -279,19 +364,19 @@ msgstr "Ajan"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Name"
-msgstr ""
+msgstr "Temsilci Adı"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Subtitle"
-msgstr ""
+msgstr "Aracı Alt Başlığı"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/thread_actions_patch.js:0
 msgid "Agent configuration"
-msgstr ""
+msgstr "Aracı yapılandırması"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_base_automation__ai_agent_id
@@ -299,6 +384,9 @@ msgid ""
 "Agent that runs the AI actions of this automation rule. Its tool calls are "
 "auto-confirmed and each run is kept in a chat for inspection."
 msgstr ""
+"Bu otomasyon kuralının Yapay Zeka eylemlerini çalıştıran aracı. Araç "
+"çağrıları otomatik olarak onaylanır ve her çalıştırma, inceleme için bir "
+"sohbette tutulur."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -319,12 +407,12 @@ msgstr ""
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_action_prompt
 msgid "Ai Action Prompt"
-msgstr ""
+msgstr "YZ Eylem İstemi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_next_trigger_date
 msgid "Ai Next Trigger Date"
-msgstr ""
+msgstr "YZ Sonraki Tetikleme Tarihi"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -335,19 +423,19 @@ msgstr "Tüm Modeller"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.js:0
 msgid "Allow this Agent to ask for help to other Agents"
-msgstr ""
+msgstr "Bu Temsilcinin diğer Temsilcilerden yardım istemesine izin ver"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__architect
 msgid "Architect"
-msgstr ""
+msgstr "Mimar"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Archive"
-msgstr ""
+msgstr "Arşivle"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -359,18 +447,18 @@ msgstr "Arşivlendi"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to archive this agent?"
-msgstr ""
+msgstr "Bu temsilciyi ar\\u015hive kaldırmak istediğinizden emin misiniz?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to delete this agent?"
-msgstr ""
+msgstr "Bu temsilciyi silmek istediğinizden emin misiniz?"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__artist
 msgid "Artist"
-msgstr ""
+msgstr "Sanatçı"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -379,40 +467,40 @@ msgstr ""
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__automation_id
 msgid "Automation"
-msgstr ""
+msgstr "Otomasyon"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_base_automation
 msgid "Automation Rule"
-msgstr ""
+msgstr "Otomasyon Kuralları"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Automation Rule %(name)s"
-msgstr ""
+msgstr "Otomasyon Kuralı %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__automation_ids
 msgid "Automation rules that run this agent by themselves."
-msgstr ""
+msgstr "Bu aracı kendiliğinden çalıştıran otomasyon kuralları."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.js:0
 msgid "Automation triggered!"
-msgstr ""
+msgstr "Otomasyon tetiklendi!"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__avatar_role
 msgid "Avatar Role"
-msgstr ""
+msgstr "Avatar Rolü"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Based on a Date Field"
-msgstr ""
+msgstr "Tarih Alanına Dayalı"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -427,14 +515,14 @@ msgstr "Acenteyi Arayın"
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "Channel opened by an automation rule or scheduled action."
-msgstr ""
+msgstr "Otomasyon kuralı veya zamanlanmış eylem tarafından açılan kanal."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "Close"
-msgstr ""
+msgstr "Kapat"
 
 #. module: ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_config_menu
@@ -444,7 +532,7 @@ msgstr "Ayarlar"
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ai_agent_action_create
 msgid "Create Agent"
-msgstr ""
+msgstr "Aracı Oluştur"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_skill
@@ -452,6 +540,8 @@ msgid ""
 "Create a skill that leverages instructions and tools to direct Odoo AI in "
 "assisting the user with their tasks."
 msgstr ""
+"Odoo Yapay Zeka'nın, kullanıcının görevlerine yardımcı olması için "
+"talimatlardan ve araçlardan yararlanan bir beceri oluşturun."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_agent_action
@@ -461,23 +551,23 @@ msgstr "İlk Acentenizi oluşturun!"
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_skill_action
 msgid "Create your first skill!"
-msgstr ""
+msgstr "İlk becerinizi oluşturun!"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Created a Trigger"
-msgstr ""
+msgstr "Bir Tetikleyici Oluşturuldu"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Tarafından oluşturuldu"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Oluşturuldu"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -487,7 +577,7 @@ msgstr "Özel Kurallar"
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Custom Skills"
-msgstr ""
+msgstr "Özel Beceriler"
 
 #. module: ai_agentic
 #: model:ir.actions.act_window,name:ai_agentic.ai_composer_action
@@ -505,35 +595,39 @@ msgid ""
 "- What can it do?\n"
 "- How should it work?"
 msgstr ""
+"Temsilcinizin işleyiş çerçevesini tanımlayın:\n"
+"- Hangi rolü üstlenmeli?\n"
+"- Neler yapabilir?\n"
+"- Nasıl çalışmalı?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Sil"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__detective
 msgid "Detective"
-msgstr ""
+msgstr "Dedektif"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Disable"
-msgstr ""
+msgstr "Devre dışı"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "İptal"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Mesajlaşma Kanalı"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__display_name
@@ -546,26 +640,26 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__display_name
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "İsim Göster"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Dropdown menu"
-msgstr ""
+msgstr "Aşağı Açılır Menü"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "Düzenle"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Enable"
-msgstr ""
+msgstr "Etkinleştir"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
@@ -576,28 +670,28 @@ msgstr "Acenteye ne yapmaları gerektiğini açıklayın..."
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "File"
-msgstr ""
+msgstr "Dosya"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "From AI Automation"
-msgstr ""
+msgstr "Yapay Zeka Otomasyonundan"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__headset
 msgid "Headset"
-msgstr ""
+msgstr "Kulaklık"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__hoodie
 msgid "Hoodie"
-msgstr ""
+msgstr "Sweatshirt"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "I need help to choose"
-msgstr ""
+msgstr "Seçim yapmak için yardıma ihtiyacım var"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__id
@@ -610,7 +704,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__id
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -618,12 +712,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Instructions"
-msgstr ""
+msgstr "Açıklamalar"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Interval"
-msgstr ""
+msgstr "Aralık"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__avatar_role
@@ -631,6 +725,8 @@ msgid ""
 "Job role the agent depicts. Setting it redraws the avatar in the agent's own "
 "color."
 msgstr ""
+"Temsilcinin canlandırdığı iş rolü. Bu ayar, avatarı temsilcinin kendi "
+"renginde yeniden çizer."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -641,22 +737,22 @@ msgstr "Anahtar"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Knowledge"
-msgstr ""
+msgstr "Bilgi Birikimi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__prev_trigger_date
 msgid "Last Trigger Date"
-msgstr ""
+msgstr "Son Tetikleme Tarihi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Son Güncelleyen"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Son Güncelleme"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -665,17 +761,19 @@ msgid ""
 "Let's create a new Trigger together, I'm not sure what setup is best for my "
 "use case."
 msgstr ""
+"Birlikte yeni bir Tetikleyici oluşturalım, durumum için en iyi ayarın ne "
+"olduğundan emin değilim."
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__librarian
 msgid "Librarian"
-msgstr ""
+msgstr "Kütüphaneci"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "Link"
-msgstr ""
+msgstr "Bağlantı"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -686,7 +784,7 @@ msgstr "Posta Şablonu ekstra istemi"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_agent.py:0
 msgid "My agent"
-msgstr ""
+msgstr "Temsilcim"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
@@ -699,7 +797,7 @@ msgstr "Adı"
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__next_trigger_date
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Next Trigger Date"
-msgstr ""
+msgstr "Sonraki Tetikleme Tarihi"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_composer_action
@@ -709,19 +807,19 @@ msgstr "Varsayılan İstemler bulunamadı!"
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_tool_action
 msgid "No Tools found!"
-msgstr ""
+msgstr "Araç bulunamadı!"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No automation runs yet."
-msgstr ""
+msgstr "Henüz otomasyon çalıştırılmadı."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "No valid URLs found to process."
-msgstr ""
+msgstr "İşlenecek geçerli URL bulunamadı."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -730,23 +828,25 @@ msgid ""
 "No valid files to upload. Only PDF, Word, PowerPoint, Excel, Text, CSV, "
 "OpenDocument, and Markdown files are allowed."
 msgstr ""
+"Yüklenecek geçerli dosya yok. Yalnızca PDF, Word, PowerPoint, Excel, Metin, "
+"CSV, OpenDocument ve Markdown dosyalarına izin verilir."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Not now"
-msgstr ""
+msgstr "Şimdi değil"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent_source__file_sources_count
 msgid "Number of file sources"
-msgstr ""
+msgstr "Dosya kaynaklarının sayısı"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "On a Schedule"
-msgstr ""
+msgstr "Zamanlanmış Olarak"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -757,13 +857,13 @@ msgstr "Model Üzerinde"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Paste your links, one per line"
-msgstr ""
+msgstr "Bağlantılarınızı her satıra bir tane olacak şekilde yapıştırın"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Prompt"
-msgstr ""
+msgstr "İstem"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
@@ -774,37 +874,38 @@ msgstr "Özellikler"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Ran the trigger %(name)s"
-msgstr ""
+msgstr "Tetikleyici çalıştırıldı %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid ""
 "Read-only rendering of the Markdown instructions, shown in the agent panel."
 msgstr ""
+"Temsilci panelinde gösterilen, Markdown talimatların salt okunur görünümü."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Remove"
-msgstr ""
+msgstr "Kaldır"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid "Rendered Instructions"
-msgstr ""
+msgstr "Oluşturulmuş Talimatlar"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Reprocess"
-msgstr ""
+msgstr "Yeniden işleme"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_panel_sources.xml:0
 msgid "Restrict answers to Sources"
-msgstr ""
+msgstr "Yanıtları Kaynaklarla sınırla"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -823,53 +924,55 @@ msgstr "Kural Adı"
 #: code:addons/ai_agentic/models/ai_tool.py:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.xml:0
 msgid "Run"
-msgstr ""
+msgstr "Çalıştır"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run automatically at a set frequency, e.g. on Mondays 8AM"
 msgstr ""
+"Belirli bir sıklıkta otomatik olarak çalıştır, örn. Pazartesi günleri saat "
+"08:00'de"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run once per record, when a specific date is reached"
-msgstr ""
+msgstr "Belirli bir tarihe ulaşıldığında, kayıt başına bir kez çalıştır"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Run this automation now?"
-msgstr ""
+msgstr "Bu otomasyonu şimdi çalıştır?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a new record is added"
-msgstr ""
+msgstr "Yeni bir kayıt eklendiğinde çalıştır"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a specific field gets updated"
-msgstr ""
+msgstr "Belirli bir alan güncellendiğinde çalıştır"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_run_automation
 msgid "Running the automation"
-msgstr ""
+msgstr "Otomasyon çalışıyor"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__sales
 msgid "Sales"
-msgstr ""
+msgstr "Satış"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Save"
-msgstr ""
+msgstr "Kaydet"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -879,12 +982,12 @@ msgstr "Bir eylem seçin..."
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ir_actions_server
 msgid "Server Action"
-msgstr ""
+msgstr "Sunucu İşlemi"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_search
 msgid "Skill"
-msgstr ""
+msgstr "Yetenek"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -895,17 +998,19 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
 msgid "Skills"
-msgstr ""
+msgstr "Yetenekler"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Skills configured by the user, excluding built-in native skills."
-msgstr ""
+msgstr "Kullanıcı tarafından yapılandırılan, yerel beceriler hariç yetenekler."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_skill_action
 msgid "Skills help you manage and organize your AI operations."
 msgstr ""
+"Beceriler, Yapay Zeka işlemlerinizi yönetmenize ve organize etmenize "
+"yardımcı olur."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -914,6 +1019,8 @@ msgid ""
 "Some URLs are invalid and were skipped. URLs must start with http://, "
 "https://, or ftp://"
 msgstr ""
+"Bazı URL'ler geçersizdir ve atlanmıştır. URL'ler http://, https:// veya "
+"ftp:// ile başlamalıdır"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -922,6 +1029,8 @@ msgid ""
 "Some files have invalid formats and were skipped: %s. Only PDF, Word, "
 "PowerPoint, Excel, Text, CSV, and OpenDocument files are allowed."
 msgstr ""
+"Bazı dosyalar geçersiz biçimlere sahiptir ve atlanmıştır: %s. Yalnızca PDF, "
+"Word, PowerPoint, Excel, Metin, CSV ve OpenDocument dosyalarına izin verilir."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
@@ -933,17 +1042,17 @@ msgstr "Kaynaklar"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.xml:0
 msgid "Subagents"
-msgstr ""
+msgstr "Alt temsilciler"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 msgid "Summarize the chatter"
-msgstr ""
+msgstr "Sohbeti özetleyin"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
 msgid "Summarize what this skill does"
-msgstr ""
+msgstr "Bu becerinin ne yaptığını özetleyin"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -963,7 +1072,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "Title"
-msgstr ""
+msgstr "Başlık"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -972,7 +1081,7 @@ msgstr ""
 #: model:ir.ui.menu,name:ai_agentic.ai_tool_menu_action
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "Tools"
-msgstr ""
+msgstr "Araçlar"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_tool_action
@@ -981,6 +1090,9 @@ msgid ""
 "                generating an image or updating a record) when called by an "
 "Agent."
 msgstr ""
+"Araçlar, bir Temsilci tarafından arandığında yapay zeka temsilcisinin "
+"veritabanınızda (görsel oluşturmak veya kayıt güncellemek gibi) "
+"gerçekleştirebileceği belirli eylemlerdir."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -988,42 +1100,42 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__automation_ids
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "Triggers"
-msgstr ""
+msgstr "Tetikleyiciler"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Unarchive"
-msgstr ""
+msgstr "Arşivden geri al"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Unread"
-msgstr ""
+msgstr "Okunmamış"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Updated a Trigger"
-msgstr ""
+msgstr "Tetikleyici güncellendi"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Upload a File"
-msgstr ""
+msgstr "Dosya Yükleme"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_tool_view_search
 msgid "Use in AI is set"
-msgstr ""
+msgstr "Yapay zekada kullanım ayarlandı"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "When should your agent be triggered?"
-msgstr ""
+msgstr "Temsilciniz ne zaman tetiklenmeli?"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -1033,12 +1145,12 @@ msgstr "Kullanıcılar ihtiyaç duyduğunda"
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__worker
 msgid "Worker"
-msgstr ""
+msgstr "İşçi"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "Working on your automation"
-msgstr ""
+msgstr "Otomasyonunuz üzerinde çalışılıyor"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -1063,19 +1175,19 @@ msgstr "örneğin SDR Danışmanı"
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 msgid "e.g. write a one paragraph summary of the chatter conversation"
-msgstr ""
+msgstr "Örneğin, sohbetin bir paragraflık özetini yazın"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "has run %s"
-msgstr ""
+msgstr "çalıştırıldı %s"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "self-updated its configuration"
-msgstr ""
+msgstr "yapılandırmasını kendisi güncelledi"
 
 #~ msgid "Model"
 #~ msgstr "Model"

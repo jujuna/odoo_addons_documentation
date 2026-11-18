@@ -2,22 +2,25 @@
 
 from datetime import date
 
+from dateutil.relativedelta import relativedelta
+
+from odoo import fields
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestPayslipNoAccountingCommon
 
 
 @tagged('post_install', '-at_install', 'student')
-class TestStudent(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestStudent(TestPayslipNoAccountingCommon, TestBelgiumCommon):
 
     _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.company_data['company'].current_payroll_config_id.write({
+        cls.env.company.current_payroll_config_id.write({
             'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
         })
 
@@ -84,3 +87,20 @@ class TestStudent(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip.compute_sheet()
 
         self._validate_payslip(payslip)
+
+    def test_student_under_15_blocks_validation(self):
+        self.employee.sudo().write({
+            'birthday': fields.Date.today() - relativedelta(years=14),
+            'employee_type_id': self.env.ref('hr.contract_type_student').id,
+            'lang': 'fr_BE',
+        })
+        payslip = self.env['hr.payslip'].with_context(allowed_company_ids=self.env.company.ids).create({
+            'name': 'Test Payslip',
+            'employee_id': self.employee.id,
+            'date_from': date(2020, 9, 1),
+            'date_to': date(2020, 9, 30),
+        })
+        payslip.compute_sheet()
+
+        with self.assertRaisesRegex(ValidationError, "Employees under 15 years old"):
+            payslip.action_payslip_done()

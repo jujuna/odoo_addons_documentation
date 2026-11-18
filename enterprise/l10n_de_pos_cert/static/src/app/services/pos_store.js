@@ -115,8 +115,9 @@ patch(PosStore.prototype, {
     _createAmountPerVatRateArray(order) {
         const expectedBase = order.prices.taxDetails.base_amount;
         let baseAmountSum = 0;
+        // Tax details are already signed (negative for a refund), like the payment amounts
         const result = order.prices.taxDetails.subtotals[0].tax_groups.map((group) => {
-            const amount = parseFloat((group.tax_amount + group.base_amount) * order.orderSign);
+            const amount = parseFloat(group.tax_amount + group.base_amount);
             baseAmountSum += group.base_amount;
             const tax_id = Object.values(group.involved_tax_ids)[0];
             let tax_amount = 0;
@@ -131,7 +132,7 @@ patch(PosStore.prototype, {
 
         // Adjustments (e.g., gift cards, tips) may lack tax info, default it to 0% to avoid mismatches.
         const difference = parseFloat(
-            (expectedBase + order.requiredSettlementAmount() - baseAmountSum) * order.orderSign
+            expectedBase + order.requiredSettlementAmount() - baseAmountSum
         );
         if (difference) {
             const existingNullEntry = result.find((item) => item.vat_rate === "0");
@@ -182,6 +183,33 @@ patch(PosStore.prototype, {
         return await this.transactionCall(payload, data, order, 0, true);
     },
 
+    async _fetchTransaction(txId) {
+        if (!txId) {
+            return;
+        }
+        let token = this.getApiToken();
+        if (!token) {
+            await this._authenticate();
+            token = this.getApiToken();
+        }
+        const response = await fetch(`${this.getApiUrl()}/tss/${this.getTssId()}/tx/${txId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            method: "GET",
+        });
+        if (response.ok) {
+            return await response.json();
+        }
+    },
+    async fetchReceiptTransaction(order) {
+        const result = await this._fetchTransaction(order.l10n_de_fiskaly_transaction_uuid);
+        if (result) {
+            order.uiState.tx_revision = result.revision + 1;
+        }
+        return result;
+    },
     async transactionCall(payload, data, order, retryCount = 0, isReceiptTxn = false) {
         let token = this.getApiToken();
         try {
@@ -205,14 +233,50 @@ patch(PosStore.prototype, {
                 const errorCode = await this.handleRequestError(result, order, retryCount);
                 // Most commonly useful for restaurants as there are update order txns but kept here for generic error handling
                 if (errorCode === "revision_mismatch" && order) {
+                    const currentTransaction = isReceiptTxn
+                        ? await this.fetchReceiptTransaction(order)
+                        : await this.fetchOrderTransaction(order);
+                    if (
+                        ["FINISHED", "CANCELLED"].includes(data.state) && // if the transaction is already finished or cancelled, return the current transaction
+                        currentTransaction?.state === data.state
+                    ) {
+                        return currentTransaction;
+                    }
+                    if (
+                        isReceiptTxn &&
+                        data.state === "FINISHED" &&
+                        currentTransaction?.state === "CANCELLED"
+                    ) {
+                        // e.g. cancelled by cancelActiveTransactions at closing: sign in a new receipt
+                        await this.createTransaction(order);
+                        return await this.transactionCall(
+                            `${order.l10n_de_fiskaly_transaction_uuid}?tx_revision=2`,
+                            data,
+                            order,
+                            retryCount + 1,
+                            true
+                        );
+                    }
                     const newPayload = payload.replace(
                         /tx_revision=\d+/,
                         `tx_revision=${order.uiState.tx_revision}`
                     );
-                    return await this.transactionCall(newPayload, data, order, retryCount + 1);
+                    return await this.transactionCall(
+                        newPayload,
+                        data,
+                        order,
+                        retryCount + 1,
+                        isReceiptTxn
+                    );
                 }
                 if (errorCode === "retry") {
-                    return await this.transactionCall(payload, data, order, retryCount + 1);
+                    return await this.transactionCall(
+                        payload,
+                        data,
+                        order,
+                        retryCount + 1,
+                        isReceiptTxn
+                    );
                 }
             }
 
@@ -230,11 +294,8 @@ patch(PosStore.prototype, {
     async handleRequestError(result, order, retryCount) {
         if (result.code === "E_TX_UPSERT" && order && !retryCount) {
             // The local tx_revision is out of sync (e.g. order was started on another
-            // device). Fetch the real revision from Fiskaly; transactionCall will then
-            // rebuild the payload and retry.
-            if (order) {
-                await this.fetchTransaction(order);
-            }
+            // device, or a previous response was lost). transactionCall will fetch the
+            // real revision from Fiskaly, rebuild the payload and retry.
             return "revision_mismatch";
         } else if (result.status_code === 401) {
             if (!retryCount) {
@@ -446,7 +507,7 @@ patch(PosStore.prototype, {
     /**
      * This function first attempts to send the orders remaining in the queue to Fiskaly before trying to
      * send it to Odoo. Two cases can happen:
-     * - Failure to send to Fiskaly => we assume that if one order fails, EVERY order will fail
+     * - Failure to send to Fiskaly => the order is kept locally and retried at the next sync
      * - Failure to send to Odoo => the order is already sent to Fiskaly, we store them locally with the TSS info
      */
     async syncAllOrders(options = {}) {
@@ -470,10 +531,12 @@ patch(PosStore.prototype, {
         const sentToFiskaly = [];
         const fiskalyFailure = [];
         const ordersToUpdate = {};
+        // Orders Fiskaly rejected stay local: they must not reach Odoo without their signature
+        const unsignedOrders = new Set();
         for (const order of orders) {
             try {
                 const orderObject = orderObjectMap[order.id];
-                if (!fiskalyError && !orderObject.fiskalyServerError && !orderObject.networkError) {
+                if (!orderObject.fiskalyServerError && !orderObject.networkError) {
                     const updated = await this.handleOrderTransaction(order, orderObject);
                     if (updated) {
                         ordersToUpdate[order.id] = true;
@@ -487,6 +550,7 @@ patch(PosStore.prototype, {
             } catch (error) {
                 fiskalyError = error;
                 fiskalyError.code = "fiskaly";
+                unsignedOrders.add(order);
                 fiskalyFailure.push(order);
             }
         }
@@ -499,7 +563,10 @@ patch(PosStore.prototype, {
                 }
             }
             try {
-                result = await super.syncAllOrders({ ...options, orders });
+                result = await super.syncAllOrders({
+                    ...options,
+                    orders: orders.filter((order) => !unsignedOrders.has(order)),
+                });
             } catch (error) {
                 odooError = error;
             }

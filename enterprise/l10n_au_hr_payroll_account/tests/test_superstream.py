@@ -697,3 +697,20 @@ class TestPayrollSuperStream(AccountTestInvoicingCommon):
             'voluntary_amount': 0,
             'amount_total': 120,
         }])
+
+    @mock_skip_stp_api_calls()
+    def test_register_super_payment_without_employee_private_street(self):
+        self.payslips.unlink()
+        today = date.today()
+        self.employee.private_street = False
+        slip = self._create_payslip_for_period(today.replace(day=1), today + relativedelta(day=31))
+        slip.compute_sheet()
+        slip.action_payslip_done()
+
+        # Pay the super stream
+        superstream = slip._get_superstreams()
+        superstream.journal_id = self.journal_id
+        superstream.action_confirm()
+        slip.move_id.action_post()
+        superstream.action_register_super_payment()
+        self.assertEqual(superstream.state, 'done')

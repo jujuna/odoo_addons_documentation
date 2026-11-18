@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-20 07:25+0000\n"
+"POT-Creation-Date: 2026-11-13 17:50+0000\n"
+"PO-Revision-Date: 2026-11-10 10:07+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/fi/>\n"
@@ -101,7 +101,7 @@ msgstr "%(return_type_name)s %(period_suffix)s %(country_code)s"
 #. odoo-python
 #: code:addons/account_reports/wizard/fiscal_year.py:0
 msgid "%(vat_label)s Periodicity"
-msgstr ""
+msgstr "%(vat_label)s Jaksollisuus"
 
 #. module: account_reports
 #. odoo-python
@@ -128,6 +128,8 @@ msgid ""
 "'%(account_name)s' account balance is affected by journal items which don't "
 "originate from a bank statement or payment."
 msgstr ""
+"'%(account_name)s' -tilin saldoon vaikuttaa kirjausrivit, jotka eivät ole "
+"peräisin tiliotteesta tai maksusta."
 
 #. module: account_reports
 #. odoo-python
@@ -166,6 +168,8 @@ msgid ""
 "'active' field of account.return.type shouldn't be directly written to in "
 "data files. Use active_fallback. (Detected while loading %(file_path)s)"
 msgstr ""
+"account.return.type 'aktiivinen'-kenttää ei pitäisi kirjoittaa suoraan "
+"datatiedostoihin. Käytä active_fallback. (Havaittu ladattaessa %(file_path)s)"
 
 #. module: account_reports
 #. odoo-python
@@ -211,46 +215,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the list of your open invoices.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Hyvä <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Hyvä <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    Ohessa luettelo avoimista laskuistanne.\n"
-"                    <br/>\n"
-"                    Ethän epäröi ottaa meihin yhteyttä, mikäli sinulla on "
-"kysyttävää.\n"
-"                    <br/>\n"
-"                    Terveisin,\n"
-"                    <br/>\n"
-"                    <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_customer_statement
@@ -258,46 +241,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the statement of your account.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                   <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Hyvä <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                   <t t-else=\"\">Hyvä <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                   <br/>\n"
-"                    Liitteenä tiliotteenne.\n"
-"                   <br/>\n"
-"                    Ettehän epäröi ottaa meihin yhteyttä, mikäli teillä on "
-"kysyttävää.\n"
-"                   <br/>\n"
-"                    Ystävällisin terveisin,\n"
-"                   <br/>\n"
-"\t                <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_tax_return_deadline
@@ -305,17 +267,18 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    Hi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    The deadline to submit <strong t-out=\"object.name\"/> "
-"is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    The deadline to submit <strong t-out=\"object.name\"></"
+"strong> is <strong t-out=\"format_date(object.date_deadline)\"></strong>."
+"<br>\n"
 "                    To avoid any potential fine, please ensure all remaining "
-"documents are sent over as soon as possible.<br/>\n"
+"documents are sent over as soon as possible.<br>\n"
 "                    If you've already submitted everything but still "
 "received this email, it's likely the tax return hasn't been marked as "
-"submitted in Odoo.<br/>\n"
+"submitted in Odoo.<br>\n"
 "                    Should you have any question or need assistance, feel "
-"free to get in touch.<br/><br/>\n"
-"                    Best regards,<br/>\n"
+"free to get in touch.<br><br>\n"
+"                    Best regards,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -334,12 +297,12 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -347,12 +310,12 @@ msgid ""
 "                        <td>Amount to Pay</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
 "                        <td>Due By</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Kind regards,</p>\n"
@@ -360,41 +323,6 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p>\n"
-"                    Hyvä <t t-out=\"object.company_id.name\">YrityksenNimi</"
-"t>,\n"
-"                </p>\n"
-"                <p>\n"
-"                    Vastaanotettujen asiakirjojen ja tietojen pohjalta "
-"yrityksen <t t-out=\"object.company_id.name\">YrityksesiNimi</t>\n"
-"                    veroilmoitus ajanjaksolta <t t-"
-"out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> on lähetetty.\n"
-"                </p>\n"
-"                <p>\n"
-"                    Maksettava summa on <t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/>.\n"
-"                </p>\n"
-"                <table style=\"border:1px solid black; padding:20px; text-"
-"align:left; border-spacing: 16px;\">\n"
-"                    <tr>\n"
-"                        <td>Maksettava</td>\n"
-"                        <td><t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
-"                    </tr>\n"
-"                    <tr>\n"
-"                        <td>Eräpäivä</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
-"                    </tr>\n"
-"                </table>\n"
-"                <p>Ystävällisin terveisin,</p>\n"
-"                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -474,7 +402,7 @@ msgstr "<strong>Merkinnät: </strong>"
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "> 12 Months"
-msgstr ""
+msgstr "> 12 kuukautta"
 
 #. module: account_reports
 #: model:ir.model.constraint,message:account_reports.constraint_account_report_horizontal_group_name_uniq
@@ -635,7 +563,7 @@ msgstr "Tilin palautustarkistusmalli"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_financial_year_op__account_return_periodicity_label
 msgid "Account Return Periodicity Label"
-msgstr ""
+msgstr "Tilin ilmoitusjakson nimike"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_res_company__account_revaluation_journal_id
@@ -656,12 +584,12 @@ msgstr "Tilityyppi"
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_profit_account_id
 msgid "Account on which a rounding gain of the tax closing entry is posted."
-msgstr ""
+msgstr "Tili, jolle veron päätöskirjauksen pyöristysvoitto kirjataan."
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_loss_account_id
 msgid "Account on which a rounding loss of the tax closing entry is posted."
-msgstr ""
+msgstr "Tili, jolle veron päätöskirjauksen pyöristystappio kirjataan."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_account_balances_search_view
@@ -798,12 +726,12 @@ msgstr "Aktiivinen"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__active_fallback
 msgid "Active Fallback"
-msgstr ""
+msgstr "Aktiivinen varasuunnitelma"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__active_selection
 msgid "Active Selection"
-msgstr ""
+msgstr "Aktiivinen valinta"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__activity_ids
@@ -887,12 +815,12 @@ msgstr "Oikaisukirjaus"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
 msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
-msgstr ""
+msgstr "Oikaisut nettotuloksen/(tappion) täsmäyttämiseksi nettokassavirtoihin:"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
 msgid "Advance Account"
-msgstr ""
+msgstr "Ennakkomaksutili"
 
 #. module: account_reports
 #. odoo-python
@@ -1062,6 +990,8 @@ msgid ""
 "All the Journal Entries used to record received taxes amounts in the Cash "
 "Basis journal are in sequence."
 msgstr ""
+"Kaikki maksuperusteisessa päiväkirjassa vastaanotettujen verojen "
+"kirjaamiseen käytetyt päiväkirjan kirjaukset ovat sekvenssissä."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_allocation_of_prior_year_result_to_equity
@@ -1418,6 +1348,8 @@ msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
 "taxes."
 msgstr ""
+"Auditoi kirjausrivit ja tilit varmistaaksesi, että ne on kohdistettu "
+"oikeisiin veroihin."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__auto_generate
@@ -1539,7 +1471,7 @@ msgstr "Pankkitäsmäytys"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.bank_name
 msgid "Bank Name"
-msgstr ""
+msgstr "Pankin nimi"
 
 #. module: account_reports
 #. odoo-python
@@ -1560,7 +1492,7 @@ msgstr "Pankkitäsmäytysraportin erityiskäsittelijä"
 #. module: account_reports
 #: model:ir.actions.client,name:account_reports.action_account_report_bank_reconciliation
 msgid "Bank Reconciliation Summary"
-msgstr ""
+msgstr "Pankkitäsmäytyksen yhteenveto"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_statements
@@ -1570,7 +1502,7 @@ msgstr "Tiliotteet"
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Pankkitapahtuma"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -1589,6 +1521,8 @@ msgid ""
 "Bank reconciliation helps identify missing invoices or bills that may affect "
 "taxes."
 msgstr ""
+"Pankkitäsmäytys auttaa tunnistamaan puuttuvat myynti- tai ostolaskut, jotka "
+"voivat vaikuttaa veroihin."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.bank_information_customer_report
@@ -1671,7 +1605,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow
 msgid "CASH FLOW"
-msgstr ""
+msgstr "KASSAVIRTA"
 
 #. module: account_reports
 #. odoo-python
@@ -1694,7 +1628,7 @@ msgstr "CTA"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Calculated Ending Bank Balance as of %(date_to)s"
-msgstr ""
+msgstr "Laskettu pankkitilin loppusaldo %(date_to)s"
 
 #. module: account_reports
 #. odoo-python
@@ -1755,12 +1689,12 @@ msgstr "Käteinen"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Cash Basis sequences"
-msgstr ""
+msgstr "Maksuperusteiset sekvenssit"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_indirect_report_handler
 msgid "Cash Flow Indirect Report Custom Handler"
-msgstr ""
+msgstr "Kassavirran epäsuoran raportin erityiskäsittelijä"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_report_handler
@@ -1776,32 +1710,32 @@ msgstr "Rahavirtalaskelma"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_financial_activities
 msgid "Cash Flows from financing activities"
-msgstr ""
+msgstr "Rahoitustoiminnan kassavirrat"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_investing_activities
 msgid "Cash Flows from investing activities"
-msgstr ""
+msgstr "Sijoitustoiminnan kassavirrat"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
 msgid "Cash Flows from operating activities"
-msgstr ""
+msgstr "Liiketoiminnan kassavirrat"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
 msgid "Cash advances made to third parties"
-msgstr ""
+msgstr "Kolmansille osapuolille myönnetyt käteisennakot"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_bop
 msgid "Cash and cash equivalents at beginning"
-msgstr ""
+msgstr "Rahavarat aluksi"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_eop
 msgid "Cash and cash equivalents at end"
-msgstr ""
+msgstr "Rahavarat lopuksi"
 
 #. module: account_reports
 #. odoo-python
@@ -2114,7 +2048,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_advance_tax_payment_account_id
 msgid "Company Advance Tax Payment Account"
-msgstr ""
+msgstr "Yrityksen ennakonpidätyksen maksutili"
 
 #. module: account_reports
 #. odoo-python
@@ -2138,12 +2072,12 @@ msgstr "Yrityksen asetukset"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_tax_payable_account_id
 msgid "Company Tax Payable Account"
-msgstr ""
+msgstr "Yrityksen verovelkatili"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_tax_receivable_account_id
 msgid "Company Tax Receivable Account"
-msgstr ""
+msgstr "Yrityksen verosaamisten tili"
 
 #. module: account_reports
 #. odoo-python
@@ -2254,7 +2188,7 @@ msgstr "Määritä tilit"
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.res_config_settings_view_form
 msgid "Configure your tax returns"
-msgstr ""
+msgstr "Määritä veroilmoituksesi"
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_marketable_securities_review
@@ -2314,7 +2248,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.column,name:account_reports.interco_comparison_counterpart
 msgid "Counterpart"
-msgstr ""
+msgstr "Vastapuoli"
 
 #. module: account_reports
 #. odoo-javascript
@@ -2364,7 +2298,7 @@ msgstr "Luo asiakas"
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_audit
 msgid "Create a new working file to start your next period review."
-msgstr ""
+msgstr "Luo uusi työtiedosto aloittaaksesi seuraavan jakson tarkistuksen."
 
 #. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_create_snapshots_ir_actions_server
@@ -2622,7 +2556,7 @@ msgstr "Päiväys huomioidaan kommentin mukaisesti."
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
 msgid "Date:"
-msgstr ""
+msgstr "Päivämäärä:"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
@@ -2755,7 +2689,7 @@ msgstr "Tuloennakko"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_deferred_revenue
 msgid "Deferred revenue"
-msgstr ""
+msgstr "Tuloennakko"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_expression_form
@@ -2776,7 +2710,7 @@ msgstr "Poista"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
 msgid "Depreciation and amortisation"
-msgstr ""
+msgstr "Poistot ja kuoletukset"
 
 #. module: account_reports
 #. odoo-javascript
@@ -2799,7 +2733,7 @@ msgstr "Määrittää ilmoituksen työnkulun."
 #. module: account_reports
 #: model:account.report.column,name:account_reports.interco_comparison_difference
 msgid "Difference"
-msgstr ""
+msgstr "Erotus"
 
 #. module: account_reports
 #. odoo-python
@@ -3003,6 +2937,8 @@ msgid ""
 "Downpayments posted on this account will be considered by the Tax Closing "
 "Entry."
 msgstr ""
+"Tälle tilille kirjatut ennakkomaksut otetaan huomioon "
+"veronpäätöskirjauksessa."
 
 #. module: account_reports
 #. odoo-javascript
@@ -3211,13 +3147,13 @@ msgstr "Vuoden loppu"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.ending_balance
 msgid "Ending Balance"
-msgstr ""
+msgstr "Loppusaldo"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Ending General Ledger Balance as of %(date_to)s"
-msgstr ""
+msgstr "Pääkirjan loppusaldo päivämääränä %(date_to)s"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3306,6 +3242,8 @@ msgid ""
 "Ensures that applied taxes and fiscal positions match the customer or vendor "
 "country location."
 msgstr ""
+"Varmistaa, että sovelletut verot ja verokantasäännöt vastaavat asiakkaan tai "
+"tavarantoimittajan maan sijaintia."
 
 #. module: account_reports
 #. odoo-python
@@ -3323,7 +3261,7 @@ msgstr "Oma pääoma"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Equity & Non-current Liabilities"
-msgstr ""
+msgstr "Oma pääoma & pitkäaikaiset velat"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_equity_account_movements_legal_documents
@@ -3399,7 +3337,7 @@ msgstr "Tiivistelmän erityiskäsittelijä"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Expense"
-msgstr ""
+msgstr "Kulu"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__expense_provision_account_id
@@ -3463,7 +3401,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__active_selection__false
 msgid "False"
-msgstr ""
+msgstr "Epätosi"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_horizontal_group_rule__field_name
@@ -3647,7 +3585,7 @@ msgstr "Valuuttakurssierot"
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign advance tax payment account (%s)"
-msgstr ""
+msgstr "Ulkomaisten ennakonpidätysten tili (%s)"
 
 #. module: account_reports
 #. odoo-python
@@ -3664,13 +3602,13 @@ msgstr "Ulkomaan operaatiot"
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign tax account payable (%s)"
-msgstr ""
+msgstr "Ulkomaan verovelka (%s)"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign tax account receivable (%s)"
-msgstr ""
+msgstr "Ulkomaan verosaamiset (%s)"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3697,22 +3635,23 @@ msgstr "Tulevat toimenpiteet"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
 msgid "Gain (-)/Loss (+) on sale of financial instruments"
-msgstr ""
+msgstr "Voitto (-) / tappio (+) rahoitusvälineiden myynnistä"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
 msgid "Gain (-)/Loss (+) on sale of intangible assets"
-msgstr ""
+msgstr "Voitto (-) / tappio (+) aineettomien hyödykkeiden myynnistä"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
 msgid "Gain (-)/Loss (+) on sale of property, plant and equipment"
 msgstr ""
+"Voitto (-) / tappio (+) aineellisten käyttöomaisuushyödykkeiden myynnistä"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_rou
 msgid "Gain (-)/Loss (+) on sale of right-of-use assets"
-msgstr ""
+msgstr "Voitto (-) / tappio (+) käyttöoikeusomaisuuden myynnistä"
 
 #. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_garbage_collect_snapshots_ir_actions_server
@@ -3734,7 +3673,7 @@ msgstr "Pääkirja"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.gl_balance
 msgid "General Ledger Balance"
-msgstr ""
+msgstr "Pääkirjan saldo"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_general_ledger_report_handler
@@ -3910,7 +3849,7 @@ msgstr "Onko raportti avattu kerran"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/interco_comparison_report/filters.js:0
 msgid "Hide Tax Lines"
-msgstr ""
+msgstr "Piilota verorivit"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4168,7 +4107,7 @@ msgstr "Sisältää analyyttiset simulaatiot"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Income"
-msgstr ""
+msgstr "Tulot"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__income_provision_account_id
@@ -4189,7 +4128,7 @@ msgstr "Tulovaraus kohteelle %s"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
 msgid "Income tax paid (-)/received (+)"
-msgstr ""
+msgstr "Tulovero maksettu (-) / vastaanotettu (+)"
 
 #. module: account_reports
 #. odoo-python
@@ -4232,7 +4171,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report,name:account_reports.cash_flow_report_indirect
 msgid "Indirect Cash Flow Statement"
-msgstr ""
+msgstr "Epäsuora rahavirtalaskelma"
 
 #. module: account_reports
 #. odoo-python
@@ -4259,12 +4198,12 @@ msgstr "Kokonaisluvun pyöristäminen"
 #: model:account.report.line,name:account_reports.interco_comparison_line
 #: model:ir.actions.client,name:account_reports.action_account_report_interco_comparison
 msgid "Interco Comparison"
-msgstr ""
+msgstr "Konsernin sisäinen vertailu"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_interco_comparison_report_handler
 msgid "Interco Comparison Report Custom Handler"
-msgstr ""
+msgstr "Konsernin sisäisen vertailuraportin erityiskäsittelijä"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_intercompany_account_reconciliation
@@ -4285,17 +4224,17 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
 msgid "Interest paid"
-msgstr ""
+msgstr "Maksetut korot"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
 msgid "Interest received"
-msgstr ""
+msgstr "Saadut korot"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
 msgid "Interests/Dividends paid"
-msgstr ""
+msgstr "Maksetut korot/osingot"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4362,7 +4301,7 @@ msgstr "Varastoinnin analyyttinen tarkastus"
 #. module: account_reports
 #: model:ir.ui.menu,name:account_reports.menu_action_stock_account_report_stock_valuation
 msgid "Inventory Valuation"
-msgstr ""
+msgstr "Varaston arvonmääritys"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_investigate_unusual_supplier_balances
@@ -4400,7 +4339,7 @@ msgstr "On suoritettu"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__is_country_in_active_country
 msgid "Is Country Fiscal Active"
-msgstr ""
+msgstr "Onko maan verotus aktiivinen"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_creation_wizard__is_create_disabled
@@ -4439,6 +4378,11 @@ msgstr "On palautettavissa"
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_report_set
 msgid "Is Report Set"
 msgstr "On asetettu raportti"
+
+#. module: account_reports
+#: model:ir.model.fields,field_description:account_reports.field_account_journal__is_tax_return_journal
+msgid "Is Tax Return Journal"
+msgstr "On veroilmoituspäiväkirja"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_tax_return
@@ -4675,7 +4619,7 @@ msgstr "Rivit"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Liquidity"
-msgstr ""
+msgstr "Likviditeetti"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4821,7 +4765,7 @@ msgstr "Valikko"
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_base_partner_merge_automatic_wizard
 msgid "Merge Partner Wizard"
-msgstr ""
+msgstr "Ohjattu kumppanin yhdistämistoiminto"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_mail_message
@@ -4876,6 +4820,9 @@ msgid ""
 "your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
+"Puuttuvat yritystiedot (kuten %(vat_label)s tai maa) voivat aiheuttaa "
+"virheitä ilmoitukseesi, kuten väärän verokannan tai virheellisten "
+"verovapautusten myöntämisen."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -5017,7 +4964,7 @@ msgstr "Nettovarallisuus"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
 msgid "Net financial result : income (-)/cost (+)"
-msgstr ""
+msgstr "Nettotulos : tuotto (-)/kulut (+)"
 
 #. module: account_reports
 #. odoo-python
@@ -5081,7 +5028,7 @@ msgstr "Ei negatiivisia käteiskassan saldoja"
 #. module: account_reports
 #: model:account.report.column,name:account_reports.followup_report_follow_up
 msgid "No Reminder"
-msgstr ""
+msgstr "Ei muistutusta"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_no_unjustified_cash_payments_to_supplier
@@ -5104,7 +5051,7 @@ msgstr "Korjauksia ei tarvita"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "No closing entry"
-msgstr ""
+msgstr "Ei päätöskirjausta"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5127,7 +5074,7 @@ msgstr "Ei luotavia kirjauksia."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_audit
 msgid "No pending working files!"
-msgstr ""
+msgstr "Ei työtiedostoja käsiteltävänä!"
 
 #. module: account_reports
 #. odoo-python
@@ -5138,7 +5085,7 @@ msgstr "Tarvittavia varauksia ei löytynyt."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "No tax return to do!"
-msgstr ""
+msgstr "Ei veroilmoituksia tehtävänä!"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5219,7 +5166,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
 msgid "Not reconciled yet"
-msgstr ""
+msgstr "Ei vielä täsmäytetty"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__notes
@@ -5298,7 +5245,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Off-balance"
-msgstr ""
+msgstr "Taseen ulkopuolella"
 
 #. module: account_reports
 #: model:account.report.column,name:account_reports.aged_payable_report_period5
@@ -5323,6 +5270,12 @@ msgstr "Yhtä valituista muodoista ei voi viedä DMS-järjestelmään"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_search_view
 msgid "Ongoing"
 msgstr "Käynnissä"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/res_partner.py:0
+msgid "Only a partner with a Tax ID can be set as main."
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -5401,7 +5354,7 @@ msgstr "Tilivuoden alkusaldo"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Opening Bank Balance as of %(date_from)s"
-msgstr ""
+msgstr "Pankin avaussaldo %(date_from)s"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_expense0
@@ -5456,12 +5409,12 @@ msgstr "Muut tulot"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
 msgid "Other payables"
-msgstr ""
+msgstr "Muut velat"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
 msgid "Other receivables"
-msgstr ""
+msgstr "Muut saamiset"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
@@ -5625,13 +5578,13 @@ msgstr "Kumppanit:"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Partners: %(partnersCount)s"
-msgstr ""
+msgstr "Kumppanit: %(partnersCount)s"
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Partners: %(partnersCount)s, Tags: %(tagsCount)s"
-msgstr ""
+msgstr "Kumppanit: %(partnersCount)s, tunnisteet: %(tagsCount)s"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__resolved_check_count
@@ -5662,7 +5615,7 @@ msgstr "Velka"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_payable_account_id
 msgid "Payable Account"
-msgstr ""
+msgstr "Velkatili"
 
 #. module: account_reports
 #. odoo-python
@@ -5817,7 +5770,7 @@ msgstr "Suunnitelmat"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/interco_comparison_report/warnings.xml:0
 msgid "Please choose the counterparts to consider in the company selector."
-msgstr ""
+msgstr "Valitse yritysvalitsimessa huomioitavat vastapuolet."
 
 #. module: account_reports
 #. odoo-javascript
@@ -5853,7 +5806,7 @@ msgstr "Valitse pääyritys ja sen sivuhaarat yritysvalitsimesta jatkaaksesi."
 msgid ""
 "Please set a deferred account on the related account or in the accounting "
 "settings."
-msgstr ""
+msgstr "Määritä siirtotili kyseisessä tilissä tai kirjanpitoasetuksissa."
 
 #. module: account_reports
 #. odoo-python
@@ -5961,17 +5914,17 @@ msgstr "Etene varoen, sillä tälle kaudelle saattaa jo olla olemassa oikaisu ("
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_borrowings
 msgid "Proceeds from borrowings"
-msgstr ""
+msgstr "Lainojen nostot"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_recov_adv
 msgid "Proceeds from recoverable advances"
-msgstr ""
+msgstr "Tulot takaisinperittävistä ennakkomaksuista"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_share_issuance
 msgid "Proceeds from share issuance"
-msgstr ""
+msgstr "Tulot osakeanneista"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5996,7 +5949,7 @@ msgstr "Tuloslaskelma"
 #. module: account_reports
 #: model:ir.actions.client,name:account_reports.action_account_report_pl_generic
 msgid "Profit and Loss - Generic"
-msgstr ""
+msgstr "Tuloslaskelma - Yleinen"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profitability0
@@ -6017,7 +5970,7 @@ msgstr "Arvonalentumisvaraus"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_provision
 msgid "Provisions"
-msgstr ""
+msgstr "Varaukset"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_purchases
@@ -6057,13 +6010,13 @@ msgstr "Arvostelut"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_recep_recov_cash_adv
 msgid "Receipt of recoverable cash advances"
-msgstr ""
+msgstr "Takaisinperittävien käteisennakoiden kuitti"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_receipts
 #: model:account.report.line,name:account_reports.unreconciled_receipts
 msgid "Receipts"
-msgstr ""
+msgstr "Kuitit"
 
 #. module: account_reports
 #. odoo-python
@@ -6076,7 +6029,7 @@ msgstr "Saamiset"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_receivable_account_id
 msgid "Receivable Account"
-msgstr ""
+msgstr "Saamistili"
 
 #. module: account_reports
 #. odoo-python
@@ -6128,7 +6081,7 @@ msgstr "Täsmäytä verovelat veroilmoitusten kanssa"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_transactions
 msgid "Reconciled Transactions"
-msgstr ""
+msgstr "Täsmäytetyt tapahtumat"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__records_count
@@ -6174,17 +6127,17 @@ msgstr "Muistutus: Tuleva {{ object.name }} määräaika - Vaatii toimintaa"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_borrowings
 msgid "Repayment of borrowings"
-msgstr ""
+msgstr "Lainojen takaisinmaksu"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_lease
 msgid "Repayment of lease"
-msgstr ""
+msgstr "Vuokran takaisinmaksu"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_recov_adv
 msgid "Repayment of recoverable advances"
-msgstr ""
+msgstr "Takaisinperittävien ennakoiden takaisinmaksu"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__account_report_id
@@ -6297,6 +6250,11 @@ msgstr "Ilmoitus täytetty"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_list_view
 msgid "Return Name"
 msgstr "Ilmoituksen nimi"
+
+#. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Return Reminders"
+msgstr "Palautusmuistutukset"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__return_state
@@ -6444,6 +6402,8 @@ msgid ""
 "Review invoices, bills and entries which are either in draft or marked as "
 "Anomaly/To Review."
 msgstr ""
+"Tarkista laskut ja kirjaukset, jotka ovat luonnostilassa tai merkitty "
+"poikkeaviksi/tarkistettaviksi."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6605,7 +6565,7 @@ msgstr "Osiot"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
 msgid "Select or type a value"
-msgstr ""
+msgstr "Valitse tai kirjoita arvo"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6634,10 +6594,15 @@ msgid "Send And Print Values"
 msgstr "Lähetä ja tulosta arvot"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Send Copy To"
+msgstr "Lähetä kopio osoitteeseen"
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_customer_statement.py:0
 msgid "Send Customer Statements"
-msgstr ""
+msgstr "Avaa asiakastiliotteet"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__send_mail_readonly
@@ -6689,6 +6654,8 @@ msgid "Service Sales to North-Irish Customers"
 msgstr "Palvelumyynnit pohjoisirlantilaisille asiakkaille"
 
 #. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/widgets/set_as_main_partner/set_as_main_partner.xml:0
 #: model_terms:ir.ui.view,arch_db:account_reports.duplicate_vat_partner_tree_view
 msgid "Set as main"
 msgstr "Aseta pääasialliseksi"
@@ -6762,7 +6729,7 @@ msgstr "Näytä varoitus olemassa olevasta ilmoituksesta"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_qr_code_payment_wizard__show_warning_missing_vat_number
 msgid "Show Warning Missing Vat Number"
-msgstr ""
+msgstr "Näytä varoitus puuttuvasta alv-numerosta"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__show_warning_move_id
@@ -6795,6 +6762,7 @@ msgstr "Näytä jo luodut siirrot."
 #: model_terms:ir.ui.view,arch_db:account_reports.account_reports_journal_dashboard_kanban_view
 msgid "Simplify tax filing. Automate return preparation."
 msgstr ""
+"Yksinkertaista verojen ilmoittamista. Automatisoi ilmoitusten valmistelu."
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
@@ -6807,7 +6775,7 @@ msgstr "Yksi vastaanottaja"
 #: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Snapshots"
-msgstr ""
+msgstr "Tilannekuvat"
 
 #. module: account_reports
 #. odoo-python
@@ -6999,7 +6967,7 @@ msgstr "Tunnisteet"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Tags: %(tagsCount)s"
-msgstr ""
+msgstr "Tunnisteet: %(tagsCount)s"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7018,22 +6986,22 @@ msgstr "Käytetty vero"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_account_placeholder
 msgid "Tax Closing Account Placeholder"
-msgstr ""
+msgstr "Veroilmoitustilin paikkamerkki"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_form_view
 msgid "Tax Closing Rounding"
-msgstr ""
+msgstr "Veroilmoituksen pyöristys"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_rounding_loss_account_id
 msgid "Tax Closing Rounding Loss Account"
-msgstr ""
+msgstr "Veroilmoituksen pyöristystappiotili"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_rounding_profit_account_id
 msgid "Tax Closing Rounding Profit Account"
-msgstr ""
+msgstr "Veroilmoituksen pyöristysvoittotili"
 
 #. module: account_reports
 #. odoo-python
@@ -7067,7 +7035,7 @@ msgstr "Veron jaksollisuus"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Rate & Country Consistency"
-msgstr ""
+msgstr "Verokannan & maan yhdenmukaisuus"
 
 #. module: account_reports
 #. odoo-python
@@ -7079,7 +7047,7 @@ msgstr "Saatujen verojen oikaisu"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Reconciliation"
-msgstr ""
+msgstr "Verotäsmäytys"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7101,7 +7069,7 @@ msgstr "Veroilmoitus"
 #. odoo-python
 #: code:addons/account_reports/models/res_users.py:0
 msgid "Tax Return Checks"
-msgstr ""
+msgstr "Veroilmoituksen tarkistukset"
 
 #. module: account_reports
 #: model:mail.template,name:account_reports.email_template_tax_return_deadline
@@ -7117,7 +7085,7 @@ msgstr "Veroilmoituksen jaksotus"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Return Type"
-msgstr ""
+msgstr "Veroilmoitustyyppi"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__return_type
@@ -7158,7 +7126,7 @@ msgstr "Veroyksiköt"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax and country mismatch"
-msgstr ""
+msgstr "Veron ja maan välinen ristiriita"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
@@ -7166,6 +7134,8 @@ msgid ""
 "Tax current account used as a counterpart to the Tax Closing Entry when in "
 "favor of the authorities."
 msgstr ""
+"Verotuksen käyttötili vastineeksi verotilinpäätöskirjaukselle, kun se on "
+"viranomaisten hyväksi."
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_receivable_account_id
@@ -7173,6 +7143,8 @@ msgid ""
 "Tax current account used as a counterpart to the Tax Closing Entry when in "
 "favor of the company."
 msgstr ""
+"Verotuksen käyttötilivastineeksi verotilinpäätöskirjaukselle, kun se on "
+"yrityksen hyväksi."
 
 #. module: account_reports
 #: model:mail.template,name:account_reports.email_template_generic_tax_instructions
@@ -7241,6 +7213,9 @@ msgid ""
 "General Ledger ending balance %(gl_balance)s for the selected report period, "
 "resulting in an unexplained difference of %(difference)s"
 msgstr ""
+"Laskettu pankin loppusaldo %(bank_balance)s ei täsmää valitun "
+"raportointikauden pääkirjan loppusaldoa %(gl_balance)s, mikä johtaa "
+"selittämättömään eroavaisuuteen %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7291,6 +7266,9 @@ msgid ""
 "opening balance %(gl_balance)s for the selected report period, resulting in "
 "an unexplained difference of %(difference)s"
 msgstr ""
+"Pankin alkusaldo %(bank_balance)s ei täsmää valitun raportointikauden "
+"pääkirjan alkusaldoa %(gl_balance)s, mikä johtaa selittämättömään "
+"eroavaisuuteen %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7517,7 +7495,7 @@ msgstr ""
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "Time to relax 🌴"
-msgstr ""
+msgstr "Aika rentoutua 🌴"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__name
@@ -7594,7 +7572,7 @@ msgstr "CTA yhteensä"
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
 msgid "Total Due:"
-msgstr ""
+msgstr "Maksettavaa yhteensä:"
 
 #. module: account_reports
 #. odoo-python
@@ -7628,18 +7606,18 @@ msgstr "Ostovelkojen analyyttinen tarkastus"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
 msgid "Trade payables"
-msgstr ""
+msgstr "Ostovelat"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
 msgid "Trade receivables"
-msgstr ""
+msgstr "Myyntisaamiset"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Transactions without Statement"
-msgstr ""
+msgstr "Tapahtumat ilman tiliotetta"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_treasury_financing
@@ -7661,7 +7639,7 @@ msgstr "Koetaseen erityiskäsittelijä"
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__active_selection__true
 msgid "True"
-msgstr ""
+msgstr "Tosi"
 
 #. module: account_reports
 #. odoo-python
@@ -7807,7 +7785,7 @@ msgstr "Realisoitumattomat valuuttakurssivoitot/-tappiot"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_forex
 msgid "Unrealized FX Gain (-)/Loss (+)"
-msgstr ""
+msgstr "Realisoitumaton valuuttakurssivoitto (-) / -tappio (+)"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7821,7 +7799,7 @@ msgstr "Täsmäyttämättömät kirjaukset"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.unreconciled_transactions
 msgid "Unreconciled Transactions"
-msgstr ""
+msgstr "Täsmäyttämättömät tapahtumat"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_check__type__file
@@ -7853,7 +7831,7 @@ msgstr "Käytetään laskemaan katettu aikaväli valitun jaksotuksen perusteella
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_res_users
 msgid "User"
-msgstr ""
+msgstr "Käyttäjä"
 
 #. module: account_reports
 #: model:account.report.column,name:account_reports.account_financial_report_ec_sales_vat
@@ -7916,17 +7894,17 @@ msgstr "Var N-1"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var
 msgid "Variation"
-msgstr ""
+msgstr "Variaatio"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_cash
 msgid "Variation of Cash"
-msgstr ""
+msgstr "Rahavarojen muutos"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_non_cash
 msgid "Variation of NON Cash"
-msgstr ""
+msgstr "Ei-kassavarojen muutos"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_payment_wizard__vat_balance
@@ -8093,12 +8071,12 @@ msgstr "Luonnoskirjauksilla"
 #: model:ir.actions.act_window,name:account_reports.action_view_account_audit
 #: model:ir.ui.menu,name:account_reports.menu_action_working_files
 msgid "Working Files"
-msgstr "Tarkistuslistat"
+msgstr "Työtiedostot"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
 msgid "Working capital adjustments"
-msgstr ""
+msgstr "Käyttöpääoman oikaisut"
 
 #. module: account_reports
 #. odoo-python
@@ -8231,6 +8209,12 @@ msgstr "Et voi päivittää tätä arvoa, koska %s on lukinnut sen"
 
 #. module: account_reports
 #. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "You do not have permission to refresh returns."
+msgstr "Sinulla ei ole lupaa päivittää ilmoituksia."
+
+#. module: account_reports
+#. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "You must be an accountant to access accounting reports."
 msgstr ""
@@ -8240,19 +8224,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a payable account for 'Tax Payable Account'."
-msgstr ""
+msgstr "Sinun on valittava velkatili kohteelle 'Verovelkatili'."
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a receivable account for 'Tax Receivable Account'."
-msgstr ""
+msgstr "Sinun on valittava saamistili kohteelle 'Verosaamistili'."
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must use non-trade accounts for tax returns."
-msgstr ""
+msgstr "Veroilmoituksissa on käytettävä ei-kaupallisia tilejä."
 
 #. module: account_reports
 #. odoo-python
@@ -8440,7 +8424,7 @@ msgstr "tämän summan maksamiseksi."
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "transactions"
-msgstr ""
+msgstr "tapahtumat"
 
 #. module: account_reports
 #. odoo-javascript
@@ -8458,7 +8442,7 @@ msgstr "siirrettiin tälle riville edelliseltä kaudelta."
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "which are not related to any bank statement."
-msgstr ""
+msgstr "jotka eivät liity mihinkään tiliotteeseen."
 
 #. module: account_reports
 #. odoo-javascript
@@ -8516,7 +8500,208 @@ msgstr "⇒ Palauta Odoon kurssiin"
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
-msgstr ""
+msgstr "≤ 12 kuukautta"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the list of your open invoices.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Hyvä <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Hyvä <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Ohessa luettelo avoimista laskuistanne.\n"
+#~ "                    <br/>\n"
+#~ "                    Ethän epäröi ottaa meihin yhteyttä, mikäli sinulla on "
+#~ "kysyttävää.\n"
+#~ "                    <br/>\n"
+#~ "                    Terveisin,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the statement of your account.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                   <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Hyvä <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                   <t t-else=\"\">Hyvä <t t-out=\"object.name or ''\"/>,</"
+#~ "t>\n"
+#~ "                   <br/>\n"
+#~ "                    Liitteenä tiliotteenne.\n"
+#~ "                   <br/>\n"
+#~ "                    Ettehän epäröi ottaa meihin yhteyttä, mikäli teillä "
+#~ "on kysyttävää.\n"
+#~ "                   <br/>\n"
+#~ "                    Ystävällisin terveisin,\n"
+#~ "                   <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hi <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    The deadline to submit <strong t-out=\"object.name\"/"
+#~ "> is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    To avoid any potential fine, please ensure all "
+#~ "remaining documents are sent over as soon as possible.<br/>\n"
+#~ "                    If you've already submitted everything but still "
+#~ "received this email, it's likely the tax return hasn't been marked as "
+#~ "submitted in Odoo.<br/>\n"
+#~ "                    Should you have any question or need assistance, feel "
+#~ "free to get in touch.<br/><br/>\n"
+#~ "                    Best regards,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hei <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    Määräaika <strong t-out=\"object.name\"/> "
+#~ "lähettämiselle on <strong t-out=\"format_date(object.date_deadline)\"/>."
+#~ "<br/>\n"
+#~ "                    Mahdollisten sakkojen välttämiseksi varmistakaa, että "
+#~ "kaikki jäljellä olevat asiakirjat lähetetään mahdollisimman pian.<br/>\n"
+#~ "                    Jos olette jo lähettäneet kaiken, mutta saatte silti "
+#~ "tämän sähköpostin, veroilmoitusta ei todennäköisesti ole merkitty Odoossa "
+#~ "lähetetyksi.<br/>\n"
+#~ "                    Otattehan rohkeasti yhteyttä, mikäli teillä on "
+#~ "kysyttävää tai tarvitsette apua.<br/><br/>\n"
+#~ "                    Ystävällisin terveisin,<br/>\n"
+#~ "                </p>\n"
+#~ "           </div> \n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">YourCompany</"
+#~ "t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "tax return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Amount to Pay</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Due By</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Hyvä <t t-"
+#~ "out=\"object.company_id.name\">YrityksenNimi</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Vastaanotettujen asiakirjojen ja tietojen pohjalta "
+#~ "yrityksen <t t-out=\"object.company_id.name\">YrityksesiNimi</t>\n"
+#~ "                    veroilmoitus ajanjaksolta <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> on lähetetty.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Maksettava summa on <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/>.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Maksettava</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Eräpäivä</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Ystävällisin terveisin,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Pankkitiliotteen rivi"

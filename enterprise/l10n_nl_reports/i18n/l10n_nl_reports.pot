@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 18:27+0000\n"
-"PO-Revision-Date: 2026-10-23 18:27+0000\n"
+"POT-Creation-Date: 2026-11-06 18:28+0000\n"
+"PO-Revision-Date: 2026-11-06 18:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -88,12 +88,12 @@ msgid ""
 "                </p>\n"
 "                <p>\n"
 "                    Based on the documents and information received, the VAT return of <t t-out=\"object.company_id.name or ''\">NL Company</t>\n"
-"                    for period <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"/> has been submitted.\n"
+"                    for period <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
-"                    It has been determined that an amount of <t t-out=\"format_amount(object.total_amount_to_pay, object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"                    It has been determined that an amount of <t t-out=\"format_amount(object.total_amount_to_pay, object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"></t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -862,6 +862,15 @@ msgstr ""
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "The VAT balance is"
+msgstr ""
+
+#. module: l10n_nl_reports
+#. odoo-python
+#: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
+msgid ""
+"The VAT return for a period before 2026 can no longer be filed "
+"electronically. Since September 1st 2026, older periods are no longer "
+"accepted in Digipoort."
 msgstr ""
 
 #. module: l10n_nl_reports

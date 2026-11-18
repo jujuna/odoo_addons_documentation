@@ -444,6 +444,7 @@
             <field name="model_id" ref="model_account_return"/>
             <field name="state">code</field>
             <field name="code">action = model.action_open_tax_return_view(env.context.get('sub_action_domain'), env.context.get('sub_action_context'))</field>
+            <field name="group_ids" eval="[(4, ref('account.group_account_readonly'))]"/>
         </record>
 
         <record id="account_return_check_template_reconcile_payable_with_fillings" model="account.return.check.template">
@@ -571,7 +572,7 @@ Analyze discrepancies, verify post-period payments, and document the status of a
             <field name="return_type" ref="account_reports.default_audit_return_type"/>
             <field name="code">_account_return_check_template_allocation_of_prior_year_result_to_equity</field>
             <field name="model">account.account</field>
-            <field name="domain">[('account_type', 'in', ['equity', 'equity_unaffected'])]</field>
+            <field name="domain">[('account_type', 'in', ['equity', 'equity_unaffected', 'equity_retained'])]</field>
         </record>
 
         <record id="account_return_check_template_risk_provisioning_and_provision_movement_schedule" model="account.return.check.template">

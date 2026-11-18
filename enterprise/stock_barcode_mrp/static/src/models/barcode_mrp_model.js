@@ -261,6 +261,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     setData(data) {
         data.actionId = this.actionId || data.actionId;
         super.setData(...arguments);
+        this.showGenerateLot = false;
         this.headerViewId = data.data.header_view_id;
         this.useTrackingNumber = true;
         if (this.config.restrict_scan_product) {

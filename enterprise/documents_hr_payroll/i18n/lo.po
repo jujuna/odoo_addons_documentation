@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_hr_payroll
+# * documents_hr_payroll
 #
+# Bone NI <bounkirdni@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 02:04+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Lao <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 17:51+0000\n"
+"PO-Revision-Date: 2026-10-29 22:47+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
 "documents_hr_payroll/lo/>\n"
 "Language: lo\n"
 "MIME-Version: 1.0\n"
@@ -24,17 +25,19 @@ msgid ""
 "\n"
 "Employee payslips will be automatically integrated to the Document app.\n"
 msgstr ""
+"\n"
+"ໃບແຈ້ງເງິນເດືອນຂອງພະນັກງານຈະຖືກເຊື່ອມໂຍງເຂົ້າໃນແອັບເອກະສານໂດຍອັດຕະໂນມັດ.\n"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "%(payslips)s payslip(s), sent to %(employees)s employee(s)"
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນ %(payslips)s ໃບ, ສົ່ງໃຫ້ພະນັກງານ %(employees)s ຄົນ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
 msgid ", <br/><br/>Please find the following payslip(s):<br/><br/>"
-msgstr ""
+msgstr ", <br/><br/>ກະລຸນາກວດເບິ່ງໃບແຈ້ງເງິນເດືອນດັ່ງຕໍ່ໄປນີ້:<br/><br/>"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
@@ -43,6 +46,9 @@ msgid ""
 "            Have a nice day,<br/>\n"
 "            The HR Team"
 msgstr ""
+"<br/>\n"
+"            ຂໍໃຫ້ເປັນມື້ທີ່ດີ,<br/>\n"
+"            ທີມງານ HR"
 
 #. module: documents_hr_payroll
 #: model:mail.template,body_html:documents_hr_payroll.mail_template_new_declaration
@@ -51,15 +57,15 @@ msgid ""
 "margin:0px auto;\">\n"
 "                <tbody>\n"
 "                        <t t-set=\"document_access_link\" t-"
-"value=\"object.document_id.access_url\"/>\n"
+"value=\"object.document_id.access_url\"></t>\n"
 "                    <tr>\n"
 "                        <td valign=\"top\" style=\"text-align: left; font-"
 "size: 14px;\">\n"
-"                            Dear <t t-out=\"object.employee_id.name\"/>, a "
-"new declaration file is available for you.<br/><br/>\n"
+"                            Dear <t t-out=\"object.employee_id.name\"></t>, "
+"a new declaration file is available for you.<br><br>\n"
 "                                <t t-"
 "if=\"object.employee_id.user_id\">Please find the PDF in your employee "
-"portal.<br/><br/></t>\n"
+"portal.<br><br></t>\n"
 "                                <div t-if=\"document_access_link\" "
 "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
 "                                    <a t-attf-"
@@ -69,7 +75,7 @@ msgid ""
 "                                    View Declaration\n"
 "                                </a>\n"
 "                            </div>\n"
-"                            Have a nice day,<br/>\n"
+"                            Have a nice day,<br>\n"
 "                            The HR Team\n"
 "                        </td>\n"
 "                    </tr>\n"
@@ -84,13 +90,13 @@ msgid ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
 "        <t t-set=\"document_access_link\" t-"
-"value=\"object.document_access_url\"/>\n"
+"value=\"object.document_access_url\"></t>\n"
 "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
 "\">\n"
-"            Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
-"available for you.<br/><br/>\n"
+"            Dear <t t-out=\"object.employee_id.name\"></t>, a new payslip is "
+"available for you.<br><br>\n"
 "            <t t-if=\"object.employee_id.user_id\">Please find the PDF in "
-"your employee portal.<br/><br/></t>\n"
+"your employee portal.<br><br></t>\n"
 "            <div t-if=\"document_access_link\" style=\"text-align: center; "
 "padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
 "                <a t-attf-href=\"{{ document_access_link }}\" "
@@ -100,7 +106,7 @@ msgid ""
 "                    Your Payslip\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br/>\n"
+"            Have a nice day,<br>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
@@ -111,69 +117,69 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "A payslip should be validated or paid to be sent to the employee."
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນຕ້ອງໄດ້ຮັບການຢືນຢັນ ຫຼື ຈ່າຍແລ້ວ ຈຶ່ງສາມາດສົ່ງໃຫ້ພະນັກງານໄດ້."
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__body_html
 msgid "Body"
-msgstr ""
+msgstr "ເນື້ອໃນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "ບໍລິສັດ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "ການຕັ້ງຄ່າ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "Confirm"
-msgstr ""
+msgstr "ຢືນຢັນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_payroll_overwrite_employee_declaration
 msgid "Confirm Overwrite Employee Declaration"
-msgstr ""
+msgstr "ຢືນຢັນການຂຽນທັບໃບແຈ້ງການຂອງພະນັກງານ"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,button_name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "Create Contacts"
-msgstr ""
+msgstr "ສ້າງລາຍຊື່ຜູ້ຕິດຕໍ່"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_uid
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "ສ້າງໂດຍ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_date
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_date
 msgid "Created on"
-msgstr ""
+msgstr "ສ້າງເມື່ອ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__custom_comment
 msgid "Custom Comment"
-msgstr ""
+msgstr "ຄຳເຫັນກຳນົດເອງ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
 msgid "Dear"
-msgstr ""
+msgstr "ຮຽນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__declaration_ids
 msgid "Declarations"
-msgstr ""
+msgstr "ໃບແຈ້ງການ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "Discard"
-msgstr ""
+msgstr "ຍົກເລີກ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__display_name
@@ -187,39 +193,39 @@ msgstr ""
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "ຊື່ສະແດງ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_documents_document
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__document_id
 msgid "Document"
-msgstr ""
+msgstr "ເອກະສານ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__document_access_url
 msgid "Document Access Url"
-msgstr ""
+msgstr "Url ເຂົ້າເຖິງເອກະສານ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_declaration_mixin.py:0
 msgid "Documents"
-msgstr ""
+msgstr "ເອກະສານ"
 
 #. module: documents_hr_payroll
 #: model:ir.module.module,shortdesc:base.module_documents_hr_payroll
 msgid "Documents - Payroll"
-msgstr ""
+msgstr "ເອກະສານ - ເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_declaration_mixin__documents_count
 msgid "Documents Count"
-msgstr ""
+msgstr "ຈຳນວນເອກະສານ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_employee
 msgid "Employee"
-msgstr ""
+msgstr "ພະນັກງານ"
 
 #. module: documents_hr_payroll
 #. odoo-python
@@ -229,18 +235,20 @@ msgid ""
 "function:\n"
 "%s"
 msgstr ""
+"ຕ້ອງກຳນົດອີເມວສ່ວນຕົວ ຫຼື ອີເມວບ່ອນເຮັດວຽກຂອງພະນັກງານ ເພື່ອໃຊ້ຟັງຊັນ \"ສົ່ງທາງອີເມວ\":\n"
+"%s"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "File Name"
-msgstr ""
+msgstr "ຊື່ໄຟລ໌"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "File(s) already exist"
-msgstr ""
+msgstr "ມີໄຟລ໌ນີ້ຢູ່ແລ້ວ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,help:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id
@@ -249,11 +257,13 @@ msgid ""
 "Group given editor access on the Employees and Payroll folders created from "
 "now on. Changing it does not affect the existing folders."
 msgstr ""
+"ກຸ່ມທີ່ໄດ້ຮັບສິດແກ້ໄຂໃນໂຟນເດີພະນັກງານ ແລະ ເງິນເດືອນ ທີ່ສ້າງຂຶ້ນນັບແຕ່ນີ້ເປັນຕົ້ນໄປ. "
+"ການປ່ຽນແປງຈະບໍ່ມີຜົນຕໍ່ໂຟນເດີທີ່ມີຢູ່ແລ້ວ."
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_employee__hr_employee_payroll_folder_id
 msgid "HR Employee Payroll Folder"
-msgstr ""
+msgstr "ໂຟນເດີເງິນເດືອນພະນັກງານ HR"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__id
@@ -267,256 +277,370 @@ msgstr ""
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__id
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/documents_document.py:0
 msgid "Impossible to delete an employee \"Payroll\" folder"
-msgstr ""
+msgstr "ບໍ່ສາມາດລຶບໂຟນເດີ \"ເງິນເດືອນ\" ຂອງພະນັກງານໄດ້"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,description:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "It will not be possible to send payslips to the employee"
-msgstr ""
+msgstr "ຈະບໍ່ສາມາດສົ່ງໃບແຈ້ງເງິນເດືອນໃຫ້ພະນັກງານໄດ້"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_uid
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "ອັບເດດລ່າສຸດໂດຍ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_date
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "ອັບເດດລ່າສຸດເມື່ອ"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "Missing Contact Information"
-msgstr ""
+msgstr "ຂາດຂໍ້ມູນຕິດຕໍ່"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payroll_overwrite_employee_declaration.py:0
 msgid "Overwrite confirmed. Files will be posted shortly."
-msgstr ""
+msgstr "ຢືນຢັນການຂຽນທັບແລ້ວ. ໄຟລ໌ຈະຖືກບັນທຶກລົງໃນໄວໆນີ້."
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
 msgid "PDFs will be posted in Documents shortly"
-msgstr ""
+msgstr "ໄຟລ໌ PDF ຈະຖືກບັນທຶກເຂົ້າໃນເອກະສານໃນໄວໆນີ້"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip_run
 msgid "Pay Run"
-msgstr ""
+msgstr "ຮອບການຈ່າຍເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip
 msgid "Pay Slip"
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 msgid "Payroll"
-msgstr ""
+msgstr "ເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/res_company.py:0
 msgid "Payroll (%(company_name)s)"
-msgstr ""
+msgstr "ເງິນເດືອນ (%(company_name)s)"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.res_config_settings_view_form
 msgid "Payroll Access Group"
-msgstr ""
+msgstr "ກຸ່ມສິດເຂົ້າເຖິງເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payroll_declaration_mixin
 msgid "Payroll Declaration Mixin"
-msgstr ""
+msgstr "Payroll Declaration Mixin"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__documents_hr_payroll_group_id
 msgid "Payroll Documents Default Group"
-msgstr ""
+msgstr "ກຸ່ມເລີ່ມຕົ້ນຂອງເອກະສານເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payroll_employee_declaration
 msgid "Payroll Employee Declaration"
-msgstr ""
+msgstr "ໃບແຈ້ງການເງິນເດືອນພະນັກງານ"
 
 #. module: documents_hr_payroll
 #: model:mail.template,name:documents_hr_payroll.mail_template_new_declaration
 msgid "Payroll: New Declaration"
-msgstr ""
+msgstr "ເງິນເດືອນ: ໃບແຈ້ງການໃໝ່"
 
 #. module: documents_hr_payroll
 #: model:mail.template,name:documents_hr_payroll.mail_template_new_payslip
 msgid "Payroll: New Payslip Document"
-msgstr ""
+msgstr "ເງິນເດືອນ: ເອກະສານໃບແຈ້ງເງິນເດືອນໃໝ່"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "Payslip %(date_from)s - %(date_to)s"
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນ %(date_from)s - %(date_to)s"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__payslip_ids
 msgid "Payslips"
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__pdf_to_post
 msgid "Pdf To Post"
-msgstr ""
+msgstr "PDF ທີ່ລໍຖ້າບັນທຶກ"
 
 #. module: documents_hr_payroll
 #. odoo-javascript
 #: code:addons/documents_hr_payroll/static/src/backend_components/cog_menu/hr_payroll_post_pdfs_cog_menu.xml:0
 msgid "Post PDFs"
-msgstr ""
+msgstr "ບັນທຶກ PDF"
 
 #. module: documents_hr_payroll
 #. odoo-javascript
 #: code:addons/documents_hr_payroll/static/src/views/employee_declaration_list/documents_hr_payroll_employee_declaration_list_controller.xml:0
 msgid "Post Reports ("
-msgstr ""
+msgstr "ບັນທຶກລາຍງານ ("
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_posted
 msgid "Posted PDF"
-msgstr ""
+msgstr "PDF ທີ່ບັນທຶກແລ້ວ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Preview"
-msgstr ""
+msgstr "ເບິ່ງຕົວຢ່າງ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_to_post
 msgid "Queued PDF posting"
-msgstr ""
+msgstr "ຢູ່ໃນຄິວລໍຖ້າບັນທຶກ PDF"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__employee_ids
 msgid "Recipients"
-msgstr ""
+msgstr "ຜູ້ຮັບ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__document_count
 msgid "Related Document Count"
-msgstr ""
+msgstr "ຈຳນວນເອກະສານທີ່ກ່ຽວຂ້ອງ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 msgid "Resend All Employee's Payslips"
-msgstr ""
+msgstr "ສົ່ງໃບແຈ້ງເງິນເດືອນທັງໝົດຂອງພະນັກງານຄືນໃໝ່"
 
 #. module: documents_hr_payroll
 #: model:ir.actions.server,name:documents_hr_payroll.ir_actions_server_send_payslip_by_employee_by_email
 msgid "Resend All Payslips"
-msgstr ""
+msgstr "ສົ່ງໃບແຈ້ງເງິນເດືອນທັງໝົດຄືນໃໝ່"
 
 #. module: documents_hr_payroll
 #: model:ir.actions.server,name:documents_hr_payroll.ir_actions_server_send_payslip_by_email
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.view_hr_payslip_form_inherit_documents
 msgid "Send By Email"
-msgstr ""
+msgstr "ສົ່ງທາງອີເມວ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "Send Email"
-msgstr ""
+msgstr "ສົ່ງອີເມວ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "Send Payslip By Email"
-msgstr ""
+msgstr "ສົ່ງໃບແຈ້ງເງິນເດືອນທາງອີເມວ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Send Payslips"
-msgstr ""
+msgstr "ສົ່ງໃບແຈ້ງເງິນເດືອນ"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip_send_mail
 msgid "Send payslips to Employee by email"
-msgstr ""
+msgstr "ສົ່ງໃບແຈ້ງເງິນເດືອນໃຫ້ພະນັກງານທາງອີເມວ"
 
 #. module: documents_hr_payroll
 #: model:mail.template,description:documents_hr_payroll.mail_template_new_declaration
 msgid "Sent to employee to notify them about their new declaration file"
-msgstr ""
+msgstr "ສົ່ງໃຫ້ພະນັກງານເພື່ອແຈ້ງເຕືອນກ່ຽວກັບໄຟລ໌ໃບແຈ້ງການໃໝ່ຂອງພວກເຂົາ"
 
 #. module: documents_hr_payroll
 #: model:mail.template,description:documents_hr_payroll.mail_template_new_payslip
 msgid "Sent to employee to notify them about their new payslip"
-msgstr ""
+msgstr "ສົ່ງໃຫ້ພະນັກງານເພື່ອແຈ້ງເຕືອນກ່ຽວກັບໃບແຈ້ງເງິນເດືອນໃໝ່ຂອງພວກເຂົາ"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "Some payslips could not be resend as they do not have related document"
-msgstr ""
+msgstr "ບໍ່ສາມາດສົ່ງໃບແຈ້ງເງິນເດືອນບາງໃບຄືນໃໝ່ໄດ້ ເນື່ອງຈາກບໍ່ມີເອກະສານທີ່ກ່ຽວຂ້ອງ"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__state
 msgid "State"
-msgstr ""
+msgstr "ສະຖານະ"
 
 #. module: documents_hr_payroll
 #: model:ir.module.module,summary:base.module_documents_hr_payroll
 msgid "Store employee payslips in the Document app"
-msgstr ""
+msgstr "ເກັບຮັກສາໃບແຈ້ງເງິນເດືອນຂອງພະນັກງານໄວ້ໃນແອັບເອກະສານ"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "The following file(s) already exist. Do you want to overwrite them?"
-msgstr ""
+msgstr "ມີໄຟລ໌ດັ່ງຕໍ່ໄປນີ້ຢູ່ແລ້ວ. ທ່ານຕ້ອງການຂຽນທັບບໍ່?"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "The payslip has been sent to the employee by email."
-msgstr ""
+msgstr "ໃບແຈ້ງເງິນເດືອນໄດ້ຖືກສົ່ງໃຫ້ພະນັກງານທາງອີເມວແລ້ວ."
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 msgid "There is no valid payslip to send to the employee."
-msgstr ""
+msgstr "ບໍ່ມີໃບແຈ້ງເງິນເດືອນທີ່ຖືກຕ້ອງເພື່ອສົ່ງໃຫ້ພະນັກງານ."
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Write your custom message here..."
-msgstr ""
+msgstr "ຂຽນຂໍ້ຄວາມກຳນົດເອງຂອງທ່ານຢູ່ນີ້..."
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "You can not send the documents link to the employee."
-msgstr ""
+msgstr "ທ່ານບໍ່ສາມາດສົ່ງລິ້ງເອກະສານໃຫ້ພະນັກງານໄດ້."
 
 #. module: documents_hr_payroll
 #: model:mail.template,subject:documents_hr_payroll.mail_template_new_declaration
 msgid ""
 "{{ object.employee_id.name }}, a new declaration file is available for you"
-msgstr ""
+msgstr "{{ object.employee_id.name }}, ມີໄຟລ໌ໃບແຈ້ງການໃໝ່ສຳລັບທ່ານ"
 
 #. module: documents_hr_payroll
 #: model:mail.template,subject:documents_hr_payroll.mail_template_new_payslip
 msgid "{{ object.employee_id.name }}, a new payslip is available for you"
-msgstr ""
+msgstr "{{ object.employee_id.name }}, ມີໃບແຈ້ງເງິນເດືອນໃໝ່ສຳລັບທ່ານ"
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\">\n"
+#~ "                <tbody>\n"
+#~ "                        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_id.access_url\"/>\n"
+#~ "                    <tr>\n"
+#~ "                        <td valign=\"top\" style=\"text-align: left; font-"
+#~ "size: 14px;\">\n"
+#~ "                            Dear <t t-out=\"object.employee_id.name\"/>, "
+#~ "a new declaration file is available for you.<br/><br/>\n"
+#~ "                                <t t-"
+#~ "if=\"object.employee_id.user_id\">Please find the PDF in your employee "
+#~ "portal.<br/><br/></t>\n"
+#~ "                                <div t-if=\"document_access_link\" "
+#~ "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;"
+#~ "\">\n"
+#~ "                                    <a t-attf-"
+#~ "href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-"
+#~ "color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "#fff; border-radius: 5px; font-size:13px;\">\n"
+#~ "                                    View Declaration\n"
+#~ "                                </a>\n"
+#~ "                            </div>\n"
+#~ "                            Have a nice day,<br/>\n"
+#~ "                            The HR Team\n"
+#~ "                        </td>\n"
+#~ "                    </tr>\n"
+#~ "                </tbody>\n"
+#~ "            </table>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\">\n"
+#~ "                <tbody>\n"
+#~ "                        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_id.access_url\"/>\n"
+#~ "                    <tr>\n"
+#~ "                        <td valign=\"top\" style=\"text-align: left; font-"
+#~ "size: 14px;\">\n"
+#~ "                            ຮຽນ <t t-out=\"object.employee_id.name\"/>, "
+#~ "ມີໄຟລ໌ໃບແຈ້ງການໃໝ່ສຳລັບທ່ານ.<br/><br/>\n"
+#~ "                                <t t-"
+#~ "if=\"object.employee_id.user_id\">ກະລຸນາກວດເບິ່ງໄຟລ໌ PDF "
+#~ "ຢູ່ໃນພອດທັລພະນັກງານຂອງທ່ານ.<br/><br/></t>\n"
+#~ "                                <div t-if=\"document_access_link\" "
+#~ "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;"
+#~ "\">\n"
+#~ "                                    <a t-attf-"
+#~ "href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-"
+#~ "color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "#fff; border-radius: 5px; font-size:13px;\">\n"
+#~ "                                    ເບິ່ງໃບແຈ້ງການ\n"
+#~ "                                </a>\n"
+#~ "                            </div>\n"
+#~ "                            ຂໍໃຫ້ເປັນມື້ທີ່ດີ,<br/>\n"
+#~ "                            ທີມງານ HR\n"
+#~ "                        </td>\n"
+#~ "                    </tr>\n"
+#~ "                </tbody>\n"
+#~ "            </table>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_access_url\"/>\n"
+#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+#~ "\">\n"
+#~ "            Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
+#~ "available for you.<br/><br/>\n"
+#~ "            <t t-if=\"object.employee_id.user_id\">Please find the PDF in "
+#~ "your employee portal.<br/><br/></t>\n"
+#~ "            <div t-if=\"document_access_link\" style=\"text-align: "
+#~ "center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+#~ "                <a t-attf-href=\"{{ document_access_link }}\" "
+#~ "target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
+#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
+#~ "size:13px;\">\n"
+#~ "                    Your Payslip\n"
+#~ "                </a>\n"
+#~ "            </div>\n"
+#~ "            Have a nice day,<br/>\n"
+#~ "            The HR Team\n"
+#~ "        </td></tr>\n"
+#~ "    </tbody></table>\n"
+#~ "                "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_access_url\"/>\n"
+#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+#~ "\">\n"
+#~ "            ຮຽນ <t t-out=\"object.employee_id.name\"/>, "
+#~ "ມີໃບແຈ້ງເງິນເດືອນໃໝ່ສຳລັບທ່ານ.<br/><br/>\n"
+#~ "            <t t-if=\"object.employee_id.user_id\">ກະລຸນາກວດເບິ່ງໄຟລ໌ PDF "
+#~ "ຢູ່ໃນພອດທັລພະນັກງານຂອງທ່ານ.<br/><br/></t>\n"
+#~ "            <div t-if=\"document_access_link\" style=\"text-align: "
+#~ "center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+#~ "                <a t-attf-href=\"{{ document_access_link }}\" "
+#~ "target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
+#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
+#~ "size:13px;\">\n"
+#~ "                    ໃບແຈ້ງເງິນເດືອນຂອງທ່ານ\n"
+#~ "                </a>\n"
+#~ "            </div>\n"
+#~ "            ຂໍໃຫ້ເປັນມື້ທີ່ດີ,<br/>\n"
+#~ "            ທີມງານ HR\n"
+#~ "        </td></tr>\n"
+#~ "    </tbody></table>\n"
+#~ "                "

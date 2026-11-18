@@ -1300,6 +1300,28 @@ class TestSubscription(TestSubscriptionCommon, MockEmail, PaymentCommon):
             'Recurring pricing discounts should apply to recurring lines',
         )
 
+    def test_subscription_full_recurring_pricing_discount(self):
+        """Check that a 100% recurring pricing discount is applied when creating a subscription from a template."""
+        self.pricelist.item_ids = [Command.create({
+            'applied_on': '1_product',
+            'product_tmpl_id': self.product_tmpl_2.id,
+            'compute_price': 'discount',
+            'price_discount': 100,
+            'plan_id': self.plan_month.id,
+        })]
+        sub = self.env['sale.order'].with_context(**self.context_no_mail).create({
+            'is_subscription': True,
+            'partner_id': self.user_portal.partner_id.id,
+            'sale_order_template_id': self.subscription_tmpl.id,
+            'pricelist_id': self.pricelist.id,
+        })
+        sub._onchange_sale_order_template_id()
+        self.assertRecordValues(sub.order_line.filtered(lambda line: line.product_id == self.product2), [{
+            'price_unit': 20.0,
+            'discount': 100.0,
+            'price_subtotal': 0.0,
+        }])
+
     def test_non_subscription_pricelist_discount(self):
         pricelist = self.pricelist
         pricelist.item_ids = [

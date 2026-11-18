@@ -103,7 +103,7 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
             "23472020A12345674A12345674         BERNARDO GANADOR                        D28   B 000000001000000  000000000000000 0000000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000001000000 000000000000000                     000000000000000000000                                                                                                                                                                                                   ",
             "23472020A1234567474280274A         PARTNER 2                               D28   B 000000000500000  000000000000000 0000000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000000000000 000000000500000 000000000000000                     000000000000000000000                                                                                                                                                                                                   ",
         ]
-        for generated_line, expected_line in zip(boe_file.raw.decode('utf-8').splitlines(), expected):
+        for generated_line, expected_line in zip(boe_file.raw.decode('iso-8859-1').splitlines(), expected):
             self.assertEqual(generated_line, expected_line)
 
         boe_file = self._check_boe_export(
@@ -113,7 +113,7 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
                 'substitutive_declaration': True,
             }
         )
-        header_line = boe_file.raw.decode('utf-8').splitlines()[0]
+        header_line = boe_file.raw.decode('iso-8859-1').splitlines()[0]
         self.assertEqual('C', header_line[120], "Complementary declaration should use 'C'")
         self.assertEqual('S', header_line[121], "Substitutive declaration should use 'S'")
 
@@ -180,10 +180,11 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
         report = self.env.ref('l10n_es_reports.mod_347')
         options = self._generate_options(report, '2020-01-01', '2020-12-31')
         boe_file = self._get_report_boe(report, 347, options)
+        boe_file_content = boe_file['file_content'].decode('iso-8859-1')
 
-        self.assertTrue(self.spanish_partner.name.upper() not in boe_file['file_content'])
+        self.assertTrue(self.spanish_partner.name.upper() not in boe_file_content)
         # Only the other partner is above the 3 005,06 € threshold must be reported
-        self.assertIn(other_spanish_partner.name.upper(), boe_file['file_content'])
+        self.assertIn(other_spanish_partner.name.upper(), boe_file_content)
 
     @freeze_time('2025-05-15')
     @mute_logger('odoo.addons.account.models.partner')
@@ -219,7 +220,7 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
         options = self._generate_options(report, '2025-05-01', '2025-05-31')
         boe_file = self._get_report_boe(report, 349, options)
         #  The original amount should be in the BOE file, even though it has been entirely refunded.
-        self.assertIn('99999', boe_file['file_content'])
+        self.assertIn('99999', boe_file['file_content'].decode('iso-8859-1'))
 
     @freeze_time('2025-05-15')
     @mute_logger('odoo.addons.account.models.partner')
@@ -261,7 +262,7 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
         report = self.env.ref('l10n_es_reports.mod_349')
         options = self._generate_options(report, '2025-03-01', '2025-03-31')
         boe_file = self._get_report_boe(report, 349, options)
-        boe_file_content = boe_file['file_content']
+        boe_file_content = boe_file['file_content'].decode('iso-8859-1')
 
         # The rectiffied value should be in the BOE file
         self.assertIn('88888', boe_file_content)
@@ -321,4 +322,4 @@ class TestBOEGeneration(TestEsAccountReportsCommon):
         # - the rectified tax base (0.00),
         # - and the previously declared tax base (1000.00).
         # Under REGISTRO DE RECTIFICACIONES https://www.boe.es/buscar/doc.php?id=BOE-A-2010-5098
-        self.assertNotIn('20250500000000000000000000100000', boe_file['file_content'])
+        self.assertNotIn('20250500000000000000000000100000', boe_file['file_content'].decode('iso-8859-1'))

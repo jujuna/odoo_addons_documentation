@@ -72,7 +72,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '10', 'property_reference': '',
-            'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
+            'property_situation': '', 'surcharge_fee': '', 'surcharge_type': '', 'tax_rate': 21.0,
             'taxed_amount': 210.0, 'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
         })
@@ -86,8 +86,8 @@ class TestLibrosExport(TestAccountReportsCommon):
             'invoice_type': 'F1', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '06', 'property_reference': '',
-            'property_situation': '', 'reception_number': 'BILL/2019/06/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
-            'surcharge_type': 0.0, 'tax_deductible': 210.0, 'tax_rate': 21.0, 'taxed_amount': 210.0,
+            'property_situation': '', 'reception_number': 'BILL/2019/06/0001', 'reception_number_final': '', 'surcharge_fee': '',
+            'surcharge_type': '', 'tax_deductible': 210.0, 'tax_rate': 21.0, 'taxed_amount': 210.0,
             'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
         })
 
@@ -105,7 +105,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
             'income_computable': 500.0, 'total_amount': 655.0, 'base_amount': 500.0, 'tax_rate': 10.0,
-            'taxed_amount': 155.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0, 'withholding_type': 0.0,
+            'taxed_amount': 155.0, 'surcharge_type': '', 'surcharge_fee': '', 'withholding_type': 0.0,
             'withholding_amount': 0.0,
         })
 
@@ -126,6 +126,18 @@ class TestLibrosExport(TestAccountReportsCommon):
             'taxed_amount': 105.0, 'surcharge_type': 5.20, 'surcharge_fee': 26.0, 'withholding_type': 0.0,
             'withholding_amount': 0.0,
         })
+
+    def test_libros_export_with_zero_surcharge(self):
+        """ Test that a 0% surcharge equivalence tax fills the surcharge columns with 0 """
+        company_id = self.company_data['company'].id
+        tax_0 = self.env.ref(f'account.{company_id}_account_tax_template_p_iva0_s_bc')
+        tax_0_surcharge = self.env.ref(f'account.{company_id}_account_tax_template_p_req0')
+        self.init_invoice('in_invoice', amounts=[500], post=True, taxes=[tax_0, tax_0_surcharge])
+        exp_line_vals = self.get_libros_sheet_line_vals()[1]
+        line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        self.assertEqual(line_vals_list[0]['surcharge_type'], 0.0)
+        self.assertEqual(line_vals_list[0]['surcharge_fee'], 0.0)
 
     def test_libros_export_with_wrong_surcharge_raises_error(self):
         self.init_invoice('out_invoice', amounts=[500], post=True, taxes=[self.tax_21, self.tax_10_surcharge])
@@ -152,7 +164,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
             'expense_deductible': 500.0, 'total_amount': 505.0, 'base_amount': 500.0, 'tax_rate': 21.0,
-            'taxed_amount': 105.0, 'tax_deductible': 105.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'taxed_amount': 105.0, 'tax_deductible': 105.0, 'surcharge_type': '', 'surcharge_fee': '',
             'withholding_type': 20.0, 'withholding_amount': 100.0,
         })
 
@@ -173,8 +185,8 @@ class TestLibrosExport(TestAccountReportsCommon):
             'invoice_type': 'F5', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
-            'property_situation': '', 'reception_number': 'BILL/2019/01/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
-            'surcharge_type': 0.0, 'tax_deductible': 50.0, 'tax_rate': 10.0, 'taxed_amount': 50.0,
+            'property_situation': '', 'reception_number': 'BILL/2019/01/0001', 'reception_number_final': '', 'surcharge_fee': '',
+            'surcharge_type': '', 'tax_deductible': 50.0, 'tax_rate': 10.0, 'taxed_amount': 50.0,
             'total_amount': 550.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
         })
 
@@ -193,7 +205,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
-            'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
+            'property_situation': '', 'surcharge_fee': '', 'surcharge_type': '', 'tax_rate': 21.0,
             'taxed_amount': -210.0, 'total_amount': -1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
         })
@@ -205,7 +217,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
-            'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
+            'property_situation': '', 'surcharge_fee': '', 'surcharge_type': '', 'tax_rate': 21.0,
             'taxed_amount': 210.0, 'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
         })
@@ -225,7 +237,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
             'expense_deductible': 1000.0, 'total_amount': 1000.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
-            'taxed_amount': 210.0, 'tax_deductible': 210.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'taxed_amount': 210.0, 'tax_deductible': 210.0, 'surcharge_type': '', 'surcharge_fee': '',
             'withholding_type': 0.0, 'withholding_amount': 0.0,
         })
 
@@ -307,7 +319,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             amount_vals[i] = self.get_amount_vals(line_vals_list[i])
         self.assertDictEqual(amount_vals[0], {
             'income_computable': 100.0, 'total_amount': 121.0, 'base_amount': 100.0, 'tax_rate': 21.0,
-            'taxed_amount': 21.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0, 'withholding_type': 0.0,
+            'taxed_amount': 21.0, 'surcharge_type': '', 'surcharge_fee': '', 'withholding_type': 0.0,
             'withholding_amount': 0.0,
         })
         self.assertDictEqual(amount_vals[1], {
@@ -327,7 +339,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         })
         self.assertDictEqual(amount_vals[4], {
             'income_computable': 222.22, 'total_amount': 248.89, 'base_amount': 222.22, 'tax_rate': 21.0,
-            'taxed_amount': 46.67, 'surcharge_type': 0.0, 'surcharge_fee': 0.0, 'withholding_type': 9.0,
+            'taxed_amount': 46.67, 'surcharge_type': '', 'surcharge_fee': '', 'withholding_type': 9.0,
             'withholding_amount': 20.0,
         })
 
@@ -462,6 +474,6 @@ class TestLibrosExport(TestAccountReportsCommon):
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
             'expense_deductible': 54.0, 'total_amount': 54.0, 'base_amount': 54.0, 'tax_rate': 21.0,
-            'taxed_amount': 11.34, 'tax_deductible': 11.34, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'taxed_amount': 11.34, 'tax_deductible': 11.34, 'surcharge_type': '', 'surcharge_fee': '',
             'withholding_type': 0.0, 'withholding_amount': 0.0,
         })

@@ -12,6 +12,13 @@ const { DateTime, Duration } = luxon;
 export const MINIMUM_DURATION_FOR_EVENT = 60;
 export const MINIMUM_DURATION_FOR_CONTEXT_SWITCH = 2;
 export const MINIMUM_AFK_FILLING = 60 * 3;
+// Name of the editor tracked by each editor watcher
+const EDITOR_NAMES = {
+    "aw-watcher-vscode-odoo": "VS Code",
+    // includes vscode, vscodium, antigravity ...
+    "aw-watcher-vscode": "VS Code",
+    "aw-watcher-pycharm": "Pycharm",
+};
 
 /**
  * Owns fetching, matching and aggregating ActivityWatch/Odoo activity into timesheet
@@ -43,10 +50,9 @@ export class TimesheetAssistantModel {
         this.migrateConsumedEvents(); // can be removed in the future
         this.cleanOldConsumedEvents();
         this.cleanOldBlockouts();
-        this.assistantTimesheetIdsKey = "aw_assistant_timesheet_ids";
-        this.assistantTimesheetIds = JSON.parse(
-            localStorage.getItem(this.assistantTimesheetIdsKey) || "{}"
-        );
+        // the taken records now know their timesheet: the assistant timesheets are not stored
+        // anymore (can be removed in the future)
+        localStorage.removeItem("aw_assistant_timesheet_ids");
         this.frequencyViewerLocalConfig = new FrequencyViewerLocalConfig();
         this.scores = this.frequencyViewerLocalConfig.scores;
         this.roundingValues = { minimum: 15, rounding: 15 };
@@ -102,15 +108,6 @@ export class TimesheetAssistantModel {
         });
     }
 
-    titleAndDayKey(title, extra = {}) {
-        const key = { title, day: this.data.currentDate.toISO().split("T")[0] };
-        if (extra.res_model && extra.id) {
-            key.res_model = extra.res_model;
-            key.id = extra.id;
-        }
-        return JSON.stringify(key);
-    }
-
     projectName(id) {
         return this.projectById[id]?.name;
     }
@@ -157,10 +154,17 @@ export class TimesheetAssistantModel {
         const buckets = await fetch(`${baseUrl}/api/0/buckets/`).then((response) =>
             response.json()
         );
+        // VS Code can be tracked by the standard aw-watcher-vscode (`app.editor.activity`), by
+        // aw-watcher-vscode-odoo (`app.vscode.activity`), or by both: the events of
+        // aw-watcher-vscode-odoo then have precedence over the standard ones.
         return Object.values(buckets).filter((bucket) =>
-            ["afkstatus", "currentwindow", "web.tab.current", "app.editor.activity"].includes(
-                bucket.type
-            )
+            [
+                "afkstatus",
+                "currentwindow",
+                "web.tab.current",
+                "app.editor.activity",
+                "app.vscode.activity",
+            ].includes(bucket.type)
         );
     }
 
@@ -245,54 +249,8 @@ export class TimesheetAssistantModel {
             data += "|" + event.data.app;
         }
 
-        for (const rule of this.awRules) {
-            const regex = new RegExp(rule.regex);
-            const match = data.match(regex);
-            if (match) {
-                if (rule.project_id) {
-                    event.project_id = rule.project_id[0];
-                    event._res_model = "project.project";
-                    event._res_id = rule.project_id[0];
-                }
-
-                if (rule.task_id) {
-                    event.task_id = rule.task_id[0];
-                    event._res_model = "project.task";
-                    event._res_id = rule.task_id[0];
-                }
-
-                if (!event.task_id && match.groups?.task_id) {
-                    const taskId = parseInt(match.groups.task_id, 10);
-                    if (!isNaN(taskId)) {
-                        event.task_id = taskId;
-                        event._res_model = "project.task";
-                        event._res_id = taskId;
-                    }
-                }
-
-                if (rule.template != null || rule.description != null) {
-                    event.template = rule.template;
-                    event.description = rule.description;
-                    event.matches = Array.from(match);
-
-                    let key = rule.template;
-                    let name = rule.description || rule.template;
-                    for (let i = 1; i < match.length; i++) {
-                        name = name.replace(`$${i}`, match[i] ?? "");
-                        key = key.replace(`$${i}`, match[i] ?? "");
-                    }
-                    event.name = name;
-                    event.key = key;
-                } else {
-                    event.name = rule.type;
-                }
-                event.threshold = rule.threshold;
-                event.always_active = rule.always_active;
-                event.side_activity = rule.side_activity;
-                event.type = rule.type;
-                event.keyEvent = true;
-                return;
-            }
+        if (this.applyAwRules(event, data)) {
+            return;
         }
 
         if (!event.data.url) {
@@ -366,6 +324,100 @@ export class TimesheetAssistantModel {
         }
     }
 
+    /**
+     * Apply the first matching aw rule to the event.
+     * @returns {boolean} whether a rule matched
+     */
+    applyAwRules(event, data) {
+        for (const rule of this.awRules) {
+            const regex = new RegExp(rule.regex);
+            const match = data.match(regex);
+            if (match) {
+                if (rule.project_id) {
+                    event.project_id = rule.project_id[0];
+                    event._res_model = "project.project";
+                    event._res_id = rule.project_id[0];
+                }
+
+                if (rule.task_id) {
+                    event.task_id = rule.task_id[0];
+                    event._res_model = "project.task";
+                    event._res_id = rule.task_id[0];
+                }
+
+                if (!event.task_id && match.groups?.task_id) {
+                    const taskId = parseInt(match.groups.task_id, 10);
+                    if (!isNaN(taskId)) {
+                        event.task_id = taskId;
+                        event._res_model = "project.task";
+                        event._res_id = taskId;
+                    }
+                }
+
+                if (rule.template != null || rule.description != null) {
+                    event.template = rule.template;
+                    event.description = rule.description;
+                    event.matches = Array.from(match);
+
+                    let key = rule.template;
+                    let name = rule.description || rule.template;
+                    for (let i = 1; i < match.length; i++) {
+                        name = name.replace(`$${i}`, match[i] ?? "");
+                        key = key.replace(`$${i}`, match[i] ?? "");
+                    }
+                    event.name = name;
+                    event.key = key;
+                } else {
+                    event.name = rule.type;
+                }
+                event.threshold = rule.threshold;
+                event.always_active = rule.always_active;
+                event.side_activity = rule.side_activity;
+                event.type = rule.type;
+                event.keyEvent = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The repository and the branch of an editor event, the same way for all the editors:
+     * - aw-watcher-vscode-odoo sends them as `repository` (e.g. "odoo-dev/enterprise") and
+     *   `branch`;
+     * - aw-watcher-vscode sends the folder of the workspace as `project`, and no branch;
+     * - aw-watcher-pycharm sends the name of the project as `project`, and `branch`.
+     * Without `repository`, it is the last folder of `project`. Missing or "unknown" values
+     * are empty.
+     */
+    getEditorRepositoryBranch(data) {
+        const known = (value) => (value && value !== "unknown" ? value : "");
+        const folder = known(data.project).split(/[\\/]/).filter(Boolean).pop();
+        const repository = known(data.repository) || folder || "";
+        return { repository, branch: known(data.branch) };
+    }
+
+    /**
+     * Editor events, handled the same way for all the editors: they are matched by the aw rules
+     * against "<repository>|<branch>", e.g. "odoo-dev/enterprise|master-1234-dev" (missing or
+     * "unknown" values are empty). Without matching rule, they are named
+     * "<editor> - <repository> - <branch>".
+     */
+    parseEditorActivity(event, client) {
+        event.type = "development";
+        const { repository, branch } = this.getEditorRepositoryBranch(event.data);
+        if (this.applyAwRules(event, `${repository}|${branch}`)) {
+            return;
+        }
+        const editor = EDITOR_NAMES[client];
+        if (!editor || !repository) {
+            event.name = _t("Development");
+            return;
+        }
+        event.name = [editor, repository, branch].filter(Boolean).join(" - ");
+        event.keyEvent = true;
+    }
+
     async loadAwEvents(data, baseUrl, start, end) {
         // We call this unconditionally to guarantee a safe fallback structure for the catch block.
         // When there is no fake data for the current date, the 'events' array inside this method is empty,
@@ -418,30 +470,8 @@ export class TimesheetAssistantModel {
                             Duration.fromObject({ seconds: event.duration })
                         );
                         let eventType = watchers[index].type;
-                        if (eventType === "app.editor.activity") {
-                            event.type = "development";
-                            if (watchers[index].client === "aw-watcher-vscode") {
-                                // includes vscode, vscodium, antigravity ...
-                                event.name =
-                                    event.data.project === "unknown"
-                                        ? _t("Development")
-                                        : _t("VS Code - %(folder)s", {
-                                              folder: event.data.project,
-                                          });
-                                event.keyEvent = true;
-                            } else if (watchers[index].client === "aw-watcher-pycharm") {
-                                // can be refactored with the previous
-                                event.name =
-                                    event.data.project === "unknown"
-                                        ? _t("Development")
-                                        : _t("Pycharm - %(folder)s - %(branch)s", {
-                                              folder: event.data.project,
-                                              branch: event.data.branch,
-                                          });
-                                event.keyEvent = true;
-                            } else {
-                                event.name = _t("Development");
-                            }
+                        if (["app.editor.activity", "app.vscode.activity"].includes(eventType)) {
+                            this.parseEditorActivity(event, watchers[index].client);
                         } else if (["currentwindow", "web.tab.current"].includes(eventType)) {
                             if (!this.parseWatcherActivity(event, gmailEmails, composingEvents)) {
                                 continue;
@@ -575,10 +605,9 @@ export class TimesheetAssistantModel {
             delete range.isInKeyEventGroup;
             const duration = getDuration(range);
             if (
-                range.isConsumed ||
-                (isAfk(range) &&
-                    duration >= MINIMUM_DURATION_FOR_EVENT &&
-                    !group?.keyEvents[0].always_active)
+                isAfk(range) &&
+                duration >= MINIMUM_DURATION_FOR_EVENT &&
+                !group?.keyEvents[0].always_active
             ) {
                 closeGroup();
                 continue;
@@ -911,6 +940,7 @@ export class TimesheetAssistantModel {
             stop: deserializeDateTime(event.stop),
             duration: event.duration !== undefined ? event.duration * 3600 : undefined,
             keyEvent: true,
+            isOdooEvent: true,
         }));
 
         const allSuggestedAwEvents = [];
@@ -922,7 +952,12 @@ export class TimesheetAssistantModel {
         }
 
         for (const events of [keyEvents, otherEvents]) {
-            for (const eventType of ["app.editor.activity", "web.tab.current", "currentwindow"]) {
+            for (const eventType of [
+                "app.vscode.activity",
+                "app.editor.activity",
+                "web.tab.current",
+                "currentwindow",
+            ]) {
                 if (events?.[eventType]) {
                     events[eventType].sort((a, b) => a.start - b.start);
                     this.merge(allSuggestedAwEvents, this.normalizeEvents(events[eventType]));
@@ -1001,12 +1036,12 @@ export class TimesheetAssistantModel {
 
         // the manual timesheets are deducted from the suggestions, so they must be loaded first
         await this.loadTimesheets(data);
-        await this.computeSuggestions(data, metaData);
+        this.computeSuggestions(data, metaData);
 
         return { data, metaData };
     }
 
-    async computeSuggestions(data = this.data, metaData = this.metaData) {
+    computeSuggestions(data = this.data, metaData = this.metaData) {
         Object.assign(data, {
             grouped: {},
             recordsByStart: {},
@@ -1014,21 +1049,11 @@ export class TimesheetAssistantModel {
 
         const ranges = [];
         this.merge(ranges, this.getTimerBlockouts(data));
+        const deletedOdooEvents = new Set(this.getConsumedEventsOfDay(data)?.odooEvents);
         for (const range of metaData.rawOdooEvents) {
-            const keyWithDay = this.titleAndDayKey(range.name, range);
-            const consumed = this.consumedEvents[keyWithDay];
-            if (consumed) {
-                if (consumed.isConsumed) {
-                    // if taken, we keep the range to mask any ActivityWatch events underneath,
-                    // but we mark it to avoid displaying it in the suggestions.
-                    range.isConsumed = true;
-                } else {
-                    // if deleted/ignored, we completely remove the range so that background
-                    // activity can surface as new suggestions.
-                    continue;
-                }
+            if (!deletedOdooEvents.has(this._getOdooEventKey(range))) {
+                ranges.push({ ...range });
             }
-            ranges.push({ ...range });
         }
 
         this.merge(ranges, metaData.allSuggestedAwEvents);
@@ -1097,12 +1122,6 @@ export class TimesheetAssistantModel {
             alwaysActive: false,
         };
         for (const range of ranges) {
-            if (range.isConsumed) {
-                // hide consumed events from the suggestions list without allowing
-                // underlying AW activity to reappear (hiding without replacing)
-                continue;
-            }
-
             if (
                 (range.data?.status === "afk" || range.type === "afk") &&
                 !activeKeyEvent.alwaysActive &&
@@ -1205,16 +1224,18 @@ export class TimesheetAssistantModel {
                         name = range.name;
                         type = range.type;
                     } else {
-                        activeKeyEvent.name = range.name;
-                        activeKeyEvent.type = range.type;
-                        activeKeyEvent.alwaysActive = range.always_active ?? false;
+                        // an Odoo event only names itself: the next activities are not part of it
+                        activeKeyEvent.name = range.isOdooEvent ? null : range.name;
+                        activeKeyEvent.type = range.isOdooEvent ? "other" : range.type;
+                        activeKeyEvent.alwaysActive =
+                            !range.isOdooEvent && (range.always_active ?? false);
                         if (foundNewContext) {
                             activeKeyEvent.projectId = targetProjectId;
                             activeKeyEvent.taskId = targetTaskId;
                             activeKeyEvent.start = range.start;
                         }
-                        name = activeKeyEvent.name;
-                        type = activeKeyEvent.type;
+                        name = range.name;
+                        type = range.type;
                     }
                 } else {
                     name = activeKeyEvent.name;
@@ -1242,26 +1263,29 @@ export class TimesheetAssistantModel {
             }
         }
 
-        // legacy: the time taken or deleted from the project view was only stored as a duration
-        // (`duration` minus the `timelineDuration` taken or deleted from the chronological view)
-        const legacyConsumedByKey = {};
+        // the records taken by a timesheet that does not exist anymore show up again
+        const timesheetIds = new Set(this.getTimesheets(data).map((ts) => ts.id));
+        this._restoreTimesheetsRecords(
+            Object.values(this.getConsumedEventsOfDay(data)?.records || {})
+                .map((consumed) => consumed.timesheetId)
+                .filter((id) => id && !timesheetIds.has(id)),
+            data
+        );
+
+        const consumedRecords = this.getConsumedEventsOfDay(data)?.records || {};
+        // legacy: the time taken or deleted from the project view was only stored by title
+        const legacyDurations = { ...this.getConsumedEventsOfDay(data)?.legacyDurations };
         for (const record of Object.values(data.recordsByStart)) {
-            const key = this.titleAndDayKey(record.title, record);
-            const consumedEvent = this.consumedEvents[key];
+            const consumed = consumedRecords[this._getStartKey(record.start)];
             let trackedDuration = record.duration;
-            if (consumedEvent?.timelineStartTimes?.includes(record.start)) {
+            if (consumed) {
                 // a taken or deleted record stays hidden, so that the manual timesheets are
                 // deducted from the same records, in the same order, as before the reload
-                record.consumedDuration =
-                    consumedEvent.timelineDurations?.[record.start] ?? trackedDuration;
-            } else if (consumedEvent?.duration) {
+                record.consumedDuration = consumed.duration ?? trackedDuration;
+            } else if (legacyDurations[record.title]) {
                 // removed from the records of the same title, from the first one
-                legacyConsumedByKey[key] ??= Math.max(
-                    0,
-                    consumedEvent.duration - (consumedEvent.timelineDuration || 0)
-                );
-                const legacyConsumed = Math.min(legacyConsumedByKey[key], trackedDuration);
-                legacyConsumedByKey[key] -= legacyConsumed;
+                const legacyConsumed = Math.min(legacyDurations[record.title], trackedDuration);
+                legacyDurations[record.title] -= legacyConsumed;
                 trackedDuration -= legacyConsumed;
             }
             record.trackedDuration = trackedDuration;
@@ -1277,12 +1301,11 @@ export class TimesheetAssistantModel {
             this._addRecordToGrouped(data, record);
         }
 
-        const today = data.currentDate.toISO().split("T")[0];
-        const assistantIdsForDay = new Set(this.assistantTimesheetIds[today] || []);
         for (const ts of this.getTimesheets(data)) {
-            if (!assistantIdsForDay.has(ts.id)) {
+            const manualHours = this._getManualHours(ts, data);
+            if (manualHours > 0) {
                 const groupKey = this.projectTaskKey(ts.project_id.id, ts.task_id.id);
-                this.refreshSuggestions(groupKey, ts.unit_amount * 3600, data);
+                this.refreshSuggestions(groupKey, manualHours * 3600, data);
             }
         }
     }
@@ -1440,6 +1463,13 @@ export class TimesheetAssistantModel {
         const starts = Object.keys(data.recordsByStart);
         const lastPushed = starts.length ? data.recordsByStart[starts[starts.length - 1]] : null;
 
+        // an Odoo event keeps its own duration: nothing is packed into it, and it is not packed
+        // into anything
+        if (block.isOdooEvent || lastPushed?.isOdooEvent) {
+            data.recordsByStart[block.start] = block;
+            return;
+        }
+
         if (block.duration < threshold && (!lastPushed || lastPushed.type != "afk")) {
             if (lastPushed) {
                 lastPushed.duration += block.duration;
@@ -1449,8 +1479,13 @@ export class TimesheetAssistantModel {
 
         if (lastPushed && lastPushed.duration < MINIMUM_DURATION_FOR_EVENT) {
             if (block.type == "afk") {
-                data.recordsByStart[starts[starts.length - 2]].duration +=
-                    block.duration + lastPushed.duration;
+                const previousPushed = data.recordsByStart[starts[starts.length - 2]];
+                // the short event comes right after an Odoo event: AFK is not packed into it
+                if (previousPushed.isOdooEvent) {
+                    data.recordsByStart[block.start] = block;
+                    return;
+                }
+                previousPushed.duration += block.duration + lastPushed.duration;
                 delete data.recordsByStart[starts[starts.length - 1]];
                 return;
             }
@@ -1492,7 +1527,7 @@ export class TimesheetAssistantModel {
         const validIds = [];
         if (timesheets.length) {
             timesheets.records.forEach((timesheet) => {
-                this.addTimesheet(timesheet, true, data);
+                this.refreshTimesheetsOnAdd(timesheet, data);
                 validIds.push(timesheet.id);
             });
         }
@@ -1530,12 +1565,10 @@ export class TimesheetAssistantModel {
         data.totalTime += timesheet.unit_amount;
     }
 
-    addTimesheet(timesheet, isAssistant = false, data = this.data) {
+    addTimesheet(timesheet, data = this.data) {
         this.refreshTimesheetsOnAdd(timesheet, data);
-        if (!isAssistant) {
-            const groupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
-            this.refreshSuggestions(groupKey, timesheet.unit_amount * 3600, data);
-        }
+        const groupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
+        this.refreshSuggestions(groupKey, this._getManualHours(timesheet, data) * 3600, data);
     }
 
     refreshTimesheetsOnRemove(timesheetId) {
@@ -1554,9 +1587,12 @@ export class TimesheetAssistantModel {
         if (!timesheetToRemove) {
             return;
         }
-        const today = this.data.currentDate.toISO().split("T")[0];
-        const isAssistant = (this.assistantTimesheetIds[today] || []).includes(timesheetId);
-        if (!isAssistant) {
+
+        // a timesheet that took suggestions gives them back: recompute everything, its manual
+        // part included, instead of only giving back its time to its project/task
+        if (this._restoreTimesheetsRecords([timesheetId])) {
+            this.computeSuggestions();
+        } else {
             const groupKey = this.projectTaskKey(
                 timesheetToRemove.project_id.id,
                 timesheetToRemove.task_id.id
@@ -1582,23 +1618,19 @@ export class TimesheetAssistantModel {
         if (!oldTimesheet) {
             return;
         }
-        const today = this.data.currentDate.toISO().split("T")[0];
-        const isAssistant = (this.assistantTimesheetIds[today] || []).includes(timesheet.id);
-        if (!isAssistant) {
-            const oldGroupKey = this.projectTaskKey(
-                oldTimesheet.project_id.id,
-                oldTimesheet.task_id.id
-            );
-            const newGroupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
-            if (oldGroupKey !== newGroupKey) {
-                this.refreshSuggestions(oldGroupKey, -oldTimesheet.unit_amount * 3600);
-                this.refreshSuggestions(newGroupKey, timesheet.unit_amount * 3600);
-            } else {
-                this.refreshSuggestions(
-                    oldGroupKey,
-                    (timesheet.unit_amount - oldTimesheet.unit_amount) * 3600
-                );
-            }
+        const oldGroupKey = this.projectTaskKey(
+            oldTimesheet.project_id.id,
+            oldTimesheet.task_id.id
+        );
+        const newGroupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
+        const oldManualHours = this._getManualHours(oldTimesheet);
+        const newManualHours = this._getManualHours(timesheet);
+
+        if (oldGroupKey !== newGroupKey) {
+            this.refreshSuggestions(oldGroupKey, -oldManualHours * 3600);
+            this.refreshSuggestions(newGroupKey, newManualHours * 3600);
+        } else {
+            this.refreshSuggestions(oldGroupKey, (newManualHours - oldManualHours) * 3600);
         }
     }
 
@@ -1662,6 +1694,114 @@ export class TimesheetAssistantModel {
         return res;
     }
 
+    getSelectedSuggestionsDuration(selectedRows, groupBy) {
+        let totalMinutes = 0;
+        for (const row of selectedRows) {
+            const { groupKey, title, start } = JSON.parse(row);
+            const params = this.getSuggestionParams(groupKey, title, start, groupBy);
+            if (params !== false) {
+                totalMinutes += params.unit_amount;
+            }
+        }
+        return totalMinutes;
+    }
+
+    async mergeSuggestionsIntoTimesheet(timesheet, selectedRows, groupBy) {
+        const rawAddedMinutes = this.getSelectedSuggestionsDuration(selectedRows, groupBy);
+        if (!rawAddedMinutes) {
+            return;
+        }
+
+        const undoData = {
+            day: this.data.currentDate.toISO().split("T")[0],
+            timesheetId: timesheet.id,
+            previousUnitAmount: timesheet.unit_amount,
+            selectedRows: new Set(selectedRows),
+            consumedStartKeys: new Set(),
+            matchings: [],
+        };
+
+        const newUnitAmount =
+            roundTimeSpent({
+                minutesSpent: timesheet.unit_amount * 60 + rawAddedMinutes,
+                ...this.roundingValues,
+            }) / 60;
+
+        undoData.addedUnitAmount = newUnitAmount - undoData.previousUnitAmount;
+        await this.orm.write(this.timesheetModel, [timesheet.id], {
+            unit_amount: newUnitAmount,
+        });
+
+        const [updatedTimesheet] = await this.orm.webRead(this.timesheetModel, [timesheet.id], {
+            specification: this.specification,
+        });
+
+        // the selected rows belong to the project/task of the timesheet: learn it, like when
+        // taking them
+        const localConfigVals = this.getLocalConfigValsOnTake(timesheet);
+        for (const row of undoData.selectedRows) {
+            const { groupKey, title, start } = JSON.parse(row);
+            const matchKey = this.getMatchKey(groupKey, title, start, groupBy);
+            const startsToConsume =
+                groupBy === "timeline"
+                    ? [start]
+                    : [...(this.data.grouped[groupKey]?.suggestions?.[title]?.starts || [])];
+
+            for (const recordStart of startsToConsume) {
+                const record = this.data.recordsByStart[recordStart];
+                if (record && this.isVisible(record)) {
+                    undoData.consumedStartKeys.add(this._getStartKey(recordStart));
+                }
+            }
+
+            this.onDelete(groupKey, title, false, true, start, groupBy, timesheet.id);
+            undoData.matchings.push(
+                this.frequencyViewerLocalConfig.addMatching(matchKey, localConfigVals)
+            );
+        }
+
+        this.refreshTimesheetsOnUpdate(updatedTimesheet);
+        this.computeSuggestions();
+        return undoData;
+    }
+
+    async undoAddedTime(undoData) {
+        const [currentTimesheet] = await this.orm.webRead(
+            this.timesheetModel,
+            [undoData.timesheetId],
+            { specification: this.specification }
+        );
+
+        if (!currentTimesheet) {
+            return false;
+        }
+
+        const unitAmount = Math.max(0, currentTimesheet.unit_amount - undoData.addedUnitAmount);
+        await this.orm.write(this.timesheetModel, [undoData.timesheetId], {
+            unit_amount: unitAmount,
+        });
+        const [revertedTimesheet] = await this.orm.webRead(
+            this.timesheetModel,
+            [undoData.timesheetId],
+            { specification: this.specification }
+        );
+
+        this.refreshTimesheetsOnUpdate(revertedTimesheet);
+
+        const records = this.consumedEvents[undoData.day]?.records;
+        for (const startKey of undoData.consumedStartKeys) {
+            if (records?.[startKey]?.timesheetId === undoData.timesheetId) {
+                delete records[startKey];
+            }
+        }
+
+        localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
+        // the rows don't belong to the project/task of the timesheet anymore
+        this.frequencyViewerLocalConfig.removeMatchings(undoData.matchings);
+        this.computeSuggestions();
+        return true;
+    }
+
     async onTake(groupKey, title, start = false, groupBy) {
         // duplicated in fetchData
         const todayStart = this.data.currentDate.toISO();
@@ -1681,8 +1821,7 @@ export class TimesheetAssistantModel {
         };
 
         const [timesheetId] = await this.orm.create(this.timesheetModel, [vals]);
-        this.recordAssistantTimesheet(timesheetId);
-        this.onDelete(groupKey, title, false, true, start, groupBy);
+        this.onDelete(groupKey, title, false, true, start, groupBy, timesheetId);
         this.frequencyViewerLocalConfig.addMatching(
             matchKey,
             this.getLocalConfigValsOnTake(params)
@@ -1691,56 +1830,48 @@ export class TimesheetAssistantModel {
         const [timesheet] = await this.orm.webRead(this.timesheetModel, [timesheetId], {
             specification: this.specification,
         });
-        this.addTimesheet(timesheet, true);
+        this.addTimesheet(timesheet);
     }
 
-    recordAssistantTimesheet(id) {
-        const day = this.data.currentDate.toISO().split("T")[0];
-        if (!this.assistantTimesheetIds[day]) {
-            this.assistantTimesheetIds[day] = [];
-        }
-        this.assistantTimesheetIds[day].push(id);
-        localStorage.setItem(
-            this.assistantTimesheetIdsKey,
-            JSON.stringify(this.assistantTimesheetIds)
-        );
-    }
-
-    onDelete(groupKey, title, refresh = true, isConsumed = false, start = false, groupBy) {
+    /**
+     * Hide a row, taken by the given timesheet or deleted. The records are stored by start,
+     * except for a deleted Odoo event, which is removed from the next computation by its id.
+     */
+    onDelete(
+        groupKey,
+        title,
+        refresh = true,
+        isConsumed = false,
+        start = false,
+        groupBy,
+        timesheetId = false
+    ) {
         // both views show the same chronological records: a row of the project view is made
         // of all the records sharing its project/task and title.
         const starts =
             groupBy === "timeline"
                 ? [start]
                 : [...(this.data.grouped[groupKey]?.suggestions?.[title]?.starts || [])];
-        let hasMeeting = false;
+        const day = this.data.currentDate.toISO().split("T")[0];
+        this.consumedEvents[day] ??= { records: {}, odooEvents: [] };
+        const consumedEventsOfDay = this.consumedEvents[day];
+        let hasDeletedOdooEvent = false;
         for (const recordStart of starts) {
             const record = this.data.recordsByStart[recordStart];
             // a hidden record stays, so that it shows up again if its time is given back
             if (!record || !this.isVisible(record)) {
                 continue;
             }
-            hasMeeting ||= record.type === "meeting";
-            const keyWithDay = this.titleAndDayKey(record.title, record);
-            if (!this.consumedEvents[keyWithDay]) {
-                this.consumedEvents[keyWithDay] = {
-                    isConsumed: false,
-                    timelineStartTimes: [],
+            if (!isConsumed && record.res_model && record.id) {
+                consumedEventsOfDay.odooEvents.push(this._getOdooEventKey(record));
+                hasDeletedOdooEvent = true;
+            } else {
+                // the rest of the tracked time was deducted by manual timesheets, it can still
+                // be given back to them or deducted by others
+                consumedEventsOfDay.records[this._getStartKey(recordStart)] = {
+                    duration: record.remaining,
+                    ...(timesheetId && { timesheetId }),
                 };
-            }
-            const consumedEvent = this.consumedEvents[keyWithDay];
-            consumedEvent.timelineStartTimes = [
-                ...(consumedEvent.timelineStartTimes || []),
-                recordStart,
-            ];
-            // the rest of the tracked time was deducted by manual timesheets, it can still be
-            // given back to them or deducted by others
-            consumedEvent.timelineDurations = {
-                ...consumedEvent.timelineDurations,
-                [recordStart]: record.remaining,
-            };
-            if (isConsumed) {
-                consumedEvent.isConsumed = true;
             }
             record.consumedDuration = record.remaining;
             this._refreshRecordDuration(record);
@@ -1748,9 +1879,59 @@ export class TimesheetAssistantModel {
 
         localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
 
-        if (hasMeeting && refresh) {
+        if (hasDeletedOdooEvent && refresh) {
             this.computeSuggestions();
         }
+    }
+
+    getConsumedEventsOfDay(data = this.data) {
+        return this.consumedEvents[data.currentDate.toISO().split("T")[0]];
+    }
+
+    _getStartKey(start) {
+        return DateTime.fromISO(start).toMillis();
+    }
+
+    _getOdooEventKey(event) {
+        return `${event.res_model},${event.id}`;
+    }
+
+    /**
+     * Hours of the timesheet that were not taken from the suggestions: the records it took are
+     * already hidden, so only the rest of its time is deducted from its project/task.
+     */
+    _getManualHours(timesheet, data = this.data) {
+        let takenSeconds = 0;
+        for (const consumed of Object.values(this.getConsumedEventsOfDay(data)?.records || {})) {
+            if (consumed.timesheetId === timesheet.id) {
+                takenSeconds += consumed.duration ?? 0;
+            }
+        }
+        return Math.max(0, timesheet.unit_amount - takenSeconds / 3600);
+    }
+
+    /**
+     * Forget the records taken by the given timesheets of the day, so that they show up again
+     * on the next computation.
+     *
+     * @returns {boolean} whether a record was forgotten
+     */
+    _restoreTimesheetsRecords(timesheetIds, data = this.data) {
+        const records = this.getConsumedEventsOfDay(data)?.records;
+        if (!records || !timesheetIds.length) {
+            return false;
+        }
+        let restored = false;
+        for (const [startKey, consumed] of Object.entries(records)) {
+            if (timesheetIds.includes(consumed.timesheetId)) {
+                delete records[startKey];
+                restored = true;
+            }
+        }
+        if (restored) {
+            localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
+        }
+        return restored;
     }
 
     async generateSampleData() {
@@ -1802,19 +1983,45 @@ export class TimesheetAssistantModel {
         }
     }
 
+    /**
+     * The events used to be stored by title and day: `{"{title, day, res_model?, id?}": event}`.
+     * They are now stored by day: `{day: {records: {start: {duration, timesheetId?}},
+     * odooEvents: ["res_model,id"], legacyDurations?: {title: duration}}}`.
+     */
     migrateConsumedEvents() {
-        // `some` will short circuit, we could also just test the first value but this feels cleaner
-        if (Object.values(this.consumedEvents).some((value) => typeof value !== "number")) {
-            return;
+        let hasChanges = false;
+        for (const [key, event] of Object.entries(this.consumedEvents)) {
+            if (!key.startsWith("{")) {
+                continue; // already stored by day
+            }
+            hasChanges = true;
+            delete this.consumedEvents[key];
+            const { title, day, res_model, id } = JSON.parse(key);
+            this.consumedEvents[day] ??= { records: {}, odooEvents: [] };
+            const consumedEventsOfDay = this.consumedEvents[day];
+            if (res_model && !event.isConsumed) {
+                consumedEventsOfDay.odooEvents.push(`${res_model},${id}`);
+                continue;
+            }
+            for (const start of event.timelineStartTimes || []) {
+                consumedEventsOfDay.records[this._getStartKey(start)] = {
+                    duration: event.timelineDurations?.[start],
+                };
+            }
+            // taken or deleted from the project view, only the duration is known
+            const legacyDuration = (event.duration || 0) - (event.timelineDuration || 0);
+            if (legacyDuration > 0) {
+                consumedEventsOfDay.legacyDurations ??= {};
+                consumedEventsOfDay.legacyDurations[title] = legacyDuration;
+            }
         }
-        for (const [key, value] of Object.entries(this.consumedEvents)) {
-            this.consumedEvents[key] = { duration: value, isConsumed: true };
+        if (hasChanges) {
+            localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
         }
-        localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
     }
 
     cleanOldConsumedEvents() {
-        const hasChanges = purgeOldCacheKeys(this.consumedEvents, (key) => JSON.parse(key).day, 30);
+        const hasChanges = purgeOldCacheKeys(this.consumedEvents, (key) => key, 30);
         if (hasChanges) {
             localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
         }

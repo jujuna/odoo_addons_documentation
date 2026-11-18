@@ -722,6 +722,74 @@ limited leaves.
 sick leave period >= 6 months in one year
         """)
 
+    def test_sick_leave_of_exactly_six_months(self):
+        """
+        An uninterrupted sick leave of exactly 6 months is assimilated at 50%
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Valentino',
+            'contract_date_start': date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 4000,
+            'l10n_be_joint_committee_id': self.cp302.id,
+            'resource_calendar_id': self.resource_calendar_40.id,
+            'lang': 'fr_BE',
+        })
+        # from Monday 3 March to Tuesday 2 September 2025 included
+        self._create_leave_from_we_type_code(
+            employee=employee,
+            work_entry_type_code=self.sick_leave_codes[0],
+            date_from=date(2025, 3, 3),
+            date_to=date(2025, 9, 2),
+        )
+        work_days_in_leave = sum(self._get_week_day_count_in_period(date(2025, 3, 3), date(2025, 9, 2)).values())
+        workable_days = sum(self._get_week_day_count_in_period(date(2025, 1, 1), date(2025, 12, 31)).values())
+        wanted_amount = round(employee.wage * ((workable_days - work_days_in_leave * 0.5) / workable_days), 2)
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            "date_from": date(2025, 12, 1),
+            "date_to": date(2025, 12, 31),
+            "struct_id": self.cp200_struct.id,
+        })
+        payslip.compute_sheet()
+        amount = payslip.line_ids.filtered_domain([['code', '=', 'CP302THIRTEEN']]).total
+        self.assertAlmostEqual(amount, wanted_amount)
+
+    def test_refused_sick_leave(self):
+        """
+        A refused sick leave is no absence: the 13th month is the full one
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Valentino',
+            'contract_date_start': date(2024, 1, 1),
+            'contract_date_end': False,
+            'wage': 4000,
+            'l10n_be_joint_committee_id': self.cp302.id,
+            'resource_calendar_id': self.resource_calendar_40.id,
+            'lang': 'fr_BE',
+        })
+        leave = self._create_leave_from_we_type_code(
+            employee=employee,
+            work_entry_type_code=self.sick_leave_codes[0],
+            date_from=date(2025, 3, 3),
+            date_to=date(2025, 3, 7),
+        )
+        leave.action_refuse()
+        self.assertEqual(leave.state, 'refuse')
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            "date_from": date(2025, 12, 1),
+            "date_to": date(2025, 12, 31),
+            "struct_id": self.cp200_struct.id,
+        })
+        payslip.compute_sheet()
+        amount = payslip.line_ids.filtered_domain([['code', '=', 'CP302THIRTEEN']]).total
+        self.assertAlmostEqual(amount, employee.wage)
+
     def test_long_sick_leave_cross_year(self):
         """
         If a long sick leave period is over two different years, than we should

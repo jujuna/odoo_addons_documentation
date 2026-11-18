@@ -47,7 +47,8 @@ class TestAIAgentSource(TestAICommon):
 
     @mute_logger("odoo.addons.ai.models.ai_embedding_mixin")
     def test_reindexing_skipped_source_indexes_it(self):
-        """Tests that re-indexing a skipped source after changing its content updates it to indexed."""
+        """Tests that a skipped source is not processed again by the embedding cron, and that
+        re-indexing it after changing its content updates it to indexed."""
         test_attachment = self.env["ir.attachment"].create(
             {
                 "name": "test_doc.txt",
@@ -63,6 +64,15 @@ class TestAIAgentSource(TestAICommon):
 
         self.assertFalse(test_attachment.embedding_ids)
         self.assertEqual("skipped", skipped_source.status, "Source with too short content should be skipped.")
+
+        with (
+            self.registry_test_mode(),
+            self.assertNoLogs("odoo.addons.ai.models.ai_embedding_mixin", level="WARNING"),
+        ):
+            self.env.ref("ai.ir_cron_embed_records").method_direct_trigger()
+
+        self.assertFalse(test_attachment.embedding_ids)
+        self.assertEqual("skipped", skipped_source.status, "Skipped source should not be processed again by the cron.")
 
         with (
             self.registry_test_mode(),

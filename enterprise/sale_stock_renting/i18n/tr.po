@@ -14,18 +14,19 @@
 # Ediz Duman <neps1192@gmail.com>, 2022
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"PO-Revision-Date: 2026-11-09 16:35+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "sale_stock_renting/tr/>\n"
 "Language: tr\n"
@@ -62,16 +63,23 @@ msgid ""
 "available for pickup.\n"
 "                        </span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
+"                        <span>\n"
+"                            Bazı ürünlerin teslim alınması için talep edilen "
+"miktar mevcut değil.\n"
+"                        </span>"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Erişim Grupları"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
 msgid "Activate to use stock deliveries and receipts for rental orders."
 msgstr ""
+"Kiralık siparişler için stok teslimatlarını ve fişleri kullanmak üzere "
+"etkinleştirin."
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.stock_lot_kanban_allocation
@@ -87,6 +95,7 @@ msgstr "Satır Ekle"
 #: model:ir.module.module,summary:base.module_sale_stock_renting
 msgid "Allows use of stock application to manage rentals inventory"
 msgstr ""
+"Envanter uygulamasını kullanarak kiralama envanterini yönetmeye olanak tanır"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.sale_order_line_form_lot_allocation
@@ -119,7 +128,7 @@ msgstr "Kiralık için uygun"
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Firma"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_config_settings
@@ -181,7 +190,7 @@ msgstr "ID"
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
 msgid "Inventory"
-msgstr ""
+msgstr "Envanter"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__is_product_storable
@@ -298,7 +307,7 @@ msgstr "Kiralama Konumu"
 #. module: sale_stock_renting
 #: model:ir.module.module,shortdesc:base.module_sale_stock_renting
 msgid "Rental Stock Management"
-msgstr ""
+msgstr "Kiralık Stok Yönetimi"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
@@ -309,7 +318,7 @@ msgstr "Kiralama Transferleri"
 #. odoo-python
 #: code:addons/sale_stock_renting/models/stock_move.py:0
 msgid "Rental move: %(order)s"
-msgstr ""
+msgstr "Kiralık hareket: %(order)s"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__group_rental_stock_picking
@@ -378,6 +387,8 @@ msgid ""
 "Technical field holding the tracking method. False on a storable product "
 "means it's tracked by quantity only."
 msgstr ""
+"Takip yöntemini içeren teknik alan. Depolanabilir bir üründe \"false\" "
+"değeri, ürünün yalnızca miktar bazında takip edildiği anlamına gelir."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_product_product__preparation_time
@@ -402,12 +413,15 @@ msgid ""
 "This location is internal because products in rental are still considered as "
 "company assets."
 msgstr ""
+"Bu teknik konum, halihazırda kiralık olan ürünler için stok görevi görür. "
+"Kiralık ürünler hala şirket varlığı olarak kabul edildiğinden, bu konum "
+"dahili bir konumdur."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__tracking
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__tracking
 msgid "Tracking Method"
-msgstr ""
+msgstr "Takip Yöntemi"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -422,7 +436,7 @@ msgstr ""
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Aktarım"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__unavailable_lot_ids

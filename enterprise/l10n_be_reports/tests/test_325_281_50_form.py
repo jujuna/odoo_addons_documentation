@@ -2,7 +2,7 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 from odoo import Command, fields
 from odoo.exceptions import UserError
-from odoo.tests import tagged, freeze_time
+from odoo.tests import Form, tagged, freeze_time
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -237,6 +237,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f2005_registratienummer>0477472701</f2005_registratienummer>
                                                 <f2008_typefiche>28150</f2008_typefiche>
                                                 <f2009_volgnummer>1</f2009_volgnummer>
+                                                <f2011_nationaalnr>0475646428</f2011_nationaalnr>
                                                 <f2013_naam>partner_a</f2013_naam>
                                                 <f2015_adres>Rue du Jacobet, 9</f2015_adres>
                                                 <f2016_postcodebelgisch>7100</f2016_postcodebelgisch>
@@ -262,7 +263,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f50_2103_advantagenature/>
                                                 <f50_2107_uitgeoefendberoep/>
                                                 <f50_2109_fiscaalidentificat/>
-                                                <f50_2110_kbonbr>0475646428</f50_2110_kbonbr>
+                                                <f50_2110_kbonbr/>
                                             </Fiche28150>
                                         </Opgave32550>
                                     </Opgaven>
@@ -327,6 +328,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f2005_registratienummer>0477472701</f2005_registratienummer>
                                                 <f2008_typefiche>28150</f2008_typefiche>
                                                 <f2009_volgnummer>1</f2009_volgnummer>
+                                                <f2011_nationaalnr>0475646428</f2011_nationaalnr>
                                                 <f2013_naam>partner_a</f2013_naam>
                                                 <f2015_adres>Rue du Jacobet, 9</f2015_adres>
                                                 <f2016_postcodebelgisch>7100</f2016_postcodebelgisch>
@@ -352,7 +354,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f50_2103_advantagenature/>
                                                 <f50_2107_uitgeoefendberoep/>
                                                 <f50_2109_fiscaalidentificat/>
-                                                <f50_2110_kbonbr>0475646428</f50_2110_kbonbr>
+                                                <f50_2110_kbonbr/>
                                             </Fiche28150>
                                         </Opgave32550>
                                     </Opgaven>
@@ -421,6 +423,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f2005_registratienummer>0477472701</f2005_registratienummer>
                                                 <f2008_typefiche>28150</f2008_typefiche>
                                                 <f2009_volgnummer>1</f2009_volgnummer>
+                                                <f2011_nationaalnr>0807677428</f2011_nationaalnr>
                                                 <f2013_naam>SPRL Popiul</f2013_naam>
                                                 <f2015_adres>Rue Arthur Libert, Longueville 8</f2015_adres>
                                                 <f2016_postcodebelgisch>1325</f2016_postcodebelgisch>
@@ -446,13 +449,14 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f50_2103_advantagenature/>
                                                 <f50_2107_uitgeoefendberoep/>
                                                 <f50_2109_fiscaalidentificat/>
-                                                <f50_2110_kbonbr>0807677428</f50_2110_kbonbr>
+                                                <f50_2110_kbonbr/>
                                             </Fiche28150>
                                             <Fiche28150>
                                                 <f2002_inkomstenjaar>2000</f2002_inkomstenjaar>
                                                 <f2005_registratienummer>0477472701</f2005_registratienummer>
                                                 <f2008_typefiche>28150</f2008_typefiche>
                                                 <f2009_volgnummer>2</f2009_volgnummer>
+                                                <f2011_nationaalnr>0475646428</f2011_nationaalnr>
                                                 <f2013_naam>partner_a</f2013_naam>
                                                 <f2015_adres>Rue du Jacobet, 9</f2015_adres>
                                                 <f2016_postcodebelgisch>7100</f2016_postcodebelgisch>
@@ -478,7 +482,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                                                 <f50_2103_advantagenature/>
                                                 <f50_2107_uitgeoefendberoep/>
                                                 <f50_2109_fiscaalidentificat/>
-                                                <f50_2110_kbonbr>0475646428</f50_2110_kbonbr>
+                                                <f50_2110_kbonbr/>
                                             </Fiche28150>
                                         </Opgave32550>
                                     </Opgaven>
@@ -500,6 +504,114 @@ class TestResPartner28150(AccountTestInvoicingCommon):
             self.get_xml_tree_from_string(resulting_xml),
             self.get_xml_tree_from_string(expected_281_50_xml),
         )
+
+    def test_281_50_xml_beneficiary_identification(self):
+        """The national number goes in 2.011 for a natural person and the BCE number in 2.011
+        for a legal person, but in 2.110 for a natural person. 2.109 is reserved for the tax
+        identification number of a non-resident (its foreign VAT number, or else its citizen
+        identification), who has nothing in 2.011.
+        """
+        partner_d = self.env['res.partner'].create({
+            'name': 'Lawyer, Ann',
+            'street': 'Rue du Palais 1',
+            'zip': '1000',
+            'city': 'Bruxelles',
+            'country_id': self.env.ref('base.be').id,
+            'additional_identifiers': {'BE_EN': '0807677428'},
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        partner_f = self.env['res.partner'].create({
+            'name': 'Doe, John',
+            'street': 'Rue Haute 2',
+            'zip': '1000',
+            'city': 'Bruxelles',
+            'country_id': self.env.ref('base.be').id,
+            'citizen_identification': '85.07.30-033.61',
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        partner_e = self.env['res.partner'].create({
+            'name': 'Société Française',
+            'street': 'Rue de Rivoli 1',
+            'zip': '75001',
+            'city': 'Paris',
+            'country_id': self.env.ref('base.fr').id,
+            'vat': 'FR23334175221',
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        partner_g = self.env['res.partner'].create({
+            'name': 'Jansen, Piet',
+            'street': 'Damrak 1',
+            'zip': '1012',
+            'city': 'Amsterdam',
+            'country_id': self.env.ref('base.nl').id,
+            'citizen_identification': '1234 56 782',
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        for partner in (self.partner_c, partner_d, partner_e, partner_f, partner_g):
+            self.create_and_post_bill(partner_id=partner, product_id=self.product_a, amount=1000.0, date='2000-05-12')
+
+        form_325 = self.create_325_form()
+        xml_tree = self.get_xml_tree_from_string(form_325._generate_325_form_xml())
+        identification = {
+            fiche.findtext('f2013_naam'): (
+                fiche.findtext('f50_2030_aardpersoon'),
+                fiche.findtext('f2011_nationaalnr'),
+                fiche.findtext('f50_2109_fiscaalidentificat'),
+                fiche.findtext('f50_2110_kbonbr'),
+            )
+            for fiche in xml_tree.iter('Fiche28150')
+        }
+        self.assertEqual(identification, {
+            # Belgian legal person: BCE number in 2.011
+            'partner_a': ('2', '0475646428', '', ''),
+            # Belgian natural person without BCE number: national number in 2.011
+            'Super': ('1', '91103044444', '', ''),
+            # Belgian natural person with a BCE number (liberal profession): BCE number in 2.110
+            'Lawyer': ('1', '', '', '0807677428'),
+            # the national number is sent without its formatting
+            'Doe': ('1', '85073003361', '', ''),
+            # foreign legal person: its foreign VAT number in 2.109, nothing in 2.011
+            'Société Française': ('2', '', 'FR23334175221', ''),
+            # foreign natural person without VAT number: its citizen identification in 2.109, nothing in 2.011
+            'Jansen': ('1', '', '123456782', ''),
+        })
+
+    def test_281_50_missing_first_name_warning(self):
+        """The first name of a natural person (2.114) is found in its name after a comma: the 325 and the
+        281.50 warn about the natural persons without one, without blocking the generation."""
+        partner_d = self.env['res.partner'].create({
+            'name': 'John Doe',
+            'street': 'Rue Haute 2',
+            'zip': '1000',
+            'city': 'Bruxelles',
+            'country_id': self.env.ref('base.be').id,
+            'citizen_identification': '85.07.30-033.61',
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        for partner in (self.partner_c, partner_d):
+            self.create_and_post_bill(partner_id=partner, product_id=self.product_a, amount=1000.0, date='2000-05-12')
+
+        form_325 = self.create_325_form(state='draft')
+        forms_by_partner = form_325.form_281_50_ids.grouped('partner_id')
+        # partner_a is a legal person, "Super, Bob" has a first name
+        self.assertFalse(forms_by_partner[self.partner_a].is_first_name_missing)
+        self.assertFalse(forms_by_partner[self.partner_c].is_first_name_missing)
+        self.assertTrue(forms_by_partner[partner_d].is_first_name_missing)
+        self.assertEqual(form_325.form_281_50_missing_first_names, 'John Doe')
+        with Form(form_325) as form:
+            self.assertEqual(form.form_281_50_missing_first_names, 'John Doe')
+        with Form(forms_by_partner[partner_d]) as form:
+            self.assertTrue(form.is_first_name_missing)
+            # The first name typed on the 281.50 removes the warning
+            form.partner_first_name = 'John'
+            form.partner_name = 'Doe'
+            self.assertFalse(form.is_first_name_missing)
+        self.assertFalse(form_325.form_281_50_missing_first_names)
+
+        # The warning doesn't block the generation of the XML file
+        forms_by_partner[partner_d].partner_first_name = ''
+        xml_tree = self.get_xml_tree_from_string(form_325._generate_325_form_xml())
+        self.assertIn('Doe', [fiche.findtext('f2013_naam') for fiche in xml_tree.iter('Fiche28150')])
 
     def test_281_50_partner_remuneration_should_include_amount_directly_put_in_expense_without_invoice(self):
         expense_account_atn_281_50 = self.copy_account(self.company_data['default_account_expense'])
@@ -538,6 +650,35 @@ class TestResPartner28150(AccountTestInvoicingCommon):
             }
         ])
 
+    def test_281_50_paid_amount_of_an_expense_paid_to_a_contact_of_the_company(self):
+        """A payment to a contact of a tagged company, booked directly on a 281.50 account, is a payment to the
+        company, as for the bills"""
+        expense_account_atn_281_50 = self.copy_account(self.company_data['default_account_expense'])
+        expense_account_atn_281_50.tag_ids = self.tag_281_50_atn
+        contact = self.env['res.partner'].create({'name': 'Contact of SPRL Popiul', 'parent_id': self.partner_b.id})
+
+        statement = self.env['account.bank.statement'].create({
+            'name': '281.50 test',
+            'date': fields.Date.from_string('2000-05-12'),
+            'balance_end_real': -1000.0,
+            'line_ids': [
+                (0, 0, {
+                    'journal_id': self.company_data['default_journal_bank'].id,
+                    'payment_ref': 'line2',
+                    'partner_id': contact.id,
+                    'amount': -1000.0,
+                    'date': fields.Date.from_string('2000-05-12'),
+                }),
+            ],
+        })
+        st_line = statement.line_ids
+        st_line.set_account_bank_statement_line(st_line.line_ids[-1].id, expense_account_atn_281_50.id)
+
+        form_325 = self.create_325_form()
+        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'atn': 1000.0, 'total_remuneration': 1000.0, 'paid_amount': 1000.0},
+        ])
+
     def test_281_50_partner_remuneration_should_not_include_amount_from_last_year_directly_put_as_expense(self):
         expense_account_atn_281_50 = self.copy_account(self.company_data['default_account_expense'])
         expense_account_atn_281_50.tag_ids = self.tag_281_50_atn
@@ -566,15 +707,15 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         self.assertEqual(len(form_281_50_partner_b), 0, "Amount paid in 1999 shouldn't be taken into account for ref_year 2020")
 
     def test_281_50_partner_remuneration_should_not_include_commission_from_previous_year(self):
-        previous_year_bill = self.create_and_post_bill(self.partner_b, self.product_b, 500.0, '1999-05-12')
-        self.pay_bill(bill=previous_year_bill, amount=250, date='1999-05-12')
+        previous_year_bill = self.create_and_post_bill(self.partner_b, self.product_b, 600.0, '1999-05-12')
+        self.pay_bill(bill=previous_year_bill, amount=300, date='1999-05-12')
         # make a payment to the vendor partner_b and reconcile it with the bill for the previous year
-        self.pay_bill(bill=previous_year_bill, amount=250, date='2000-05-12')
+        self.pay_bill(bill=previous_year_bill, amount=300, date='2000-05-12')
         form_325 = self.create_325_form()
         form_281_50 = form_325.form_281_50_ids
         self.assertRecordValues(form_325.form_281_50_ids, [
             # pylint: disable=C0326
-            {'partner_id': self.partner_b.id, 'commissions':    0.0, 'fees': 0.0, 'atn': 0.0, 'exposed_expenses': 0.0, 'total_remuneration':    0.0, 'paid_amount': 250.0, },
+            {'partner_id': self.partner_b.id, 'commissions':    0.0, 'fees': 0.0, 'atn': 0.0, 'exposed_expenses': 0.0, 'total_remuneration':    0.0, 'paid_amount': 300.0},
             {'partner_id': self.partner_a.id, 'commissions': 1000.0, 'fees': 0.0, 'atn': 0.0, 'exposed_expenses': 0.0, 'total_remuneration': 1000.0, 'paid_amount':   0.0, },
         ])
         self.assertRecordValues(form_325, [
@@ -582,6 +723,29 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                 'form_281_50_total_amount': 1000.0,
                 'form_281_50_ids': form_281_50.ids,
             }
+        ])
+
+    def test_281_50_paid_amount_should_include_payment_of_bill_from_any_previous_year(self):
+        """The paid amount includes the amounts paid during the reference year related to other years"""
+        old_bill = self.create_and_post_bill(self.partner_b, self.product_b, 1000.0, '1998-05-12')
+        self.pay_bill(bill=old_bill, amount=1000, date='2000-05-12')
+        form_325 = self.create_325_form()
+        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'fees': 0.0, 'total_remuneration': 0.0, 'paid_amount': 1000.0},
+        ])
+
+    def test_281_50_paid_amount_should_include_advance_for_bill_of_next_year(self):
+        """An advance paid during the reference year is reported in its paid amount, even if the bill is of the next
+        year, and not again in the paid amount of the next year"""
+        next_year_bill = self.create_and_post_bill(self.partner_b, self.product_b, 1000.0, '2001-01-15')
+        self.pay_bill(bill=next_year_bill, amount=1000, date='2000-12-20')
+        form_325 = self.create_325_form()
+        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'fees': 0.0, 'total_remuneration': 0.0, 'paid_amount': 1000.0},
+        ])
+        form_325_next_year = self.create_325_form(ref_year=2001)
+        self.assertRecordValues(form_325_next_year.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'fees': 1000.0, 'total_remuneration': 1000.0, 'paid_amount': 0.0},
         ])
 
     def test_325_50_wizard_should_return_325_form_view(self):
@@ -747,6 +911,22 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         self.assertEqual(form_year_1.official_id, '1')
         form_year_2 = self.create_form28150(ref_year=2021)
         self.assertEqual(form_year_2.official_id, '1')
+
+    def test_281_50_correction_should_keep_the_original_sequence(self):
+        """A corrective or cancelled form replaces the original form of the beneficiary: it keeps its number (2.009),
+        an added form gets a new one"""
+        original = self.create_form28150(ref_year=2020)
+        other = self.create_form28150(ref_year=2020, partner=self.partner_b)
+        self.assertEqual((original.official_id, other.official_id), ('1', '2'))
+        correction = self.create_form28150(ref_year=2020, form_type='1')
+        self.assertEqual(correction.official_id, '1')
+        cancellation = self.create_form28150(ref_year=2020, form_type='3', partner=self.partner_b)
+        self.assertEqual(cancellation.official_id, '2')
+        partner_d = self.partner_b.copy({'name': 'SPRL Nouvelle', 'is_company': True})
+        added = self.create_form28150(ref_year=2020, form_type='2', partner=partner_d)
+        self.assertEqual(added.official_id, '3')
+        # Without original form, a corrective form gets a new number
+        self.assertEqual(self.create_form28150(ref_year=2021, form_type='1').official_id, '1')
 
     def test_281_50_shouldnt_have_any_sequence_while_state_is_draft(self):
         form = self.create_form28150(ref_year=2020, state='draft')
@@ -958,7 +1138,8 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                 'fees': 1500.0,
                 'exposed_expenses': 1500.0,
                 'total_remuneration': 6000.0,
-                'paid_amount': 3000.0,
+                # the payments of 2000: the advance of 1995 is reported in 1995
+                'paid_amount': 2000.0,
             }
         ])
 
@@ -1002,6 +1183,17 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=200.0, date='2000-05-12')
         form_325 = self.create_325_form(ref_year=2000)
         self.assertFalse(form_325.form_281_50_ids.filtered(lambda f: f.partner_id.id == self.partner_b.id))
+
+    def test_281_50_form_for_amount_of_250_shouldnt_be_created(self):
+        """No 281.50 is due when the amount doesn't exceed 250 euros"""
+        partner_d = self.partner_c.copy({'name': 'Doe, Jane', 'citizen_identification': '85073003361'})
+        bill_b = self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=250.0, date='2000-05-12')
+        self.create_and_post_bill(partner_id=self.partner_c, product_id=self.product_b, amount=250.01, date='2000-05-12')
+        bill_d = self.create_and_post_bill(partner_id=partner_d, product_id=self.product_b, amount=250.0, date='1999-05-12')
+        self.pay_bill(bill=bill_b, amount=250, date='2000-05-12')
+        self.pay_bill(bill=bill_d, amount=250, date='2000-05-12')
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertEqual(form_325.form_281_50_ids.partner_id, self.partner_a + self.partner_c)
 
     def test_281_50_vendor_bill_and_credit_note_without_payment(self):
         """ Ensure form 281.50 handles correctly credit note in its computation """
@@ -1192,3 +1384,140 @@ class TestResPartner28150(AccountTestInvoicingCommon):
                 'trainer_remuneration': 10000.0,
             }
         ])
+
+    def test_281_50_sports_remuneration_should_not_be_counted_twice_for_the_threshold(self):
+        """The sportsman and trainer remunerations are part of the commissions, fees, ... amounts:
+        they must not be added again to check the 250 euros threshold."""
+        product_c = self.env['product.product'].create({'name': 'product_c'})
+        product_c.property_account_expense_id = self.product_a.property_account_expense_id.copy()
+        product_c.property_account_expense_id.tag_ids |= (self.tag_281_50_commissions + self.tag_281_50_sportsman_remuneration)
+        self.create_and_post_bill(self.partner_c, product_c, 130.0, '2000-05-12')
+
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertEqual(form_325.form_281_50_ids.partner_id, self.partner_a)
+
+    def test_281_50_amounts_should_come_from_the_form_company(self):
+        """The amounts of the 281.50 come from the company of the 325, not from the active company"""
+        company_2 = self.company_data_2['company']
+        expense_account = self.company_data_2['default_account_expense']
+        expense_account.tag_ids |= self.tag_281_50_fees
+        bill = self.env['account.move'].with_company(company_2).create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_b.id,
+            'invoice_date': fields.Date.from_string('2000-05-12'),
+            'invoice_line_ids': [Command.create({
+                'name': 'fees',
+                'account_id': expense_account.id,
+                'quantity': 1.0,
+                'price_unit': 1000.0,
+                'tax_ids': [],
+            })],
+        })
+        bill.action_post()
+
+        self.assertEqual(self.env.company, self.company_data['company'])
+        form_325 = self.env['l10n_be.form.325'].create({
+            'company_id': company_2.id,
+            'sender_id': company_2.partner_id.id,
+            'reference_year': '2000',
+        })
+        form_325._generate_form_281_50()
+        self.assertRecordValues(form_325.form_281_50_ids, [
+            {'partner_id': self.partner_b.id, 'commissions': 0.0, 'fees': 1000.0},
+        ])
+
+    def test_281_50_pdf_paid_amount_equal_to_total_should_not_be_printed(self):
+        """The zone g is only filled when the paid amount differs from the total (e)"""
+        form = self.create_form28150(ref_year=2000, commission=100.0, fees=200.0, atn=300.0, exposed_expenses=400.0, paid_amount=1000.0)
+        form.write({'sportsman_remuneration': 50.0, 'trainer_remuneration': 60.0})
+        html = self.env['ir.actions.report']._render_qweb_html('l10n_be_reports.action_report_partner_281_50_pdf', form)[0].decode()
+        self.assertNotRegex(html, r'>\s*0\.00\s*<')
+        self.assertNotIn('NIL', html)
+
+    def test_281_50_amounts_of_the_branches(self):
+        """The 325 of a company declares the expenses of its branches and their payments"""
+        company = self.company_data['company']
+        branch = self.env['res.company'].create({
+            'name': 'Branch',
+            'country_id': company.country_id.id,
+            'parent_id': company.id,
+        })
+        self.cr.precommit.run()  # load the chart of accounts
+        self.env.user.company_ids |= branch
+        bill = self.env['account.move'].with_company(branch).create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_b.id,
+            'invoice_date': fields.Date.from_string('2000-05-12'),
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_b.id,
+                'account_id': self.product_b.property_account_expense_id.id,
+                'quantity': 1.0,
+                'price_unit': 1000.0,
+                'tax_ids': [],
+            })],
+        })
+        bill.action_post()
+        self.assertEqual(bill.company_id, branch)
+        self.env['account.payment.register'].with_company(branch).with_context(
+            active_model='account.move', active_ids=bill.ids,
+        ).create({'payment_date': fields.Date.from_string('2000-06-01')})._create_payments()
+
+        form_325 = self.create_325_form()
+        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'fees': 1000.0, 'paid_amount': 1000.0},
+        ])
+
+    def test_281_50_sport_remunerations_above_the_total(self):
+        """Belcotax-on-web refuses 2.066 + 2.067 > 2.064: an account only tagged for the sportsmen blocks the
+        generation, with the beneficiary and the account"""
+        sport_account = self.copy_account(self.company_data['default_account_expense'])
+        sport_account.tag_ids = self.tag_281_50_sportsman_remuneration
+        self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=500.0, date='2000-05-12')
+        bill = self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_a, amount=1000.0, date='2000-05-12')
+        bill.button_draft()
+        bill.invoice_line_ids.account_id = sport_account
+        bill.action_post()
+
+        with self.assertRaisesRegex(UserError, 'SPRL Popiul') as error:
+            self.create_325_form()
+        self.assertIn(sport_account.display_name, str(error.exception))
+
+        # The account also tagged for the fees: the sportsman remuneration is part of the fees
+        sport_account.tag_ids |= self.tag_281_50_fees
+        form_325 = self.create_325_form()
+        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda f: f.partner_id == self.partner_b), [
+            {'fees': 1500.0, 'sportsman_remuneration': 1000.0},
+        ])
+
+    def test_325_debtor_natural_person(self):
+        """A debtor natural person without BCE number is identified by its national number (1.037)"""
+        self.debtor.write({'is_company': False, 'vat': False, 'additional_identifiers': {}})
+        self.debtor.citizen_identification = '85.07.30-033.61'
+        xml_tree = self.get_xml_tree_from_string(self.create_325_form()._generate_325_form_xml())
+        self.assertEqual(xml_tree.findtext('.//Aangifte/a1037_nationaalnr'), '85073003361')
+        self.assertFalse(xml_tree.findtext('.//Aangifte/a1005_registratienummer'))
+
+        # A debtor company has no national number
+        self.debtor.write({'is_company': True})
+        xml_tree = self.get_xml_tree_from_string(self.create_325_form(ref_year=2000)._generate_325_form_xml())
+        self.assertIsNone(xml_tree.find('.//Aangifte/a1037_nationaalnr'))
+
+    def test_325_warning_eea_vat_number(self):
+        """The 325 warns about the beneficiaries with a VAT number of another country of the EEA"""
+        partner_fr = self.env['res.partner'].create({
+            'name': 'Société Française',
+            'is_company': True,
+            'street': 'Rue de Rivoli 1',
+            'zip': '75001',
+            'city': 'Paris',
+            'country_id': self.env.ref('base.fr').id,
+            'vat': 'FR23334175221',
+            'category_id': [Command.link(self.env.ref('l10n_be_reports.res_partner_tag_281_50').id)],
+        })
+        self.create_and_post_bill(partner_id=partner_fr, product_id=self.product_a, amount=1000.0, date='2000-05-12')
+        form_325 = self.create_325_form(state='draft')
+        self.assertEqual(form_325.form_281_50_ids.partner_id, self.partner_a | partner_fr)
+        # partner_a has a Belgian VAT number
+        self.assertEqual(form_325.form_281_50_eu_vat_partners, 'Société Française')
+        with Form(form_325) as form:
+            self.assertEqual(form.form_281_50_eu_vat_partners, 'Société Française')

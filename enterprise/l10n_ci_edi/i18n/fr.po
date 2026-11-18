@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_ci_edi
+# * l10n_ci_edi
 #
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 18:18+0000\n"
-"PO-Revision-Date: 2026-09-18 05:18+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-12 15:31+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "l10n_ci_edi/fr/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,6 +28,11 @@ msgid ""
 "            - Test: Connection to the DGI FNE system in test mode.\n"
 "        "
 msgstr ""
+"\n"
+"            - Production : Connexion au système FNE de la DGI en mode "
+"production.\n"
+"            - Test : Connexion au système FNE de la DGI en mode test.\n"
+"        "
 
 #. module: l10n_ci_edi
 #: model:ir.module.module,description:base.module_l10n_ci_edi
@@ -41,90 +47,102 @@ msgid ""
 "- Generate QR codes for validated invoices\n"
 "- Handle credit notes and invoice corrections\n"
 msgstr ""
+"\n"
+"Ce module s'intègre au système de facturation électronique (Facture "
+"Normalisée Électronique - FNE)\n"
+"de la Direction Générale des Impôts (DGI) de Côte d'Ivoire.\n"
+"\n"
+"Il permet aux entreprises de :\n"
+"- Envoyer les factures normalisées par voie électronique à la DGI\n"
+"- Recevoir la validation et les numéros de factures normalisées\n"
+"- Générer des codes QR pour les factures validées\n"
+"- Gérer les avoirs et les corrections de factures\n"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "API Token"
-msgstr ""
+msgstr "Jeton API"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_account_chart_template
 msgid "Account Chart Template"
-msgstr ""
+msgstr "Modèle de plan comptable"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,help:l10n_ci_edi.field_res_company__l10n_ci_edi_fne_api_token
 #: model:ir.model.fields,help:l10n_ci_edi.field_res_config_settings__l10n_ci_edi_fne_api_token
 msgid "Authentication token provided by the DGI for API access."
-msgstr ""
+msgstr "Jeton d'authentification fourni par la DGI pour accéder à l'API."
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "Authentication token provided by the DGI for the FNE API."
-msgstr ""
+msgstr "Jeton d'authentification fourni par la DGI pour l'API FNE."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__card
 msgid "Bank Card"
-msgstr ""
+msgstr "Carte bancaire"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__transfer
 msgid "Bank Transfer"
-msgstr ""
+msgstr "Virement bancaire"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move_send.py:0
 msgid "Cannot send to FNE"
-msgstr ""
+msgstr "Impossible d'envoyer à la FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__cash
 msgid "Cash"
-msgstr ""
+msgstr "Espèces"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__check
 msgid "Check"
-msgstr ""
+msgstr "Chèque"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Société"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Paramètres de configuration"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "Credit notes must reference the original invoice for FNE compliance."
 msgstr ""
+"Les avoirs doivent faire référence à la facture d'origine pour être "
+"conformes à la FNE."
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "Côte d'Ivoire FNE E-Invoicing"
-msgstr ""
+msgstr "Côte d'Ivoire - Facturation électronique FNE"
 
 #. module: l10n_ci_edi
 #: model:res.partner.category,name:l10n_ci_edi.res_partner_category_government
 msgid "Côte d'Ivoire Government Institution"
-msgstr ""
+msgstr "Institution publique de Côte d'Ivoire"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_datetime
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_datetime
 msgid "Date and time of FNE validation."
-msgstr ""
+msgstr "Date et heure de validation par la FNE."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__deferred
 msgid "Deferred Payment"
-msgstr ""
+msgstr "Paiement différé"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_chart_template__display_name
@@ -135,94 +153,94 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_config_settings__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nom d'affichage"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_account_tax
 msgid "ETA tax codes mixin"
-msgstr ""
+msgstr "Mixin des codes fiscaux ETA"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/res_company.py:0
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_status__error
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/res_company.py:0
 msgid "Error connecting to the FNE server. Please try again later."
-msgstr ""
+msgstr "Erreur de connexion au serveur FNE. Veuillez réessayer plus tard."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/res_company.py:0
 msgid "Error decoding response from the FNE server."
-msgstr ""
+msgstr "Erreur lors du décodage de la réponse du serveur FNE."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_company__l10n_ci_edi_fne_api_token
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_config_settings__l10n_ci_edi_fne_api_token
 msgid "FNE API Token"
-msgstr ""
+msgstr "Jeton API FNE"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.view_move_form
 msgid "FNE Details"
-msgstr ""
+msgstr "Détails FNE"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.view_move_form
 msgid "FNE Information"
-msgstr ""
+msgstr "Informations FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_invoice_id
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_invoice_id
 msgid "FNE Invoice Id"
-msgstr ""
+msgstr "Identifiant de facture FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_is_needed
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_is_needed
 msgid "FNE Is Needed"
-msgstr ""
+msgstr "FNE requise"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move_line__l10n_ci_edi_fne_item_id
 msgid "FNE Item ID"
-msgstr ""
+msgstr "Identifiant d'article FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_payment_method
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_payment_method
 msgid "FNE Payment Method"
-msgstr ""
+msgstr "Mode de paiement FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_qrcode_img
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_qrcode_img
 msgid "FNE QR Code"
-msgstr ""
+msgstr "Code QR FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_qrcode
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_qrcode
 msgid "FNE QR Code URL"
-msgstr ""
+msgstr "URL du code QR FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_reference
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_reference
 msgid "FNE Reference"
-msgstr ""
+msgstr "Référence FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_company__l10n_ci_edi_server_mode
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_config_settings__l10n_ci_edi_server_mode
 msgid "FNE Server Mode"
-msgstr ""
+msgstr "Mode du serveur FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_status
@@ -230,18 +248,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.view_account_invoice_filter
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.view_invoice_tree
 msgid "FNE Status"
-msgstr ""
+msgstr "Statut FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_tax__l10n_ci_edi_tax_code
 msgid "FNE Tax Code"
-msgstr ""
+msgstr "Code fiscal FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_datetime
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_datetime
 msgid "FNE Validation Time"
-msgstr ""
+msgstr "Heure de validation FNE"
 
 #. module: l10n_ci_edi
 #. odoo-python
@@ -250,18 +268,20 @@ msgid ""
 "FNE configuration is incomplete for company '%(company)s'. Please configure "
 "the FNE Server Mode and API Token in Settings."
 msgstr ""
+"La configuration FNE est incomplète pour la société '%(company)s'. Veuillez "
+"configurer le mode du serveur FNE et le jeton API dans les paramètres."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_invoice_id
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_invoice_id
 msgid "FNE invoice id."
-msgstr ""
+msgstr "Identifiant de facture FNE."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "FNE sticker balance is low: %(warning)s"
-msgstr ""
+msgstr "Le solde de stickers FNE est faible : %(warning)s"
 
 #. module: l10n_ci_edi
 #. odoo-python
@@ -270,12 +290,14 @@ msgid ""
 "FNE submission returned the following error:\n"
 " %(error)s"
 msgstr ""
+"L'envoi à la FNE a renvoyé l'erreur suivante :\n"
+" %(error)s"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move_send.py:0
 msgid "Failed to send to FNE"
-msgstr ""
+msgstr "Échec de l'envoi à la FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_chart_template__id
@@ -286,49 +308,49 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_config_settings__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "Invoice is already being processed by another user."
-msgstr ""
+msgstr "La facture est déjà en cours de traitement par un autre utilisateur."
 
 #. module: l10n_ci_edi
 #: model:ir.module.module,shortdesc:base.module_l10n_ci_edi
 msgid "Ivory Coast - E-Invoicing (FNE)"
-msgstr ""
+msgstr "Côte d’Ivoire - Facturation électronique (FNE)"
 
 #. module: l10n_ci_edi
 #: model:ir.module.module,summary:base.module_l10n_ci_edi
 msgid "Ivory Coast Facture Normalisée Electronique (FNE) Integration"
-msgstr ""
+msgstr "Côte d’Ivoire - Intégration de la Facture Normalisée Électronique (FNE)"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "Pièce comptable"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_account_move_line
 msgid "Journal Item"
-msgstr ""
+msgstr "Écriture comptable"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_company__l10n_ci_edi_is_active
 msgid "L10N Ci Edi Is Active"
-msgstr ""
+msgstr "L10N Ci Edi est actif"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_validation_messages
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_validation_messages
 msgid "L10N Ci Edi Validation Messages"
-msgstr ""
+msgstr "Messages de validation L10N Ci Edi"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_payment_method__mobile-money
 msgid "Mobile Money"
-msgstr ""
+msgstr "Mobile Money"
 
 #. module: l10n_ci_edi
 #. odoo-python
@@ -337,32 +359,34 @@ msgid ""
 "One or more lines do not have an item ID, you should reverse the original "
 "invoice after being sent to FNE."
 msgstr ""
+"Une ou plusieurs lignes n'ont pas d'identifiant d'article. Vous devez "
+"extourner la facture d'origine après son envoi à la FNE."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_res_config_settings__l10n_ci_edi_company_parent_id
 msgid "Parent Company"
-msgstr ""
+msgstr "Société mère"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "Please configure the FNE credentials on the root company."
-msgstr ""
+msgstr "Veuillez configurer les identifiants FNE sur la société racine."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__res_company__l10n_ci_edi_server_mode__production
 msgid "Production"
-msgstr ""
+msgstr "Production"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.view_move_form
 msgid "QR Code"
-msgstr ""
+msgstr "Code QR"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_rne
 #: model:ir.model.fields,field_description:l10n_ci_edi.field_account_move__l10n_ci_edi_fne_rne
 msgid "RNE"
-msgstr ""
+msgstr "RNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_bank_statement_line__l10n_ci_edi_fne_rne
@@ -371,52 +395,54 @@ msgid ""
 "Receipt number issued through TERNE(Electronic Standardized Receipt Issuing "
 "Terminal)"
 msgstr ""
+"Numéro de reçu émis par le TERNE (Terminal électronique d'émission de reçus "
+"normalisés)"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_tax__l10n_ci_edi_tax_code__tvab
 msgid "Reduced TVA (9%)"
-msgstr ""
+msgstr "TVA réduite (9 %)"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "Select the FNE environment to connect to."
-msgstr ""
+msgstr "Sélectionnez l'environnement FNE auquel vous connecter."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move_send.py:0
 msgid "Send to FNE"
-msgstr ""
+msgstr "Envoyer à la FNE"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_move__l10n_ci_edi_fne_status__sent
 msgid "Sent"
-msgstr ""
+msgstr "Envoyé"
 
 #. module: l10n_ci_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ci_edi.res_config_settings_view_form_inherit_l10n_ci_edi
 msgid "Server Mode"
-msgstr ""
+msgstr "Mode du serveur"
 
 #. module: l10n_ci_edi
 #: model:ir.model,name:l10n_ci_edi.model_account_move_send
 msgid "Shared Send Invoice Wizard Functions"
-msgstr ""
+msgstr "Fonctions partagées de l'assistant d'envoi de factures"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_tax__l10n_ci_edi_tax_code__tva
 msgid "TVA (18%)"
-msgstr ""
+msgstr "TVA (18 %)"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_tax__l10n_ci_edi_tax_code__tvac
 msgid "TVA exempt by convention"
-msgstr ""
+msgstr "Exonération de TVA par convention"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__account_tax__l10n_ci_edi_tax_code__tvad
 msgid "TVA exempt by law"
-msgstr ""
+msgstr "Exonération de TVA par la loi"
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields,help:l10n_ci_edi.field_account_tax__l10n_ci_edi_tax_code
@@ -424,35 +450,44 @@ msgid ""
 "Tax code used when reporting this tax to the FNE system. Taxes without a "
 "code are sent to the FNE as custom taxes."
 msgstr ""
+"Code fiscal utilisé lors de la déclaration de cette taxe au système FNE. Les "
+"taxes sans code sont envoyées à la FNE en tant que taxes personnalisées."
 
 #. module: l10n_ci_edi
 #: model:ir.model.fields.selection,name:l10n_ci_edi.selection__res_company__l10n_ci_edi_server_mode__test
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "The FNE payment method is required for FNE e-invoicing."
 msgstr ""
+"Le mode de paiement FNE est obligatoire pour la facturation électronique FNE."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "The customer NCC (Tax ID) is required for FNE e-invoicing."
 msgstr ""
+"Le NCC (numéro de compte contribuable) du client est obligatoire pour la "
+"facturation électronique FNE."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "The customer email is required for FNE e-invoicing."
 msgstr ""
+"L'adresse e-mail du client est obligatoire pour la facturation électronique "
+"FNE."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/account_move.py:0
 msgid "The customer phone is required for FNE e-invoicing."
 msgstr ""
+"Le numéro de téléphone du client est obligatoire pour la facturation "
+"électronique FNE."
 
 #. module: l10n_ci_edi
 #. odoo-python
@@ -460,9 +495,11 @@ msgstr ""
 msgid ""
 "The original invoice must be sent to FNE before its credit note can be sent."
 msgstr ""
+"La facture d'origine doit être envoyée à la FNE avant que son avoir puisse "
+"être envoyé."
 
 #. module: l10n_ci_edi
 #. odoo-python
 #: code:addons/l10n_ci_edi/models/res_company.py:0
 msgid "Unknown error"
-msgstr ""
+msgstr "Erreur inconnue"

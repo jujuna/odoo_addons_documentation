@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-19 09:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:50+0000\n"
+"PO-Revision-Date: 2026-11-12 10:39+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/nl/>\n"
@@ -36,6 +36,9 @@ msgid ""
 "Accounting Reports\n"
 "==================\n"
 msgstr ""
+"\n"
+"Boekhoudrapporten\n"
+"==================\n"
 
 #. module: account_reports
 #. odoo-python
@@ -83,7 +86,7 @@ msgstr "%(return_type_name)s %(period_suffix)s %(country_code)s"
 #. odoo-python
 #: code:addons/account_reports/wizard/fiscal_year.py:0
 msgid "%(vat_label)s Periodicity"
-msgstr ""
+msgstr "%(vat_label)s frequentie"
 
 #. module: account_reports
 #. odoo-python
@@ -110,6 +113,8 @@ msgid ""
 "'%(account_name)s' account balance is affected by journal items which don't "
 "originate from a bank statement or payment."
 msgstr ""
+"Het saldo van rekening '%(account_name)s' wordt beïnvloed door "
+"boekingsregels die niet afkomstig zijn van een bankafschrift of betaling."
 
 #. module: account_reports
 #. odoo-python
@@ -148,6 +153,9 @@ msgid ""
 "'active' field of account.return.type shouldn't be directly written to in "
 "data files. Use active_fallback. (Detected while loading %(file_path)s)"
 msgstr ""
+"Het veld 'active' van account.return.type mag in gegevensbestanden niet "
+"rechtstreeks worden beschreven. Gebruik active_fallback. (Gedetecteerd "
+"tijdens het laden van %(file_path)s)"
 
 #. module: account_reports
 #. odoo-python
@@ -195,43 +203,43 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the list of your open invoices.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                   <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                   <t t-else=\"\">Beste <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                   <br/>\n"
-"                    Bijgaand vind je de lijst met je openstaande facturen.\n"
-"                   <br/>\n"
+"                    <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Beste <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
+"                    Hierbij vind je de lijst met je openstaande facturen.\n"
+"                    <br>\n"
 "                    Aarzel niet om contact met ons op te nemen als je vragen "
 "hebt.\n"
-"                   <br/>\n"
+"                    <br>\n"
 "                    Met vriendelijke groet,\n"
-"                   <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -242,21 +250,21 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the statement of your account.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -264,21 +272,21 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Beste <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    In de bijlage vind je het overzicht van je rekening.\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Beste <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
+"                    Hierbij vind je het overzicht van je rekening.\n"
+"                    <br>\n"
 "                    Aarzel niet om contact met ons op te nemen als je vragen "
 "hebt.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Met vriendelijke groet,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -289,35 +297,37 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    Hi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    The deadline to submit <strong t-out=\"object.name\"/> "
-"is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    The deadline to submit <strong t-out=\"object.name\"></"
+"strong> is <strong t-out=\"format_date(object.date_deadline)\"></strong>."
+"<br>\n"
 "                    To avoid any potential fine, please ensure all remaining "
-"documents are sent over as soon as possible.<br/>\n"
+"documents are sent over as soon as possible.<br>\n"
 "                    If you've already submitted everything but still "
 "received this email, it's likely the tax return hasn't been marked as "
-"submitted in Odoo.<br/>\n"
+"submitted in Odoo.<br>\n"
 "                    Should you have any question or need assistance, feel "
-"free to get in touch.<br/><br/>\n"
-"                    Best regards,<br/>\n"
+"free to get in touch.<br><br>\n"
+"                    Best regards,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    Hoi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    De deadline om <strong t-out=\"object.name\"/> in te "
-"dienen is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
-"                    Zorg er alstublieft voor dat alle resterende documenten "
-"zo snel mogelijk worden verzonden om boetes te vermijden.<br/>\n"
-"                    Als je alles al hebt ingediend, maar deze e-mail toch "
-"hebt ontvangen, is de btw-aangifte waarschijnlijk niet als ingediend "
-"gemarkeerd in Odoo.<br/>\n"
-"                    Mocht je vragen hebben of hulp nodig hebben, neem dan "
-"gerust contact met ons op.<br/><br/>\n"
-"                    Met vriendelijke groet,<br/>\n"
+"                    Hallo <span t-out=\"ctx.get('partner') and "
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    De deadline voor het indienen van <strong t-"
+"out=\"object.name\"></strong> is <strong t-"
+"out=\"format_date(object.date_deadline)\"></strong>.<br>\n"
+"                    Zorg er alsjeblieft voor dat alle resterende documenten "
+"zo snel mogelijk worden verzonden om boetes te vermijden.<br>\n"
+"                    Als je alles al hebt ingediend maar toch deze e-mail "
+"hebt ontvangen, is de btw-aangifte waarschijnlijk nog niet als ingediend "
+"gemarkeerd in Odoo.<br>\n"
+"                    Mocht je vragen hebben of hulp nodig hebben, aarzel dan "
+"niet om contact op te nemen.<br><br>\n"
+"                    Met vriendelijke groet,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -335,12 +345,12 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -348,12 +358,12 @@ msgid ""
 "                        <td>Amount to Pay</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
 "                        <td>Due By</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Kind regards,</p>\n"
@@ -363,20 +373,20 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p>\n"
-"                    Hallo <t t-out=\"object.company_id.name\">JouwBedrijf</"
+"                    Beste <t t-out=\"object.company_id.name\">JouwBedrijf</"
 "t>,\n"
 "                </p>\n"
 "                <p>\n"
 "                    Op basis van de ontvangen documenten en informatie is de "
 "btw-aangifte van <t t-out=\"object.company_id.name\">JouwBedrijf</t>\n"
-"                    over de periode <t t-"
+"                    voor periode <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> ingediend.\n"
+"object.date_to)\"></t> ingediend.\n"
 "                </p>\n"
 "                <p>\n"
-"                    Er is vastgesteld dat er nog een bedrag van <t t-"
+"                    Het is vastgesteld dat een bedrag van <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> verschuldigd is.\n"
+"object.amount_to_pay_currency_id)\"></t> nog moet worden betaald.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -384,12 +394,12 @@ msgstr ""
 "                        <td>Te betalen bedrag</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
-"                        <td>Verschuldigd tegen</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td>Vervaldatum</td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Met vriendelijke groet,</p>\n"
@@ -477,7 +487,7 @@ msgstr "<strong>Notities: </strong>"
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "> 12 Months"
-msgstr ""
+msgstr "> 12 maanden"
 
 #. module: account_reports
 #: model:ir.model.constraint,message:account_reports.constraint_account_report_horizontal_group_name_uniq
@@ -663,11 +673,15 @@ msgstr "Rekeningtype"
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_profit_account_id
 msgid "Account on which a rounding gain of the tax closing entry is posted."
 msgstr ""
+"Rekening waarop een afrondingswinst van de afsluitende belastingboeking "
+"wordt geboekt."
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_loss_account_id
 msgid "Account on which a rounding loss of the tax closing entry is posted."
 msgstr ""
+"Rekening waarop een afrondingsverlies van de afsluitende belastingsboeking "
+"wordt geboekt."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_account_balances_search_view
@@ -804,12 +818,12 @@ msgstr "Actief"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__active_fallback
 msgid "Active Fallback"
-msgstr ""
+msgstr "Actieve fallback"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__active_selection
 msgid "Active Selection"
-msgstr ""
+msgstr "Actieve selectie"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__activity_ids
@@ -898,7 +912,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
 msgid "Advance Account"
-msgstr ""
+msgstr "Voorafbetalingsrekening"
 
 #. module: account_reports
 #. odoo-python
@@ -1429,6 +1443,8 @@ msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
 "taxes."
 msgstr ""
+"Audit boekingsregels en rekeningen om te zorgen dat ze correct aan de "
+"belastingen zijn toegewezen."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__auto_generate
@@ -1550,7 +1566,7 @@ msgstr "Bankaflettering"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.bank_name
 msgid "Bank Name"
-msgstr ""
+msgstr "Naam bank"
 
 #. module: account_reports
 #. odoo-python
@@ -1581,7 +1597,7 @@ msgstr "Bankafschriften"
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Banktransactie"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -1600,6 +1616,8 @@ msgid ""
 "Bank reconciliation helps identify missing invoices or bills that may affect "
 "taxes."
 msgstr ""
+"Bankaflettering helpt bij het identificeren van ontbrekende verkoopfacturen "
+"of leveranciersfacturen die invloed kunnen hebben op de belastingen."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.bank_information_customer_report
@@ -1682,7 +1700,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow
 msgid "CASH FLOW"
-msgstr ""
+msgstr "KASSTROOM"
 
 #. module: account_reports
 #. odoo-python
@@ -1705,7 +1723,7 @@ msgstr "Cumulatieve omrekeningsverschillen"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Calculated Ending Bank Balance as of %(date_to)s"
-msgstr ""
+msgstr "Berekend eindsaldo bank vanaf %(date_to)s"
 
 #. module: account_reports
 #. odoo-python
@@ -1797,7 +1815,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
 msgid "Cash Flows from operating activities"
-msgstr ""
+msgstr "Kasstromen uit operationele activiteiten"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
@@ -2043,7 +2061,7 @@ msgstr "Eindsaldo"
 #. odoo-python
 #: code:addons/account_reports/models/account_move.py:0
 msgid "Closing entry deleted"
-msgstr "Sluitingsvermelding verwijderd"
+msgstr "Afsluitboeking verwijderd"
 
 #. module: account_reports
 #. odoo-python
@@ -2126,7 +2144,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_advance_tax_payment_account_id
 msgid "Company Advance Tax Payment Account"
-msgstr ""
+msgstr "Rekening voorafbetaling van bedrijf"
 
 #. module: account_reports
 #. odoo-python
@@ -2193,7 +2211,7 @@ msgstr "Vergelijking"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 msgid "Comparison in"
-msgstr ""
+msgstr "Vergelijking in"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.pdf_export_filters
@@ -2267,7 +2285,7 @@ msgstr "Accounts configureren"
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.res_config_settings_view_form
 msgid "Configure your tax returns"
-msgstr ""
+msgstr "Je belastingaangiften configureren"
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_marketable_securities_review
@@ -2638,7 +2656,7 @@ msgstr "Datum beschouwd als aangetekend door de aantekening."
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
 msgid "Date:"
-msgstr ""
+msgstr "Datum:"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
@@ -2773,7 +2791,7 @@ msgstr "Uitgestelde omzet"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_deferred_revenue
 msgid "Deferred revenue"
-msgstr ""
+msgstr "Uitgestelde omzet"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_expression_form
@@ -2794,7 +2812,7 @@ msgstr "Verwijderen"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
 msgid "Depreciation and amortisation"
-msgstr ""
+msgstr "Afschrijving en amortisatie"
 
 #. module: account_reports
 #. odoo-javascript
@@ -2817,7 +2835,7 @@ msgstr "Bepaalt de workflow van de aangifte."
 #. module: account_reports
 #: model:account.report.column,name:account_reports.interco_comparison_difference
 msgid "Difference"
-msgstr ""
+msgstr "Verschil"
 
 #. module: account_reports
 #. odoo-python
@@ -3231,13 +3249,13 @@ msgstr "Einde van het jaar"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.ending_balance
 msgid "Ending Balance"
-msgstr ""
+msgstr "Eindsaldo"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Ending General Ledger Balance as of %(date_to)s"
-msgstr ""
+msgstr "Eindsaldo grootboek vanaf %(date_to)s"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3327,6 +3345,8 @@ msgid ""
 "Ensures that applied taxes and fiscal positions match the customer or vendor "
 "country location."
 msgstr ""
+"Zorgt ervoor dat toegepaste belastingen en fiscale posities overeenkomen met "
+"het land van de klant of leverancier."
 
 #. module: account_reports
 #. odoo-python
@@ -3344,7 +3364,7 @@ msgstr "Eigen vermogen"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Equity & Non-current Liabilities"
-msgstr ""
+msgstr "Eigen vermogen & lang vreemd vermogen"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_equity_account_movements_legal_documents
@@ -3418,7 +3438,7 @@ msgstr "Managementsamenvatting Custom Handler"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Expense"
-msgstr ""
+msgstr "Uitgaven"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__expense_provision_account_id
@@ -3483,7 +3503,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__active_selection__false
 msgid "False"
-msgstr ""
+msgstr "False"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_horizontal_group_rule__field_name
@@ -3671,7 +3691,7 @@ msgstr "Wisselkoersverschillen"
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign advance tax payment account (%s)"
-msgstr ""
+msgstr "Buitenlandse voorafbetalingsrekening (%s)"
 
 #. module: account_reports
 #. odoo-python
@@ -3687,14 +3707,16 @@ msgstr "Buitenlandse bewerkingen"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
+#, fuzzy
 msgid "Foreign tax account payable (%s)"
-msgstr ""
+msgstr "Crediteurenrekening buitenlandse belasting (%s)"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
+#, fuzzy
 msgid "Foreign tax account receivable (%s)"
-msgstr ""
+msgstr "Debiteurenrekening buitenlandse belasting (%s)"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3758,7 +3780,7 @@ msgstr "Grootboek"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.gl_balance
 msgid "General Ledger Balance"
-msgstr ""
+msgstr "Saldo grootboek"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_general_ledger_report_handler
@@ -3934,7 +3956,7 @@ msgstr "Is het rapport één keer geopend geweest"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/interco_comparison_report/filters.js:0
 msgid "Hide Tax Lines"
-msgstr ""
+msgstr "Belastingregels verbergen"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4192,7 +4214,7 @@ msgstr "Inclusief analytische simulaties"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Income"
-msgstr ""
+msgstr "Inkomsten"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__income_provision_account_id
@@ -4257,7 +4279,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report,name:account_reports.cash_flow_report_indirect
 msgid "Indirect Cash Flow Statement"
-msgstr ""
+msgstr "Indirect kasstroomoverzicht"
 
 #. module: account_reports
 #. odoo-python
@@ -4311,17 +4333,17 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
 msgid "Interest paid"
-msgstr ""
+msgstr "Betaalde interesten"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
 msgid "Interest received"
-msgstr ""
+msgstr "Ontvangen interesten"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
 msgid "Interests/Dividends paid"
-msgstr ""
+msgstr "Betaalde interesten/dividenden"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4388,7 +4410,7 @@ msgstr "Analytische controle Voorraad"
 #. module: account_reports
 #: model:ir.ui.menu,name:account_reports.menu_action_stock_account_report_stock_valuation
 msgid "Inventory Valuation"
-msgstr ""
+msgstr "Voorraadwaardering"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_investigate_unusual_supplier_balances
@@ -4465,6 +4487,11 @@ msgstr "Is terugvorderbaar"
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_report_set
 msgid "Is Report Set"
 msgstr "Is rapport ingesteld"
+
+#. module: account_reports
+#: model:ir.model.fields,field_description:account_reports.field_account_journal__is_tax_return_journal
+msgid "Is Tax Return Journal"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_tax_return
@@ -4701,7 +4728,7 @@ msgstr "Regels"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Liquidity"
-msgstr ""
+msgstr "Liquiditeit"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4906,6 +4933,9 @@ msgid ""
 "your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
+"Ontbrekende bedrijfsgegevens (zoals %(vat_label)s of land) kunnen fouten in "
+"je rapport veroorzaken, zoals het gebruik van het verkeerde belastingtarief "
+"of het ten onrechte vrijstellen van transacties."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -5114,7 +5144,7 @@ msgstr "Geen negatieve kassaldi"
 #. module: account_reports
 #: model:account.report.column,name:account_reports.followup_report_follow_up
 msgid "No Reminder"
-msgstr ""
+msgstr "Geen herinnering"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_no_unjustified_cash_payments_to_supplier
@@ -5137,7 +5167,7 @@ msgstr "Geen wijziging nodig"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "No closing entry"
-msgstr ""
+msgstr "Geen afsluitboeking"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5160,7 +5190,7 @@ msgstr "Geen te genereren boeking."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_audit
 msgid "No pending working files!"
-msgstr ""
+msgstr "Geen openstaande werkbestanden!"
 
 #. module: account_reports
 #. odoo-python
@@ -5171,7 +5201,7 @@ msgstr "Er is geen voorziening gevonden."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "No tax return to do!"
-msgstr ""
+msgstr "Geen btw-aangifte te doen!"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5359,6 +5389,12 @@ msgstr "Lopend"
 
 #. module: account_reports
 #. odoo-python
+#: code:addons/account_reports/models/res_partner.py:0
+msgid "Only a partner with a Tax ID can be set as main."
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Only an Accountant can delete a return."
 msgstr "Enkel accountants kunnen een aangifte verwijderen."
@@ -5439,7 +5475,7 @@ msgstr "Openingsbalans van boekjaar"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Opening Bank Balance as of %(date_from)s"
-msgstr ""
+msgstr "Beginsaldo bank vanaf %(date_from)s"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_expense0
@@ -5494,12 +5530,12 @@ msgstr "Overige opbrengsten"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
 msgid "Other payables"
-msgstr ""
+msgstr "Overige crediteuren"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
 msgid "Other receivables"
-msgstr ""
+msgstr "Overige debiteuren"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
@@ -5594,12 +5630,12 @@ msgstr "Categorieën Partners"
 #: model:ir.actions.client,name:account_reports.action_account_report_partner_ledger
 #: model:ir.ui.menu,name:account_reports.menu_action_account_report_partner_ledger
 msgid "Partner Ledger"
-msgstr "Saldilijsten"
+msgstr "Partnergrootboek"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_partner_ledger_report_handler
 msgid "Partner Ledger Custom Handler"
-msgstr "Aangepaste handler voor saldilijsten"
+msgstr "Aangepaste handler voor partnergrootboek"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5662,13 +5698,13 @@ msgstr "Partners:"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Partners: %(partnersCount)s"
-msgstr ""
+msgstr "Partners: %(partnersCount)s"
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Partners: %(partnersCount)s, Tags: %(tagsCount)s"
-msgstr ""
+msgstr "Partners: %(partnersCount)s, Labels: %(tagsCount)s"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__resolved_check_count
@@ -5699,7 +5735,7 @@ msgstr "Crediteuren"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_payable_account_id
 msgid "Payable Account"
-msgstr ""
+msgstr "Crediteurenrekening"
 
 #. module: account_reports
 #. odoo-python
@@ -5761,7 +5797,7 @@ msgstr "Percentage"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 msgid "Percentage of"
-msgstr ""
+msgstr "Percentage van"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_performance0
@@ -6061,7 +6097,7 @@ msgstr "Voorziening voor bijzondere waardevermindering"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_provision
 msgid "Provisions"
-msgstr ""
+msgstr "Voorzieningen"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_purchases
@@ -6120,7 +6156,7 @@ msgstr "Debiteuren"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_receivable_account_id
 msgid "Receivable Account"
-msgstr ""
+msgstr "Debiteurenrekening"
 
 #. module: account_reports
 #. odoo-python
@@ -6343,6 +6379,11 @@ msgid "Return Name"
 msgstr "Retouradres: Naam"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Return Reminders"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__return_state
 msgid "Return State"
 msgstr "Terugkeerstatus"
@@ -6488,6 +6529,8 @@ msgid ""
 "Review invoices, bills and entries which are either in draft or marked as "
 "Anomaly/To Review."
 msgstr ""
+"Controleer verkoopfacturen, leveranciersfacturen en boekingen die in concept "
+"staan of zijn gemarkeerd als Afwijking/Te beoordelen."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6650,7 +6693,7 @@ msgstr "Secties"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
 msgid "Select or type a value"
-msgstr ""
+msgstr "Selecteer of typ een waarde"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6679,10 +6722,15 @@ msgid "Send And Print Values"
 msgstr "Waarden verzenden en afdrukken"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Send Copy To"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_customer_statement.py:0
 msgid "Send Customer Statements"
-msgstr ""
+msgstr "Saldilijsten verzenden"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__send_mail_readonly
@@ -6734,6 +6782,8 @@ msgid "Service Sales to North-Irish Customers"
 msgstr "Verkoop van diensten aan Noord-Ierse klanten"
 
 #. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/widgets/set_as_main_partner/set_as_main_partner.xml:0
 #: model_terms:ir.ui.view,arch_db:account_reports.duplicate_vat_partner_tree_view
 msgid "Set as main"
 msgstr "Instellen als hoofd"
@@ -6807,7 +6857,7 @@ msgstr "Toon waarschuwing Bestaande terugkeer"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_qr_code_payment_wizard__show_warning_missing_vat_number
 msgid "Show Warning Missing Vat Number"
-msgstr ""
+msgstr "Waarschuwing ontbrekend btw-nummer tonen"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__show_warning_move_id
@@ -6840,6 +6890,8 @@ msgstr "Toon reeds gegenereerde uitgestelde bedragen."
 #: model_terms:ir.ui.view,arch_db:account_reports.account_reports_journal_dashboard_kanban_view
 msgid "Simplify tax filing. Automate return preparation."
 msgstr ""
+"Vereenvoudig de belastingaangifte. Automatiseer de voorbereiding van de "
+"aangifte."
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
@@ -6852,7 +6904,7 @@ msgstr "Eén ontvanger"
 #: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Snapshots"
-msgstr ""
+msgstr "Momentopnames"
 
 #. module: account_reports
 #. odoo-python
@@ -7048,7 +7100,7 @@ msgstr "Labels"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Tags: %(tagsCount)s"
-msgstr ""
+msgstr "Labels: %(tagsCount)s"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7116,7 +7168,7 @@ msgstr "Belastingperiodiciteit"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Rate & Country Consistency"
-msgstr ""
+msgstr "Consistentie belastingtarief & land"
 
 #. module: account_reports
 #. odoo-python
@@ -7150,7 +7202,7 @@ msgstr "Btw-aangifte"
 #. odoo-python
 #: code:addons/account_reports/models/res_users.py:0
 msgid "Tax Return Checks"
-msgstr ""
+msgstr "Controles belastingaangifte"
 
 #. module: account_reports
 #: model:mail.template,name:account_reports.email_template_tax_return_deadline
@@ -7166,7 +7218,7 @@ msgstr "Btw-aangifteperiode"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Return Type"
-msgstr ""
+msgstr "Type belastingaangifte"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__return_type
@@ -7207,7 +7259,7 @@ msgstr "Fiscale btw-eenheid"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax and country mismatch"
-msgstr ""
+msgstr "Belasting en land komen niet overeen"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
@@ -7291,6 +7343,9 @@ msgid ""
 "General Ledger ending balance %(gl_balance)s for the selected report period, "
 "resulting in an unexplained difference of %(difference)s"
 msgstr ""
+"Het berekende bank-eindsaldo %(bank_balance)s komt niet overeen met het "
+"grootboek-eindsaldo %(gl_balance)s voor de geselecteerde rapportageperiode, "
+"wat resulteert in een onverklaard verschil van %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7344,6 +7399,9 @@ msgid ""
 "opening balance %(gl_balance)s for the selected report period, resulting in "
 "an unexplained difference of %(difference)s"
 msgstr ""
+"De bank-beginbalans %(bank_balance)s komt niet overeen met de grootboek-"
+"beginbalans %(gl_balance)s voor de geselecteerde rapportageperiode, wat "
+"resulteert in een onverklaard verschil van %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7586,7 +7644,7 @@ msgstr ""
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "Time to relax 🌴"
-msgstr ""
+msgstr "Tijd om te ontspannen 🌴"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__name
@@ -7663,7 +7721,7 @@ msgstr "Totale cumulatieve omrekeningsverschillen"
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
 msgid "Total Due:"
-msgstr ""
+msgstr "Totaal verschuldigd:"
 
 #. module: account_reports
 #. odoo-python
@@ -7697,18 +7755,18 @@ msgstr "Analytische controle van handelsschulden"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
 msgid "Trade payables"
-msgstr ""
+msgstr "Handelsschulden"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
 msgid "Trade receivables"
-msgstr ""
+msgstr "Handelsvorderingen"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Transactions without Statement"
-msgstr ""
+msgstr "Transacties zonder afschrift"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_treasury_financing
@@ -7730,7 +7788,7 @@ msgstr "Aangepaste handler voor proefbalans"
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__active_selection__true
 msgid "True"
-msgstr ""
+msgstr "True"
 
 #. module: account_reports
 #. odoo-python
@@ -7925,7 +7983,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_res_users
 msgid "User"
-msgstr ""
+msgstr "Gebruiker"
 
 #. module: account_reports
 #: model:account.report.column,name:account_reports.account_financial_report_ec_sales_vat
@@ -7988,7 +8046,7 @@ msgstr "Vari N-1"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var
 msgid "Variation"
-msgstr ""
+msgstr "Variatie"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_cash
@@ -8110,13 +8168,13 @@ msgstr "Betaling bekijken"
 #. module: account_reports
 #: model:ir.module.module,summary:base.module_account_reports
 msgid "View and create reports"
-msgstr ""
+msgstr "Rapporten bekijken en aanmaken"
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/warnings.xml:0
 msgid "View submitted"
-msgstr ""
+msgstr "Ingediend bekijken"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__visible_states
@@ -8309,6 +8367,12 @@ msgstr "Je kunt deze waarde niet bijwerken omdat ze vergrendeld is door: %s"
 
 #. module: account_reports
 #. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "You do not have permission to refresh returns."
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "You must be an accountant to access accounting reports."
 msgstr ""
@@ -8319,12 +8383,16 @@ msgstr ""
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a payable account for 'Tax Payable Account'."
 msgstr ""
+"Je moet een crediteurenrekening selecteren voor 'Rekening te betalen "
+"belasting'."
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a receivable account for 'Tax Receivable Account'."
 msgstr ""
+"Je moet een debiteurenrekening selecteren voor 'Rekening te ontvangen "
+"belasting'."
 
 #. module: account_reports
 #. odoo-python
@@ -8516,7 +8584,7 @@ msgstr "om dit bedrag te betalen."
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "transactions"
-msgstr ""
+msgstr "transacties"
 
 #. module: account_reports
 #. odoo-javascript
@@ -8534,7 +8602,7 @@ msgstr "werden uit de vorige periode op deze lijn overgedragen."
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "which are not related to any bank statement."
-msgstr ""
+msgstr "die niet gekoppeld zijn aan een bankafschrift."
 
 #. module: account_reports
 #. odoo-javascript
@@ -8592,7 +8660,209 @@ msgstr "⇒ Reset naar Odoo’s koers"
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
-msgstr ""
+msgstr "≤ 12 maanden"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the list of your open invoices.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                   <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                   <t t-else=\"\">Beste <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                   <br/>\n"
+#~ "                    Bijgaand vind je de lijst met je openstaande "
+#~ "facturen.\n"
+#~ "                   <br/>\n"
+#~ "                    Aarzel niet om contact met ons op te nemen als je "
+#~ "vragen hebt.\n"
+#~ "                   <br/>\n"
+#~ "                    Met vriendelijke groet,\n"
+#~ "                   <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the statement of your account.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Beste <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Beste <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    In de bijlage vind je het overzicht van je rekening.\n"
+#~ "                    <br/>\n"
+#~ "                    Aarzel niet om contact met ons op te nemen als je "
+#~ "vragen hebt.\n"
+#~ "                    <br/>\n"
+#~ "                    Met vriendelijke groet,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hi <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    The deadline to submit <strong t-out=\"object.name\"/"
+#~ "> is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    To avoid any potential fine, please ensure all "
+#~ "remaining documents are sent over as soon as possible.<br/>\n"
+#~ "                    If you've already submitted everything but still "
+#~ "received this email, it's likely the tax return hasn't been marked as "
+#~ "submitted in Odoo.<br/>\n"
+#~ "                    Should you have any question or need assistance, feel "
+#~ "free to get in touch.<br/><br/>\n"
+#~ "                    Best regards,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hoi <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    De deadline om <strong t-out=\"object.name\"/> in te "
+#~ "dienen is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    Zorg er alstublieft voor dat alle resterende "
+#~ "documenten zo snel mogelijk worden verzonden om boetes te vermijden.<br/"
+#~ ">\n"
+#~ "                    Als je alles al hebt ingediend, maar deze e-mail toch "
+#~ "hebt ontvangen, is de btw-aangifte waarschijnlijk niet als ingediend "
+#~ "gemarkeerd in Odoo.<br/>\n"
+#~ "                    Mocht je vragen hebben of hulp nodig hebben, neem dan "
+#~ "gerust contact met ons op.<br/><br/>\n"
+#~ "                    Met vriendelijke groet,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">YourCompany</"
+#~ "t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "tax return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Amount to Pay</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Due By</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Hallo <t t-"
+#~ "out=\"object.company_id.name\">JouwBedrijf</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Op basis van de ontvangen documenten en informatie is "
+#~ "de btw-aangifte van <t t-out=\"object.company_id.name\">JouwBedrijf</t>\n"
+#~ "                    over de periode <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> ingediend.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Er is vastgesteld dat er nog een bedrag van <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> verschuldigd is.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Te betalen bedrag</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Verschuldigd tegen</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Met vriendelijke groet,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Bankafschriftregel"

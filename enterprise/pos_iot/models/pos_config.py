@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.exceptions import AccessError
 
 
 class PosConfig(models.Model):
@@ -51,3 +52,27 @@ class PosConfig(models.Model):
                 config.iot_device_ids = printer_devices or False
 
             config.iot_device_ids += config.payment_method_ids.mapped('iot_device_id')
+
+    def open_iot_customer_display(self, device_uuid, theme):
+        if not self.env.user.has_group('point_of_sale.group_pos_user'):
+            raise AccessError(self.env._("You don't have the access rights to open the customer display."))
+        for config in self:
+            if config.iot_display_id:
+                config.env['iot.channel'].sudo().send_message({
+                    "iot_identifier": config.iot_display_id.iot_id.identifier,
+                    "device_identifier": config.iot_display_id.identifier,
+                    "action": "update_url",
+                    "url": f"{config.get_base_url()}/pos_customer_display/{config.id}/{device_uuid}?access_token={config.access_token}&theme={theme}"
+                })
+
+    def close_iot_customer_display(self):
+        if not self.env.user.has_group('point_of_sale.group_pos_user'):
+            raise AccessError(self.env._("You don't have the access rights to close the customer display."))
+        for config in self:
+            if config.iot_display_id:
+                config.env['iot.channel'].sudo().send_message({
+                    "iot_identifier": config.iot_display_id.iot_id.identifier,
+                    "device_identifier": config.iot_display_id.identifier,
+                    "action": "update_url",
+                    "url": ""
+                })

@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* appointment_hr_recruitment
+# * appointment_hr_recruitment
 #
+# Bone NI <bounkirdni@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.1a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:05+0000\n"
-"PO-Revision-Date: 2026-09-18 01:54+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Lao <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 17:50+0000\n"
+"PO-Revision-Date: 2026-11-08 15:34+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
 "appointment_hr_recruitment/lo/>\n"
 "Language: lo\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,8 @@ msgid ""
 "\n"
 "Keeps track of all appointments related to applicants.\n"
 msgstr ""
+"\n"
+"ຕິດຕາມການນັດໝາຍທັງໝົດທີ່ກ່ຽວຂ້ອງກັບຜູ້ສະໝັກ.\n"
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,body_html:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
@@ -32,26 +35,47 @@ msgid ""
 "    <h2>Hello,</h2>\n"
 "    <div style=\"font-size: 13px;\">\n"
 "        Thanks for your application and interest in <t t-"
-"out=\"object.company_id.name or ''\">YourCompany</t>.<br/>\n"
-"        <br/>\n"
+"out=\"object.company_id.name or ''\">YourCompany</t>.<br>\n"
+"        <br>\n"
 "        I would like to organize a phone interview with you, it should last "
 "about 30 min.\n"
 "        We'll go through your resume and motivations to join the <t t-"
 "out=\"object.company_id.name or ''\">YourCompany</t> team.\n"
-"        You can book a slot in our agenda by cliking on the button below.<br/"
-">\n"
+"        You can book a slot in our agenda by cliking on the button below."
+"<br>\n"
 "    </div>\n"
-"    <br/>\n"
+"    <br>\n"
 "    <a t-att-href=\"object._get_interview_invite_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
 "'#875A7B'}}; text-decoration: none; color: "
 "{{user.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px 8px "
-"16px; border-radius: 5px;\">Schedule my interview</a><br/>\n"
-"    <br/>\n"
+"16px; border-radius: 5px;\">Schedule my interview</a><br>\n"
+"    <br>\n"
 "    Best regards,\n"
 "</div>\n"
 "        "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <h2>ສະບາຍດີ,</h2>\n"
+"    <div style=\"font-size: 13px;\">\n"
+"        ຂອບໃຈສຳລັບການສະໝັກ ແລະ ຄວາມສົນໃຈຂອງທ່ານຕໍ່ກັບ <t t-"
+"out=\"object.company_id.name or ''\">YourCompany</t>.<br>\n"
+"        <br>\n"
+"        ພວກເຮົາຢາກຂໍນັດສຳພາດທາງໂທລະສັບກັບທ່ານ, ເຊິ່ງຈະໃຊ້ເວລາປະມານ 30 ນາທີ.\n"
+"        ພວກເຮົາຈະກວດເບິ່ງຊີວະປະຫວັດ ແລະ ແຮງຈູງໃຈຂອງທ່ານໃນການເຂົ້າຮ່ວມທີມງານ <t t-"
+"out=\"object.company_id.name or ''\">YourCompany</t>.\n"
+"        ທ່ານສາມາດເລືອກຈອງເວລາໃນຕາຕະລາງຂອງພວກເຮົາໄດ້ ໂດຍການກົດປຸ່ມຂ້າງລຸ່ມນີ້.<br>\n"
+"    </div>\n"
+"    <br>\n"
+"    <a t-att-href=\"object._get_interview_invite_url()\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px 8px "
+"16px; border-radius: 5px;\">ກຳນົດເວລານັດສຳພາດຂອງຂ້ອຍ</a><br>\n"
+"    <br>\n"
+"    ດ້ວຍຄວາມນັບຖື,\n"
+"</div>\n"
+"        "
 
 #. module: appointment_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
@@ -60,16 +84,19 @@ msgid ""
 "                    It may have expired because your application process has "
 "already been completed or closed."
 msgstr ""
+"<i class=\"oi\" data-icon=\"info\"/>\n"
+"                    ລິ້ງອາດຈະໝົດອາຍຸແລ້ວ ເນື່ອງຈາກຂະບວນການສະໝັກຂອງທ່ານໄດ້ສຳເລັດ ຫຼື ຖືກປິດໄປ"
+"ແລ້ວ."
 
 #. module: appointment_hr_recruitment
 #: model:ir.model,name:appointment_hr_recruitment.model_hr_applicant
 msgid "Applicant"
-msgstr ""
+msgstr "ຜູ້ສະໝັກ"
 
 #. module: appointment_hr_recruitment
 #: model:ir.model,website_form_label:appointment_hr_recruitment.model_hr_applicant
 msgid "Apply for a Job"
-msgstr ""
+msgstr "ສະໝັກວຽກ"
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,subject:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
@@ -77,16 +104,18 @@ msgid ""
 "Can we plan an interview together for your {{ (object.job_id.name + ' ') if "
 "object.job_id else '' }}application?"
 msgstr ""
+"ພວກເຮົາສາມາດນັດໝາຍເວລາສຳພາດຮ່ວມກັນສຳລັບການສະໝັກ {{ (object.job_id.name + ' ') if "
+"object.job_id else '' }}ຂອງທ່ານໄດ້ບໍ່?"
 
 #. module: appointment_hr_recruitment
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "ຊື່ສະແດງ"
 
 #. module: appointment_hr_recruitment
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: appointment_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
@@ -95,44 +124,46 @@ msgid ""
 "the\n"
 "                    original email or contact the recruitment team directly."
 msgstr ""
+"ຖ້າຫາກທ່ານຄິດວ່າມີຂໍ້ຜິດພາດ ຫຼື ມີຄຳຖາມ, ທ່ານສາມາດຕອບກັບ\n"
+"                    ອີເມວຕົ້ນສະບັບ ຫຼື ຕິດຕໍ່ທີມງານຮັບສະໝັກພະນັກງານໂດຍກົງໄດ້ເລີຍ."
 
 #. module: appointment_hr_recruitment
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__interview_invite_code
 msgid "Interview Invite Code"
-msgstr ""
+msgstr "ລະຫັດເຊີນສຳພາດ"
 
 #. module: appointment_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
 msgid "Interview Link Unavailable"
-msgstr ""
+msgstr "ລິ້ງສຳພາດບໍ່ພ້ອມໃຊ້ງານ"
 
 #. module: appointment_hr_recruitment
 #: model:appointment.type,name:appointment_hr_recruitment.appointment_type_interviews
 msgid "Interviews availabilities"
-msgstr ""
+msgstr "ຊ່ວງເວລາຫວ່າງສຳລັບການສຳພາດ"
 
 #. module: appointment_hr_recruitment
 #: model:ir.module.module,summary:base.module_appointment_hr_recruitment
 msgid "Keep track of recruitment appointments"
-msgstr ""
+msgstr "ຕິດຕາມການນັດໝາຍຮັບສະໝັກພະນັກງານ"
 
 #. module: appointment_hr_recruitment
 #: model:ir.module.module,shortdesc:base.module_appointment_hr_recruitment
 msgid "Recruitment tracking on appointments"
-msgstr ""
+msgstr "ການຕິດຕາມການຮັບສະໝັກພະນັກງານໃນການນັດໝາຍ"
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,name:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
 msgid "Recruitment: Schedule interview"
-msgstr ""
+msgstr "ການຮັບສະໝັກພະນັກງານ: ກຳນົດເວລານັດສຳພາດ"
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,description:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
 msgid ""
 "Send this email when you want to schedule an interview with an applicant"
-msgstr ""
+msgstr "ສົ່ງອີເມວນີ້ເມື່ອທ່ານຕ້ອງການກຳນົດເວລານັດສຳພາດກັບຜູ້ສະໝັກ"
 
 #. module: appointment_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
 msgid "This interview is no longer active"
-msgstr ""
+msgstr "ການສຳພາດນີ້ບໍ່ໄດ້ເປີດໃຊ້ງານອີກຕໍ່ໄປ"

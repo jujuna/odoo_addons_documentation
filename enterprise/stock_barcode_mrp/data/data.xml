@@ -5,4 +5,14 @@
         <field name="res_model">mrp.production</field>
         <field name="target">fullscreen</field>
     </record>
+
+    <data noupdate="1">
+        <!-- Set `restrict_scan_dest_location` on False for mrp_operation picking types. -->
+        <function model="stock.picking.type" name="write">
+            <value model="stock.picking.type" search="[('code', '=', 'mrp_operation')]"/>
+            <value eval="{
+                'restrict_scan_dest_location': 'no',
+            }"/>
+        </function>
+    </data>
 </odoo>

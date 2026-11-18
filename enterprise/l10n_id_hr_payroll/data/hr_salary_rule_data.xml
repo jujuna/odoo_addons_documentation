@@ -608,10 +608,10 @@ result_rate = payslip._rule_parameter('l10n_id_jp_percent')
         <field name="condition_python">result = payslip.l10n_id_include_pkp_ptkp and employee.employee_type_id.code == 'PERMANENT'</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-gross_total = payslip._l10n_id_get_gross_accumulated()
-amount_to_apply = categories['GROSS'] * payslip._rule_parameter('l10n_id_biaya_jabatan_percent') / 100
-to_add = min(amount_to_apply, payslip._rule_parameter('l10n_id_biaya_jabatan_salary_threshold') / 12)
-result = gross_total + to_add
+gross_total = payslip._l10n_id_get_total_gross() + categories['GROSS']
+amount_to_apply = gross_total * (payslip._rule_parameter('l10n_id_biaya_jabatan_percent') / 100)
+threshold = payslip._rule_parameter('l10n_id_biaya_jabatan_salary_threshold') / 12 * payslip._l10n_id_get_months_count()
+result = min(amount_to_apply, threshold)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_id_hr_payroll.hr_payroll_structure_id_employee_salary'),

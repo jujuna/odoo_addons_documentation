@@ -30,14 +30,15 @@ class TestHelpdeskPortal(HttpCase, HelpdeskCommon):
         self.assertFalse(ticket.closed_by_partner, 'The ticket should not be closed by the customer.')
 
         self.authenticate(portal_user.login, portal_user.login)
-        response = self.url_open(f"/my/ticket/close/{ticket.id}/{ticket.access_token}")
-
+        response = self.url_open(f"/my/ticket/close/{ticket.id}/{ticket.access_token}",
+                                 data={'csrf_token': self.csrf_token()})
+        self.assertIn('ticket_closed=1', response.url, 'The portal should confirm the ticket was closed.')
         self.assertEqual(response.status_code, 200, 'The request should be successful.')
         self.assertTrue(ticket.closed_by_partner, 'The ticket should be closed by the customer.')
         self.assertEqual(ticket.stage_id, self.stage_done, 'The ticket should be moved to the Done stage.')
 
     def test_ignore_mail_scanner_closure(self):
-        """Only GET requests should lead to a ticket being closed."""
+        """Only POST requests should lead to a ticket being closed."""
         self.test_team.allow_portal_ticket_closing = True
         self.test_team.privacy_visibility = 'portal'
 
@@ -51,8 +52,9 @@ class TestHelpdeskPortal(HttpCase, HelpdeskCommon):
         url = f"/my/ticket/close/{ticket.id}/{ticket.access_token}"
         self.url_open(url, method='HEAD')
         self.assertFalse(ticket.closed_by_partner)
-        self.url_open(url)
-        self.assertTrue(ticket.closed_by_partner)
+        response = self.url_open(url)
+        self.assertFalse(ticket.closed_by_partner)
+        self.assertNotIn('ticket_closed', response.url, 'The portal should not claim the ticket was closed.')
 
     def test_portal_user_see_all_company_ticket(self):
         """

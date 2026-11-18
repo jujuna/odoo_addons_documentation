@@ -5,7 +5,6 @@ import {
     contains,
     getService,
     mountWithCleanup,
-    onRpc,
     selectFieldDropdownItem,
     serverState,
 } from "@web/../tests/web_test_helpers";
@@ -76,12 +75,6 @@ test("Helpdesk project toggles Task field to Ticket field and state persists on 
 
 test.tags("desktop");
 test("Timesheet is prefilled with the task/ticket last visited", async () => {
-    onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => ({
-        timesheets: {
-            records: [],
-        },
-    }));
-
     const [helpdeskProject] = pyEnv["project.project"].create([
         {
             name: "Helpdesk Support Project",
@@ -147,12 +140,6 @@ test("Timesheet is prefilled with the task/ticket last visited", async () => {
 
 test.tags("desktop");
 test("Timesheet keeps an edited draft over the ticket last visited", async () => {
-    onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => ({
-        timesheets: {
-            records: [],
-        },
-    }));
-
     const [helpdeskProject] = pyEnv["project.project"].create([
         {
             name: "Helpdesk Support Project",
@@ -216,12 +203,6 @@ test("Timesheet keeps an edited draft over the ticket last visited", async () =>
 
 test.tags("desktop");
 test("Timesheet is prefilled with project and helpdesk ticket", async () => {
-    onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => ({
-        timesheets: {
-            records: [],
-        },
-    }));
-
     const [helpdeskProject] = pyEnv["project.project"].create([
         {
             name: "Helpdesk Support Project",

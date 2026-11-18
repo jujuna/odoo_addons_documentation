@@ -515,7 +515,7 @@ class AppointmentController(http.Controller):
         datetime_object = datetime.strptime(unquote_plus(date_time), dtf)
         display_duration = int(float(duration) / 24) if allday else float(duration)  # only show days for allday slots
         resource = request.env['appointment.resource'].sudo().browse(int(resource_selected_id)) if resource_selected_id else request.env['appointment.resource']
-        staff_user = request.env['res.users'].browse(int(staff_user_id)) if staff_user_id else request.env['res.users']
+        staff_user = request.env['res.users'].browse(int(staff_user_id)) if staff_user_id and appointment_type.schedule_based_on == 'users' else request.env['res.users']
         users_possible = self._get_possible_staff_users(
             appointment_type,
             json.loads(unquote_plus(kwargs.get('filter_staff_user_ids') or '[]')),

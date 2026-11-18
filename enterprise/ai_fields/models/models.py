@@ -5,7 +5,7 @@ import collections
 import logging
 
 from odoo import _, api, Command, models
-from odoo.addons.ai.utils.ai_fields_tools import get_ai_value, get_field_prompt_vals, get_property_prompt_vals, parse_ai_prompt_values
+from odoo.addons.ai.utils.ai_fields_tools import AIServiceError, get_ai_value, get_field_prompt_vals, get_property_prompt_vals, parse_ai_prompt_values
 from odoo.exceptions import AccessError
 from odoo.fields import Domain
 from odoo.tools import html_sanitize
@@ -150,7 +150,7 @@ class Base(models.AbstractModel):
         user_prompt, context_fields, allowed_values = get_field_prompt_vals(self.env, field, field_prompt)
         for record in self:
             try:
-                record[field.name] = get_ai_value(
+                value = get_ai_value(
                     record,
                     {'type': field.type, 'name': field.name, 'description': field.string},
                     user_prompt,
@@ -158,9 +158,11 @@ class Base(models.AbstractModel):
                     allowed_values,
                 )
             except Exception as e:  # noqa: BLE001
-                _logger.info("Could not get a value for an AI Field (%s on %s): %s", field.name, field.model_name, e)
-                if field.type in ('char', 'text', 'html'):
-                    record[field.name] = ""  # prevent query llm again for the field (unresolvable/timeout)
+                _logger.warning("Could not get a value for an AI Field (%s on %s): %s", field.name, field.model_name, e)
+                if field.type in ('char', 'text', 'html') and not isinstance(e, AIServiceError):
+                    record[field.name] = ""  # prevent query llm again for the field (unresolvable), service errors are retried
+            else:
+                record[field.name] = value
 
     def _fill_ai_property(self, fname, property_definition):
         """Assign values to the specified AI property field for the records in `self` using LLM.
@@ -185,8 +187,10 @@ class Base(models.AbstractModel):
                     allowed_values,
                 )
             except Exception as e:  # noqa: BLE001
-                _logger.info("Could not get a value for an AI property (%s in %s on %s): %s", property_definition['name'], fname, self._name, e)
-                value = False  # prevent query llm again for the property (unresolvable/timeout)
+                _logger.warning("Could not get a value for an AI property (%s in %s on %s): %s", property_definition['name'], fname, self._name, e)
+                if isinstance(e, AIServiceError):
+                    continue  # service errors are retried
+                value = False  # prevent query llm again for the property (unresolvable)
 
             # update the property value (without overriding existing properties)
             # we don't write the definition otherwise we will retrigger the cron if there

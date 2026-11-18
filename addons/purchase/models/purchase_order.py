@@ -6,7 +6,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from dateutil.relativedelta import relativedelta
-from markupsafe import escape, Markup
+from markupsafe import Markup
 from werkzeug.urls import url_encode
 
 from odoo import api, fields, models, _
@@ -771,7 +771,7 @@ class PurchaseOrder(models.Model):
                 'partner_id': self.partner_id.id,
             },
             'domain': [
-                ('partner_id', 'in', (self.partner_id | self.partner_id.commercial_partner_id).ids),
+                ('partner_id.commercial_partner_id', '=', self.partner_id.commercial_partner_id.id),
                 ('company_id', 'in', self.env.company.ids),
                 '|', '|',
                 ('purchase_order_id', '=', self.id),
@@ -1152,7 +1152,7 @@ class PurchaseOrder(models.Model):
                 email_layout_xmlid="mail.mail_notification_layout_with_responsible_signature",
                 email_values={'email_to': self.env.user.email, 'recipient_ids': []},
             )
-            return {'toast_message': escape(_("A sample email has been sent to %s.", self.env.user.email))}
+            return {'toast_message': _("A sample email has been sent to %s.", self.env.user.email)}
 
     def _send_reminder_open_composer(self,template_id):
         self.ensure_one()

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.saas~18+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
 "PO-Revision-Date: 2026-10-18 15:31+0000\n"
 "Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
 "Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/sign/lo/>\n"
@@ -365,6 +365,15 @@ msgstr "<small class=\"text-muted\">ຜູ້ສົ່ງ</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">ຜູ້ເຊັນ</small>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"<small>SMS Verification: The signatory has confirmed their control of the "
+"phone number using a unique code sent by SMS</small>"
+msgstr ""
+"<small>ການຢັ້ງຢືນຜ່ານ SMS: ຜູ້ລົງລາຍເຊັນໄດ້ຢັ້ງຢືນຄວາມເປັນເຈົ້າຂອງເບີໂທລະສັບ "
+"ໂດຍໃຊ້ລະຫັດພິເສດທີ່ສົ່ງຜ່ານ SMS ແລ້ວ</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -1994,6 +2003,19 @@ msgid "Email Subject"
 msgstr "ຫົວຂໍ້ອີເມວ"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Email Verification"
+msgstr "ການຢັ້ງຢືນຜ່ານອີເມວ"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"Email Verification: The signatory has confirmed control of their email inbox "
+"by clicking on a unique link"
+msgstr ""
+"ການຢັ້ງຢືນຜ່ານອີເມວ: ຜູ້ລົງລາຍເຊັນໄດ້ຢັ້ງຢືນການຄວບຄຸມກ່ອງຂໍ້ຄວາມອີເມວຂອງຕົນ ໂດຍການກົດໃສ່ລິ້ງພິເສດ"
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2424,16 +2446,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
 "If you do not want to receive these notifications anymore, you can disable "
-"the extra-authentication step in the\n"
-"                        <code>\n"
-"                            Sign &gt; Configuration &gt; Roles\n"
-"                        </code>\n"
-"                        menu."
+"the extra-authentication step\n"
+"                        in the signer settings of your sign templates."
 msgstr ""
-"ຖ້າທ່ານບໍ່ຕ້ອງການຮັບການແຈ້ງເຕືອນເຫຼົ່ານີ້ອີກຕໍ່ໄປ, ທ່ານສາມາດປິດຂັ້ນຕອນການຢືນຢັນຕົວຕົນເພີ່ມເຕີມໄດ້ທີ່ເມນູ\n"
-"                        <code>\n"
-"                            Sign &gt; Configuration &gt; Roles\n"
-"                        </code>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -3684,6 +3699,11 @@ msgid "SMS Token"
 msgstr "ໂທເຄັນ SMS"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "SMS Verification"
+msgstr "ການຢືນຢັນຜ່ານ SMS"
+
+#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "ການຂາຍ"
@@ -3767,11 +3787,6 @@ msgstr "ການກຳນົດເວລາຄຳຮ້ອງຂໍລາຍເ
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "ຄົ້ນຫາ <span class=\"nolabel\"> (ໃນເອກະສານ)</span>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Secure Link"
-msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4270,6 +4285,7 @@ msgstr "ຄ່າແຮຊຂອງຜູ້ລົງລາຍເຊັນ:"
 #: model:ir.model.fields.selection,name:sign.selection__mail_activity_type__category__sign_request
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__signature
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__sign
+#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model:mail.activity.type,summary:sign.mail_activity_data_signature_request
 #: model:sign.item.type,name:sign.sign_item_type_signature
 #: model:sign.item.type,placeholder:sign.sign_item_type_signature
@@ -4351,7 +4367,6 @@ msgstr "ການປະຕິເສດລາຍເຊັນ"
 #: model:ir.model,name:sign.model_sign_request
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__sign_request_id
-#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Signature Request"
 msgstr "ຄຳຮ້ອງຂໍລາຍເຊັນ"
@@ -4748,11 +4763,6 @@ msgstr "ຂີດຂ້າພື້ນທີ່ທີ່ໄຮໄລ້"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__subject
 msgid "Subject"
 msgstr "ຫົວຂໍ້"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "System Account"
-msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
@@ -5400,14 +5410,8 @@ msgstr "ບໍ່ສາມາດເຊັນເອກະສານໄດ້ ເ�
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "ລະຫັດສະເພາະຜ່ານ SMS"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Unique Link via Email"
-msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5564,11 +5568,6 @@ msgstr "ຄ່າ"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "ມີຄ່ານີ້ຢູ່ແລ້ວ!"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Verification method"
-msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6219,23 +6218,18 @@ msgid "{{0}} Summary"
 msgstr "ບົດສະຫຼຸບ {{0}}"
 
 #~ msgid ""
-#~ "<small>SMS Verification: The signatory has confirmed their control of the "
-#~ "phone number using a unique code sent by SMS</small>"
+#~ "If you do not want to receive these notifications anymore, you can "
+#~ "disable the extra-authentication step in the\n"
+#~ "                        <code>\n"
+#~ "                            Sign &gt; Configuration &gt; Roles\n"
+#~ "                        </code>\n"
+#~ "                        menu."
 #~ msgstr ""
-#~ "<small>ການຢັ້ງຢືນຜ່ານ SMS: ຜູ້ລົງລາຍເຊັນໄດ້ຢັ້ງຢືນຄວາມເປັນເຈົ້າຂອງເບີໂທລະສັບ "
-#~ "ໂດຍໃຊ້ລະຫັດພິເສດທີ່ສົ່ງຜ່ານ SMS ແລ້ວ</small>"
-
-#~ msgid "Email Verification"
-#~ msgstr "ການຢັ້ງຢືນຜ່ານອີເມວ"
-
-#~ msgid ""
-#~ "Email Verification: The signatory has confirmed control of their email "
-#~ "inbox by clicking on a unique link"
-#~ msgstr ""
-#~ "ການຢັ້ງຢືນຜ່ານອີເມວ: ຜູ້ລົງລາຍເຊັນໄດ້ຢັ້ງຢືນການຄວບຄຸມກ່ອງຂໍ້ຄວາມອີເມວຂອງຕົນ ໂດຍການກົດໃສ່ລິ້ງພິເສດ"
-
-#~ msgid "SMS Verification"
-#~ msgstr "ການຢືນຢັນຜ່ານ SMS"
+#~ "ຖ້າທ່ານບໍ່ຕ້ອງການຮັບການແຈ້ງເຕືອນເຫຼົ່ານີ້ອີກຕໍ່ໄປ, "
+#~ "ທ່ານສາມາດປິດຂັ້ນຕອນການຢືນຢັນຕົວຕົນເພີ່ມເຕີມໄດ້ທີ່ເມນູ\n"
+#~ "                        <code>\n"
+#~ "                            Sign &gt; Configuration &gt; Roles\n"
+#~ "                        </code>"
 
 #, fuzzy
 #~ msgid "Is Signing"

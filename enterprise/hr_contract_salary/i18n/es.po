@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-09-21 11:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-10 15:32+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/"
 "hr_contract_salary/es/>\n"
@@ -115,10 +115,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -135,44 +135,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>¡Enhorabuena!</h2>\n"
-"                Puede configurar su paquete salarial al hacer clic en el "
-"siguiente enlace.<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    El enlace expirará el <t t-out=\"ctx.get('validity_end')"
-"\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        Configurar paquete\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -191,7 +169,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -802,13 +780,13 @@ msgstr "País"
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__country_code
 msgid "Country Code"
-msgstr ""
+msgstr "Código de país"
 
 #. module: hr_contract_salary
 #: model:sign.item.type,name:hr_contract_salary.sign_item_type_country_name
 #: model:sign.item.type,placeholder:hr_contract_salary.sign_item_type_country_name
 msgid "Country Name"
-msgstr ""
+msgstr "Nombre del país"
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.personal.info,name:hr_contract_salary.hr_contract_salary_personal_info_country_of_birth
@@ -1016,7 +994,7 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_sign_request__display_name
 #: model:ir.model.fields,field_description:hr_contract_salary.field_sign_request_item__display_name
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit__display_type
@@ -1038,7 +1016,7 @@ msgstr "Documento"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "Documents"
-msgstr ""
+msgstr "Documentos"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__sign_template_id
@@ -1603,6 +1581,11 @@ msgstr "Puesto de trabajo"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__job_title
 msgid "Job Title"
 msgstr "Nombre del puesto"
+
+#. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
@@ -2709,7 +2692,7 @@ msgstr "Tipo de creación de firma"
 #. module: hr_contract_salary
 #: model:ir.module.module,summary:base.module_hr_contract_salary
 msgid "Sign Employment Contracts"
-msgstr ""
+msgstr "Firme contratos de empleados"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_signatory__order
@@ -2843,7 +2826,7 @@ msgstr "Tipo de estructura"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
+msgid "Sum of Benefits Values"
 msgstr ""
 
 #. module: hr_contract_salary
@@ -2875,11 +2858,19 @@ msgid "Text"
 msgstr "Texto"
 
 #. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
+
+#. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
 msgid ""
 "The ISO country code in two chars. \n"
 "You can use this field for quick search."
 msgstr ""
+"EL código ISO del país en dos caracteres.\n"
+"Puede utilizar este campo para la búsqueda rápida."
 
 #. module: hr_contract_salary
 #: model:ir.model.constraint,message:hr_contract_salary.constraint_res_config_settings_check_access_token_validity
@@ -3272,16 +3263,21 @@ msgid "id"
 msgstr "ID"
 
 #. module: hr_contract_salary
-#: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
-#: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
-msgid "month"
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
 msgstr ""
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
+msgid "month"
+msgstr "mes"
+
+#. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "year"
-msgstr ""
+msgstr "año"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer_applicant
@@ -3289,15 +3285,64 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: Oferta de trabajo - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: Oferta de trabajo - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
-"{{ object.company_id.name }}: Oferta de empleo - {{ "
-"object.employee_id.name }}"
+"{{ object.company_id.name }}: Oferta de empleo - "
+"{{ object.employee_id.name }}"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>¡Enhorabuena!</h2>\n"
+#~ "                Puede configurar su paquete salarial al hacer clic en el "
+#~ "siguiente enlace.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    El enlace expirará el <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configurar paquete\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

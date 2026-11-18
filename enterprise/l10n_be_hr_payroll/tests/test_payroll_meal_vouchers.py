@@ -1,7 +1,9 @@
 from datetime import date, datetime
 import csv
 import io
+from freezegun import freeze_time
 from openpyxl import load_workbook
+from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tests import tagged
 from .common import TestPayrollCommon
@@ -288,13 +290,106 @@ class TestPayrollMealVouchers(TestPayrollCommon):
         employee.meal_voucher_calculation_method = 'hours'
         payslip.compute_sheet()
         meal_voucher_line = payslip.line_ids.filtered(lambda line: line.code == 'MEAL_V_EMP')
-        # 160 eligible hours / 7.6 reference hours per day = 21.05, rounded to 21 vouchers.
+        # 160 eligible hours / 7.6 reference hours per day = 21.05, rounded up to 22 vouchers, limited to the
+        # 20 working days of a full-time worker in February 2026.
         self.assertRecordValues(meal_voucher_line, [{
             'amount': 1.09,
-            'quantity': 21,
+            'quantity': 20,
             'rate': -100,
-            'total': -22.89,
+            'total': -21.80,
         }])
+
+    @freeze_time('2026-10-15')
+    def test_meal_vouchers_per_hours_rounded_up(self):
+        """ The number of meal vouchers computed from the hours is rounded up to the next unit """
+        calendar_35 = self.resource_calendar.copy({
+            'name': 'Calendar 35 Hours/Week',
+            'full_time_required_hours': 38,
+            'attendance_ids': [Command.clear()] + [
+                Command.create({'dayofweek': str(day), 'hour_from': hour_from, 'hour_to': hour_to})
+                for day in range(5) for hour_from, hour_to in [(8, 12), (13, 16)]
+            ],
+        })
+        employee = self.create_employee_with_benefits({
+            'name': 'Meal Vouchers per Hours',
+            'resource_calendar_id': calendar_35.id,
+            'reference_calendar_id': self.belgian_company.resource_calendar_id.id,
+            'date_version': date(2026, 2, 1),
+            'contract_date_start': date(2026, 2, 1),
+        })
+        employee.meal_voucher_calculation_method = 'hours'
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2026, 2, 1),
+            'date_to': date(2026, 2, 28),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        # 20 days x 7 hours = 140 eligible hours / 7.6 reference hours per day = 18.42, rounded up to 19
+        self.assertEqual(payslip.line_ids.filtered(lambda line: line.code == 'MEAL_V_EMP').quantity, 19)
+
+    @freeze_time('2026-10-15')
+    def test_generate_current_month_report_twice(self):
+        # The "Generate" button of the "Order Meal Vouchers" warning opens the report of the month
+        # once it exists, instead of creating a second one.
+        Report = self.env['l10n_be.meal.vouchers.report'].with_company(self.belgian_company)
+        action_1 = Report._action_generate_current_month_report()
+        action_2 = Report._action_generate_current_month_report()
+        self.assertEqual(action_1['res_id'], action_2['res_id'])
+        report = Report.browse(action_1['res_id'])
+        self.assertRecordValues(report, [{'company_id': self.belgian_company.id, 'year': '2026', 'month': '10'}])
+
+    def test_mark_as_done_with_outdated_file(self):
+        # A payslip validated after the file was generated is not in the ordered vouchers: the report
+        # cannot be marked as done, as it would link that payslip, until the file is generated again.
+        employees = self.employee_john | self.create_employee_with_benefits({
+            'name': 'Late Payslip Employee',
+            'date_version': date(2023, 1, 1),
+            'contract_date_start': date(2023, 1, 1),
+        })
+        payslip_a = self.create_and_validate_payslips(employees[0], 2023, [3])
+        report = self.env['l10n_be.meal.vouchers.report'].create({
+            'company_id': self.belgian_company.id,
+            'month': '3',
+            'year': '2023',
+        })
+        report.action_generate_meal_vouchers_report()
+        self.assertEqual(report.meal_vouchers_line_ids.employee_id, employees[0])
+
+        payslip_b = self.create_and_validate_payslips(employees[1], 2023, [3])
+        self.env.flush_all()
+        self.env.invalidate_all()
+        with self.assertRaises(UserError):
+            report.action_set_state('done')
+        self.assertEqual(report.state, 'ready')
+        self.assertFalse(payslip_b.l10n_be_meal_vouchers_report_id)
+
+        report.action_generate_meal_vouchers_report()
+        report.action_set_state('done')
+        self.assertEqual((payslip_a | payslip_b).l10n_be_meal_vouchers_report_id, report)
+
+    def test_open_postponed_payslips_of_a_draft_report(self):
+        # The "Open Payslips" button of a postponed line opens the postponed payslips
+        employee = self.employee_john
+        payslips = self.create_and_validate_payslips(employee, 2023, [2, 3])
+        report = self.env['l10n_be.meal.vouchers.report'].create({
+            'company_id': self.belgian_company.id,
+            'month': '3',
+            'year': '2023',
+        })
+        self.env.flush_all()
+        self.env.invalidate_all()
+        line = report.meal_vouchers_line_ids.filtered(lambda l: l.employee_id == employee and l.postponed)
+        self.assertEqual(len(line), 1)
+        action = line.action_open_corrected_payslips()
+        self.assertEqual(self.env['hr.payslip'].search(action['domain']), payslips[0])
+
+    def test_report_total_value_in_cents(self):
+        report, _employee, line = self._create_report_for_export()
+        self.assertEqual(line.total_value, line.total * 7.5)
+        self.assertTrue(line.total % 2, "The total value should not be a round amount")
+        self.assertAlmostEqual(report.total_value, line.total_value, 2)
 
     def test_meal_vouchers_export(self):
         report, employee, line = self._create_report_for_export()
@@ -367,6 +462,12 @@ class TestPayrollMealVouchers(TestPayrollCommon):
         days_off = sum((allocation_PTO | allocation_extra).mapped('number_of_days'))
         self.assertEqual(meal_vouchers_line.quantity, (days_per_week * 52) - 10 - days_off)
         self.assertEqual(meal_vouchers_line.amount, termination_fees.version_id.meal_voucher_amount - termination_fees.version_id.meal_voucher_employee_share)
+
+        # The employer part of the meal voucher, the worker paying at least 1.09 EUR
+        termination_fees.version_id.meal_voucher_employee_share = 0
+        termination_fees.compute_sheet()
+        meal_vouchers_line = termination_fees.line_ids.filtered(lambda l: l.name == 'Meal Voucher')
+        self.assertAlmostEqual(meal_vouchers_line.amount, 8 - 1.09, 2)
 
     def test_part_time_employee_departure_with_legal_leaves_meal_vouchers(self):
         """
@@ -443,6 +544,11 @@ class TestPayrollMealVouchers(TestPayrollCommon):
 
         self.assertEqual(len(report.meal_vouchers_line_ids), 3,
                          "There should be exactly one line per employee across all branches.")
+
+        # The lines are the ones of the report companies, whatever the active company of the user
+        self.env.invalidate_all()
+        branch_report = report.with_company(companies[2])
+        self.assertEqual(branch_report.meal_vouchers_line_ids.mapped('employee_id'), expected_reported_employees)
 
     def _create_union_mission_payslip(self, category_options):
         """ Take 2 union mission days (021.00) in February 2023 and return the payslip of that month. """

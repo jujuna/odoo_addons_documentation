@@ -3,7 +3,7 @@
 import contextlib
 
 from odoo import api, Command, fields, models, _
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.fields import Domain
 
 
@@ -63,6 +63,13 @@ class DocumentsMixin(models.AbstractModel):
                     raise UserError(_('This folder is already linked to %(other_record_name)s',
                                       other_record_name=other_record.display_name))
                 raise UserError(_('This folder is already linked to another record.'))
+
+    @api.constrains(lambda self: [self._documents_record_folder_field_name] if self._documents_record_folder_field_name else [])
+    def _check_documents_folder_not_bridge_folder(self):
+        if folders := self.sudo()[self._documents_record_folder_field_name]:
+            CompanySudo = self.env['res.company'].sudo().with_context(active_test=False)
+            if CompanySudo.search_count(CompanySudo._get_used_folder_ids_domain(folders.ids), limit=1):
+                raise ValidationError(_("Impossible to link company bridge folders to a record."))
 
     @api.ondelete(at_uninstall=False)
     def _unlink_reset_linked_record(self):

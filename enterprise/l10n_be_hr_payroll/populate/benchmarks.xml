@@ -199,4 +199,45 @@
             </create>
         </field>
     </record>
+
+    <record id="benchmark_payroll_reload" model="populate.blueprint">
+        <field name="name">Payroll data reload: Belgian payroll history</field>
+        <field name="definition_xml" type="xml">
+            <create model="hr.employee" count="100" id="reload_employees" context="{'tracking_disable': True, 'mail_create_nosubscribe': True}">
+                <field name="name" generator="fake.name"/>
+                <field name="company_id" eval="env.company.id"/>
+                <field name="date_version" eval="'2025-01-01'"/>
+                <field name="contract_date_start" eval="'2025-01-01'"/>
+                <field name="structure_type_id" eval="env.ref('hr.structure_type_employee_cp200').id"/>
+                <field name="wage" eval="3500.0"/>
+            </create>
+            <create model="hr.payslip" count="1200" id="reload_payslips" context="{'tracking_disable': True, 'mail_create_nosubscribe': True}">
+                <field name="employee_id" ref="reload_employees"/>
+                <field name="version_id" eval="env['hr.employee'].browse(employee_id).version_id.id"/>
+                <field name="struct_id" eval="env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id"/>
+                <value name="month" generator="misc.counter" start="1" end="13"/>
+                <field name="date_from" eval="'2025-%02d-01' % month"/>
+                <field name="date_to" eval="'2025-%02d-28' % month"/>
+                <field name="state" values="{'draft': 1, 'paid': 1}"/>
+                <field name="line_ids" eval="[]"/>
+                <field name="worked_days_line_ids" eval="[]"/>
+                <field name="input_line_ids" eval="[]"/>
+            </create>
+            <create model="hr.payslip.line" count="12000" id="reload_lines">
+                <field name="slip_id" ref="reload_payslips" partition="True"/>
+                <field name="employee_id" eval="env['hr.payslip'].browse(slip_id).employee_id.id"/>
+                <field name="version_id" eval="env['hr.payslip'].browse(slip_id).version_id.id"/>
+                <field name="salary_rule_id" domain="[('struct_ids.code', '=', 'BEMONTHLY')]"/>
+                <field name="amount" eval="100.0"/>
+                <field name="total" eval="100.0"/>
+            </create>
+            <create model="hr.payslip.worked_days" count="3600" id="reload_worked_days">
+                <field name="payslip_id" ref="reload_payslips" partition="True"/>
+                <field name="version_id" eval="env['hr.payslip'].browse(payslip_id).version_id.id"/>
+                <field name="work_entry_type_id" domain="[('country_id.code', '=', 'BE'), ('active', '=', True)]"/>
+                <field name="number_of_days" eval="1.0"/>
+                <field name="number_of_hours" eval="8.0"/>
+            </create>
+        </field>
+    </record>
 </odoo>

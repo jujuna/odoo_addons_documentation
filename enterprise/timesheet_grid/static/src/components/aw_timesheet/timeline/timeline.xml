@@ -15,8 +15,8 @@
                             'o_suggestions_suggestion_no_toolbar': !(hasTakeButton || hasRemoveButton),
                        }"
                        t-att-aria-current="this.props.isSelected(record.groupKey, record.title, record.start)"
-                       t-on-mousedown.stop="(ev) => this.props.onMouseDown(record.groupKey, record.title, ev, record.start)"
-                       t-on-mouseenter.stop="() => this.props.onMouseEnter(record.groupKey, record.title, record.start)"
+                       t-on-pointerdown="(ev) => this.props.onMouseDown(record.groupKey, record.title, ev, record.start)"
+                       t-on-pointerenter.stop="() => this.props.onMouseEnter(record.groupKey, record.title, record.start)"
                     >
                         <div class="flag position-absolute end-100 h-100 bg-view rounded-start align-items-center">
                             <i class="oi smaller" data-icon="chevron_backward" role="presentation"/>
@@ -38,15 +38,15 @@
                                     t-out="this.formatDuration(record.duration / 3600, { hideZeroHours: false })"
                                 />
                             </div>
-                            <div class="d-flex flex-column min-w-0">
+                            <div class="d-flex flex-column min-w-0 pe-lg-5">
                                 <span
                                     class="o_suggestions_suggestion_description w-100 min-w-0 w-xl-auto"
-                                    t-out="record.title"
+                                    t-out="this.props.highlight(record.title)"
                                 />
                                 <div t-if="record.type != 'afk'" class="w-100 small text-muted text-truncate">
-                                    <t t-if="record.project" t-out="record.project"/>
+                                    <t t-if="record.project" t-out="this.props.highlight(record.project)"/>
                                     <em class="opacity-50" t-else="">No Project</em>
-                                    <t t-if="record.task" t-out="' / ' + record.task"/>
+                                    <t t-if="record.task"> / <t t-out="this.props.highlight(record.task)"/></t>
                                     <em class="opacity-50" t-else=""> / No Task</em>
                                 </div>
                             </div>

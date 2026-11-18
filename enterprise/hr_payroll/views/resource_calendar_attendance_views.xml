@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="resource.view_resource_calendar_attendance_tree"/>
         <field name="arch" type="xml">
             <field name="work_entry_type_id" position="after">
-                <field name="category_options_ids" widget="many2many_tags" optional="hidden"/>
+                <field name="category_options_ids" widget="many2many_tags" optional="hidden" invisible="not has_category_options"/>
             </field>
         </field>
     </record>
@@ -17,7 +17,17 @@
         <field name="inherit_id" ref="resource.view_resource_calendar_attendance_form"/>
         <field name="arch" type="xml">
             <field name="work_entry_type_id" position="after">
-                <field name="category_options_ids" widget="many2many_tags"/>
+                <field name="category_options_ids" widget="many2many_tags" invisible="not has_category_options"/>
+            </field>
+        </field>
+    </record>
+    <record id="resource_calendar_attendance_multi_create_view_form" model="ir.ui.view">
+        <field name="name">resource.calendar.attendance.multi.create.view.form.inherit.hr.payroll</field>
+        <field name="model">resource.calendar.attendance</field>
+        <field name="inherit_id" ref="hr_work_entry.view_resource_calendar_multi_create_form"/>
+        <field name="arch" type="xml">
+            <field name="work_entry_type_id" position="after">
+                <field name="category_options_ids" string="Options" widget="many2many_tags" invisible="not has_category_options"/>
             </field>
         </field>
     </record>

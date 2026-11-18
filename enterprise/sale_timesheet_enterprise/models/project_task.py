@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
+from odoo.fields import Domain
 from odoo.addons.sale_timesheet_enterprise.models.sale_order_line import DEFAULT_INVOICED_TIMESHEET
 
 
@@ -15,6 +16,13 @@ PROJECT_TASK_READABLE_FIELDS_TO_MAP = {
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
+
+    @api.model
+    def _get_portal_timesheet_domain(self):
+        return Domain.AND([
+            super()._get_portal_timesheet_domain(),
+            self.env['account.analytic.line']._get_invoiced_timesheet_domain(),
+        ])
 
     # Project Sharing fields
     portal_remaining_hours = fields.Float(compute='_compute_project_sharing_timesheets', help="Total remaining time, can be re-estimated periodically by the assignee of the task.", export_string_translation=False)
@@ -36,14 +44,16 @@ class ProjectTask(models.Model):
         # >>> set.union({}, [2, 4], [4], [], [1, 2, 3]) = {2, 4, 1, 3}
         all_task_ids = set.union(set(), *subtask_ids_per_task_id.values(), self.ids)
         timesheet_read_group = self.env['account.analytic.line'].sudo()._read_group(
-            [
-                ('project_id', '!=', False),
-                ('task_id', 'in', list(all_task_ids)),
-                ('validated', 'in', [True, (self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET) == 'approved']),
-                '|',
-                    ('so_line', '=', False),
-                    ('so_line.state', '=', 'sale'),
-            ],
+            Domain.AND([
+                [
+                    ('project_id', '!=', False),
+                    ('task_id', 'in', list(all_task_ids)),
+                    '|',
+                        ('so_line', '=', False),
+                        ('so_line.state', '=', 'sale'),
+                ],
+                self.env['account.analytic.line']._get_invoiced_timesheet_domain(),
+            ]),
             ['task_id'],
             ['unit_amount:sum'],
         )

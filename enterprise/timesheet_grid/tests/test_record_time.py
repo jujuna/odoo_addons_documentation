@@ -4,7 +4,9 @@ from datetime import date, timedelta
 
 from freezegun import freeze_time
 
+from odoo import Command
 from odoo.tests import HttpCase, tagged
+from odoo.tools import SQL
 
 from odoo.addons.hr_timesheet.tests.test_timesheet import TestCommonTimesheet
 from odoo.addons.hr.tests.test_utils import get_admin_employee
@@ -56,6 +58,9 @@ class TestRecordTime(TestCommonTimesheet, HttpCase):
 
         self.env['res.config.settings'].create({'timesheet_encode_method': 'days'}).execute()
         self.start_tour('/odoo', 'timesheet_overtime_day_encoding', login=self.user_employee.login, timeout=100)
+
+    def test_timesheet_tour(self):
+        self.start_tour("/odoo", "timesheet_tour", login=self.user_manager.login)
 
     def test_timesheet_availabilty_days(self):
         # Create company
@@ -160,3 +165,65 @@ class TestRecordTime(TestCommonTimesheet, HttpCase):
         })
         result = self.make_jsonrpc_request('/timesheet_grid/timesheet_systray_user_data', params={})
         self.assertIn(running.id, [ts['id'] for ts in result['timesheets']['records']])
+
+    @freeze_time('2026-07-13 12:00:00')
+    def test_systray_multi_company(self):
+        """The systray and its timer only use the timesheets of the companies selected in the
+        company switcher, not those of every company the user is allowed in."""
+        company_a = self.env.company
+        company_b = self.env['res.company'].create({'name': 'Company B'})
+        self.user_employee.company_ids = [Command.link(company_b.id)]
+        employee_b = self.env['hr.employee'].create({
+            'name': 'User Empl Employee B',
+            'user_id': self.user_employee.id,
+            'company_id': company_b.id,
+        })
+        project_b = self.env['project.project'].create({
+            'name': 'Project B',
+            'allow_timesheets': True,
+            'company_id': company_b.id,
+        })
+        self.timesheet.unlink()
+        timesheet_a, timesheet_b = self.env['account.analytic.line'].create([{
+            'name': '/',
+            'project_id': self.project_customer.id,
+            'employee_id': self.empl_employee.id,
+            'date': date(2026, 7, 13),
+        }, {
+            'name': '/',
+            'project_id': project_b.id,
+            'employee_id': employee_b.id,
+            'date': date(2026, 7, 13),
+        }])
+        self.assertEqual(timesheet_b.company_id, company_b, "The timesheet should take the company of its project")
+        # create_date comes from the database clock, which freeze_time does not affect
+        self.env.cr.execute(SQL(
+            "UPDATE account_analytic_line SET create_date = '2026-07-13 11:30:00' WHERE id = %s", timesheet_a.id,
+        ))
+        self.env.cr.execute(SQL(
+            "UPDATE account_analytic_line SET create_date = '2026-07-13 11:50:00' WHERE id = %s", timesheet_b.id,
+        ))
+        (timesheet_a | timesheet_b).invalidate_recordset(['create_date'])
+
+        self.user_employee.password = self.user_employee.login
+        self.authenticate(self.user_employee.login, self.user_employee.login)
+        for company, employee, timesheet, elapsed_seconds in (
+            (company_a, self.empl_employee, timesheet_a, 1800),
+            (company_b, employee_b, timesheet_b, 600),
+        ):
+            with self.subTest(company=company.name):
+                params = {'context': {'allowed_company_ids': company.ids}}
+                result = self.make_jsonrpc_request('/timesheet_grid/timesheet_systray_user_data', params=params)
+                self.assertEqual(result['employee']['id'], employee.id,
+                                 "The systray should use the user's employee of the selected company")
+                self.assertEqual([ts['id'] for ts in result['timesheets']['records']], timesheet.ids,
+                                 "The systray should only list the timesheets of the selected company")
+                result = self.make_jsonrpc_request('/timesheet_grid/get_timer_start_time', params=params)
+                self.assertEqual(result['elapsed_seconds'], elapsed_seconds,
+                                 "The timer should resume from the last timesheet of the selected company")
+
+        result = self.make_jsonrpc_request('/timesheet_grid/timesheet_systray_user_data', params={
+            'context': {'allowed_company_ids': (company_a | company_b).ids},
+        })
+        self.assertCountEqual([ts['id'] for ts in result['timesheets']['records']], (timesheet_a | timesheet_b).ids,
+                              "The systray should list the timesheets of every selected company")

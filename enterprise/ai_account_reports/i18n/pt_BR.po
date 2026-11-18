@@ -1,0 +1,592 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * ai_account_reports
+#
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
+# "Maitê Dietze (madi)" <madi@odoo.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-11-03 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
+"20/ai_account_reports/pt_BR/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"Language: pt_BR\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid ""
+"\n"
+"Builds reusable configuration from action_report_id returned by\n"
+"accounting_report_list, using the companies currently selected in Odoo.\n"
+"A matching current browser report supplies its native options and source\n"
+"action; otherwise native defaults apply.\n"
+"\n"
+"Returns report_config, currencies, available_option_overrides, a paginated\n"
+"line_catalog and report_config_ref. report_config contains action_report_id\n"
+"and options. options.companies lists the companies included by native reporting,\n"
+"which may be fewer than the current selection.\n"
+"Its options retain native settings and choices, including report_id and\n"
+"columns. report_config.options.columns contains all native column definitions\n"
+"in order; expression_label can repeat across groups. Match report_id to\n"
+"available_variants or sections for the selected report name. Currency details\n"
+"are listed separately by ID.\n"
+"Returned options are a subset of the saved settings. aging_based_on is\n"
+"base_on_invoice_date for invoice dates or base_on_maturity_date for due dates.\n"
+"\n"
+"Use native names in option_overrides. journals and account_type accept\n"
+"{id, selected} objects. In resolved native options, no selected entries means\n"
+"all listed entries apply. Use accounting_report_select to change identity or\n"
+"options. If the user changes the company selection, describe the report again\n"
+"to obtain a new reference.\n"
+"        "
+msgstr ""
+"\n"
+"Constrói uma configuração reutilizável a partir de action_report_id "
+"retornado por\n"
+"accounting_report_list, usando as empresas atualmente selecionadas no Odoo.\n"
+"Um relatório do navegador atual correspondente fornece suas opções nativas e "
+"ação\n"
+"de origem; caso contrário, os padrões nativos se aplicam.\n"
+"\n"
+"Retorna report_config, currencies, available_option_overrides, um\n"
+"line_catalog paginado e report_config_ref. report_config contém "
+"action_report_id\n"
+"e options. options.companies lista as empresas incluídas pelo relatório "
+"nativo,\n"
+"que pode ser menor do que a seleção atual.\n"
+"Suas opções mantêm as configurações e escolhas nativas, incluindo report_id "
+"e\n"
+"columns. report_config.options.columns contém todas as definições de coluna "
+"nativas\n"
+"em ordem; expression_label pode se repetir entre grupos. Corresponda "
+"report_id a\n"
+"available_variants ou seções para o nome do relatório selecionado. Detalhes "
+"da moeda\n"
+"são listados separadamente por ID.\n"
+"As opções retornadas são um subconjunto das configurações salvas. "
+"aging_based_on é\n"
+"base_on_invoice_date para datas de fatura ou base_on_maturity_date para "
+"datas de vencimento.\n"
+"\n"
+"Use nomes nativos em option_overrides. journals e account_type aceitam\n"
+"objetos {id, selected}. Em opções nativas resolvidas, nenhuma entrada "
+"selecionada significa\n"
+"que todas as entradas listadas se aplicam. Use accounting_report_select para "
+"alterar a identidade ou\n"
+"opções. Se o usuário alterar a seleção da empresa, descreva o relatório "
+"novamente\n"
+"para obter uma nova referência.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid ""
+"\n"
+"Computes native report values from report_config_ref returned by describe or\n"
+"select. Returns report_config, currencies, column_groups, paginated lines,\n"
+"native warnings and the same report_config_ref.\n"
+"An empty warnings object means the report returned no warnings. It does not\n"
+"establish that the accounts are correct, reconciled or compliant. Consider any\n"
+"line-level warning_text as well.\n"
+"report_config.options.columns keeps all native column definitions. Provide at\n"
+"least one expression_label in columns. These labels select row cells across all\n"
+"periods and groups without changing the config. Pagination limits rows,\n"
+"regardless of the number of columns.\n"
+"Each line contains native columns: expression_label, column_group_index,\n"
+"no_format (raw value) and name (formatted value). column_group_index indexes\n"
+"column_groups; forced_options.date identifies that group's period when present,\n"
+"otherwise use report_config.options.date. A configured date range does not mean\n"
+"every value is activity within that range: General Ledger account debit and\n"
+"credit totals include opening amounts. line_ref permits expansion.\n"
+"row_type distinguishes data, totals and load_more summaries. Lines retain\n"
+"native warning_text when present.\n"
+"        "
+msgstr ""
+"\n"
+"Calcula os valores nativos do relatório a partir de report_config_ref "
+"retornado por describe ou\n"
+"select. Retorna report_config, currencies, column_groups, linhas paginadas,\n"
+"avisos nativos e o mesmo report_config_ref.\n"
+"Um objeto warnings vazio significa que o relatório não retornou avisos. Isso "
+"não\n"
+"estabelece que as contas estão corretas, reconciliadas ou em conformidade. "
+"Considere também qualquer\n"
+"warning_text no nível da linha.\n"
+"report_config.options.columns mantém todas as definições de coluna nativas. "
+"Forneça pelo\n"
+"menos um expression_label nas colunas. Esses rótulos selecionam células de "
+"linha em todos os\n"
+"períodos e grupos sem alterar a configuração. A paginação limita as linhas,\n"
+"independentemente do número de colunas.\n"
+"Cada linha contém colunas nativas: expression_label, column_group_index,\n"
+"no_format (valor bruto) e name (valor formatado). column_group_index indexa\n"
+"column_groups; forced_options.date identifica o período daquele grupo quando "
+"presente,\n"
+"caso contrário, use report_config.options.date. Um intervalo de datas "
+"configurado não significa que\n"
+"todo valor é atividade dentro desse intervalo: os totais de débito e\n"
+"crédito da conta do Razão Geral incluem valores de abertura. line_ref "
+"permite expansão.\n"
+"row_type distingue dados, totais e resumos de load_more. As linhas retêm\n"
+"warning_text nativo quando presente.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid ""
+"\n"
+"Create a native audit working file for the currently selected company and\n"
+"exact dates, using the native local audit type and configured cycles. Select\n"
+"one company in Odoo before calling this tool. Requires confirmation. For branch\n"
+"structures, ask the user to create the file manually in the Accounting\n"
+"application and provide its ID. Returns the file scope, URL and native check\n"
+"progress.\n"
+"        "
+msgstr ""
+"\n"
+"Cria um arquivo de trabalho de auditoria nativo para a empresa selecionada "
+"atualmente e\n"
+"datas exatas, usando o tipo de auditoria local nativo e os ciclos "
+"configurados. Selecione\n"
+"uma empresa no Odoo antes de chamar esta ferramenta. Requer confirmação. "
+"Para estruturas\n"
+"de filiais, peça ao usuário para criar o arquivo manualmente no aplicativo "
+"Financeiro\n"
+"e fornecer seu ID. Retorna o escopo do arquivo, URL e progresso da "
+"verificação nativa.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid ""
+"\n"
+"Expands a line_ref issued by get_values or expand_line using its exact saved\n"
+"configuration and column selection. Returns the same report_config, currencies,\n"
+"lines, column_groups and pagination as get_values. Follow returned line_ref\n"
+"values for deeper detail. A load_more reference reloads its parent branch and\n"
+"may repeat earlier lines; do not double-count them.\n"
+"Rows represent report lines, not necessarily accounting records. Initial Balance\n"
+"is an opening summary. Row names are display descriptions; do not infer\n"
+"dimensions absent from the returned data. Lines retain native warning_text\n"
+"when present.\n"
+"        "
+msgstr ""
+"\n"
+"Expande um line_ref emitido por get_values ou expand_line usando sua "
+"configuração exata salva\n"
+"e seleção de coluna. Retorna o mesmo report_config, currencies,\n"
+"lines, column_groups e paginação que get_values. Siga os valores de line_ref "
+"retornados\n"
+"para obter detalhes mais profundos. Uma referência load_more recarrega seu "
+"ramo pai e\n"
+"pode repetir linhas anteriores; não as conte duas vezes.\n"
+"As linhas representam linhas de relatório, não necessariamente registros "
+"financeiros. O Saldo Inicial\n"
+"é um resumo de abertura. Os nomes das linhas são descrições de exibição; não "
+"infira\n"
+"dimensões ausentes dos dados retornados. As linhas mantêm o warning_text "
+"nativo\n"
+"quando presente.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_list
+msgid ""
+"\n"
+"Lists accessible report entry points from account_report client actions.\n"
+"Use action_report_id to describe an entry; report.report_id identifies its\n"
+"native default selection. Returns report names, default variant/section IDs,\n"
+"filter_date_range and pagination. An empty list means no matching entries.\n"
+"        "
+msgstr ""
+"\n"
+"Lista pontos de entrada de relatórios acessíveis a partir de ações do "
+"cliente account_report.\n"
+"Use action_report_id para descrever uma entrada; report.report_id identifica "
+"sua\n"
+"seleção padrão nativa. Retorna nomes de relatórios, IDs de variante/seção "
+"padrão,\n"
+"filter_date_range e paginação. Uma lista vazia significa que não há entradas "
+"correspondentes.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_open
+msgid ""
+"\n"
+"Opens the exact saved report_config_ref using its source action and full\n"
+"native options. Returns opened, report_config, currencies and the reference.\n"
+"If that exact configuration is already displayed, opened is false and reason\n"
+"explains why. Otherwise a client action opens it. Call this tool alone and wait\n"
+"for its result before answering.\n"
+"        "
+msgstr ""
+"\n"
+"Abre o report_config_ref salvo exato usando sua ação de origem e opções\n"
+"nativas completas. Retorna opened, report_config, currencies e a "
+"referência.\n"
+"Se essa configuração exata já estiver sendo exibida, opened é falso e o "
+"motivo\n"
+"explica o porquê. Caso contrário, uma ação do cliente a abre. Chame esta "
+"ferramenta sozinha e aguarde\n"
+"pelo seu resultado antes de responder.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid ""
+"\n"
+"Preview and save a validated batch of findings for one assigned cycle, under\n"
+"native access and review rules. Only non-file checks may be updated. Use\n"
+"reviewed for supported clearance, anomaly for evidenced exceptions, and todo for\n"
+"incomplete or blocked checks. Never formally completes or supervises the\n"
+"working file. Requires confirmation. After saving, returns the updated check\n"
+"codes, native check progress and working-file URL.\n"
+"\n"
+"For each saved audit note, write a short, plain-language conclusion, normally\n"
+"two or three sentences. State what is established, what is wrong, or what\n"
+"remains unresolved. Include only the decisive facts or amounts and any\n"
+"necessary next action.\n"
+"\n"
+"Do not repeat the check description, company, period or procedures unless\n"
+"needed to understand the conclusion. Avoid headings such as Scope, Procedures\n"
+"and Evidence. Preserve limitations that change what can be concluded. Use\n"
+"neutral language without mentioning agents.\n"
+"        "
+msgstr ""
+"\n"
+"Visualize e salve um lote validado de constatações para um ciclo atribuído, "
+"sob\n"
+"regras de acesso e revisão nativas. Apenas verificações não relacionadas a "
+"arquivos podem ser atualizadas. Use\n"
+"reviewed para liberação aprovada, anomaly para exceções comprovadas e todo "
+"para\n"
+"verificações incompletas ou bloqueadas. Nunca conclui ou supervisiona "
+"formalmente o\n"
+"arquivo de trabalho. Requer confirmação. Após salvar, retorna os códigos de "
+"verificação atualizados,\n"
+"progresso da verificação nativa e URL do arquivo de trabalho.\n"
+"\n"
+"Para cada nota de auditoria salva, escreva uma conclusão curta e em "
+"linguagem simples, normalmente\n"
+"duas ou três frases. Indique o que foi estabelecido, o que está errado ou o "
+"que\n"
+"permanece sem resolução. Inclua apenas os fatos ou valores decisivos e "
+"qualquer\n"
+"ação futura necessária.\n"
+"\n"
+"Não repita a descrição da verificação, empresa, período ou procedimentos a "
+"menos que\n"
+"necessário para entender a conclusão. Evite títulos como Escopo, "
+"Procedimentos\n"
+"e Evidências. Preserve as limitações que alteram o que pode ser concluído. "
+"Use\n"
+"linguagem neutra sem mencionar agentes.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid ""
+"\n"
+"Read the native working file, complete check instructions and notes, company and\n"
+"dates, live cycle progress, and paginated checks. Pass cycle to read the\n"
+"assigned cycle, or omit it to discover all cycles. File checks require manual\n"
+"evidence. Native record count is only a capped hint; it is not a complete\n"
+"evidence count. Progress summarizes native statuses and refresh flags, not a\n"
+"record of agent investigations.\n"
+"        "
+msgstr ""
+"\n"
+"Leia o arquivo de trabalho nativo, complete as instruções de verificação e "
+"notas, empresa e\n"
+"datas, progresso do ciclo ao vivo e verificações paginadas. Passe o ciclo "
+"para ler o\n"
+"ciclo atribuído, ou omita-o para descobrir todos os ciclos. Verificações de "
+"arquivo exigem evidência\n"
+"manual. A contagem de registros nativa é apenas uma estimativa limitada; não "
+"é uma contagem\n"
+"completa de evidências. O progresso resume os status nativos e sinalizadores "
+"de atualização, não um\n"
+"registro de investigações do agente.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid ""
+"\n"
+"Return a check's native action in action_detail as an investigation hint, with\n"
+"search and main view XML for record actions. Interpret its domain, active search\n"
+"defaults and search-panel selections using the XML, including filter grouping.\n"
+"Group-by defaults suggest grouping rather than record restrictions. Choose\n"
+"fields and explicit domains for search/read-group, or use accounting-report\n"
+"tools for report actions. Native report IDs and options remain in the action.\n"
+"\n"
+"No records or report_config_ref are returned. Action context is metadata for\n"
+"interpreting the action; it does not configure subsequent tools.\n"
+"If no action is available, investigate from the check instructions and attached\n"
+"documents. Other executable actions are returned without being run.\n"
+"        "
+msgstr ""
+"\n"
+"Retorne a ação nativa de uma verificação em action_detail como uma dica de "
+"investigação, com\n"
+"XML de pesquisa e visualização principal para ações de registro. Interprete "
+"seu domínio, seleções\n"
+"padrão de pesquisa ativa e seleções do painel de pesquisa usando o XML, "
+"incluindo agrupamento de filtros.\n"
+"Os padrões de agrupamento sugerem agrupamento em vez de restrições de "
+"registro. Escolha\n"
+"campos e domínios explícitos para pesquisa/read-group, ou use ferramentas de "
+"accounting-report\n"
+"para ações de relatório. IDs e opções de relatório nativos permanecem na "
+"ação.\n"
+"\n"
+"Nenhum registro ou report_config_ref é retornado. O contexto da ação é "
+"metadado para\n"
+"interpretar a ação; ele não configura ferramentas subsequentes.\n"
+"Se nenhuma ação estiver disponível, investigue a partir das instruções de "
+"verificação e documentos anexos.\n"
+"Outras ações executáveis são retornadas sem serem executadas.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_select
+msgid ""
+"\n"
+"Selects a variant or section from an exact report_config_ref.\n"
+"Use choice={kind: \"variant\", id: ...} with an ID from\n"
+"report_config.options.available_variants, or kind: \"section\" with an ID from\n"
+"report_config.options.sections. These lists belong to the supplied\n"
+"configuration. A report can serve different roles in different lists; use the\n"
+"matching kind. Returns the same description as describe.\n"
+"Optional option_overrides uses native option names and selection objects.\n"
+"Checks reference ownership, selected companies and report access.\n"
+"        "
+msgstr ""
+"\n"
+"Seleciona uma variante ou seção de um report_config_ref exato.\n"
+"Use choice={kind: \"variant\", id: ...} com um ID de\n"
+"report_config.options.available_variants, ou kind: \"section\" com um ID de\n"
+"report_config.options.sections. Estas listas pertencem à configuração "
+"fornecida.\n"
+"Um relatório pode servir a diferentes funções em diferentes listas; use o "
+"tipo correspondente.\n"
+"Retorna a mesma descrição que describe.\n"
+"Opcionalmente, option_overrides usa nomes de opção nativos e objetos de "
+"seleção.\n"
+"Verifica a propriedade da referência, empresas selecionadas e acesso ao "
+"relatório.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid ""
+"\n"
+"Set the working audit file for this session's context-dependent accounting\n"
+"fields, or pass null to clear it. Select the assigned file before querying audit\n"
+"fields with search/read-group. Wait for the setter result before issuing those\n"
+"queries. Clear it before unrelated work or select the new file when the\n"
+"assignment changes. Parent and child sessions keep separate working-file\n"
+"selections. The file's companies and main company must match Odoo's company\n"
+"selector.\n"
+"\n"
+"Returns the active file, company and period, or audit_context=null when cleared.\n"
+"This does not add company/date domains to ordinary searches, select report\n"
+"options or modify the working file's findings.\n"
+"        "
+msgstr ""
+"\n"
+"Defina o arquivo de auditoria de trabalho para os campos financeiros "
+"dependentes de contexto desta sessão,\n"
+"ou passe nulo para limpá-lo. Selecione o arquivo atribuído antes de "
+"consultar campos de auditoria\n"
+"com search/read-group. Aguarde o resultado da definição antes de emitir "
+"essas\n"
+"consultas. Limpe-o antes de trabalhos não relacionados ou selecione o novo "
+"arquivo quando a\n"
+"atribuição mudar. Sessões pai e filho mantêm seleções de arquivo de trabalho "
+"separadas.\n"
+"As empresas do arquivo e a empresa principal devem corresponder ao seletor "
+"de empresas do Odoo.\n"
+"\n"
+"Retorna o arquivo ativo, empresa e período, ou audit_context=null quando "
+"limpo.\n"
+"Isso não adiciona domínios de empresa/data a pesquisas comuns, seleciona "
+"opções de relatório\n"
+"ou modifica as constatações do arquivo de trabalho.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.module.module,shortdesc:base.module_ai_account_reports
+msgid "AI Accounting Reports"
+msgstr "Relatórios financeiros"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_session
+msgid "AI Session"
+msgstr "Sessão de IA"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_tool
+msgid "AI Tool"
+msgstr "Ferramenta de IA"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "AI Tool: Create Audit Working File"
+msgstr "Ferramenta de IA: Criar Arquivo de Trabalho de Auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "AI Tool: Describe Accounting Report"
+msgstr "Ferramenta de IA: Descrever Relatório Financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "AI Tool: Expand Accounting Report Line"
+msgstr "Ferramenta de IA: Expandir Linha de Relatório Financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "AI Tool: Get Accounting Report Values"
+msgstr "Ferramenta de IA: Obter Valores de Relatório Financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "AI Tool: Get Audit Check Action Detail"
+msgstr "Ferramenta de IA: Obter Detalhes da Ação de Verificação de Auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "AI Tool: List Accounting Reports"
+msgstr "Ferramenta de IA: Listar Relatórios Financeiros"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "AI Tool: Open Accounting Report"
+msgstr "Ferramenta de IA: Abrir Relatório Financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "AI Tool: Read Audit Checks"
+msgstr "Ferramenta de IA: Ler verificações de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "AI Tool: Save Audit Cycle Findings"
+msgstr "Ferramenta de IA: Salvar conclusões do ciclo de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "AI Tool: Select Accounting Report Identity"
+msgstr "Ferramenta de IA: Selecionar identidade do relatório financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "AI Tool: Set Working Audit File"
+msgstr "Ferramenta de IA: Definir arquivo de trabalho de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.module.module,summary:base.module_ai_account_reports
+msgid "AI-assisted accounting report analysis and audit review"
+msgstr "Análise de relatório financeiro e revisão de auditoria assistida por IA"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "Computing selected accounting figures"
+msgstr "Calculando números financeiros selecionados"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "Create Audit Working File"
+msgstr "Criar arquivo de trabalho de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__display_name
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__display_name
+msgid "Display Name"
+msgstr "Nome exibido"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "Drilling into the accounting report"
+msgstr "Analisando detalhadamente o relatório financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "Finding accessible accounting reports"
+msgstr "Localizando relatórios financeiros acessíveis"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__id
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__id
+msgid "ID"
+msgstr "ID"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "Inspecting the accounting report"
+msgstr "Inspecionando o relatório financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "Inspecting the audit check action"
+msgstr "Inspecionando a ação de verificação de auditoria"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Invalid or inaccessible partner_categories."
+msgstr "partner_categories inválidas ou inacessíveis."
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "Opening the supporting accounting report"
+msgstr "Abrindo o relatório financeiro de suporte"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "Read Audit Checks"
+msgstr "Ler verificações de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "Save Audit Cycle Findings"
+msgstr "Salvar conclusões do ciclo de auditoria"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "Selecting the accounting report"
+msgstr "Selecionando o relatório financeiro"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "Setting Working Audit File"
+msgstr "Definindo arquivo de trabalho de auditoria"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "The report engine returned an invalid company scope."
+msgstr "O mecanismo de relatório retornou um escopo de empresa inválido."
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Unavailable report."
+msgstr "Recursos indisponíveis"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "You must be an accountant to access accounting reports."
+msgstr "Você deve ser um contador para acessar relatórios financeiros."

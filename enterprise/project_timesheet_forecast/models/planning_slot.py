@@ -47,7 +47,7 @@ class PlanningSlot(models.Model):
         if not self.project_id:
             return None
         domain = Domain([
-            ('employee_id', 'in', self.employee_ids.ids),
+            ('employee_id', 'in', self.employee_public_ids.ids),
             ('date', '>=', self.start_datetime.date()),
             ('date', '<=', self.end_datetime.date())
         ])
@@ -137,7 +137,7 @@ class PlanningSlot(models.Model):
         action['context'] = {
             'default_date': self.start_datetime.date()\
                 if self.start_datetime < fields.Datetime.now() else fields.Date.context_today(self),
-            'default_employee_id': self.employee_ids[0].id if self.employee_ids else False,
+            'default_employee_id': self.employee_public_ids[:1].id,
             'default_project_id': self.project_id.id,
             'default_task_id': self.task_id.id,
             'grid_anchor': self.start_datetime.date(),

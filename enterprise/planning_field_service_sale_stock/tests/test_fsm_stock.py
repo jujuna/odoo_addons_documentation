@@ -622,6 +622,37 @@ class TestPlanningFieldServiceStock(TestPlanningFieldServiceSaleTimesheetCommon)
         self.assertEqual(stock_picking.product_id, self.storable_product_ordered)
         self.assertEqual(stock_picking.move_ids, stock_move)
 
+    def test_fsm_untracked_product_uses_quant_sublocation(self):
+        """Untracked FSM materials should consume from the reserved quant location."""
+        self.warehouse.delivery_steps = 'ship_only'
+        self.henri_user.property_warehouse_id = self.warehouse
+        product = self.env['product.product'].create({
+            'name': 'FSM product in sublocation',
+            'list_price': 50,
+            'is_storable': True,
+            'invoice_policy': 'order',
+            'taxes_id': False,
+        })
+        shelf_location = self.env['stock.location'].create({
+            'name': 'FSM Shelf',
+            'location_id': self.warehouse.lot_stock_id.id,
+        })
+        self.env['stock.quant']._update_available_quantity(product, shelf_location, 1)
+
+        self.intervention.partner_id = self.partner_1
+        product.with_user(self.henri_user).with_context(intervention_id=self.intervention.id).set_fsm_quantity(1)
+
+        order_line = self.intervention.sale_order_id.order_line.filtered(lambda line: line.product_id == product)
+        move = order_line.move_ids
+        self.assertEqual(move.move_line_ids.location_id, shelf_location)
+
+        self.intervention.with_user(self.henri_user).action_complete()
+
+        self.assertEqual(move.state, 'done')
+        self.assertEqual(move.move_line_ids.location_id, shelf_location)
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(product, shelf_location, strict=True), 0)
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(product, self.warehouse.lot_stock_id, strict=True, allow_negative=True), 0)
+
     def test_fsm_flow_with_multi_routing(self):
         """
         1) Change delivery_steps to pick_pack_ship

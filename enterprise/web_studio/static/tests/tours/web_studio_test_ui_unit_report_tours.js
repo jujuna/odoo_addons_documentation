@@ -798,11 +798,11 @@ registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", 
             trigger: ".o_translation_dialog .modal-title:contains(Translate Report)",
         },
         {
-            trigger: ".o-translate-lang-buttons button:contains(French)",
+            trigger: ".o-translate-lang-buttons button:text('French / Français')",
             run: "click",
         },
         {
-            trigger: ".o-translate-lang-buttons button.active:contains(French)",
+            trigger: ".o-translate-lang-buttons button.active:text('French / Français')",
         },
         {
             trigger: ".o_translation_dialog input:value(original term edited)",
@@ -813,7 +813,7 @@ registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", 
             run: "click",
         },
         {
-            trigger: ".o_web_studio_editor",
+            trigger: "body:not(:has(.o_translation_dialog))",
         },
     ],
 });

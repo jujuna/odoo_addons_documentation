@@ -1028,3 +1028,30 @@ class TestXmlDiffer(BaseCase):
         </data>
         """
         self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)
+
+    def test_add_comment(self):
+        xml_old = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" />
+            </div>
+        </form>
+        """
+        xml_new = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+               <!-- Added Comment -->
+               <br o-diff-key="3" />
+            </div>
+        </form>
+        """
+
+        expected_arch = """<data>
+        <data>
+            <xpath expr="/form/div/br" position="before">
+                <!-- Added Comment -->
+            </xpath>
+        </data>
+        </data>
+        """
+        self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)

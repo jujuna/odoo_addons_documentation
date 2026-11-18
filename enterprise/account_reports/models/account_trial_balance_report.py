@@ -31,11 +31,6 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         options['column_headers'][0] = column_headers
         options['columns'] = columns
 
-        # CTA
-        for group_vals in options['column_groups']:
-            if group_vals['forced_options']['trial_balance_column_type'] in ('initial_balance', 'end_balance'):
-                group_vals['forced_options']['no_impact_on_currency_table'] = True
-
         options['custom_display_config'] = {
             'pdf_export': {
                 'pdf_export_main': 'account_reports.audit_pdf_export_main',
@@ -128,18 +123,20 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         return headers, columns
 
     def _create_column(self, report, options, header_name, period_dates, block_id, fiscal_year_start, column_type, block_end_date=None):
+        forced_options = {
+            'date': period_dates,
+            'trial_balance_column_block_id': str(block_id),
+            'trial_balance_column_type': column_type,
+            'trial_balance_block_fiscalyear_start': fields.Date.to_string(fiscal_year_start),
+            'trial_balance_block_end_date': fields.Date.to_string(block_end_date) if block_end_date else options['date']['date_to'],
+        }
+        if column_type == 'initial_balance':
+            forced_options['cta_date_to'] = forced_options['trial_balance_block_end_date']
+
         header, cols = self._generate_column_group(
             report, options,
             new_header_name=header_name,
-            new_values={
-                'forced_options': {
-                    'date': period_dates,
-                    'trial_balance_column_block_id': str(block_id),
-                    'trial_balance_column_type': column_type,
-                    'trial_balance_block_fiscalyear_start': fields.Date.to_string(fiscal_year_start),
-                    'trial_balance_block_end_date': fields.Date.to_string(block_end_date) if block_end_date else options['date']['date_to'],
-                },
-            },
+            new_values={'forced_options': forced_options},
             create_single_column=self._display_single_column_for_initial_and_end_sections(options),
         )
         return header, cols
@@ -227,6 +224,16 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         # Never expand individual AMLs if we are in the Initial Balance.
         if 'id' in current_groupbys and options['trial_balance_column_type'] == 'initial_balance':
             return {next(iter(formulas_dict.values())): []}
+
+        # Closing balances are computed from the initial balance and period columns
+        # in _custom_line_postprocessor, so they don't need to be queried.
+        if options['trial_balance_column_type'] == 'end_balance':
+            return {next(iter(formulas_dict.values())): [] if current_groupbys else {
+                'balance': 0.0,
+                'debit': 0.0,
+                'credit': 0.0,
+                'has_sublines': True,
+            }}
 
         extra_domain = []
         # Don't consider income and expense AMLs from previous fiscal years.
@@ -569,25 +576,22 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
 
             action['domain'] = modified_domain
 
-        date_from, date_to = report._get_date_bounds_info(options, 'strict_range')
-        if report._get_markup(params['calling_line_dict_id']) == 'undistributed_profits_losses':
-            date_from = column_group_forced_options['date']['date_from']
-            date_to = column_group_forced_options['date']['date_to']
-
+        column_group_options = report._get_column_group_options(options, params['column_group_index'])
+        date_from, date_to = report._get_date_bounds_info(column_group_options, 'strict_range')
         action['context'].update({
             'currency_translation': report.currency_translation,
             'date_from': date_from,
             'date_to': date_to,
+            'cta_date_to': column_group_options.get('cta_date_to') or date_to,
         })
 
         if options.get('multi_currency'):
             action['views'] = [(self.env.ref('account_reports.view_multi_currency_report_audit').id, 'list')]
 
         if report._get_markup(params['calling_line_dict_id']) == 'cumulative_translation_adjustment':
-            column_group_options = report._get_column_group_options(options, params.get('column_group_index'))
             action['views'] = [(self.env.ref('account_reports.view_cumulative_translation_adjustment_audit_tree').id, 'list')]
             action['domain'] = Domain.AND([
                 report._get_options_domain(column_group_options, 'strict_range'),
-                Domain('account_type', 'in', ['equity', 'equity_unaffected', 'income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other'])])
+                Domain('account_type', 'in', ['equity', 'equity_unaffected', 'equity_retained', 'income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other'])])
 
         return action

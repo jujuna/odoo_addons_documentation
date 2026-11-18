@@ -3,6 +3,8 @@
 from odoo.addons.mail.tests.common import MailCommon
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests.common import new_test_user
+from odoo.tools import file_open, mute_logger
+from odoo.tools.convert import convert_xml_import
 
 
 class TestDiscussChannelMember(MailCommon):
@@ -28,6 +30,7 @@ class TestDiscussChannelMember(MailCommon):
         cls.user_3 = new_test_user(
             cls.env, login="user_3", name="User 3", groups="base.group_user,mail.secret_group"
         )
+        cls._create_portal_user()
         cls.group = cls.env["discuss.channel"].create({"name": "Group", "channel_type": "group"})
         cls.group.channel_member_ids.unlink()
 
@@ -61,6 +64,34 @@ class TestDiscussChannelMember(MailCommon):
         group_subchannel = self.group.with_user(self.user_1)._create_sub_channel()
         group_subchannel.with_user(self.user_2)._add_members(users=self.user_2)
         self.assertEqual(group_subchannel.channel_member_ids.partner_id, (self.user_1 | self.user_2).partner_id)
+
+    def test_group_portal_owner_or_admin_can_remove_member(self):
+        """Portal users with owner/admin role can remove members even without write access on the channel."""
+        self.group._add_members(users=self.user_portal | self.user_1 | self.user_2)
+        portal_member = self.group.channel_member_ids.filtered(lambda m: m.partner_id == self.partner_portal)
+        self.assertFalse(self.group.with_user(self.user_portal).has_access("write"))
+        for role, user in (("owner", self.user_1), ("admin", self.user_2)):
+            with self.subTest(role=role):
+                portal_member.channel_role = role
+                member = self.group.channel_member_ids.filtered(lambda m, user=user: m.partner_id == user.partner_id)
+                member.with_user(self.user_portal).unlink()
+                self.assertFalse(member.exists())
+        self.assertEqual(self.group.channel_member_ids, portal_member)
+
+    def test_group_portal_admin_cannot_remove_owner_or_admin(self):
+        """Portal users with admin role cannot remove owner or admin members."""
+        self.group._add_members(users=self.user_portal | self.user_1 | self.user_2)
+        portal_member, member_1, member_2 = (
+            self.group.channel_member_ids.filtered(lambda m, user=user: m.partner_id == user.partner_id)
+            for user in (self.user_portal, self.user_1, self.user_2)
+        )
+        portal_member.channel_role = "admin"
+        member_1.channel_role = "owner"
+        member_2.channel_role = "admin"
+        for member in member_1 | member_2:
+            with self.subTest(channel_role=member.channel_role), self.assertRaises(AccessError):
+                member.with_user(self.user_portal).unlink()
+        self.assertEqual(self.group.channel_member_ids, portal_member | member_1 | member_2)
 
     # ------------------------------------------------------------
     # PUBLIC CHANNELS
@@ -135,3 +166,54 @@ class TestDiscussChannelMember(MailCommon):
         last_message_id = channel.message_ids[0].id
         new_members = channel.with_user(self.user_1)._add_members(users=self.user_2)
         self.assertEqual(new_members.new_message_separator, last_message_id + 1)
+
+    def _update_discuss_channel_data(self):
+        with file_open("mail/data/discuss_channel_data.xml", "rb") as xml_file:
+            convert_xml_import(self.env, "mail", xml_file, {}, mode="update", noupdate=True)
+
+    def test_data_update_after_admin_left_and_rejoined_channels(self):
+        """Leaving a channel deletes the member record created by the data file
+        (and its xmlid); joining again creates a new one. Updating the module
+        must reuse it instead of creating the data member again (unique
+        partner/channel)."""
+        admin = self.env.ref("base.user_admin")
+        for xmlid in ("mail.channel_all_employees", "mail.channel_admin"):
+            channel = self.env.ref(xmlid)
+            channel.with_user(admin).action_unfollow()
+            channel._add_members(users=admin)
+        self._update_discuss_channel_data()
+        for channel_xmlid, member_xmlid in (
+            ("mail.channel_all_employees", "mail.channel_member_general_channel_for_admin"),
+            ("mail.channel_admin", "mail.channel_member_channel_admin_partner_admin"),
+        ):
+            members = self.env.ref(channel_xmlid).channel_member_ids.filtered(lambda m: m.partner_id == admin.partner_id)
+            self.assertEqual(len(members), 1)
+            self.assertEqual(self.env.ref(member_xmlid), members)
+
+    @mute_logger("odoo.sql_db")
+    def test_import_duplicate_member_still_fails(self):
+        """Reusing members is only for module data: importing a member that
+        already exists keeps failing instead of silently dropping values."""
+        admin = self.env.ref("base.user_admin")
+        channel = self.env.ref("mail.channel_all_employees")
+        member = channel.channel_member_ids.filtered(lambda m: m.partner_id == admin.partner_id)
+        self.assertEqual(len(member), 1)
+        notifications = member.custom_notifications
+        result = self.env["discuss.channel.member"].load(
+            ["channel_id/.id", "partner_id/.id", "custom_notifications"],
+            [[str(channel.id), str(admin.partner_id.id), "no_notif"]],
+        )
+        self.assertFalse(result["ids"])
+        self.assertTrue(result["messages"])
+        self.assertEqual(member.custom_notifications, notifications)
+
+    def test_data_update_recreates_deleted_admin_member(self):
+        """A data member deleted without joining again is still recreated, with
+        its xmlid, when updating the module."""
+        admin = self.env.ref("base.user_admin")
+        channel = self.env.ref("mail.channel_all_employees")
+        self.env.ref("mail.channel_member_general_channel_for_admin").unlink()
+        self._update_discuss_channel_data()
+        members = channel.channel_member_ids.filtered(lambda m: m.partner_id == admin.partner_id)
+        self.assertEqual(len(members), 1)
+        self.assertEqual(self.env.ref("mail.channel_member_general_channel_for_admin"), members)

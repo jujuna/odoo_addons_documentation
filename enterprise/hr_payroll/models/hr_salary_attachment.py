@@ -37,7 +37,7 @@ class HrSalaryAttachment(models.Model):
         'res.company', string='Company', required=True, index=True,
         default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
-    description = fields.Char(string="Note")
+    description = fields.Char(string="Payslip Description")
     structure_type_id = fields.Many2one(
         related='employee_id.version_id.structure_type_id',
         groups="hr_payroll.group_hr_payroll_user",
@@ -235,6 +235,11 @@ class HrSalaryAttachment(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """
+        Create the attachments (``date_estimated_end`` is cleared if not recurring) and recompute
+        the draft payslips of the employee overlapping them. Payslips are not recomputed in
+        ``install_mode``.
+        """
         # Clear estimated end date if the attachment is not recurring
         for vals in vals_list:
             if not vals.get('is_recurring'):
@@ -269,6 +274,10 @@ class HrSalaryAttachment(models.Model):
         return records
 
     def write(self, vals):
+        """
+        Write on the attachments (``date_estimated_end`` is cleared if not recurring) and
+        recompute their draft payslips. Payslips are not recomputed in ``install_mode``.
+        """
         # Clear estimated end date if is_recurring is set to False
         if 'is_recurring' in vals and not vals['is_recurring']:
             vals['date_estimated_end'] = False
@@ -284,6 +293,10 @@ class HrSalaryAttachment(models.Model):
         return res
 
     def action_close(self):
+        """
+        Set the attachments as done, with today as ``date_end``, and refresh the issues of their
+        draft and validated payslips.
+        """
         payslips_to_recompute = self.payslip_ids.filtered(lambda p: p.state in ['draft', 'validated'])
         today = fields.Date.context_today(self)
         self.write({
@@ -335,12 +348,27 @@ class HrSalaryAttachment(models.Model):
             raise UserError(self.env._('You cannot delete a payslip adjustment that is linked to a payslip!'))
 
     def _format_amount(self, amount):
+        """
+        Format ``amount`` with the ``input_suffix`` of the rule if any (days, %...), else as an
+        amount in the company currency.
+
+        :rtype: str
+        """
         self.ensure_one()
         if suffix := self.salary_rule_id.input_suffix:
             return f"{formatLang(self.env, amount)} {suffix}"
         return formatLang(self.env, amount, currency_obj=self.currency_id)
 
     def _get_payment_amount(self, total_amount):
+        """
+        Split ``total_amount`` over these attachments, in order, each one taking at most its
+        ``remaining_amount``.
+
+        :param float total_amount: amount to split
+        :return: ``{attachment: amount}``
+        :rtype: dict
+        :raise UserError: if ``total_amount`` exceeds the remaining amounts
+        """
         res = {}
         remaining = total_amount
         for attachment in self:
@@ -357,14 +385,21 @@ class HrSalaryAttachment(models.Model):
         raise UserError(self.env._('The total amount to pay is higher than the total remaining amount of the selected payslip adjustments.'))
 
     def record_payment(self, payslip, total_amount):
-        ''' Record a new payment for this attachment, if the total has been reached the attachment will be closed.
+        """
+        Record the payment of ``total_amount`` on these attachments for ``payslip``.
 
-        :param payslip: the payslip in which an amount of this attachment is paid
-        :param total_amount: amount to register for this payment
-            computed using the payslip_amount and the total if not given
+        Called when a payslip is paid, with the total of its lines of the rule code (negative for
+        a credit note). The attachments are processed by group of ``sequence`` (in the order of
+        ``self``): if the amount covers the ``remaining_amount`` of a group, each attachment
+        receives its remaining amount, else the amount is prorated on the group and the
+        following groups receive nothing. The payment is added to ``paid_amount`` and posted in
+        the chatter; an attachment whose ``remaining_amount`` reaches 0 is closed (never the
+        case of recurring attachments).
 
-        Note that paid_amount can never be higher than total_amount
-        '''
+        :param payslip: the ``hr.payslip`` paying the amount
+        :param float total_amount: amount paid
+        :raise UserError: if ``total_amount`` exceeds the remaining amounts
+        """
         def _record_payment(attachment, payslip, amount):
             if amount == 0:
                 return
@@ -377,8 +412,11 @@ class HrSalaryAttachment(models.Model):
             attachment.paid_amount += amount
             if attachment.remaining_amount == 0:
                 attachment.action_close()
+            elif amount < 0 and attachment.state == '2_close':
+                # A refunded payment is due again
+                attachment.action_open()
 
-        def _record_priority_payment(attachments, payslip, amount, cap_func):
+        def _record_priority_payment(attachments, payslip, amount, cap_func, sign=1):
             # Compute caps for each record
             caps = [cap_func(rec) for rec in attachments]
             total_need = sum(caps)
@@ -391,25 +429,38 @@ class HrSalaryAttachment(models.Model):
                     if not cap:
                         continue
                     amount -= cap
-                    _record_payment(attachment, payslip, cap)
+                    _record_payment(attachment, payslip, sign * cap)
                 return amount
             # We need to prorate the payment
             for attachment, cap in zip(attachments, caps):
                 if not cap:
                     continue
                 pay_amount = min(amount * cap / total_need, cap)
-                _record_payment(attachment, payslip, pay_amount)
+                _record_payment(attachment, payslip, sign * pay_amount)
             return 0
 
         assert payslip
-        remaining = total_amount
         attachments_by_priority = self.grouped('sequence')
-        for _priority, attachments in attachments_by_priority.items():
-            # Compute caps for each record
-            remaining = _record_priority_payment(attachments, payslip, remaining, lambda r: r.remaining_amount)
+        if total_amount < 0:
+            # A refund gives back what was paid, up to the paid amounts, the last priorities first
+            remaining = -total_amount
+            for _priority, attachments in reversed(attachments_by_priority.items()):
+                remaining = _record_priority_payment(attachments, payslip, remaining, lambda r: r.paid_amount, sign=-1)
+        else:
+            remaining = total_amount
+            for _priority, attachments in attachments_by_priority.items():
+                # Compute caps for each record
+                remaining = _record_priority_payment(attachments, payslip, remaining, lambda r: r.remaining_amount)
 
         if remaining:
             raise UserError(self.env._('The total amount to pay is higher than the total remaining amount of the selected payslip adjustments.'))
 
     def _get_active_amount(self):
+        """
+        Return the sum of the ``remaining_amount`` of these attachments (``amount`` for recurring
+        attachments, ``amount - paid_amount`` otherwise): the amount of the payslip input line
+        built from them.
+
+        :rtype: float
+        """
         return sum(a.remaining_amount for a in self)

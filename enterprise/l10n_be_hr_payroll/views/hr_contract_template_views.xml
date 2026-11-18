@@ -163,7 +163,7 @@
                         <field name="rd_percentage" class="o_hr_narrow_field" widget="percentage"/>
                     </div>
                 </group>
-                <group string="Impulsion Plan" name="impulsion_plan" invisible="country_code != 'BE' or l10n_be_working_region != 'wa'">
+                <group string="Impulsion Plan" name="impulsion_plan" invisible="country_code != 'BE'">
                     <field name="l10n_be_impulsion_plan"/>
                 </group>
             </group>
@@ -171,7 +171,7 @@
                 <attribute name="invisible">country_code == 'BE'</attribute>
             </field>
             <field name='structure_type_id' position="after">
-                <field name='l10n_be_salary_scale_id' string="Salary Scale" invisible="not display_l10n_be_scale" required="display_l10n_be_scale"/>
+                <field name='l10n_be_salary_scale_id' string="Salary Scale" invisible="not display_l10n_be_scale" placeholder="Unknown"/>
                 <field name="l10n_be_is_sale_representative" invisible="l10n_be_egov3_code != '200'"/>
             </field>
             <xpath expr="//sheet" position="before">

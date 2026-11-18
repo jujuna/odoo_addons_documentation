@@ -177,7 +177,7 @@ class PlanningSlot(models.Model):
             return NotImplemented
         return [('resource_ids.user_id', operator, value)]
 
-    @api.depends('resource_ids')
+    @api.depends('resource_ids.employee_id.department_id')
     def _compute_department_id(self):
         for slot in self:
             max_employees_count = 0
@@ -188,7 +188,7 @@ class PlanningSlot(models.Model):
                     max_employees_count = len(employees)
             slot.department_id = selected_department
 
-    @api.depends('resource_ids')
+    @api.depends('resource_ids.employee_id.parent_id')
     def _compute_manager_id(self):
         for slot in self:
             max_employees_count = 0
@@ -1798,7 +1798,9 @@ class PlanningSlot(models.Model):
         return 'start_datetime:day'
 
     def _get_open_shifts_resources(self):
-        # Get all resources that have the role set on those shifts as default role or in their roles.
+        """ Return the resources matching the role of each open shift, or all human resources
+            with a role if no resource has that role.
+        """
         # open_shifts.role_id.ids wouldn't include False, yet we need this information
         open_shift_role_ids = [shift.role_id.id for shift in self]
         resources = self.env['resource.resource'].search(['|', ('default_role_id', 'in', open_shift_role_ids), ('role_ids', 'in', self.role_id.ids)])
@@ -1813,12 +1815,13 @@ class PlanningSlot(models.Model):
 
         roles_without_resource = self.role_id.filtered(lambda r: not r.resource_ids and r not in resource_ids_per_role)
         if roles_without_resource:
-            resources = self.env['resource.resource'].search([('role_ids', '!=', False), ('resource_type', '=', 'user')])
+            human_resources_with_role = self.env['resource.resource'].search([('role_ids', '!=', False), ('resource_type', '=', 'user')])
             for role in roles_without_resource:
                 resource_ids_available = resource_ids_per_role[role]
-                for resource in resources:
+                for resource in human_resources_with_role:
                     if resource.id not in resource_ids_available:
                         resource_ids_available.append(resource.id)
+            resources |= human_resources_with_role
         return resources, [resource_ids_per_default_role, resource_ids_per_role]
 
     def _get_resources_dict_values(self, resource_dict):
@@ -2407,8 +2410,9 @@ class PlanningSlot(models.Model):
 
     def _get_employees_to_send_slot(self):
         self.ensure_one()
-        employees_with_email = self.employee_ids.filtered(self._get_employee_contact_field())
-        if not self.employee_public_ids or not employees_with_email:
+        # sudo: hr.employee - can read the contact of the shift employees to send them the shift
+        employees_with_email = self.sudo().employee_ids.filtered(self._get_employee_contact_field())
+        if not self.employee_public_ids:
             domain = Domain('company_id', '=', self.company_id.id) & Domain(self._get_employee_contact_field(), '!=', False)
             if self.role_id:
                 domain &= Domain('planning_role_ids', '=', False) | Domain('planning_role_ids', 'in', self.role_id.id)
@@ -2436,11 +2440,13 @@ class PlanningSlot(models.Model):
             notif_type = "warning"
             message = self.env._('There are no shifts to publish and send.')
         else:
-            planning = self.env['planning.planning'].create({
-                'start_datetime': start,
-                'end_datetime': end,
-            })
-            planning._send_planning(slots=self, employees=self.sudo().employee_ids)
+            for company, slots in self.grouped("company_id").items():
+                planning = self.env["planning.planning"].create({
+                    "company_id": company.id,
+                    "start_datetime": start,
+                    "end_datetime": end,
+                })
+                planning._send_planning(slots=slots, employees=slots.sudo().employee_ids)
             message = self.env._('The shifts have successfully been published and sent.')
         return self._get_notification_action(notif_type, message)
 
@@ -3333,17 +3339,18 @@ class PlanningSlot(models.Model):
         email_from = self.company_id.email or ''
 
         template = self.env.ref('planning.email_template_shift_switch_email', raise_if_not_found=False)
-        for resource in self.resource_ids:
-            if not (resource.resource_type == 'user' and resource.employee_id and resource not in human_resources):
+        for assignee in self.employee_public_ids:
+            if assignee.resource_id in human_resources:
                 continue
-            assignee = resource.employee_id
             start_datetime = self._format_datetime_to_user_tz(self.start_datetime, assignee.env, tz=assignee.tz, lang_code=assignee.user_partner_id.lang)
             end_datetime = self._format_datetime_to_user_tz(self.end_datetime, assignee.env, tz=assignee.tz, lang_code=assignee.user_partner_id.lang)
             allocated_hours = float_utils.float_repr(self.allocated_hours, precision_digits=2)
             allocated_percentage = float_utils.float_repr(self.allocated_percentage, precision_digits=0)
+            new_assignee_names = format_list(self.env, human_resources.mapped('name'))
             template_context = {
                 'old_assignee_name': assignee.name,
-                'new_assignee_names': format_list(self.env, human_resources.employee_id.mapped('name')),
+                'new_assignee_name': new_assignee_names,
+                'new_assignee_names': new_assignee_names,
                 'start_datetime': start_datetime,
                 'end_datetime': end_datetime,
                 'allocated_hours': allocated_hours,
@@ -3666,8 +3673,23 @@ class PlanningSlot(models.Model):
         planned_hours_mapped = defaultdict(float)
         resource_work_intervals, calendar_work_intervals = regular_resources.sudo()._get_valid_work_intervals(start, stop)
 
-        flexible_resource_work_intervals, flexible_resources_hours_per_day, flexible_resources_hours_per_week = flexible_resources._get_flexible_resource_valid_work_intervals(start, stop)
-        resource_work_intervals.update(flexible_resource_work_intervals)
+        flexible_resources_hours_per_day, flexible_resources_hours_per_week = defaultdict(dict), defaultdict(dict)
+        for tz_name, tz_resources in flexible_resources.grouped('tz').items():
+            # The period starts and stops at midnight in the browser's timezone, but flexible hours are
+            # counted per day in the resource's timezone: align the period on the closest days there, else
+            # the hours of a day of the previous or next week are added on top of the weekly hours.
+            tz = ZoneInfo(tz_name)
+            first_day = (start.astimezone(tz) + timedelta(hours=12)).date()
+            last_day = (stop.astimezone(tz) + timedelta(hours=12)).date() - timedelta(days=1)
+            work_intervals, hours_per_day, hours_per_week = (
+                tz_resources._get_flexible_resource_valid_work_intervals(
+                    datetime.combine(first_day, time.min, tzinfo=tz),
+                    datetime.combine(last_day, time.max, tzinfo=tz),
+                )
+            )
+            resource_work_intervals.update(work_intervals)
+            flexible_resources_hours_per_day.update(hours_per_day)
+            flexible_resources_hours_per_week.update(hours_per_week)
 
         for slot in planning_slots:
             if group_by_field == 'resource_ids' and slot.resource_ids:
@@ -3695,7 +3717,7 @@ class PlanningSlot(models.Model):
                 continue
 
             work_intervals = resource_work_intervals[resource.id]
-            work_duration = self._get_employee_work_hours_within_interval(resource, work_intervals, flexible_resources_hours_per_day, flexible_resources_hours_per_week)
+            work_duration = self._get_employee_work_hours_within_interval(resource, work_intervals, flexible_resources_hours_per_day, flexible_resources_hours_per_week) if not resource._is_fully_flexible() else 0.0
             if group_by_field == "resource_ids":
                 work_hours[resource.id] = work_duration
                 groups_linked_to_only_fully_flexible_resources[resource.id] = resource._is_fully_flexible()

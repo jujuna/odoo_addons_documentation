@@ -75,3 +75,19 @@ class TestPayrollDepartureNotice(TestPayrollCommon):
         })
         self.assertEqual(departure.l10n_be_first_contract_date, date(2025, 7, 1))
         self.assertNotIn('-', departure.l10n_be_seniority_description)
+
+    def test_departure_seniority_description(self):
+        employee = self.env['hr.employee'].create({
+            'name': 'Seniority Description',
+            'date_version': date(2020, 3, 1),
+            'contract_date_start': date(2020, 3, 1),
+            'employee_type_id': self.env.ref('hr.contract_type_employee').id,
+        })
+        departure = self.env['hr.employee.departure'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=employee.id).create({
+            'dismissal_date': date(2025, 4, 1),
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+        })
+        departure.departure_date = date(2025, 4, 1)
+        self.assertEqual(departure.l10n_be_seniority_description, '5 years and 1 month')
+        departure.departure_date = date(2021, 3, 1)
+        self.assertEqual(departure.l10n_be_seniority_description, '1 year and 0 months')

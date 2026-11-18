@@ -3,7 +3,7 @@
     <t t-name="sale_timesheet_enterprise.TimesheetsAssistant" t-inherit="timesheet_grid.TimesheetsAssistant" t-inherit-mode="extension">
         <div name="timesheets_section" position="replace">
             <!-- Billable section -->
-            <div class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm}">
+            <div class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size}">
                 <h2 class="h6 d-flex mt-3 mx-2">
                     Billable
                     <b class="ms-auto me-1" t-out="this.formatDuration(this.model.data.billableTime)"/>
@@ -31,9 +31,10 @@
                                 </t>
                             </div>
                             <!-- Show normal timesheet item -->
-                            <a t-else="" href="#" class="list-group-item list-group-item-action d-flex"
+                            <a t-else="" href="#" class="list-group-item list-group-item-action d-flex transition-all o_activity_watch_drop_target"
+                                t-att-data-timesheet-id="tsh.id"
                                 t-att-class="{
-                                    'pe-none': this.state.showCreateForm,
+                                    'pe-none': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size,
                                     'opacity-75': this.selectedTimesheet != null,
                                 }"
                                 t-on-click.stop="() => this.onClickExistingTimesheet(tsh)"
@@ -59,7 +60,7 @@
             </div>
 
             <!-- Non-Billable section -->
-            <div class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm}">
+            <div class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size}">
                 <h2 class="h6 d-flex mx-2">
                     Non-Billable
                     <b class="ms-auto me-1" t-out="this.formatDuration(this.model.data.nonBillableTime)"/>
@@ -87,9 +88,10 @@
                                 </t>
                             </div>
                             <!-- Show normal timesheet item -->
-                            <a t-else="" href="#" class="list-group-item list-group-item-action d-flex"
+                            <a t-else="" href="#" class="list-group-item list-group-item-action d-flex transition-all o_activity_watch_drop_target"
+                                t-att-data-timesheet-id="tsh.id"
                                 t-att-class="{
-                                    'pe-none': this.state.showCreateForm,
+                                    'pe-none': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size,
                                     'opacity-75': this.selectedTimesheet != null,
                                 }"
                                 t-on-click.stop="() => this.onClickExistingTimesheet(tsh)"

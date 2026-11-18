@@ -210,6 +210,11 @@ export class TimesheetSystrayContent extends Component {
 
     async onRecordReady(record) {
         this.currentRecord = record;
+        const [fieldName] = Object.keys(this.context.timesheet_systray_prefill || {});
+        if (fieldName && record.isNew && !record.data[fieldName]) {
+            // The server dropped it (deleted, archived or no longer accessible)
+            this.cache.discardStalePreFilledForm();
+        }
     }
 
     /**
@@ -233,6 +238,7 @@ export class TimesheetSystrayContent extends Component {
         ) {
             const [fieldName, resId] = Object.entries(prefilledFormValues)[0];
             context[`default_${fieldName}`] = resId;
+            context.timesheet_systray_prefill = { [fieldName]: resId };
             // Since values won't be given to the record in this case (see
             // savedTimesheetData), the elapsed time has to be passed here too.
             // untrack: reading it live would subscribe this component to the

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_reports_view_account_journal_form" model="ir.ui.view">
+        <field name="name">account.journal.form.reports</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form" />
+        <field name="arch" type="xml">
+            <field name="incoming_einvoice_notification_email" position="attributes">
+                <attribute name="nolabel">1</attribute>
+            </field>
+
+            <field name="incoming_einvoice_notification_email" position="before">
+                <label for="incoming_einvoice_notification_email" string="Send Copy To" invisible="is_tax_return_journal"/>
+                <label for="incoming_einvoice_notification_email" string="Return Reminders" invisible="not is_tax_return_journal"/>
+            </field>
+        </field>
+    </record>
+</odoo>

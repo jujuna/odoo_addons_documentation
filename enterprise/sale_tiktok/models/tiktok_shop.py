@@ -483,6 +483,9 @@ class TikTokShop(models.Model):
         tiktok_status = order_data["status"]
         # Update the delivery status to keep it in sync with TikTok Shop
         order.tiktok_delivery_status = const.DELIVERY_STATUS_MAPPING.get(tiktok_status, "manual")
+        # The package may be created on TikTok Shop after the order was synchronized
+        if not order.tiktok_packing_ref and (packages := order_data.get("packages")):
+            order.tiktok_packing_ref = packages[0].get("id")
 
         if tiktok_status == "CANCELLED" and order.state != "cancel":
             order._action_cancel()
@@ -544,7 +547,7 @@ class TikTokShop(models.Model):
             "tiktok_order_ref": tiktok_order_ref,
             "tiktok_shop_id": self.id,
             "tiktok_delivery_status": delivery_status,
-            "tiktok_packing_ref": order_data.get("packages", [{}])[0].get("id"),
+            "tiktok_packing_ref": (order_data.get("packages") or [{}])[0].get("id"),
             "warehouse_id": self.fbs_warehouse_id.id,
         }
         shipping_code = order_data.get("shipping_provider")
@@ -567,7 +570,11 @@ class TikTokShop(models.Model):
         return order
 
     def _adjust_order_total(self, order, currency, tiktok_total):
-        """Ensure Odoo order total matches TikTok total by adding a balancing line."""
+        """Ensure Odoo order total matches TikTok total by adding a balancing line.
+
+        A single tax-free adjustment line absorbs the full residue. The residue can come from any
+        other component not explicitly modeled as a sale order line.
+        """
         residue = currency.round(tiktok_total - order.amount_total)
         if not currency.is_zero(residue):
             adjustment_product = self._find_matching_product(
@@ -586,6 +593,13 @@ class TikTokShop(models.Model):
     def _prepare_order_lines_values(self, order_data, currency, fiscal_pos):
         """Prepare the values for the order lines to create based on TikTok Shop order data.
 
+        Each product becomes one line priced at what the buyer paid for it. TikTok Shop reports
+        prices tax-excluded, so the tax it charged (`item_tax`, `shipping_fee_tax`) is added back
+        before the subtotal is recomputed from the Odoo taxes; the line total then matches the
+        buyer-paid amount whichever way those taxes are configured. Shipping is appended as a
+        final line when the buyer-paid fee is non-zero, and anything the buyer paid beyond these
+        lines is left to `_adjust_order_total`.
+
         Note: self.ensure_one()
 
         :param dict order_data: The order data related to the item data.
@@ -593,9 +607,16 @@ class TikTokShop(models.Model):
         :param record fiscal_pos: The fiscal position of the sales order, as an
                                     `account.fiscal.position` record.
         :return: The order lines values.
-        :rtype: dict
+        :rtype: list[dict]
         """
         self.ensure_one()
+
+        order_date = datetime.fromtimestamp(
+            order_data.get("paid_time", order_data["create_time"])
+        ).date()
+        currency_rate = self.env["res.currency"]._get_conversion_rate(
+            self.company_id.currency_id, currency, self.company_id, order_date
+        )
 
         aggregated = {}
         for item_data in order_data["line_items"]:
@@ -616,31 +637,48 @@ class TikTokShop(models.Model):
                         float(item_data["sale_price"]),
                     ),
                     "quantity": 0,
-                    "discounted_subtotal": 0.0,
+                    "paid_total": 0.0,
                 }
+            item_tax = sum(
+                float(tax_data.get("tax_amount") or 0)
+                for tax_data in item_data.get("item_tax") or []
+            )
             aggregated[product_id]["quantity"] += 1
-            aggregated[product_id]["discounted_subtotal"] += float(item_data["sale_price"])
+            aggregated[product_id]["paid_total"] += float(item_data["sale_price"]) + item_tax
 
         order_lines_values = []
         for data in aggregated.values():
             product = data["product"]
             quantity = data["quantity"]
-            discounted_subtotal = data["discounted_subtotal"]
             product_taxes = product.taxes_id._filter_taxes_by_company(self.company_id)
             taxes = fiscal_pos.map_tax(product_taxes)
-
             line_specs = self._compute_reconciled_line_specs(
-                quantity, discounted_subtotal, taxes, currency
+                quantity, data["paid_total"], taxes, currency
             )
             for sub_qty, price_unit in line_specs:
-                order_lines_values.append({
+                line_values = {
                     "name": data["description"],
                     "product_id": product.id,
                     "price_unit": price_unit,
                     "tax_ids": taxes.ids,
                     "product_uom_qty": sub_qty,
                     "discount": 0,
-                })
+                }
+                extra_tax_data = self._prepare_reconciled_extra_tax_data(
+                    sub_qty,
+                    price_unit,
+                    data["paid_total"],
+                    taxes,
+                    currency,
+                    currency_rate,
+                    product,
+                )
+                if extra_tax_data:
+                    line_values["extra_tax_data"] = extra_tax_data
+                order_lines_values.append(line_values)
+
+        # No order-level discount line: TikTok Shop allocates the seller and platform discounts
+        # down to the line items, cart-level promotions included.
 
         # Shipping line
         payment = order_data.get("payment", {})
@@ -653,19 +691,31 @@ class TikTokShop(models.Model):
             )
             shipping_taxes_raw = shipping_product.taxes_id._filter_taxes_by_company(self.company_id)
             shipping_taxes = fiscal_pos.map_tax(shipping_taxes_raw)
-
+            shipping_paid_total = shipping_fee + float(payment.get("shipping_fee_tax") or 0)
             shipping_specs = self._compute_reconciled_line_specs(
-                1, shipping_fee, shipping_taxes, currency
+                1, shipping_paid_total, shipping_taxes, currency
             )
             for sub_qty, price_unit in shipping_specs:
-                order_lines_values.append({
+                line_values = {
                     "name": _("Shipping: %(carrier)s", carrier=shipping_code),
                     "product_id": shipping_product.id,
                     "price_unit": price_unit,
                     "tax_ids": shipping_taxes.ids,
                     "product_uom_qty": sub_qty,
                     "discount": 0,
-                })
+                }
+                extra_tax_data = self._prepare_reconciled_extra_tax_data(
+                    sub_qty,
+                    price_unit,
+                    shipping_paid_total,
+                    shipping_taxes,
+                    currency,
+                    currency_rate,
+                    shipping_product,
+                )
+                if extra_tax_data:
+                    line_values["extra_tax_data"] = extra_tax_data
+                order_lines_values.append(line_values)
 
         return order_lines_values
 
@@ -720,28 +770,33 @@ class TikTokShop(models.Model):
         return pricelist
 
     def _compute_subtotal(self, total, taxes, currency):
-        """Compute the subtotal from the taxes.
+        """Compute the line subtotal that reconciles with a buyer-paid, tax-inclusive total.
 
-        TikTok Shop does not provide the tax amount of the order, so we recompute the subtotal
-        from the product taxes (or those mapped by the fiscal position) to match the order total.
+        The subtotal is derived so that the line total matches `total` whichever way the
+        taxes are configured: a price-included tax reads the unit price as gross, a price-excluded
+        one adds its amount on top. A tax rate that differs from the one TikTok Shop charged
+        therefore shifts the split between base and tax, but never the line total.
 
-        If the taxes used are not identical to those used by TikTok Shop, the recomputed subtotal
-        may differ from the original subtotal.
+        The price-excluded tax amounts are backed out unrounded (`round_globally`): subtracting
+        rounded amounts would round the subtotal itself, and a rounded subtotal can land on a
+        half-cent tax (e.g. 15% of 8.70 = 1.305) that Odoo rounds away from the buyer-paid total.
 
-        :param float total: The original total.
+        :param float total: The buyer-paid total of the line, tax included.
         :param account.tax taxes: The final taxes to use for the computation of the new subtotal.
         :param res.currency currency: The currency used by the rounding methods.
         :return: The new subtotal.
         :rtype: float
         """
-        taxes_res = taxes.with_context(force_price_include=True).compute_all(
-            total, currency=currency
+        tax_details = taxes._get_tax_details(
+            price_unit=total,
+            quantity=1.0,
+            rounding_method="round_globally",
+            special_mode="total_included",
         )
-        subtotal = taxes_res["total_excluded"]
-        for tax_res in taxes_res["taxes"]:
-            tax = self.env["account.tax"].browse(tax_res["id"])
-            if tax.price_include:
-                subtotal += tax_res["amount"]
+        subtotal = tax_details["total_included"]
+        for tax_data in tax_details["taxes_data"]:
+            if not tax_data["tax"].price_include:
+                subtotal -= tax_data["tax_amount"]
         return subtotal
 
     def _build_item_description(self, sku, item_data, original_price, discounted_price):
@@ -957,28 +1012,90 @@ class TikTokShop(models.Model):
     def _compute_reconciled_line_specs(self, quantity, discounted_subtotal, taxes, currency):
         """Compute per-line (sub_quantity, price_unit) tuples.
 
-        - Branch 1: any tax has price_include -> use discounted unit price directly
-          (Odoo's tax back-out guarantees exact reconciliation at order level).
-        - Branch 2a: tax-exclusive path -> call _compute_subtotal to reverse the
-          tax-inclusive total to a tax-exclusive subtotal; round to currency
-          precision to get nominal_unit_price. Any rounding residue is absorbed at
-          order level by _prepare_order_lines_values.
+        The unit price is the unrounded subtotal that reconciles with `discounted_subtotal`
+        whichever way the taxes are configured. Rounding it would leave a residue for
+        `_adjust_order_total` to absorb.
 
         :param int quantity: Quantity for the line.
-        :param float discounted_subtotal: Platform subtotal (post-discount).
+        :param float discounted_subtotal: Buyer-paid total of the line, tax included.
         :param account.tax taxes: Taxes applied to the line.
         :param res.currency currency: Currency for rounding.
         :return: List of (sub_quantity, price_unit)
         :rtype: list[tuple[int, float]]
         """
-        # Branch 1: tax-inclusive path — use discounted unit price directly.
-        if any(tax.price_include for tax in taxes):
-            return [(quantity, discounted_subtotal / quantity)]
-
-        # Branch 2a: tax-exclusive path.
-        tax_excluded_subtotal = self._compute_subtotal(discounted_subtotal, taxes, currency)
-        unit_price = currency.round(tax_excluded_subtotal / quantity)
+        if not quantity:
+            return [(quantity, 0)]
+        unit_price = self._compute_subtotal(
+            discounted_subtotal / quantity, taxes, currency
+        )
         return [(quantity, unit_price)]
+
+    def _prepare_reconciled_extra_tax_data(
+        self, quantity, price_unit, paid_total, taxes, currency, currency_rate, product
+    ):
+        """Freeze the rounded tax split of a line so it stays on the buyer-paid total.
+
+        With a price-excluded tax, Odoo rounds the base and each tax separately, so their sum
+        can differ from `paid_total` by 0.01 whatever the unit price. The rounded amounts are
+        stored as manual amounts in `extra_tax_data`, as the global discount and down payment
+        flows do, and the line base absorbs the difference.
+
+        Example: the buyer paid 110.00 for a line taxed 7% price-included and 7% price-excluded.
+        `_compute_subtotal` gives `price_unit` 103.245614..., which is exact before rounding::
+
+                              raw        rounded
+            base             96.491228   96.49
+            7% included       6.754386    6.75
+            7% excluded       6.754386    6.75
+            line total      110.000000  109.99   -> delta = 110.00 - 109.99 = +0.01
+
+        The taxes keep 6.75 and 6.75, the base takes the cent and becomes 96.50, and the line
+        stores 96.50 + 13.50 = 110.00 instead of leaving 0.01 to `_adjust_order_total`.
+
+        :param float quantity: Quantity of the line.
+        :param float price_unit: Unrounded unit price of the line, tax excluded.
+        :param float paid_total: Buyer-paid total of the line, tax included.
+        :param account.tax taxes: Taxes applied to the line.
+        :param res.currency currency: Currency of the sales order.
+        :param float currency_rate: Rate from the company currency to `currency`.
+        :param product.product product: Product of the line.
+        :return: The `extra_tax_data` value, or an empty dict when the line has no taxes or no quantity.
+        :rtype: dict
+        """
+        if not taxes or not quantity:
+            return {}
+
+        AccountTax = self.env["account.tax"]
+        company = self.company_id
+
+        # 1. Compute the line exactly as the sale order line will, rounding included, to see
+        #    what Odoo would store for this unit price. E.g. 96.49 + 6.75 + 6.75 = 109.99.
+        base_line = AccountTax._prepare_base_line_for_taxes_computation(
+            None,
+            tax_ids=taxes,
+            price_unit=price_unit,
+            quantity=quantity,
+            currency_id=currency,
+            rate=currency_rate,
+            product_id=product,
+            product_uom_id=product.uom_id,
+        )
+        AccountTax._add_tax_details_in_base_line(base_line, company)
+        AccountTax._round_base_lines_tax_details([base_line], company)
+
+        # 2. Reconcile a reduced copy of the line with the buyer-paid total, then freeze its
+        #    rounded split on the line itself, which keeps its quantity and unit price.
+        #    The sale line, and later its invoice line, reuse these manual amounts
+        #    instead of recomputing, until the price, quantity, or taxes change.
+        reduced_base_lines = AccountTax._reduce_base_lines_to_target_amount(
+            [base_line], company, "fixed", paid_total,
+        )
+        if not reduced_base_lines:
+            return {}
+        AccountTax._fix_base_lines_tax_details_on_manual_tax_amounts(reduced_base_lines, company)
+        for key in ("manual_total_excluded_currency", "manual_total_excluded", "manual_tax_amounts"):
+            base_line[key] = reduced_base_lines[0][key]
+        return AccountTax._export_base_line_extra_tax_data(base_line)
 
     def _handle_sync_failure(self, flow="", tiktok_order_ref=False, error_messages=False):
         """Send a mail to the responsible persons to report a synchronization failure.

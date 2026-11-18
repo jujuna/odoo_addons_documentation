@@ -4,8 +4,7 @@ import { patch } from "@web/core/utils/patch";
 patch(ClosePosPopup.prototype, {
     async closeSession() {
         if (this.pos.config.iot_display_id) {
-            const { iot_id, identifier } = this.pos.config.iot_display_id;
-            this.pos.iotHttp.action(iot_id, identifier, { action: "update_url", url: "" });
+            this.pos.closeIotCustomerDisplay();
         }
         await super.closeSession(...arguments);
     },

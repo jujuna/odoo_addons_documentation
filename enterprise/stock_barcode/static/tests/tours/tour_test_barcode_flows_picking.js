@@ -613,7 +613,7 @@ registry.category("web_tour.tours").add("test_internal_picking_reserved_1", {
             trigger: ".o_barcode_location_group:first-child .o_barcode_line.o_selected",
             run: function () {
                 helper.assertLinesCount(4);
-                helper.assertScanMessage("scan_product_or_dest");
+                helper.assertScanMessage("scan_dest");
                 helper.assertValidateVisible(true);
                 helper.assertValidateIsHighlighted(false);
                 helper.assertValidateEnabled(true);
@@ -5435,7 +5435,7 @@ registry.category("web_tour.tours").add("test_receipt_delete_button", {
         },
         // ensure receipt's original move CANNOT be deleted
         {
-            trigger: ".o_barcode_line:nth-child(2) .o_edit",
+            trigger: '.o_barcode_line[data-barcode="product1"] .o_edit',
             run: "click",
         },
         {
@@ -7558,21 +7558,17 @@ registry.category("web_tour.tours").add("test_scan_packaging_on_picking_with_uom
             trigger: ".o_barcode_line[data-barcode='product1'].o_selected.o_faulty",
             run: () => {
                 helper.assertLinesCount(6);
-                helper.assertLineQty(0, "3 Units");
-                helper.assertLineQty(1, "6/6 Units");
-                helper.assertLineQty(2, "6/6 Units");
-                helper.assertLineQty(3, "6/6 Units");
-                helper.assertLineQty(4, "6/6 Units");
-                helper.assertLineQty(5, "1/1 Units");
+                const exceedingLine = helper.getLine({ barcode: "product1", selected: true });
+                helper.assertLineQty(exceedingLine, "3 Units");
             },
         },
         {
             content: "Delete the exceeding product1 line",
-            trigger: ".o_barcode_line[data-barcode='product1'] .o_delete_line",
+            trigger: ".o_barcode_line[data-barcode='product1'].o_faulty .o_delete_line",
             run: "click",
         },
         {
-            trigger: ".o_barcode_line:first-child:not(.o_faulty)",
+            trigger: ".o_barcode_lines:not(:has(.o_faulty))",
             run: () => {
                 helper.assertLinesCount(5);
                 helper.assertLineQty(0, "6/6 Units");

@@ -10,6 +10,9 @@
         'hr_payroll_attendance',
         'l10n_be_hr_payroll',
     ],
+    'data': [
+        'views/hr_employee_views.xml',
+    ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

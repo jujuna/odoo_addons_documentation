@@ -13,7 +13,11 @@ class SaleOrderLine(models.Model):
         return (self.product_id.service_policy == 'delivered_timesheet' and self.qty_delivered_method == 'timesheet') or super()._is_postpaid_line()
 
     def _get_timesheet_subscription_lines(self):
-        return self.filtered(lambda sol: sol.recurring_invoice and sol.qty_delivered_method == 'timesheet')
+        return self.filtered(
+            lambda sol: sol.recurring_invoice
+                        and not sol._subscription_is_one_time_sale()
+                        and sol.qty_delivered_method == 'timesheet'
+        )
 
     @api.depends('timesheet_ids', 'next_invoice_date')
     def _compute_qty_delivered(self):

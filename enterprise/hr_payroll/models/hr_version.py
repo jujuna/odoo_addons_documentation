@@ -100,29 +100,80 @@ class HrVersion(models.Model):
 
     @api.model
     def _benefit_white_list(self):
+        """
+        Hook: names of non-stored fields considered as salary benefit fields by
+        :meth:`_get_benefit_fields`.
+
+        :rtype: list
+        """
         return []
 
     @api.model
     def _get_sacrifice_fields(self):
+        """
+        Hook: fields of a salary sacrifice (benefits reducing the wage, ``holidays`` by default).
+        They are dependencies of ``final_yearly_costs``.
+
+        :rtype: list
+        """
         return ['holidays']
 
     @api.model
     def _benefit_black_list(self):
+        """
+        Hook: fields never considered as salary benefit fields (magic columns, ``wage``,
+        ``active``).
+
+        :rtype: set
+        """
         return set(MAGIC_COLUMNS + ['wage', 'active'])
 
     def _get_yearly_cost_sacrifice_ratio(self):
+        """
+        Return the ratio dividing the wage in :meth:`_get_yearly_cost_from_wage` to account for
+        the salary sacrifices: ``1 - holidays / 231`` by default.
+
+        :rtype: float
+        """
         return 1.0 - self.holidays / 231.0
 
     def _get_yearly_cost_sacrifice_fixed(self):
+        """
+        Hook: fixed amount added to the yearly cost for the salary sacrifices (0.0 by default).
+
+        :rtype: float
+        """
         return 0.0
 
     def _get_yearly_cost_from_wage(self, fixed=None, ratio=None):
+        """
+        Return the yearly employer cost of this version, which computes ``final_yearly_costs``:
+        ``benefits costs + salary costs factor * wage / ratio + fixed``.
+
+        See :meth:`_get_benefits_costs`, :meth:`_get_salary_costs_factor`,
+        :meth:`_get_yearly_cost_sacrifice_ratio` and :meth:`_get_yearly_cost_sacrifice_fixed`.
+
+        :param float fixed: overrides the fixed sacrifice amount
+        :param float ratio: overrides the sacrifice ratio
+        :rtype: float
+        """
         self.ensure_one()
         ratio = self._get_yearly_cost_sacrifice_ratio() if ratio is None else ratio
         fixed = self._get_yearly_cost_sacrifice_fixed() if fixed is None else fixed
         return self._get_benefits_costs() + (self._get_salary_costs_factor() * self.wage / ratio) + fixed
 
     def _get_wage_from_yearly_costs(self, yearly_cost, ratio=None, fixed=None, benefits_cost=None):
+        """
+        Return the wage giving the yearly cost ``yearly_cost``, i.e. the inverse of
+        :meth:`_get_yearly_cost_from_wage` (0 if the salary costs factor is 0). Used by the
+        inverse of ``final_yearly_costs``.
+
+        :param float yearly_cost: yearly employer cost
+        :param float ratio: overrides the sacrifice ratio
+        :param float fixed: overrides the fixed sacrifice amount
+        :param float benefits_cost: overrides the yearly cost of the benefits
+        :rtype: float
+        """
         self.ensure_one()
         ratio = self._get_yearly_cost_sacrifice_ratio() if ratio is None else ratio
         fixed = self._get_yearly_cost_sacrifice_fixed() if fixed is None else fixed
@@ -133,6 +184,14 @@ class HrVersion(models.Model):
         return 0
 
     def _get_benefit_description(self, benefit, new_value=None):
+        """
+        Return the sanitized HTML description of a salary benefit: the result of
+        ``_get_description_<benefit field>(new_value)`` if such a method exists, else
+        ``benefit.description``.
+
+        :param benefit: ``hr.contract.salary.benefit`` record
+        :param new_value: value passed to the ``_get_description_<field>`` method
+        """
         self.ensure_one()
         if hasattr(self, '_get_description_%s' % benefit.field):
             description = getattr(self, '_get_description_%s' % benefit.field)(new_value)
@@ -141,6 +200,15 @@ class HrVersion(models.Model):
         return html_sanitize(description)
 
     def _get_benefit_fields(self, triggers=True):
+        """
+        Return the names of the fields usable as salary benefits: stored (or white-listed) float,
+        integer, monetary, boolean and properties fields, minus :meth:`_benefit_black_list` and
+        Studio fields.
+
+        :param bool triggers: ``True`` for the dependencies of ``final_yearly_costs``; if
+            ``False``, text fields and ``wage`` are included as well
+        :rtype: tuple
+        """
         types = ('float', 'integer', 'monetary', 'boolean', 'properties')
         if not triggers:
             types += ('text',)
@@ -155,8 +223,15 @@ class HrVersion(models.Model):
         return tuple(benefit_fields - self._benefit_black_list())
 
     def _get_benefits_costs(self):
+        """
+        Return the yearly cost of the salary benefits of the structure type that have a cost
+        field: 12 times the monthly benefits plus the other ones.
+
+        :rtype: float
+        """
         self.ensure_one()
         benefits = self.env['hr.contract.salary.benefit'].search([
+            ('active', '=', True),
             ('structure_type_id', '=', self.structure_type_id.id),
             ('cost_res_field_id', '!=', False),
         ])
@@ -168,6 +243,13 @@ class HrVersion(models.Model):
         return monthly_cost * 12 + yearly_cost
 
     def _get_employer_costs_from_gross(self, gross):
+        """
+        Return the yearly employer cost for a periodic gross:
+        ``gross * salary costs factor + benefits costs``.
+
+        :param float gross: gross amount of one pay period
+        :rtype: float
+        """
         self.ensure_one()
         return (gross * self._get_salary_costs_factor()) + self._get_benefits_costs()
 
@@ -243,18 +325,31 @@ class HrVersion(models.Model):
                     version.issues = issues
 
     def _get_missing_payrun_issue_values(self, payruns):
-        if len(payruns) > 1:
-            date_start = payruns[0].date_start
-            date_end = payruns[0].date_end
-            if date_start.month == date_end.month and date_start.year == date_end.year:
-                period_str = format_date(self.env, date_start, date_format='MMMM y')
-            else:
-                period_str = "%s - %s" % (
-                    format_date(self.env, date_start, date_format='MMM d'),
-                    format_date(self.env, date_end, date_format='MMM d, y')
-                )
+        """
+        Return the issue (``message``, ``level``, ``action_text``, ``action``) displayed when the
+        employee is missing from ``payruns``: an action adding him to the pay runs, or opening the
+        pay runs if several pay runs of a same period can take him.
+
+        :param payruns: ``hr.payslip.run`` records
+        :rtype: dict
+        """
+        payruns_by_period = defaultdict(lambda: self.env['hr.payslip.run'])
+        for payrun in payruns:
+            payruns_by_period[payrun.date_start, payrun.date_end] |= payrun
+
+        if any(len(period_payruns) > 1 for period_payruns in payruns_by_period.values()):
+            # Several pay runs of a period can take the employee: let the user choose
+            periods = []
+            for date_start, date_end in sorted(payruns_by_period):
+                if date_start.month == date_end.month and date_start.year == date_end.year:
+                    periods.append(format_date(self.env, date_start, date_format='MMMM y'))
+                else:
+                    periods.append("%s - %s" % (
+                        format_date(self.env, date_start, date_format='MMM d'),
+                        format_date(self.env, date_end, date_format='MMM d, y')
+                    ))
             return {
-                "message": self.env._("The employee is not in any pay run for %s") % period_str,
+                "message": self.env._("The employee is not in any pay run for %s", ', '.join(periods)),
                 "level": "warning",
                 "action_text": self.env._("View Pay Runs"),
                 "action": {
@@ -268,18 +363,34 @@ class HrVersion(models.Model):
                     },
                 }
             }
+
+        if len(payruns) == 1:
+            message = self.env._("The pay run %s is missing this employee") % payruns.name
+        else:
+            message = self.env._("The employee is missing in the following pay runs: %s") % ', '.join(payruns.sorted('date_start').mapped('name'))
         return {
-            "message": self.env._("The pay run %s is missing this employee") % payruns.name,
+            "message": message,
             "level": "warning",
-            "action_text": self.env._("Add payslip to Pay Run"),
+            "action_text": self.env._("Add Payslip to Pay Run"),
             "action": {
                 "type": "object",
                 "name": "action_add_payslip_to_payrun",
-                "args": json.dumps([payruns.id]),
+                "args": json.dumps([payruns.ids]),
             },
         }
 
     def _get_missing_payrun_by_version(self):
+        """
+        Return the draft or ready pay runs from which the employee of each version is missing.
+
+        Only the pay runs of the version company and structure type (or without structure)
+        during the contract are considered, grouped by period. A period is skipped if the
+        employee already has a payslip in one of its pay runs or an overlapping off-cycle
+        payslip, or if the payroll closing date of the period is not reached yet.
+
+        :return: ``{version: [hr.payslip.run of a same period, ...]}``
+        :rtype: dict
+        """
         versions_with_contract = self.filtered(lambda e: e.contract_date_start)
         if not versions_with_contract:
             return {}
@@ -344,7 +455,11 @@ class HrVersion(models.Model):
                 payruns_by_period[period_key] = payruns_by_period.get(period_key, self.env['hr.payslip.run']) | payrun
 
             off_cycle_payslips = payslips_by_employee_and_payrun.get((version.employee_id, empty_payrun), self.env['hr.payslip'])
-            missing_payruns = []
+            missing_payruns = self.env['hr.payslip.run']
+            payrun_closing_day = int(
+                version.employee_type_id.payroll_closing_date or
+                version.company_id.payroll_closing_date
+            ) or None
 
             today = fields.Date.context_today(self)
             for (date_start, date_end), payruns in payruns_by_period.items():
@@ -355,14 +470,17 @@ class HrVersion(models.Model):
                 if any(payslip.date_from <= date_end and payslip.date_to >= date_start for payslip in off_cycle_payslips):
                     continue
 
-                payrun_closing_day = int(version.company_id.payroll_closing_date) if version.company_id.payroll_closing_date else None
                 if payrun_closing_day:
                     month_offset = 1 if payrun_closing_day <= 9 else 0
                     period_closing_date = date_end + relativedelta(months=month_offset, day=payrun_closing_day)
                     if today < period_closing_date:
                         continue
 
-                missing_payruns.append(payruns)
+                # only the pay runs that can take the employee (same employee types as _get_valid_versions_domain_payrun)
+                missing_payruns |= payruns.filtered(lambda payrun: all(
+                    not employee_types or version.employee_type_id in employee_types
+                    for employee_types in (payrun.employee_type_ids, payrun.structure_id.employee_type_ids)
+                ))
 
             if missing_payruns:
                 missing_payruns_by_version[version] = missing_payruns
@@ -441,6 +559,13 @@ class HrVersion(models.Model):
                 version.payroll_config_id = new_config
 
     def _get_property_input_value(self, code):
+        """
+        Return the value of the payroll property ``code`` of this version (value of the employee
+        input of the rule with that code), or 0.0 if the structure has no such rule or the
+        version has no such value.
+
+        :param str code: salary rule code
+        """
         self.ensure_one()
         if code in self.structure_id.rule_ids.mapped('code') and code in self.payroll_properties._values:
             with contextlib.suppress(KeyError):  # no definition for it anymore
@@ -448,6 +573,15 @@ class HrVersion(models.Model):
         return 0.0
 
     def _set_property_input_value(self, code, value):
+        """
+        Set the payroll property ``code`` of this version to ``value``. Do nothing if the
+        structure of the version has no rule with that code.
+
+        :param str code: salary rule code
+        :param value: new value
+        :raise ValidationError: if the rule has no property in ``version_properties_definition``
+            (not flagged ``input_usage_employee``)
+        """
         self.ensure_one()
         current_properties = dict(self.payroll_properties)
         rule = self.env['hr.salary.rule'].search([('code', '=', code), ('struct_ids', 'in', self.structure_id.id)], limit=1)
@@ -466,6 +600,12 @@ class HrVersion(models.Model):
             })
 
     def _get_salary_costs_factor(self):
+        """
+        Return the number of pay periods per year for ``schedule_pay``: 12 for monthly, 52 for
+        weekly, 52 times the days per week of the calendar for daily...
+
+        :rtype: float
+        """
         self.ensure_one()
         factors = {
             "annually": 1,
@@ -481,12 +621,27 @@ class HrVersion(models.Model):
         return factors.get(self.schedule_pay, super()._get_salary_costs_factor())
 
     def _is_same_occupation(self, version):
+        """
+        Return whether ``version`` has the same employee type and the same work time rate as
+        this version, used to merge versions in :meth:`_get_occupation_dates`.
+
+        :rtype: bool
+        """
         self.ensure_one()
         employee_type = self.employee_type_id
         work_time_rate = self.resource_calendar_id.work_time_rate
         return employee_type == version.employee_type_id and work_time_rate == version.resource_calendar_id.work_time_rate
 
     def _get_occupation_dates(self, include_future_contracts=False):
+        """
+        Group the versions by occupation: consecutive versions of the employee with the same
+        employee type and work time rate, without a day between them.
+
+        :param bool include_future_contracts: also consider the versions starting after today
+        :return: one ``(versions, date_from, date_to)`` per occupation, ``date_to`` being
+            ``False`` if the occupation has no end
+        :rtype: list
+        """
         # Takes several versions and returns all the versions under the same occupation (i.e. the same
         # work rate + the date_from and date_to)
         # include_future_contracts will use versions where the version_date_start is posterior
@@ -496,7 +651,7 @@ class HrVersion(models.Model):
         date_today = fields.Date.context_today(self)
 
         def remove_gap(version, other_versions, before=False):
-            # We do not consider a gap of more than 4 days to be a same occupation
+            # A day without a version ends the occupation
             # other_versions is considered to be ordered correctly in function of `before`
             current_date = version.date_start if before else version.date_end
             for i, other_version in enumerate(other_versions):
@@ -508,7 +663,7 @@ class HrVersion(models.Model):
                 else:
                     gap = (other_version.date_start - current_date).days
                     current_date = other_version.date_end
-                if gap >= 4:
+                if gap > 1:
                     return other_versions[0:i]
             return other_versions
 
@@ -546,12 +701,24 @@ class HrVersion(models.Model):
         return result
 
     def _get_normalized_wage(self):
+        """
+        Return the hourly wage: the wage of hourly versions (or of versions without weekly
+        hours), else ``wage * pay periods per year / 52 / hours per week``.
+
+        :rtype: float
+        """
         wage = self._get_contract_wage()
         if self.wage_type == 'hourly' or not self.resource_calendar_id.hours_per_week:
             return wage
         return wage * self._get_salary_costs_factor() / 52 / self.resource_calendar_id.hours_per_week
 
     def _get_contract_wage_field(self):
+        """
+        Return the name of the wage field read by ``_get_contract_wage``: ``hourly_wage`` for
+        hourly versions, ``wage`` otherwise.
+
+        :rtype: str
+        """
         self.ensure_one()
         if self.wage_type == 'hourly':
             return 'hourly_wage'
@@ -566,11 +733,31 @@ class HrVersion(models.Model):
 
     def _preprocess_work_hours_data(self, work_data, date_from, date_to):
         """
-        Method is meant to be overriden, see hr_payroll_attendance
+        Hook to adapt in place the hours computed by :meth:`_get_work_hours` before they are
+        returned (see ``hr_payroll_attendance``).
+
+        :param dict work_data: ``{(work entry type, category options): hours}``, modified in place
+        :param datetime.date date_from: first day of the period
+        :param datetime.date date_to: last day of the period
         """
         return
 
     def get_work_hours(self, date_from, date_to, work_entries_vals):
+        """
+        Return the hours of these versions per time type between two dates.
+
+        The versions are grouped by company, :meth:`_get_work_hours` is called in sudo with
+        that company, and the results are summed. Used to build the worked days lines of
+        payslips.
+
+        :param datetime.date date_from: first day (a date, not a datetime)
+        :param datetime.date date_to: last day, included
+        :param list work_entries_vals: work entry values from ``generate_work_entries`` (dicts
+            with at least ``version_id``, ``date``, ``work_entry_type_id`` and ``duration``)
+        :return: ``{(work entry type, category options): hours}``, the category options being a
+            sorted ``hr.salary.rule.category`` recordset (empty if none)
+        :rtype: collections.defaultdict
+        """
         # Get work hours between 2 dates (datetime.date)
         # To correctly englobe the period, the start and end periods are converted
         # using the calendar timezone.
@@ -593,13 +780,14 @@ class HrVersion(models.Model):
 
     def _get_work_hours(self, date_from, date_to, work_entries_vals):
         """
-        Returns the amount (expressed in hours) of work
-        for a version between two dates.
-        If called on multiple versions, sum work amounts of each version.
+        Return the hours of these versions per time type between two dates, from the work entry
+        values of these versions, then call :meth:`_preprocess_work_hours_data`.
 
-        :param date_from: The start date
-        :param date_to: The end date
-        :returns: a dictionary {work_entry_id: hours_1, work_entry_2: hours_2}
+        :param datetime.date date_from: first day
+        :param datetime.date date_to: last day, included
+        :param list work_entries_vals: work entry values (see :meth:`get_work_hours`)
+        :return: ``{(work entry type, category options): hours}``
+        :rtype: collections.defaultdict
         """
         assert not isinstance(date_from, datetime)
         assert not isinstance(date_to, datetime)
@@ -621,13 +809,34 @@ class HrVersion(models.Model):
         return work_data
 
     def _get_default_work_entry_type_id(self):
+        """
+        Return the id of the time type of regular attendances: ``default_work_entry_type_id`` of
+        the structure type, else the default of ``hr_work_entry``.
+
+        :rtype: int
+        """
         return self.structure_type_id.default_work_entry_type_id.id or super()._get_default_work_entry_type_id()
 
     def _get_fields_that_recompute_payslip(self):
+        """
+        Hook: fields whose modification refreshes the draft regular payslips of the version
+        (see :meth:`_recompute_payslips`).
+
+        :rtype: list
+        """
         # Returns the fields that should recompute the payslip
         return ['wage', 'hourly_wage', 'payroll_properties']
 
     def _get_nearly_expired_contracts(self, outdated_days, company_id=False):
+        """
+        Return the versions of the company whose contract ends between today and
+        ``outdated_days`` (excluded), and whose employee has no contract starting from
+        ``outdated_days``.
+
+        :param datetime.date outdated_days: end of the period
+        :param int company_id: company id, the current company if not set
+        :rtype: hr.version
+        """
         nearly_expired_versions = self.search([
             ('company_id', '=', company_id or self.env.company.id),
             ('contract_date_end', '>=', 'today'),
@@ -654,6 +863,11 @@ class HrVersion(models.Model):
         return super()._get_whitelist_fields_from_template() + ['payroll_properties', 'hourly_wage']
 
     def _get_valid_payslips_count(self):
+        """
+        Return the number of validated or paid payslips of these versions.
+
+        :rtype: int
+        """
         return self.env['hr.payslip'].sudo().search_count([
             ('version_id', 'in', self.ids),
             ('state', 'in', ['validated', 'paid'])
@@ -665,10 +879,21 @@ class HrVersion(models.Model):
             raise ValidationError(self.env._("You can't delete a version with validated payslips."))
 
     def _get_version_lookup_key(self):
+        """
+        Return ``(employee id, contract start date, contract end date)``, identifying the
+        contract of the version.
+
+        :rtype: tuple
+        """
         self.ensure_one()
         return (self.employee_id.id, self.contract_date_start, self.contract_date_end)
 
     def write(self, vals):
+        """
+        Write on the versions. Archiving a version with validated payslips is forbidden, and
+        changing a field of :meth:`_get_fields_that_recompute_payslip` refreshes the draft
+        payslips (:meth:`_recompute_payslips`).
+        """
         if self and not self._track_disabled():
             # Force to track wage in employee form if any changes is found after version write
             self.employee_id._track_prepare({version.sudo()._get_contract_wage_field() for version in self})
@@ -694,6 +919,15 @@ class HrVersion(models.Model):
         return vals_list
 
     def _recompute_payslips(self, date_from=None, date_to=None):
+        """
+        Refresh from the work entries the draft regular payslips of the current company that
+        overlap these versions (through ``version_id`` or the worked days lines).
+
+        :param datetime.date date_from: only payslips ending from that date (default: start of
+            the version)
+        :param datetime.date date_to: only payslips starting until that date (default: end of
+            the version)
+        """
         if not self:
             return
         # A payslip can contain worked days of several versions
@@ -705,7 +939,8 @@ class HrVersion(models.Model):
         )
         all_payslips = self.env['hr.payslip'].sudo().search(payslip_domain & Domain([
             ('state', '=', 'draft'),
-            ('company_id', '=', self.env.company.id),
+            # the payslips of the versions, whatever the current company
+            ('company_id', 'in', self.company_id.ids),
         ])).filtered(lambda p: p.is_regular)
         if all_payslips:
             all_payslips.action_refresh_from_work_entries()
@@ -738,6 +973,11 @@ class HrVersion(models.Model):
         return res
 
     def _enrich_work_entry_val(self, val):
+        """
+        Set ``trimmed_duration`` in the work entry values: the duration of a time off trimmed or
+        created by a time rule (kept out of the day rounding of the worked days lines), 0.0
+        otherwise.
+        """
         super()._enrich_work_entry_val(val)
         # at this point leave_ids is a single hr.leave (pre-merge), so singleton access is safe
         leave = val.get('leave_ids')
@@ -771,7 +1011,15 @@ class HrVersion(models.Model):
         return result
 
     def action_check_version_status(self):
-        """ Checks if this version is the latest version and has validated payslips. """
+        """
+        Return whether this version is the latest version of the employee and how many
+        validated payslips it has.
+
+        :return: dict with keys ``is_last_version``, ``valid_payslips_count``, ``date_start``
+            and ``next_period_start`` (see :meth:`_get_next_period_start`); only the first two
+            if the version has no employee
+        :rtype: dict
+        """
         self.ensure_one()
 
         if not self.employee_id:
@@ -802,7 +1050,15 @@ class HrVersion(models.Model):
         return next_period_start if next_period_start > self.date_start else False
 
     def action_create_version_from_update(self, new_date_start_str, record_changes=None):
-        """ Creates a new version with the applied updates starting at new_date_start_str. """
+        """
+        Create a new version of the employee, starting at ``new_date_start_str``, as a copy of
+        this version with ``record_changes`` applied (unknown fields are ignored).
+
+        :param str new_date_start_str: start date of the new version
+        :param dict record_changes: field values of the new version
+        :raise UserError: if the new start date is not after the start of this version
+        :return: ``True``
+        """
         self.ensure_one()
         record_changes = record_changes or {}
         new_start = fields.Date.from_string(new_date_start_str)
@@ -830,6 +1086,14 @@ class HrVersion(models.Model):
         return True
 
     def get_benefit_fields_value(self):
+        """
+        Return the monthly salary benefits of the structure type that are based on a field, with
+        their value on this version.
+
+        :return: list of dicts with keys ``id``, ``name``, ``value`` and ``currency`` (currency id
+            for monetary fields, else ``None``); empty list for users without payroll rights
+        :rtype: list
+        """
         if not self.env.user.has_groups('hr_payroll.group_hr_payroll_user'):
             return []
         self.ensure_one()

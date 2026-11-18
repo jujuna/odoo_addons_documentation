@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-10-19 08:29+0000\n"
+"PO-Revision-Date: 2026-10-26 12:33+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "account_online_payment/it/>\n"
@@ -196,7 +196,7 @@ msgstr "Completa la procedura KYC"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
 msgid "Compliance Verification Needed"
-msgstr ""
+msgstr "Verifica di conformità richiesta"
 
 #. module: account_online_payment
 #: model:ir.actions.server,name:account_online_payment.action_account_payment_confirm
@@ -206,7 +206,7 @@ msgstr "Conferma"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 msgid "Connect Bank"
-msgstr ""
+msgstr "Connetti banca"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__could_initiate_payment
@@ -237,7 +237,7 @@ msgstr "Nome visualizzato"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 msgid "Generate File"
-msgstr ""
+msgstr "Genera file"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__id
@@ -257,7 +257,7 @@ msgstr "Avvia pagamenti online"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_in_audit
 msgid "Is In Audit"
-msgstr ""
+msgstr "In fase di revisione"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_activated
@@ -276,7 +276,7 @@ msgstr "È richiesta l'attivazione del pagamento"
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_blocked
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__is_payment_blocked
 msgid "Is Payment Blocked"
-msgstr ""
+msgstr "Pagamento bloccato"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_enabled
@@ -298,30 +298,31 @@ msgstr "Nessuna connessione bancaria online trovata per questo registro."
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Online payments require a bank journal."
-msgstr ""
+msgstr "I pagamenti online richiedono un registro bancario."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only draft payments can be detached from a batch."
 msgstr ""
+"Solo i pagamenti in bozza possono essere scollegati da un raggruppamento."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only outbound payments can be paid online."
-msgstr ""
+msgstr "Solo i pagamenti in uscita possono essere pagati online."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only uninitiated or unsigned payments can be retried."
-msgstr ""
+msgstr "Solo i pagamenti non avviati o non firmati possono essere ritentati."
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
 msgid "Others"
-msgstr ""
+msgstr "Altro"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__payment_online_status
@@ -420,7 +421,7 @@ msgstr "Pagamenti attivati con successo"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
 msgid "Payments to sign"
-msgstr ""
+msgstr "Pagamenti da firmare"
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__pending
@@ -447,12 +448,12 @@ msgstr "Rifiutato"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_activate_payments_button
 msgid "Show Activate Payments Button"
-msgstr ""
+msgstr "Mostra pulsante Attiva pagamenti"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_connect_bank_button
 msgid "Show Connect Bank Button"
-msgstr ""
+msgstr "Mostra pulsante Collega banca"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
@@ -488,6 +489,9 @@ msgid ""
 "If you want to send your payment(s) through Odoo, please split your batch or "
 "create separate smaller payments."
 msgstr ""
+"L'importo massimo per i pagamenti tramite la tua banca è %(amount)s.\n"
+"Se desideri inviare i tuoi pagamenti tramite Odoo, ti preghiamo di dividere "
+"il lotto o di creare pagamenti separati di importo inferiore."
 
 #. module: account_online_payment
 #. odoo-python
@@ -500,6 +504,8 @@ msgstr "Il servizio di avvio del pagamento non è attivato per questo registro."
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "The recipient bank account must be allowed for outgoing payments."
 msgstr ""
+"Il conto bancario del destinatario deve essere abilitato per i pagamenti in "
+"uscita."
 
 #. module: account_online_payment
 #. odoo-python
@@ -531,7 +537,7 @@ msgstr ""
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
 msgid "To Sign"
-msgstr ""
+msgstr "Da firmare"
 
 #. module: account_online_payment
 #. odoo-python
@@ -592,7 +598,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "You must select at least one payment."
-msgstr ""
+msgstr "È necessario selezionare almeno un pagamento."
 
 #. module: account_online_payment
 #. odoo-python
@@ -601,6 +607,9 @@ msgid ""
 "Your bank allows a maximum of %(limit)s payments per batch.\n"
 "If you want to send your payments through Odoo, please split your batch."
 msgstr ""
+"La tua banca consente un massimo di %(limit)s pagamenti per lotto.\n"
+"Se desideri inviare i tuoi pagamenti tramite Odoo, ti preghiamo di "
+"suddividere il lotto."
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
@@ -610,7 +619,7 @@ msgstr "L'attivazione del pagamento è in sospeso, attendi!"
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_online_account
 msgid "representation of an online bank account"
-msgstr ""
+msgstr "rappresentazione di un conto bancario online"
 
 #. module: account_online_payment
 #. odoo-python

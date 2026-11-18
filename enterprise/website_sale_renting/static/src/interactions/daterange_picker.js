@@ -1,3 +1,4 @@
+import { useListener } from '@odoo/owl';
 import { Interaction } from '@web/public/interaction';
 import { registry } from '@web/core/registry';
 import { areDatesEqual, deserializeDateTime, serializeDateTime } from '@web/core/l10n/dates';
@@ -35,6 +36,11 @@ export class DaterangePicker extends Interaction {
         this.maxDate = DateTime.max(defaultEndDate, this.endDate || defaultEndDate);
         // Only add the constraints on the cart page
         this.isCartRentalPeriodPicker = !!this.el.closest('.o_wsale_shorter_cart_summary');
+        if (this.isCartRentalPeriodPicker) {
+            useListener(this.env.bus, "cart_amount_changed", () =>
+                this._updateRentingConstraints()
+            );
+        }
     }
 
     /**
@@ -56,11 +62,6 @@ export class DaterangePicker extends Interaction {
         );
         this.updateTimeSelectors(true);
         this.checkDaterangeValidity();
-        if (this.isCartRentalPeriodPicker) {
-            this.env.bus.addEventListener(
-                'cart_amount_changed', () => this._updateRentingConstraints()
-            );
-        }
     }
 
     /**

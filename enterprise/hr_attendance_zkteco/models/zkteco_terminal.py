@@ -20,7 +20,7 @@ class ZktecoTerminal(models.Model):
     terminal_sn = fields.Char(
         string="Terminal ID",
         required=True,
-        help="The ID of the terminal that is defined in the Biotime server",
+        help="The ID of the terminal that is defined in the BioTime server",
     )
 
     _unique_terminal_sn_company = models.Constraint(

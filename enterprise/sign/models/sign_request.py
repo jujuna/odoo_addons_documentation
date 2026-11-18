@@ -599,7 +599,10 @@ class SignRequest(models.Model):
             ('state', '=', 'scheduled'),
             ('scheduled_date', '<=', fields.Datetime.now()),
             ('scheduled_date', '!=', False),
-        ]).state = 'sent'
+        ]).write({
+            'state': 'sent',
+            'last_reminder': fields.Date.today(),
+        })
 
     def _sign(self):
         """ Sign a SignRequest. It can only be used in the SignRequestItem._sign """

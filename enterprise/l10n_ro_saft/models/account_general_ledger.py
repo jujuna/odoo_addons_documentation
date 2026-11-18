@@ -575,9 +575,19 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             'number': 0,
             'move_vals_list': []
         }
+
         for move_vals in values['move_vals_list']:
-            if not move_vals['statement_line_id']:
+            if not (move_vals['statement_line_id'] or move_vals['payment_id']):
                 continue
+
+            liquidity_lines_vals = [line_vals for line_vals in move_vals['line_vals_list'] if line_vals['account_type'] in ('asset_cash', 'liability_credit_card')]
+
+            # We consider payment-type journal entries only when no bank statement matching is required
+            if not move_vals['statement_line_id']:
+                liquidity_lines_vals = [line_vals for line_vals in liquidity_lines_vals if line_vals['account_id'] == move_vals['journal_default_account_id']]
+                if not liquidity_lines_vals:
+                    continue
+
             move_vals.update({
                 # Payment method '01' corresponds to cash, '03' corresponds to non-cash money transfers.
                 'payment_method': '01' if move_vals['journal_type'] == 'cash' else '03',
@@ -585,11 +595,10 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'payment_line_vals_list': [],
             })
 
-            for line_vals in move_vals['line_vals_list']:
-                if line_vals['account_type'] in ('asset_cash', 'liability_credit_card'):
-                    move_vals['payment_line_vals_list'].append(line_vals)
-                    payment_vals['total_debit'] += line_vals['debit']
-                    payment_vals['total_credit'] += line_vals['credit']
+            for liquidity_line_vals in liquidity_lines_vals:
+                move_vals['payment_line_vals_list'].append(liquidity_line_vals)
+                payment_vals['total_debit'] += liquidity_line_vals['debit']
+                payment_vals['total_credit'] += liquidity_line_vals['credit']
 
             payment_vals['number'] += 1
             payment_vals['move_vals_list'].append(move_vals)
@@ -602,7 +611,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             return super()._saft_get_account_type(account_type)
 
         activ_types = ['asset_non_current', 'asset_fixed', 'asset_receivable', 'asset_cash', 'asset_current', 'asset_prepayments']
-        pasiv_types = ['equity', 'equity_unaffected', 'liability_payable', 'liability_credit_card', 'liability_current', 'liability_non_current']
+        pasiv_types = ['equity', 'equity_unaffected', 'equity_retained', 'liability_payable', 'liability_credit_card', 'liability_current', 'liability_non_current']
 
         if account_type in activ_types:
             return 'Activ'

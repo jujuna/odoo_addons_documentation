@@ -31,6 +31,11 @@ class AccountMove(models.Model):
                     for so in move.invoice_line_ids.subscription_id:
                         # Normally, only one subscription_id per move, but we handle multiple contracts as a precaution
                         so.message_post(body=body)
+                        so.message_notify(
+                        body=body,
+                        subject=self.env._("Refund on subscription. Next Invoice date to check"),
+                        partner_ids=so.user_id.partner_id.ids,
+                    )
                 continue
 
             effective_date = min(move.invoice_line_ids.filtered('deferred_start_date').mapped('deferred_start_date'), default=False) or move.invoice_date

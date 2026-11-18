@@ -121,7 +121,22 @@ class TestPayrollBase(TransactionCase):
             cls.version.sudo().write({'car_id': cls.car.id})
 
     @classmethod
-    def _generate_payslip(cls, date_from, date_to, struct_id=False, input_line_ids=False, version_id=False, employee_id=False):
+    def _generate_payslip(cls, date_from, date_to, struct_id=False, input_line_ids=False, version_id=False, employee_id=False, input_values=False):
+        """Create and compute a payslip.
+
+        :param dict input_values: ``{rule_code: amount}``, input lines set at creation like
+            ``hr.payslip._set_input_values`` (codes without rule in the structure and falsy
+            amounts are ignored), so that the sheet is computed only once.
+        """
+        if input_values:
+            rule_by_code = {}
+            for rule in cls.env['hr.payroll.structure'].browse(struct_id or cls.structure.id).rule_ids:
+                rule_by_code.setdefault(rule.code, rule)
+            input_line_ids = list(input_line_ids or []) + [
+                Command.create({'name': rule.input_name, 'salary_rule_id': rule.id, 'amount': amount})
+                for code, amount in input_values.items()
+                if amount and (rule := rule_by_code.get(code))
+            ]
         vals = {
             'name': "Test Payslip",
             'employee_id': employee_id or cls.employee.id,

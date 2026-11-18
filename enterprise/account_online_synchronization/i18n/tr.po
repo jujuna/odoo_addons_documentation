@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:51+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
+"POT-Creation-Date: 2026-11-06 17:49+0000\n"
+"PO-Revision-Date: 2026-11-09 07:54+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_online_synchronization/tr/>\n"
@@ -69,11 +69,11 @@ msgstr "0 işlem alındı"
 #: model:mail.template,body_html:account_online_synchronization.email_template_sync_reminder
 msgid ""
 "<div style=\"font-size: 14px;\">\n"
-"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()\"/"
-">\n"
+"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()"
+"\"></t>\n"
 "                    <p>\n"
 "                        Dear <t t-out=\"object.bank_account_id.holder_name "
-"or ''\">Marc Demo</t>,<br/><br/>\n"
+"or ''\">Marc Demo</t>,<br><br>\n"
 "                        The connection between <b><a t-att-href=\"base_url\" "
 "t-out=\"base_url or ''\">https://yourcompany.odoo.com</a></b>\n"
 "                        and <t t-out=\"object.account_online_link_id.name or "
@@ -86,7 +86,7 @@ msgid ""
 "                    <p>Renew your consent to keep using bank synchronization "
 "seamlessly with Odoo.</p>\n"
 "                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
-"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"></t>\n"
 "                    <div style=\"margin:16px auto; text-align:center\">\n"
 "                        <a t-att-href=\"renew_concent_url\" t-attf-"
 "style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
@@ -101,6 +101,41 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()\"/>"
+"\n"
+"                   <p> \n"
+"                        Sayın <t t-out=\"object.bank_account_id.holder_name "
+"or ''\">Marc Demo</t>,<br/><br/>\n"
+"                       <b><a t-att-href=\"base_url\" t-out=\"base_url or "
+"''\"> https://yourcompany.odoo.com</a></b>\n"
+"                        ve <t t-out=\"object.account_online_link_id.name or "
+"''\">Belfius</t>\n"
+"                        <t t-if=\"not "
+"object.expiring_synchronization_due_day\">arasındaki bağlantı süresi doldu.</"
+"t>\n"
+"                        <t t-else=\"\">, <t t-"
+"out=\"object.expiring_synchronization_due_day or ''\">10</t> gün içinde sona "
+"erecek.</t>\n"
+"                    </p>\n"
+"                   <p> Odoo ile banka senkronizasyonunu sorunsuz bir şekilde "
+"kullanmaya devam etmek için onayınızı yenileyin.</p>\n"
+"                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+"                   <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"renew_concent_url\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\"> \n"
+"                            Onayı Yenile\n"
+"                       </a>\n"
+"                    </div> \n"
+"                   <p> Bu, banka senkronizasyonu onayınızın süresi dolmadan "
+"önce size hatırlatma yapmak amacıyla Odoo Muhasebe tarafından gönderilen "
+"otomatik bir e-postadır.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
@@ -188,7 +223,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_state
@@ -269,7 +304,7 @@ msgstr "Banka Senkronizasyonu: Onayınızı güncelleyin"
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Banka İşlemi"
 
 #. module: account_online_synchronization
 #: model:mail.template,name:account_online_synchronization.email_template_sync_reminder
@@ -717,12 +752,12 @@ msgstr "Seçilen yevmiye defterine banka hesabı bağla"
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
 msgid "Manual Bank Transactions"
-msgstr ""
+msgstr "Manuel Banka İşlemleri"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -830,7 +865,7 @@ msgstr "Çevrim İçi Hesaplar"
 #. module: account_online_synchronization
 #: model:ir.module.module,shortdesc:base.module_account_online_synchronization
 msgid "Online Bank Statement Synchronization"
-msgstr ""
+msgstr "Çevrimiçi Banka Dekontu Senkronizasyonu"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__online_identifier
@@ -877,7 +912,7 @@ msgstr "Ödeme Ref"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "Payments"
-msgstr ""
+msgstr "Ödemeler"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_bank_statement_line_transient__state__pending
@@ -1045,7 +1080,7 @@ msgstr "Bir Alacak Kartı Hesabı Seçin"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_form
 msgid "Send Now"
-msgstr ""
+msgstr "Şimdi Gönder"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__sequence
@@ -1137,7 +1172,7 @@ msgstr "Bu yevmiye defteri için bekleyen işlem yoktur."
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "There's already a synchronized journal linked to this IBAN"
-msgstr ""
+msgstr "Bu IBAN'a bağlı senkronize bir hesap zaten mevcut"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__provider_type
@@ -1161,7 +1196,7 @@ msgstr "Bu buton, getirme durumunu sıfırlar."
 #. module: account_online_synchronization
 #: model:ir.module.module,summary:base.module_account_online_synchronization
 msgid "This module is used for Online bank synchronization."
-msgstr ""
+msgstr "Bu modül, çevrim içi banka senkronizasyonu için kullanılır."
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1206,7 +1241,7 @@ msgstr "İşlem Detayları"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__transaction_uuid
 msgid "Transaction Uuid"
-msgstr ""
+msgstr "İşlem Uuid"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
@@ -1272,7 +1307,7 @@ msgstr "Odoo destek ekibiyle iletişime geçebilirsiniz"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You can manage your bank synchronization consent for this connection %s"
-msgstr ""
+msgstr "Bu bağlantı için banka senkronizasyonu onayınızı yönetebilirsiniz %s"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1335,13 +1370,13 @@ msgstr "kayıtlar"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "here."
-msgstr ""
+msgstr "burada."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "journal_id"
-msgstr ""
+msgstr "journal_id"
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1383,6 +1418,79 @@ msgstr "bu süre içinde çevrimiçi senkronizasyon kullanılarak oluşturulmam�
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "within this period."
 msgstr "bu süre içinde."
+
+#~ msgid ""
+#~ "<div style=\"font-size: 14px;\">\n"
+#~ "                    <t t-set=\"base_url\" t-value=\"object.get_base_url()"
+#~ "\"/>\n"
+#~ "                    <p>\n"
+#~ "                        Dear <t t-"
+#~ "out=\"object.bank_account_id.holder_name or ''\">Marc Demo</t>,<br/><br/"
+#~ ">\n"
+#~ "                        The connection between <b><a t-att-"
+#~ "href=\"base_url\" t-out=\"base_url or ''\">https://yourcompany.odoo.com</"
+#~ "a></b>\n"
+#~ "                        and <t t-out=\"object.account_online_link_id.name "
+#~ "or ''\">Belfius</t>\n"
+#~ "                        <t t-if=\"not "
+#~ "object.expiring_synchronization_due_day\">expired.</t>\n"
+#~ "                        <t t-else=\"\">expires in <t t-"
+#~ "out=\"object.expiring_synchronization_due_day or ''\">10</t> days.</t>\n"
+#~ "                    </p>\n"
+#~ "                    <p>Renew your consent to keep using bank "
+#~ "synchronization seamlessly with Odoo.</p>\n"
+#~ "                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+#~ "renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+#~ "                    <div style=\"margin:16px auto; text-align:center\">\n"
+#~ "                        <a t-att-href=\"renew_concent_url\" t-attf-"
+#~ "style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "align:center; text-decoration:none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}};\">\n"
+#~ "                            Renew Consent\n"
+#~ "                        </a>\n"
+#~ "                    </div>\n"
+#~ "                    <p>This is an automated email sent by Odoo Accounting "
+#~ "to remind you before a bank sync consent expiration.</p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"font-size: 14px;\">\n"
+#~ "                    <t t-set=\"base_url\" t-value=\"object.get_base_url()"
+#~ "\"/>\n"
+#~ "                   <p> \n"
+#~ "                        Sayın <t t-"
+#~ "out=\"object.bank_account_id.holder_name or ''\">Marc Demo</t>,<br/><br/"
+#~ ">\n"
+#~ "                       <b><a t-att-href=\"base_url\" t-out=\"base_url or "
+#~ "''\"> https://yourcompany.odoo.com</a></b>\n"
+#~ "                        ve <t t-out=\"object.account_online_link_id.name "
+#~ "or ''\">Belfius</t>\n"
+#~ "                        <t t-if=\"not "
+#~ "object.expiring_synchronization_due_day\">arasındaki bağlantı süresi "
+#~ "doldu.</t>\n"
+#~ "                        <t t-else=\"\">, <t t-"
+#~ "out=\"object.expiring_synchronization_due_day or ''\">10</t> gün sonra "
+#~ "sona erecek.</t>\n"
+#~ "                    </p>\n"
+#~ "                   <p> Odoo ile banka senkronizasyonunu sorunsuz bir "
+#~ "şekilde kullanmaya devam etmek için onayınızı yenileyin.</p>\n"
+#~ "                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+#~ "renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+#~ "                   <div style=\"margin:16px auto; text-align:center\">\n"
+#~ "                        <a t-att-href=\"renew_concent_url\" t-attf-"
+#~ "style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "align:center; text-decoration:none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}};\"> \n"
+#~ "                            Onayı Yenile\n"
+#~ "                       </a>\n"
+#~ "                    </div> \n"
+#~ "                   <p> Bu, banka senkronizasyonu onayınızın süresi "
+#~ "dolmadan önce size hatırlatma yapmak amacıyla Odoo Muhasebe tarafından "
+#~ "gönderilen otomatik bir e-postadır.</p>\n"
+#~ "                </div>\n"
+#~ "            "
 
 #~ msgid "Manual Bank Statement Lines"
 #~ msgstr "Manuel Banka Ekstresi Satırları"

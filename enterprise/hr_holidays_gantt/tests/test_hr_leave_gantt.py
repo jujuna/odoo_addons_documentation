@@ -793,7 +793,10 @@ class TestHrLeaveGantt(TestHolidayContract):
     def test_gantt_view_duration_based_schedule_with_leaves(self):
         """
         A duration-based-schedule leave of full day must gray out
-        the whole day not just the amount of hours in the calendar
+        the whole day not just the amount of hours in the calendar.
+        Half-days being centered on noon for such a schedule, a morning and an
+        afternoon leave on the same day produce touching leave intervals and
+        must gray out that whole day as well.
         """
         duration_calendar = self.env['resource.calendar'].create({
             'name': 'Duration-based 8h Calendar',
@@ -808,17 +811,37 @@ class TestHrLeaveGantt(TestHolidayContract):
         })
         self.jules_emp.write({'resource_calendar_id': duration_calendar.id})
         self.create_leave(date(2026, 3, 17), date(2026, 3, 18), employee_id=self.jules_emp.id).action_approve()
+        half_day_type = self.env['hr.work.entry.type'].create({
+            'name': 'Half Day Leaves',
+            'code': 'Half Day Leaves',
+            'count_as': 'absence',
+            'requires_allocation': False,
+            'request_unit': 'half_day',
+            'unit_of_measure': 'day',
+        })
+        self.env['hr.leave'].create([{
+            'name': 'Half day',
+            'employee_id': self.jules_emp.id,
+            'work_entry_type_id': half_day_type.id,
+            'request_date_from': date(2026, 3, 20),
+            'request_date_to': date(2026, 3, 20),
+            'request_date_from_period': period,
+            'request_date_to_period': period,
+        } for period in ('am', 'pm')]).action_approve()
 
+        # The gantt period is the user's days: its end bounds the last unavailability
+        user_tz = ZoneInfo(self.env.user.tz) if self.env.user.tz else UTC
         unavailabilities = self.env['hr.leave']._gantt_unavailability(
             'employee_id',
             [self.jules_emp.id],
-            datetime(2026, 3, 16, 0, 0, tzinfo=UTC),
-            datetime(2026, 3, 20, 0, 0, tzinfo=UTC),
+            datetime(2026, 3, 16, 0, 0, tzinfo=user_tz),
+            datetime(2026, 3, 21, 0, 0, tzinfo=user_tz),
             'day',
         )
-        user_tz = ZoneInfo(self.env.user.tz) if self.env.user.tz else UTC
         self.assertEqual(unavailabilities[self.jules_emp.id][0]['start'], datetime(2026, 3, 17, 0, 0, tzinfo=user_tz))
         self.assertEqual(unavailabilities[self.jules_emp.id][0]['stop'], datetime(2026, 3, 19, 0, 0, tzinfo=user_tz))
+        self.assertEqual(unavailabilities[self.jules_emp.id][1]['start'], datetime(2026, 3, 20, 0, 0, tzinfo=user_tz))
+        self.assertEqual(unavailabilities[self.jules_emp.id][1]['stop'], datetime(2026, 3, 21, 0, 0, tzinfo=user_tz))
 
     def test_multi_create_encodes_hours_as_a_duration(self):
         """In the multi select context, the user can only encode durations for one or multiple days (splitted)"""

@@ -129,17 +129,13 @@ class PaymentTransaction(models.Model):
         :return: The created payment.
         :rtype: recordset of `account.payment`
         """
-        if self.provider_id.custom_mode != "sepa_direct_debit":
-            return super()._create_payment(**extra_create_values)
-
-        if self.operation in ("online_token", "offline"):
-            mandate = self.token_id.sdd_mandate_id
-        else:
-            mandate = self.mandate_id
-
-        payment_method_line = self.provider_id.journal_id.inbound_payment_method_line_ids.filtered(
-            lambda line: line.payment_provider_id == self.provider_id
-        )
-        return super()._create_payment(
-            payment_method_line_id=payment_method_line.id, mandate_id=mandate.id
-        )
+        if self.provider_id.custom_mode == 'sepa_direct_debit':
+            extra_create_values['mandate_id'] = (
+                self.token_id.sdd_mandate_id
+                if self.operation in ('online_token', 'offline') else
+                self.mandate_id
+            ).id
+            extra_create_values['payment_method_line_id'] = self.provider_id.journal_id.inbound_payment_method_line_ids.filtered(
+                lambda l: l.payment_provider_id == self.provider_id
+            ).id
+        return super()._create_payment(**extra_create_values)

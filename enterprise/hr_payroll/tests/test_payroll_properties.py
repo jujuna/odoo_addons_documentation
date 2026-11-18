@@ -4,7 +4,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from odoo.tests import tagged
 from odoo.addons.hr_payroll.tests.common import TestPayslipContractBase
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 @tagged('payroll_properties')
@@ -470,3 +470,16 @@ class TestPayrollProperties(TestPayslipContractBase):
 
         unused_section.unlink()
         self.assertFalse(unused_section.exists())
+
+    def test_salary_rule_code_validation_with_employee_input(self):
+        """
+        Test that employee input salary rule codes only contain alphanumeric characters and underscores.
+        """
+        with self.assertRaises(ValidationError):
+            self.env['hr.salary.rule'].create({
+                'name': 'Test Rule',
+                'code': 'BS-101',
+                'struct_ids': [(4, self.structure_A.id)],
+                'input_usage_employee': True,
+                'input_section': self.category1.id,
+            })

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="finvoice_3_export">
+        <Finvoice Version="3.0">
+            <MessageTransmissionDetails>
+                <MessageSenderDetails>
+                    <FromIdentifier t-out="company.name"/>
+                    <FromIntermediator t-out="company.name"/>
+                </MessageSenderDetails>
+                <MessageReceiverDetails>
+                    <ToIdentifier t-out="move['partner_name']"/>
+                    <ToIntermediator t-out="move['partner_name']"/>
+                </MessageReceiverDetails>
+                <MessageDetails>
+                    <MessageIdentifier t-out="move['name']"/>
+                    <MessageTimeStamp t-out="move['time_stamp']"/>
+                </MessageDetails>
+            </MessageTransmissionDetails>
+
+            <SellerPartyDetails>
+                <SellerOrganisationName t-out="company.name"/>
+                <SellerOrganisationTaxCode t-out="company.vat"/>
+            </SellerPartyDetails>
+
+            <BuyerPartyDetails>
+                <BuyerOrganisationName t-out="move['partner_name']"/>
+                <BuyerOrganisationTaxCode t-out="move['partner_vat']"/>
+                <BuyerPostalAddressDetails>
+                    <BuyerStreetName t-out="move['partner_address']['street']"/>
+                    <BuyerTownName t-out="move['partner_address']['city']"/>
+                    <BuyerPostCodeIdentifier t-out="move['partner_address']['zip']"/>
+                </BuyerPostalAddressDetails>
+            </BuyerPartyDetails>
+
+            <DeliveryPartyDetails>
+                <DeliveryOrganisationName t-out="move['partner_name']"/>
+                <DeliveryOrganisationTaxCode t-out="move['partner_vat']"/>
+                <DeliveryPostalAddressDetails>
+                    <DeliveryStreetName t-out="move['partner_address']['street']"/>
+                    <DeliveryTownName t-out="move['partner_address']['city']"/>
+                    <DeliveryPostCodeIdentifier t-out="move['partner_address']['zip']"/>
+                </DeliveryPostalAddressDetails>
+            </DeliveryPartyDetails>
+
+            <InvoiceDetails>
+                <InvoiceTypeCode t-out="move['invoice_type']['code']"/>
+                <InvoiceTypeText t-out="move['invoice_type']['text']"/>
+                <OriginCode t-out="move['origin_code']"/>
+                <InvoiceNumber t-out="move['name']"/>
+                <InvoiceDate Format="CCYYMMDD" t-out="move['invoice_date'].strftime('%Y%m%d')"/>
+                <InvoiceTotalVatIncludedAmount t-att-AmountCurrencyIdentifier="move['currency_name']" t-out="move['amount_total']"/>
+            </InvoiceDetails>
+
+            <t t-foreach="move['lines']" t-as="line">
+                <InvoiceRow>
+                    <ArticleName t-out="line['product_name']"/>
+                    <OrderedQuantity t-att-QuantityUnitCode="line['product_uom']" t-out="line['quantity']"/>
+                    <UnitPriceAmount t-att-AmountCurrencyIdentifier="line['currency_name']" t-out="line['price_unit']"/>
+                    <t t-if="line['is_discount']">
+                        <UnitPriceDiscountAmount t-att-AmountCurrencyIdentifier="line['currency_name']" t-out="line['discount']"/>
+                    </t>
+                    <UnitPriceNetAmount t-att-AmountCurrencyIdentifier="line['currency_name']" t-out="line['price_subtotal']"/>
+                    <UnitPriceVatIncludedAmount t-att-AmountCurrencyIdentifier="line['currency_name']" t-out="line['price_total']"/>
+                    <t t-if="line['reversed_entry']">
+                        <OriginalInvoiceNumber t-out="line['reversed_entry'].name"/>
+                        <OriginalInvoiceDate Format="CCYYMMDD" t-out="line['reversed_entry'].invoice_date.strftime('%Y%m%d')"/>
+                    </t>
+                </InvoiceRow>
+            </t>
+
+            <EpiDetails>
+                <EpiIdentificationDetails>
+                    <EpiDate Format="CCYYMMDD" t-out="doc.l10n_fi_date.strftime('%Y%m%d')"/>
+                    <EpiReference t-out="move['payment_ref']"/>
+                </EpiIdentificationDetails>
+                <EpiPartyDetails>
+                    <EpiBfiPartyDetails>
+                        <EpiBfiIdentifier IdentificationSchemeName="BIC" t-out="move['bank']['bic']"/>
+                        <EpiBfiName t-out="move['bank']['name']"/>
+                    </EpiBfiPartyDetails>
+                    <EpiBeneficiaryPartyDetails>
+                        <EpiAccountID t-att-IdentificationSchemeName="move['bank']['acc_type']" t-out="move['bank']['acc_number']"/>
+                    </EpiBeneficiaryPartyDetails>
+                </EpiPartyDetails>
+                <EpiPaymentInstructionDetails>
+                    <EpiInstructedAmount t-att-AmountCurrencyIdentifier="move['currency_name']" t-out="move['amount_total']"/>
+                    <EpiCharge t-att-ChargeOption="move['epi_charge']"/>
+                    <EpiDateOptionDate Format="CCYYMMDD" t-out="move['due_date'].strftime('%Y%m%d')"/>
+                </EpiPaymentInstructionDetails>
+            </EpiDetails>
+        </Finvoice>
+    </template>
+</odoo>

@@ -24,9 +24,9 @@ class TestL10nEsBOEContent(TestEsAccountReportsCommon):
         options = self._generate_options(report, '2025-01-01', '2025-01-31')
         with patch.object(odoo.release, 'version', '19.1a1'):
             generated_111_boe = self._get_report_boe(report, 111, options).get('file_content')
-        with file_open("l10n_es_reports/tests/data/expected_mod111.txt", "rt") as f:
+        with file_open("l10n_es_reports/tests/data/expected_mod111.txt", "rb") as f:
             expected_boe = f.read()
-        self.assertEqual(generated_111_boe, expected_boe.strip())
+        self.assertEqual(generated_111_boe, expected_boe.rstrip(b'\n'))
 
     @freeze_time('2025-02-15')
     def test_boe_generation_modelo_115(self):
@@ -40,9 +40,9 @@ class TestL10nEsBOEContent(TestEsAccountReportsCommon):
         options = self._generate_options(report, '2025-01-01', '2025-01-31')
         with patch.object(odoo.release, 'version', '19.1a1'):
             generated_115_boe = self._get_report_boe(report, 115, options).get('file_content')
-        with file_open("l10n_es_reports/tests/data/expected_mod115.txt", "rt") as f:
+        with file_open("l10n_es_reports/tests/data/expected_mod115.txt", "rb") as f:
             expected_boe = f.read()
-        self.assertEqual(generated_115_boe, expected_boe.strip())
+        self.assertEqual(generated_115_boe, expected_boe.rstrip(b'\n'))
 
     @freeze_time('2025-04-15')
     def test_boe_generation_modelo_303(self):
@@ -68,7 +68,7 @@ class TestL10nEsBOEContent(TestEsAccountReportsCommon):
         options = self._generate_options(report, '2025-01-01', '2025-01-31')
         with patch.object(odoo.release, 'version', '19.1a1'):
             generated_303_boe = self._get_report_boe(report, 303, options).get('file_content')
-        with file_open("l10n_es_reports/tests/data/expected_mod303.txt", "rt") as f:
+        with file_open("l10n_es_reports/tests/data/expected_mod303.txt", "rb") as f:
             expected_boe = f.read()
 
-        self.assertEqual(generated_303_boe, expected_boe.strip())
+        self.assertEqual(generated_303_boe, expected_boe.rstrip(b'\n'))

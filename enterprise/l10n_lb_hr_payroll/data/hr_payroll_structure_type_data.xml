@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="structure_type_employee_lb" model="hr.payroll.structure.type">
+        <field name="name">Lebanon: Employee</field>
+        <field name="country_id" ref="base.lb"/>
+        <field name="wage_type">monthly</field>
+        <field name="default_schedule_pay">monthly</field>
+        <field name="default_resource_calendar_id" eval="ref('resource_calendar_lb_48', raise_if_not_found=False)"/>
+    </record>
+</odoo>

@@ -74,17 +74,27 @@
             <div class="o_activitywatch_sync d-lg-flex flex-column flex-lg-row-reverse flex-grow-1 o_activity_watch_min_h-0">
                 <div class="o_suggestions w-lg-50 overflow-x-hidden overflow-y-auto d-flex flex-column flex-grow-0 flex-shrink-0 flex-shrink-xl-1 bg-200 o_activity_watch_min_h-0">
                     <t t-set="recordsList" t-value="this.records"/>
-                    <div class="bg-view border-bottom d-flex flex-wrap justify-content-between align-items-center py-2 px-3">
-                        <div role="heading" aria-level="2" class="fw-medium">
+                    <div class="o_aw_column_header o_aw_suggestions_header bg-view border-bottom py-2 px-3">
+                        <div role="heading" aria-level="2" class="o_aw_suggestions_title fw-medium">
                             Suggestions
                         </div>
-                        <span class="btn btn-sm px-0 w-0 opacity-0 pe-none">
-                            <!--Placeholder
-                            to ensure the left and right sections use the right height -->
-                            placeholder
-                        </span>
-                        <div t-if="recordsList.length" class="d-inline-flex align-items-center text-nowrap">
-                            <div class="btn-group btn-group-sm">
+                        <t t-if="recordsList.length">
+                            <div class="o_aw_search_bar position-relative d-flex align-items-center bg-view border rounded-pill px-3">
+                                <i class="oi text-muted me-2 flex-shrink-0" data-icon="search" role="presentation"/>
+                                <input type="text"
+                                    t-ref="this.searchInput"
+                                    class="o_aw_search_input flex-grow-1 border-0 shadow-none bg-transparent p-0"
+                                    placeholder="Search suggestions..."
+                                    t-att-value="this.state.searchQuery"
+                                    t-on-input="(ev) => this._debouncedSearch(ev.target.value)"/>
+                                <button t-if="this.state.searchQuery" type="button"
+                                        class="btn btn-link btn-sm position-absolute end-0 text-muted text-decoration-none p-0 pe-3"
+                                        t-on-click="() => this.clearSearch()"
+                                        title="Clear search">
+                                    <i class="oi" data-icon="close" role="presentation"/>
+                                </button>
+                            </div>
+                            <div class="o_aw_groupby btn-group btn-group-sm text-nowrap">
                                 <button
                                     name="action_groupby_timeline"
                                     t-att-class="(this.state.groupBy === 'timeline') and 'active'"
@@ -106,10 +116,10 @@
                                     By Project
                                 </button>
                             </div>
-                        </div>
+                        </t>
                     </div>
 
-                    <div class="position-relative d-flex flex-column flex-grow-1">
+                    <div class="position-relative d-flex flex-column flex-grow-1 o_activity_watch_min_h">
                         <!-- Installer Dialog Banner -->
                         <div t-if="this.model.data.awServerStatus !== 'connected' and !this.state.connectionWarningDismissed"
                              class="alert alert-info d-none d-lg-block rounded-0 border-bottom z-1 py-2 px-3 w-100 mb-0"
@@ -195,10 +205,19 @@
                         </div>
 
                         <div t-ref="this.suggestionsContentRef" class="o_suggestions_content position-relative d-flex flex-column flex-grow-1 pt-3 px-3 overflow-x-hidden overflow-y-auto">
-                            <div t-if="recordsList.length" class="flex-grow-1">
+                            <div t-if="recordsList.length" class="flex-grow-1 d-flex flex-column">
+
+                                <div t-if="this.state.searchQuery.trim() and !this.visualRecords().length" class="flex-grow-1 d-flex align-items-center justify-content-center">
+                                    <p class="text-muted text-center text-truncate w-100 mb-0" t-att-title="this.state.searchQuery">
+                                        No suggestions match "<t t-out="this.state.searchQuery"/>".
+                                    </p>
+                                </div>
+
                                 <TimesheetsAssistantByProject t-if="this.state.groupBy === 'project'"
                                     model="this.model"
+                                    grouped="this.filteredGrouped()"
                                     selectedRowsSize="this.selectedRowCount"
+                                    highlight="(text) => this.highlight(text)"
                                     isSelected="(groupKey, title, start) => this.isSelected(groupKey, title, start)"
                                     getSelectionClass="(groupKey, title, previousWasSelected, start) => this.getSelectionClass(groupKey, title, previousWasSelected, start)"
                                     onMouseDown="(groupKey, title, ev, start) => this.onMouseDown(groupKey, title, ev, start)"
@@ -209,9 +228,10 @@
 
                                 <TimesheetsAssistantTimeline t-if="this.state.groupBy === 'timeline'"
                                     model="this.model"
-                                    records="recordsList"
+                                    records="this.filteredRecords()"
                                     showAwayTime="this.state.showAwayTime"
                                     selectedRowsSize="this.selectedRowCount"
+                                    highlight="(text) => this.highlight(text)"
                                     isSelected="(groupKey, title, start) => this.isSelected(groupKey, title, start)"
                                     getSelectionClass="(groupKey, title, previousWasSelected, start) => this.getSelectionClass(groupKey, title, previousWasSelected, start)"
                                     onMouseDown="(groupKey, title, ev, start) => this.onMouseDown(groupKey, title, ev, start)"
@@ -235,7 +255,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div t-if="this.debugMode.isActive()" class="flex-grow-1 d-flex align-items-end justify-content-center">
+                            <div t-if="this.debugMode.isActive()" class="mt-auto flex-shrink-0 d-flex align-items-end justify-content-center">
                                 <div class="bg-black text-200 font-monospace p-4 pt-3 d-flex flex flex-column gap-2 flex-grow-0 shadow-lg rounded">
                                     <b class="mb-1"><i class="oi me-1" data-icon="bug_report"/><small>Debug</small></b>
                                     <div class="d-flex flex-lg-nowrap gap-2">
@@ -266,7 +286,7 @@
                 <!-- RIGHT SIDE: form + my timesheets -->
                 <div class="o_activity_watch_timesheet_right d-flex flex-shrink-1 flex-grow-1 flex-column o_activity_watch_min_h-0 overflow-hidden">
                     <div
-                        class="bg-view border-bottom d-flex flex-wrap align-items-center px-3 py-2"
+                        class="o_aw_column_header bg-view border-bottom d-flex flex-wrap align-items-center px-3 py-2"
                     >
                         <button
                             type="button"
@@ -282,7 +302,7 @@
                         </div>
                     </div>
 
-                    <div class="o_activity_watch_timesheet_right_content d-flex flex-column flex-grow-1 overflow-x-hidden overflow-y-auto">
+                    <div t-ref="this.timesheetsSectionRef" class="o_activity_watch_timesheet_right_content d-flex flex-column flex-grow-1 overflow-x-hidden overflow-y-auto">
                         <!-- Creation Form -->
                         <div
                             t-if="this.state.showCreateForm"
@@ -304,7 +324,7 @@
                         </div>
 
                         <!-- Timesheets section -->
-                        <div name="timesheets_section" class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm}">
+                        <div name="timesheets_section" class="mb-4" t-att-class="{'opacity-50': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size}">
                             <h2 class="h6 d-none">Timesheets</h2>
                             <t t-if="this.model.data.timesheets.length === 0">
                                 <p class="text-muted small ms-3 mb-0 mt-2">No time recorded.</p>
@@ -329,9 +349,10 @@
                                             </t>
                                         </div>
                                         <!-- Show normal timesheet item -->
-                                        <a t-else="" href="#" class="list-group-item list-group-item-action d-flex"
+                                        <a t-else="" href="#" class="list-group-item list-group-item-action d-flex o_activity_watch_drop_target transition-all"
+                                           t-att-data-timesheet-id="tsh.id"
                                            t-att-class="{
-                                               'pe-none': this.state.showCreateForm,
+                                               'pe-none': this.state.showCreateForm &amp;&amp; !this.state.selectedRows.size,
                                                'opacity-75': this.selectedTimesheet != null,
                                            }"
                                            t-on-click.stop="() => this.onClickExistingTimesheet(tsh)"

@@ -278,9 +278,9 @@ class FiscalDeclarationHandler(models.AbstractModel):
                 section_id = self.env.ref(f'l10n_fr_reports.{report}').id
                 section = fiscal_declaration.section_report_ids.filtered(lambda sect: sect.id == section_id)
                 section_options = section.get_options({'date': options.get('date'), 'unfold_all': True})
-                lines.extend(section._get_lines(section_options))
+                lines.extend((section, line) for line in section._get_lines(section_options))
 
-            for line in lines:
+            for section, line in lines:
                 if not line.code:
                     continue
                 splitted_code = line.code.rsplit('_', 2)

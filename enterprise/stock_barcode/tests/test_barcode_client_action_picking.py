@@ -3348,9 +3348,20 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             {'quantity': 3.0, 'picked': False, 'lot_id': lots[0].id }
         ])
 
+        self.call_count = 0
+        self1 = self
+        post_barcode_process_orig = odoo.addons.stock_barcode.models.stock_move.StockMove.post_barcode_process
+
+        def post_barcode_process_mock(self, barcode_quantities):
+            self1.call_count += 1
+            return post_barcode_process_orig(self, barcode_quantities)
+
         action = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
         url = f"/web#action={action.id}"
-        self.start_tour(url, 'test_split_line_on_exit_for_delivery_with_lot', login='admin')
+        with patch('odoo.addons.stock_barcode.models.stock_move.StockMove.post_barcode_process', new=post_barcode_process_mock):
+            self.start_tour(url, 'test_split_line_on_exit_for_delivery_with_lot', login='admin')
+        # The tour exits twice, each exit must post-process only once.
+        self.assertEqual(self.call_count, 2)
         # Checks receipt moves values.
         self.assertRecordValues(delivery.move_line_ids.sorted('quantity'), [
             {'quantity': 1, 'picked': True, 'lot_id': lots[0].id},

@@ -13,6 +13,7 @@ from odoo.addons.l10n_mx_edi.models.l10n_mx_edi_document import (
     CFDI_DATE_FORMAT,
     USAGE_SELECTION,
 )
+from odoo.addons.l10n_mx_edi.models.res_company import FISCAL_REGIMES_SELECTION
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import formatLang
 from odoo.tools.float_utils import float_round
@@ -2924,6 +2925,7 @@ class AccountMove(models.Model):
             'num_reg_id_trib': num_reg_id_trib,
             'vat': num_reg_id_trib if is_sale_invoice and rfc in ('XEXX010101000', 'XAXX010101000') else rfc,
             'zip': customer_data['zip_code'],
+            'fiscal_regime': cfdi_values['receptor_fiscal_regime'] if is_sale_invoice else cfdi_values['fiscal_regime'],
         })
 
         self.env['res.partner']._import_retrieve_customer(
@@ -2957,6 +2959,8 @@ class AccountMove(models.Model):
             create_vals['zip'] = zip_code
         if not is_generic_rfc:
             create_vals['vat'] = rfc
+            if customer_values['fiscal_regime'] in dict(FISCAL_REGIMES_SELECTION):
+                create_vals['l10n_mx_edi_fiscal_regime'] = customer_values['fiscal_regime']
         elif rfc == 'XEXX010101000':
             export_fiscal_position = import_values['company']._l10n_mx_edi_get_foreign_customer_fiscal_position()
             create_vals['property_account_position_id'] = export_fiscal_position.id

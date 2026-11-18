@@ -19,12 +19,11 @@ class SaleOrderLine(models.Model):
         return values
 
     def _timesheet_compute_delivered_quantity_domain(self):
-        domain = super()._timesheet_compute_delivered_quantity_domain()
         # force to use only the validated timesheet
-        param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET
-        if param_invoiced_timesheet == 'approved':
-            domain = Domain.AND([domain, [('validated', '=', True)]])
-        return domain
+        return Domain.AND([
+            super()._timesheet_compute_delivered_quantity_domain(),
+            self.env['account.analytic.line']._get_invoiced_timesheet_domain(),
+        ])
 
     def get_allocated_hours_field(self):
         return 'product_uom_qty'

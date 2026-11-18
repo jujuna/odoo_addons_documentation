@@ -1,9 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import json
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
 
+from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tests import Form
 from odoo.tests.common import freeze_time
@@ -63,10 +65,9 @@ class TestEmployeePayrunIssues(TestPayslipBase):
         self.assertEqual(issue_data['action']['name'], 'action_add_payslip_to_payrun')
 
         # 3. Execute the action
-        action_result = self.employee.action_add_payslip_to_payrun(payslip_run.id)
+        self.employee.action_add_payslip_to_payrun(payslip_run.id)
 
         # 4. Assert the action's effects
-        self.assertEqual(action_result['tag'], 'reload', "Action did not return a reload tag")
         new_payslip = self.env['hr.payslip'].search([('employee_id', '=', self.employee.id)])
         self.assertEqual(len(new_payslip), 1, "Payslip was created")
         self.assertEqual(new_payslip.payslip_run_id, payslip_run)
@@ -404,3 +405,93 @@ class TestEmployeePayrunIssues(TestPayslipBase):
         self.assertEqual(len(runs), 1)
         # 4. Verify that the correction payrun does not generate any 'missing employee' issues for our primary test employee 'richard_emp'
         self.assertFalse(self.employee.issues, "No issue should be generated for missing employee in correction payruns")
+
+    def _create_payrun(self, date_start, **values):
+        return self.env['hr.payslip.run'].create({
+            'name': 'Salary Slip %s' % date_start.strftime('%B'),
+            'date_start': date_start,
+            'date_end': date_start + relativedelta(day=31),
+            'company_id': self.employee.company_id.id,
+            'structure_id': self.developer_pay_structure.id,
+            **values,
+        })
+
+    def _get_missing_payrun_issues(self):
+        self.employee.version_id.invalidate_recordset(['issues'])
+        return [
+            issue for issue in (self.employee.version_id.issues or {}).values()
+            if issue.get('action', {}).get('name') == 'action_add_payslip_to_payrun'
+            or issue.get('action', {}).get('res_model') == 'hr.payslip.run'
+        ]
+
+    def test_12_one_issue_for_several_missing_periods(self):
+        """ Missing in the pay runs of several periods: one issue, whose action creates all the payslips. """
+        payrun_feb = self._create_payrun(self.start_of_month)
+        payrun_mar = self._create_payrun(date(2018, 3, 1))
+
+        issues = self._get_missing_payrun_issues()
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(
+            issues[0]['message'],
+            "The employee is missing in the following pay runs: %s, %s" % (payrun_feb.name, payrun_mar.name))
+        self.assertEqual(issues[0]['action_text'], "Add Payslip to Pay Run")
+
+        action = self.employee.action_add_payslip_to_payrun(*json.loads(issues[0]['action']['args']))
+        new_payslips = self.env['hr.payslip'].search(action['domain'])
+        self.assertEqual(len(new_payslips), 2)
+        self.assertEqual(new_payslips.payslip_run_id, payrun_feb | payrun_mar)
+        self.assertEqual(new_payslips.employee_id, self.employee)
+        self.assertEqual(set(new_payslips.mapped('date_from')), {self.start_of_month, date(2018, 3, 1)})
+        self.assertFalse(self._get_missing_payrun_issues())
+
+    def test_13_closing_date_of_the_employee_type(self):
+        """ The closing day of the employee type has priority over the one of the company. """
+        employee_type = self.env['hr.employee.type'].create({'name': 'Worker', 'payroll_closing_date': '5'})
+        self.employee.version_id.employee_type_id = employee_type
+        self.employee.company_id.payroll_closing_date = False
+        self._create_payrun(self.start_of_month)
+
+        with freeze_time('2018-03-01'):
+            self.assertFalse(self._get_missing_payrun_issues(), "The February period is not closed yet")
+        with freeze_time('2018-03-06'):
+            self.assertEqual(len(self._get_missing_payrun_issues()), 1)
+
+    def test_14_no_issue_for_a_payrun_of_another_employee_type(self):
+        """ A pay run limited to other employee types doesn't miss the employee, and can't take him. """
+        employee_type = self.env['hr.employee.type'].create({'name': 'Worker'})
+        other_type = self.env['hr.employee.type'].create({'name': 'Student'})
+        self.employee.version_id.employee_type_id = employee_type
+        self.env['hr.employee'].create({
+            'name': 'Student Employee',
+            'date_version': date(2018, 1, 1),
+            'contract_date_start': date(2018, 1, 1),
+            'wage': 1000,
+            'structure_type_id': self.structure_type.id,
+            'employee_type_id': other_type.id,
+        })
+        payrun = self._create_payrun(self.start_of_month, employee_type_ids=[Command.set(other_type.ids)])
+        self.assertEqual(payrun.state, '00_draft')
+
+        self.assertFalse(self._get_missing_payrun_issues())
+        with self.assertRaises(UserError):
+            self.employee.action_add_payslip_to_payrun(payrun.ids)
+        self.assertFalse(self.env['hr.payslip'].search([('employee_id', '=', self.employee.id)]))
+
+        self.employee.version_id.employee_type_id = other_type
+        self.assertEqual(len(self._get_missing_payrun_issues()), 1)
+
+    def test_15_several_payruns_in_a_period_among_several_periods(self):
+        """ Several pay runs of the same period could take the employee: no payrun is chosen for him. """
+        struct_b = self.env['hr.payroll.structure'].create({
+            'name': 'Analyst Structure',
+            'type_id': self.developer_pay_structure.type_id.id,
+        })
+        payrun_feb_a = self._create_payrun(self.start_of_month)
+        payrun_feb_b = self._create_payrun(self.start_of_month, structure_id=struct_b.id)
+        payrun_mar = self._create_payrun(date(2018, 3, 1))
+
+        issues = self._get_missing_payrun_issues()
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0]['action_text'], 'View Pay Runs')
+        self.assertEqual(issues[0]['message'], "The employee is not in any pay run for February 2018, March 2018")
+        self.assertCountEqual(issues[0]['action']['domain'][0][2], (payrun_feb_a | payrun_feb_b | payrun_mar).ids)

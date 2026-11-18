@@ -10,7 +10,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools import BinaryBytes, format_date
 from odoo.tools.misc import file_path
-from odoo.addons.l10n_be_hr_payroll.models.utils import to_eurocent
+from odoo.addons.l10n_be_hr_payroll.models.utils import round_eurocent, to_eurocent
 
 
 class L10n_Be273Xx(models.Model):
@@ -112,21 +112,25 @@ class L10n_Be273Xx(models.Model):
 
     @api.depends('xml_file')
     def _compute_validation_state(self):
-        xsd_schema_file_path = file_path('l10n_be_hr_payroll/data/withholdingTaxDeclarationOriginal_202012.xsd')
-        xsd_root = etree.parse(xsd_schema_file_path)
-        schema = etree.XMLSchema(xsd_root)
-
         no_xml_file_reports = self.filtered(lambda report: not report.xml_file)
         no_xml_file_reports.update({
             'xml_validation_state': 'normal',
         })
         for report in self - no_xml_file_reports:
-            xml_root = etree.fromstring(report.xml_file.content)
-            try:
-                schema.assertValid(xml_root)
-                report.xml_validation_state = 'done'
-            except etree.DocumentInvalid:
-                report.xml_validation_state = 'invalid'
+            report.xml_validation_state = 'invalid' if report._get_xml_validation_error() else 'done'
+
+    def _get_xml_validation_error(self):
+        """Return the reason why the XML file does not match the schema of the declaration, if any."""
+        self.ensure_one()
+        if not self.xml_file:
+            return False
+        xsd_schema_file_path = file_path('l10n_be_hr_payroll/data/withholdingTaxDeclarationOriginal_202012.xsd')
+        schema = etree.XMLSchema(etree.parse(xsd_schema_file_path))
+        try:
+            schema.assertValid(etree.fromstring(self.xml_file.content))
+        except etree.DocumentInvalid as err:
+            return str(err)
+        return False
 
     @api.depends('type', 'origin_id.year', 'origin_id.month')
     def _compute_year_month(self):
@@ -184,14 +188,31 @@ class L10n_Be273Xx(models.Model):
             'line_ids': [Command.clear()] + lines_to_create,
         })
 
-    def action_generate(self):
+    def _check_employees_niss(self):
         self.ensure_one()
-        payslips = self.line_ids.payslip_id
-        invalid_employees = payslips.employee_id.filtered(lambda e: not e._is_niss_valid())
+        invalid_employees = self.line_ids.payslip_id.employee_id.filtered(lambda e: not e._is_niss_valid())
         if invalid_employees:
             raise UserError(self.env._('Invalid NISS number for those employees:\n %s', '\n'.join(invalid_employees.mapped('name'))))
 
+    def action_generate(self):
+        self.ensure_one()
+        payslips = self.line_ids.payslip_id
+        self._check_employees_niss()
+        # Another report may have declared some payslips since this one was populated
+        finalized_reports = self.search(self._get_other_finalized_reports_domain())
+        declared_payslips = payslips.filtered(lambda p: p.l10n_be_273_line_ids.sheet_id & finalized_reports)
+        if declared_payslips:
+            raise UserError(self.env._(
+                'Those payslips are already declared in another 273.XX report, populate this report again:\n %s',
+                '\n'.join(declared_payslips.mapped('name'))))
+
         self._generate_xml()
+        if self.xml_validation_state == 'invalid':
+            # e.g. negative amounts, when the refunds of a declared month outweigh the income of the month
+            raise UserError(self.env._(
+                'The XML file of the 273.XX report does not match the schema of the declaration. '
+                'Check that no amount is negative: the refunds of a declared month are declared with a correction of that month.\n\n'
+                'Error: %(error)s', error=self._get_xml_validation_error()))
         self._generate_pdf()
         self.state = 'ready'
 
@@ -228,7 +249,6 @@ class L10n_Be273Xx(models.Model):
                 'default_company_id': self.company_id.id,
                 'default_type': 'correction',
                 'default_origin_id': self.id,
-                'default_line_ids': [Command.set(self.line_ids.ids)],
             }
         }
 
@@ -246,6 +266,7 @@ class L10n_Be273Xx(models.Model):
         self.ensure_one()
         if not self.xml_file:
             self.action_populate()
+            self._check_employees_niss()
             self._generate_xml()
         return {
             'model': self._name,
@@ -272,37 +293,67 @@ class L10n_Be273Xx(models.Model):
         return self.env['hr.payslip']._l10n_be_get_fiscal_line_domain(date_from, date_to)
 
     def _get_rendering_data_273S(self):
+        """ The 273S declares, per beneficiary, the gross income (col. b), the deductible costs
+        (col. c: the lump-sum costs) and the taxable income (col. d) on which the withholding tax
+        is computed. The taxable income is the withholding base of the payslips: the IP minus its
+        personal social contributions minus the lump-sum costs, deducted according to the date of
+        each payslip (see `hr.payslip._get_be_ip_deduction` and `_l10n_be_has_ip_flat_rate_costs`).
+        """
         self.ensure_one()
         payslips = self.line_273S_ids.payslip_id
 
         gross_codes = self._get_salary_rule_codes_from_tag('273s_gross_income')
         withholding_codes = self._get_salary_rule_codes_from_tag('273s_withholding_tax')
+        # The personal social contributions on the IP, deducted from the withholding base
+        onss_codes = self.env['l10n.be.281.mapping']._get_codes_for_tag('273S', '273s_ip_onss', self.year)
         line_values = payslips._get_line_values(
-            gross_codes + withholding_codes, compute_sum=True, extra_domain=self._get_fiscal_line_domain())
+            gross_codes + withholding_codes + onss_codes, compute_sum=True, extra_domain=self._get_fiscal_line_domain())
+        year_ip_by_payslip = self._get_273S_previous_year_ip(payslips, gross_codes)
 
-        # The first threshold is at 16320 € of gross IP, so we only consider the rate at 7.5 %.
-        gross_amount = sum(line_values[code]['sum']['total'] for code in gross_codes)
-        tax_amount = -sum(line_values[code]['sum']['total'] for code in withholding_codes)
-
-        mapped_ip = defaultdict(lambda: [0, 0])
+        mapped_ip = defaultdict(lambda: {'gross': 0.0, 'withholding': 0.0, 'onss': 0.0, 'costs': 0.0, 'taxable': 0.0})
+        employee_by_beneficiary = {}
         for payslip in payslips.sudo():
             payslip_gross = sum(line_values[code][payslip.id]['total'] for code in gross_codes)
             payslip_withholding = sum(line_values[code][payslip.id]['total'] for code in withholding_codes)
             # Either side alone still keeps the beneficiary, or its amount has no line to sit under.
-            if payslip_gross or payslip_withholding:
-                mapped_ip[payslip.employee_id][0] += payslip_gross
-                mapped_ip[payslip.employee_id][1] += payslip_withholding
+            if not (payslip_gross or payslip_withholding):
+                continue
+            payslip_onss = sum(line_values[code][payslip.id]['total'] for code in onss_codes)
+            payslip_costs = 0.0
+            if payslip_gross and payslip._l10n_be_has_ip_flat_rate_costs():
+                # a refund (negative IP) cancels the costs of the refunded payslip: same period, so same IP paid
+                # earlier in the year
+                payslip_costs = payslip._get_be_ip_flat_rate_costs(None, None, {
+                    'values': {'ip': abs(payslip_gross)},
+                    'year_total': year_ip_by_payslip[payslip],
+                })
+                if payslip_gross < 0:
+                    payslip_costs = -payslip_costs
+            # One beneficiary per person: the same person can be employed by several companies of the report
+            beneficiary = (payslip.employee_id.niss or '').replace('-', '').replace('.', '') or payslip.employee_id
+            employee = employee_by_beneficiary.setdefault(beneficiary, payslip.employee_id)
+            values = mapped_ip[employee]
+            values['gross'] += payslip_gross
+            values['withholding'] += payslip_withholding
+            values['onss'] += payslip_onss
+            values['costs'] += payslip_costs
+
+        # The costs are rounded to the cent, so that the costs, the taxable amount and the IP ONSS add up to the
+        # gross amount (declared to the cent)
+        for values in mapped_ip.values():
+            values['costs'] = round_eurocent(values['costs'])
+            values['taxable'] = round_eurocent(values['gross'] - values['onss'] - values['costs'])
 
         return {
             'declaration': {
-                'gross_amount': round(gross_amount / 2, 2) * 2,  # To avoid 1 cent diff (eg: 286079.05)
+                'gross_amount': sum(values['gross'] for values in mapped_ip.values()),
                 'deductable_costs':  {
-                    'fixed': gross_amount / 2,
+                    'fixed': sum(values['costs'] for values in mapped_ip.values()),
                     'actual': 0,
                 },
-                'taxable_amount': gross_amount / 2,
+                'taxable_amount': sum(values['taxable'] for values in mapped_ip.values()),
                 'rate': 15.0,
-                'tax_amount': tax_amount,
+                'tax_amount': -sum(values['withholding'] for values in mapped_ip.values()),
             },
             'beneficiaries': [
                 {
@@ -317,14 +368,44 @@ class L10n_Be273Xx(models.Model):
                         'nationality': employee.country_id.code,
                         'identification': employee.niss.replace('-', '').replace('.', ''),
                     },
-                    'gross_amount': ip_values[0],
+                    'gross_amount': values['gross'],
                     'deductable_costs': {
-                        'fixed': ip_values[0] / 2,
+                        'fixed': values['costs'],
                         'actual': 0,
                     },
-                    'tax_amount': ip_values[1],
-                } for employee, ip_values in mapped_ip.items()],
+                    'taxable_amount': values['taxable'],
+                    'tax_amount': values['withholding'],
+                # Sorted by postal code, then by name (form 273 S, note 17)
+                } for employee, values in sorted(
+                    mapped_ip.items(), key=lambda item: (item[0].private_zip or '', item[0].legal_name or ''))],
         }
+
+    def _get_273S_previous_year_ip(self, payslips, gross_codes):
+        """ The IP paid earlier in the year, by payslip with lump-sum costs: these costs depend on the
+        yearly IP (brackets), as when the payslip was computed.
+        """
+        year_ip_by_payslip = defaultdict(float)
+        costs_payslips = payslips.sudo().filtered(lambda payslip: payslip._l10n_be_has_ip_flat_rate_costs())
+        if not costs_payslips or not gross_codes:
+            return year_ip_by_payslip
+        years = {payslip.date_to.year for payslip in costs_payslips}
+        lines_by_employee = defaultdict(list)
+        for line in self.env['hr.payslip.line'].sudo().search_read([
+            ('employee_id', 'in', costs_payslips.employee_id.ids),
+            ('code', 'in', gross_codes),
+            ('slip_id.state', 'in', ('validated', 'paid')),
+            ('date_to', '>=', date(min(years), 1, 1)),
+            ('date_to', '<=', date(max(years), 12, 31)),
+        ], ['employee_id', 'date_to', 'slip_id', 'total']):
+            lines_by_employee[line['employee_id'][0]].append(line)
+        for payslip in costs_payslips:
+            year_ip_by_payslip[payslip] = sum(
+                line['total'] for line in lines_by_employee[payslip.employee_id.id]
+                if line['date_to'].year == payslip.date_to.year
+                and line['date_to'] < payslip.date_to
+                and line['slip_id'][0] != payslip.id
+            )
+        return year_ip_by_payslip
 
     def _get_rendering_data_273_part(self):
         self.ensure_one()
@@ -369,7 +450,9 @@ class L10n_Be273Xx(models.Model):
                 'phone': self.company_id.phone,
                 'email': self.company_id.email,
             },
-            'period': fields.Date.today(),
+            # Attribution date of the declared income: the end of the declared month, which a
+            # correction shares with its origin, whatever the day the files are generated.
+            'period': self.period + relativedelta(day=31),
             'declaration_273S': self._get_rendering_data_273S(),
             'declaration_273_part': self._get_rendering_data_273_part(),
             'to_eurocent': lambda amount: str(to_eurocent(amount)),
@@ -390,16 +473,19 @@ class L10n_Be273Xx(models.Model):
             origin_report = origin_report.origin_id
         return ancestor_reports
 
-    def _get_payslips(self, report_type):
+    def _get_other_finalized_reports_domain(self):
         self.ensure_one()
-        date_from, date_to = self._get_report_period()
-        ancestor_reports = self._get_ancestor_reports()
-        finalized_reports = self._search([
-            ('id', 'not in', ancestor_reports.ids),
+        return Domain([
+            ('id', 'not in', self._get_ancestor_reports().ids),
             ('year', '=', self.year),
             ('state', 'in', ['ready', 'done']),
             ('company_id', 'in', self.branch_ids.ids),
         ])
+
+    def _get_payslips(self, report_type):
+        self.ensure_one()
+        date_from, date_to = self._get_report_period()
+        finalized_reports = self._search(self._get_other_finalized_reports_domain())
         domain = Domain([
             ('state', 'in', ['validated', 'paid']),
             ('company_id', 'in', self.branch_ids.ids),

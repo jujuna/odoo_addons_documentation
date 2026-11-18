@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:40+0000\n"
-"PO-Revision-Date: 2026-10-16 13:47+0000\n"
+"POT-Creation-Date: 2026-10-30 17:39+0000\n"
+"PO-Revision-Date: 2026-11-10 12:14+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/payment/"
 "es/>\n"
@@ -650,12 +650,12 @@ msgstr "Demostración"
 #: model:ir.model.fields,field_description:payment.field_res_country__display_name
 #: model:ir.model.fields,field_description:payment.field_res_partner__display_name
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_status
 msgid "Don't hesitate to contact us if you don't receive it."
-msgstr "Contáctenos en caso de que no lo reciba."
+msgstr "Contacta con nosotros en caso de que no lo reciba."
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__done_msg
@@ -749,7 +749,7 @@ msgstr "Completo y parcial"
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider__support_manual_capture__full_only
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider__support_refund__full_only
 msgid "Full Only"
-msgstr "Completos solamente"
+msgstr "Solo íntegro"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
@@ -789,7 +789,7 @@ msgstr "Contiene un importe restante"
 #. module: payment
 #: model:ir.model.fields,help:payment.field_payment_transaction__is_post_processed
 msgid "Has the payment been post-processed"
-msgstr "¿Se ha posprocesado el pago?"
+msgstr "Se ha procesado el pago posteriormente"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__pre_msg
@@ -1061,7 +1061,7 @@ msgstr "No hay proveedor establecido"
 #. module: payment
 #: model_terms:ir.actions.act_window,help:payment.action_payment_method
 msgid "No payment methods found for your payment providers."
-msgstr "No se encontraron métodos de pago para sus proveedores de pago"
+msgstr "No se han encontrado métodos de pago para tus proveedores de pago."
 
 #. module: payment
 #: model_terms:ir.actions.act_window,help:payment.action_payment_provider
@@ -1236,7 +1236,7 @@ msgstr "Detalles de pago"
 #. module: payment
 #: model:ir.module.module,shortdesc:base.module_payment
 msgid "Payment Engine"
-msgstr ""
+msgstr "Motor de pago"
 
 #. module: payment
 #. odoo-python
@@ -1962,7 +1962,7 @@ msgstr ""
 #. module: payment
 #: model:ir.module.module,summary:base.module_payment
 msgid "The payment engine used by payment provider modules."
-msgstr ""
+msgstr "El motor de pago que los módulos del proveedor de pagos utilizan."
 
 #. module: payment
 #: model:ir.model.fields,help:payment.field_payment_method__support_manual_capture
@@ -2168,6 +2168,18 @@ msgstr ""
 "con algunos proveedores de pago.\n"
 "                     Se recomienda configurar un correo electrónico para "
 "este contacto."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/controllers/portal.py:0
+msgid "This payment method is not available."
+msgstr ""
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/controllers/portal.py:0
+msgid "This payment provider is not available."
+msgstr ""
 
 #. module: payment
 #: model_terms:ir.actions.act_window,help:payment.action_payment_provider
@@ -2442,7 +2454,7 @@ msgstr "Tu pedido está confirmado; pronto recibirás la factura."
 #: model_terms:payment.provider,auth_msg:payment.payment_provider_worldline
 #: model_terms:payment.provider,auth_msg:payment.payment_provider_xendit
 msgid "Your payment has been authorized."
-msgstr "Su pago ha sido autorizado."
+msgstr "Tu pago ha sido autorizado."
 
 #. module: payment
 #. odoo-python
@@ -2549,7 +2561,7 @@ msgstr "Se está procesando tu pago."
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_status
 msgid "Your payment is on its way!"
-msgstr "Su pago está en camino."
+msgstr "¡Tu pago está en camino!"
 
 #. module: payment
 #. odoo-python

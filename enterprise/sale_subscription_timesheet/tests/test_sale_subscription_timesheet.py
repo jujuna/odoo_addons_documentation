@@ -387,3 +387,31 @@ class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
             self.env['sale.order']._cron_recurring_create_invoice()
             new_invoice = subscription.invoice_ids - invoice
             self.assertEqual(new_invoice.invoice_line_ids.quantity, 1.0)
+
+    def test_one_time_sale_timesheet_delivered_qty(self):
+        """
+        Ensure timesheets are counted as delivered for a recurring product
+        sold as one-time sale.
+        """
+        self.product_deliver_timesheet.allow_one_time_sale = True
+        order = self.env['sale.order'].create({
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_deliver_timesheet.id,
+                    'product_uom_qty': 10,
+                }),
+            ],
+        })
+        order.action_confirm()
+        self.assertFalse(order.plan_id)
+
+        task = order.tasks_ids
+        self.env['account.analytic.line'].create({
+            'name': 'Test Line',
+            'project_id': task.project_id.id,
+            'task_id': task.id,
+            'unit_amount': 4,
+            'employee_id': self.employee_user.id,
+        })
+        self.assertEqual(order.order_line.qty_delivered, 4)

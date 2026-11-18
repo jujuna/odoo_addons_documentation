@@ -101,7 +101,9 @@ class L10nBeOnssDeclaration(models.Model):
 
     def action_test_sftp_connection(self):
         self._check_access_sftp_connection()
-        with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
+        # The access of the employer, from any of its branches
+        company_sudo = self.env.company.root_id.sudo()
+        with open_sftp_connection(company_sudo.onss_sftp_private_key, company_sudo.onss_technical_user_name) as sftp:
             # List files in home directory
             files = sftp.listdir('.')
             success_msg = _("Connection Test Succeeded. Files in remote root: %s", files)
@@ -128,31 +130,34 @@ class L10nBeOnssDeclaration(models.Model):
             raise UserError(self.env._("Cannot post declaration(s) due to the following errors:\n\n%(errors)s", errors='\n'.join(errors)))
 
         self._check_access_sftp_connection()
-        with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
-            for declaration in self:
-                if declaration.environment == "R":
-                    target_folder = "IN"
-                elif declaration.environment == "T":
-                    target_folder = "INTEST"
-                else:
-                    target_folder = "INTEST-S"
+        # The declarations are sent with the access of the employer: the root company of their company
+        for company, declarations in self.grouped(lambda d: (d.company_id or self.env.company).root_id).items():
+            company_sudo = company.sudo()
+            with open_sftp_connection(company_sudo.onss_sftp_private_key, company_sudo.onss_technical_user_name) as sftp:
+                for declaration in declarations:
+                    if declaration.environment == "R":
+                        target_folder = "IN"
+                    elif declaration.environment == "T":
+                        target_folder = "INTEST"
+                    else:
+                        target_folder = "INTEST-S"
 
-                for file in declaration.onss_file_ids:
-                    # Considered safe by construction, and will be rejected by ONSS server
-                    # if format / location is invalid
-                    remote_path = f'/{target_folder}/{file.name}'
+                    for file in declaration.onss_file_ids:
+                        # Considered safe by construction, and will be rejected by ONSS server
+                        # if format / location is invalid
+                        remote_path = f'/{target_folder}/{file.name}'
 
-                    with file.file.open() as stream:
-                        sftp.putfo(stream, remote_path)
-                    _logger.info("File %s uploaded to %s", file.name, remote_path)
+                        with file.file.open() as stream:
+                            sftp.putfo(stream, remote_path)
+                        _logger.info("File %s uploaded to %s", file.name, remote_path)
 
-                declaration.state = 'posted'
-                declaration.batch_declaration_id.message_post(body=_(
-                    'The %(declaration)s (id=%(declaration_id)s) has been posted by %(user)s to ONSS portal',
-                    declaration=declaration._get_html_link(_('declaration')),
-                    declaration_id=declaration.id,
-                    user=self.env.user.name))
-                _logger.info(self.env._("Declaration posted successfully to %(folder)s", folder=target_folder))
+                    declaration.state = 'posted'
+                    declaration.batch_declaration_id.message_post(body=_(
+                        'The %(declaration)s (id=%(declaration_id)s) has been posted by %(user)s to ONSS portal',
+                        declaration=declaration._get_html_link(_('declaration')),
+                        declaration_id=declaration.id,
+                        user=self.env.user.name))
+                    _logger.info(self.env._("Declaration posted successfully to %(folder)s", folder=target_folder))
 
         return {
             'type': 'ir.actions.client',
@@ -311,8 +316,11 @@ class L10nBeOnssDeclaration(models.Model):
                             error_message='\n'.join(error_message)))
                     else:
                         dimona_data = form['HandlingResult']['ImpactReport']['DimonaImpactReport'].get('DimonaPeriodAfter', {})
-                        anomaly_report = form['HandlingResult'].get('AnomalyReport', False)
-                        if anomaly_report and (anomaly_report.get('ErrorID', '').endswith('510') or anomaly_report.get('ErrorID', '').endswith('460')):
+                        anomaly_report = form['HandlingResult'].get('AnomalyReport') or []
+                        if isinstance(anomaly_report, dict):
+                            anomaly_report = [anomaly_report]
+                        # a late Dimona (460) or unmet access conditions (510), among the anomalies of the period
+                        if any(anomaly.get('ErrorID', '').endswith(('510', '460')) for anomaly in anomaly_report):
                             # The dates are strings in the notification
                             dimona_start = fields.Date.to_date(dimona_data.get('StartingDate')) or False
                             dimona_end = fields.Date.to_date(dimona_data.get('EndingDate')) or False
@@ -435,7 +443,9 @@ class L10nBeOnssDeclaration(models.Model):
                         'local_unit_id': student_contribution.get('LocalUnitID'),
                     }
                     consultation_state['student_contributions'].append(student_contribution_dict)
-                consultation_results[natural_person_consultation['INSS']] = {"state": consultation_state, 'worker_code': worker_record_consultation['WorkerCode']}
+                # A natural person can have several worker records (e.g. a blue collar becoming a white collar)
+                consultation_results.setdefault(natural_person_consultation['INSS'], []).append(
+                    (worker_record_consultation.get('EmployerClass'), worker_record_consultation['WorkerCode'], consultation_state))
                 natural_person_variables[natural_person_consultation['INSS']] = {
                     'natural_person_pid': natural_person_consultation.get('NaturalPersonPID'),
                     'decl_natural_person_pid': natural_person_consultation.get('DeclNaturalPersonPID'),
@@ -448,26 +458,36 @@ class L10nBeOnssDeclaration(models.Model):
             ('quarter_end', '=', quarter_end),
         ])
         states_by_niss = {state.niss: state for state in existing_natural_person_states}
-        for niss, consultation_result in consultation_results.items():
+        state_model = self.env['l10n_be.dmfa.natural_person.state']
+        for niss, worker_records in consultation_results.items():
+            employee = states_by_niss[niss].employee_id if niss in states_by_niss else (
+                self.env['hr.employee'].with_context(active_test=False).search([('niss', '=', niss)], limit=1))
+            company = employee.company_id
+            configured_employer_class = company._get_payroll_config(quarter_end).l10n_be_employer_category_id.dmfa_code if company else False
+            worker_record_states = {
+                state_model._get_worker_record_key(employer_class, worker_code, configured_employer_class): worker_record_state
+                for employer_class, worker_code, worker_record_state in worker_records
+            }
             if niss in states_by_niss:
-                states_by_niss[niss].validate_changes(consultation_result['state'], consultation_result['worker_code'], from_consultation=True)
+                for worker_record_key, worker_record_state in worker_record_states.items():
+                    states_by_niss[niss].validate_changes(worker_record_state, worker_record_key, from_consultation=True)
             else:
-                employee = self.env['hr.employee'].with_context(active_test=False).search([('niss', '=', niss)], limit=1)
-                if employee:
-                    new_state = self.env['l10n_be.dmfa.natural_person.state'].create({
-                        'employee_id': employee.id,
-                        'niss': niss,
-                        'quarter_start': quarter_start,
-                        'quarter_end': quarter_end,
-                        'worker_record_data': consultation_state,
-                    })
-                    states_by_niss[niss] = new_state
+                if not employee:
+                    continue
+                states_by_niss[niss] = self.env['l10n_be.dmfa.natural_person.state'].create({
+                    'employee_id': employee.id,
+                    'niss': niss,
+                    'quarter_start': quarter_start,
+                    'quarter_end': quarter_end,
+                    'worker_record_data': worker_record_states,
+                })
             states_by_niss[niss].natural_person_pid = natural_person_variables[niss]['natural_person_pid']
             states_by_niss[niss].decl_natural_person_pid = natural_person_variables[niss]['decl_natural_person_pid']
             states_by_niss[niss].version_number = natural_person_variables[niss]['version_number']
             states_by_niss[niss].worker_record_version_number = natural_person_variables[niss]['worker_record_version_number']
-            for occupation in self._ensure_list(consultation_result['state']['occupations']):
-                states_by_niss[niss].update_occupation_version(occupation['contract_id'], occupation['version_number'])
+            for worker_record_state in worker_record_states.values():
+                for occupation in self._ensure_list(worker_record_state['occupations']):
+                    states_by_niss[niss].update_occupation_version(occupation['contract_id'], occupation['version_number'])
 
     @api.model
     def _analyse_idflux_file(self, data_dict):
@@ -650,7 +670,8 @@ class L10nBeOnssDeclaration(models.Model):
     @api.model
     def _fetch_files(self):
         self._check_access_sftp_connection()
-        with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
+        company_sudo = self.env.company.root_id.sudo()
+        with open_sftp_connection(company_sudo.onss_sftp_private_key, company_sudo.onss_technical_user_name) as sftp:
             target_folders = ['OUT', 'OUTTEST', 'OUTTEST-S']
             incoming_files = []
 

@@ -511,58 +511,31 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
         self.assertIn(self.helpdesk_portal.partner_id, ticket.message_partner_ids,
                     "Portal user's partner should be added as a follower after sharing")
 
-    def test_ticket_creation_removes_email_signatures(self):
+    def test_ticket_creation_keeps_forwarded_content(self):
         """
-        Tests that email signature is correctly removed from a ticket
-        description when a ticket is created from an email alias.
+        Tests that the content of a forwarded email is kept in the ticket description.
         """
-
-        gmail_email_source = f"""From: {self.partner_1.email_formatted}
+        email_source = f"""From: {self.partner_1.email_formatted}
 To: {self.test_team.alias_id.alias_full_name}
-Subject: Test Gmail Signature Removal
+Subject: Fwd: Test Gmail Forward
 Content-Type: text/html;
 
-<p>This is the main helpdesk ticket content.</p>
-<span>--</span>
-<div data-smartmail="gmail_signature">
-<p>Valid Lelitre</p>
-<p>Concerned Customer</p>
-</div>
-"""
-
-        outlook_email_source = f"""From: {self.partner_2.email_formatted}
-To: {self.test_team.alias_id.alias_full_name}
-Subject: Test Outlook Signature Removal
-Content-Type: text/html;
-
-<p>This is the main helpdesk ticket content.</p>
-<div id="Signature">
-<p>Valid Poilvache</p>
-<p>Valued Client</p>
-</div>
+<div dir="ltr">Please check this request.<br>
+<div class="gmail_quote gmail_quote_container">
+<div dir="ltr" class="gmail_attr">---------- Forwarded message ---------<br>From: Some Customer &lt;customer@example.com&gt;<br>Subject: Test Gmail Forward<br></div>
+<br><div dir="ltr">This is the forwarded helpdesk ticket content.</div>
+</div></div>
 """
         with self.mock_mail_gateway():
-            gmail_ticket = self.env['mail.thread'].message_process(
+            ticket = self.env['mail.thread'].message_process(
                 model='helpdesk.ticket',
-                message=gmail_email_source,
-                custom_values={'team_id': self.test_team.id}
-            )
-            outlook_ticket = self.env['mail.thread'].message_process(
-                model='helpdesk.ticket',
-                message=outlook_email_source,
+                message=email_source,
                 custom_values={'team_id': self.test_team.id}
             )
 
-        # 1. Verify Gmail signature removal
-        self.assertIn("This is the main helpdesk ticket content", gmail_ticket.description, "The main content should be present.")
-        self.assertNotIn("--", gmail_ticket.description, "The Gmail signature separator should have been removed.")
-        self.assertNotIn("Valid Lelitre", gmail_ticket.description, "The Gmail signature should have been removed.")
-        self.assertNotIn("Concerned Customer", gmail_ticket.description, "The Gmail signature should have been removed.")
-
-        # 2. Verify Outlook signature removal
-        self.assertIn("This is the main helpdesk ticket content", outlook_ticket.description, "The main content should be present.")
-        self.assertNotIn("Valid Poilvache", outlook_ticket.description, "The Outlook signature should have been removed.")
-        self.assertNotIn("Valued Client", outlook_ticket.description, "The Outlook signature should have been removed.")
+        self.assertIn("Please check this request.", ticket.description, "The forwarder's email content should be present.")
+        self.assertIn("Forwarded message", ticket.description, "The forwarded email header should be present.")
+        self.assertIn("This is the forwarded helpdesk ticket content.", ticket.description, "The forwarded email content should be present.")
 
     def test_ticket_access_action(self):
         """ Test that the access action link is correctly generated for internal and portal users """

@@ -1,14 +1,53 @@
-import { t, useEffect, useProps } from "@odoo/owl";
+import { onWillStart, proxy, t, useEffect, useProps } from "@odoo/owl";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { addFieldDependencies } from "@web/model/relational_model/utils";
+import { MultiCreatePopover } from "@web/views/view_components/multi_create_popover";
 import {
     MultiSelectionButtons,
     multiSelectionButtonsProps,
 } from "@web/views/view_components/multi_selection_buttons";
 import { usePopover } from "@web/core/popover/popover_hook";
 
+/**
+ * When the allocations of the employee don't cover the time off, a time off officer can grant the missing part
+ * and create the time off at once ("Allocate and Add").
+ */
+export class HrHolidaysGanttMultiCreatePopover extends MultiCreatePopover {
+    static template = "hr_holidays_gantt.MultiCreatePopover";
+
+    setup() {
+        super.setup();
+        this.ganttAllocationState = proxy({ canGrant: false, isOfficer: false });
+        onWillStart(async () => {
+            this.ganttAllocationState.isOfficer = await user.hasGroup("hr_holidays.group_hr_holidays_user");
+        });
+        const { onRootLoaded, onRecordChanged } = this.multiCreateRecordProps.hooks;
+        const updateCanGrant = (record) => {
+            this.ganttAllocationState.canGrant = !!record.data.allocation_display_warning;
+        };
+        this.multiCreateRecordProps.hooks.onRootLoaded = (record) => {
+            onRootLoaded?.(record);
+            updateCanGrant(record);
+        };
+        this.multiCreateRecordProps.hooks.onRecordChanged = (record) => {
+            onRecordChanged?.(record);
+            updateCanGrant(record);
+        };
+    }
+
+    async onAllocateAndAdd() {
+        this.multiCreateData.grantMissingAllocation = true;
+        await this.onAdd();
+    }
+}
+
 export class HrHolidaysGanttMultiSelectionButtons extends MultiSelectionButtons {
     static template = "hr_holidays_gantt.HrHolidaysGanttMultiSelectionButtons";
+    static components = {
+        ...MultiSelectionButtons.components,
+        Popover: HrHolidaysGanttMultiCreatePopover,
+    };
     props = useProps({
         reactive: t.object({
             ...multiSelectionButtonsProps.reactive.toShape(),

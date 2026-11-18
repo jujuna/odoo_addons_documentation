@@ -5,8 +5,12 @@ import re
 
 from collections import defaultdict
 
+from lxml import etree
+
 from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import file_open
+from odoo.tools.convert import xml_import
 from odoo.tools.safe_eval import safe_eval
 
 from ast import literal_eval
@@ -15,7 +19,19 @@ _logger = logging.getLogger(__name__)
 
 
 def _safe_eval_rule(expr, localdict, **kwargs):
-    """Evaluate salary rule code with an acyclic alias to the shared context."""
+    """
+    Evaluate salary rule code against the shared computation context of a payslip.
+
+    The code sees every key of ``localdict``, plus ``localdict`` itself (an alias added to a
+    temporary namespace only, to avoid a cyclic reference). Every variable assigned by the
+    code (``result``, ``result_qty``, any custom variable...) is copied back into
+    ``localdict``, so it stays visible to the rules computed afterwards on the same payslip.
+
+    :param str expr: python expression, or statements with ``mode='exec'``
+    :param dict localdict: computation context of the payslip, updated in place
+    :param kwargs: forwarded to :func:`~odoo.tools.safe_eval.safe_eval` (e.g. ``mode='exec'``)
+    :return: the value returned by ``safe_eval`` (``None`` in ``exec`` mode)
+    """
     # Salary rule code expects a `localdict` variable referring to the shared
     # computation context. Adding it directly as a key like
     # `localdict['localdict'] = localdict` creates a cyclic reference, which
@@ -227,10 +243,28 @@ result_rate = 10''')
         return domain
 
     def _get_property_default_value(self):
+        """
+        Return the default amount of the input fed by this rule: ``input_default_value``, or 0.0.
+
+        Used as default of the version property (see
+        ``hr.payroll.structure._sync_properties_to_definition``) and of the input lines seeded on
+        new payslips.
+
+        :rtype: float
+        """
         self.ensure_one()
         return self.input_default_value or 0.0
 
     def _raise_error(self, localdict, error_type, e):
+        """
+        Raise a ``UserError`` about a failed evaluation of this rule, giving the employee,
+        version, payslip and rule.
+
+        :param dict localdict: computation context (must contain ``employee``, ``version`` and ``payslip``)
+        :param str error_type: first line of the message
+        :param Exception e: the original exception
+        :raise UserError: always
+        """
         raise UserError(_("""%(error_type)s
 - Employee: %(employee)s
 - Version: %(version)s
@@ -247,9 +281,27 @@ result_rate = 10''')
 
     def _compute_rule(self, localdict):
         """
-        :param localdict: dictionary containing the current computation environment
-        :return: returns a tuple (amount, qty, rate)
-        :rtype: (float, float, float)
+        Compute the amount, quantity and rate of this rule for the payslip of ``localdict``.
+
+        Called by ``hr.payslip._get_payslip_lines`` when :meth:`_satisfy_condition` is truthy.
+        The line total is then ``amount * quantity * rate / 100`` (see
+        ``hr.payslip._get_payslip_line_total``). Depending on ``amount_select``:
+
+        * ``property_input``: ``amount`` is ``inputs[code].amount``, quantity 1, rate 100
+          (``(0.0, 1.0, 100.0, {})`` if the payslip has no input line with the rule code);
+        * ``fix``: ``amount`` is ``amount_fix``, quantity is the evaluation of ``quantity``, rate 100;
+        * ``percentage``: ``amount`` is the evaluation of ``amount_percentage_base``, quantity is
+          the evaluation of ``quantity``, rate is ``amount_percentage``;
+        * ``code``: ``amount_python_compute`` is executed; ``amount`` is ``result``, quantity is
+          ``result_qty`` (default 1.0) and rate is ``result_rate`` (default 100.0).
+
+        :param dict localdict: computation context built by ``hr.payslip._get_localdict``, in
+            which the caller resets ``result``, ``result_qty``, ``result_rate``, ``result_name``
+            and ``explanation_info`` before each rule
+        :return: ``(amount, quantity, rate, explanation_info)``, ``explanation_info`` being the
+            dict used to format ``explanation_template``
+        :rtype: tuple
+        :raise UserError: if the evaluation of an expression or of the code fails
         """
         self.ensure_one()
 
@@ -279,6 +331,23 @@ result_rate = 10''')
             self._raise_error(localdict, _("Wrong python code defined for:"), e)
 
     def _satisfy_condition(self, localdict):
+        """
+        Return whether this rule applies to the payslip of ``localdict``.
+
+        Depending on ``condition_select``:
+
+        * ``none``: ``True``;
+        * ``domain``: the payslip filtered by ``condition_domain`` (truthy recordset if it matches);
+        * ``property_input``: ``True`` if the payslip has an input line with the rule code and a
+          non-zero amount;
+        * ``python``: ``condition_python`` is executed and the value of ``result`` is returned.
+          ``result`` is reset to ``None`` before each rule: a condition that doesn't assign it
+          is falsy.
+
+        :param dict localdict: computation context of the payslip (see :meth:`_compute_rule`)
+        :return: a truthy value if the rule must be computed
+        :raise UserError: if the python condition fails
+        """
         self.ensure_one()
         if self.condition_select == 'none':
             return True
@@ -295,6 +364,13 @@ result_rate = 10''')
             self._raise_error(localdict, _("Wrong python condition defined for:"), e)
 
     def _get_report_field_name(self):
+        """
+        Return the name of the field representing this rule in reports:
+        ``x_l10n_<country code>_<rule code>``, lowercased, with ``.``, ``-`` and spaces
+        replaced by ``_`` (``xx`` as country code if the rule has no country).
+
+        :rtype: str
+        """
         self.ensure_one()
         return 'x_l10n_%s_%s' % (
             self.country_id.code.lower() if self.country_id.code else 'xx',
@@ -327,6 +403,11 @@ result_rate = 10''')
         return
 
     def _set_all_external_identifiers_noupdate(self, noupdate):
+        """
+        Set the ``noupdate`` flag of the XML ids of these rules.
+
+        :param bool noupdate: ``True`` to protect the rules from module updates
+        """
         self.env['ir.model.data'].sudo().search([
             ('model', '=', "hr.salary.rule"), ('res_id', 'in', self.ids)
         ]).write({'noupdate': noupdate})
@@ -334,6 +415,14 @@ result_rate = 10''')
 
     @api.model
     def _get_critical_fields(self):
+        """
+        Return the fields of the computation definition. When a user changes one of them on a
+        rule created by the system, the rule is flagged ``modified_by_user`` and its XML ids are
+        set ``noupdate``, so module updates no longer overwrite it (until
+        :meth:`action_reset_rule`).
+
+        :rtype: list
+        """
         return [
             'code', 'category_ids', 'struct_ids', 'country_id', 'sequence',
             'condition_select', 'condition_python', 'condition_domain', 'amount_select', 'amount_fix',
@@ -384,6 +473,11 @@ result_rate = 10''')
         return required
 
     def _validate_category_ids_field(self, vals):
+        """
+        Return whether ``vals['category_ids']`` (module data values) is a single CLEAR
+        ``(5, 0, 0)`` or SET ``(6, 0, ids)`` command, the only forms that a payroll data reset
+        restores correctly.
+        """
         category_ids = vals.get('category_ids')
         if len(category_ids) != 1 or len(category_ids[0]) != 3:
             return False
@@ -392,6 +486,13 @@ result_rate = 10''')
 
     @api.model_create_multi
     def create(self, vals_list):
+        """
+        Create the rules and rebuild the properties definition of their structures.
+
+        When loaded from module data (``install_mode``), log a warning for each rule that doesn't
+        explicitly set the fields given by :meth:`_get_reset_required_explicit_fields`, or that
+        sets ``category_ids`` with another command than CLEAR or SET.
+        """
         rules = super().create(vals_list)
         rules._sync_properties_definition()
 
@@ -434,6 +535,12 @@ result_rate = 10''')
         return rules
 
     def write(self, vals):
+        """
+        Write on the rules and rebuild the properties definition of their structures.
+
+        When a user modifies a field of :meth:`_get_critical_fields` on a rule created by the
+        system, the rule is flagged ``modified_by_user`` and its XML ids are set ``noupdate``.
+        """
         rules_created_by_system = self.filtered(
             lambda r: r.create_uid.id == SUPERUSER_ID
         )
@@ -459,18 +566,64 @@ result_rate = 10''')
         return result
 
     def _sync_properties_definition(self):
+        """Rebuild the ``version_properties_definition`` of the structures of these rules."""
         self.struct_ids._sync_properties_to_definition()
 
-    @api.constrains('code', 'condition_select')
+    @api.constrains('code', 'condition_select', 'input_usage_employee')
     def _validate_code(self):
         for rule in self:
-            if rule.condition_select == 'property_input' and not re.match(r'^[a-zA-Z0-9_]+$', rule.code):
+            if (rule.condition_select == 'property_input' or rule.input_usage_employee) and not re.match(r'^[a-zA-Z0-9_]+$', rule.code):
                 raise ValidationError(self.env._("Invalid Code: %s\nThe code must contain only letters, numbers, and underscores (e.g., 'BASIC_SALARY' or 'rule_01').", rule.code))
 
+    def _reload_from_data_files(self):
+        """
+        Reload only the ``<record>`` of this rule from the payroll data files
+        (``hr.payslip._get_data_files_to_update``), leaving the other records of
+        these files untouched.
+
+        :raises UserError: if the rule is not defined in the payroll data files
+        """
+        self.ensure_one()
+        xmlids = self.env['ir.model.data'].sudo().search([
+            ('model', '=', self._name), ('res_id', '=', self.id),
+        ])
+        reloaded = False
+        for module, filenames in self.env['hr.payslip']._get_data_files_to_update():
+            names = set(xmlids.filtered(lambda d: d.module == module).mapped('name'))
+            if not names:
+                continue
+            for filename in filenames:
+                with file_open(f'{module}/{filename}', 'rb') as fp:
+                    doc = etree.parse(fp)
+                    xml_filename = fp.name
+                records = [
+                    node for node in doc.iter('record')
+                    if node.get('id', '').removeprefix(f'{module}.') in names
+                ]
+                if not records:
+                    continue
+                _logger.info("Reloading salary rule %s from %s/%s", self.code, module, filename)
+                root = etree.Element('odoo')
+                root.extend(records)
+                xml_import(self.env, module, {}, 'update', xml_filename=xml_filename).parse(root)
+                reloaded = True
+        if not reloaded:
+            raise UserError(self.env._(
+                "The salary rule %s is not defined in the payroll data and cannot be reset.",
+                self.display_name,
+            ))
+
     def action_reset_rule(self):
+        """
+        Restore this rule as defined in the module data: re-enable the update of its XML ids,
+        reload its record from the payroll data files (:meth:`_reload_from_data_files`),
+        then unarchive it and clear ``modified_by_user``.
+
+        :return: client action displaying a success notification
+        """
         self.ensure_one()
         self._set_all_external_identifiers_noupdate(False)
-        self.env['hr.payslip'].with_user(SUPERUSER_ID)._update_payroll_data(self.country_id.code)
+        self.with_user(SUPERUSER_ID)._reload_from_data_files()
         self.with_user(SUPERUSER_ID).write({
             'modified_by_user': False,
             'active': True,

@@ -54,7 +54,7 @@ class ResPartner(models.Model):
             Partner's fields:
             - Street
             - Zip
-            - Citizen id or VAT number
+            - Citizen id, VAT number or BCE number
             - Country
         """
         partner_missing_data = self._get_partner_missing_data(check_phone_number=check_phone_number)
@@ -72,7 +72,8 @@ class ResPartner(models.Model):
         partner_missing_data = self.env['res.partner']
         for partner in self:
             partner = partner.commercial_partner_id
-            if not all([partner.street, partner.zip, partner.country_id, (partner.citizen_identification or partner.vat)]):
+            identification = partner.citizen_identification or partner.vat or partner._get_additional_identifier('BE_EN')
+            if not all([partner.street, partner.zip, partner.country_id, identification]):
                 partner_missing_data |= partner
             if check_phone_number and not partner.phone:
                 partner_missing_data |= partner

@@ -56,13 +56,24 @@ export class FakeEventsPlugin extends Plugin {
     async _loadProjectsAndTasks() {
         const projects = await this.orm.searchRead(
             "project.project",
-            [["is_template", "=", false]],
-            ["id"]
+            [
+                ["is_template", "=", false],
+                ["allow_timesheets", "=", true],
+            ],
+            ["id"],
+            { limit: 10 }
         );
+        if (!projects.length) {
+            return { projects, tasksByProject: {} };
+        }
         const tasks = await this.orm.searchRead(
             "project.task",
-            [["is_template", "=", false]],
-            ["project_id"]
+            [
+                ["is_template", "=", false],
+                ["project_id", "in", projects.map((p) => p.id)],
+            ],
+            ["project_id"],
+            { limit: 100 }
         );
 
         const tasksByProject = {};
@@ -146,7 +157,7 @@ export class FakeEventsPlugin extends Plugin {
                 return ev;
             };
 
-            if (r < 0.1) {
+            if (r < 0.1 && projects.length > 0) {
                 const proj = randomChoice(projects);
                 const pid = proj.id;
                 const tlist = tasksByProject[pid];

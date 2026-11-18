@@ -1,3 +1,4 @@
+from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests import tagged
 
@@ -39,3 +40,55 @@ class TestAccountBillPayment(AccountTestInvoicingCommon):
 
         payment.unlink()
         self.assertEqual(bill.payment_state, 'not_paid')
+
+    def test_partial_reconcile_with_payments_coming_from_provider(self):
+        """ Test that we not allow partial reconcile on payments coming from
+            payment provider.
+        """
+        if 'payment_transaction_id' not in self.env['account.payment']._fields:
+            self.skipTest("account_payment is not installed")
+
+        provider = self.env['payment.provider'].create({  # noqa: OLS03001
+            'name': 'Test',
+            'journal_id': self.company_data['default_journal_bank'].id,
+        })
+        payment_method = self.env['payment.method'].create({  # noqa: OLS03001
+            'name': 'Test Payment Method',
+            'code': 'test',
+            'active': True,
+            'provider_id': provider.id,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'journal_id': self.company_data['default_journal_sale'].id,
+            'invoice_line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'product_id': self.product_a.id,
+                    'quantity': 1,
+                    'price_unit': 100,
+                })
+            ]
+        })
+        payment_transaction = self.env['payment.transaction'].with_context(payment_safe_write=True).create({  # noqa: OLS03001
+            'provider_id': provider.id,
+            'payment_method_id': payment_method.id,
+            'invoice_ids': [invoice.id],
+            'partner_id': self.partner_a.id,
+            'amount': 200,
+            'currency_id': invoice.currency_id.id,
+        })
+        payment_transaction._create_payment(payment_method_line_id=self.company_data['default_journal_bank'].inbound_payment_method_line_ids[0].id)
+        payment_transaction._post_process()
+        payment = payment_transaction.payment_id
+        invoice.action_post()
+        payment.action_post()
+        statement_line = self.env['account.bank.statement.line'].create({
+            'journal_id': self.company_data['default_journal_bank'].id,
+            'date': '2026-01-01',
+            'partner_id': self.partner_a.id,
+            'amount': 100.0,
+        })
+        inv_line = payment.move_id.line_ids.filtered(lambda l: l.balance == 200)
+        self.assertFalse(statement_line._get_partial_amounts(-200, inv_line, -100, -100))

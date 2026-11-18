@@ -13,7 +13,7 @@ GROUPED_ACCOUNT_TYPES = {
     'income': {'types': ('income', 'income_other'), 'counterpart': 'expense'},
     'expense': {'types': ('expense', 'expense_other', 'expense_depreciation', 'expense_direct_cost'), 'counterpart': 'income'},
     'non_current_assets': {'types': ('asset_fixed', 'asset_non_current'), 'counterpart': 'equity_and_non_cur_liabilities'},
-    'equity_and_non_cur_liabilities': {'types': ('equity', 'equity_unaffected', 'liability_non_current'), 'counterpart': 'non_current_assets'},
+    'equity_and_non_cur_liabilities': {'types': ('equity', 'equity_unaffected', 'equity_retained', 'liability_non_current'), 'counterpart': 'non_current_assets'},
     'liquidity': {'types': ('asset_cash',), 'counterpart': 'liquidity'},
     'off_balance': {'types': ('off_balance',), 'counterpart': 'off_balance'},
 }

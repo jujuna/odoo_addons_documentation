@@ -2848,3 +2848,20 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
                 {'type_id': return_types[1].id, 'company_id': self.company_data['company'].id},
             ]
         )
+
+    def test_readonly_user_access_tax_returns_action(self):
+        """Ensure users with Accounting Read-only rights can view the Tax Return page without encountering an AccessError."""
+        readonly_user = self.env['res.users'].create({
+            'name': 'Readonly Test',
+            'login': 'readonly_test_user',
+            'group_ids': [
+                Command.set([
+                    self.env.ref('base.group_user').id,
+                    self.env.ref('account.group_account_readonly').id,
+                ])
+            ],
+        })
+        server_action = self.env.ref('account_reports.action_server_open_view_account_return')
+        result = server_action.with_user(readonly_user).run()
+        self.assertEqual(result.get('type'), 'ir.actions.act_window')
+        self.assertEqual(result.get('res_model'), 'account.return')

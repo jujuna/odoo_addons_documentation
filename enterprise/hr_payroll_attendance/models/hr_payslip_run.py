@@ -10,7 +10,7 @@ class HrPayslipRun(models.Model):
     @api.model
     def _get_start_payrun_warnings(self, versions, date_start, date_end):
         warnings = super()._get_start_payrun_warnings(versions, date_start, date_end)
-        attendance_versions = versions.filtered('attendance_based')
+        attendance_versions = versions.filtered(lambda v: not v.has_static_work_entries())
         if not attendance_versions:
             return warnings
         pending_overtime_domain = Domain.AND([

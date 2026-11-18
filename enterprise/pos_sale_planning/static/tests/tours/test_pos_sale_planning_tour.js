@@ -37,6 +37,10 @@ registry.category("web_tour.tours").add("test_pos_sale_planning_with_linked_reso
             PlanningSlotPopup.clickResourceInPopup("Meeting Room A"),
             // Payment line name includes the slot display name in parentheses
             PaymentScreen.selectedPaymentlineHas("Resource (Linked) (Slot Partner)", "11.5"),
+            {
+                content: "invoice button is disabled",
+                trigger: ".js_invoice[disabled]",
+            },
             Chrome.endTour(),
         ].flat(),
 });

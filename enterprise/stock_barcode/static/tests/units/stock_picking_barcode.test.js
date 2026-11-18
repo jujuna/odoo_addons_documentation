@@ -80,6 +80,12 @@ test("scan barcode button in mobile device and check video scanner delay", async
             super.setup();
         },
     });
+    // simulate an environment with a camera, so the test doesn't rely on the browser's one
+    patch(navigator.mediaDevices, {
+        async getUserMedia() {
+            return new MediaStream();
+        },
+    });
     const pickingRecord = {
         id: 2,
         state: "done",

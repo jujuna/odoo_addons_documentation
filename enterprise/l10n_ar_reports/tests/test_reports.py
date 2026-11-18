@@ -588,3 +588,30 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
         self.options['txt_type'] = 'sale'
         out = self.env['l10n_ar.tax.report.handler']._vat_book_get_txt_files(self.options, 'sale')
         self.assertTrue(out)
+
+    def test_sale_only_simple_responsibility_change(self):
+        """ VAT Simple tax report should only take into account the "ARCA Responsibility Type" of the customer
+            at the date of the invoice for each invoice.
+        """
+        self.options['ar_vat_book_tax_types_available']['sale']['selected'] = True
+        self.options['ar_vat_book_tax_types_available']['purchase']['selected'] = False
+        self.options['date']['date_from'] = '2024-01-01'
+        self.options['date']['date_to'] = '2024-01-31'
+        # "ARCA Responsibility Type" of customer is "IVA Sujeto Exento"
+        self._create_invoice_one_line(
+            product_id=self.service_iva_27,
+            price_unit=100.0,
+            partner_id=self.res_partner_servicios_globales,
+            invoice_date='2024-01-18',
+            post=True,
+        )
+        # Change "ARCA Responsibility Type" of customer to "IVA Responsable Inscripto"
+        self.res_partner_servicios_globales.l10n_ar_afip_responsibility_type_id = self.env.ref("l10n_ar.res_IVARI")
+        self._create_invoice_one_line(
+            product_id=self.product_iva_105,
+            price_unit=1000.0,
+            partner_id=self.res_partner_servicios_globales,
+            invoice_date='2024-01-19',
+            post=True,
+        )
+        self._test_csv_file('SaleInvoiceResponsibility.csv', 'sale_invoice')

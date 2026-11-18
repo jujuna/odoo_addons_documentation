@@ -123,6 +123,22 @@ class TestHrAppraisalRequest(TransactionCase, MockEmail):
         # Check the appraisal request rights
         self.assertFalse(self.employee.can_request_appraisal)
 
+    def test_request_appraisal_url(self):
+        """The request should link to the correct appraisal."""
+        for user in (self.manager_user, self.employee_user):
+            with self.subTest(user=user.name):
+                appraisal = self.env['hr.appraisal'].create({'employee_id': self.employee.id, 'manager_ids': self.employee.parent_id})
+                request = self.request_appraisal_from(appraisal, user=user)
+                with self.mock_mail_gateway():
+                    request.action_invite()
+                self.assertMailMailWRecord(
+                    appraisal,
+                    [self.employee_user.partner_id if user == self.manager_user else self.manager_user.partner_id],
+                    'sent',
+                    author=self.manager_user.partner_id if user == self.manager_user else self.employee_user.partner_id,
+                    email_values={'body_content': f'{appraisal.get_base_url()}/mail/view?model=hr.appraisal&amp;res_id={appraisal.id}'},
+                )
+
     def test_user_body(self):
         """ user body should be sent """
         appraisal = self.env['hr.appraisal'].create({'employee_id': self.employee.id, 'manager_ids': self.employee.parent_id})

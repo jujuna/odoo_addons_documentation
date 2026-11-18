@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 01:03+0000\n"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-11-12 12:45+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "timesheet_grid/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -118,7 +118,31 @@ msgstr "/Nessuna attività"
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "07m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "12m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "1h 21m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "2h 22m"
+msgstr "2o 22m"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "42m"
 msgstr ""
 
 #. module: timesheet_grid
@@ -126,9 +150,9 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
 msgid ""
 "<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "
-"\"Metting with the customer.\"</i>"
+"\"Meeting with the customer.\"</i>"
 msgstr ""
-"<b>Aggiungi una descrizione</b> <br/> <i> Riassumi brevemente la tua "
+"<b>Aggiungi una descrizione</b> <br/> <i>Riassumi brevemente la tua "
 "attività, ad es. \"Incontro con il cliente.\"</i>"
 
 #. module: timesheet_grid
@@ -172,6 +196,16 @@ msgstr ""
 "inizia qui.</i>"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
+msgid ""
+"<b>Start your session</b> <br/> <i>A session must be running to log a "
+"timesheet.</i>"
+msgstr ""
+"<b>Avvia la sessione</b> <br/> <i>È necessario avviare una sessione per "
+"registrare un foglio ore.</i>"
+
+#. module: timesheet_grid
 #: model_terms:digest.tip,tip_description:timesheet_grid.digest_tip_timesheet_grid_0
 msgid "<b>Tip: Let the Timesheets Assistant do the hard work</b>"
 msgstr ""
@@ -212,18 +246,18 @@ msgstr ""
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder_user
 msgid ""
 "<t>\n"
-"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
-"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"></t>\n"
+"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"></t>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to log your hours for the following period: <t t-"
 "out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" data-"
-"icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
+"icon=\"east\"></i> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
 "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged <t "
 "t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != "
 "0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> hours on "
 "the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours % 1 !"
 "= 0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> requested."
-"<br/>\n"
+"<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}};; padding: 8px 16px "
@@ -231,36 +265,36 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Fill in your timesheet</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
 msgstr ""
 "<t>\n"
-"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
-"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
-"Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
-"questo è un semplice promemoria per ricordarti di registrare le tue ore "
-"durante il seguente periodo: <t t-out=\"ctx.get('date_start') or "
-"''\">05/05/2021</t> <i class=\"oi\" data-icon=\"east\"/> <t t-"
-"out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.\n"
-"Finora, hai <t t-if=\"timesheet_hours != 0\">solo</t> registrato <t t-"
+"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"></t>\n"
+"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"></t>\n"
+"Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
+"con il seguente promemoria vogliamo ricordarti di registrare le ore per il "
+"seguente periodo: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i "
+"class=\"oi\" data-icon=\"east\"></i> <t t-out=\"ctx.get('date_stop') or ''\">"
+"06/05/2021</t>.\n"
+"Per adesso, hai registrato <t t-if=\"timesheet_hours != 0\">solo</t> <t t-"
 "out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != 0\" "
-"t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> ore delle <t t-"
+"t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> ore sulle <t t-"
 "out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours % 1 != 0\" t-"
-"out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> richieste.<br/>\n"
+"out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> richieste.<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}};; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\">Riempi il tuo foglio ore</a>\n"
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size: 13px;\">Compila il foglio ore</a>\n"
 "</div>\n"
-"<br/>Grazie,<br/>\n"
+"<br>Grazie,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
@@ -269,10 +303,10 @@ msgstr ""
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder
 msgid ""
 "<t>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to approve your team's timesheets for the "
 "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - "
-"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
@@ -280,29 +314,28 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Validate the Timesheets</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
 msgstr ""
 "<t>\n"
-"Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
-"questo è un semplice promemoria per ricordarti di approvare i fogli ore del "
-"tuo team per il seguente periodo: <t t-out=\"ctx.get('date_start') or "
-"''\">05/05/2021</t> - <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>."
-"<br/>\n"
+"Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
+"ti ricordiamo di approvare i fogli ore del tuo team per il seguente periodo: "
+"<t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - <t t-out=\"ctx.get"
+"('date_stop') or ''\">06/05/2021</t>.<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\">Convalida i fogli ore</a>\n"
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size: 13px;\">Valida fogli ore</a>\n"
 "</div>\n"
-"<br/>Grazie,<br/>\n"
+"<br>Grazie,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
@@ -311,24 +344,24 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A document being written, scrolling"
-msgstr ""
+msgstr "Un documento in fase di scrittura, scorrimento"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A terminal with code scrolling by"
-msgstr ""
+msgstr "Un terminale con codice che scorre"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A video call with a participant on screen"
-msgstr ""
+msgstr "Una videochiamata con un partecipante sullo schermo"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Gruppi di accesso"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__active
@@ -358,6 +391,12 @@ msgstr "ActivityWatch è installato ma deve essere configurato."
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/timeline/timeline.xml:0
 msgid "Add"
 msgstr "Aggiungi"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/hooks/use_aw_suggestions_draggable.js:0
+msgid "Add %s suggestions"
+msgstr "Aggiungi %s suggerimenti"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
@@ -416,7 +455,7 @@ msgstr "Importo"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "An inbox, with a message opening"
-msgstr ""
+msgstr "Una posta in arrivo, con un messaggio che si apre"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_account_analytic_line
@@ -524,7 +563,7 @@ msgstr "Assente"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Bill 22% more of your time"
-msgstr ""
+msgstr "Fattura il 22% in più del tuo tempo"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -576,8 +615,14 @@ msgstr "Chiamata"
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Call Marc"
+msgstr "Chiamare Marc"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Captured today"
-msgstr ""
+msgstr "Acquisito oggi"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -613,6 +658,12 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Chronological"
 msgstr "Cronologico"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Clear search"
+msgstr "Cancella ricerca"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -668,7 +719,7 @@ msgstr "Configurazione completa"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Composing email $1"
-msgstr ""
+msgstr "Redazione e-mail 1 $"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -714,6 +765,8 @@ msgid ""
 "Connected failed. Make sure ActivityWatch is running, and enable “Apps on "
 "Device” in your browser settings"
 msgstr ""
+"Connessione non riuscita. Assicurati che ActivityWatch sia in esecuzione e "
+"abilita “App sul dispositivo” nelle impostazioni del browser"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1003,6 +1056,12 @@ msgstr "Tutti"
 
 #. module: timesheet_grid
 #. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Feature XyZ"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Find the ActivityWatch extension and copy its"
 msgstr "Trova l'estensione ActivityWatch e copia il suo"
@@ -1238,7 +1297,7 @@ msgstr "URL manifesto"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Matched to the right project, ready to confirm"
-msgstr ""
+msgstr "Abbinato al progetto corretto, pronto per la conferma"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__meeting
@@ -1361,7 +1420,7 @@ msgstr "Hai bisogno di aiuto? Consulta la nostra documentazione"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Never lose track of your time again"
-msgstr ""
+msgstr "Non perdere mai più traccia del tuo tempo"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1430,6 +1489,12 @@ msgstr "Nessun suggerimento per %(boldStart)s%(day)s%(boldEnd)s ."
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
 msgid "No suggestions for %(boldStart)sToday%(boldEnd)s."
 msgstr "Nessun suggerimento per %(boldStart)sOggi%(boldEnd)s."
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "No suggestions match \""
+msgstr "Nessun suggerimento corrisponde a \""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1598,7 +1663,7 @@ msgstr "Giorno precedente"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Privacy-friendly"
-msgstr ""
+msgstr "Privacy-friendly"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__applies_to__private
@@ -1623,15 +1688,15 @@ msgid "Public Employee"
 msgstr "Dipendente pubblico"
 
 #. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "Pycharm - %(folder)s - %(branch)s"
-msgstr "Pycharm - %(folder)s - %(branch)s"
-
-#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_timesheet_merge_wizard__unit_amount
 msgid "Quantity"
 msgstr "Quantità"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Read Agreement"
+msgstr ""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1643,7 +1708,7 @@ msgstr "Lettura posta in arrivo"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Reading email $1"
-msgstr ""
+msgstr "Lettura e-mail 1 $"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1723,6 +1788,12 @@ msgid "Restart the Server"
 msgstr "Riavvia il server"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Review Specification"
+msgstr ""
+
+#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_res_config_settings__timesheet_rounding
 msgid "Round up"
 msgstr "Arrotondamento"
@@ -1740,6 +1811,12 @@ msgstr "Arrotondamento applicato quando si traccia il tempo usando il timer"
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Save"
 msgstr "Salva"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Search suggestions..."
+msgstr "Cerca suggerimenti..."
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_list
@@ -1892,7 +1969,7 @@ msgstr "Avvia sessione"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Start new timer"
-msgstr ""
+msgstr "Avvia nuovo timer"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1940,7 +2017,7 @@ msgstr "L'Assistente è pronto a monitorare la tua attività. 🎉"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "The Timesheets Assistant isn't available on mobile yet"
-msgstr ""
+msgstr "L'assistente Fogli ore non è ancora disponibile su dispositivi mobili"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.res_config_settings_view_form
@@ -2026,6 +2103,9 @@ msgid ""
 "Example pattern: Meet - (.*)\\|https://meet.google.com captures each Google "
 "Meet meeting.\n"
 "\n"
+"For code editors, the pattern is matched against \"<repository>|<branch>\", "
+"e.g. odoo-dev/enterprise|master-1234-dev.\n"
+"\n"
 "Tip: The parts in parentheses (…) are captured automatically and can be used "
 "in the Template or in the Description.\n"
 "\n"
@@ -2034,23 +2114,26 @@ msgid ""
 "Search for info about Customer A → counted as part of the same event\n"
 "Open Customer B Meeting → a new event starts."
 msgstr ""
-"Questo indica a Odoo quale attività tracciare da ActivityWatch. Ogni "
-"attività che corrisponde a questo modello creerà un nuovo evento, e tutte le "
+"Questo indica a Odoo quale attività monitorare da ActivityWatch. Ogni "
+"attività che corrisponde a questo modello creerà un nuovo evento e tutte le "
 "azioni correlate successive saranno conteggiate come parte di esso fino "
-"all'inizio di un'attività diversa. Vengono tracciate solo le attività di "
+"all’inizio di un’attività diversa. Vengono monitorate solo le attività di "
 "durata superiore a 1 minuto.\n"
 "\n"
-"Esempio di modello: Meet - (.*)\\|https://meet.google.com cattura ogni "
-"riunione di Google Meet.\n"
+"Esempio di modello: Meet - (.*)\\|https://meet.google.com rileva ogni "
+"riunione su Google Meet.\n"
+"\n"
+"Per gli editor di codice, il modello viene confrontato con \"<repository>|"
+"<branch>\", ad esempio odoo-dev/enterprise|master-1234-dev.\n"
 "\n"
 "Suggerimento: le parti tra parentesi (…) vengono acquisite automaticamente e "
 "possono essere utilizzate nel Modello o nella Descrizione.\n"
 "\n"
 "Esempio di un nuovo evento:\n"
-"Apri riunione con il Cliente A → viene creato un nuovo evento\n"
-"Cerca informazioni sul Cliente A → conteggiato come parte dello stesso "
+"apri riunione con il Cliente A → viene creato un nuovo evento\n"
+"cerca informazioni sul Cliente A → viene conteggiato come parte dello stesso "
 "evento\n"
-"Apri riunione con il Cliente B → inizia un nuovo evento."
+"apri riunione con il Cliente B → ha inizio un nuovo evento."
 
 #. module: timesheet_grid
 #. odoo-python
@@ -2085,6 +2168,18 @@ msgstr "Arrotondamento tempo"
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_view_grid_by_project
 msgid "Time Spent"
 msgstr "Tempo impiegato"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time added"
+msgstr "Tempo aggiunto"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time removed"
+msgstr "Tempo eliminato"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_employee_public__timesheet_manager_id
@@ -2330,6 +2425,12 @@ msgstr "Sotto"
 
 #. module: timesheet_grid
 #. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Undo"
+msgstr "Annulla"
+
+#. module: timesheet_grid
+#. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Unknown Activity"
 msgstr "Attività sconosciuta"
@@ -2399,12 +2500,6 @@ msgid "User responsible of timesheet validation. Should be Timesheet Manager."
 msgstr ""
 "Utente responsabile della convalida dei fogli ore. Deve essere supervisore "
 "dei fogli ore."
-
-#. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "VS Code - %(folder)s"
-msgstr "VS Code - %(folder)s"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2657,7 +2752,7 @@ msgstr "I tuoi fogli ore"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Your activity, tracked locally"
-msgstr ""
+msgstr "La tua attività, monitorata localmente"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2733,7 +2828,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Zero effort"
-msgstr ""
+msgstr "Sforzo zero"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2766,6 +2861,18 @@ msgid "below to open the ActivityWatch website."
 msgstr "di seguito per aprire il sito web di ActivityWatch."
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info py-3"
+msgstr "border border-info py-3"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info rounded py-3"
+msgstr "border border-info rounded py-3"
+
+#. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.res_config_settings_view_form
 msgid "days"
 msgstr "giorni"
@@ -2792,7 +2899,7 @@ msgstr "campo."
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "from %(person)s: \"%(subject)s\""
-msgstr ""
+msgstr "da %(person)s: \"%(subject)s\""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2886,7 +2993,7 @@ msgstr "impostazioni, inserisci il tuo"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "to %(person)s: \"%(subject)s\""
-msgstr ""
+msgstr "a %(person)s: \"%(subject)s\""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2900,6 +3007,156 @@ msgstr "per verificare che tutto funzioni."
 msgid "website."
 msgstr "sito web."
 
+#~ msgid ""
+#~ "<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "
+#~ "\"Metting with the customer.\"</i>"
+#~ msgstr ""
+#~ "<b>Aggiungi una descrizione</b> <br/> <i> Riassumi brevemente la tua "
+#~ "attività, ad es. \"Incontro con il cliente.\"</i>"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to log your hours for the following period: "
+#~ "<t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" "
+#~ "data-icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</"
+#~ "t>.\n"
+#~ "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged "
+#~ "<t t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % "
+#~ "1 != 0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> "
+#~ "hours on the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-"
+#~ "if=\"working_hours % 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 "
+#~ "* 60))\">:30</t> requested.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Fill in your timesheet</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "questo è un semplice promemoria per ricordarti di registrare le tue ore "
+#~ "durante il seguente periodo: <t t-out=\"ctx.get('date_start') or "
+#~ "''\">05/05/2021</t> <i class=\"oi\" data-icon=\"east\"/> <t t-"
+#~ "out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.\n"
+#~ "Finora, hai <t t-if=\"timesheet_hours != 0\">solo</t> registrato <t t-"
+#~ "out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != "
+#~ "0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> ore "
+#~ "delle <t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours "
+#~ "% 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> "
+#~ "richieste.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Riempi il tuo foglio ore</a>\n"
+#~ "</div>\n"
+#~ "<br/>Grazie,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to approve your team's timesheets for the "
+#~ "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> "
+#~ "- <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Validate the Timesheets</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "Ciao <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "questo è un semplice promemoria per ricordarti di approvare i fogli ore "
+#~ "del tuo team per il seguente periodo: <t t-out=\"ctx.get('date_start') or "
+#~ "''\">05/05/2021</t> - <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</"
+#~ "t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Convalida i fogli ore</a>\n"
+#~ "</div>\n"
+#~ "<br/>Grazie,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+
+#~ msgid "Pycharm - %(folder)s - %(branch)s"
+#~ msgstr "Pycharm - %(folder)s - %(branch)s"
+
+#~ msgid ""
+#~ "This tells Odoo which activity to track from ActivityWatch. Each activity "
+#~ "that matches this pattern will create a new event, and all following "
+#~ "related actions are counted as part of it until a different activity "
+#~ "starts. Only activities longer than 1 minute are tracked.\n"
+#~ "\n"
+#~ "Example pattern: Meet - (.*)\\|https://meet.google.com captures each "
+#~ "Google Meet meeting.\n"
+#~ "\n"
+#~ "Tip: The parts in parentheses (…) are captured automatically and can be "
+#~ "used in the Template or in the Description.\n"
+#~ "\n"
+#~ "Example of a new event:\n"
+#~ "Open Customer A Meeting → a new event is created\n"
+#~ "Search for info about Customer A → counted as part of the same event\n"
+#~ "Open Customer B Meeting → a new event starts."
+#~ msgstr ""
+#~ "Questo indica a Odoo quale attività tracciare da ActivityWatch. Ogni "
+#~ "attività che corrisponde a questo modello creerà un nuovo evento, e tutte "
+#~ "le azioni correlate successive saranno conteggiate come parte di esso "
+#~ "fino all'inizio di un'attività diversa. Vengono tracciate solo le "
+#~ "attività di durata superiore a 1 minuto.\n"
+#~ "\n"
+#~ "Esempio di modello: Meet - (.*)\\|https://meet.google.com cattura ogni "
+#~ "riunione di Google Meet.\n"
+#~ "\n"
+#~ "Suggerimento: le parti tra parentesi (…) vengono acquisite "
+#~ "automaticamente e possono essere utilizzate nel Modello o nella "
+#~ "Descrizione.\n"
+#~ "\n"
+#~ "Esempio di un nuovo evento:\n"
+#~ "Apri riunione con il Cliente A → viene creato un nuovo evento\n"
+#~ "Cerca informazioni sul Cliente A → conteggiato come parte dello stesso "
+#~ "evento\n"
+#~ "Apri riunione con il Cliente B → inizia un nuovo evento."
+
+#~ msgid "VS Code - %(folder)s"
+#~ msgstr "VS Code - %(folder)s"
+
 #~ msgid "Composing email to $1: \"$2\""
 #~ msgstr "Scrivere un’e-mail a 1 €: \"2 €\""
 
@@ -2908,9 +3165,6 @@ msgstr "sito web."
 
 #~ msgid "Automatic timesheets, zero effort."
 #~ msgstr "Fogli ore automatici, zero sforzo."
-
-#~ msgid "Call Marc"
-#~ msgstr "Chiamare Marc"
 
 #~ msgid "Coding PR#23"
 #~ msgstr "Codifica PR#23"

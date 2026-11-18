@@ -1,3 +1,5 @@
+from dateutil.relativedelta import relativedelta
+
 from odoo import fields, models
 from odoo.exceptions import UserError
 
@@ -24,7 +26,7 @@ class HrLeaveAdvancePay(models.TransientModel):
         leave_id = self.env["hr.leave"].browse(self.env.context["hr_leave_id"])
         employee_id = leave_id.employee_id
         start_dt = leave_id.date_from.replace(day=1)
-        next_month_start_dt = start_dt.replace(month=(start_dt.month + 1) % 12)
+        next_month_start_dt = start_dt + relativedelta(months=1)
         version_id = employee_id._get_version(start_dt)
         payslip_id = self.env["hr.payslip"].search(
             [

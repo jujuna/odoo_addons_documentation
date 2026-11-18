@@ -220,3 +220,40 @@ class TestPayrollWorkedDays(TestPayrollBase):
             payslip_form.date_to = date(2030, 1, 31)
         self.assertEqual(payslip.l10n_mx_years_worked, 15)
         self.assertEqual(payslip.l10n_mx_integration_factor, 1.0410958904109588)
+
+    def test_integration_factor_without_contract_history(self):
+        """
+        Ensure that a payslip for an employee without any contract history
+        (e.g. the salary configurator simulation employee) can be computed.
+        """
+        # Mimic the salary configurator: an archived employee with no contract
+        # history and an inactive simulation version.
+        employee = self.env['hr.employee'].create({
+            'name': 'Simulation Employee',
+            'active': False,
+            'company_id': self.env.company.id,
+            'country_id': self.env.ref('base.mx').id,
+        })
+        simulation_version = self.env['hr.version'].create({
+            'name': 'Package Simulation',
+            'active': False,
+            'employee_id': employee.id,
+            'company_id': self.env.company.id,
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'structure_type_id': self.env.ref('l10n_mx_hr_payroll.l10n_mx_employee').id,
+            'wage': 30000.0,
+        })
+        self.assertFalse(employee._get_first_contract_date())
+
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Simulation',
+            'employee_id': employee.id,
+            'version_id': simulation_version.id,
+            'struct_id': self.env.ref('l10n_mx_hr_payroll.l10n_mx_regular_pay').id,
+            'date_from': date(2026, 2, 1),
+        })
+        payslip.compute_sheet()
+
+        self.assertGreater(payslip.l10n_mx_integration_factor, 0)
+        self.assertEqual(payslip.l10n_mx_years_worked, 1)

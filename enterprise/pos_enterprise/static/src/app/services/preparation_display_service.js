@@ -20,7 +20,8 @@ export class PrepDisplay extends WithLazyGetterTrap {
 
     constructor() {
         super(...arguments);
-        this.ready = this.setup(...arguments).then(() => this);
+        const instance = proxy(this);
+        instance.ready = instance.setup(...arguments).then(() => instance);
     }
     async setup({ env, deps: { bus_service, notification, orm, dialog } }) {
         this.data = usePlugin(PosDataPlugin);
@@ -624,5 +625,5 @@ registry.category("services").add("preparation_display", preparationDisplayServi
  * @returns {PrepDisplay}
  */
 export function usePrepDisplay() {
-    return proxy(useService("preparation_display"));
+    return useService("preparation_display");
 }

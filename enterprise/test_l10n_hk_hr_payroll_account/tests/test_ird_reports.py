@@ -830,3 +830,121 @@ class TestIrdReports(TestL10NHkHrPayrollAccountCommon):
         employee_two_data = next(iter(d for d in data['employees_data'] if d['employee'] == self.employee_two))
         self.assertEqual(employee_data['TypeOfForm'], 'S')
         self.assertEqual(employee_two_data['TypeOfForm'], 'A')
+
+    @freeze_time('2026-04-20')
+    def test_ir56m_tax_year_threshold_per_employee(self):
+        """ The thresholds are checked per employee on what is paid over the whole tax year (01/04/2025 - 31/03/2026),
+        whatever the versions, the contract end or the employee type: subcontracting fees above 200000, or the other
+        fees above 25000. An employee is not reported again on another sheet. """
+        contractor_type = self.env.ref('l10n_hk_hr_payroll.l10n_hk_contract_type_contractor')
+        non_employee_type = self.env.ref('l10n_hk_hr_payroll.l10n_hk_contract_type_non_employee')
+        employees = {}
+        for name, contract_fields in (
+            ('A', {}),  # no contract end
+            ('B', {'contract_date_end': date(2025, 12, 31)}),  # contract ended during the year
+            ('C', {}),  # new version on 01/10/2025
+            ('D', {'date_version': date(2025, 1, 1), 'contract_date_start': date(2025, 1, 1)}),
+            ('F', {}),
+            ('G', {'employee_type_id': contractor_type.id}),
+            ('H', {}),
+            ('I', {'employee_type_id': contractor_type.id}),
+            ('J', {'employee_type_id': contractor_type.id}),
+            ('K', {}),
+        ):
+            employees[name] = self._setup_employee(
+                country=self.env.ref('base.hk'),
+                structure_type=self.env.ref('l10n_hk_hr_payroll.structure_type_non_employee_cap57'),
+                resource_calendar=self.resource_calendar,
+                contract_fields={
+                    'date_version': date(2025, 5, 1),
+                    'contract_date_start': date(2025, 5, 1),
+                    'employee_type_id': non_employee_type.id,
+                    'wage': 0.0,
+                    'identification_id': f'{name}1000001',
+                    **contract_fields,
+                },
+                employee_fields={
+                    'name': name,
+                    'l10n_hk_surname': name,
+                    'l10n_hk_given_name': 'Test',
+                    'sex': 'male',
+                    'private_street': '1 Test Road',
+                    'private_city': 'Kowloon',
+                    'private_state_id': self.env.ref('base.state_hk_kln').id,
+                },
+            )
+        version_c2 = employees['C'].create_version({'date_version': date(2025, 10, 1)})
+
+        for name, date_from, date_to, inputs in (
+            ('A', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 45000}),
+            ('B', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 45000}),
+            ('C', date(2025, 8, 1), date(2025, 8, 31), {'CONSULT_FEE': 18000}),
+            ('C', date(2025, 10, 1), date(2025, 10, 31), {'CONSULT_FEE': 18000}),
+            # the payslip ending in the tax year counts, even if it starts before, but not the one ending before
+            ('D', date(2025, 10, 1), date(2025, 10, 31), {'CONSULT_FEE': 20000}),
+            ('D', date(2025, 3, 15), date(2025, 4, 14), {'CONSULT_FEE': 10000}),
+            ('D', date(2025, 2, 15), date(2025, 3, 14), {'CONSULT_FEE': 10000}),
+            # the threshold is on the fees, 30000 of which 6000 are withheld
+            ('F', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 30000, 'WITHHELD': 6000}),
+            # 150000 of subcontracting fees and 20000 of commission are both below their threshold, they are not summed
+            ('G', date(2025, 8, 1), date(2025, 8, 31), {'SUBCON_FEE': 150000}),
+            ('G', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 20000}),
+            # the threshold depends on what is paid, not on the employee type
+            ('H', date(2025, 10, 1), date(2025, 10, 31), {'SUBCON_FEE': 30000}),
+            ('I', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 30000}),
+            # the subcontracting fees are above their threshold, all the fees of the year are reported
+            ('J', date(2025, 8, 1), date(2025, 8, 31), {'SUBCON_FEE': 210000}),
+            ('J', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 10000}),
+            # the fees must exceed the threshold
+            ('K', date(2025, 10, 1), date(2025, 10, 31), {'COMMISSION': 25000}),
+        ):
+            payslip = self.env['hr.payslip'].create({
+                'name': f'Payslip {name} {date_from}',
+                'employee_id': employees[name].id,
+                'struct_id': self.env.ref('l10n_hk_hr_payroll.hr_payroll_structure_cap57_non_employee_salary').id,
+                'date_from': date_from,
+                'date_to': date_to,
+            })
+            payslip._set_input_values(inputs)
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+
+        ir56m = self.env['l10n_hk.ir56m'].create({
+            'year_of_employer_return': '2026',
+            'type_of_form': 'O',
+            'name_of_signer': 'LEE, MAN MAN',
+            'designation_of_signer': 'DIRECTOR',
+        })
+        ir56m.action_generate_declarations()
+        self.assertEqual(
+            ir56m.line_ids.employee_id,
+            employees['A'] | employees['B'] | employees['C'] | employees['D'] | employees['F'] | employees['I'] | employees['J'],
+        )
+        self.assertEqual(ir56m.line_ids.filtered(lambda line: line.employee_id == employees['C']).version_id, version_c2)
+
+        ir56m.action_generate_xml()
+        message = self.env['mail.message'].search([
+            ('model', '=', ir56m._name),
+            ('res_id', '=', ir56m.id),
+            ('attachment_ids', '!=', False),
+        ])
+        xml_tree = etree.fromstring(message.attachment_ids.raw.content)
+        recipients = {recipient.find('HKID').text: recipient for recipient in xml_tree.findall('.//Recipient')}
+        self.assertEqual(
+            {hkid: int(recipient.find('TotalIncome').text) for hkid, recipient in recipients.items()},
+            {
+                'A1000001': 45000, 'B1000001': 45000, 'C1000001': 36000, 'D1000001': 30000, 'F1000001': 30000,
+                'I1000001': 30000, 'J1000001': 220000,
+            },
+        )
+        self._assert_report_totals(xml_tree, recipient_tag='Recipient', excludedTags=['AmtOfSumWithheld'])
+
+        # The payslip starting before the tax year is reported from the start of the tax year
+        self.assertEqual(recipients['D1000001'].find('StartDateOfService').text, '20250401')
+        self.assertEqual(recipients['D1000001'].find('EndDateOfService').text, '20251031')
+        employees_data = ir56m._get_rendering_data(employees['D'])['employees_data']
+        self.assertEqual(employees_data[0]['PeriodOfConsultFee'], '01/04/2025 - 31/10/2025')
+
+        # Everybody is already reported, even C who has two versions with payslips
+        with self.assertRaises(UserError):
+            ir56m.copy().action_generate_declarations()

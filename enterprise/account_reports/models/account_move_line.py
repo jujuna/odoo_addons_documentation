@@ -52,6 +52,7 @@ class AccountMoveLine(models.Model):
         return SQL("%s - %s", table.consolidation_balance, current_rate_table.consolidation_balance)
 
     @api.depends('consolidation_balance', 'consolidation_rate', 'balance')
+    @api.depends_context('date_from', 'date_to', 'cta_date_to')
     def _compute_cta_value(self):
         for line in self:
             line.cta_value = line.consolidation_balance - line.with_context(currency_translation='current').consolidation_balance

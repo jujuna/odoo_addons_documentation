@@ -222,7 +222,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'date_end': date(2018, 4, 30),
             'resource_calendar_id': self.resource_calendar_24_hours_per_week_4_days_per_week.id,
         })
-        self.assertEqual(wizard.time_off_allocation, 14.5)
+        self.assertEqual(wizard.time_off_allocation, 15)
         view = wizard.with_context(force_schedule=True).action_validate()
         self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(date(2018, 4, 1))
-        self.assertEqual(allocation.number_of_days, 14.5, "14.5 days allocated by the credit")
+        self.assertEqual(allocation.number_of_days, 15, "15 days allocated by the credit")

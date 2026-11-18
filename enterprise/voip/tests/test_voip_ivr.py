@@ -68,13 +68,17 @@ class TestVoipIvr(TransactionCase):
         self.assertEqual(duplicate.menu_sound_id.name, "Main Menu Copy")
         self.assertEqual(duplicate.tts_text, menu.tts_text)
 
-    def test_deleting_menu_deletes_its_sound(self):
+    def test_deleting_menu_keeps_its_sound(self):
+        """Its sound may be used elsewhere, e.g. as a voicemail greeting."""
         menu = self.env["voip.ivr"].with_context(voip_skip_pbx_sync=True).create({
             "name": "Main Menu",
             **tts_sound_values("Press one for sales."),
         })
-        menu_sound = menu.menu_sound_id
+        voicemail = self.env["voip.voicemail"].with_context(voip_skip_pbx_sync=True).create({
+            "name": "Sales",
+            "audio_message_id": menu.menu_sound_id.id,
+        })
 
         menu.unlink()
 
-        self.assertFalse(menu_sound.exists())
+        self.assertTrue(voicemail.audio_message_id.exists())

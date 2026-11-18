@@ -42,6 +42,7 @@ export default class BarcodePickingModel extends BarcodeModel {
         this.scrapViewId = data.data.scrap_view_id;
         this.packageKanbanViewId = data.data.package_view_id;
         this.precision = data.data.precision;
+        this.showGenerateLot = use_create_lots && !this.config.restrict_scan_tracking_number;
 
         this.candidatePickingsToBatch = data.data.candidate_pickings_to_batch || [];
 
@@ -522,6 +523,58 @@ export default class BarcodePickingModel extends BarcodeModel {
         });
     }
 
+    async generateLots(move, nextSerial, qtyToProcess, count, defaultGenerationMode) {
+        const moveLineVals = await this.orm.call("stock.move", "action_generate_lot_line_vals", [
+            {
+                barcode_picking_type_id: this.record.picking_type_id.id,
+                barcode_default_generation_mode: defaultGenerationMode,
+                default_product_id: move.product_id,
+                default_location_dest_id: move.location_dest_id,
+                default_location_id: move.location_id,
+                default_tracking: move.has_tracking,
+                default_quantity: qtyToProcess,
+                default_uom_id: this.isLotTracking ? move.uom_id : undefined,
+            },
+            "generate",
+            nextSerial,
+            count,
+            "",
+        ]);
+        this.cache.setCache({
+            "stock.picking.type": [
+                {
+                    ...this.pickingTypeId,
+                    barcode_default_snln_generation: defaultGenerationMode,
+                },
+            ],
+        });
+
+        const moveLines = this.pageLines.filter((l) => [l.move_id, l.move_id.id].includes(move.id));
+        const lineToUpdate = moveLines
+            .filter((l) => !l.lot_id && l.qty_done < l.reserved_uom_qty)
+            // If there are already lots scanned we want to first split so they remain unchanged
+            .map(async (line) => (this.shouldSplitLine(line) ? await this.splitLine(line) : line));
+        for (const vals of moveLineVals) {
+            const params = {
+                lot_name: vals.lot_name,
+                qty_done: vals.quantity,
+            };
+            const line = await lineToUpdate.shift();
+            if (line) {
+                await this.updateLine(line, params);
+                if (this.shouldSplitLine(line, false)) {
+                    lineToUpdate.push(await this.splitLine(line, vals.quantity));
+                }
+            } else {
+                await this._createNewLine({
+                    copyOf: moveLines[0],
+                    fieldsParams: params,
+                });
+            }
+        }
+        this.trigger("update");
+    }
+
     get backordersDomain() {
         return [["backorder_id", "=", this.resId]];
     }
@@ -867,11 +920,13 @@ export default class BarcodePickingModel extends BarcodeModel {
         );
     }
 
-    shouldSplitLine(line) {
+    shouldSplitLine(line, checkParent = true) {
         if (!line.qty_done || !line.reserved_uom_qty || line.qty_done >= line.reserved_uom_qty) {
             return false; // No need to split a completed line or a line with no reservation.
         }
-        line = this._getParentLine(line) || line;
+        if (checkParent) {
+            line = this._getParentLine(line) || line;
+        }
         return line.qty_done && line.reserved_uom_qty && line.qty_done < line.reserved_uom_qty;
     }
 
@@ -885,9 +940,6 @@ export default class BarcodePickingModel extends BarcodeModel {
      * @returns {boolean|Object} Returns the new splitted line or false if line can't be split.
      */
     async splitLine(line, splitQty) {
-        if (!this.shouldSplitLine(line)) {
-            return false;
-        }
         // Use line's locations otherwise the picking's locations are used as default locations.
         const fieldsParams = {
             location_id: line.location_id.id,
@@ -926,9 +978,11 @@ export default class BarcodePickingModel extends BarcodeModel {
             this._clearScanData();
             return false;
         }
-        const splitLine = selectedLine.lot_id ? null : await this.splitLine(selectedLine);
-        if (splitLine && this.config.lines_need_destination_location) {
-            splitLine.wasUpdated = false;
+        if (!selectedLine.lot_id && this.shouldSplitLine(selectedLine)) {
+            const splitLine = await this.splitLine(selectedLine);
+            if (splitLine && this.config.lines_need_destination_location) {
+                splitLine.wasUpdated = false;
+            }
         }
         // If the line has no reservation and is grouped with sibling lines,
         // checks if we can assign to it a part of the reservation.
@@ -1959,7 +2013,8 @@ export default class BarcodePickingModel extends BarcodeModel {
     }
 
     _lineIsComplete(line) {
-        const isComplete = line.reserved_uom_qty && line.qty_done >= line.reserved_uom_qty;
+        const isComplete =
+            typeof line.reserved_uom_qty === "number" && line.qty_done >= line.reserved_uom_qty;
         if (line.isPackageLine && !line.reserved_uom_qty && line.qty_done) {
             return true; // For package line, considers an unreserved package as a completed line.
         }
@@ -2184,10 +2239,14 @@ export default class BarcodePickingModel extends BarcodeModel {
     }
 
     _onExit() {
+        if (this._onExitProcessed) {
+            return;
+        }
         if (["done", "cancel"].includes(this.record.state) || this.moveIds?.length === 0) {
             // No need to all post process if operation is closed or have no move.
             return;
         }
+        this._onExitProcessed = true;
         const quantitiesByMove = this.initialState.lines.reduce((res, line) => {
             const moveId = this._getLineMoveId(line);
             const move = this.cache.getRecord("stock.move", moveId);

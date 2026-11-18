@@ -7,16 +7,18 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-09-17 23:55+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-30 16:18+0000\n"
+"Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/mrp_mps/pt_BR/>\n"
+"20/mrp_mps/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,6 +29,7 @@ msgstr ""
 
 #. module: mrp_mps
 #: model:ir.module.module,description:base.module_mrp_mps
+#, fuzzy
 msgid ""
 "\n"
 "Master Production Schedule\n"
@@ -49,6 +52,24 @@ msgid ""
 "will\n"
 "procure.\n"
 msgstr ""
+"\n"
+"Plano mestre de produção\n"
+" ==========================\n"
+"\n"
+"Às vezes, você precisa criar os pedidos de compra para os componentes de\n"
+"ordens de fabricação que só serão criadas posteriormente. Ou para ordens de "
+"produção\n"
+"em que você só terá as ordens de venda mais tarde. A solução é prever\n"
+"suas previsões de venda e, com base nisso, você já criará alguns pedidos de "
+"produção\n"
+"ou pedidos de compra.\n"
+"\n"
+"Você precisa escolher os produtos que deseja adicionar ao relatório. Você "
+"pode escolher\n"
+"o período do relatório: dia, semana, mês, ... Também é possível definir\n"
+"o estoque de segurança, o mínimo a ser fornecido e substituir manualmente a "
+"quantidade que você irá\n"
+"adquirir.\n"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_bom_form_view_inherit_mps
@@ -118,8 +139,9 @@ msgstr "Adicionar um produto"
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/mps_selection.js:0
+#, fuzzy
 msgid "All Periods"
-msgstr ""
+msgstr "Todos os períodos"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__allowed_route_ids
@@ -379,10 +401,13 @@ msgstr "Quantidade prevista para"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
+#, fuzzy
 msgid ""
 "Forecast Quantity for <span class=\"fw-bold\">selected products</span> based "
 "on historical date or actual demand."
 msgstr ""
+"Quantidade prevista para <span class=\"fw-bold\">produtos selecionados</"
+"span> com base em data histórica ou demanda real."
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__low_forecast
@@ -498,7 +523,7 @@ msgstr "Última atualização em"
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_mps_forecast_suggestion__based_on__last_year
 msgid "Last Year"
-msgstr ""
+msgstr "Últimos 2 anos"
 
 #. module: mrp_mps
 #: model:ir.ui.menu,name:mrp_mps.mrp_mps_menu_planning
@@ -621,8 +646,9 @@ msgstr "Nunca"
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.xml:0
+#, fuzzy
 msgid "No product yet. Add one to start scheduling."
-msgstr ""
+msgstr "Nenhum produto ainda. Adicione um para iniciar o planejamento."
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
@@ -850,7 +876,7 @@ msgstr "Replenish_qty foi atualizada manualmente"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id
 msgid "Replenishment Route"
-msgstr ""
+msgstr "Reabastecimento"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
@@ -871,7 +897,7 @@ msgstr "Acionador de reposição"
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "Replenishment:"
-msgstr ""
+msgstr "Reabastecimento"
 
 #. module: mrp_mps
 #. odoo-python
@@ -899,12 +925,13 @@ msgstr "Rota"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id_placeholder
 msgid "Route Id Placeholder"
-msgstr ""
+msgstr "Marcador de posição de ID de rota"
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__specified_route_id
+#, fuzzy
 msgid "Route for replenishing this product."
-msgstr ""
+msgstr "Rota para reabastecer este produto."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -957,14 +984,16 @@ msgstr "Exibir fornecedor"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__specified_route_id
+#, fuzzy
 msgid "Specified Route"
-msgstr ""
+msgstr "Rota especificada"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
+#, fuzzy
 msgid "Starting Inventory"
-msgstr ""
+msgstr "Inventário inicial"
 
 #. module: mrp_mps
 #: model:ir.model,name:mrp_mps.model_stock_rule
@@ -988,7 +1017,7 @@ msgstr "Campo técnico para dar suporte à filtragem por situação da reposiç�
 #. odoo-python
 #: code:addons/mrp_mps/models/mrp_mps.py:0
 msgid "Template for Master Production Schedule"
-msgstr ""
+msgstr "Plano mestre de produção"
 
 #. module: mrp_mps
 #: model:ir.model.constraint,message:mrp_mps.constraint_mrp_production_schedule_warehouse_product_ref_uniq
@@ -1038,6 +1067,7 @@ msgstr "A quantidade prevista em estoque no final do período."
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.xml:0
+#, fuzzy
 msgid ""
 "The master schedule translates your sales and demand forecasts into a "
 "production and purchase planning for each component.\n"
@@ -1045,6 +1075,11 @@ msgid ""
 "constraints such as: safety stock, production capacity, lead times.\n"
 "                    It's the perfect tool to support your S&OP meetings."
 msgstr ""
+"O plano mestre traduz suas previsões de vendas e demanda em um planejamento "
+"de produção e compra para cada componente.\n"
+"Ele garante que tudo seja programado no prazo, com base em restrições como: "
+"estoque de segurança, capacidade de produção, prazos de entrega.\n"
+"É a ferramenta perfeita para apoiar suas reuniões de PVO."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -1108,8 +1143,9 @@ msgstr ""
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.js:0
+#, fuzzy
 msgid "Update forecast"
-msgstr ""
+msgstr "Atualizar previsão"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__supplier_id
@@ -1158,7 +1194,7 @@ msgstr "com base em dados históricos ou na demanda real."
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "by"
-msgstr ""
+msgstr "por"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view

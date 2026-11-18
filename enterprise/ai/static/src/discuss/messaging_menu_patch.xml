@@ -4,9 +4,9 @@
 <t t-inherit="mail.MessagingMenu" t-inherit-mode="extension">
     <xpath expr="//DiscussSearch" position="after">
         <Dropdown t-if="this.showAgentFilterDropdown">
-            <button class="btn btn-outline-secondary ms-1 flex-shrink-0 position-relative" aria-label="Filters" title="Filters">
+            <button class="btn btn-outline-secondary flex-shrink-0 position-relative rounded-circle" aria-label="Filters" title="Filters">
                 <i class="oi oi-filled" data-icon="filter_alt" role="img"/>
-                <span t-if="this.isAgentFilterActive" class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-success">
+                <span t-if="this.isAgentFilterActive" class="position-absolute top-0 end-0 p-1 rounded-circle bg-success">
                     <span class="visually-hidden">filters active</span>
                 </span>
             </button>

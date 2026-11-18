@@ -31,8 +31,16 @@ class PlanningPlanning(models.Model):
     def _compute_dates(self):
         tz = ZoneInfo(self.env.user.tz or 'UTC')
         for planning in self:
-            planning.date_start = planning.start_datetime.replace(tzinfo=datetime.UTC).astimezone(tz).replace(tzinfo=None)
-            planning.date_end = planning.end_datetime.replace(tzinfo=datetime.UTC).astimezone(tz).replace(tzinfo=None)
+            planning.date_start = (
+                planning.start_datetime.replace(tzinfo=datetime.UTC).astimezone(tz).replace(tzinfo=None)
+                if planning.start_datetime
+                else False
+            )
+            planning.date_end = (
+                planning.end_datetime.replace(tzinfo=datetime.UTC).astimezone(tz).replace(tzinfo=None)
+                if planning.end_datetime
+                else False
+            )
 
     def _compute_display_name(self):
         """ This override is need to have a human readable string in the email light layout header (`message.record_name`) """

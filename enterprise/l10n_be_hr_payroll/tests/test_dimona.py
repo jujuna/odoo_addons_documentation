@@ -4,8 +4,9 @@ from datetime import date
 from unittest.mock import patch
 from dateutil.relativedelta import relativedelta
 
+from odoo import SUPERUSER_ID
 from odoo.addons.l10n_be_hr_payroll.models.hr_version import HrVersion
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import MockHTTPClient, TransactionCase
 from odoo.tests import tagged
 
@@ -111,6 +112,30 @@ class TestDimona(TransactionCase):
         self.assertFalse(self.version.l10n_be_dimona_declaration_id.state)
         self.assertFalse(self.version.l10n_be_last_dimona_declaration_id.state)
 
+    def test_dimona_student_planned_hours_quota(self):
+        """ The planned hours of a student can't exceed the yearly quota of the student hours (650 in 2026) """
+        self.version.write({
+            'l10n_be_dimona_category': 'stu',
+            'contract_date_start': date(2026, 7, 1),
+            'contract_date_end': date(2026, 9, 30),
+            'l10n_be_dimona_planned_hours': 650,
+        })
+        with self.assertRaisesRegex(ValidationError, "can't exceed the yearly quota of 650 hours"):
+            self.version.l10n_be_dimona_planned_hours = 700
+        with self.assertRaisesRegex(ValidationError, "can't be negative"):
+            self.version.l10n_be_dimona_planned_hours = -1
+        # from the employee form too
+        with self.assertRaisesRegex(ValidationError, "can't exceed the yearly quota of 650 hours"):
+            self.employee.l10n_be_dimona_planned_hours = 651
+        # the quota of the year of the start of the occupation (600 hours in 2024)
+        with self.assertRaisesRegex(ValidationError, "can't exceed the yearly quota of 600 hours"):
+            self.version.write({
+                'contract_date_start': date(2024, 7, 1),
+                'contract_date_end': date(2024, 9, 30),
+            })
+        # the hours of a worker who is not a student are not limited
+        self.version.write({'l10n_be_dimona_category': 'oth', 'l10n_be_dimona_planned_hours': 700})
+
     def test_dimona_close(self):
         self.version.l10n_be_dimona_declaration_id = self.env['l10n.be.dimona.declaration'].create({
                 'name': '2029409422',
@@ -190,6 +215,59 @@ class TestDimona(TransactionCase):
         self.assertEqual(self.version.l10n_be_last_dimona_declaration_id.name, '309320239')
         self.assertFalse(self.version.l10n_be_dimona_declaration_id.state)
         self.assertFalse(self.version.l10n_be_last_dimona_declaration_id.state)
+
+    def test_dimona_branch_employee(self):
+        """ The Dimona of the employees of a branch are filed with the access of the employer, its root company """
+        certificate = self.env['certificate.certificate'].create({'name': 'onss cert'})
+        self.env.company.onss_certificate_id = certificate
+        branch = self.env['res.company'].create({
+            'name': 'Branch', 'parent_id': self.env.company.id, 'country_id': self.belgium.id})
+        self.env.user.company_ids |= branch
+        # The Dimona IN is filed when the contract is created
+        with MockHTTPClient(return_headers={'Location': 'foo/bar/blork/2029409422'}, return_status=201):
+            employee = self.env['hr.employee'].create({
+                'name': 'Branch Employee',
+                'company_id': branch.id,
+                'niss': '91111111192',
+                'private_street': '23 Test Street',
+                'private_city': 'Test City',
+                'private_zip': '6800',
+                'private_country_id': self.belgium.id,
+                'wage': 2000,
+                'date_version': date(2025, 9, 26),
+                'contract_date_start': date(2025, 9, 26),
+                'sex': 'male',
+                'l10n_be_dimona_category': 'oth',
+            })
+        self.assertTrue(employee.version_id._l10n_be_dimona_can_declare())
+        self.assertEqual(employee.version_id.l10n_be_dimona_declaration_id.name, '2029409422')
+
+    def test_fetched_dimona_of_branch_employee(self):
+        """ The Dimona fetched by the employer, the root company, are linked to the employees of its branches """
+        branch = self.env['res.company'].create({
+            'name': 'Branch', 'parent_id': self.env.company.id, 'country_id': self.belgium.id})
+        self.employee.company_id = branch
+        relation = self.env['l10n.be.dimona.relation'].create({
+            'name': self.employee.niss,
+            'company_id': self.env.company.id,
+            'content': {'startDate': '2025-09-26'},
+        })
+        period = self.env['l10n.be.dimona.period'].create({
+            'name': '2029409422',
+            'company_id': self.env.company.id,
+            'content': {'startDate': '2025-09-26', 'worker': {'ssin': self.employee.niss}},
+        })
+        self.assertEqual(relation.employee_id, self.employee)
+        self.assertEqual(period.employee_id, self.employee)
+        self.assertEqual(period.relation_id, relation)
+
+    def test_fetch_all_dimona_from_cron(self):
+        """ The cron fetches the Dimona of all the companies, without version """
+        self.env.company.onss_certificate_id = self.env['certificate.certificate'].create({'name': 'onss cert'})
+        cron_env = self.env(user=SUPERUSER_ID, su=True)
+        with MockHTTPClient(return_json={'items': [], 'next': False}, return_status=200) as mock:
+            cron_env['hr.version'].action_fetch_all_dimona()
+        self.assertTrue(mock.calls)
 
     def test_dimona_flow_classic(self):
         # pylint: disable=function-redefined
@@ -339,14 +417,13 @@ class TestDimona(TransactionCase):
         departure_reason = self.env['hr.departure.reason'].create({
             'name': 'End of Contract',
         })
-        self.employee.departure_reason_id = departure_reason.id
+        # Without departure reason, a new contract end date is not a departure yet
+        self.version.contract_date_end = date(2025, 9, 30)
+        self.assertFalse(self.employee.l10n_be_needs_dimona_out)
 
-        worker_code_495 = self.env['l10n.be.worker.code'].create({
-            'name': 'Student/Trainee',
-            'dmfa_code': '495',
-            'egov3_code': '00495',
-        })
-        self.version.l10n_be_worker_code_id = worker_code_495.id
+        # Blue-collar worker: an open-ended period must be closed too
+        self.version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015')
+        self.employee.departure_reason_id = departure_reason.id
 
         # Now, set contract end date
         self.version.contract_date_end = date(2025, 9, 24)
@@ -603,7 +680,8 @@ class TestDimona(TransactionCase):
                         "dimonaIn": {
                             "features": {
                                 "workerType": "OTH",
-                                "jointCommissionNumber": "200",
+                                # CP 200 is not one of the committees declared as such
+                                "jointCommissionNumber": "XXX",
                             },
                             "startDate": "2025-09-26",
                         },
@@ -632,9 +710,9 @@ class TestDimona(TransactionCase):
         warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_missing_dimona_in')
 
         def get_dashboard_employees():
-            return self.env['hr.employee'].union(*(
+            return self.env['hr.employee'].union(
                 warning_data['records'] for warning_data in warning._get_applicable_payroll_warnings(self.env.company)
-            ))
+            )
 
         self.assertEqual(self.employee.l10n_be_dimona_next_action, 'in')
         self.assertIn(self.employee, get_dashboard_employees())
@@ -654,9 +732,9 @@ class TestDimona(TransactionCase):
         warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_dimona_period_not_covered_by_payslip')
 
         def get_dashboard_employees():
-            return self.env['hr.employee'].union(*(
+            return self.env['hr.employee'].union(
                 warning_data['records'] for warning_data in warning._get_applicable_payroll_warnings(self.env.company)
-            ))
+            )
 
         date_start = self.version.contract_date_start
         colleague = self.env['hr.employee'].create({
@@ -713,3 +791,186 @@ class TestDimona(TransactionCase):
 
         self.assertTrue(employee.l10n_be_needs_dimona_in)
         self.assertEqual(employee.l10n_be_dimona_next_action, 'in')
+
+    def _create_dimona_periods(self, period_dates):
+        relation = self.env['l10n.be.dimona.relation'].create({
+            'name': self.employee.niss,
+            'company_id': self.env.company.id,
+            'content': {'startDate': period_dates[0][0].isoformat(), 'worker': {'ssin': self.employee.niss}},
+        })
+        self.assertEqual(relation.employee_id, self.employee)
+        periods = self.env['l10n.be.dimona.period'].create([{
+            'name': str(9000000 + index),
+            'company_id': self.env.company.id,
+            'content': {
+                'startDate': date_start.isoformat(),
+                **({'endDate': date_end.isoformat()} if date_end else {}),
+                'worker': {'ssin': self.employee.niss},
+            },
+        } for index, (date_start, date_end) in enumerate(period_dates)])
+        self.assertEqual(relation.period_ids, periods)
+        self.assertEqual(self.employee.l10n_be_dimona_relation_id, relation)
+        return periods
+
+    def _set_contracts(self, contract_dates):
+        (first_start, first_end), *other_contracts = contract_dates
+        self.version.write({
+            'date_version': first_start,
+            'contract_date_start': first_start,
+            'contract_date_end': first_end,
+        })
+        for date_start, date_end in other_contracts:
+            self.employee.create_version({
+                'date_version': date_start,
+                'contract_date_start': date_start,
+                'contract_date_end': date_end,
+            })
+
+    def test_dimona_periods_mismatch_history_not_encoded(self):
+        """ The company fetched the whole Dimona history but only encoded the current contract. """
+        self.env.company.first_payrun_date = False
+        self._set_contracts([(date(2024, 1, 1), False)])
+        self._create_dimona_periods([(date(2020, 1, 1), date(2022, 12, 31)), (date(2024, 1, 1), False)])
+        self.assertEqual(
+            self.employee._get_dimona_periods_version_mismatch_warning(),
+            "Dimona periods and contract versions are not aligned.",
+            "Without first payrun date, the whole history is compared")
+
+        self.env.company.first_payrun_date = date(2025, 1, 1)
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+    def test_dimona_periods_mismatch_history_encoded(self):
+        """ The company encoded the past contracts too: they are ignored like the periods. """
+        self.env.company.first_payrun_date = date(2025, 1, 1)
+        self._set_contracts([(date(2020, 1, 1), date(2022, 12, 31)), (date(2024, 1, 1), False)])
+        self._create_dimona_periods([(date(2020, 1, 1), date(2022, 12, 31)), (date(2024, 1, 1), False)])
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+        # A start date difference before the first payrun date is not compared anymore
+        current_contract = self.employee.version_ids.filtered(lambda v: v.contract_date_start == date(2024, 1, 1))
+        current_contract.contract_date_start = date(2024, 2, 1)
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+        # A real mismatch after the first payrun date is still reported
+        current_contract.contract_date_end = date(2025, 6, 30)
+        self.assertEqual(
+            self.employee._get_dimona_periods_version_mismatch_warning(),
+            "Dimona periods and contract versions are not aligned.")
+
+    def test_dimona_periods_mismatch_no_first_payrun_date(self):
+        self.env.company.first_payrun_date = False
+        self._set_contracts([(date(2020, 1, 1), date(2022, 12, 31)), (date(2024, 1, 1), False)])
+        self._create_dimona_periods([(date(2020, 1, 1), date(2022, 12, 31)), (date(2024, 1, 1), False)])
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+        self.employee.version_ids.filtered(lambda v: v.contract_date_start == date(2020, 1, 1)).contract_date_end = date(2022, 11, 30)
+        self.assertEqual(
+            self.employee._get_dimona_periods_version_mismatch_warning(),
+            "Dimona periods and contract versions are not aligned.")
+
+    def test_dimona_periods_mismatch_straddling_first_payrun_date(self):
+        """ The Dimona period started long before the first payrun date while the contract
+            was encoded from the first payrun date: compared from the first payrun date only. """
+        self.env.company.first_payrun_date = date(2025, 1, 1)
+        self._set_contracts([(date(2025, 1, 1), False)])
+        self._create_dimona_periods([(date(2020, 1, 1), False)])
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+        # Same with the contract encoded with the real hiring date
+        self.version.write({'date_version': date(2020, 1, 1), 'contract_date_start': date(2020, 1, 1)})
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+        # A contract starting after the first payrun date does not cover the period
+        self.version.write({'date_version': date(2025, 2, 1), 'contract_date_start': date(2025, 2, 1)})
+        self.assertEqual(
+            self.employee._get_dimona_periods_version_mismatch_warning(),
+            "Dimona periods and contract versions are not aligned.")
+
+        self.env.company.first_payrun_date = False
+        self.version.write({'date_version': date(2025, 1, 1), 'contract_date_start': date(2025, 1, 1)})
+        self.assertEqual(
+            self.employee._get_dimona_periods_version_mismatch_warning(),
+            "Dimona periods and contract versions are not aligned.")
+
+    def test_dimona_joint_committee_declaration(self):
+        """ The joint committee is always declared in a Dimona IN: the committee number (3 digits)
+            for the committees listed by the ONSS, "XXX" for the other ones. """
+        cases = [
+            ('l10n_be_joint_committee_302', 'oth', 'XXX'),
+            ('l10n_be_joint_committee_302', 'stu', 'XXX'),
+            ('l10n_be_joint_committee_302', 'ext', '302'),
+            ('l10n_be_joint_committee_124', 'oth', '124'),
+            ('l10n_be_joint_committee_140_03', 'oth', '140'),
+            ('l10n_be_joint_committee_145_04', 'ext', '145'),
+            ('l10n_be_joint_committee_149_01', 'oth', '149'),
+            ('l10n_be_joint_committee_322', 'oth', '322'),
+            ('l10n_be_joint_committee_322_01', 'oth', 'XXX'),
+            ('l10n_be_joint_committee_200', 'oth', 'XXX'),
+            ('l10n_be_joint_committee_200', 'stu', 'XXX'),
+            ('l10n_be_joint_committee_118_03', 'oth', 'XXX'),
+            (False, 'oth', 'XXX'),
+        ]
+        for committee_xmlid, category, expected in cases:
+            with self.subTest(committee=committee_xmlid, category=category):
+                self.version.write({
+                    'l10n_be_joint_committee_id': committee_xmlid and self.env.ref(f'l10n_be_hr_payroll.{committee_xmlid}').id,
+                    'l10n_be_dimona_category': category,
+                })
+                features = self.version._l10n_be_dimona_payload('in')['dimonaIn']['features']
+                self.assertEqual(features, {'workerType': category, 'jointCommissionNumber': expected})
+
+        # The submitted declaration carries it
+        self.version.write({
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'l10n_be_dimona_category': 'oth',
+        })
+        wizard = self.env['l10n.be.dimona.wizard'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'declaration_type': 'in',
+        })
+        with MockHTTPClient(return_headers={'Location': 'foo/bar/blork/2029409498'}, return_status=201):
+            wizard.submit_declaration()
+        declaration = self.version.l10n_be_dimona_declaration_id
+        self.assertEqual(declaration.request_content['dimonaIn']['features']['jointCommissionNumber'], 'XXX')
+
+    def test_dimona_joint_committee_mismatch_warning(self):
+        """ The joint committee answered by the ONSS is compared with the declared value. """
+        self.env.company.first_payrun_date = False
+        self._set_contracts([(date(2024, 1, 1), False)])
+        self.version.l10n_be_dimona_category = 'oth'
+        period = self._create_dimona_periods([(date(2024, 1, 1), False)])
+
+        def set_onss_committee(committee):
+            period.declaration_ids.unlink()
+            self.env['l10n.be.dimona.declaration'].create({
+                'name': '2029409422',
+                'company_id': self.env.company.id,
+                'employee_id': self.employee.id,
+                'content': {
+                    'dimonaIn': {
+                        'startDate': '2024-01-01',
+                        'features': {'workerType': 'OTH', 'jointCommissionNumber': committee},
+                    },
+                    'declarationStatus': {'result': 'A', 'period': {'id': int(period.name)}},
+                },
+            })
+            self.assertEqual(period.declaration_ids.declaration_type, 'dimona_in')
+
+        for committee_xmlid, onss_committee, mismatch in [
+            ('l10n_be_joint_committee_200', 'XXX', False),
+            # declared before: the committee code was sent as is
+            ('l10n_be_joint_committee_200', '200', False),
+            ('l10n_be_joint_committee_200', '302', True),
+            ('l10n_be_joint_committee_302', '302', False),
+            ('l10n_be_joint_committee_302', 'XXX', False),
+            ('l10n_be_joint_committee_302', '100', True),
+            ('l10n_be_joint_committee_140_03', '140', False),
+            ('l10n_be_joint_committee_140_03', '140.03', False),
+        ]:
+            with self.subTest(committee=committee_xmlid, onss_committee=onss_committee):
+                self.version.l10n_be_joint_committee_id = self.env.ref(f'l10n_be_hr_payroll.{committee_xmlid}')
+                set_onss_committee(onss_committee)
+                self.assertEqual(
+                    "The Dimona joint committee does not match the contract version one." in self.employee._get_dimona_periods_version_mismatch_warning(),
+                    mismatch)

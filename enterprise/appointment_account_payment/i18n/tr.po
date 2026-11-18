@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:52+0000\n"
-"PO-Revision-Date: 2026-10-19 08:28+0000\n"
+"PO-Revision-Date: 2026-11-05 07:33+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "appointment_account_payment/tr/>\n"
@@ -27,12 +27,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/appointment_account_payment/models/appointment_type.py:0
 msgid "%(date_start)s at %(time_start)s"
-msgstr ""
+msgstr "%(date_start)s, saat %(time_start)s"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-msgstr ""
+msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -47,6 +47,8 @@ msgid ""
 "<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/"
 ">Appointment Scheduled!"
 msgstr ""
+"<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/>"
+"Randevu Planlandı!"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
@@ -60,12 +62,12 @@ msgstr ""
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "<span class=\"fw-bold\">Attendees</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Katılımcılar</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "<span class=\"fw-bold\">Online</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Çevrimiçi</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
@@ -74,11 +76,14 @@ msgid ""
 "                        <span invisible=\"not manage_capacity\">per seat</"
 "span>"
 msgstr ""
+"<span invisible=\"manage_capacity\">rezervasyon başına</span>\n"
+"                        <span invisible=\"not manage_capacity\">koltuk "
+"başına</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_form
 msgid "<span>Proceed to Payment</span>"
-msgstr ""
+msgstr "<span>Ödemeye Geç</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -112,7 +117,7 @@ msgstr "Ödeme adımını etkinleştirmek için bir ürün gereklidir."
 #. module: appointment_account_payment
 #: model:ir.module.module,description:base.module_appointment_account_payment
 msgid "Add a payment step at the end of appointment and resource bookings"
-msgstr ""
+msgstr "Randevu ve kaynak rezervasyonlarının sonunda bir ödeme adımı ekle"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__allday
@@ -161,6 +166,8 @@ msgid ""
 "Appointment Unavailable! <i class=\"oi oi-filled text-danger me-3\" data-"
 "icon=\"cancel\"/>"
 msgstr ""
+"Randevu Müsait Değil! <i class=\"oi oi-filled text-danger me-3\" data-"
+"icon=\"cancel\"/>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
@@ -168,6 +175,8 @@ msgid ""
 "Appointment waiting for payment <i class=\"oi text-warning me-3\" data-"
 "icon=\"hourglass_bottom\"/>"
 msgstr ""
+"Ödeme bekleyen randevu <i class=\"oi text-warning me-3\" data-"
+"icon=\"hourglass_bottom\"/>"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__asked_capacity
@@ -370,7 +379,7 @@ msgstr "Ücretli Danışmanlık"
 #. odoo-python
 #: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
 msgid "Paid Consultation Booking Fees"
-msgstr ""
+msgstr "Ücretli Danışmanlık Rezervasyon Ücretleri"
 
 #. module: appointment_account_payment
 #. odoo-python
@@ -382,12 +391,12 @@ msgstr "Ücretli Koltuklar"
 #. odoo-python
 #: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
 msgid "Paid Seats Booking Fees"
-msgstr ""
+msgstr "Ücretli Koltuk Rezervasyon Ücretleri"
 
 #. module: appointment_account_payment
 #: model:ir.module.module,shortdesc:base.module_appointment_account_payment
 msgid "Pay to Book"
-msgstr ""
+msgstr "Rezervasyon İçin Ödeme Yapın"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -523,7 +532,7 @@ msgstr "Peşin Ödeme"
 #. module: appointment_account_payment
 #: model:ir.module.module,summary:base.module_appointment_account_payment
 msgid "Up-front payment on bookings"
-msgstr ""
+msgstr "Rezervasyonlarda Peşin Ödeme"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking_line__appointment_user_id
@@ -537,11 +546,13 @@ msgid ""
 "With %(user_name)s\n"
 "%(date_start)s at %(time_start)s"
 msgstr ""
+"Kullanıcı %(user_name)s ile\n"
+"%(date_start)s, saat %(time_start)s"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "Your Details"
-msgstr ""
+msgstr "Bilgileriniz"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_validated

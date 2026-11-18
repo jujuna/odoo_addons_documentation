@@ -3,6 +3,7 @@ import secrets
 from typing import Any
 
 from odoo import api, models
+from werkzeug.exceptions import Forbidden
 
 
 _logger = logging.getLogger(__name__)
@@ -11,6 +12,21 @@ _logger = logging.getLogger(__name__)
 class IotChannel(models.AbstractModel):
     _name = 'iot.channel'
     _description = "The Websocket IoT Channel"
+
+    def _is_message_allowed(self, message, message_type):
+        if self.env.is_system():
+            return True
+
+        if not self.env.user._is_internal():
+            return False
+
+        if self.env.user.has_group("iot.group_iot_admin"):
+            return True
+
+        if message_type != "iot_action":
+            return False
+
+        return message.get("action") != "update_url"
 
     @api.model
     def get_iot_channel(self):
@@ -35,8 +51,8 @@ class IotChannel(models.AbstractModel):
         :param message: The message to send to the IoT Box
         :param message_type: The type of the message (Default: call an action on a device)
         """
-        if not self.env.is_system() and not self.env.user._is_internal():
-            return
+        if not self._is_message_allowed(message, message_type):
+            raise Forbidden()
         loggable_message = {k: v for k, v in message.items() if k != "document"}
         _logger.info("Sending message to IoT channel: %s", loggable_message)
         self.env['bus.bus']._sendone(self.get_iot_channel(), message_type, message)

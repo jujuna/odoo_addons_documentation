@@ -47,11 +47,13 @@ class HrPayslipWorkedDays(models.Model):
         'work_entry_type_id', 'payslip_id', 'payslip_id.struct_id',
         'payslip_id.employee_id', 'payslip_id.version_id', 'payslip_id.struct_id', 'payslip_id.date_from', 'payslip_id.date_to')
     def _compute_is_paid(self):
+        """A worked days line is paid if the ``amount_rate`` of its work entry type is not 0."""
         for worked_days in self:
             worked_days.is_paid = worked_days.work_entry_type_id.amount_rate != 0
 
     @api.depends('payslip_id.worked_days_line_ids.version_id.work_time_rate', 'payslip_id.sum_worked_hours')
     def _compute_fte(self):
+        """Compute the full-time equivalent of the line: ``version.work_time_rate * number_of_hours / payslip.sum_worked_hours``."""
         for version, worked_days in self.grouped('version_id').items():
             work_time_rate = version.work_time_rate
             for payslip, worked_days_by_payslip in worked_days.grouped('payslip_id').items():
@@ -64,8 +66,17 @@ class HrPayslipWorkedDays(models.Model):
         'is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage', 'version_id.hourly_wage',
         'work_entry_type_id.amount_rate', 'work_entry_type_id.is_extra_hours')
     def _compute_amount(self):
+        """Compute the amount paid for the line: ``hourly_rate * number_of_hours * amount_rate`` (0 if not paid).
+
+        The hourly rate is the version wage for hourly wages; otherwise the version wage
+        (``_get_contract_wage()``) divided by the working hours of the version calendar over the
+        whole payslip period, so that a monthly wage is prorated by hours (for flexible calendars,
+        the hours of the non extra-hours lines are used). Out-of-contract lines (code ``000.00``)
+        and lines without version are 0. Lines of edited or non draft payslips are never recomputed.
+        """
+        worked_days_to_compute = self.filtered(lambda wd: not wd.payslip_id.edited and wd.payslip_id.state == 'draft')
         all_calendar_periods = dict()
-        for payslip_id in self.grouped('payslip_id'):
+        for payslip_id in worked_days_to_compute.grouped('payslip_id'):
             date_from, date_to = payslip_id.date_from, payslip_id.date_to
             if not date_from or not date_to:
                 continue
@@ -83,14 +94,19 @@ class HrPayslipWorkedDays(models.Model):
                 )
 
         work_intervals_per_version = dict()
+        work_intervals_per_calendar = dict()
         for version, (date_from, date_to, calendar) in all_calendar_periods.items():
             ctz = ZoneInfo(version._get_tz())
-            dt_from = datetime.combine(date_from, time.min, ctz)
-            dt_to = datetime.combine(date_to, time.max, ctz)
-            work_intervals_per_version[version] = calendar._work_intervals_batch(dt_from, dt_to, compute_leaves=False)[False]
+            key = (calendar, date_from, date_to, ctz)
+            if key not in work_intervals_per_calendar:
+                dt_from = datetime.combine(date_from, time.min, ctz)
+                dt_to = datetime.combine(date_to, time.max, ctz)
+                # Without resources or leaves, these intervals are shared by versions on the same calendar.
+                work_intervals_per_calendar[key] = calendar._work_intervals_batch(dt_from, dt_to, compute_leaves=False)[False]
+            work_intervals_per_version[version] = work_intervals_per_calendar[key]
 
         work_times_per_payslip = dict()
-        for payslip_id in self.grouped('payslip_id'):
+        for payslip_id in worked_days_to_compute.grouped('payslip_id'):
             for version in payslip_id.worked_days_line_ids.grouped('version_id'):
                 date_from, date_to = payslip_id.date_from, payslip_id.date_to
                 work_time = 0
@@ -108,10 +124,8 @@ class HrPayslipWorkedDays(models.Model):
                         work_time = sum(wd.number_of_hours for wd in payslip_id.worked_days_line_ids if not wd.work_entry_type_id.is_extra_hours)
                 work_times_per_payslip[payslip_id, version] = float_round(work_time, 2)
 
-        for worked_days in self:
-            if worked_days.payslip_id.edited or worked_days.payslip_id.state != 'draft':
-                continue
-            if not worked_days.version_id or worked_days.code in '000.00':
+        for worked_days in worked_days_to_compute:
+            if not worked_days.version_id or worked_days.code == '000.00':
                 worked_days.amount = 0
                 continue
             version = worked_days.version_id
@@ -123,6 +137,10 @@ class HrPayslipWorkedDays(models.Model):
             worked_days.amount = hourly_rate * worked_days.number_of_hours * amount_rate if worked_days.is_paid else 0
 
     def _is_incomplete_day(self):
+        """Return whether the line represents less than a full day (less than one day, or less hours per day than the calendar).
+
+        :rtype: bool
+        """
         self.ensure_one()
         work_hours = self.payslip_id._get_worked_day_lines_hours_per_day(self.version_id)
         # For refunds number of days is negative
@@ -155,6 +173,10 @@ class HrPayslipWorkedDays(models.Model):
             worked_day.period_end_date = min(worked_day.version_id.date_end or date.max, worked_day.payslip_id.date_to)
 
     def _get_default_name(self):
+        """Return the default description of the line: the work entry type name, with "(Half-Day)" or "(Custom Hours)" for incomplete days and the category option names.
+
+        :rtype: str
+        """
         self.ensure_one()
         type_name = self.work_entry_type_id.name or ''
         incomplete_day = self._is_incomplete_day()

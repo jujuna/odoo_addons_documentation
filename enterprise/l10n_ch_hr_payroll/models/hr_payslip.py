@@ -94,6 +94,11 @@ class HrPayslip(models.Model):
         else:
             return super()._get_schedule_timedelta()
 
+    def _get_payslip_line_name(self, localdict, rule, input_line=None):
+        if self.country_code == 'CH':
+            return localdict['result_name'] or rule.name
+        return super()._get_payslip_line_name(localdict, rule, input_line)
+
     @api.model
     def _issues_dependencies(self):
         return super()._issues_dependencies() + ['l10n_ch_monthly_snapshot.validation_errors']

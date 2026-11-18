@@ -24,7 +24,10 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
         if report.filter_multi_company != 'tax_units' and len(options['companies']) > 1:
             raise UserError(_('Please select only one company to send the report. If you wish to aggregate multiple companies, please create a tax unit.'))
         date_to = datetime.date.fromisoformat(options['date']['date_to'])
-        closing_date_from, closing_date_to = self.env.ref('l10n_nl_reports.nl_tax_return_type')._get_period_boundaries(self.env.company, date_to)
+        if report == self.env.ref('l10n_nl_reports.dutch_icp_report'):
+            closing_date_from, closing_date_to = fields.Date.to_date(options['date']['date_from']), date_to
+        else:
+            closing_date_from, closing_date_to = self.env.ref('l10n_nl_reports.nl_tax_return_type')._get_period_boundaries(self.env.company, date_to)
         new_options = report.get_options({
             **options,
             'date': {

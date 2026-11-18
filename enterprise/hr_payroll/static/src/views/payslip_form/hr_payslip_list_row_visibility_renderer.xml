@@ -10,5 +10,8 @@
         <xpath expr="//tr[hasclass('o_data_row')]" position="attributes">
             <attribute name="t-att-style">this.getRowStyle(record)</attribute>
         </xpath>
+        <xpath expr="//t[@t-set='isInvisible']" position="attributes">
+            <attribute name="t-value" add="this.isValueHidden(column, record)" separator=" or "/>
+        </xpath>
     </t>
 </odoo>

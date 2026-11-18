@@ -270,3 +270,278 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
 
         self.assertTrue(action)
         self.assertIsInstance(action['context'], dict)
+
+    def test_default_deferred_account_trigger_deferral_warning_popup_data(self):
+        """
+        Tests that posting invoice lines not associated with a deferred entry into
+        a default deferred account triggers a warning in the lines of the default
+        deferred accounts. Tests that the warning references the correct accounts
+        and items. Tests that the warnings are displayed in the correct columns
+        when the balance sheet is split in different comparison periods, analytic
+        plans and analytic accounts.
+        """
+
+        self.env.user.group_ids += self.env.ref('analytic.group_analytic_accounting')
+
+        analytic_plan_1 = self.env['account.analytic.plan'].create({
+            'name': 'Plan 1',
+        })
+        analytic_plan_2 = self.env['account.analytic.plan'].create({
+            'name': 'Plan 2',
+        })
+
+        analytic_account_1 = self.env['account.analytic.account'].create({
+            'name': 'Account 1',
+            'plan_id': analytic_plan_1.id,
+        })
+        analytic_account_2 = self.env['account.analytic.account'].create({
+            'name': 'Account 2',
+            'plan_id': analytic_plan_2.id,
+        })
+
+        def create_invoice(invoice_lines, move_type='in_invoice', invoice_date='2023-01-01', post=True, analytic_distribution=False):
+            journal = self.company_data['default_journal_sale']
+            if move_type.startswith('in_'):
+                journal = self.company_data['default_journal_purchase']
+            move = self.env['account.move'].create({
+                'move_type': move_type,
+                'partner_id': self.partner_a.id,
+                'date': invoice_date,
+                'invoice_date': invoice_date,
+                'journal_id': journal.id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'product_id': self.product_a.id,
+                        'quantity': 1,
+                        'account_id': invoice_line[0].id,
+                        'price_unit': invoice_line[1],
+                        'deferred_start_date': invoice_line[2],
+                        'deferred_end_date': invoice_line[3],
+                        'analytic_distribution': analytic_distribution,
+                    }) for invoice_line in invoice_lines
+                ],
+            })
+            if post:
+                move.action_post()
+            return move
+
+        self.env.cr.cache.pop('report_deferred_lines', None)
+
+        self.env.company.generate_deferred_expense_entries_method = 'on_validation'
+        self.env.company.generate_deferred_revenue_entries_method = 'on_validation'
+
+        expense_account = self.env['account.account'].create({
+            'name': 'Expense Account',
+            'code': 'EXPACC',
+            'account_type': 'expense',
+        })
+        revenue_account = self.env['account.account'].create({
+            'name': 'Revenue Account',
+            'code': 'REVACC',
+            'account_type': 'income',
+        })
+
+        non_deferred_expense_account = expense_account
+
+        # normal expense
+        create_invoice(
+            [[non_deferred_expense_account, 1000, False, False]],
+            invoice_date='2023-03-15',
+            move_type='in_invoice',
+            analytic_distribution={
+                analytic_account_1.id: 100,
+            },
+        )
+
+        # normal deferred expense
+        create_invoice(
+            [[non_deferred_expense_account, 1000, '2023-01-01', '2023-04-30']],
+            invoice_date='2023-03-15',
+            move_type='in_invoice',
+            analytic_distribution={
+                analytic_account_1.id: 100,
+            },
+        )
+
+        # normal revenue
+        non_deferred_revenue_account = revenue_account
+        create_invoice(
+            [[non_deferred_revenue_account, 1000, False, False]],
+            invoice_date='2023-03-15',
+            move_type='out_invoice',
+            analytic_distribution={
+                analytic_account_1.id: 100,
+            },
+        )
+
+        # normal deferred revenue
+        create_invoice(
+            [[non_deferred_revenue_account, 1000, '2023-01-01', '2023-04-30']],
+            invoice_date='2023-03-15',
+            move_type='out_invoice',
+            analytic_distribution={
+                analytic_account_1.id: 100,
+            },
+        )
+
+        def get_default_deferred_account_line(lines, default_deferred_account):
+            default_deferred_account_line = [
+                line
+                for line in lines
+                if line.name == default_deferred_account.display_name
+            ]
+            self.assertTrue(len(default_deferred_account_line) == 1)
+            return default_deferred_account_line[0]
+
+        def get_default_deferred_account_warning_per_column(lines, default_deferred_account):
+            line = get_default_deferred_account_line(lines, default_deferred_account)
+            return [column.deferral_warning_popup_data for column in line.columns]
+
+        def get_move_line_ids_without_deferral_entry_per_column(options, lines, default_deferred_account):
+            line = get_default_deferred_account_line(lines, default_deferred_account)
+            return [
+                self.env['account.move.line'].search(
+                    self.report._get_move_line_ids_without_deferral_entry_domain(
+                        options,
+                        [default_deferred_account.id],
+                        column_group_index=column.column_group_index,
+                    ),
+                ).ids
+                for column in line.columns
+            ]
+
+        def test_deferred_account_line_warning(default_deferred_account, move_type):
+            options = self._generate_options(
+                self.report,
+                '2023-03-01',
+                '2023-03-31',
+                default_options={
+                    'analytic_plans_groupby': [analytic_plan_1.id],
+                    'analytic_accounts_groupby': [analytic_account_2.id],
+                    'forced_companies': [self.env.company.id],
+                },
+            )
+
+            options = self._update_comparison_filter(options, self.report, 'same_last_year', 2)
+            options['unfold_all'] = True
+
+            # 9 columns, (1 analytic plan + 1 analytic account + 1 total) * 3 periods
+            lines = self.report._get_lines(options)
+            self.assertEqual(
+                get_default_deferred_account_warning_per_column(lines, default_deferred_account),
+                [None, None, None, None, None, None, None, None, None],
+            )
+
+            # dated in the current year, should be present only in the latest period column * 2 analytic columns (analytical plan 1 and total) => 2 columns
+            deferred_lines_posted_directly_to_deferred_account = create_invoice(
+                [[default_deferred_account, 1000, '2023-01-01', '2023-04-30']],
+                invoice_date='2023-03-15',
+                move_type=move_type,
+                analytic_distribution={
+                    analytic_account_1.id: 100,
+                },
+            ).invoice_line_ids
+
+            lines = self.report._get_lines(options)
+            self.assertEqual(
+                get_default_deferred_account_warning_per_column(lines, default_deferred_account),
+                [
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Analytic plan 1       for period 1
+                    None,                                                               # Analytic account 2    for period 1
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Total                 for period 1
+                    None,                                                               # Analytic plan 1       for period 2
+                    None,                                                               # Analytic account 2    for period 2
+                    None,                                                               # Total                 for period 2
+                    None,                                                               # Analytic plan 1       for period 3
+                    None,                                                               # Analytic account 2    for period 3
+                    None,                                                               # Total                 for period 3
+                ],
+            )
+            self.assertEqual(
+                get_move_line_ids_without_deferral_entry_per_column(
+                    options,
+                    lines,
+                    default_deferred_account,
+                ),
+                [
+                    deferred_lines_posted_directly_to_deferred_account.ids,             # Analytic plan 1       for period 1
+                    [],                                                                 # Analytic account 2    for period 1
+                    deferred_lines_posted_directly_to_deferred_account.ids,             # Total                 for period 1
+                    [],                                                                 # Analytic plan 1       for period 2
+                    [],                                                                 # Analytic account 2    for period 2
+                    [],                                                                 # Total                 for period 2
+                    [],                                                                 # Analytic plan 1       for period 3
+                    [],                                                                 # Analytic account 2    for period 3
+                    [],                                                                 # Total                 for period 3
+                ],
+            )
+
+            # dated in the previous year, should be present in 2 period column * 2 analytic columns (analytical account 2 and total) => 4 columns
+            non_deferred_lines_posted_directly_to_deferred_account = create_invoice(
+                [[default_deferred_account, 1000, False, False]],
+                invoice_date='2022-03-15',
+                move_type=move_type,
+                analytic_distribution={
+                    analytic_account_2.id: 100,
+                },
+            ).invoice_line_ids
+
+            lines = self.report._get_lines(options)
+            self.assertEqual(
+                get_default_deferred_account_warning_per_column(lines, default_deferred_account),
+                [
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Analytic plan 1       for period 1
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Analytic account 2    for period 1
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Total                 for period 1
+                    None,                                                               # Analytic plan 1       for period 2
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Analytic account 2    for period 2
+                    {"deferred_accounts_with_warning": [default_deferred_account.id]},   # Total                 for period 2
+                    None,                                                               # Analytic plan 1       for period 3
+                    None,                                                               # Analytic account 2    for period 3
+                    None,                                                               # Total                 for period 3
+                ],
+            )
+            self.assertEqual(
+                get_move_line_ids_without_deferral_entry_per_column(
+                    options,
+                    lines,
+                    default_deferred_account,
+                ),
+                [
+                    deferred_lines_posted_directly_to_deferred_account.ids,             # Analytic plan 1       for period 1
+                    non_deferred_lines_posted_directly_to_deferred_account.ids,         # Analytic account 2    for period 1
+                    (deferred_lines_posted_directly_to_deferred_account +
+                        non_deferred_lines_posted_directly_to_deferred_account).ids,    # Total                 for period 1
+                    [],                                                                 # Analytic plan 1       for period 2
+                    non_deferred_lines_posted_directly_to_deferred_account.ids,         # Analytic account 2    for period 2
+                    non_deferred_lines_posted_directly_to_deferred_account.ids,         # Total                 for period 2
+                    [],                                                                 # Analytic plan 1       for period 3
+                    [],                                                                 # Analytic account 2    for period 3
+                    [],                                                                 # Total                 for period 3
+                ],
+            )
+
+            # Tests that no warning is displayed in multi-company
+            options = self._generate_options(
+                self.report,
+                '2023-03-01',
+                '2023-03-31',
+                default_options={
+                    'analytic_plans_groupby': [analytic_plan_1.id],
+                    'analytic_accounts_groupby': [analytic_account_2.id],
+                },
+            )
+
+            options = self._update_comparison_filter(options, self.report, 'same_last_year', 2)
+            options['unfold_all'] = True
+
+            self.assertTrue(len(options['companies']) > 1)
+
+            lines = self.report._get_lines(options)
+            self.assertEqual(
+                get_default_deferred_account_warning_per_column(lines, default_deferred_account),
+                [None, None, None, None, None, None, None, None, None],
+            )
+
+        test_deferred_account_line_warning(self.env.company.deferred_expense_account_id, 'in_invoice')
+        test_deferred_account_line_warning(self.env.company.deferred_revenue_account_id, 'out_invoice')

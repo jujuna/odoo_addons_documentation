@@ -286,7 +286,7 @@ class L10n_HkIrd(models.AbstractModel):
             domain=[
                 ("employee_id", "in", employees.ids),
                 ('state', 'in', ['validated', 'paid']),
-                ('date_from', '>=', self.start_period),
+                ('date_to', '>=', self.start_period),
                 ('date_to', '<=', self.end_period),
             ],
         )
@@ -320,7 +320,7 @@ class L10n_HkIrd(models.AbstractModel):
         self.ensure_one()
         all_payslips = self.env['hr.payslip'].search([
             ('state', 'in', ['validated', 'paid']),
-            ('date_from', '>=', self.start_period),
+            ('date_to', '>=', self.start_period),
             ('date_to', '<=', self.end_period),
             ('employee_id', 'in', employees.ids),
             ('struct_id.country_id', '=', self.env.ref('base.hk').id),

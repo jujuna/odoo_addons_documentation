@@ -11,12 +11,16 @@ from odoo.addons.resource.models.utils import HOURS_PER_DAY
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
+    def has_static_work_entries(self):
+        # Company executives are paid on their working schedule, even when attendance based
+        return super().has_static_work_entries() or self.l10n_be_joint_committee_id.egov3_code == '999'
+
     def _get_work_hours_split_half(self, date_from, date_to, work_entries_vals):
         res = super()._get_work_hours_split_half(date_from, date_to, work_entries_vals)
         work_entry_type_overtime = self.env.ref('hr_work_entry.be_work_entry_type_overtime', False)
         if not work_entry_type_overtime:
             return res
-        hours_per_day = self.resource_calendar_id.hours_per_day or self.reference_calendar_id.hours_per_day or HOURS_PER_DAY
+        hours_per_day = self.resource_calendar_id.hours_per_day or self._get_reference_calendar().hours_per_day or HOURS_PER_DAY
         overtime_by_work_type_with_options = defaultdict(float)
         new_res = res.copy()
         for work_type_with_options in res:

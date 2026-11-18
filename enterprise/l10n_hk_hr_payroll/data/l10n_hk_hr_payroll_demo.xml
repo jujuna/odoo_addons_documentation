@@ -250,6 +250,15 @@
         <field name="company_id" ref="base.demo_company_hk"/>
     </record>
 
+    <record id="hk_hr_job_trainee" model="hr.job">
+        <field name="name">Trainee</field>
+        <field name="company_id" ref="base.demo_company_hk"/>
+    </record>
+    <record id="hk_hr_job_marketing" model="hr.job">
+        <field name="name">Marketing and Community Manager</field>
+        <field name="company_id" ref="base.demo_company_hk"/>
+    </record>
+
     <record id="hr_employee_anthony" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_anthony')).name"/>
         <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
@@ -385,7 +394,7 @@
         <field name="bank_account_ids" eval="[(4, ref('l10n_hk_hr_payroll.res_partner_bank_account_david_lee'))]"/>
         <field name="l10n_hk_surname">Lee</field>
         <field name="l10n_hk_given_name">David</field>
-        <field name="job_id" ref="hr.job_trainee"/>
+        <field name="job_id" ref="l10n_hk_hr_payroll.hk_hr_job_trainee"/>
         <field name="company_id" ref="base.demo_company_hk"/>
         <field name="structure_type_id" ref="structure_type_casual_employee_cap57"/>
         <field name="schedule_pay">weekly</field>
@@ -435,7 +444,7 @@
         <field name="bank_account_ids" eval="[(4, ref('l10n_hk_hr_payroll.res_partner_bank_account_rebecca_wong'))]"/>
         <field name="l10n_hk_surname">Wong</field>
         <field name="l10n_hk_given_name">Rebecca</field>
-        <field name="job_id" ref="hr.job_marketing"/>
+        <field name="job_id" ref="l10n_hk_hr_payroll.hk_hr_job_marketing"/>
         <field name="company_id" ref="base.demo_company_hk"/>
         <field name="structure_type_id" ref="structure_type_non_employee_cap57"/>
         <field name="schedule_pay">weekly</field>

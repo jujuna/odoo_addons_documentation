@@ -107,12 +107,15 @@ patch(PosStore.prototype, {
 
         for (const invoice of invoices) {
             const sign = invoice.move_type === "out_refund" ? -1 : 1;
-            await this.addLineToCurrentOrder({
+            const invoiceLine = await this.addLineToCurrentOrder({
                 qty: 1 * sign,
                 price_unit: invoice.amount_residual,
                 taxes_id: [],
                 product_tmpl_id: this.dummyProductForSettleStuff,
             });
+            invoiceLine.full_product_name = invoice.name
+                ? _t("Settle Invoice (%(name)s)", { name: invoice.name })
+                : _t("Settle Invoice");
         }
         this.navigate("PaymentScreen", { orderUuid: currentOrder.uuid });
     },
@@ -131,12 +134,13 @@ patch(PosStore.prototype, {
         currentOrder.uiState.depositMoney = true;
         currentOrder.uiState.is_settling_account = true;
 
-        await this.addLineToCurrentOrder({
+        const depositLine = await this.addLineToCurrentOrder({
             qty: 1,
             price_unit: amount,
             taxes_id: [],
             product_tmpl_id: this.dummyProductForSettleStuff,
         });
+        depositLine.full_product_name = _t("Deposit Money");
 
         const { status, data: paymentLine } = currentOrder.addPaymentline(paymentMethod);
         if (!status) {

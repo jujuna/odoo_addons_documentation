@@ -290,3 +290,34 @@ describe("leave split tool", () => {
         expect(SPLIT_TOOL).toHaveCount(0);
     });
 });
+
+describe("new time off button", () => {
+    function mockUserEmployee(employeeId) {
+        onRpc("res.users", "read", ({ args }) => [{ id: args[0][0], employee_id: employeeId }]);
+    }
+
+    test("New opens the time off form dialog", async () => {
+        const { env } = await makeMockServer();
+        const [employeeId] = env["hr.employee"].create([{ name: "Employee 1" }]);
+        mockUserEmployee(employeeId);
+        await mountView({ type: "gantt", resModel: "hr.leave" });
+
+        await click(".o_gantt_button_add");
+        await waitFor(".modal .o_form_view");
+        expect(".modal-title").toHaveText("New Time Off");
+    });
+
+    test("New warns a user without an employee in the current company", async () => {
+        await makeMockServer();
+        mockUserEmployee(false);
+        await mountView({ type: "gantt", resModel: "hr.leave" });
+
+        await click(".o_gantt_button_add");
+        await waitFor(".modal");
+        expect(".modal-title").toHaveText("UserError");
+        expect(".modal-body").toHaveText(
+            "This operation is not allowed as you are not linked to an employee in the current company."
+        );
+        expect(".modal .o_form_view").toHaveCount(0);
+    });
+});

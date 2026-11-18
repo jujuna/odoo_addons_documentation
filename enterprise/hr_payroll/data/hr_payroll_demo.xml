@@ -246,7 +246,8 @@
             <field name="request_unit">day</field>
             <field name="round_days_type">DOWN</field>
         </record>
-
+    </data>
+    <data noupdate="1">
         <!-- Payslip pay run Year -1 -->
         <record id="hr_payslip_batch_year_1" model="hr.payslip.run">
             <field name="name" eval="'Late salary ' + (DateTime.today() - relativedelta(years=1, month=1, day=1)).strftime('%b %Y')"/>
@@ -335,8 +336,9 @@
             <value model="hr.payslip" search="[('payslip_run_id', '=', ref('hr_payslip_batch_month_2'))]"/>
         </function>
 
+        <!-- The request is on a relative date: it can fall on a public holiday, covering no working time -->
         <function model="hr.leave" name="action_approve">
-            <value eval="ref('hr_holidays.hr_holidays_cl_mit_1')"/>
+            <value model="hr.leave" search="[('id', '=', ref('hr_holidays.hr_holidays_cl_mit_1')), ('number_of_days', '>', 0)]"/>
         </function>
 
     </data>

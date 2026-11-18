@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -61,6 +61,50 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.l10n_be_has_white_cash_register',
         readonly=False
     )
+
+    # Not stored: the choice is held by two mutually exclusive salary package benefits (with their salary
+    # rule), shared by all the companies (benefits and rules have no company)
+    l10n_be_loss_on_commission_pto = fields.Selection(
+        selection=[
+            ('monthly', 'Monthly'),
+            ('double_holiday', 'With the Double Holiday Pay'),
+        ],
+        string="Loss on Commission for Paid Time Off",
+        compute='_compute_l10n_be_loss_on_commission_pto',
+        inverse='_inverse_l10n_be_loss_on_commission_pto',
+        groups="hr_payroll.group_hr_payroll_user",
+        help="How the loss on commission during the paid time off is compensated (JC 200), for all the companies:\n"
+             "- Monthly: on the payslip of the month of the time off (Loss on Commission on Paid Time Off),\n"
+             "- With the Double Holiday Pay: once a year, with the double holiday pay (Single Holiday Pay on "
+             "Variable Salary).\n"
+             "Switching to monthly after the double holiday pay of the year pays the paid time off of the year twice.")
+
+    @api.depends('company_id')
+    def _compute_l10n_be_loss_on_commission_pto(self):
+        monthly, double_holiday = self._l10n_be_get_loss_on_commission_pto_benefits()
+        if monthly.active:
+            value = 'monthly'
+        elif double_holiday.active:
+            value = 'double_holiday'
+        else:
+            value = False
+        for settings in self:
+            settings.l10n_be_loss_on_commission_pto = value
+
+    def _inverse_l10n_be_loss_on_commission_pto(self):
+        monthly, double_holiday = self._l10n_be_get_loss_on_commission_pto_benefits()
+        for settings in self:
+            benefit = {'monthly': monthly, 'double_holiday': double_holiday}.get(settings.l10n_be_loss_on_commission_pto)
+            if benefit and not benefit.active:
+                # restoring one of the benefits archives the other one, with their salary rules
+                benefit.active = True
+
+    def _l10n_be_get_loss_on_commission_pto_benefits(self):
+        Benefit = self.env['hr.contract.salary.benefit']
+        return (
+            self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly', raise_if_not_found=False) or Benefit,
+            self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday', raise_if_not_found=False) or Benefit,
+        )
 
     def action_open_hr_payroll_localization(self):
         return {

@@ -327,10 +327,48 @@ class TestPayrun(TestPayslipBase):
         self.assertEqual(len(pay_run.slip_ids), 1)
         self.assertEqual(len(pay_run.version_ids), 3)
 
-        # 3. removing payslip
+        # 3. moving the employee to off-cycle: the payslip is kept but detached
+        pay_run.action_move_to_off_cycle(empl_a.id)
+        self.assertTrue(payslip_empl_a.exists(), "The payslip should not be deleted")
+        self.assertFalse(payslip_empl_a.payslip_run_id, "The payslip was not removed from payrun")
+        self.assertEqual(len(pay_run.slip_ids), 0, "The payslip was not removed from payrun")
+        self.assertEqual(len(pay_run.version_ids), 2, "The version was not removed from payrun")
+
+        payslip_empl_a.payslip_run_id = pay_run.id
+        self.assertEqual(len(pay_run.slip_ids), 1)
+        self.assertEqual(len(pay_run.version_ids), 3)
+
+        # 4. removing payslip
         payslip_empl_a.unlink()
         self.assertEqual(len(pay_run.slip_ids), 0, "The payslip was not removed from payrun")
         self.assertEqual(len(pay_run.version_ids), 2, "The version was not removed from payrun")
+
+    def test_removing_all_payslips_deletes_payrun(self):
+        pay_run = self.env['hr.payslip.run'].create({
+            'date_start': '2026-06-01',
+            'date_end': '2026-06-30',
+            'structure_id': self.developer_pay_structure.id,
+            'version_ids': [(6, 0, (self.employee_pik | self.employee_achu).version_id.ids)],
+        })
+        pay_run.action_open_payslips()
+        payslips = pay_run.slip_ids
+        self.assertEqual(len(payslips), 2)
+        action = payslips.action_move_to_off_cycle()
+        self.assertEqual(len(payslips.exists()), 2, "Off-cycled payslips should be kept.")
+        self.assertFalse(pay_run.exists(), "A pay run left without any payslip should be deleted.")
+        self.assertEqual(action['res_model'], 'hr.payslip.run', "The deleted pay run should not be reloaded.")
+
+        pay_run = self.env['hr.payslip.run'].create({
+            'date_start': '2026-06-01',
+            'date_end': '2026-06-30',
+            'structure_id': self.developer_pay_structure.id,
+        })
+        pay_run.action_open_payslips()
+        payslips = pay_run.slip_ids
+        # payslips have followers in the UI, their deletion must not refill the pay run's employees
+        payslips.message_subscribe(partner_ids=self.env.user.partner_id.ids)
+        payslips.unlink()
+        self.assertFalse(pay_run.exists(), "A pay run left without any payslip should be deleted.")
 
     @freeze_time("2026-02-15")
     def test_cron_generate_payrun_for_employee_types_with_auto_post(self):
@@ -452,3 +490,18 @@ class TestPayrun(TestPayslipBase):
             [(wet.id, f"{wet.name} [{wet.code}]") for wet in work_entry_types],
         )
         self.assertEqual(work_entry_types[0].display_name, work_entry_types[0].name)
+
+    def test_payrun_name_uses_calendar_year(self):
+        """ The first and last days of a year can be in a week of another year, the name keeps their own year. """
+        payrun = self.env['hr.payslip.run'].create({
+            'date_start': '2025-12-16',
+            'date_end': '2025-12-31',
+            'structure_id': self.developer_pay_structure.id,
+        })
+        self.assertEqual(payrun.name, '16 Dec 2025 - 31 Dec 2025')
+        payrun = self.env['hr.payslip.run'].create({
+            'date_start': '2027-01-01',
+            'date_end': '2027-12-31',
+            'structure_id': self.developer_pay_structure.id,
+        })
+        self.assertEqual(payrun.name, '2027')

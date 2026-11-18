@@ -3,17 +3,18 @@
 # * databases
 #
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 18:02+0000\n"
-"PO-Revision-Date: 2026-09-18 01:08+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-09 14:35+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "databases/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -37,12 +38,22 @@ msgid ""
 "tasks\n"
 "and more.\n"
 msgstr ""
+"\n"
+"Tüm müşteri veritabanlarınızı bağlayın ve yönetin\n"
+"============================================\n"
+"\n"
+"Veritabanları uygulaması, tüm müşteri veritabanlarınızı tek bir\n"
+"Odoo çalışma alanından bağlamanıza ve yönetmenize olanak tanır. İster bir "
+"Muhasebe firması ister bir Odoo Partner olun,\n"
+"her bir veritabanını kimin yönettiğini kolayca takip edebilir, Çalışma "
+"Çizelgelerini, görevleri\n"
+"ve daha fazlasını izleyebilirsiniz.\n"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
 msgid "%(nb_failed_dbs)s databases could not be synchronized.\n"
-msgstr ""
+msgstr "%(nb_failed_dbs)s veritabanı eşitlenemedi.\n"
 
 #. module: databases
 #. odoo-python
@@ -54,7 +65,7 @@ msgstr "%(nb_new_dbs)s yeni veritabanları, %(nb_updated_dbs)s güncellendi."
 #. odoo-python
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
 msgid "- … and %(nb_dbs)d more!\n"
-msgstr ""
+msgstr "- … ve %(nb_dbs)d tane daha!\n"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
@@ -66,6 +77,13 @@ msgid ""
 "                                useful to cut all access at once\n"
 "                            </span>"
 msgstr ""
+"<span class=\"o_form_label\">\n"
+"                                Erişimi yönet:\n"
+"                            </span>\n"
+"                            <span class=\"text-muted\">\n"
+"                                tüm erişimi tek seferde kesmek için "
+"kullanışlıdır\n"
+"                            </span>"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
@@ -134,6 +152,8 @@ msgstr "Bir hata oluştu: %s"
 msgid ""
 "Automatically connect to SaaS databases using Odoo.com as an OAuth provider."
 msgstr ""
+"Odoo.com'u OAuth sağlayıcısı olarak kullanarak SaaS veritabanlarına otomatik "
+"olarak bağlanın."
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.databases_manage_users_wizard_view_form
@@ -191,7 +211,7 @@ msgstr "Veritabanı"
 #. odoo-python
 #: code:addons/databases/api.py:0
 msgid "Database \"%s\" not found"
-msgstr ""
+msgstr "\"%s\" veritabanı bulunamadı"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_api_key
@@ -344,6 +364,8 @@ msgstr ""
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
 msgid "Error while creating an API key on %(nb_dbs)d databases:\n"
 msgstr ""
+"Şu sayıdaki veritabanında API anahtarı oluşturulurken hata oluştu: %(nb_dbs)"
+"d veritabanı:\n"
 
 #. module: databases
 #. odoo-python
@@ -357,6 +379,8 @@ msgstr "%(dbname)s adresinde kullanıcı oluştururken hata oluştu: %(message)s
 msgid ""
 "Error while fetching information from %(host_names)s on %(ip)s: %(message)s\n"
 msgstr ""
+"Şu adresten bilgi getirilirken hata oluştu: %(host_names)s konumunda %(ip)s: "
+"%(message)s\n"
 
 #. module: databases
 #. odoo-python
@@ -505,7 +529,7 @@ msgstr "Oturum aç"
 #. module: databases
 #: model:ir.module.module,summary:base.module_databases
 msgid "Manage a fleet of Odoo databases"
-msgstr ""
+msgstr "Odoo veritabanlarından oluşan bir filoyu yönetin"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_kpi_properties
@@ -520,7 +544,7 @@ msgstr "Şekli"
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_res_config_settings__module_databases_auth
 msgid "Module Databases Auth"
-msgstr ""
+msgstr "Veritabanı Kimlik Doğrulama Modülü"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_databases_user__name
@@ -545,7 +569,7 @@ msgstr "Yeni veritabanları seçilen proje şablonuna dayalı olacaktır."
 #. module: databases
 #: model:res.groups.privilege,placeholder:databases.res_groups_privilege_databases
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: databases
 #: model_terms:ir.actions.act_window,help:databases.action_view_tasks_all
@@ -687,17 +711,17 @@ msgstr "Sorumlu"
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
 msgid "Revoke all access"
-msgstr ""
+msgstr "Tüm erişimi iptal et"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.res_config_settings_view_form
 msgid "SaaS SSO Auto-login"
-msgstr ""
+msgstr "SaaS SSO Otomatik Giriş"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_res_config_settings__databases_saas_single_sign_on
 msgid "Saas SSO"
-msgstr ""
+msgstr "SaaS SSO"
 
 #. module: databases
 #. odoo-python
@@ -816,7 +840,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/databases/models/res_users.py:0
 msgid "This user has no access to remove."
-msgstr ""
+msgstr "Bu kullanıcının kaldırılacak bir erişimi yok."
 
 #. module: databases
 #: model:ir.model.constraint,message:databases.constraint_project_project_database_url_required
@@ -826,7 +850,7 @@ msgstr "Uh-oh! Görünüşe göre bir veritabanı için bir url eksik!"
 #. module: databases
 #: model:project.tags,name:databases.project_tag_db_unreachable
 msgid "Unreachable"
-msgstr ""
+msgstr "Ulaşılamıyor"
 
 #. module: databases
 #: model:ir.model,name:databases.model_res_users
@@ -838,7 +862,7 @@ msgstr "Kullanıcı"
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__user_is_database_user
 msgid "User Is Database User"
-msgstr ""
+msgstr "Kullanıcı Veritabanı Kullanıcısıdır"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
@@ -880,8 +904,10 @@ msgstr ""
 msgid ""
 "You can't revoke your own access. You wouldn't want to lock yourself out!"
 msgstr ""
+"Kendi erişiminizi iptal edemezsiniz. Kendinizi dışarıda bırakmak "
+"istemezsiniz!"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
 msgid "remote user"
-msgstr ""
+msgstr "uzak kullanıcı"

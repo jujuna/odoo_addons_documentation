@@ -48,3 +48,17 @@ class TestAccountantTours(AccountTestInvoicingHttpCommon):
             'company_ids': [Command.set(companies.ids)],
         })
         self.start_tour("/odoo", 'account_merge_wizard_tour', login="admin", cookies={"cids": f"{companies[0].id}-{companies[1].id}"})
+
+    def test_accountant_readonly_dashboard_tour(self):
+        self.env['res.users'].create({
+            'name': 'Readonly Accountant',
+            'login': 'readonly_user',
+            'group_ids': [
+                Command.set([
+                    self.env.ref('base.group_user').id,
+                    self.env.ref('account.group_account_readonly').id,
+                ])
+            ],
+        })
+
+        self.start_tour("/odoo", 'accountant_readonly_dashboard_tour', login='readonly_user')

@@ -396,6 +396,16 @@ class AccountDeferredReportHandler(models.AbstractModel):
             elif already_generated:
                 warnings['account_reports.deferred_report_info_fully_generated'] = {'alert_type': 'info'}
 
+        # Display a warning in the deferred reports when journal items are posted in
+        # the default deferred accounts without being associated with a deferral entry
+        # Checked only on mono-company
+        if len(company_ids := report.get_report_company_ids(options)) == 1:
+            company = self.env['res.company'].browse(company_ids)
+            deferred_account = company.deferred_expense_account_id if self._get_deferred_report_type() == 'expense' else company.deferred_revenue_account_id
+            if report._check_move_line_ids_without_deferral_entry(options, deferred_account.ids):
+                warnings['account_reports.deferred_lines_without_deferral_entry_warning'] = {
+                    'account_ids': deferred_account.ids,
+                }
 
     def open_journal_items(self, options, params):
         report = self.env['account.report'].browse(options['report_id'])

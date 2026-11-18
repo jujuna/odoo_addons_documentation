@@ -59,10 +59,10 @@ class TestSalarySacrificeComputations(TestPayrollCommon):
         # Add a benefit - yearly_costs increases
         test_version = self.employee_without_benefits.version_id
         initial_yearly_costs = test_version.final_yearly_costs
-        test_version.internet = 1000.  # benefit cost = 12_000 €
+        test_version.internet = 1000.  # benefit cost = 12_000 € + 15 € (employer ONSS on 12 x 5 €, imported rate 25 %)
         updated_yearly_costs = test_version.final_yearly_costs
-        self.assertEqual(initial_yearly_costs, 43620.5)
-        self.assertEqual(updated_yearly_costs, initial_yearly_costs + 12_000.)
+        self.assertEqual(initial_yearly_costs, 42925.0)
+        self.assertAlmostEqual(updated_yearly_costs, initial_yearly_costs + 12_015.0, places=2)
 
         # Increase net contribution -> yearly_costs is reduced
         # Approx:
@@ -71,7 +71,7 @@ class TestSalarySacrificeComputations(TestPayrollCommon):
         test_version.l10n_be_cafeteria_plan_net_contribution = 200.
         computed_yearly_costs_after = test_version._get_yearly_cost_from_wage()
 
-        self.assertAlmostEqual(test_version.final_yearly_costs, computed_yearly_costs_after, delta=0.001)
+        self.assertAlmostEqual(test_version.final_yearly_costs, computed_yearly_costs_after, places=2)
 
         self.assertTrue(test_version.final_yearly_costs < updated_yearly_costs)
         self.assertTrue(test_version.final_yearly_costs > initial_yearly_costs)

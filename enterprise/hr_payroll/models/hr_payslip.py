@@ -208,9 +208,21 @@ class HrPayslip(models.Model):
     is_company_executive = fields.Boolean(compute='_compute_is_company_executive')
 
     def _get_salary_advance_balances(self):
+        """Return the salary advance balances of the employees of ``self``.
+
+        Hook for the localizations handling salary advances (``l10n_be_hr_payroll``,
+        ``l10n_sa_hr_payroll``, ``l10n_tr_hr_payroll``). The base implementation returns an empty
+        ``defaultdict(lambda: defaultdict(float))``, i.e. ``{employee: {balance_key: amount}}``.
+        """
         return defaultdict(lambda: defaultdict(float))
 
     def _show_notification(self, message, notification_type):
+        """Return a client action displaying a notification.
+
+        :param str message: title of the notification.
+        :param str notification_type: ``'success'``, ``'warning'``, ``'danger'`` or ``'info'``.
+        :rtype: dict
+        """
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -222,6 +234,18 @@ class HrPayslip(models.Model):
 
     @api.model
     def _schedule_period_start(self, schedule, today, country_code=False):
+        """Return the first day of the pay period of the given schedule that contains ``today``.
+
+        Used to default the start date of payslips and pay runs. Unknown schedules fall back on the
+        monthly behaviour. The ``bi-weekly`` periods depend on the week start of the user language.
+
+        :param str schedule: a ``schedule_pay`` value (``'monthly'``, ``'weekly'``, ``'bi-weekly'``,
+            ``'semi-monthly'``, ``'bi-monthly'``, ``'quarterly'``, ``'semi-annually'``,
+            ``'annually'``, ``'daily'``).
+        :param date today: reference date.
+        :param str country_code: unused in the base implementation, available for overrides.
+        :rtype: date
+        """
         week_start = self.env["res.lang"]._get_data(code=self.env.user.lang).week_start
         if schedule == 'quarterly':
             current_year_quarter = math.ceil(today.month / 3)
@@ -260,6 +284,7 @@ class HrPayslip(models.Model):
         return super().create(vals_list)
 
     def _creation_message(self):
+        """Return the chatter message logged at creation, mentioning the pay run if any."""
         # A payslip is most often created by a pay run rather than by hand.
         # The creation log names the run and the user so the reader knows where the payslip came from.
         self.ensure_one()
@@ -301,6 +326,16 @@ class HrPayslip(models.Model):
 
     @api.model
     def _schedule_timedelta(self, schedule, date_from, country_code=False):
+        """Return the ``relativedelta`` to add to the period start to get the period end (inclusive).
+
+        ``date_to = date_from + _schedule_timedelta(...)``. For instance ``months=1, days=-1`` for a
+        monthly schedule. Overridden by ``l10n_mx_hr_payroll`` for its own periods.
+
+        :param str schedule: a ``schedule_pay`` value, see :meth:`_schedule_period_start`.
+        :param date date_from: start of the period (only used by ``semi-monthly``).
+        :param str country_code: unused in the base implementation, available for overrides.
+        :rtype: dateutil.relativedelta.relativedelta
+        """
         if schedule == 'quarterly':
             timedelta = relativedelta(months=3, days=-1)
         elif schedule == 'semi-annually':
@@ -322,6 +357,10 @@ class HrPayslip(models.Model):
         return timedelta
 
     def _get_schedule_timedelta(self):
+        """Return the period ``relativedelta`` of this payslip, see :meth:`_schedule_timedelta`.
+
+        The schedule is the version ``schedule_pay``, or the default schedule of its structure type.
+        """
         self.ensure_one()
         schedule = self.version_id.schedule_pay or self.version_id.structure_type_id.default_schedule_pay
         return self._schedule_timedelta(schedule, self.date_from, self.country_code)
@@ -337,6 +376,22 @@ class HrPayslip(models.Model):
     @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to',
                  'version_id.payroll_properties', 'employee_id.salary_attachment_ids')
     def _compute_input_line_ids(self):
+        """Synchronize the input lines from the salary attachments and the version properties.
+
+        Only draft and validated payslips with a structure are processed:
+
+        * input lines whose rule is linked to one of the employee's salary attachments are
+          rebuilt from the attachments that are open during the period (one line per attachment,
+          named after its payslip description, amount ``_get_active_amount()``, negated on
+          credit notes);
+        * rules of the structure reading a property input (``condition_select`` or
+          ``amount_select`` equal to ``'property_input'``, ``input_usage_employee`` or
+          ``input_selected_by_default``) get a line seeded from ``version.payroll_properties``
+          (only if the version structure is the payslip structure) or from the rule default value.
+          Codes that already have a line are never touched, so manual edits are kept.
+
+        Overridden by many localizations to inject their own input lines.
+        """
         property_rules_by_struct = {}
         for struct in self.struct_id:
             property_rules_by_struct[struct.id] = [
@@ -377,13 +432,11 @@ class HrPayslip(models.Model):
                         and (not a.date_end or a.date_end >= slip.date_from)
                         and a.salary_rule_id.code in attach_rules_by_code
                 )
-                for code, attachments in valid_attachments.grouped(lambda a: a.salary_rule_id.code).items():
-                    rule = attach_rules_by_code[code]
-                    amount = attachments._get_active_amount()
-                    name = ', '.join(d for d in attachments.mapped('description') if d)
+                for attachment in valid_attachments:
+                    rule = attach_rules_by_code[attachment.salary_rule_id.code]
                     input_line_vals.append(Command.create({
-                        'name': name,
-                        'amount': amount if not slip.credit_note else -amount,
+                        'name': attachment.description,
+                        'amount': attachment._get_active_amount() * (-1 if slip.credit_note else 1),
                         'salary_rule_id': rule.id,
                     }))
 
@@ -441,6 +494,7 @@ class HrPayslip(models.Model):
         valid_payslips = self.filtered(lambda p: p.date_from and p.date_to and p.employee_id)
         # Search on stored fields only, searching on date_start/date_end is costly
         all_candidate_versions = self.env['hr.version'].search([
+            ('active', '=', True),
             ('employee_id', 'in', valid_payslips.employee_id.ids),
             ('date_version', '<=', max(valid_payslips.mapped('date_to'))),
         ]).sorted('date_start') if valid_payslips else self.env['hr.version']
@@ -471,6 +525,13 @@ class HrPayslip(models.Model):
             slip.salary_attachment_count = len(slip.salary_attachment_ids)
 
     def _get_payslip_family(self):
+        """Return the payslips related to this one through ``origin_payslip_id``, excluding itself.
+
+        For an original payslip: its refunds and corrections. For a refund or a correction: the
+        origin and all its other related payslips.
+
+        :rtype: hr.payslip
+        """
         self.ensure_one()
         if (origin := self.origin_payslip_id):
             return (origin | origin.related_payslip_ids | self.related_payslip_ids) - self
@@ -496,6 +557,13 @@ class HrPayslip(models.Model):
                 slip.correction_net_delta = 0.0
 
     def _get_negative_net_rule(self):
+        """Return the salary rule with code ``DEDUCTION`` of the payslip structure, if any.
+
+        It is the rule used to carry over a negative net to the next payslip. Overridden by
+        ``l10n_be_hr_payroll``.
+
+        :rtype: hr.salary.rule
+        """
         self.ensure_one()
         return self.env['hr.salary.rule'].search([
             ('code', '=', 'DEDUCTION'),
@@ -503,17 +571,23 @@ class HrPayslip(models.Model):
         ], limit=1)
 
     def _set_input_value(self, code, value):
-        """Set an input value for this payslip via an explicit input row.
+        """Set the input value of the rule ``code`` of the payslip structure.
 
-        Creates or updates the input line for the matching salary rule. A falsy
-        value clears any existing line (0 means absent). The row takes precedence
-        over the version's property value. No-op if the structure has no rule
-        with this code.
+        Creates or updates the matching input line; a falsy value deletes it (0 means absent).
+        The input line takes precedence over the version property value. Does nothing if the
+        structure has no rule with this code. The lines are updated with ``update()``, so on a
+        saved payslip ``write`` recomputes the lines of computed drafts.
+
+        :param str code: salary rule code.
+        :param value: new amount (anything convertible to ``float``, invalid values count as 0).
         """
         self._set_input_values({code: value})
 
     def _set_input_values(self, values):
-        """Batch version of _set_input_value: {code: value}."""
+        """Batch version of :meth:`_set_input_value`.
+
+        :param dict values: ``{rule_code: value}``.
+        """
         self.ensure_one()
         commands = []
         for code, value in values.items():
@@ -541,6 +615,11 @@ class HrPayslip(models.Model):
 
     @api.depends('employee_id.current_version_id', 'date_from')
     def _compute_is_wrong_version(self):
+        """Flag validated/paid payslips whose version is not (anymore) the expected one for the period.
+
+        The expected version is the one of the same contract overlapping the period, or the version
+        valid at ``date_from``. Used by the payroll warnings proposing a correction.
+        """
         non_validated = self.filtered(lambda slip: slip.state not in ("validated", "paid"))
         non_validated.is_wrong_version = False
         for payslip in (self - non_validated):
@@ -592,6 +671,13 @@ class HrPayslip(models.Model):
             payslip.has_wrong_leaves = bool(overlapping_leaves)
 
     def _is_invalid(self):
+        """Return a message if the payslip is not a legal document yet (not validated nor paid).
+
+        Used by the reports to display a watermark. Overridden by ``l10n_be_hr_payroll`` and
+        ``l10n_mx_hr_payroll_account``.
+
+        :return: the message, or ``False`` if the payslip is valid.
+        """
         self.ensure_one()
         if self.state not in ['validated', 'paid']:
             return _("This payslip is not validated. This is not a legal document.")
@@ -599,6 +685,11 @@ class HrPayslip(models.Model):
 
     @api.depends(lambda self: self._get_recomputing_fields())
     def _compute_line_ids(self):
+        """Recompute the lines of computed draft payslips when one of :meth:`_get_recomputing_fields` changes.
+
+        Opt-in only: nothing happens unless the context key ``payslip_no_recompute`` is truthy
+        (despite its name). The normal way to compute the lines is :meth:`compute_sheet`.
+        """
         if not self.env.context.get("payslip_no_recompute"):
             return
 
@@ -610,6 +701,10 @@ class HrPayslip(models.Model):
             payslip.line_ids = [(5, 0, 0)] + lines_vals
 
     def _get_recomputing_fields(self):
+        """Return the field names triggering :meth:`_compute_line_ids` (its ``depends``).
+
+        :rtype: list[str]
+        """
         return [
             'employee_id', 'version_id', 'struct_id',
             'date_from', 'date_to', 'worked_days_line_ids',
@@ -617,17 +712,37 @@ class HrPayslip(models.Model):
         ]
 
     def _get_basic_wage_line_codes(self):
+        """Return the rule codes summed into the ``basic_wage`` field (default ``{'BASIC'}``).
+
+        Overridden by ``l10n_be_hr_payroll``.
+
+        :rtype: set[str]
+        """
         return {'BASIC'}
 
     def _get_gross_wage_line_codes(self):
+        """Return the rule codes summed into the ``gross_wage`` field (default ``{'GROSS'}``).
+
+        :rtype: set[str]
+        """
         return {'GROSS'}
 
     def _get_net_wage_line_codes(self):
+        """Return the rule codes summed into the ``net_wage`` field (default ``{'NET'}``).
+
+        :rtype: set[str]
+        """
         return {'NET'}
 
     @api.depends('line_ids.total')
     def _compute_basic_net(self):
-        to_compute_payslips = self.filtered(lambda p: p.state in ('draft')).with_prefetch()
+        """Compute ``basic_wage``, ``gross_wage``, ``net_wage`` and ``employer_cost`` from the lines.
+
+        Only draft payslips are recomputed: the values of validated payslips are frozen. The codes
+        come from :meth:`_get_basic_wage_line_codes`, :meth:`_get_gross_wage_line_codes`,
+        :meth:`_get_net_wage_line_codes` and the rules flagged ``appears_on_employee_cost_dashboard``.
+        """
+        to_compute_payslips = self.filtered(lambda p: p.state == 'draft').with_prefetch()
         if not to_compute_payslips:
             return
 
@@ -687,6 +802,12 @@ class HrPayslip(models.Model):
             payslip.is_company_executive = executive_type and payslip.employee_type_id == executive_type
 
     def _get_regular_worked_hours(self):
+        """Return the reference number of worked hours of the payslip (default ``sum_worked_hours``).
+
+        Hook for localizations, overridden by ``l10n_au_hr_payroll``.
+
+        :rtype: float
+        """
         # To be overridden by localization modules. Used for the amount computation for each worked days type.
         self.ensure_one()
         return self.sum_worked_hours
@@ -700,12 +821,35 @@ class HrPayslip(models.Model):
             raise ValidationError(_("Payslip 'Date From' must be earlier than 'Date To'."))
 
     def _record_attachment_payment(self, attachments, slip_lines):
+        """Register the payment of salary attachments with the total of the given payslip lines.
+
+        Called when the payslip is marked as paid (see :meth:`write`). The amount is negative for
+        credit notes.
+
+        :param hr.salary.attachment attachments: attachments sharing the same rule code.
+        :param hr.payslip.line slip_lines: lines of that rule code.
+        """
         self.ensure_one()
         sign = -1 if self.credit_note else 1
         amount = sum(sl.total for sl in slip_lines)
         attachments.record_payment(self, sign * abs(amount))
 
     def write(self, vals):
+        """Write the payslips, with the following side effects:
+
+        * editing ``name``, ``amount``, ``quantity`` or ``rate`` of lines (``line_ids`` update
+          commands): the lines are recomputed with the edited values forced (see
+          :meth:`_recompute_with_forced_lines`), the edited lines are flagged
+          ``manually_modified`` and the changes are logged in the chatter. Writing ``total``
+          alone writes it as ``amount``;
+        * changing ``input_line_ids``: computed, non-refund draft payslips are recomputed with
+          :meth:`compute_sheet`;
+        * ``state`` set to ``'paid'``: the payments of the linked salary attachments are recorded;
+        * ``state`` set to ``'draft'`` on non-draft payslips: :meth:`action_refresh_from_work_entries`;
+        * changing ``struct_id`` updates ``ignore_worked_day_lines`` from the structure, and
+          changing ``ignore_worked_day_lines`` recomputes the payslips;
+        * moving a payslip out of a draft pay run removes its version from that pay run.
+        """
         payslips_to_update = self.env['hr.payslip']
         if vals.get('state') == 'draft':
             payslips_to_update = self.filtered(lambda p: p.state != 'draft')
@@ -731,8 +875,8 @@ class HrPayslip(models.Model):
         for payslip in self:
             old_line_vals[payslip.id] = {}
             if update_cmds and any(line_id in payslip.line_ids.ids for line_id in update_cmds):
-                for line in payslip.line_ids:
-                    old_line_vals[payslip.id][line.salary_rule_id.id] = {
+                for line, key in payslip._get_line_override_keys().items():
+                    old_line_vals[payslip.id][key] = {
                         'name': line.name,
                         'code': line.code,
                         'amount': line.amount,
@@ -752,6 +896,7 @@ class HrPayslip(models.Model):
             for payslip in self:
                 overrides = {}
                 audit_changes = defaultdict(list)
+                line_keys = payslip._get_line_override_keys()
                 for line_id, changed_vals in update_cmds.items():
                     line = self.env['hr.payslip.line'].browse(line_id)
                     if line.slip_id.id != payslip.id:
@@ -760,7 +905,7 @@ class HrPayslip(models.Model):
                     # A line edited a second time already starts with this label.
                     if explanation and not line.manually_modified:
                         explanation = self.env._("Manually modified. Explanation before the change:\n%(explanation)s", explanation=explanation)
-                    overrides[line.code] = {
+                    overrides[line_keys[line]] = {
                         'name': line.name,
                         'amount': line.amount,
                         'quantity': line.quantity,
@@ -771,8 +916,8 @@ class HrPayslip(models.Model):
                 if overrides:
                     payslip._recompute_with_forced_lines(overrides)
                 if old_line_vals[payslip.id]:
-                    for line in payslip.line_ids:
-                        old = old_line_vals[payslip.id].get(line.salary_rule_id.id, {})
+                    for line, key in payslip._get_line_override_keys().items():
+                        old = old_line_vals[payslip.id].get(key, {})
                         for field in ('name', 'amount', 'quantity', 'rate', 'total'):
                             if old.get(field) != line[field]:
                                 audit_changes[line.name].append({
@@ -803,19 +948,53 @@ class HrPayslip(models.Model):
 
         return res
 
+    @api.model
+    def _get_line_override_key(self, code, rank=0):
+        """Return the key of a payslip line in ``force_payslip_line_overrides``.
+
+        A rule computed once per input line (several inputs of its code) gives several lines of
+        the same code, told apart by their rank in the order of computation.
+
+        :param str code: code of the line.
+        :param int rank: rank of the line among the lines of its code.
+        :return: ``code`` for the first line, else ``(code, rank)``.
+        """
+        return (code, rank) if rank else code
+
+    def _get_line_override_keys(self):
+        """Return ``{hr.payslip.line: key}`` of the lines of the payslip, see :meth:`_get_line_override_key`."""
+        self.ensure_one()
+        keys = {}
+        rank_by_code = defaultdict(int)
+        # The lines of a code are created in the order of their computation
+        for line in self.line_ids.sorted('id'):
+            keys[line] = self._get_line_override_key(line.code, rank_by_code[line.code])
+            rank_by_code[line.code] += 1
+        return keys
+
     def _recompute_with_forced_lines(self, forced_line_vals):
+        """Recompute the lines of a draft payslip, forcing the values of some lines.
+
+        The lines before the first modified line (by sequence) keep their current values, the
+        following ones are recomputed by :meth:`_get_payslip_lines` (with the context key
+        ``force_payslip_line_overrides``), so that the rules depending on the edited lines take
+        the new values into account. Custom line names are always kept. Sets ``edited``.
+
+        :param dict forced_line_vals: ``{line key: {'name', 'amount', 'quantity', 'rate',
+            'manually_modified', 'explanation'}}``, see :meth:`_get_line_override_keys`.
+        """
         self.ensure_one()
         if self.state != 'draft':
             return
-        modified_codes = set(forced_line_vals)
-        modified_lines = self.line_ids.filtered(lambda l: l.code in modified_codes)
+        line_keys = self._get_line_override_keys()
+        modified_lines = self.line_ids.filtered(lambda l: line_keys[l] in forced_line_vals)
         min_sequence = min(modified_lines.mapped('sequence'), default=0)
         all_overrides = {}
-        for line in self.line_ids:
+        for line, key in line_keys.items():
             if line.sequence < min_sequence:
-                all_overrides[line.code] = {'name': line.name, 'amount': line.amount, 'quantity': line.quantity, 'rate': line.rate, 'explanation': line.explanation, 'manually_modified': line.manually_modified}
+                all_overrides[key] = {'name': line.name, 'amount': line.amount, 'quantity': line.quantity, 'rate': line.rate, 'explanation': line.explanation, 'manually_modified': line.manually_modified}
             else:
-                all_overrides[line.code] = {'name': line.name}
+                all_overrides[key] = {'name': line.name}
         all_overrides.update(forced_line_vals)
         new_lines = self.with_context(
             force_payslip_line_overrides=all_overrides
@@ -825,6 +1004,10 @@ class HrPayslip(models.Model):
         super().write({'edited': True})
 
     def _log_line_manual_changes(self, changes):
+        """Post a chatter message listing manual line changes.
+
+        :param dict changes: ``{line_name: [{'field': str, 'old': value, 'new': value}]}``.
+        """
         self.ensure_one()
         field_labels = {
             'name': self.env._('Name'),
@@ -860,6 +1043,11 @@ class HrPayslip(models.Model):
         self.message_post(body=body)
 
     def action_payslip_draft(self):
+        """Reset the payslips to draft, removing the payment report and the confirmation date.
+
+        Through :meth:`write`, the worked days and lines of the payslips are regenerated (see
+        :meth:`action_refresh_from_work_entries`).
+        """
         self.env['ir.attachment'].sudo().search([
             ('res_model', '=', 'hr.payslip'),
             ('res_id', 'in', self.ids),
@@ -875,6 +1063,11 @@ class HrPayslip(models.Model):
         return True
 
     def _get_pdf_reports(self):
+        """Group the payslips by PDF report: the structure ``report_id``, or ``hr_payroll.action_report_payslip``.
+
+        :return: ``{ir.actions.report: hr.payslip}``.
+        :rtype: dict
+        """
         default_report = self.env.ref('hr_payroll.action_report_payslip')
         result = defaultdict(lambda: self.env['hr.payslip'])
         for payslip in self:
@@ -885,23 +1078,50 @@ class HrPayslip(models.Model):
         return result
 
     def _get_email_template(self):
+        """Return the mail template sent with the generated payslip PDF (``hr_payroll.mail_template_new_payslip``).
+
+        :rtype: mail.template
+        """
         return self.env.ref(
             'hr_payroll.mail_template_new_payslip', raise_if_not_found=False
         )
 
     def _check_send_payslip_mail(self):
+        """Return whether the payslip must be sent by email after its PDF generation.
+
+        Refunds and corrections without net difference are not sent. Overridden by
+        ``l10n_mx_hr_payroll_account``.
+
+        :rtype: bool
+        """
         self.ensure_one()
         if self.is_correction_payslip and self.currency_id.is_zero(self.correction_net_delta):
             return False
         return not self.is_refund_payslip
 
     def _check_generate_payslip_pdf(self):
+        """Return whether a PDF must be generated for the payslip.
+
+        Refunds and corrections without net difference get no PDF.
+
+        :rtype: bool
+        """
         self.ensure_one()
         if self.is_correction_payslip and self.currency_id.is_zero(self.correction_net_delta):
             return False
         return not self.is_refund_payslip
 
     def _generate_pdf(self):
+        """Generate the PDF of the payslips, attach it to them and send it by email.
+
+        The PDFs are rendered by :meth:`_prepare_payslip_pdf_content` in the language given by
+        :meth:`_get_payslips_pdf_lang`, registered as main attachment, then :meth:`_pdf_post_create`
+        is called and the template of :meth:`_get_email_template` is sent for the payslips accepted
+        by :meth:`_check_send_payslip_mail`. With the context key ``is_test_print``, the PDFs are
+        only generated.
+
+        :return: a notification client action, or ``None`` with ``is_test_print``.
+        """
         mapped_reports = self._get_pdf_reports()
         employees = []
         attachments_vals_list = []
@@ -952,6 +1172,12 @@ class HrPayslip(models.Model):
         """
 
     def _is_out_of_contract(self):
+        """Return whether the (non refund) payslip period does not overlap its version contract dates at all.
+
+        Used by the "No running contract" payroll warning.
+
+        :rtype: bool
+        """
         return (not self.is_refund_payslip and self.version_id and self.date_from and self.date_to and
             (
                 not self.version_id.contract_date_start or self.version_id.contract_date_start > self.date_to or
@@ -959,6 +1185,12 @@ class HrPayslip(models.Model):
             ))
 
     def _is_period_mismatch_payslip(self):
+        """Return whether the period of a draft or validated payslip does not match its pay schedule.
+
+        Payslips ignoring worked days are never considered mismatching.
+
+        :rtype: bool
+        """
         self.ensure_one()
         if self.state not in ['draft', 'validated'] or not (self.date_from and self.date_to) or self.ignore_worked_day_lines:
             return False
@@ -966,6 +1198,14 @@ class HrPayslip(models.Model):
         return bool(schedule and self.date_from + self._get_schedule_timedelta() != self.date_to)
 
     def _get_payslips_pdf_lang(self):
+        """Return the languages in which each payslip PDF is printed.
+
+        The primary language is the employee language (or its user, the current user, the
+        environment language). Overridden by ``l10n_be_hr_payroll`` (bilingual payslips).
+
+        :return: ``{payslip: (primary_lang, secondary_lang_or_None)}``.
+        :rtype: dict
+        """
         # Returns primary/secondary language for each payslip
         lang_map = {}
         for payslip in self:
@@ -974,12 +1214,21 @@ class HrPayslip(models.Model):
         return lang_map
 
     def _prepare_payslip_pdf_content(self, report, languages):
+        """Render the payslip PDF with the given report, in the company of the payslip.
+
+        :param ir.actions.report report: report to render.
+        :param tuple languages: ``(primary_lang, secondary_lang)`` as returned by
+            :meth:`_get_payslips_pdf_lang`.
+        :return: the PDF content.
+        :rtype: bytes
+        """
         self.ensure_one()
         # in the document layout of the company of the payslip, not the one of the current company
         pdf_content, _ = self.env['ir.actions.report'].sudo().with_company(self.company_id).with_context(lang=languages[0])._render_qweb_pdf(report, self.id)
         return pdf_content
 
     def _queue_for_send(self):
+        """Flag the payslips for PDF generation and trigger the cron doing it (:meth:`_cron_generate_pdf`)."""
         self.write({'queued_for_pdf': True})
         self.env.flush_all()  # This is necessary for the cron to have the changes
         payslip_cron = self.env.ref(
@@ -989,6 +1238,12 @@ class HrPayslip(models.Model):
             payslip_cron._trigger()
 
     def _get_employees_from_records(self, records):
+        """Return the employees related to records of any model (employee, ``employee_id`` or ``employee_ids``).
+
+        Used to match payroll warnings with the payslips to validate.
+
+        :rtype: hr.employee
+        """
         Employee = self.env['hr.employee']
         if not records:
             return Employee
@@ -1001,6 +1256,12 @@ class HrPayslip(models.Model):
         return Employee
 
     def _get_leaves_domain(self, extra_domain=None):
+        """Return a ``hr.leave`` domain matching the time off of each payslip employee overlapping its period.
+
+        :param extra_domain: domain added (AND) to the domain of each payslip, or a callable taking
+            the payslip and returning such a domain.
+        :rtype: odoo.fields.Domain
+        """
         domain_list = []
         for p in self:
             domain = [
@@ -1016,21 +1277,45 @@ class HrPayslip(models.Model):
         return Domain.OR(domain_list) if domain_list else Domain.FALSE
 
     def action_payslip_done(self):
+        """Validate the payslips: ``state`` becomes ``'validated'`` and ``done_date`` is set.
+
+        Raises a ``ValidationError`` if the user is not payroll officer, if a blocking payroll
+        warning (``block_payslips``) concerns the payslips or their employees, if a payslip is
+        cancelled, has errors (``error_count``) or is linked to an archived version. The payslips
+        are expected to be computed (use :meth:`action_validate` to compute them first).
+
+        Then the time off of regular payslips is flagged ``payslip_state = 'done'``, a negative net
+        is stored in ``negative_net_to_report`` and, with the context key ``payslip_generate_pdf``,
+        the PDFs are generated or queued. Overridden by most localizations (accounting entries,
+        declarations, ...).
+        """
         if not self.env.user.has_group('hr_payroll.group_hr_payroll_officer'):
             raise ValidationError(self.env._("You do not have sufficient permissions to validate payslips."))
 
-        warnings = self.env['hr.payroll.warning'].get_payroll_dashboard_warning_cards([], block_payslips=True, include_model_warnings=True)
-
         warning_messages = []
-        payslip_employees = self.mapped('employee_id')
-        for warning in warnings:
-            records = warning['warning_records']
-            if records._name == 'hr.payslip':
-                has_blocking_records = bool(self & records)
-            else:
-                has_blocking_records = bool(payslip_employees & self._get_employees_from_records(records))
-            if has_blocking_records:
-                warning_messages.append(f"{warning['name']}: {warning['description']}" if warning.get('description', '') else f"{warning['name']}")
+        # The blocking warnings are the ones of the country of the payslips, not of the current company
+        for company, payslips in self.grouped('company_id').items():
+            warnings = self.env['hr.payroll.warning'].with_company(company).get_payroll_dashboard_warning_cards(
+                [], block_payslips=True, include_model_warnings=True)
+            payslip_employees = payslips.employee_id
+            for warning in warnings:
+                records = warning['warning_records']
+                if records._name == 'hr.payslip':
+                    has_blocking_records = bool(payslips & records)
+                elif records._name == 'hr.leave':
+                    # A time off only blocks the payslips of its period
+                    has_blocking_records = any(
+                        leave.employee_id == payslip.employee_id
+                        and leave.request_date_from <= payslip.date_to
+                        and leave.request_date_to >= payslip.date_from
+                        for leave in records
+                        for payslip in payslips
+                    )
+                else:
+                    has_blocking_records = bool(payslip_employees & self._get_employees_from_records(records))
+                message = f"{warning['name']}: {warning['description']}" if warning.get('description', '') else f"{warning['name']}"
+                if has_blocking_records and message not in warning_messages:
+                    warning_messages.append(message)
         if warning_messages:
             if len(warning_messages) > 1:
                 warning_messages = [f"{i + 1}) {message}" for i, message in enumerate(warning_messages)]
@@ -1087,7 +1372,11 @@ class HrPayslip(models.Model):
                     on_confirmed_payslips._queue_for_send()
 
     def action_validate(self):
-        """ Validate the draft payslips of the recordset, computing them first if needed. """
+        """Compute the draft payslips without lines, then validate the draft payslips with :meth:`action_payslip_done`.
+
+        :return: the action returned by :meth:`compute_sheet` (a localization may ask for missing
+            data) or by :meth:`action_payslip_done`, if any.
+        """
         if not self.env.user.has_group('hr_payroll.group_hr_payroll_officer'):
             raise ValidationError(self.env._("You do not have sufficient permissions to validate payslips."))
         to_recompute_payslips = self.filtered(lambda slip: slip.state == 'draft' and not slip.line_ids)
@@ -1102,6 +1391,10 @@ class HrPayslip(models.Model):
         return self.filtered(lambda slip: slip.state == 'draft').action_payslip_done()
 
     def action_payslip_cancel(self):
+        """Cancel the payslips and give their time off back the ``'normal'`` payslip state.
+
+        Only payroll managers can cancel validated payslips.
+        """
         if not self.env.user.has_group('hr_payroll.group_hr_payroll_manager') \
             and self.filtered(lambda slip: slip.state == 'validated'):
             raise UserError(_("Cannot cancel a payslip that is validated."))
@@ -1109,6 +1402,12 @@ class HrPayslip(models.Model):
         self.write({'state': 'cancel', 'done_date': False})
 
     def action_payslip_paid(self):
+        """Mark validated payslips as paid and set their ``paid_date`` (if not already set).
+
+        Paying a correction also pays its validated origin and related payslips. When the company
+        generates the PDF ``on_paid``, the PDFs are queued. Through :meth:`write`, the payments of
+        the salary attachments are recorded.
+        """
         if any(slip.state not in ['validated', 'paid'] for slip in self):
             raise UserError(_('Cannot mark payslip as paid if not confirmed.'))
         if self.filtered('error_count'):
@@ -1151,6 +1450,7 @@ class HrPayslip(models.Model):
         }
 
     def action_payslip_unpaid(self):
+        """Set paid payslips back to validated."""
         if any(slip.state != 'paid' for slip in self):
             raise UserError(_('You cannot cancel the payment if the payslip has not been paid.'))
         self.write({'state': 'validated'})
@@ -1172,14 +1472,15 @@ class HrPayslip(models.Model):
             # as an action to correct incorrect payslips (which do not necessarily have to be paid).
             if any(payslip.credit_note or payslip.state != 'paid' for payslip in self):
                 raise UserError(self.env._('You can only correct payslips that have been paid.'))
-        view = self.env.ref('hr_payroll.hr_payslip_correction_wizard_form', raise_if_not_found=False)
+        # Cached lookup: the payroll warnings build this action for each payslip to correct
+        view_id = self.env['ir.model.data']._xmlid_to_res_id('hr_payroll.hr_payslip_correction_wizard_form', raise_if_not_found=False)
         default_is_button_action = self.env.context.get('default_is_button_action')
         return {
             'type': 'ir.actions.act_window',
             'name': self.env._('Payslip Correction') if len(self) == 1 else self.env._('Payslips Correction'),
             'res_model': 'hr.payslip.correction.wizard',
             'view_mode': 'form',
-            'views': [(view.id if view else False, 'form')],
+            'views': [(view_id or False, 'form')],
             'target': 'new',
             'context': {
                 'default_employee_ids': self.employee_id.ids,
@@ -1233,6 +1534,16 @@ class HrPayslip(models.Model):
             }
 
     def _action_refund_payslips(self):
+        """Create and validate a refund (credit note) for each payslip.
+
+        A refund is a copy with ``credit_note``, ``is_refund_payslip`` and ``edited`` set, and
+        ``origin_payslip_id`` pointing to the original payslip, whose worked days, inputs and lines
+        are negated. The original is flagged ``is_refunded`` and its time off get back the
+        ``'normal'`` payslip state.
+
+        :return: the refunds.
+        :rtype: hr.payslip
+        """
         reverted_payslips = self.env['hr.payslip']
         for payslip in self:
             reverted_payslip = payslip.copy({
@@ -1266,13 +1577,23 @@ class HrPayslip(models.Model):
         return reverted_payslips
 
     def _action_correct_payslips(self):
+        """Create and compute a correction payslip for each payslip.
+
+        A correction is a new draft payslip for the same employee, version, structure and period,
+        with ``origin_payslip_id`` set and a copy of the original input lines. The original is
+        flagged ``is_corrected``. Usually called after :meth:`_action_refund_payslips`.
+
+        :return: the corrections.
+        :rtype: hr.payslip
+        """
         corrected_payslips_values = []
         for payslip in self:
+            reference_date = max(payslip.date_from, payslip.version_id.contract_date_start or payslip.date_from, payslip.version_id.date_version)
             corrected_payslips_values.append({
                 'origin_payslip_id': payslip.id,
                 'employee_id': payslip.employee_id.id,
                 'struct_id': payslip.struct_id.id,
-                'version_id': payslip.version_id.id,
+                'version_id': payslip.employee_id._get_version(reference_date).id,
                 'date_from': payslip.date_from,
                 'date_to': payslip.date_to,
                 'input_line_ids': [
@@ -1292,11 +1613,13 @@ class HrPayslip(models.Model):
         return corrected_payslips
 
     def refund_sheet(self):
+        """Refund the payslips (see :meth:`_action_refund_payslips`) and open the payslips and their refunds."""
         reverted_payslips = self._action_refund_payslips()
         return (self | reverted_payslips)._get_payslips_action()
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_draft_or_cancel(self):
+        """Prevent the deletion of validated or paid payslips, then recompute the issues of their remaining duplicates."""
         if any(payslip.state not in ('draft', 'cancel') for payslip in self):
             raise UserError(_(
                 "Oops! Only draft and cancelled payslips can be deleted without causing any chaos. We can't "
@@ -1318,22 +1641,34 @@ class HrPayslip(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _unlink_and_remove_version_from_draft_payrun(self):
+        # a pay run losing all its payslips and employees is deleted with them
+        emptied_payruns = self.payslip_run_id.filtered(
+            lambda payrun: payrun.slip_ids <= self and payrun.version_ids <= self.version_id
+        )
         for slip in self:
             payrun = slip.payslip_run_id
             if payrun:
                 payrun.write({'version_ids': [Command.unlink(slip.version_id.id)]})
+        emptied_payruns._unlink_emptied_payruns()
 
     def compute_sheet(self):
-        """
-        Compute payslip lines for draft payslips sequentially by employee to ensure accurate cumulative/YTD calculations.
+        """Compute the lines of the draft payslips; the other payslips are ignored.
 
-        When processing a batch, some employees may have multiple payslips in the same period (e.g., due to a
-        mid-month contract version change). To ensure cumulative salary rules evaluate correctly,
-        an employee's first payslip must be fully computed before their second payslip is evaluated.
+        The existing lines are deleted and ``compute_date`` is set. Refund payslips get the negated
+        lines of their origin. The other payslips are computed with :meth:`_get_payslip_lines`.
+        The worked days are not regenerated (see :meth:`action_refresh_from_work_entries`).
 
-        To do so, we group payslips by employee, sort them chronologically, and evaluate them in horizontal "layers":
-            - Layer 1: Computes the 1st payslip for ALL employees simultaneously.
-            - Layer 2: Computes the 2nd payslip for the subset of employees who have one, etc
+        Payslips are computed by employee in chronological "layers" so that the cumulative/YTD
+        rules of an employee's second payslip of the period (e.g. after a mid-period version
+        change) see the first one:
+
+        * layer 1 computes the first payslip of all employees at once;
+        * layer 2 computes the second payslip of the employees having one, etc.
+
+        Overridden by several localizations (``l10n_au``, ``l10n_ch``, ``l10n_hk``, ``l10n_ae``),
+        for instance to ask for missing data first.
+
+        :return: ``True``, or an action returned by an override.
         """
         payslips = self.filtered(lambda slip: slip.state == 'draft')
         # delete old payslip lines
@@ -1368,6 +1703,11 @@ class HrPayslip(models.Model):
         return True
 
     def action_refresh_from_work_entries(self):
+        """Regenerate the worked days and recompute the lines of the draft payslips.
+
+        To be used after a change of the time off, attendances or version of the period. Manually
+        edited payslips (``edited``) are skipped.
+        """
         # Refresh the whole payslip in case the HR has modified some work entries
         # after the payslip generation
         if any(p.state != 'draft' for p in self):
@@ -1379,13 +1719,35 @@ class HrPayslip(models.Model):
         payslips.compute_sheet()
 
     def action_move_to_off_cycle(self):
+        """Detach the payslips from their pay run and remove their versions from it; the pay runs left empty are deleted.
+
+        :return: the pay runs action if a pay run was deleted, else a ``soft_reload`` client action.
+        """
+        # once detached, an emptied pay run would be refilled with all the valid versions
+        emptied_payruns = self.payslip_run_id.filtered(
+            lambda payrun: payrun.slip_ids <= self and payrun.version_ids <= self.version_id
+        )
         for slip in self:
             payrun = slip.payslip_run_id
             if payrun:
                 payrun.off_cycle_version(slip.version_id.id)
+        if emptied_payruns:
+            emptied_payruns.unlink()
+            # the deleted pay run cannot be reloaded
+            return self.env['ir.actions.act_window']._for_xml_id('hr_payroll.action_hr_payslip_run') | {'target': 'main'}
         return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
     def _round_days(self, work_entry_type, days):
+        """Round a number of days according to the work entry type.
+
+        Types requested by ``day`` or ``half_day`` are rounded to 1 or 0.5 with the type
+        ``round_days_type`` method (``'HALF-UP'``, ``'UP'``, ``'DOWN'``); ``hour`` types are not
+        rounded.
+
+        :param hr.work.entry.type work_entry_type: type of the worked days line.
+        :param float days: number of days to round.
+        :rtype: float
+        """
         if work_entry_type.request_unit != 'hour':
             precision_rounding = 0.5 if work_entry_type.request_unit == "half_day" else 1
             day_rounded = float_round(days, precision_rounding=precision_rounding, rounding_method=work_entry_type.round_days_type)
@@ -1394,19 +1756,44 @@ class HrPayslip(models.Model):
 
     @api.model
     def _get_attachment_rules(self):
+        """Return the rules that can be used as salary attachment (``input_usage_payslip``).
+
+        :return: ``{rule_code: hr.salary.rule}``.
+        :rtype: dict
+        """
         rules = self.env['hr.salary.rule'].search([('input_usage_payslip', '=', True)])
         return {rule.code: rule for rule in rules}
 
     def _get_worked_day_lines_hours_per_day(self, version):
+        """Return the hours per day used to convert hours into days in the worked days lines.
+
+        Defaults to the version calendar ``hours_per_day``. Overridden by ``l10n_be_hr_payroll``.
+
+        :param hr.version version: version of the worked days.
+        :rtype: float
+        """
         return version.resource_calendar_id.hours_per_day
 
     def _get_worked_day_lines_hours_per_week(self, version):
+        """Return the weekly hours of the version calendar (or of the employee calendars if flexible).
+
+        :param hr.version version: version of the worked days.
+        :rtype: float
+        """
         self.ensure_one()
         if version.sudo()._is_flexible():
             return version.employee_id._get_calendars()[version.employee_id.id].hours_per_week
         return version.resource_calendar_id.hours_per_week
 
     def _get_out_of_contract_calendar(self, version):
+        """Return the calendar used to count the out-of-contract time of the period.
+
+        The version calendar, or for flexible versions the employee calendar, or the company calendar.
+        Overridden by ``l10n_be_hr_payroll``.
+
+        :param hr.version version: version not covering the whole period.
+        :rtype: resource.calendar
+        """
         self.ensure_one()
         if not version.sudo()._is_flexible():
             return version.resource_calendar_id
@@ -1416,6 +1803,34 @@ class HrPayslip(models.Model):
         return version.company_id.resource_calendar_id
 
     def _get_worked_day_lines_values(self, version, work_entries_vals):
+        """Return the worked days values of one version, from its generated work entries.
+
+        The work entry durations of the payslip period are summed by (work entry type, category
+        options) with ``version.get_work_hours()``, then converted into days with
+        :meth:`_get_worked_day_lines_hours_per_day` and rounded with :meth:`_round_days`. The
+        rounding difference is carried over to the type with the most hours. The time-rule-trimmed
+        part of the hours (``trimmed_duration``) is never rounded. Overridden by
+        ``l10n_be_hr_payroll``, ``l10n_hk_hr_payroll`` and ``l10n_ph_hr_payroll``.
+
+        :param hr.version version: the version.
+        :param list[dict] work_entries_vals: work entry values generated by
+            ``hr.version.generate_work_entries()`` (keys ``date``, ``duration``,
+            ``work_entry_type_id``, ``version_id``, optionally ``category_options_ids`` and
+            ``trimmed_duration``).
+        :return: list of ``hr.payslip.worked_days`` values, sorted by work entry type
+            sequence::
+
+                {
+                    'version_id': int,
+                    'sequence': int,
+                    'work_entry_type_id': int,
+                    'number_of_days': float,
+                    'number_of_hours': float,
+                    'category_options_ids': hr.salary.rule.category,
+                }
+
+        :rtype: list[dict]
+        """
         self.ensure_one()
         res = []
         hours_per_day = self._get_worked_day_lines_hours_per_day(version)
@@ -1460,12 +1875,37 @@ class HrPayslip(models.Model):
         return sorted(res, key=lambda d: work_entry_type.browse(d['work_entry_type_id']).sequence)
 
     def _get_out_of_period_duration(self, start, stop, reference_calendar):
+        """Return the working time of the calendar between two datetimes, used for the out-of-contract line.
+
+        Only attendances counted as working time are taken into account, without time off.
+        Overridden by ``l10n_be_hr_payroll`` and ``l10n_mx_hr_payroll``.
+
+        :param datetime start: start of the out-of-contract period.
+        :param datetime stop: end of the out-of-contract period.
+        :param resource.calendar reference_calendar: see :meth:`_get_out_of_contract_calendar`.
+        :return: ``{'days': float, 'hours': float}``.
+        :rtype: dict
+        """
         return reference_calendar.get_work_duration_data(start, stop, compute_leaves=False,
             domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.count_as', '=', 'working_time')])
 
     def _get_worked_day_lines(self, versions, work_entries_vals, check_out_of_version=True):
-        """
-        :returns: a list of dict containing the worked days values that should be applied for the given payslip
+        """Return the worked days values of the payslip for all its versions.
+
+        For each version (sorted by ``date_version``), the values of
+        :meth:`_get_worked_day_lines_values` are added. With ``check_out_of_version``, the parts of
+        the period before the contract start (first version) or after the contract end (last
+        version), or the whole period if the version has no contract, are added as an
+        out-of-contract line: work entry type with code ``000.00`` of the structure country, or
+        ``hr_work_entry.generic_hr_work_entry_type_out_of_contract``. Its amount is 0, so the wage
+        is prorated. Overridden by ``l10n_hk_hr_payroll``.
+
+        :param hr.version versions: the versions of the payslip (same contract).
+        :param list[dict] work_entries_vals: generated work entry values of these versions.
+        :param bool check_out_of_version: whether to add the out-of-contract lines.
+        :return: list of worked days values, see :meth:`_get_worked_day_lines_values` (the
+            out-of-contract line has no ``category_options_ids``).
+        :rtype: list[dict]
         """
         res = []
         self.ensure_one()
@@ -1519,18 +1959,41 @@ class HrPayslip(models.Model):
 
     @property
     def is_outside_contract(self):
+        """Whether the version contract does not cover the payslip period at all (always ``False`` in salary simulations)."""
         self.ensure_one()
         if self.env.context.get('salary_simulation'):
             return False
         return self._is_outside_contract_dates()
 
     def _rule_parameter(self, code, reference_date=False, raise_if_not_found=True):
+        """Return the value of the rule parameter ``code`` valid at the reference date.
+
+        Main way for salary rules to read legal values (rates, ceilings, scales), e.g.
+        ``payslip._rule_parameter('cct90_employer_onss_threshold')``.
+
+        :param str code: ``hr.rule.parameter`` code.
+        :param date reference_date: defaults to :meth:`_get_ytd_reference_date` (``date_to``).
+        :param bool raise_if_not_found: raise a ``UserError`` if no value exists, otherwise
+            return ``None``.
+        :return: the evaluated parameter value (any python literal: number, dict, list, ...), a
+            deep copy of the cached value.
+        """
         self.ensure_one()
         if not reference_date:
             reference_date = self._get_ytd_reference_date()
         return self.env['hr.rule.parameter']._get_parameter_from_code(code, reference_date, raise_if_not_found)
 
     def _sum(self, code, from_date, to_date=None):
+        """Return the sum of the line totals with the given rule code of the employee's validated or paid payslips in a date range.
+
+        Only payslips fully included in ``[from_date, to_date]`` are taken into account. The
+        current payslip is not included unless validated.
+
+        :param str code: rule code.
+        :param date from_date: minimum ``date_from`` of the payslips.
+        :param date to_date: maximum ``date_to`` of the payslips, defaults to today.
+        :rtype: float
+        """
         if to_date is None:
             to_date = fields.Date.context_today(self)
         self.env.cr.execute("""
@@ -1547,12 +2010,27 @@ class HrPayslip(models.Model):
 
     @api.ormcache('code')
     def _get_child_category_ids(self, code):
+        """Return the codes of the salary rule category ``code`` and all its descendants (cached).
+
+        :rtype: tuple[str]
+        """
         root_category = self.env['hr.salary.rule.category'].search([('code', '=', code)], limit=1)
         if not root_category:
             return tuple()
         return tuple(self.env['hr.salary.rule.category'].search([('id', 'child_of', root_category.id)]).mapped('code'))
 
     def _sum_category(self, code, from_date, to_date=None, include_children=False):
+        """Return the sum of the line totals of a category on the validated or paid payslips of the employees of ``self``.
+
+        Only payslips fully included in ``[from_date, to_date]`` are taken into account.
+
+        :param str code: salary rule category code.
+        :param date from_date: minimum ``date_from`` of the payslips.
+        :param date to_date: maximum ``date_to`` of the payslips, today by default.
+        :param bool include_children: also sum the descendant categories. A line whose rule
+            has several matching categories is counted once.
+        :rtype: float
+        """
         if to_date is None:
             to_date = fields.Date.context_today(self)
         if not self.ids:
@@ -1567,28 +2045,36 @@ class HrPayslip(models.Model):
         if not category_codes or not employee_ids:
             return 0.0
 
+        # A line is counted once, even if several categories of its rule match.
         self.env.cr.execute("""
             SELECT sum(pl.total)
             FROM hr_payslip as hp,
-                 hr_payslip_line as pl,
-                 hr_salary_rule_category as rc,
-                 hr_salary_rule as sr,
-                 hr_salary_rule_hr_salary_rule_category_rel as rel
+                 hr_payslip_line as pl
             WHERE hp.employee_id IN %s
               AND hp.state in ('validated', 'paid')
               AND hp.date_from >= %s
               AND hp.date_to <= %s
               AND hp.id = pl.slip_id
-              AND sr.id = pl.salary_rule_id
-              AND sr.id = rel.hr_salary_rule_id
-              AND rc.id = rel.hr_salary_rule_category_id
-
-              AND rc.code IN %s""", (tuple(employee_ids), from_date, to_date, tuple(category_codes)))
+              AND EXISTS (
+                  SELECT 1
+                  FROM hr_salary_rule_hr_salary_rule_category_rel as rel,
+                       hr_salary_rule_category as rc
+                  WHERE rel.hr_salary_rule_id = pl.salary_rule_id
+                    AND rc.id = rel.hr_salary_rule_category_id
+                    AND rc.code IN %s
+              )""", (tuple(employee_ids), from_date, to_date, tuple(category_codes)))
 
         res = self.env.cr.fetchone()
         return res and res[0] or 0.0
 
     def _sum_worked_days(self, code, from_date, to_date=None):
+        """Return the sum of the worked days amounts of a work entry type on the employee's validated or paid payslips.
+
+        :param str code: work entry type code.
+        :param date from_date: minimum ``date_from`` of the payslips.
+        :param date to_date: maximum ``date_to`` of the payslips, defaults to today.
+        :rtype: float
+        """
         self.ensure_one()
         if to_date is None:
             to_date = fields.Date.context_today(self)
@@ -1613,6 +2099,16 @@ class HrPayslip(models.Model):
         return res[0] if res else 0.0
 
     def _get_base_local_dict(self):
+        """Return the helpers available in the salary rules code, merged first in :meth:`_get_localdict`.
+
+        Base keys: ``float_round``, ``float_compare``, ``relativedelta``, ``ceil``, ``floor``,
+        ``UserError``, ``date``, ``datetime``, ``defaultdict`` and ``_get_payroll_translation``.
+        Override to expose more helpers (e.g. ``l10n_in_hr_payroll`` adds ``_``,
+        ``l10n_mx_hr_payroll``, ``l10n_au_hr_payroll``, ``l10n_ch_hr_payroll``,
+        ``l10n_hk_hr_payroll`` add their own).
+
+        :rtype: dict
+        """
         return {
             'float_round': float_round,
             'float_compare': float_compare,
@@ -1627,13 +2123,17 @@ class HrPayslip(models.Model):
         }
 
     def _get_category_options_data(self, work_entries=None):
-        """
-        Generate a dict mapping each salary rule category option code to the cumulate hours from worked day lines.
+        """Return the hours of the worked days lines by category option code.
 
-        A category option implies its ancestors: hours carrying a child option (e.g. a custom premium
-        pay) are also credited to each parent category code, once per worked day line.
+        A category option implies its ancestors: hours carrying a child option (e.g. a custom
+        premium pay) are also credited to each parent category code, once per worked days line.
+        Exposed as ``category_options`` in the rules, e.g. ``category_options['PREMIUM_PAY_NIGHT']``.
+        Overridden by ``l10n_be_hr_payroll``.
 
-        :return: DefaultDictPayroll mapping category code to total hours (defaults to 0 for missing keys).
+        :param list work_entries: work entry values carrying category options (unused by the
+            base implementation).
+        :return: mapping category code to total hours, 0 for missing keys.
+        :rtype: DefaultDictPayroll
         """
         self.ensure_one()
         category_options = DefaultDictPayroll(lambda: 0)
@@ -1644,12 +2144,15 @@ class HrPayslip(models.Model):
         return category_options
 
     def _get_premium_pay_additional_amount(self, category_code):
-        """
-        Compute the extra amount granted by the custom premium pays (descendant categories of the
-        category with the given code) present on the payslip worked days, on top of the legal rate.
+        """Compute the extra amount granted by the custom premium pays of the worked days, on top of the legal rate.
 
+        Custom premium pays are descendant categories of ``category_code`` with a
+        ``premium_amount_per_hour``, ``premium_amount_per_day`` or ``premium_percentage_hourly_rate``.
         The percentage is based on the hourly rate of each worked day line itself: percentage / 100
         x (amount / hours) x hours, which simplifies to percentage / 100 x amount.
+
+        :param str category_code: code of the legal premium pay category (e.g. ``'PREMIUM_PAY_NIGHT'``).
+        :rtype: float
         """
         self.ensure_one()
         if self.ignore_worked_day_lines:
@@ -1670,10 +2173,46 @@ class HrPayslip(models.Model):
         return total
 
     def _get_localdict(self, work_entries=None):
+        """Return the evaluation context of the salary rules of the payslip.
+
+        Override to add keys (e.g. ``l10n_vn_hr_payroll`` adds ``l10n_vn_gross_up``,
+        ``l10n_id_hr_payroll``, ``l10n_ph_hr_payroll``). Keys:
+
+        * the helpers of :meth:`_get_base_local_dict`;
+        * ``payslip`` (``hr.payslip``), ``employee`` (``hr.employee``), ``version``
+          (``hr.version``), ``company`` (``res.company``), ``payroll_config``
+          (``payroll.config.settings``);
+        * ``categories``: ``DefaultDictPayroll`` ``{category_code: float}``, missing codes are 0.
+          Initialized with the worked days amounts by category of their work entry type (with
+          the ancestors, each code credited once per worked days line), then increased by each
+          computed rule total (each code once per rule, see
+          ``hr.salary.rule.category._sum_salary_rule_category``), e.g. ``categories['GROSS']``;
+        * ``category_options``: see :meth:`_get_category_options_data`;
+        * ``rules``: legacy ``DefaultDictPayroll``, never filled; use ``result_rules``;
+        * ``result_rules``: ``DefaultDictPayroll`` ``{rule_code: {'total', 'amount', 'quantity',
+          'rate', 'ytd'}}`` of the rules computed so far, e.g. ``result_rules['GROSS']['total']``;
+        * ``worked_days``: plain ``dict`` ``{work_entry_type_code: hr.payslip.worked_days}``.
+          A code may have several lines (several versions or category options): prefer
+          ``sum(worked_days['WORK100'].mapped('number_of_days'))`` to
+          ``worked_days['WORK100'].number_of_days``. Missing codes raise ``KeyError``;
+        * ``inputs``: plain ``dict`` ``{rule_code: hr.payslip.input}``, e.g.
+          ``inputs['DEDUCTION'].amount``. Several inputs with the same code are aggregated
+          (summed ``amount``). Missing codes raise ``KeyError``, use ``inputs.get(code)``;
+        * ``same_type_input_lines``: ``{rule_code: hr.payslip.input}`` of the codes having
+          several input lines (the rule is then computed once per input line). Missing codes
+          return an empty recordset;
+        * ``work_entries``: work entry values of the period and of the worked days versions.
+
+        :meth:`_get_payslip_lines` adds the keys of :meth:`_get_common_localdict` and
+        :meth:`_get_round_common_localdict`, and the rule outputs.
+
+        :param list[dict] work_entries: work entry values generated for the payslip versions.
+        :rtype: dict
+        """
         self.ensure_one()
         # Check for multiple inputs of the same type and keep a copy of
         # them because otherwise they are lost when building the dict
-        same_type_input_lines = defaultdict(lambda x: self.env['hr.payslip.input'])
+        same_type_input_lines = defaultdict(lambda: self.env['hr.payslip.input'])
         input_line_ids_by_code = self.input_line_ids.grouped('code')
         for code, input_lines in input_line_ids_by_code.items():
             if len(input_lines) > 1:
@@ -1691,10 +2230,8 @@ class HrPayslip(models.Model):
         categories = DefaultDictPayroll(lambda: 0)
         if not self.ignore_worked_day_lines:
             for worked_day_line in self.worked_days_line_ids:
-                for category in worked_day_line.work_entry_type_id.category_ids:
-                    codes = category._get_codes_with_ancestors()
-                    for code in codes:
-                        categories[code] += worked_day_line.amount
+                for code in worked_day_line.work_entry_type_id.category_ids._get_codes_with_ancestors():
+                    categories[code] += worked_day_line.amount
 
         localdict = {
             **self._get_base_local_dict(),
@@ -1722,15 +2259,47 @@ class HrPayslip(models.Model):
         return localdict
 
     def _get_common_localdict(self):
+        """Return the values shared by the localdicts of all the payslips computed together.
+
+        Hook to fetch data once per batch instead of once per payslip (overridden by
+        ``l10n_be_hr_payroll``). The base implementation returns ``global_line_values``:
+        ``{rule_code: {payslip_id or 'sum': {'amount', 'quantity', 'total'}}}``, filled during the
+        computation. :meth:`_get_payslip_lines` also adds ``localdicts`` (``{payslip_id: localdict}``)
+        to the common dict, but does not copy it into the localdicts.
+
+        :rtype: dict
+        """
         vals_list = ['amount', 'quantity', 'total']
         return {
             'global_line_values': defaultdict(lambda: defaultdict(lambda: dict.fromkeys(vals_list, 0.0)))
         }
 
     def _get_round_common_localdict(self, round_nb, common_localdict):
+        """Return values to add to the localdicts before computing a round of rules.
+
+        Rules are computed by ``round_of_computation`` (all payslips of a structure for round 1,
+        then round 2, ...). Override to compute values needing the results of the previous round
+        for all the payslips, e.g. ``l10n_be_hr_payroll`` computes withholding tax exemptions
+        shared between payslips in rounds 2 and 3.
+
+        :param int round_nb: the ``round_of_computation`` about to be computed.
+        :param dict common_localdict: see :meth:`_get_common_localdict`, with ``localdicts``.
+        :rtype: dict
+        """
         return {}
 
     def _get_payslip_line_total(self, amount, quantity, rate, rule):
+        """Return the total of a payslip line: ``amount * quantity * rate / 100``.
+
+        Override to round the totals (``l10n_be_hr_payroll`` rounds to the cent,
+        ``l10n_ch_hr_payroll`` to 5 cents for some rules).
+
+        :param float amount: rule amount (``result``).
+        :param float quantity: rule quantity (``result_qty``).
+        :param float rate: rule rate in percent (``result_rate``).
+        :param hr.salary.rule rule: the computed rule.
+        :rtype: float
+        """
         self.ensure_one()
         return amount * quantity * rate / 100.0
 
@@ -1748,6 +2317,13 @@ class HrPayslip(models.Model):
         return 'date_to'
 
     def _get_last_ytd_payslips(self):
+        """Return the last validated or paid payslip of the same employee and structure since the last YTD reset.
+
+        The YTD reset date is given by the company (``get_last_ytd_reset_date``), the dates are
+        compared with :meth:`_get_ytd_reference_date`.
+
+        :return: ``defaultdict`` ``{payslip: hr.payslip}``, empty recordset if none.
+        """
         last_ytd_payslips = defaultdict(lambda: self.env['hr.payslip'])
         if not self:
             return last_ytd_payslips
@@ -1787,16 +2363,96 @@ class HrPayslip(models.Model):
 
         return last_ytd_payslips
 
+    def _get_last_line_ytd_values(self, code_list):
+        """Return the YTD of the given codes on these payslips, as :meth:`_get_line_values`.
+
+        A rule computed once per input line (several inputs of its code) gives several lines with
+        a cumulative YTD: the YTD of the code is the one of its last line, not their sum.
+
+        :param code_list: codes of the salary rules.
+        :return: ``{code: {payslip_id: {'ytd': float}}}``, missing values are 0.
+        :rtype: defaultdict
+        """
+        result = defaultdict(lambda: defaultdict(lambda: {'ytd': 0.0}))
+        if not self or not code_list:
+            return result
+        last_line_ids = self.env['hr.payslip.line']._read_group(
+            [('slip_id', 'in', self.ids), ('code', 'in', list(code_list))],
+            ['slip_id', 'code'],
+            ['id:max'],
+        )
+        for line in self.env['hr.payslip.line'].browse(line_id for _slip, _code, line_id in last_line_ids):
+            result[line.code][line.slip_id.id]['ytd'] = line.ytd
+        return result
+
+    def _get_payslip_line_name(self, localdict, rule, input_line=None):
+        """Return the name of the payslip line of ``rule``.
+
+        The ``result_name`` of the rule, else the rule name. The description of the input line
+        (e.g. the payslip description of a payslip adjustment) is appended to the rule name as
+        "Rule - Description", unless it is the default name of the input (``input_name``, not
+        translated) or the rule name, or the rule sets another ``result_name``.
+
+        :param dict localdict: evaluation context of the rule, after its computation.
+        :param hr.salary.rule rule: computed rule.
+        :param hr.payslip.input input_line: input line read by the rule, if any.
+        :rtype: str
+        """
+        result_name = localdict['result_name']
+        # Most input rules only echo the input name in result_name, a different value is a deliberate label
+        if (
+            input_line and input_line.name
+            and input_line.name not in (rule.name, rule.input_name)
+            and result_name in (False, input_line.name)
+        ):
+            return f"{rule.name} - {input_line.name}"
+        return result_name or rule.name
+
     def _get_payslip_lines(self, force_categories_by_code=None):
+        """Evaluate the salary rules and return the values of the payslip lines to create.
+
+        Does not write anything. For each structure, the rules are evaluated by
+        ``round_of_computation`` then ``sequence``, for all the payslips of ``self``. Each
+        payslip has one localdict (see :meth:`_get_localdict`) kept across the rounds. For each
+        rule, ``result``, ``result_qty`` (1), ``result_rate`` (100), ``result_name`` and
+        ``explanation_info`` are reset; if the condition is satisfied, the rule is computed, the
+        total is given by :meth:`_get_payslip_line_total`, then:
+
+        * ``localdict[rule.code]`` is set to the total (rule codes are variables in the next rules);
+        * ``result_rules[rule.code]`` and ``global_line_values`` are updated;
+        * the total is added to the rule categories (and their ancestors) in ``categories``;
+        * the explanation is ``rule.explanation_template.format(**explanation_info)``.
+
+        The YTD of each line is the YTD of the line of the same code in the last YTD payslip (see
+        :meth:`_get_last_ytd_payslips`) plus its total. A rule whose code has several input lines
+        (``same_type_input_lines``) produces one line per input line. Variables assigned in rule
+        code stay in the localdict for the next rules.
+
+        Context keys: ``force_payslip_localdict`` (use this localdict for all payslips),
+        ``prevent_payslip_computation_line_ids`` (ids of rules to skip),
+        ``force_payslip_line_overrides`` (``{line key: {'name', ...}}`` forced values, see
+        :meth:`_recompute_with_forced_lines`). Overridden e.g. by ``l10n_vn_hr_payroll`` (net
+        salary gross-up loop) and ``l10n_id_hr_payroll``.
+
+        :param dict force_categories_by_code: ``{category_code: amount}`` forced in ``categories``
+            before the computation, to simulate a payslip. Use with caution.
+        :return: one dict per line, ready to be passed to ``hr.payslip.line.create()``
+            (see ``compute_sheet``)::
+
+                {
+                    'sequence': int, 'code': str, 'name': str, 'salary_rule_id': int,
+                    'version_id': int, 'employee_id': int, 'slip_id': int,
+                    'explanation': str or False,
+                    'amount': float, 'quantity': float, 'rate': float, 'total': float, 'ytd': float,
+                    'manually_modified': bool,
+                }
+
+        :rtype: list[dict]
+        """
         # The parameter force_categories_by_code should be used with caution. You should normally never use that parameter.
         # This parameter has been added in the purpose to simulate the result of the payslip by forcing one particular
         # salary rule category with a value. One usage example of that parameter is the withholding tax rule for the company
         # executive in BE in case of non-periodic revenue.
-
-        def get_rule_name(localdict, rule):
-            if localdict['result_name']:
-                return localdict['result_name']
-            return rule.name
 
         if not self:
             return []
@@ -1814,7 +2470,7 @@ class HrPayslip(models.Model):
             self.env['hr.payslip']
         )
 
-        line_values = ytd_payslips._get_line_values(code_set, ['ytd'])
+        line_values = ytd_payslips._get_last_line_ytd_values(code_set)
 
         work_entries_vals = self.worked_days_line_ids.version_id.generate_work_entries(
             min(self.mapped('date_from')), max(self.mapped('date_to')))
@@ -1877,10 +2533,18 @@ class HrPayslip(models.Model):
                         })
                         explanation = False
                         if rule._satisfy_condition(localdict):
-                            if rule.code in localdict['same_type_input_lines']:
-                                for multi_line_rule in localdict['same_type_input_lines'][rule.code]:
+                            if localdict['same_type_input_lines'].get(rule.code):
+                                for rank, multi_line_rule in enumerate(localdict['same_type_input_lines'][rule.code]):
                                     localdict['inputs'][rule.code] = multi_line_rule
-                                    amount, qty, rate, explanation_info = rule._compute_rule(localdict)
+                                    localdict['result_name'] = False
+                                    explanation = False
+                                    forced = manual_overrides.get(payslip._get_line_override_key(rule.code, rank), {})
+                                    amount_forced = 'amount' in forced
+                                    if amount_forced:
+                                        amount, qty, rate = forced['amount'], forced['quantity'], forced['rate']
+                                        explanation = forced.get('explanation', False)
+                                    else:
+                                        amount, qty, rate, explanation_info = rule._compute_rule(localdict)
                                     tot_rule = payslip._get_payslip_line_total(amount, qty, rate, rule)
                                     ytd = result_rules_dict[rule.code]['ytd'] + tot_rule
 
@@ -1899,7 +2563,7 @@ class HrPayslip(models.Model):
 
                                     localdict = rule.category_ids._sum_salary_rule_category(
                                         localdict, tot_rule)
-                                    if rule.explanation_template:
+                                    if rule.explanation_template and not amount_forced:
                                         try:
                                             explanation_info = explanation_info or {}
                                             explanation = rule.with_context(lang=self.env.user.lang).explanation_template.format(**explanation_info)
@@ -1908,7 +2572,7 @@ class HrPayslip(models.Model):
                                     line_vals.append({
                                         'sequence': rule.sequence,
                                         'code': rule.code,
-                                        'name': get_rule_name(localdict, rule),
+                                        'name': forced.get('name') or payslip._get_payslip_line_name(localdict, rule, multi_line_rule),
                                         'salary_rule_id': rule.id,
                                         'version_id': localdict['version'].id,
                                         'employee_id': localdict['employee'].id,
@@ -1919,6 +2583,7 @@ class HrPayslip(models.Model):
                                         'total': tot_rule,
                                         'slip_id': payslip.id,
                                         'ytd': ytd,
+                                        'manually_modified': forced.get('manually_modified', False),
                                     })
                                 input_line_ids = localdict['same_type_input_lines'][rule.code].ids
                                 localdict['inputs'][rule.code] = self.__get_aggregator_hr_payslip_input_model()(
@@ -1971,7 +2636,7 @@ class HrPayslip(models.Model):
                                 result[rule.code] = {
                                     'sequence': rule.sequence,
                                     'code': rule.code,
-                                    'name': override_name or get_rule_name(localdict, rule),
+                                    'name': override_name or payslip._get_payslip_line_name(localdict, rule, localdict['inputs'].get(rule.code)),
                                     'salary_rule_id': rule.id,
                                     'version_id': localdict['version'].id,
                                     'employee_id': localdict['employee'].id,
@@ -1990,6 +2655,7 @@ class HrPayslip(models.Model):
         return line_vals
 
     def _compute_worked_days_ytd(self):
+        """Set the ``ytd`` of the worked days lines: YTD of the same code in the last YTD payslip plus the line amount."""
         last_ytd_payslips = self._get_last_ytd_payslips()
         ytd_payslips = reduce(
             lambda ytd_payslips, payslip: ytd_payslips | payslip, last_ytd_payslips.values(),
@@ -2012,6 +2678,10 @@ class HrPayslip(models.Model):
 
     @api.depends('employee_id', 'date_from')
     def _compute_version_id(self):
+        """Default the version: the first version of a contract overlapping the period, or the version valid at ``date_from``.
+
+        The period end is estimated from the schedule of the version valid at ``date_from``.
+        """
         for slip in self:
             if not slip.employee_id:
                 slip.version_id = False
@@ -2032,6 +2702,7 @@ class HrPayslip(models.Model):
 
     @api.depends('version_id')
     def _compute_struct_id(self):
+        """Default the structure to the default structure of the version structure type (only when not set)."""
         for slip in self.filtered(lambda p: not p.struct_id):
             slip.struct_id = slip.version_id.structure_type_id.default_struct_id\
                 or slip.employee_id.version_id.structure_type_id.default_struct_id
@@ -2055,7 +2726,7 @@ class HrPayslip(models.Model):
         week_start = self.env["res.lang"]._get_data(code=lang).week_start
         schedule = self.version_id.schedule_pay or self.version_id.structure_type_id.default_schedule_pay
         if schedule == 'monthly':
-            period_name = self._format_date_cached(cache, start_date, "MMMM Y")
+            period_name = self._format_date_cached(cache, start_date, "MMMM y")
         elif schedule == 'quarterly':
             current_year_quarter = math.ceil(start_date.month / 3)
             period_name = _("Quarter %(quarter)s of %(year)s", quarter=current_year_quarter, year=start_date.year)
@@ -2076,8 +2747,8 @@ class HrPayslip(models.Model):
             period_name = _("Weeks %(week)s and %(week1)s of %(year)s",
                 week=first_week, week1=first_week + 1, year=start_date.year)
         elif schedule == 'bi-monthly':
-            start_date_string = self._format_date_cached(cache, start_date, "MMMM Y")
-            end_date_string = self._format_date_cached(cache, end_date, "MMMM Y")
+            start_date_string = self._format_date_cached(cache, start_date, "MMMM y")
+            end_date_string = self._format_date_cached(cache, end_date, "MMMM y")
             period_name = _("%(start_date_string)s and %(end_date_string)s", start_date_string=start_date_string, end_date_string=end_date_string)
         return period_name
 
@@ -2111,6 +2782,12 @@ class HrPayslip(models.Model):
 
     @api.model
     def _issues_dependencies(self):
+        """Return the fields triggering the recomputation of the payslip issues (see :meth:`_compute_issues`).
+
+        Extend it when a localization adds payroll warnings on payslips depending on other fields.
+
+        :rtype: list[str]
+        """
         return [
             'state', 'date_to', 'date_from', 'employee_id',
             'version_id', 'version_id.contract_date_start', 'version_id.contract_date_end', 'version_id.schedule_pay',
@@ -2126,6 +2803,13 @@ class HrPayslip(models.Model):
         ]
 
     def _get_payslips_to_compute_issues(self):
+        """Return the payslips whose issues must be computed.
+
+        Draft and validated payslips, and paid payslips with outdated data (version, employee or
+        time off changed since validation) that are not refunded, corrected or kept as is.
+
+        :rtype: hr.payslip
+        """
         to_compute_payslips = self.filtered(lambda p: p.state in ('draft', 'validated')).with_prefetch()
         paid_payslips_with_wrong_data = self.filtered_domain([
             ("state", "=", "paid"),
@@ -2138,6 +2822,17 @@ class HrPayslip(models.Model):
 
     @api.depends(lambda self: self._issues_dependencies())
     def _compute_issues(self):
+        """Compute ``issues``, ``error_count`` and ``warning_count`` from the payroll warnings displayed on payslips.
+
+        Each active ``hr.payroll.warning`` with ``display_on_model`` on ``hr.payslip`` is evaluated
+        on the payslips of :meth:`_get_payslips_to_compute_issues`. ``issues`` is a JSON dict
+        ``{index: {'message': str, 'level': 'danger' or 'warning', 'action_text': str,
+        'action': dict}}`` (``action*`` keys only for python warnings giving
+        ``warning_details``). ``'danger'`` issues are errors and block the validation.
+
+        Not computed in tests or while the registry is loading, unless the context key
+        ``hr_payroll_force_compute_issue`` is set.
+        """
         self.error_count = 0
         self.warning_count = 0
         self.issues = {}
@@ -2164,6 +2859,9 @@ class HrPayslip(models.Model):
                 warning_result[warning] = (warning._get_warning_domain_records(payslips_to_check.company_id, records_to_check=payslips_to_check), {})
             else:
                 records, details, _, _ = warning._get_warning_python_records(localdict={'active_ids': payslips_to_check.ids})
+                if records._name != self._name:
+                    # Without saved payslips (new payslip form), a warning may answer for the dashboard instead
+                    records = self.browse()
                 warning_result[warning] = (records, details or {})
 
         for slip in payslips_to_check:
@@ -2197,6 +2895,10 @@ class HrPayslip(models.Model):
             slip.issues = dict(enumerate(payslip_issues)) if payslip_issues else {}
 
     def _get_error_message(self):
+        """Return the blocking (``'danger'``) issues of the payslips as a bullet list text.
+
+        :rtype: str
+        """
         if len(self) == 1:
             return '\n'.join([
                 f' • {issue["message"]}'
@@ -2220,6 +2922,15 @@ class HrPayslip(models.Model):
 
     @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to', 'ignore_worked_day_lines')
     def _compute_worked_days_line_ids(self):
+        """Generate the worked days lines of the payslips.
+
+        Only payslips with an employee, dates, a version and a structure using worked days (and not
+        ``ignore_worked_day_lines``) get lines. Refunds get the negated lines of their origin. For
+        the others, the versions taken into account are the payslip version and the versions of the
+        same contract (same ``_get_version_lookup_key()``) starting during the period. The work
+        entries of these versions are generated on the fly (nothing is stored) and converted by
+        :meth:`_get_new_worked_days_lines`. Skipped in salary simulations.
+        """
         if not self or self.env.context.get('salary_simulation'):
             return
         self.update({'worked_days_line_ids': [(5, 0, 0)]})
@@ -2291,6 +3002,11 @@ class HrPayslip(models.Model):
             slip.update({'worked_days_line_ids': slip._get_new_worked_days_lines(versions=versions, work_entries_vals=slip_work_entries_vals)})
 
     def _get_similar_payslips(self):
+        """Return the non cancelled payslips with the same version, structure, period and ``ignore_worked_day_lines``.
+
+        :return: ``{(version, structure, date_from, date_to, ignore_worked_day_lines): hr.payslip}``.
+        :rtype: dict
+        """
         done_payslips = self.filtered(lambda p: p.version_id and p.struct_id and p.date_from and p.date_to)
         search_domain = [
             ('struct_id', 'in', done_payslips.struct_id.ids),
@@ -2310,26 +3026,48 @@ class HrPayslip(models.Model):
         }
 
     def _get_new_worked_days_lines(self, versions, work_entries_vals):
+        """Return the ``worked_days_line_ids`` create commands, see :meth:`_get_worked_day_lines`.
+
+        :rtype: list[tuple]
+        """
         if self.ignore_worked_day_lines:
             return []
         return [(0, 0, vals) for vals in self._get_worked_day_lines(versions=versions, work_entries_vals=work_entries_vals)]
 
     def _get_salary_line_total(self, code):
+        """Deprecated, use :meth:`_get_line_values`."""
         _logger.warning('The method _get_salary_line_total is deprecated in favor of _get_line_values')
         lines = self.line_ids.filtered(lambda line: line.code == code)
         return sum([line.total for line in lines])
 
     def _get_salary_line_quantity(self, code):
+        """Deprecated, use :meth:`_get_line_values`."""
         _logger.warning('The method _get_salary_line_quantity is deprecated in favor of _get_line_values')
         lines = self.line_ids.filtered(lambda line: line.code == code)
         return sum([line.quantity for line in lines])
 
     def _get_line_values(self, code_list, vals_list=None, compute_sum=False, extra_domain=None):
-        """Sum the payslip lines of self, grouped by code.
+        """Sum the payslip lines of ``self`` by code and payslip, in a single query.
 
-        :param extra_domain: optional hr.payslip.line domain restricting the lines
-            taken into account, e.g. to keep only the amounts a declaration must
-            report for a given period.
+        Main tool to read computed amounts in reports and declarations. For example
+        ``payslips._get_line_values(['GROSS', 'NET'], compute_sum=True)['NET']['sum']['total']``.
+
+        :param list[str] code_list: rule codes.
+        :param list[str] vals_list: fields to sum among ``'total'`` (default), ``'amount'``,
+            ``'quantity'`` and ``'ytd'``.
+        :param bool compute_sum: also fill the ``'sum'`` key with the sum over all payslips.
+        :param extra_domain: optional ``hr.payslip.line`` domain restricting the lines taken into
+            account, e.g. to keep only the amounts a declaration must report for a given period.
+        :return: nested ``defaultdict`` (missing codes or payslips give
+            0.0)::
+
+                {
+                    'NET': {
+                        'sum': {'total': 300.0},       # only with compute_sum
+                        payslip_1.id: {'total': 100.0},
+                        payslip_2.id: {'total': 200.0},
+                    },
+                }
         """
         if vals_list is None:
             vals_list = ['total']
@@ -2370,6 +3108,16 @@ class HrPayslip(models.Model):
         return result
 
     def _get_worked_days_line_values(self, code_list, vals_list=None, compute_sum=False, exclude_codes=False):
+        """Sum the worked days lines of ``self`` by work entry type code and payslip, in a single query.
+
+        :param list[str] code_list: work entry type codes.
+        :param list[str] vals_list: fields to sum among ``'amount'`` (default),
+            ``'number_of_days'``, ``'number_of_hours'`` and ``'ytd'``.
+        :param bool compute_sum: also fill the ``'sum'`` key with the sum over all payslips.
+        :param bool exclude_codes: take the codes not in ``code_list`` instead.
+        :return: nested ``defaultdict`` ``{code: {payslip_id or 'sum': {field: float}}}``, same
+            structure as :meth:`_get_line_values`.
+        """
         if vals_list is None:
             vals_list = ['amount']
         valid_values = {'number_of_hours', 'number_of_days', 'amount', 'ytd'}
@@ -2425,6 +3173,11 @@ class HrPayslip(models.Model):
 
     # YTI TODO: Convert in a single SQL request + Handle children
     def _get_category_data(self, category_code):
+        """Sum the quantity and total of the lines of the payslip whose rule belongs to the category (children excluded).
+
+        :return: ``{'quantity': float, 'total': float}``.
+        :rtype: dict
+        """
         category_data = {'quantity': 0.0, 'total': 0.0}
         for line in self.line_ids:
             if any(cat.code == category_code for cat in line.salary_rule_id.category_ids):
@@ -2433,6 +3186,10 @@ class HrPayslip(models.Model):
         return category_data
 
     def _get_input_line_amount(self, code):
+        """Return the sum of the amounts of the input lines with the given rule code.
+
+        :rtype: float
+        """
         lines = self.input_line_ids.filtered(lambda line: line.code == code)
         return sum([line.amount for line in lines])
 
@@ -2452,10 +3209,18 @@ class HrPayslip(models.Model):
         }
 
     def _get_contract_wage(self):
+        """Return the wage of the payslip version (``version._get_contract_wage()``).
+
+        :rtype: float
+        """
         self.ensure_one()
         return self.version_id._get_contract_wage()
 
     def _is_outside_contract_dates(self):
+        """Return whether the version contract does not overlap the payslip period at all (or the version has no contract).
+
+        :rtype: bool
+        """
         self.ensure_one()
         payslip = self
         contract = self.version_id
@@ -2463,10 +3228,21 @@ class HrPayslip(models.Model):
             or (contract.contract_date_end and contract.contract_date_end < payslip.date_from)
 
     def _get_data_files_to_update(self):
+        """Return the data files reloaded by :meth:`_update_payroll_data`.
+
+        Overridden by each localization to list its payroll data (rules, parameters, ...).
+
+        :return: ``[(module_name, [file_path, ...]), ...]``, order matters.
+        :rtype: list[tuple]
+        """
         # Note: Use lists as modules/files order should be maintained
         return []
 
     def _update_payroll_data(self, country_code=False):
+        """Reload the payroll data files of :meth:`_get_data_files_to_update`, then update the work entry types.
+
+        :param str country_code: only reload the files of the ``l10n_<country_code>*`` modules.
+        """
         data_to_update = self._get_data_files_to_update()
         _logger.info("Update payroll static data")
         idref = {}
@@ -2480,6 +3256,7 @@ class HrPayslip(models.Model):
         self.env['hr.work.entry.type']._update_payroll_related_fields(country_code)
 
     def action_generate_pdf(self):
+        """Generate (and send) the PDFs of the computed payslips, see :meth:`_generate_pdf`."""
         computed_payslips = self.filtered('line_ids')
         if not computed_payslips:
             return self._show_notification(self.env._('No Computed Payslips'), 'danger')
@@ -2488,6 +3265,13 @@ class HrPayslip(models.Model):
 
     @api.model
     def _cron_generate_pdf(self, batch_size=False):
+        """Generate the queued payslip PDFs (``queued_for_pdf``), then the employee declaration PDFs, by batch.
+
+        The cron is re-triggered while there are records left.
+
+        :param int batch_size: number of records processed per run (default 30).
+        :return: ``True`` if the cron was re-triggered.
+        """
         payslips = self.search([
             ('state', 'in', ['validated', 'paid']),
             ('queued_for_pdf', '=', True),
@@ -2516,20 +3300,26 @@ class HrPayslip(models.Model):
 
     @api.model
     def __get_aggregator_hr_payslip_input_model(self):
-        """this method return an aggregator version of hr.payslip.input Model.
-        this method is also meant to be overriden in case other modules adds new fields
-        to hr.payslip.input model. In case it can be extended as such:
-        ```py
-        def __get_aggregator_hr_payslip_input_model(self):
-            class ProxyHrPayslipInput(super().__get_aggregator_hr_payslip_input_model()):
-                ... # your modifications
-        return ProxyHrPayslipInput
-        ```
+        """Return an aggregator version of the ``hr.payslip.input`` model class.
 
-        Note: -this method use the normal python class inheritance instead of odoo's
-              -the aggregation assumes that the code are the same for all the inputs
-        Warning: Do not reproduce elsewhere it's quite a specific case here
-        return: Aggregator version of hr.payslip.input model
+        Used by :meth:`_get_localdict` for the codes having several input lines: a recordset
+        of this class behaves like a single input in ``inputs[code]``, with ``amount`` summed,
+        ``sequence`` the minimum and ``name`` the common name (or the names joined by commas).
+        The other fields are read on the first record. It uses plain python inheritance
+        (``_register = False``), not the Odoo one, and assumes all the inputs share the same
+        code. Do not reproduce elsewhere.
+
+        Override it when a module adds fields to ``hr.payslip.input`` that must be aggregated::
+
+            def __get_aggregator_hr_payslip_input_model(self):
+                class ProxyHrPayslipInput(super().__get_aggregator_hr_payslip_input_model()):
+                    ...  # your modifications
+                return ProxyHrPayslipInput
+
+        The name is mangled by python (``_HrPayslip__get_aggregator_hr_payslip_input_model``):
+        the override only works from a class also named ``HrPayslip``.
+
+        :return: subclass of the ``hr.payslip.input`` model class.
         """
 
         class ProxyHrPayslipInput(self.env['hr.payslip.input'].__class__):
@@ -2573,6 +3363,18 @@ class HrPayslip(models.Model):
         return ProxyHrPayslipInput
 
     def _compute_salary_allocations(self, total_amount=None):
+        """Split the net amount of the payslip between the bank accounts of the employee.
+
+        Salary attachments with a beneficiary bank account first receive their computed amount.
+        Then, with a single account, it receives the whole amount; with several accounts, the
+        fixed allocations are taken first, and the remaining amount is split by percentage, the
+        last account receiving the rounding remainder.
+
+        :param float total_amount: amount to split, defaults to the net wage (or the net
+            difference for a correction).
+        :return: ``defaultdict(float)`` ``{str(res.partner.bank id): amount}``.
+        :raise ValidationError: if the allocations exceed or do not cover the amount.
+        """
         self.ensure_one()
         if total_amount is None:
             if self.is_correction_payslip:
@@ -2641,12 +3443,19 @@ class HrPayslip(models.Model):
         return res
 
     def safe_compute_salary_allocations(self, total_amount=None):
+        """Same as :meth:`_compute_salary_allocations`, but return ``{'__error__': message}`` instead of raising."""
         try:
             return self._compute_salary_allocations(total_amount)
         except ValidationError as e:
             return {"__error__": str(e)}
 
     def generate_payments_dict(self):
+        """Return the payments of the payslip, one per bank account, for the payment reports.
+
+        :return: ``[{'partner': str, 'account_num': str, 'amount': float}]``; ``partner`` is the
+            account holder between parentheses if it is not the employee.
+        :rtype: list[dict]
+        """
         payments = []
         allocations = self._compute_salary_allocations()
 
@@ -2662,6 +3471,12 @@ class HrPayslip(models.Model):
         return payments
 
     def _negative_net_context(self):
+        """Return the negative net amounts still to report for the employees of the draft payslips.
+
+        :return: ``{hr.employee: amount}`` summed over the validated or paid payslips with
+            ``has_negative_net_to_report``.
+        :rtype: dict
+        """
         target_slips = self.filtered(
             lambda s: s.id and s.state == 'draft' and s.currency_id
         )
@@ -2684,6 +3499,13 @@ class HrPayslip(models.Model):
         }
 
     def _get_basic_salary(self):
+        """Return the basic salary of the period: the sum of the worked days amounts.
+
+        Falls back on the version wage (:meth:`_get_contract_wage`) in salary simulations, or if
+        the payslip has no worked days.
+
+        :rtype: float
+        """
         self.ensure_one()
         salary_simulation = self.env.context.get('salary_simulation')
         if salary_simulation or self.ignore_worked_day_lines or not self.worked_days_line_ids:
@@ -2691,6 +3513,15 @@ class HrPayslip(models.Model):
         return sum(line.amount for line in self.worked_days_line_ids)
 
     def _get_payroll_translation(self, text, **kwargs):
+        """Return the translation of a source term used in data code (salary rules, warnings).
+
+        Terms evaluated in data are not extracted for translation: each localization overrides this
+        method with an explicit ``self.env._()`` call per term. Unknown terms are logged and
+        returned as is, formatted with ``kwargs``.
+
+        :param str text: source term.
+        :rtype: str
+        """
         # Please order alphabetically to easily spot duplicates
         _logger.warning('Translation source term not explicitely defined (It could remain untranslated) for:\n%s', text)
         if kwargs:
@@ -2698,6 +3529,7 @@ class HrPayslip(models.Model):
         return text
 
     def return_time_off_to_normal(self):
+        """Give the time off of the payslips (``payslip_state`` blocked or done) back the ``'normal'`` payslip state."""
         domain = Domain.AND([
             [('payslip_state', 'in', ['blocked', 'done'])],
             self._get_leaves_domain()

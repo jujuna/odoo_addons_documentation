@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 
 from odoo.tests import tagged
 from odoo.fields import Command
@@ -101,7 +102,7 @@ class TestPayslipValidationCp302(TestPayrollBase, TestBelgiumCommon):
         return worker
 
     def _generate_worker_termination_payslip(self, worker, departure_date, dismissal_date,
-                                             reason_code=340):
+                                             reason_code=340, notice_respect='without'):
         departure_reason = self.env['hr.departure.reason'].create({
             'name': 'Termination',
             'l10n_be_reason_code': reason_code,
@@ -112,7 +113,7 @@ class TestPayslipValidationCp302(TestPayrollBase, TestBelgiumCommon):
             'departure_date': departure_date,
             'departure_reason_id': departure_reason.id,
             'departure_description': 'Worker termination test',
-            'l10n_be_notice_respect': 'without',
+            'l10n_be_notice_respect': notice_respect,
         })
         departure.action_register()
         payslips = departure._generate_termination_payslip() + departure._generate_termination_holidays()
@@ -269,8 +270,9 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
         4. Eco vouchers are due
         """
         worker = self._create_worker('CP302 Worker Termination Test', 2500.0, eco_checks=250)
+        # notice of 13 weeks from 2026-06-22 partially worked until 2026-07-15: 9 weeks and 4 days remain
         _, payslip = self._generate_worker_termination_payslip(
-            worker, date(2026, 7, 15), date(2026, 6, 15), reason_code=342,
+            worker, date(2026, 7, 15), date(2026, 6, 15), reason_code=342, notice_respect='partial',
         )
 
         nd_week = payslip._get_input_line_amount('ND_WEEK')
@@ -280,6 +282,7 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
 
         self.assertGreater(nd_week, 0, "Should have notice weeks")
         self.assertGreater(nd_day, 0, "Should have remaining days (2026-07-15 is not end of month)")
+        self.assertEqual((nd_week, nd_day), (9, 4))
         self.assertGreater(yearend_bonus, 0, "Should have a year-end bonus (fixed one month's wage)")
         self.assertEqual(eco_voucher, 250, "Should have eco vouchers configured")
 
@@ -418,8 +421,9 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
         """
         worker = self._create_worker('Worker Partial Weeks Test', 3040.0, eco_checks=250)
 
+        # notice of 13 weeks from 2026-04-13 partially worked until 2026-05-29: 6 weeks and 2 days remain
         _, payslip = self._generate_worker_termination_payslip(
-            worker, date(2026, 5, 29), date(2026, 4, 6),
+            worker, date(2026, 5, 29), date(2026, 4, 6), reason_code=342, notice_respect='partial',
         )
 
         version = worker.sudo().version_id
@@ -432,6 +436,7 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
 
         self.assertGreater(nd_week, 0, "Should have notice weeks")
         self.assertGreater(nd_day, 0, "Should have remaining days (not end of week)")
+        self.assertEqual((nd_week, nd_day), (6, 2))
 
         annual_salary_revalued_line = payslip.line_ids.filtered(lambda line: line.code == 'REFERENCE_SALARY_REVALUED')
         weekly_package = annual_salary_revalued_line.total
@@ -492,9 +497,9 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
             f"= {term_salary.total:.2f}€",
         )
 
-    def _generate_hourly_worker_illness_payslip(self, work_entry_type, hourly_wage=16.0):
+    def _generate_hourly_worker_illness_payslip(self, work_entry_type, hourly_wage=16.0, **version_fields):
         # Worker paid 16.00 EUR an hour on the 38 hours a week, ill from Monday 6 to Wednesday 8 October 2025
-        worker = self._create_worker('Hourly worker', 0.0, wage_type='hourly', hourly_wage=hourly_wage)
+        worker = self._create_worker('Hourly worker', 0.0, wage_type='hourly', hourly_wage=hourly_wage, **version_fields)
         self.env['resource.calendar.leaves'].create({
             'name': 'Illness',
             'calendar_id': self.resource_calendar_38_hours_per_week.id,
@@ -510,6 +515,50 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
             employee_id=worker.id,
             version_id=worker.version_id.id,
         )
+
+    def test_hourly_worker_pay_rounded_per_day(self):
+        """
+        Paid by the hour, the pay of every day is rounded to the cent, as a pay line per day: 23 days of 7.6 hours at
+        15.5511 EUR in October 2025 pay 23 x 118.19 = 2718.37 EUR, not 174.8 h x 15.5511 = 2718.33 EUR.
+        """
+        worker = self._create_worker('Hourly worker', 0.0, wage_type='hourly', hourly_wage=15.5511)
+        payslip = self._generate_payslip(
+            date_from=date(2025, 10, 1),
+            date_to=date(2025, 10, 31),
+            employee_id=worker.id,
+            version_id=worker.version_id.id,
+        )
+        work = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '002.00')
+        self.assertAlmostEqual(work.number_of_hours, 174.8, places=2)
+        self.assertAlmostEqual(work.amount, 2718.37, places=2)
+
+    def test_hourly_worker_monthly_version_in_month(self):
+        """
+        A worker paid by the hour until the 15th of October 2025 and by the month from the 16th: only the line of the
+        hourly version is rounded per day (11 days of 7.6 hours x 118.19 = 1300.09 EUR), the line of the monthly
+        version keeps its share of the wage (not the monthly wage taken as an hourly rate x 91.2 hours).
+        """
+        worker = self._create_worker('Hourly then monthly worker', 0.0, wage_type='hourly', hourly_wage=15.5511)
+        hourly_version = worker.version_id
+        monthly_version = worker.sudo().create_version({
+            'date_version': date(2025, 10, 16),
+            'wage_type': 'monthly',
+            'wage': 2634.67,
+            'hourly_wage': 0.0,
+        })
+        payslip = self._generate_payslip(
+            date_from=date(2025, 10, 1),
+            date_to=date(2025, 10, 31),
+            employee_id=worker.id,
+            version_id=hourly_version.id,
+        )
+        work = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '002.00')
+        hourly_work = work.filtered(lambda wd: wd.version_id == hourly_version)
+        monthly_work = work.filtered(lambda wd: wd.version_id == monthly_version)
+        self.assertAlmostEqual(hourly_work.number_of_hours, 83.6, places=2)
+        self.assertAlmostEqual(hourly_work.amount, 1300.09, places=2)
+        self.assertAlmostEqual(monthly_work.number_of_hours, 91.2, places=2)
+        self.assertLess(monthly_work.amount, 2634.67)
 
     def test_hourly_worker_illness_day_15_30(self):
         """
@@ -536,6 +585,22 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
         illness = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '082.00')
         # 22.8 h x 16.00 x 85.88% = 313.29 EUR
         self.assertAlmostEqual(illness.amount, 313.29, places=2)
+        line_values = payslip._get_line_values(['REPLACEMENT_REVENUE', 'REPLACEMENT_REVENUE.P.P'])
+        self.assertAlmostEqual(line_values['REPLACEMENT_REVENUE'][payslip.id]['total'], 313.29, places=2)
+        # 313.29 x 40.38% = 126.51 EUR
+        self.assertAlmostEqual(line_values['REPLACEMENT_REVENUE.P.P'][payslip.id]['total'], -126.51, places=2)
+
+    def test_hourly_worker_guaranteed_salary_withholding_tax_children(self):
+        """
+        Annex III n° 78.1.1 taxes the guaranteed salary of the second week of illness following the rules of n° 53
+        only: the rate of the yearly normal pay, without the exemption (n° 54) and the reduction (n° 55) for dependent
+        children of the exceptional allowances. With 4 children, the yearly normal pay of 27483.97 EUR is under the
+        limit of the exemption (35330 EUR) and under the ceiling of the reduction (36720 EUR) in 2025, and the tax is
+        still the one of a worker without children (not 313.29 x 30.28% x 45% = 42.69 EUR, the rate of a yearly pay
+        lowered to 2 x 27483.97 - 35330 = 19637.94 EUR, then reduced by 55%).
+        """
+        payslip = self._generate_hourly_worker_illness_payslip(
+            self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_incapacity_worker_second_week'), children=4)
         line_values = payslip._get_line_values(['REPLACEMENT_REVENUE', 'REPLACEMENT_REVENUE.P.P'])
         self.assertAlmostEqual(line_values['REPLACEMENT_REVENUE'][payslip.id]['total'], 313.29, places=2)
         # 313.29 x 40.38% = 126.51 EUR
@@ -576,3 +641,27 @@ to flat_rate_professional_fees_max_cp200 and flat_rate_professional_fees_rate_cp
             self.assertAlmostEqual(total(overtime_payslip, code), total(payslip, code), places=2,
                                    msg=f"The net overtime must not change {code}")
         self.assertAlmostEqual(total(overtime_payslip, 'NET'), total(payslip, 'NET') + overtime_amount, places=2)
+
+    def test_worker_termination_contribution_812_uplift(self):
+        """
+        Special contribution on the termination fees (812): for the workers whose holiday pay is paid by a holiday
+        fund, the 108% applies to the annual salary compared with the thresholds, not to the contribution base.
+        """
+        worker = self._create_worker('Worker Contribution 812', 2500.0)
+        version = worker.sudo().version_id
+        for month in (4, 5, 6):
+            monthly_payslip = self._generate_payslip(
+                date(2026, month, 1), date(2026, month, 1) + relativedelta(months=1, days=-1),
+                employee_id=worker.id, version_id=version.id)
+            monthly_payslip.action_payslip_done()
+        _, payslip = self._generate_worker_termination_payslip(
+            worker, date(2026, 7, 15), date(2026, 7, 15), reason_code=342,
+        )
+        quarter_payslips = self.env['hr.payslip'].search([
+            ('employee_id', '=', worker.id), ('struct_id.code', '=', 'BEMONTHLY'), ('state', 'in', ['validated', 'paid'])])
+        quarter_salary = quarter_payslips._get_line_values(['SALARY'], compute_sum=True)['SALARY']['sum']['total']
+        worked_days = quarter_payslips.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id.dmfa_code in ['1', '101'])
+        yearly_salary = quarter_salary / sum(worked_days.mapped('number_of_days')) * 260
+        self.assertAlmostEqual(payslip._l10n_be_get_termination_yearly_salary(), yearly_salary * 1.08, places=2)
+        # all the seniority is after 2014: the whole indemnity is the base
+        self.assertAlmostEqual(payslip._get_termination_fees_contribution_basis(1000.0), 1000.0, places=2)

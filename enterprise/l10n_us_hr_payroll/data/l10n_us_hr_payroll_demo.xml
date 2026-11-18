@@ -101,6 +101,15 @@
         <field name="company_id" ref="l10n_us.demo_company_us"/>
     </record>
 
+    <record id="us_hr_job_cto" model="hr.job">
+        <field name="name">Chief Technical Officer</field>
+        <field name="company_id" ref="l10n_us.demo_company_us"/>
+    </record>
+    <record id="us_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="l10n_us.demo_company_us"/>
+    </record>
+
     <record id="hr_employee_troy" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_us_hr_payroll.res_partner_troy')).name"/>
         <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
@@ -134,7 +143,7 @@
         <field name="address_id" ref="l10n_us_hr_payroll.res_partner_troy"/>
         <field name="l10n_us_filing_status">single</field>
         <field name="l10n_us_state_filing_status">ca_status_1</field>
-        <field name="job_id" ref="hr.job_cto"/>
+        <field name="job_id" ref="l10n_us_hr_payroll.us_hr_job_cto"/>
         <field name="department_id" ref="l10n_us_hr_payroll.us_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_us_hr_payroll.structure_type_employee_us"/>
         <field name="wage_type">monthly</field>
@@ -182,7 +191,7 @@
         <field name="address_id" ref="l10n_us_hr_payroll.res_partner_maggie_work_address"/>
         <field name="l10n_us_filing_status">single</field>
         <field name="l10n_us_state_filing_status">ca_status_1</field>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_us_hr_payroll.us_hr_job_developer"/>
         <field name="department_id" ref="l10n_us_hr_payroll.us_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_us_hr_payroll.structure_type_employee_us"/>
         <field name="wage_type">monthly</field>
@@ -201,9 +210,10 @@
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="structure_type_id" ref="structure_type_employee_us"/>
         <field name="wage">3000.00</field>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_us_hr_payroll.us_hr_job_developer"/>
         <field name="department_id" ref="us_hr_department_rd"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="company_id" ref="l10n_us.demo_company_us"/>
+        <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('l10n_us.demo_company_us').id)], limit=1)"/>
     </record>
 
     <function name="create_version" model="hr.employee">

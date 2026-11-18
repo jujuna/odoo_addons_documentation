@@ -2,6 +2,14 @@ import { patch } from "@web/core/utils/patch";
 import { TimesheetsAssistant } from "@timesheet_grid/components/aw_timesheet/aw_timesheet";
 
 patch(TimesheetsAssistant.prototype, {
+    get searchFields() {
+        return [...super.searchFields, "ticket"];
+    },
+
+    get activitySearchFields() {
+        return [...super.activitySearchFields, "ticket"];
+    },
+
     get selectedData() {
         const res = super.selectedData;
 

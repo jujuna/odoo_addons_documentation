@@ -76,6 +76,17 @@ class TestSoLineDeterminedInTimesheet(TestPlanningFieldServiceSaleTimesheetCommo
             msg="Order line subtotal is not correct",
         )
 
+    def test_material_count_without_hr_rights(self):
+        self.assertFalse(self.george_user.has_group("hr.group_hr_user"))
+        self.george_employee.timesheet_product_id = self.product_delivery_timesheet2
+        self.intervention.with_user(self.george_user).action_complete()
+        self.assertEqual(
+            self.intervention.sale_order_id.order_line.product_id,
+            self.product_delivery_timesheet2,
+        )
+        intervention = self.intervention.with_user(self.george_user)
+        self.assertEqual(intervention.material_line_product_count, 0)
+
     def test_sol_determined_on_timesheet_with_task_is_under_warranty(self):
         """ Test the functionality to ensure that the SOL in the timesheet is not set in the FSM project after task validation.
             - Created two tasks, one designated as "Under Warranty" and another not.

@@ -98,6 +98,7 @@ class AccountReportColumnData(AccountReportDataCommon):
     no_format: Any | None = None
     report_line_id: int | None = None
     sortable: bool | None = None
+    deferral_warning_popup_data: Any | None = None
 
     def __post_init__(self) -> None:
         if self.name is None and self.is_zero is None:

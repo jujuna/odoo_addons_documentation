@@ -301,6 +301,11 @@
         &.unfoldable { padding-left: 0.75rem !important }
     }
 
+    .o_account_report_line_focus > td {
+        box-shadow: inset 0 0 0 9999px var(--warning);
+        transition:  box-shadow 2s ease;
+    }
+
     @for $i from 2 through 16 {
         .line_level_#{$i} {
             $indentation: ($i - 1) * 8px;
@@ -564,6 +569,15 @@ label:focus-within input { border: 0; }
             &.end-0::after { border-top-color: $o-white; }
         }
     }
+}
+
+.deferral_warning_popover {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: .5rem;
+    box-sizing: content-box;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

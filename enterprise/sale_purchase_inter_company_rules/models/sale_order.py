@@ -151,7 +151,7 @@ class SaleOrder(models.Model):
         display_type = so_line.display_type
         if display_type and display_type not in self.env['purchase.order.line']._fields['display_type'].get_values(self.env):
             display_type = 'line_note'
-        return {
+        vals = {
             'name': so_line.name,
             'product_qty': quantity,
             'product_id': so_line.product_id and so_line.product_id.id or False,
@@ -164,3 +164,14 @@ class SaleOrder(models.Model):
             'sequence': so_line.sequence,
             'auto_sale_order_line_id': so_line.id,
         }
+        analytic = self.env['account.move.line']._inter_company_get_analytic_distribution(
+            so_line.analytic_distribution,
+            so_line.distribution_analytic_account_ids,
+            so_line.product_id.id,
+            so_line.product_id.categ_id.id,
+            so_line.order_id.company_id.partner_id,
+            company,
+        )
+        if analytic:
+            vals['analytic_distribution'] = analytic
+        return vals

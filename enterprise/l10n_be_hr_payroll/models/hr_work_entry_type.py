@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
+from datetime import date
 
 from odoo import api, fields, models, _
 from odoo.tools.float_utils import float_compare
@@ -125,6 +126,16 @@ class HrWorkEntryType(models.Model):
             'l10n_be_drs_risk_ids',
             'l10n_be_drs_nature',
         ]
+
+    def _get_l10n_be_dmfa_code(self, quarter_start):
+        """ The DmfA service code of the work entry type for the quarter starting on `quarter_start`.
+        The first day of bad weather in the construction is declared under the service code 1 since
+        the quarter 3/2024 (ONSS, DmfA instructions of 2024/3), under the code 4 before. """
+        self.ensure_one()
+        if quarter_start < date(2024, 7, 1) \
+                and self == self.env.ref('hr_work_entry.l10n_be_work_entry_type_construction_bad_weather_first_day', raise_if_not_found=False):
+            return '4'
+        return self.dmfa_code
 
     def _get_data_files_to_update(self):
         # Note: file order should be maintained

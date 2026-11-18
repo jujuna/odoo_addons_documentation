@@ -41,7 +41,12 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
             payslips_to_work_on = self.unpaid_payslips
         # Map the necessary data
         grouped_payments = {}
+        latest_payslip_date = None
+        batch_id = None
         for slip in payslips_to_work_on:
+            batch_id = slip.id
+            if latest_payslip_date is None or slip.date > latest_payslip_date:
+                latest_payslip_date = slip.date
             if self.payment_method_line_id.sepa_pain_version == 'pain.001.001.09':
                 if not slip.iso20022_uetr:
                     iso20022_uetr = slip.iso20022_uetr = str(uuid4())
@@ -88,11 +93,17 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
             if payment['amount'] > 0:
                 payments_data.append(payment)
 
+        if self.payslip_run_id:
+            batch_id = self.payslip_run_id.id
+        if not latest_payslip_date:
+            latest_payslip_date = fields.Date.today()
+        latest_payslip_date_str = latest_payslip_date.strftime('%Y_%m_%d')
         # Generate XML File
         return self.journal_id.sudo().with_context(
             sepa_payroll_sala=True,
             l10n_be_hr_payroll_sepa_salary_payment=self.journal_id.company_id.account_fiscal_country_id.code == "BE"
-        ).create_iso20022_credit_transfer(payments=payments_data, payment_method_line=self.payment_method_line_id, batch_booking=True)
+        ).create_iso20022_credit_transfer(payments=payments_data, payment_method_line=self.payment_method_line_id, batch_booking=True),\
+            f"{latest_payslip_date_str}_{batch_id}"
 
     def _perform_checks(self):
         super()._perform_checks()
@@ -118,5 +129,5 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
     def generate_payment_report(self):
         super().generate_payment_report()
         if self.export_format in ['sepa', 'iso20022_ch']:
-            payment_report = self._create_sepa_binary()
-            self._write_file(payment_report, '.xml')
+            payment_report, filename = self._create_sepa_binary()
+            self._write_file(payment_report, '.xml', filename)

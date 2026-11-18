@@ -198,8 +198,8 @@
                         <br />
                         Currently, your account with <t t-out="object.company_id.name or ''">YourCompany</t> has an overdue balance of
                         <b>
-                            <t t-if="ctx.get('amount_due')">
-                                <t t-out="format_amount(ctx.get('amount_due'), object.currency_id) or ''">$ 143,750.00</t>
+                            <t t-if="ctx.get('amount_due') and ctx.get('overdue_currency')">
+                                <t t-out="format_amount(ctx.get('amount_due'), ctx.get('overdue_currency')) or ''">$ 143,750.00</t>
                             </t>
                             <t t-elif="object.followup_single_currency_id">
                                 <t t-out="format_amount(object.total_overdue_currency_followup, object.followup_single_currency_id) or ''"/>
@@ -246,8 +246,8 @@
                         <br /><br />
                         We are writing to follow up on our previous email regarding the overdue invoices amounting in
                         <b>
-                            <t t-if="ctx.get('amount_due')">
-                                <t t-out="format_amount(ctx.get('amount_due'), object.currency_id) or ''">$ 143,750.00</t>
+                            <t t-if="ctx.get('amount_due') and ctx.get('overdue_currency')">
+                                <t t-out="format_amount(ctx.get('amount_due'), ctx.get('overdue_currency')) or ''">$ 143,750.00</t>
                             </t>
                             <t t-elif="object.followup_single_currency_id">
                                 <t t-out="format_amount(object.total_overdue_currency_followup, object.followup_single_currency_id) or ''"/>
@@ -297,8 +297,8 @@
                         <br /><br />
                         This is our third and final reminder regarding the outstanding payments for your overdue invoices amounting in 
                         <b>
-                            <t t-if="ctx.get('amount_due')">
-                                <t t-out="format_amount(ctx.get('amount_due'), object.currency_id) or ''">$ 143,750.00</t>
+                            <t t-if="ctx.get('amount_due') and ctx.get('overdue_currency')">
+                                <t t-out="format_amount(ctx.get('amount_due'), ctx.get('overdue_currency')) or ''">$ 143,750.00</t>
                             </t>
                             <t t-elif="object.followup_single_currency_id">
                                 <t t-out="format_amount(object.total_overdue_currency_followup, object.followup_single_currency_id) or ''"/>

@@ -35,7 +35,7 @@ class SocialAccount(models.Model):
     @api.model
     def search_mention_suggestions(self, search_term, media_type):
         """ Return a fake result to show the feature. """
-        partner = self.env.ref('social_demo.res_partner_2', raise_if_not_found=False)
+        partner = self.env.ref('base.res_partner_2', raise_if_not_found=False)
         common_result = {
             'name': search_term,
             'profile_image_url': f'/web/image/res.partner/{partner.id}/avatar_128',

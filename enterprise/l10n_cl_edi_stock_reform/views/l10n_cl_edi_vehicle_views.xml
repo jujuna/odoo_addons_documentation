@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="l10n_cl_edi_vehicle_view_form" model="ir.ui.view">
+        <field name="name">l10n_cl_edi.vehicle.form</field>
+        <field name="model">l10n_cl_edi.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Transport (CL)">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/> <!-- enables the archive actions -->
+                    <group>
+                        <field name="name"/>
+                        <field name="license_plate"/>
+                        <field name="trailer_license_plate"/>
+                        <field name="transport_company_id"/>
+                        <field name="operator_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_cl_edi_vehicle_view_list" model="ir.ui.view">
+        <field name="name">l10n_cl_edi.vehicle.list</field>
+        <field name="model">l10n_cl_edi.vehicle</field>
+        <field name="arch" type="xml">
+            <list string="Transports (CL)">
+                <field name="name"/>
+                <field name="license_plate"/>
+                <field name="trailer_license_plate" optional="show"/>
+                <field name="transport_company_id"/>
+                <field name="operator_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_cl_edi_vehicle_view_search" model="ir.ui.view">
+        <field name="name">l10n_cl_edi.vehicle.search</field>
+        <field name="model">l10n_cl_edi.vehicle</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="license_plate"/>
+                <field name="transport_company_id"/>
+                <field name="operator_id"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_stock_l10n_cl_transport" model="ir.actions.act_window">
+        <field name="name">Transport (CL)</field>
+        <field name="res_model">l10n_cl_edi.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_cl_edi_vehicle_view_search"/>
+    </record>
+</odoo>

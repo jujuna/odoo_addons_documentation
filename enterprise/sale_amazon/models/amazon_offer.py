@@ -7,6 +7,7 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import split_every
 
+from odoo.addons.sale_amazon import const
 from odoo.addons.sale_amazon import utils as amazon_utils
 
 _logger = logging.getLogger(__name__)
@@ -235,14 +236,34 @@ class AmazonOffer(models.Model):
         :param amazon.account account: The Amazon account to which the stock update should apply.
         """
         feed_data_by_offer = self._get_feed_data()
-        # `_get_feed_data` can fail for some offers (rate limit)
-        offers_to_sync = self.filtered(lambda o: o in feed_data_by_offer)
+        offers_to_sync = (
+            self
+            # `_get_feed_data` can fail for some offers (rate limit)
+            .filtered(lambda o: o in feed_data_by_offer)
+            # Filter out offers still processing
+            .filtered(lambda o: o.amazon_sync_status != "processing")
+            # Retry failed attempts first
+            .sorted(lambda o: o.amazon_sync_status != "error")
+        )
 
         # Inventory feed can only apply to one marketplace
         for marketplace_id, offers in offers_to_sync.grouped("marketplace_id").items():
-            offers._send_inventory_feed(
-                account, {o: feed_data_by_offer[o] for o in offers}, marketplace_id
-            )
+            for offer_batch in split_every(
+                const.JSON_LISTINGS_FEED_SIZE_LIMIT,
+                offers.ids,
+                lambda ids: self.browse(ids).with_prefetch(offers_to_sync.ids),
+            ):
+                try:
+                    offer_batch._send_inventory_feed(
+                        account, {o: feed_data_by_offer[o] for o in offer_batch}, marketplace_id
+                    )
+                except amazon_utils.AmazonRateLimitError:
+                    _logger.info(
+                        "Rate limit reached while sending inventory availability notification for"
+                        " Amazon account with id %s.",
+                        account.id,
+                    )
+                    return
 
     def _send_inventory_feed(self, account, feed_data_by_offer, marketplace_id):
         """Send the inventory feed for the given marketplace.
@@ -263,34 +284,26 @@ class AmazonOffer(models.Model):
             feed_info["messageId"] = i
         messages = self._build_feed_messages(feed_data_by_offer)
         json_feed = amazon_utils.build_json_feed(account, messages)
-        try:
-            feed_ref = amazon_utils.submit_feed(
-                account,
-                json_feed,
-                "JSON_LISTINGS_FEED",
-                feed_content_type="application/json; charset=UTF-8",
-                marketplace_api_refs=[marketplace_id.api_ref],
-            )
-        except amazon_utils.AmazonRateLimitError:
-            _logger.info(
-                "Rate limit reached while sending inventory availability notification for Amazon"
-                " account with id %s.",
-                account.id,
-            )
-        else:
-            _logger.info(
-                "Sent inventory availability notification (feed_ref %s) to Amazon for account ID"
-                " %s. SKUs: %s.",
-                feed_ref,
-                account.id,
-                ", ".join(self.mapped("sku")),
-            )
-            self.amazon_sync_status = "processing"
-            # Save feed reference to later sync any error that might have occurred
-            for feed_info in feed_data_by_offer.values():
-                feed_info["amazon_feed_ref"] = feed_ref
-            # Save message IDs
-            self._save_feed_data(feed_data_by_offer)
+        feed_ref = amazon_utils.submit_feed(
+            account,
+            json_feed,
+            "JSON_LISTINGS_FEED",
+            feed_content_type="application/json; charset=UTF-8",
+            marketplace_api_refs=[marketplace_id.api_ref],
+        )
+        _logger.info(
+            "Sent inventory availability notification (feed_ref %s) to Amazon for account ID"
+            " %s. SKUs: %s.",
+            feed_ref,
+            account.id,
+            ", ".join(self.mapped("sku")),
+        )
+        self.amazon_sync_status = "processing"
+        # Save feed reference to later sync any error that might have occurred
+        for feed_info in feed_data_by_offer.values():
+            feed_info["amazon_feed_ref"] = feed_ref
+        # Save message IDs
+        self._save_feed_data(feed_data_by_offer)
 
     def _build_feed_messages(self, feed_data_by_offer):
         """Construct the inventory feed messages.

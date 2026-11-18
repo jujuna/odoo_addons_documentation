@@ -123,15 +123,24 @@
                 </div>
                 <t t-set-slot="content">
                     <div class="o-voip-AudioDeviceSelector-menu d-flex flex-column gap-2 p-2">
-                        <span class="text-muted small">Microphone</span>
-                        <DeviceSelect kind="'audioinput'" permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"/>
-                        <span class="text-muted small mt-1">Call speakers</span>
-                        <div class="o-voip-AudioDeviceSelector-callOutput">
-                            <DeviceSelect kind="'audiooutput'" permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"/>
+                        <div class="o-voip-AudioDeviceSelector-microphoneInput">
+                            <DeviceSelect
+                                kind="'audioinput'"
+                                permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"
+                                label.translate="Microphone"/>
                         </div>
-                        <span class="text-muted small mt-1">Ringtone</span>
+                        <div class="o-voip-AudioDeviceSelector-callOutput">
+                            <DeviceSelect
+                                kind="'audiooutput'"
+                                permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"
+                                label.translate="Call speakers"/>
+                        </div>
                         <div class="o-voip-AudioDeviceSelector-ringtoneOutput">
-                            <DeviceSelect kind="'audiooutput'" settingName="'ringtoneOutputDeviceId'" permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"/>
+                            <DeviceSelect
+                                kind="'audiooutput'"
+                                settingName="'ringtoneOutputDeviceId'"
+                                permissionDialogConfiguration="this.voip.softphone.audioPermissionDialogConfiguration"
+                                label.translate="Ringtone"/>
                         </div>
                     </div>
                 </t>

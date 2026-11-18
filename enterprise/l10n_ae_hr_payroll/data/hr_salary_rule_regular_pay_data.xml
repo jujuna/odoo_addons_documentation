@@ -312,7 +312,7 @@ result = version.l10n_ae_other_allowances if version.has_static_work_entries() e
             <field name="code">EOS</field>
             <field name="sequence">20</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = not employee.active and employee.departure_reason_id</field>
+            <field name="condition_python">result = employee.departure_reason_id and employee.departure_date and employee.departure_date &lt;= payslip.date_to and employee.departure_date &gt;= payslip.date_from</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = version._l10n_ae_get_eos_compensation()</field>
             <field name="struct_ids" eval="[(6, 0, [
@@ -327,7 +327,10 @@ result = version.l10n_ae_other_allowances if version.has_static_work_entries() e
             <field name="code">EOSP</field>
             <field name="appears_on_payslip">non_zero</field>
             <field name="sequence">25</field>
-            <field name="condition_select">none</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+result = not employee.departure_date or employee.departure_date &gt; payslip.date_to
+            </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 excluded_entry_types = ['158.00', '000.00']
@@ -382,7 +385,9 @@ result = eos_benefit - total_provisions
             <field name="sequence">30</field>
             <field name="amount_select">code</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = version.l10n_ae_number_of_leave_days</field>
+            <field name="condition_python">
+result = not employee.departure_date or employee.departure_date &gt; payslip.date_to
+            </field>
             <field name="amount_python_compute">
 gross_salary = categories['BASIC'] + categories['ALW']
 number_of_leave_days = version.l10n_ae_number_of_leave_days
@@ -742,7 +747,7 @@ result_rate = -version.l10n_ae_dews_emp_contribution * 100
             <field name="sequence">70</field>
             <field name="amount_select">code</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = employee.departure_reason_id</field>
+            <field name="condition_python">result = employee.departure_reason_id and employee.departure_date and employee.departure_date &lt;= payslip.date_to and employee.departure_date &gt;= payslip.date_from</field>
             <field name="amount_python_compute">
 gross_salary = version.wage + version.l10n_ae_housing_allowance + version.l10n_ae_transportation_allowance + version.l10n_ae_other_allowances
 employee_annual_leaves_due = version.l10n_ae_number_of_leave_days / 12 * payslip.date_from.month - employee.l10n_ae_annual_leave_days_taken 
@@ -764,7 +769,7 @@ else:
             <field name="sequence">71</field>
             <field name="amount_select">code</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = employee.departure_reason_id</field>
+            <field name="condition_python">result = employee.departure_reason_id and employee.departure_date and employee.departure_date &lt;= payslip.date_to and employee.departure_date &gt;= payslip.date_from</field>
             <field name="amount_python_compute">
 gross_salary = version.wage + version.l10n_ae_housing_allowance + version.l10n_ae_transportation_allowance + version.l10n_ae_other_allowances
 employee_annual_leaves_due = version.l10n_ae_number_of_leave_days / 12 * payslip.date_from.month - employee.l10n_ae_annual_leave_days_taken 

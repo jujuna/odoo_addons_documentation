@@ -135,6 +135,12 @@ class ResCompany(models.Model):
         return max(date_configs, key=lambda v: v.date_version) if date_configs else configs[:1]
 
     def _get_first_payroll_config_date(self):
+        """
+        Return the start date of the first payroll configuration: the earliest of the company
+        creation date and ``first_payrun_date``.
+
+        :rtype: datetime.date
+        """
         self.ensure_one()
         first_date = self.create_date.date()
         if self.first_payrun_date:
@@ -142,6 +148,10 @@ class ResCompany(models.Model):
         return first_date
 
     def _backdate_first_payroll_config(self):
+        """
+        Move the first payroll configuration of the companies back to ``first_payrun_date``
+        when it starts later (parent companies first).
+        """
         # Parents first: a branch config is linked to the parent config effective at its date
         for company in self.filtered('first_payrun_date').sorted(lambda c: len(c.parent_path or '')):
             first_config = company.payroll_config_ids.sorted('date_version')[:1]
@@ -149,6 +159,15 @@ class ResCompany(models.Model):
                 first_config.date_version = company.first_payrun_date
 
     def create_payroll_config(self, date_version=None):
+        """
+        Create a payroll configuration (``payroll.config.settings``) for each company: a copy of
+        its last configuration or, if it has none, an empty one.
+
+        :param date_version: start date of the configuration (``date``, ``datetime`` or string);
+            defaults to the company creation date for a copy, and to
+            :meth:`_get_first_payroll_config_date` otherwise
+        :return: the created configurations
+        """
         if isinstance(date_version, str):
             date_version = fields.Date.to_date(date_version)
         elif isinstance(date_version, datetime):
@@ -174,6 +193,13 @@ class ResCompany(models.Model):
         return payroll_configs
 
     def get_last_ytd_reset_date(self, target_date):
+        """
+        Return the last YTD reset date (``ytd_reset_month`` and ``ytd_reset_day``) on or before
+        ``target_date``. The YTD amounts of payslips accumulate from that date.
+
+        :param datetime.date target_date: reference date
+        :rtype: datetime.date
+        """
         self.ensure_one()
         last_ytd_reset_date = date(target_date.year, int(self.ytd_reset_month), self.ytd_reset_day)
         if last_ytd_reset_date > target_date:
@@ -181,13 +207,15 @@ class ResCompany(models.Model):
         return last_ytd_reset_date
 
     def _get_monthly_payroll_next_closing_date(self):
-        """Return the company's pay run closing date.
-        :rtype date | None
+        """
+        Return the next pay run closing date of the company, ``None`` if
+        ``payroll_closing_date`` is not set.
 
-        Logic:
-        - If payrun_closing_day is between [1..9], the closing date is in the next month.
-        - If payrun_closing_day is between [22..31] the closing date is in the current month.
-        - If today is past the computed closing date, return the closing date of the next month.
+        From today (or ``first_payrun_date`` if later): a closing day between 22 and 31 closes
+        the pay month itself, a closing day between 1 and 9 closes the previous month during the
+        next one. When the closing date is past, the closing date of the next month is returned.
+
+        :rtype: datetime.date or None
         """
         self.ensure_one()
         if not self.payroll_closing_date:
@@ -212,4 +240,11 @@ class ResCompany(models.Model):
         companies_without_payroll_config = companies.filtered(lambda c: not c.payroll_config_ids)
         if companies_without_payroll_config:
             companies_without_payroll_config.sudo().create_payroll_config()
+            # A new branch also follows the later versions of the payroll settings of its parent company
+            for branch in companies_without_payroll_config.filtered('parent_id'):
+                first_date = min(branch.sudo().payroll_config_ids.mapped('date_version'))
+                later_parent_configs = branch.parent_id.sudo().payroll_config_ids.filtered(
+                    lambda config: config.date_version > first_date)
+                if branch_vals_list := later_parent_configs._get_branch_versions_from_parent_vals():
+                    self.env['payroll.config.settings'].sudo().create(branch_vals_list)
         return companies

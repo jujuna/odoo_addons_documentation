@@ -25,7 +25,8 @@ class HrPayrollEmployeeDeclaration(models.Model):
         for declaration in self:
             if declaration.document_id:
                 declaration.state = 'pdf_posted'
-            elif declaration.pdf_to_post:
+            elif declaration.pdf_to_post and declaration.state not in ('pdf_to_generate', 'error'):
+                # the PDF is posted once generated
                 declaration.state = 'pdf_to_post'
 
     def _get_posted_documents(self):

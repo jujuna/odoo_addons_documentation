@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit_hr_attendance" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.inherit.l10n_be_hr_payroll_attendance</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
+        <field name="arch" type="xml">
+            <field name="attendance_based" position="attributes">
+                <attribute name="invisible">l10n_be_egov3_code == '999'</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

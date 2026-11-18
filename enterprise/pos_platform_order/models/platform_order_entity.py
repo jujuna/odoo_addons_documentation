@@ -177,7 +177,8 @@ class PlatformOrderEntity(models.Model):
         :return: dict of order values
         """
         session = self.config_id.current_session_id
-        pos_reference, tracking_number = self.config_id._get_next_order_refs()
+        data = self.config_id._get_next_order_refs()
+        pos_reference = data[0]
         default_pricelist_id = self.pricelist_line_ids[:1].pricelist_id.id
 
         partner = self._find_or_create_partners_from_data(kwargs)
@@ -197,7 +198,6 @@ class PlatformOrderEntity(models.Model):
             'name': kwargs.get('name', '/'),
             'source': 'platform_order',
             'pos_reference': pos_reference,
-            'tracking_number': tracking_number,
             'floating_order_name': kwargs.get('floating_order_name', ''),
             'session_id': session.id,
             'company_id': self.config_id.company_id.id,

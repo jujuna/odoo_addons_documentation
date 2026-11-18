@@ -128,6 +128,13 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
         self.assertEqual(order.amount_total, 100.0)
         self.assertEqual(order.amount_tax, 0.0)
 
+    def test_order_tracking_number(self):
+        self.urban_piper_config.open_ui()
+        order_1 = self.create_urbanpiper_order()
+        order_2 = self.create_urbanpiper_order()
+        self.assertTrue(order_1.tracking_number.isdigit())
+        self.assertEqual(int(order_2.tracking_number), int(order_1.tracking_number) + 1)
+
     def test_paid_future_order_creates_session_account_move(self):
         self.urban_piper_config.open_ui()
         order = self.create_urbanpiper_order(context={'delivery_datetime': 30})
@@ -247,12 +254,13 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
             UrbanPiperConnector(self.urbanpiper_store).post_stores()
 
         self.assertEqual(len(payloads[0]['stores']), 1)
-        self.assertEqual(payloads[0]['stores'][0], {
+        store_payload = payloads[0]['stores'][0]
+        self.assertIn({'language': 'hi', 'name': 'गडा इलेक्ट्रॉनिक्स'}, store_payload.pop('translations'))
+        self.assertEqual(store_payload, {
             'name': 'Very Special UrbanPiper Store',
             'city': 'Ahmedabad',
             'ref_id': 'very-special-store',
             'min_pickup_time': 1200,
-            'translations': [{'language': 'hi', 'name': 'गडा इलेक्ट्रॉनिक्स'}],
             'timings': [{
                 'day': 'monday',
                 'slots': [{'start_time': '00:00:00', 'end_time': '23:59:00'}]
@@ -295,6 +303,7 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
         self.assertIsNotNone(inventory_payload)
         # Items
         self.assertEqual(len(inventory_payload['items']), 1)
+        self.assertIn({'language': 'hi', 'title': 'पिज़ो'}, inventory_payload['items'][0]['translations'])
         assert_payload_equal(inventory_payload['items'][0], {
             'title': 'Pizza',
             'price': 230.0,
@@ -305,7 +314,6 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
             'recommended': True,
             'included_platforms': ['doordash'],
             'tags': {'default': [], 'doordash': ['alcohol-present']},
-            'translations': [{'language': 'hi', 'title': 'पिज़ो'}],
         })
         # Taxes - No taxes data when tax_type = total_included
         self.assertEqual(len(inventory_payload['taxes']), 0)

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-10-20 12:16+0000\n"
+"PO-Revision-Date: 2026-11-09 07:54+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_online_payment/tr/>\n"
@@ -47,6 +47,27 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Merhaba,</p>\n"
+"                    <p>Odoo'da ödeme özelliğinizi henüz "
+"etkinleştirmediğinizi görüyoruz. Bu özelliği etkinleştirerek, Odoo hesabınız "
+"üzerinden ödemeleri doğrudan ve verimli bir şekilde işleyebileceksiniz.</p>\n"
+"                    <p>Elbette, bu e-postayı aldıktan sonra ödemeleri zaten "
+"etkinleştirdiyseniz, bu mesajı görmezden gelebilirsiniz.</p>\n"
+"                    <p>Başlamaya hazır mısınız? Ödemelerinizi buradan "
+"etkinleştirin! Ayrıca, Odoo'daki planlanmış etkinliklerinize giderek bu "
+"ayarlamayı daha sonra da tamamlayabilirsiniz.</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                       <a t-att-href=\"ctx.get('url')\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\"> \n"
+"                            Ödemeleri etkinleştirin\n"
+"                       </a>\n"
+"                    </div> \n"
+"               </div> \n"
+"            "
 
 #. module: account_online_payment
 #: model:mail.template,body_html:account_online_payment.mail_template_account_payment_activation_success
@@ -103,7 +124,7 @@ msgstr "Hesap Çevrimiçi Bağlantı Ödemeleri Etkin"
 #. module: account_online_payment
 #: model:ir.module.module,shortdesc:base.module_account_online_payment
 msgid "Account Online Payment"
-msgstr ""
+msgstr "Hesap Çevrim İçi Ödemesi"
 
 #. module: account_online_payment
 #: model:ir.actions.server,name:account_online_payment.ir_cron_bank_sync_update_payment_status_ir_actions_server
@@ -127,7 +148,7 @@ msgstr "Ödemeleri Etkinleştir"
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "Tüm ödemelerin aynı ödeme yöntemine sahip olması gerekir."
 
 #. module: account_online_payment
 #. odoo-python
@@ -149,7 +170,7 @@ msgstr "Toplu Ödeme"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_bulk_payment_activated
 msgid "Bulk Payment Activated"
-msgstr ""
+msgstr "Toplu Ödeme Etkinleştirildi"
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__canceled
@@ -165,7 +186,7 @@ msgstr "Durumu Kontrol Et"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_code
 msgid "Code"
-msgstr ""
+msgstr "Kod"
 
 #. module: account_online_payment
 #. odoo-python
@@ -176,33 +197,33 @@ msgstr "KYC'nizi tamamlayın"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
 msgid "Compliance Verification Needed"
-msgstr ""
+msgstr "Uyumluluk Doğrulaması Gerekiyor"
 
 #. module: account_online_payment
 #: model:ir.actions.server,name:account_online_payment.action_account_payment_confirm
 msgid "Confirm"
-msgstr ""
+msgstr "Onayla"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 msgid "Connect Bank"
-msgstr ""
+msgstr "Bankayı Bağla"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__could_initiate_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__could_initiate_payment
 msgid "Could Initiate Payment"
-msgstr ""
+msgstr "Ödeme Başlatılabildi"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Create Payment"
-msgstr ""
+msgstr "Ödeme Oluştur"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Create Payments"
-msgstr ""
+msgstr "Ödeme Oluştur"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__display_name
@@ -217,7 +238,7 @@ msgstr "İsim Göster"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 msgid "Generate File"
-msgstr ""
+msgstr "Dosya Oluştur"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__id
@@ -232,12 +253,12 @@ msgstr "ID"
 #. module: account_online_payment
 #: model:ir.module.module,summary:base.module_account_online_payment
 msgid "Initiate online payments"
-msgstr ""
+msgstr "Çevrim içi ödemeleri başlat"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_in_audit
 msgid "Is In Audit"
-msgstr ""
+msgstr "Denetim Altında"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_activated
@@ -250,13 +271,13 @@ msgstr "Ödeme Etkinleştirildi"
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_activation_requested
 msgid "Is Payment Activation Requested"
-msgstr ""
+msgstr "Ödeme Etkinleştirme Talep Edildi"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_blocked
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__is_payment_blocked
 msgid "Is Payment Blocked"
-msgstr ""
+msgstr "Ödeme Engelli mi"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_enabled
@@ -266,42 +287,42 @@ msgstr "Ödeme Etkin"
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_journal
 msgid "Journal"
-msgstr ""
+msgstr "Yevmiye"
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "No online bank connection found for this journal."
-msgstr ""
+msgstr "Bu yevmiye için herhangi bir çevrimiçi banka bağlantısı bulunamadı."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Online payments require a bank journal."
-msgstr ""
+msgstr "Çevrim içi ödemeler için bir banka yevmiyesi gerekir."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only draft payments can be detached from a batch."
-msgstr ""
+msgstr "Yalnızca taslak ödemeler bir gruptan ayrılabilir."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only outbound payments can be paid online."
-msgstr ""
+msgstr "Yalnızca giden ödemeler çevrimiçi ödenebilir."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "Only uninitiated or unsigned payments can be retried."
-msgstr ""
+msgstr "Yalnızca başlatılmamış veya imzalanmamış ödemeler yeniden denenebilir."
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
 msgid "Others"
-msgstr ""
+msgstr "Diğerleri"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__payment_online_status
@@ -312,39 +333,39 @@ msgstr "PIS Durumu"
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_payment_register
 msgid "Pay"
-msgstr ""
+msgstr "Ödeme"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_list_inherit_account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Pay Now"
-msgstr ""
+msgstr "Şimdi Öde"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Pay now"
-msgstr ""
+msgstr "Şimdi Öde"
 
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "Ödeme"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_identifier
 msgid "Payment ID"
-msgstr ""
+msgstr "Ödeme Kimliği"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 msgid "Payment Method"
-msgstr ""
+msgstr "Ödeme Yöntemi"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_placeholder
 msgid "Payment Method Placeholder"
-msgstr ""
+msgstr "Ödeme Yöntemi Yer tutucusu"
 
 #. module: account_online_payment
 #. odoo-python
@@ -359,7 +380,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_online_payment/models/account_online_link.py:0
 msgid "Payment activation process is already in progress."
-msgstr ""
+msgstr "Ödeme etkinleştirme süreci halihazırda devam etmektedir."
 
 #. module: account_online_payment
 #. odoo-python
@@ -371,13 +392,13 @@ msgstr "Ödeme zaten imzalanmış"
 #. odoo-python
 #: code:addons/account_online_payment/wizard/account_payment_register.py:0
 msgid "Payment created"
-msgstr ""
+msgstr "Ödeme oluşturuldu"
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "Payments are already activated for this bank connection."
-msgstr ""
+msgstr "Bu banka bağlantısı için ödemeler zaten etkinleştirilmiş."
 
 #. module: account_online_payment
 #. odoo-python
@@ -389,7 +410,7 @@ msgstr "Ödemeler zaten etkinleştirildi."
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "Payments are not enabled for this bank connection."
-msgstr ""
+msgstr "Bu banka bağlantısı için ödemeler etkinleştirilmemiş."
 
 #. module: account_online_payment
 #: model:mail.template,name:account_online_payment.mail_template_account_payment_activation_success
@@ -400,7 +421,7 @@ msgstr "Ödemeler başarıyla etkinleştirildi"
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
 msgid "Payments to sign"
-msgstr ""
+msgstr "İmzalanacak ödemeler"
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__pending
@@ -427,17 +448,17 @@ msgstr "Reddedildi"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_activate_payments_button
 msgid "Show Activate Payments Button"
-msgstr ""
+msgstr "Ödemeleri Etkinleştir Düğmesini Göster"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_connect_bank_button
 msgid "Show Connect Bank Button"
-msgstr ""
+msgstr "Banka Bağlantı Düğmesini Göster"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Sign Later"
-msgstr ""
+msgstr "Daha Sonra İmzala"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
@@ -448,7 +469,7 @@ msgstr "Ödemeyi İmzala"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_single_payment_activated
 msgid "Single Payment Activated"
-msgstr ""
+msgstr "Tek Ödeme Etkinleştirildi"
 
 #. module: account_online_payment
 #: model:ir.model.fields,help:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
@@ -468,18 +489,21 @@ msgid ""
 "If you want to send your payment(s) through Odoo, please split your batch or "
 "create separate smaller payments."
 msgstr ""
+"Bankanızla yapılacak ödemeler için maksimum tutar %(amount)s'dir.\n"
+"Ödemelerinizi Odoo üzerinden göndermek istiyorsanız, lütfen toplu ödemenizi "
+"bölün veya ayrı ayrı daha küçük ödemeler oluşturun."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "The payment initiation service is not activated for this journal."
-msgstr ""
+msgstr "Bu yevmiye için ödeme başlatma hizmeti etkinleştirilmemiş."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "The recipient bank account must be allowed for outgoing payments."
-msgstr ""
+msgstr "Alıcı banka hesabının giden ödemeler için izin verilmiş olması gerekir."
 
 #. module: account_online_payment
 #. odoo-python
@@ -496,6 +520,8 @@ msgid ""
 "This module allows customers to pay their invoices online using various "
 "payment methods."
 msgstr ""
+"Bu modül, müşterilerin faturalarını çeşitli ödeme yöntemleriyle çevrim içi "
+"ödemesine olanak tanır."
 
 #. module: account_online_payment
 #. odoo-python
@@ -508,7 +534,7 @@ msgstr ""
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
 msgid "To Sign"
-msgstr ""
+msgstr "İmzalanacak"
 
 #. module: account_online_payment
 #. odoo-python
@@ -547,7 +573,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "You can't pay payments from more than one journal."
-msgstr ""
+msgstr "Birden fazla yevmiyeden ödeme yapamazsınız."
 
 #. module: account_online_payment
 #. odoo-python
@@ -569,7 +595,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "You must select at least one payment."
-msgstr ""
+msgstr "En az bir ödeme seçmelisiniz."
 
 #. module: account_online_payment
 #. odoo-python
@@ -586,18 +612,18 @@ msgstr ""
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Your payment activation is pending, please wait!"
-msgstr ""
+msgstr "Ödeme etkinleştirmeniz bekleniyor, lütfen bekleyin!"
 
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_online_account
 msgid "representation of an online bank account"
-msgstr ""
+msgstr "çevrim içi banka hesabının temsili"
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/wizard/account_payment_register.py:0
 msgid "the payments"
-msgstr ""
+msgstr "ödemeler"
 
 #~ msgid "KYC Link"
 #~ msgstr "KYC Bağlantısı"

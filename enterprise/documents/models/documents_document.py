@@ -6,6 +6,7 @@ import string
 import uuid
 from ast import literal_eval
 from collections import OrderedDict, defaultdict
+from itertools import product
 from urllib.parse import quote
 
 import requests
@@ -16,7 +17,7 @@ from odoo import SUPERUSER_ID, Command, _, api, fields, models, modules
 from odoo.exceptions import AccessError, MissingError, UserError, ValidationError
 from odoo.fields import Domain
 from odoo.http.requestlib import DEFAULT_MAX_CONTENT_LENGTH
-from odoo.tools import BinaryBytes, OrderedSet, SQL, consteq, groupby
+from odoo.tools import BinaryBytes, OrderedSet, SQL, consteq, groupby, split_every
 from odoo.tools.image import image_process
 from odoo.tools.mimetypes import get_extension
 from odoo.tools.misc import clean_context
@@ -29,6 +30,7 @@ from odoo.tools.translate import mark_as_copy
 _logger = logging.getLogger(__name__)
 
 THUMBNAIL_SIZE = (268, 140)
+ACCESS_UPDATE_BATCH_SIZE = 1_000
 
 
 def _sanitize_file_extension(extension):
@@ -835,12 +837,17 @@ class DocumentsDocument(models.Model):
 
     @api.depends('attachment_id', 'res_model', 'res_id')
     def _compute_res_name(self):
+        res_ids_by_res_model = {
+            res_model: docs.mapped('res_id')
+            for res_model, docs in self.grouped('res_model').items()
+        }
         for record in self:
             if record.attachment_id and record.res_model == record.attachment_id.res_model:
                 record.res_name = record.attachment_id.res_name
             elif record.res_id and record.res_model:
                 try:
-                    record.res_name = self.env[record.res_model].browse(record.res_id).display_name
+                    prefetch_ids = res_ids_by_res_model[record.res_model]
+                    record.res_name = self.env[record.res_model].browse(record.res_id).with_prefetch(prefetch_ids).display_name
                 except MissingError:
                     record.res_name = False
             else:
@@ -1241,10 +1248,14 @@ class DocumentsDocument(models.Model):
         """
         self.flush_model()
         changes_by_document_dict = defaultdict(dict)
-        for field, value in (
-            ('access_internal', access_internal),
-            ('access_via_link', access_via_link),
-            ('is_access_via_link_hidden', is_access_via_link_hidden),
+        # Bound child_of expansion without changing the full selection in self.
+        for (field, value), root_ids in product(
+            (
+                ('access_internal', access_internal),
+                ('access_via_link', access_via_link),
+                ('is_access_via_link_hidden', is_access_via_link_hidden),
+            ),
+            split_every(ACCESS_UPDATE_BATCH_SIZE, self.ids, list),
         ):
             if value is None:
                 continue
@@ -1258,7 +1269,7 @@ class DocumentsDocument(models.Model):
                 # the update is done only "target -> shortcut",
                 # but not "shortcut -> target"
                 ('shortcut_document_id', '=', False),
-                ('id', 'in' if skip_propagation else 'child_of', self.ids),
+                ('id', 'in' if skip_propagation else 'child_of', root_ids),
             ])
             candidates_domain &= self._get_access_update_domain()
             candidates_query = self.with_context(active_test=False)._search(candidates_domain)
@@ -1297,7 +1308,7 @@ class DocumentsDocument(models.Model):
                         -- document | document.children_ids | document.shortcut_ids
                      WHERE documents_document.id = doc.id
                  RETURNING doc.id, doc.%(field)s
-            """, field=SQL.identifier(field), value=value, root_ids=self.ids, candidates=candidates))
+            """, field=SQL.identifier(field), value=value, root_ids=root_ids, candidates=candidates))
 
             for id, old_value in self.env.cr.fetchall():
                 changes_by_document_dict[id][field] = old_value
@@ -3052,6 +3063,7 @@ class DocumentsDocument(models.Model):
         to_delete = self.sudo().with_context(active_test=False).search([('id', 'child_of', self.ids)]).sudo(False)
         removable_parent_folders = self.with_context(active_test=False).folder_id.filtered(
             lambda folder: len(folder.children_ids - self) == 0 and not folder.active and folder.id not in self.ids)
+        removable_parent_folders = removable_parent_folders.filtered_domain(~self._get_no_unlink_domain())
         removable_attachments = self.attachment_id.filtered(lambda a: a.res_model != 'documents.document')
 
         res = super(DocumentsDocument, to_delete).unlink()
@@ -3092,7 +3104,14 @@ class DocumentsDocument(models.Model):
         return [
             ('active', '=', False),
             ('write_date', '<=', fields.Datetime.now() - relativedelta(days=deletion_delay)),
+            ~self._get_no_unlink_domain(),
         ]
+
+    @api.model
+    def _get_no_unlink_domain(self):
+        """Domain of documents the trash cleanup must keep: neither collected
+        nor removed as an archived, now-empty parent folder."""
+        return Domain.FALSE
 
     @api.model
     def _get_search_panel_fields(self):

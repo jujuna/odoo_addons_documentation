@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 18:20+0000\n"
-"PO-Revision-Date: 2026-09-18 18:20+0000\n"
+"POT-Creation-Date: 2026-11-06 18:26+0000\n"
+"PO-Revision-Date: 2026-11-06 18:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -400,16 +400,16 @@ msgstr ""
 #: model:mail.template,body_html:l10n_in_hr_payroll.l10n_in_mail_template_notice_period
 msgid ""
 "<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
-"    <p>Dear <t t-out=\"object.employee_id.name\"/>,</p>\n"
-"    <p>This is to confirm that your notice period will start from <strong><t t-out=\"object.l10n_in_notice_period_start\"/></strong>\n"
-"    to <strong><t t-out=\"object.departure_date\"/></strong>, as per company policy.<br/>\n"
-"    Please ensure proper handover of your responsibilities during this period.<br/>\n"
+"    <p>Dear <t t-out=\"object.employee_id.name\"></t>,</p>\n"
+"    <p>This is to confirm that your notice period will start from <strong><t t-out=\"object.l10n_in_notice_period_start\"></t></strong>\n"
+"    to <strong><t t-out=\"object.departure_date\"></t></strong>, as per company policy.<br>\n"
+"    Please ensure proper handover of your responsibilities during this period.<br>\n"
 "    For any clarification, feel free to contact HR.</p>\n"
-"    <br/>\n"
-"    <p>Regards,<br/>\n"
-"    <t t-out=\"user.name\"/><br/>\n"
-"    HR Team<br/>\n"
-"    <t t-out=\"user.company_id.name\"/></p>\n"
+"    <br>\n"
+"    <p>Regards,<br>\n"
+"    <t t-out=\"user.name\"></t><br>\n"
+"    HR Team<br>\n"
+"    <t t-out=\"user.company_id.name\"></t></p>\n"
 "</div>\n"
 "            "
 msgstr ""
@@ -1485,6 +1485,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_payslip_run__display_name
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_work_entry_type__display_name
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_gratuity_calculation_report_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_hr_payroll_epf_report__display_name
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_hr_payroll_esic_report__display_name
@@ -2177,6 +2178,12 @@ msgstr ""
 
 #. module: l10n_in_hr_payroll
 #. odoo-python
+#: code:addons/l10n_in_hr_payroll/models/hr_employee_departure.py:0
+msgid "FNF Settlement - %(period)s"
+msgstr ""
+
+#. module: l10n_in_hr_payroll
+#. odoo-python
 #: code:addons/l10n_in_hr_payroll/controller/main.py:0
 msgid "FROM DATE"
 msgstr ""
@@ -2485,6 +2492,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_payslip_run__id
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_hr_work_entry_type__id
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_gratuity_calculation_report_wizard__id
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_hr_payroll_epf_report__id
 #: model:ir.model.fields,field_description:l10n_in_hr_payroll.field_l10n_in_hr_payroll_esic_report__id
@@ -4739,6 +4747,11 @@ msgstr ""
 #. module: l10n_in_hr_payroll
 #: model:ir.model.fields,help:l10n_in_hr_payroll.field_hr_payroll_payment_report_wizard__l10n_in_neft
 msgid "Tick this box if your company use online transfer for salary"
+msgstr ""
+
+#. module: l10n_in_hr_payroll
+#: model:ir.model,name:l10n_in_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
 msgstr ""
 
 #. module: l10n_in_hr_payroll

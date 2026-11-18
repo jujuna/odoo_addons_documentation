@@ -30,4 +30,4 @@ class AccountAccount(models.Model):
     @api.depends('code')
     def _compute_l10n_mx_is_sat_exportable(self):
         for account in self:
-            account.l10n_mx_is_sat_exportable = bool(EXPORTABLE_SAT_CODE_PATTERN.fullmatch(account.code))
+            account.l10n_mx_is_sat_exportable = bool(account.code and EXPORTABLE_SAT_CODE_PATTERN.fullmatch(account.code))

@@ -3,6 +3,7 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
+from odoo.tools.misc import format_date
 
 
 class HrEmployeeDeparture(models.Model):
@@ -77,6 +78,10 @@ class HrEmployeeDeparture(models.Model):
             'title': self.env._('FNF Payslip'),
             'employee_id': departure.employee_id.id,
             'date_from': departure.departure_date + relativedelta(day=1),
+            'note': self.env._(
+                'FNF Settlement - %(period)s',
+                period=format_date(self.env, departure.departure_date, date_format='MMMM y'),
+            ),
         } for departure in self.filtered('departure_date')]
         if not vals_list:
             return self.env['hr.payslip']

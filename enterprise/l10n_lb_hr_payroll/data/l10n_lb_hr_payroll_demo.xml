@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="base.demo_company_lb" model="res.company" forcecreate="1">
+        <field name="name">LB Company</field>
+        <field name="currency_id" ref="base.LBP"/>
+        <field name="country_id" ref="base.lb"/>
+        <field name="resource_calendar_id" ref="l10n_lb_hr_payroll.resource_calendar_lb_48"/>
+    </record>
+
+    <record id="base.user_admin" model="res.users">
+        <field name="company_ids" eval="[(4, ref('base.demo_company_lb'))]"/>
+    </record>
+
+    <record id="base.user_demo" model="res.users">
+        <field name="company_ids" eval="[(4, ref('base.demo_company_lb'))]"/>
+    </record>
+
+    <record id="hr_department_rdlb" model="hr.department">
+        <field name="name">RD LB</field>
+        <field name="company_id" ref="base.demo_company_lb"/>
+    </record>
+
+    <record id="hr_employee_karim" model="hr.employee">
+        <field name="name">Karim Haddad</field>
+        <field name="job_id" ref="hr.job_developer"/>
+        <field name="country_id" ref="base.lb"/>
+        <field name="company_id" ref="base.demo_company_lb"/>
+        <field name="department_id" ref="hr_department_rdlb"/>
+        <field name="sex">male</field>
+        <field name="marital">married</field>
+        <field name="children">2</field>
+        <field name="structure_type_id" ref="l10n_lb_hr_payroll.structure_type_employee_lb"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+        <field name="wage">104000000</field>
+        <field name="l10n_lb_nssf_number">1001</field>
+        <field name="date_version" eval="(DateTime.today() + relativedelta(years=-6, month=1, day=1))"/>
+        <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-6, month=1, day=1))"/>
+        <field name="resource_calendar_id" ref="l10n_lb_hr_payroll.resource_calendar_lb_48"/>
+    </record>
+
+    <record id="hr_employee_rania" model="hr.employee">
+        <field name="name">Rania Khoury</field>
+        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="country_id" ref="base.lb"/>
+        <field name="company_id" ref="base.demo_company_lb"/>
+        <field name="department_id" ref="hr_department_rdlb"/>
+        <field name="parent_id" ref="hr_employee_karim"/>
+        <field name="sex">female</field>
+        <field name="structure_type_id" ref="l10n_lb_hr_payroll.structure_type_employee_lb"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+        <field name="wage">60000000</field>
+        <field name="l10n_lb_nssf_number">1002</field>
+        <field name="date_version" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1))"/>
+        <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1))"/>
+        <field name="resource_calendar_id" ref="l10n_lb_hr_payroll.resource_calendar_lb_48"/>
+    </record>
+</odoo>

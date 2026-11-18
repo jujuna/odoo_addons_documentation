@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:50+0000\n"
-"PO-Revision-Date: 2026-10-17 13:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-08 15:34+0000\n"
 "Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
 "Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/hr_payroll/"
 "lo/>\n"
@@ -20,37 +20,6 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 2026.8.1\n"
-
-#. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_payroll_warning__closing_on
-msgid ""
-"\n"
-"        Defines the reference date used to compute when the warning becomes "
-"due.\n"
-"        - Today: Uses the current date as the reference point, so the "
-"warning stays a fixed distance away.\n"
-"        - Next Payslip: Uses the payrun closing date as the reference "
-"point.\n"
-"        - Contract Start / Contract End: Uses the employee's contract start "
-"or end date as the reference point.\n"
-"        - End of Month / Quarter / Year: Uses the end of the current month / "
-"quarter / year as the reference point.\n"
-"        - Payroll Start Date: Uses the payroll start date as the reference "
-"point.\n"
-"        The warning date is then calculated by applying the Offset (Days) to "
-"this reference.\n"
-"    "
-msgstr ""
-"\n"
-"        ກຳນົດວັນທີອ້າງອີງທີ່ໃຊ້ຄຳນວນວັນຄົບກຳນົດການແຈ້ງເຕືອນ.\n"
-"        - ມື້ນີ້: ໃຊ້ມື້ນີ້ເປັນຈຸດອ້າງອີງ ເພື່ອໃຫ້ການແຈ້ງເຕືອນມີໄລຍະຫ່າງຄົງທີ່.\n"
-"        - ໃບຈ່າຍເງິນເດືອນຖັດໄປ: ໃຊ້ວັນທີປິດຮອບການຈ່າຍເງິນເດືອນເປັນຈຸດອ້າງອີງ.\n"
-"        - ເລີ່ມສັນຍາ / ສິ້ນສຸດສັນຍາ: ໃຊ້ວັນທີເລີ່ມ ຫຼື ສິ້ນສຸດສັນຍາຂອງພະນັກງານເປັນຈຸດອ້າງອີງ.\n"
-"        - ທ້າຍເດືອນ / ໄຕຣມາດ / ປີ: ໃຊ້ວັນທີສິ້ນສຸດຂອງເດືອນ / ໄຕຣມາດ / ປີ "
-"ປັດຈຸບັນເປັນຈຸດອ້າງອີງ.\n"
-"        - ວັນທີເລີ່ມຕົ້ນບັນຊີເງິນເດືອນ: ໃຊ້ວັນທີເລີ່ມຕົ້ນບັນຊີເງິນເດືອນເປັນຈຸດອ້າງອີງ.\n"
-"        ຈາກນັ້ນ ວັນທີແຈ້ງເຕືອນຈະຖືກຄຳນວນໂດຍການບວກໄລຍະຫ່າງ (ວັນ) ເຂົ້າກັບຈຸດອ້າງອີງນີ້.\n"
-"    "
 
 #. module: hr_payroll
 #: model:hr.payroll.warning,description:hr_payroll.hr_payroll_warning_welcome
@@ -113,6 +82,18 @@ msgstr "%(days)s ມື້"
 #: code:addons/hr_payroll/models/hr_salary_attachment.py:0
 msgid "%(display_name)s %(attachment_type)s"
 msgstr "%(display_name)s %(attachment_type)s"
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_payslip_run.py:0
+msgid ""
+"%(employee)s can't be added to the pay run(s) %(payruns)s: they are no "
+"longer in draft, or the employee has no running contract matching their "
+"period, structure and employee types."
+msgstr ""
+"ບໍ່ສາມາດເພີ່ມ %(employee)s ເຂົ້າໃນຮອບການຈ່າຍ %(payruns)s ໄດ້: "
+"ເນື່ອງຈາກບໍ່ໄດ້ຢູ່ໃນສະຖານະສະບັບຮ່າງອີກຕໍ່ໄປ, ຫຼື ພະນັກງານບໍ່ມີສັນຍາທີ່ກຳລັງນຳໃຊ້ ເຊິ່ງກົງກັບໄລຍະເວລາ, "
+"ໂຄງສ້າງ ແລະ ປະເພດພະນັກງານ."
 
 #. module: hr_payroll
 #. odoo-python
@@ -621,6 +602,16 @@ msgid "<span>% Hourly Rate</span>"
 msgstr "<span>% ອັດຕາຕໍ່ຊົ່ວໂມງ</span>"
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
+msgid "<span>/ Day</span>"
+msgstr ""
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
+msgid "<span>/ Hour</span>"
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
 msgid "<span>/ hour</span>"
@@ -684,16 +675,6 @@ msgid ""
 msgstr ""
 "<span>ໃບຈ່າຍເງິນເດືອນໄດ້ຮັບຜົນກະທົບຈາກການຂຶ້ນເງິນເດືອນຍ້ອນຫຼັງນີ້ ແລະ ອາດຕ້ອງໄດ້ຮັບການດັດແກ້.</"
 "span>"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
-msgid "<span>€ / Day</span>"
-msgstr "<span>€ / ມື້</span>"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
-msgid "<span>€ / Hour</span>"
-msgstr "<span>€ / ຊົ່ວໂມງ</span>"
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.report_payslip
@@ -795,10 +776,10 @@ msgid ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
 "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"        Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
-"available for you.<br/><br/>\n"
-"        Please find the PDF in your employee portal.<br/><br/>\n"
-"        Have a nice day,<br/>\n"
+"        Dear <t t-out=\"object.employee_id.name\"></t>, a new payslip is "
+"available for you.<br><br>\n"
+"        Please find the PDF in your employee portal.<br><br>\n"
+"        Have a nice day,<br>\n"
 "        The HR Team\n"
 "    </td></tr>\n"
 "</tbody></table>\n"
@@ -807,11 +788,11 @@ msgstr ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
 "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"        ຮຽນ <t t-out=\"object.employee_id.name\"/>, ທ່ານມີໃບຈ່າຍເງິນເດືອນໃໝ່ອອກແລ້ວ."
-"<br/><br/>\n"
-"        ກະລຸນາກວດເບິ່ງໄຟລ໌ PDF ໃນລະບົບພະນັກງານຂອງທ່ານ.<br/><br/>\n"
-"        ຂໍໃຫ້ມີມື້ທີ່ດີ,<br/>\n"
-"        ທີມງານຊັບພະຍາກອນມະນຸດ (HR)\n"
+"        ຮຽນ <t t-out=\"object.employee_id.name\"></t>, "
+"ໃບຈ່າຍເງິນເດືອນໃໝ່ຂອງທ່ານພ້ອມແລ້ວ.<br><br>\n"
+"        ກະລຸນາກວດເບິ່ງເອກະສານ PDF ຢູ່ໃນລະບົບປະຕູພະນັກງານຂອງທ່ານ.<br><br>\n"
+"        ຂໍໃຫ້ມີມື້ທີ່ດີ,<br>\n"
+"        ທີມງານບຸກຄະລາກອນ (HR)\n"
 "    </td></tr>\n"
 "</tbody></table>\n"
 "            "
@@ -1025,6 +1006,12 @@ msgid "Add Payslip Adjustments"
 msgstr "ເພີ່ມລາຍການປັບຍອດໃບຈ່າຍເງິນເດືອນ"
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_version.py:0
+msgid "Add Payslip to Pay Run"
+msgstr "ເພີ່ມໃບຈ່າຍເງິນເດືອນເຂົ້າໃນຮອບການຈ່າຍ"
+
+#. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/js/tours/hr_payroll.js:0
 msgid "Add a <strong>name</strong> to the contract."
@@ -1050,12 +1037,6 @@ msgstr "ເພີ່ມໝາຍເຫດໃນໃບຈ່າຍເງິນເ
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_employee_view_list
 msgid "Add an adjustment"
 msgstr "ເພີ່ມລາຍການປັບຍອດ"
-
-#. module: hr_payroll
-#. odoo-python
-#: code:addons/hr_payroll/models/hr_version.py:0
-msgid "Add payslip to Pay Run"
-msgstr "ເພີ່ມໃບຈ່າຍເງິນເດືອນເຂົ້າໃນຮອບຈ່າຍເງິນເດືອນ"
 
 #. module: hr_payroll
 #. odoo-javascript
@@ -2480,18 +2461,22 @@ msgid "Date To Review"
 msgstr "ວັນທີຕ້ອງກວດກາ"
 
 #. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_employee__departure_action_date
-#: model:ir.model.fields,help:hr_payroll.field_hr_version__departure_action_date
-msgid "Date at which the departure actually takes place."
-msgstr "ວັນທີທີ່ການລາອອກເກີດຂຶ້ນຕົວຈິງ."
-
-#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_employee__dismissal_date
 #: model:ir.model.fields,help:hr_payroll.field_hr_version__dismissal_date
 msgid ""
 "Date at which the departure process starts. Differs from the actual "
 "departure date in case of a notice period."
 msgstr "ວັນທີທີ່ຂະບວນການລາອອກເລີ່ມຕົ້ນ. ແຕກຕ່າງຈາກວັນທີລາອອກຕົວຈິງໃນກໍລະນີມີໄລຍະເວລາແຈ້ງລ່ວງໜ້າ."
+
+#. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_employee__departure_action_date
+#: model:ir.model.fields,help:hr_payroll.field_hr_version__departure_action_date
+msgid ""
+"Date at which the employee (and their user, if they have no other active "
+"employee) is archived, by default the day after the departure. If it is "
+"today or earlier, the departure is applied on confirmation; otherwise it is "
+"scheduled for that date."
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__date_end
@@ -2642,6 +2627,33 @@ msgid "Defines the frequency of the wage payment."
 msgstr "ກຳນົດຄວາມຖີ່ຂອງການຈ່າຍຄ່າຈ້າງ."
 
 #. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_payroll_warning__closing_on
+msgid ""
+"Defines the reference date used to compute when the warning becomes due.\n"
+"\n"
+"- Today: Uses the current date as the reference point, so the warning stays "
+"a fixed distance away.\n"
+"- Next Payslip: Uses the payrun closing date as the reference point.\n"
+"- Contract Start / Contract End: Uses the employee's contract start or end "
+"date as the reference point.\n"
+"- End of Month / Quarter / Year: Uses the end of the current month / "
+"quarter / year as the reference point.\n"
+"- Payroll Start Date: Uses the payroll start date as the reference point.\n"
+"\n"
+"The warning date is then calculated by applying the Offset (Days) to this "
+"reference."
+msgstr ""
+"ກຳນົດວັນທີອ້າງອີງທີ່ໃຊ້ເພື່ອຄິດໄລ່ວ່າເວລາໃດການແຈ້ງເຕືອນຈະຮອດກຳນົດ.\n"
+"\n"
+"- ມື້ນີ້: ໃຊ້ມື້ນີ້ເປັນຈຸດອ້າງອີງ, ເຮັດໃຫ້ໄລຍະຫ່າງຂອງການແຈ້ງເຕືອນຄົງທີ່.\n"
+"- ໃບຈ່າຍເງິນເດືອນຖັດໄປ: ໃຊ້ວັນທີປິດຮອບການຈ່າຍເປັນຈຸດອ້າງອີງ.\n"
+"- ວັນເລີ່ມສັນຍາ / ວັນສິ້ນສຸດສັນຍາ: ໃຊ້ວັນທີເລີ່ມຕົ້ນ ຫຼື ສິ້ນສຸດສັນຍາຂອງພະນັກງານເປັນຈຸດອ້າງອີງ.\n"
+"- ທ້າຍເດືອນ / ໄຕຣມາດ / ປີ: ໃຊ້ວັນສິ້ນສຸດຂອງເດືອນ / ໄຕຣມາດ / ປີ ປັດຈຸບັນເປັນຈຸດອ້າງອີງ.\n"
+"- ວັນທີເລີ່ມຕົ້ນບັນຊີເງິນເດືອນ: ໃຊ້ວັນທີເລີ່ມຕົ້ນຂອງບັນຊີເງິນເດືອນເປັນຈຸດອ້າງອີງ.\n"
+"\n"
+"ວັນທີແຈ້ງເຕືອນຈະຖືກຄິດໄລ່ໂດຍການບວກ ຫຼື ລົບຈຳນວນມື້ (Offset) ເຂົ້າກັບວັນທີອ້າງອີງນີ້."
+
+#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip__struct_id
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_input__struct_id
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_line__struct_id
@@ -2707,6 +2719,12 @@ msgstr "ການລາອອກ"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.mail_message_view_search_payroll_audit
 msgid "Description"
 msgstr "ຄຳອະທິບາຍ"
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_generate_multi_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_view_form
+msgid "Description shown on the payslip"
+msgstr "ລາຍລະອຽດທີ່ສະແດງຢູ່ໃນໃບຈ່າຍເງິນເດືອນ"
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
@@ -3028,6 +3046,11 @@ msgstr "ໜ້າທີ່ພະນັກງານ"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.report_payslip
 msgid "Employee Information"
 msgstr "ຂໍ້ມູນພະນັກງານ"
+
+#. module: hr_payroll
+#: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_missing_payrun
+msgid "Employee Not In Payrun"
+msgstr "ພະນັກງານບໍ່ໄດ້ຢູ່ໃນຮອບການຈ່າຍ"
 
 #. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_payslip_new
@@ -3581,6 +3604,11 @@ msgstr "ຕົວຊ່ວຍຕັ້ງຕາຕະລາງບັນຊີເ
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_contract_salary_benefit__has_admin_access
 msgid "Has Admin Access"
 msgstr "ມີສິດຜູ້ດູແລລະບົບ"
+
+#. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_resource_calendar_attendance__has_category_options
+msgid "Has Category Options"
+msgstr "ມີຕົວເລືອກໝວດໝູ່"
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__has_done_payslip
@@ -4380,13 +4408,6 @@ msgid "Line"
 msgstr "ແຖວ"
 
 #. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_salary_rule_category__parent_id
-msgid ""
-"Linking a salary category to its parent is used only for the reporting "
-"purpose."
-msgstr "ການເຊື່ອມໂຍງໝວດໝູ່ເງິນເດືອນກັບໝວດໝູ່ຫຼັກ ແມ່ນໃຊ້ສຳລັບຈຸດປະສົງໃນການລາຍງານເທົ່ານັ້ນ."
-
-#. module: hr_payroll
 #: model:ir.ui.menu,name:hr_payroll.hr_payroll_logs_menu
 msgid "Logs"
 msgstr "ບັນທຶກປະຫວັດ"
@@ -4504,11 +4525,6 @@ msgstr "ຄົ້ນຫາຂໍ້ຄວາມ"
 #: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_employee_without_bank_account
 msgid "Missing Bank Account"
 msgstr "ຂາດບັນຊີທະນາຄານ"
-
-#. module: hr_payroll
-#: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_missing_payrun
-msgid "Missing Payrun"
-msgstr "ຂາດຮອບຈ່າຍເງິນເດືອນ"
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_employee__mobile_invoice
@@ -4717,12 +4733,6 @@ msgstr "ສ້າງໃໝ່"
 
 #. module: hr_payroll
 #. odoo-javascript
-#: code:addons/hr_payroll/static/src/components/payroll_config_timeline/payroll_config_timeline.xml:0
-msgid "New Config Record"
-msgstr "ບັນທຶກການຕັ້ງຄ່າໃໝ່"
-
-#. module: hr_payroll
-#. odoo-javascript
 #: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 msgid "New Employee Record"
 msgstr "ບັນທຶກພະນັກງານໃໝ່"
@@ -4741,10 +4751,22 @@ msgid "New Payslip Adjustment"
 msgstr "ການປັບປຸງໃບແຈ້ງເງິນເດືອນໃໝ່"
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_employee.py:0
+msgid "New Payslips"
+msgstr "ໃບຈ່າຍເງິນເດືອນໃໝ່"
+
+#. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.js:0
 msgid "New Salary Attachment"
 msgstr "ລາຍການຫັກເງິນເດືອນໃໝ່"
+
+#. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/components/payroll_config_timeline/payroll_config_timeline.xml:0
+msgid "New Version"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__activity_calendar_event_id
@@ -4944,8 +4966,6 @@ msgstr "ບໍ່ສາມາດໃຊ້ກັບການບັນທຶກເ
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__note
-#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__description
-#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__description
 msgid "Note"
 msgstr "ໝາຍເຫດ"
 
@@ -4990,17 +5010,16 @@ msgstr "ຈຳນວນມື້ລາພັກທີ່ໄດ້ຮັບຄ່
 msgid ""
 "Number of days used to compute the warning date based on the selected "
 "'Closing On' rule.\n"
-"        - For contract start/end: the warning will trigger this many days "
-"before the contract start or end dates.\n"
-"        - For next payslip: the offset is applied before or after the payrun "
-"closing date.\n"
-"    "
+"\n"
+"- For contract start/end: the warning will trigger this many days before the "
+"contract start or end dates.\n"
+"- For next payslip: the offset is applied before or after the payrun closing "
+"date."
 msgstr ""
-"ຈຳນວນມື້ທີ່ໃຊ້ຄິດໄລ່ວັນທີແຈ້ງເຕືອນ ໂດຍອີງຕາມກົດເກນ 'ປິດເມື່ອ' ທີ່ເລືອກໄວ້.\n"
-"        - ສຳລັບວັນເລີ່ມຕົ້ນ/ສິ້ນສຸດສັນຍາ: ການແຈ້ງເຕືອນຈະເຮັດວຽກກ່ອນວັນເລີ່ມຕົ້ນ ຫຼື "
-"ສິ້ນສຸດສັນຍາຕາມຈຳນວນມື້ນີ້.\n"
-"        - ສຳລັບໃບແຈ້ງເງິນເດືອນຖັດໄປ: ໄລຍະຫ່າງຈະຖືກນຳໃຊ້ກ່ອນ ຫຼື ຫຼັງວັນທີປິດຮອບຈ່າຍເງິນເດືອນ.\n"
-"    "
+"ຈຳນວນມື້ທີ່ໃຊ້ຄິດໄລ່ວັນທີແຈ້ງເຕືອນ ໂດຍອີງຕາມເງື່ອນໄຂ 'ປິດວັນທີ' ທີ່ເລືອກໄວ້.\n"
+"\n"
+"- ສຳລັບວັນເລີ່ມ/ສິ້ນສຸດສັນຍາ: ລະບົບຈະແຈ້ງເຕືອນລ່ວງໜ້າຕາມຈຳນວນມື້ນີ້ ກ່ອນຮອດວັນເລີ່ມ ຫຼື ສິ້ນສຸດສັນຍາ.\n"
+"- ສຳລັບໃບຈ່າຍເງິນເດືອນຖັດໄປ: ໄລຍະຫ່າງຂອງມື້ຈະຖືກນຳໃຊ້ກ່ອນ ຫຼື ຫຼັງ ວັນທີປິດຮອບການຈ່າຍ."
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__message_has_error_counter
@@ -5145,16 +5164,11 @@ msgid "Optional on"
 msgstr "ເລືອກໄດ້ໃນ"
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_generate_multi_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_view_form
-msgid "Optional reason, or reference"
-msgstr "ເຫດຜົນທາງເລືອກ, ຫຼື ເອກະສານອ້າງອີງ"
-
-#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_leave__category_options_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip_worked_days__category_options_ids
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_leave_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_work_days_view_search_report
+#: model_terms:ir.ui.view,arch_db:hr_payroll.resource_calendar_attendance_multi_create_view_form
 msgid "Options"
 msgstr "ຕົວເລືອກ"
 
@@ -5697,6 +5711,12 @@ msgid "Payslip Count"
 msgstr "ຈຳນວນໃບແຈ້ງເງິນເດືອນ"
 
 #. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__description
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__description
+msgid "Payslip Description"
+msgstr "ລາຍລະອຽດໃບຈ່າຍເງິນເດືອນ"
+
+#. module: hr_payroll
 #: model:ir.model,name:hr_payroll.model_hr_payslip_input
 msgid "Payslip Input"
 msgstr "ຂໍ້ມູນປ້ອນເຂົ້າຂອງໃບແຈ້ງເງິນເດືອນ"
@@ -5961,6 +5981,11 @@ msgstr "ຕຳແໜ່ງ"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.res_config_settings_view_form
 msgid "Postpone time off after payslip validation"
 msgstr "ເລື່ອນເວລາລາພັກຫຼັງຈາກຢືນຢັນໃບແຈ້ງເງິນເດືອນ"
+
+#. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule_category__premium_currency_id
+msgid "Premium Currency"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_salary_rule_category_premium
@@ -7331,6 +7356,12 @@ msgstr "ພະນັກງານໄດ້ຮັບການອັບເດດແ
 #. module: hr_payroll
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_version.py:0
+msgid "The employee is missing in the following pay runs: %s"
+msgstr "ພະນັກງານຕົກຫຼົ່ນໃນຮອບການຈ່າຍຕໍ່ໄປນີ້: %s"
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_version.py:0
 msgid "The employee is not in any pay run for %s"
 msgstr "ພະນັກງານບໍ່ໄດ້ຢູ່ໃນຮອບຈ່າຍເງິນເດືອນໃດໆສຳລັບ %s"
 
@@ -7419,6 +7450,13 @@ msgstr "ໃບແຈ້ງເງິນເດືອນຄວນຢູ່ໃນສ
 
 #. module: hr_payroll
 #. odoo-python
+#: code:addons/hr_payroll/models/hr_salary_rule.py:0
+msgid ""
+"The salary rule %s is not defined in the payroll data and cannot be reset."
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-python
 #: code:addons/hr_payroll/models/hr_payslip.py:0
 msgid "The selected payslips should be linked to the same batch"
 msgstr "ໃບແຈ້ງເງິນເດືອນທີ່ເລືອກຄວນເຊື່ອມໂຍງກັບຊຸດດຽວກັນ"
@@ -7451,6 +7489,15 @@ msgstr "ຈຳນວນເງິນລວມທີ່ຕ້ອງຈ່າຍສ
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_form
 msgid "The total returned by the salary rule is calculated as:"
 msgstr "ຍອດລວມທີ່ສົ່ງຄືນໂດຍກົດເກນເງິນເດືອນແມ່ນຄິດໄລ່ຈາກ:"
+
+#. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_salary_rule_category__parent_id
+msgid ""
+"The totals of the rules of this category are also added to its parent "
+"category (and its ancestors) during the payslip computation."
+msgstr ""
+"ຍອດລວມຂອງກົດເກນໃນໝວດໝູ່ນີ້ ຈະຖືກນຳໄປບວກໃສ່ໃນໝວດໝູ່ຫຼັກ (ລວມທັງໝວດໝູ່ຂັ້ນສູງກວ່າ) "
+"ໃນລະຫວ່າງການຄິດໄລ່ໃບຈ່າຍເງິນເດືອນ."
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_input__version_id
@@ -8764,8 +8811,8 @@ msgstr "allowed_payslips"
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_correction_wizard_form
-msgid "been affected by this version's changes."
-msgstr "ໄດ້ຮັບຜົນກະທົບຈາກການປ່ຽນແປງຂອງເວີຊັນນີ້."
+msgid "been affected by these changes."
+msgstr "ໄດ້ຮັບຜົນກະທົບຈາກການປ່ຽນແປງເຫຼົ່ານີ້."
 
 #. module: hr_payroll
 #. odoo-python
@@ -8957,6 +9004,105 @@ msgstr "ປີ"
 #: model:mail.template,subject:hr_payroll.mail_template_new_payslip
 msgid "{{ object.employee_id.name }}, a new payslip is available for you"
 msgstr "{{ object.employee_id.name }}, ທ່ານມີໃບແຈ້ງເງິນເດືອນໃໝ່ພ້ອມໃຫ້ກວດສອບແລ້ວ"
+
+#~ msgid "<span>€ / Day</span>"
+#~ msgstr "<span>€ / ມື້</span>"
+
+#~ msgid "<span>€ / Hour</span>"
+#~ msgstr "<span>€ / ຊົ່ວໂມງ</span>"
+
+#~ msgid "Date at which the departure actually takes place."
+#~ msgstr "ວັນທີທີ່ການລາອອກເກີດຂຶ້ນຕົວຈິງ."
+
+#~ msgid "New Config Record"
+#~ msgstr "ບັນທຶກການຕັ້ງຄ່າໃໝ່"
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+#~ "        Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
+#~ "available for you.<br/><br/>\n"
+#~ "        Please find the PDF in your employee portal.<br/><br/>\n"
+#~ "        Have a nice day,<br/>\n"
+#~ "        The HR Team\n"
+#~ "    </td></tr>\n"
+#~ "</tbody></table>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+#~ "        ຮຽນ <t t-out=\"object.employee_id.name\"/>, "
+#~ "ທ່ານມີໃບຈ່າຍເງິນເດືອນໃໝ່ອອກແລ້ວ.<br/><br/>\n"
+#~ "        ກະລຸນາກວດເບິ່ງໄຟລ໌ PDF ໃນລະບົບພະນັກງານຂອງທ່ານ.<br/><br/>\n"
+#~ "        ຂໍໃຫ້ມີມື້ທີ່ດີ,<br/>\n"
+#~ "        ທີມງານຊັບພະຍາກອນມະນຸດ (HR)\n"
+#~ "    </td></tr>\n"
+#~ "</tbody></table>\n"
+#~ "            "
+
+#~ msgid "Optional reason, or reference"
+#~ msgstr "ເຫດຜົນທາງເລືອກ, ຫຼື ເອກະສານອ້າງອີງ"
+
+#~ msgid "been affected by this version's changes."
+#~ msgstr "ໄດ້ຮັບຜົນກະທົບຈາກການປ່ຽນແປງຂອງເວີຊັນນີ້."
+
+#~ msgid ""
+#~ "\n"
+#~ "        Defines the reference date used to compute when the warning "
+#~ "becomes due.\n"
+#~ "        - Today: Uses the current date as the reference point, so the "
+#~ "warning stays a fixed distance away.\n"
+#~ "        - Next Payslip: Uses the payrun closing date as the reference "
+#~ "point.\n"
+#~ "        - Contract Start / Contract End: Uses the employee's contract "
+#~ "start or end date as the reference point.\n"
+#~ "        - End of Month / Quarter / Year: Uses the end of the current "
+#~ "month / quarter / year as the reference point.\n"
+#~ "        - Payroll Start Date: Uses the payroll start date as the "
+#~ "reference point.\n"
+#~ "        The warning date is then calculated by applying the Offset (Days) "
+#~ "to this reference.\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "        ກຳນົດວັນທີອ້າງອີງທີ່ໃຊ້ຄຳນວນວັນຄົບກຳນົດການແຈ້ງເຕືອນ.\n"
+#~ "        - ມື້ນີ້: ໃຊ້ມື້ນີ້ເປັນຈຸດອ້າງອີງ ເພື່ອໃຫ້ການແຈ້ງເຕືອນມີໄລຍະຫ່າງຄົງທີ່.\n"
+#~ "        - ໃບຈ່າຍເງິນເດືອນຖັດໄປ: ໃຊ້ວັນທີປິດຮອບການຈ່າຍເງິນເດືອນເປັນຈຸດອ້າງອີງ.\n"
+#~ "        - ເລີ່ມສັນຍາ / ສິ້ນສຸດສັນຍາ: ໃຊ້ວັນທີເລີ່ມ ຫຼື ສິ້ນສຸດສັນຍາຂອງພະນັກງານເປັນຈຸດອ້າງອີງ.\n"
+#~ "        - ທ້າຍເດືອນ / ໄຕຣມາດ / ປີ: ໃຊ້ວັນທີສິ້ນສຸດຂອງເດືອນ / ໄຕຣມາດ / ປີ "
+#~ "ປັດຈຸບັນເປັນຈຸດອ້າງອີງ.\n"
+#~ "        - ວັນທີເລີ່ມຕົ້ນບັນຊີເງິນເດືອນ: ໃຊ້ວັນທີເລີ່ມຕົ້ນບັນຊີເງິນເດືອນເປັນຈຸດອ້າງອີງ.\n"
+#~ "        ຈາກນັ້ນ ວັນທີແຈ້ງເຕືອນຈະຖືກຄຳນວນໂດຍການບວກໄລຍະຫ່າງ (ວັນ) ເຂົ້າກັບຈຸດອ້າງອີງນີ້.\n"
+#~ "    "
+
+#~ msgid "Add payslip to Pay Run"
+#~ msgstr "ເພີ່ມໃບຈ່າຍເງິນເດືອນເຂົ້າໃນຮອບຈ່າຍເງິນເດືອນ"
+
+#~ msgid ""
+#~ "Linking a salary category to its parent is used only for the reporting "
+#~ "purpose."
+#~ msgstr "ການເຊື່ອມໂຍງໝວດໝູ່ເງິນເດືອນກັບໝວດໝູ່ຫຼັກ ແມ່ນໃຊ້ສຳລັບຈຸດປະສົງໃນການລາຍງານເທົ່ານັ້ນ."
+
+#~ msgid "Missing Payrun"
+#~ msgstr "ຂາດຮອບຈ່າຍເງິນເດືອນ"
+
+#~ msgid ""
+#~ "Number of days used to compute the warning date based on the selected "
+#~ "'Closing On' rule.\n"
+#~ "        - For contract start/end: the warning will trigger this many days "
+#~ "before the contract start or end dates.\n"
+#~ "        - For next payslip: the offset is applied before or after the "
+#~ "payrun closing date.\n"
+#~ "    "
+#~ msgstr ""
+#~ "ຈຳນວນມື້ທີ່ໃຊ້ຄິດໄລ່ວັນທີແຈ້ງເຕືອນ ໂດຍອີງຕາມກົດເກນ 'ປິດເມື່ອ' ທີ່ເລືອກໄວ້.\n"
+#~ "        - ສຳລັບວັນເລີ່ມຕົ້ນ/ສິ້ນສຸດສັນຍາ: ການແຈ້ງເຕືອນຈະເຮັດວຽກກ່ອນວັນເລີ່ມຕົ້ນ ຫຼື "
+#~ "ສິ້ນສຸດສັນຍາຕາມຈຳນວນມື້ນີ້.\n"
+#~ "        - ສຳລັບໃບແຈ້ງເງິນເດືອນຖັດໄປ: ໄລຍະຫ່າງຈະຖືກນຳໃຊ້ກ່ອນ ຫຼື "
+#~ "ຫຼັງວັນທີປິດຮອບຈ່າຍເງິນເດືອນ.\n"
+#~ "    "
 
 #~ msgid "Pay Run Name"
 #~ msgstr "ຊື່ຮອບຈ່າຍເງິນເດືອນ"

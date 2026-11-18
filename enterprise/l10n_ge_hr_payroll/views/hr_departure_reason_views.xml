@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_departure_reason_view_list" model="ir.ui.view">
+        <field name="name">hr.departure.reason.view.list.inherit.l10n_ge_hr_payroll</field>
+        <field name="model">hr.departure.reason</field>
+        <field name="inherit_id" ref="hr.hr_departure_reason_view_list"/>
+        <field name="arch" type="xml">
+            <field name="country_code" position="after">
+                <field name="l10n_ge_severance" optional="hide" invisible="country_code != 'GE'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_departure_reason_view_form" model="ir.ui.view">
+        <field name="name">hr.departure.reason.view.form.inherit.l10n_ge_hr_payroll</field>
+        <field name="model">hr.departure.reason</field>
+        <field name="inherit_id" ref="hr.hr_departure_reason_view_form"/>
+        <field name="arch" type="xml">
+            <field name="country_code" position="after">
+                <field name="l10n_ge_severance" invisible="country_code != 'GE'"/>
+            </field>
+        </field>
+    </record>
+</odoo>

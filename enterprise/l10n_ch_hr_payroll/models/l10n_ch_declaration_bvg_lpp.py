@@ -22,6 +22,7 @@ class L10nCHLPPReport(models.Model):
         all_contracts = self.env['hr.version'].search([('l10n_ch_lpp_insurance_id', '!=', False),
                                                         ('l10n_ch_lpp_not_insured', '!=', True),
                                                         ('l10n_ch_lpp_insurance_id', '!=', False),
+                                                        ('employee_id', '!=', False),
                                                         ('company_id', '=', self.company_id.id)]).filtered(lambda c: (c.date_start <= last_day_of_month and (c.date_end >= first_day_of_month if c.date_end else True)))
         yearly_values = dict(self.env["l10n.ch.employee.yearly.values"]._get_mapped_snapshots(
             domain=[('employee_id', 'in', all_contracts.employee_id.ids)]))

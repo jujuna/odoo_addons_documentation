@@ -1246,8 +1246,14 @@ class ShopeeShop(models.Model):
                 user.email
                 for user in filter(
                     None, (self.user_id, self.env.ref("base.user_admin", raise_if_not_found=False))
-                )
+                ) if user.email
             }
+            if not responsible_emails:
+                _logger.warning(
+                    "Could not send synchronization failure email because no"
+                    " responsible user has an email address configured."
+                )
+                return
             mail_template.with_context(
                 email_to=",".join(responsible_emails),
                 shopee_order_ref=shopee_order_ref,

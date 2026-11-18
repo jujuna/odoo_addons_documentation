@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import SSLError
 
 from odoo import _lt, api, fields, models
-from odoo.exceptions import RedirectWarning, ValidationError
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.tools.business_data import split_vat
 from odoo.tools.misc import format_date
 from odoo.tools.zeep import wsse
@@ -212,6 +212,17 @@ class L10n_Nl_ReportsSbrTaxReportWizard(models.TransientModel):
     def send_xbrl(self):
         # Send directly with a personal certificate, otherwise through the IAP group certificate.
         options = self.env.context['options']
+
+        # The 2025 (NT19) taxonomy declaration limit is on 2026-09-01, so as of that date, a tax
+        # return can not be submitted to digipoort. A suppletie (correction) is the way to amend an
+        # expired period and has a longer (~6 years) validity date so we don't block it here.
+        date_to = fields.Date.to_date(options['date']['date_to'])
+        if not options.get('l10n_nl_is_correction') and date_to < fields.Date.to_date('2026-01-01'):
+            raise UserError(self.env._(
+                "The VAT return for a period before 2026 can no longer be filed electronically. Since "
+                "September 1st 2026, older periods are no longer accepted in Digipoort."
+            ))
+
         is_test = is_test_mode(self.env)
         report_handler = self.env['l10n_nl_reports.tax.report.handler']
         account_return = self.env['account.return']._get_return_from_report_options(options)

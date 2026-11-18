@@ -60,7 +60,8 @@ class HrContractSalaryBenefit(models.Model):
     uom = fields.Selection([
         ('days', 'Days'),
         ('percent', 'Percent'),
-        ('currency', 'Currency')], string="Unit of Measure", default='currency')
+        ('currency', 'Currency'),
+        ('length_metric_system', 'Kilometers')], string="Unit of Measure", default='currency')
 
     activity_type_id = fields.Many2one('mail.activity.type', string='Activity Type', help="The type of activity that will be created automatically on the contract if this benefit is chosen by the employee.")
     activity_creation = fields.Selection([
@@ -107,6 +108,10 @@ class HrContractSalaryBenefit(models.Model):
         self._set_requested_documents_as_required(names)
 
     def _set_requested_documents_as_required(self, names):
+        """Make required the personal infos of the given fields (the documents requested by benefits).
+
+        :param list[str] names: field names
+        """
         personal_infos = self.env['hr.contract.salary.personal.info'].search([('field', 'in', names)])
         if personal_infos:
             personal_infos.is_required = True
@@ -161,5 +166,9 @@ class HrContractSalaryBenefitValue(models.Model):
     benefit_display_type = fields.Selection(related='benefit_id.display_type', string='Benefit Display Type')
 
     def _get_value(self):
+        """Return ``value`` as a float, or as a string for the ``text`` benefits.
+
+        :rtype: float | str
+        """
         self.ensure_one()
         return float(self.value) if self.value_type == 'float' else self.value

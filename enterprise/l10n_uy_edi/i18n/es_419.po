@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:15+0000\n"
-"PO-Revision-Date: 2026-10-23 01:33+0000\n"
+"POT-Creation-Date: 2026-11-13 18:37+0000\n"
+"PO-Revision-Date: 2026-11-05 20:55+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
 "odoo-20/l10n_uy_edi/es_419/>\n"
@@ -30,7 +30,7 @@ msgid ""
 "Minimum amount = 5000 Uruguayan Indexed Unit (>%(min_amount)s)"
 msgstr ""
 "\n"
-"NOTA: Esto es requerido ya que el e-Ticket excede el monto mínimo.\n"
+"NOTA: Esto es obligatorio, ya que el e-Ticket supera el importe mínimo.\n"
 "Monto mínimo = 5000 Unidades Indexadas Uruguayas (>%(min_amount)s)"
 
 #. module: l10n_uy_edi
@@ -150,6 +150,10 @@ msgid ""
 ">\n"
 "                        <span class=\"mx-1\">E-invoicing (Uruguay)</span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"warning\" role=\"img\" title=\"EDI (Uruguay)\"/"
+">\n"
+"                        <span class=\"mx-1\">Facturación electrónica "
+"(Uruguay)</span>"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_partner_latam_form
@@ -157,6 +161,8 @@ msgid ""
 "<i title=\"Fetch from DGI\" role=\"img\" aria-label=\"Fetch from DGI\" "
 "class=\"oi oi-fw\" data-icon=\"refresh\"/>"
 msgstr ""
+"<i title=\"Obtener de la DGI\" role=\"img\" aria-label=\"Obtener de la DGI\" "
+"class=\"oi oi-fw\" data-icon=\"refresh\"/>"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
@@ -181,6 +187,8 @@ msgid ""
 "A non-billable product cannot have sales taxes. Please remove the taxes from "
 "product '%(product_name)s' to continue."
 msgstr ""
+"Un producto no facturable no puede tener impuestos de venta. Elimina los "
+"impuestos del producto '%(product_name)s' para continuar."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -189,6 +197,8 @@ msgid ""
 "A non-billable product cannot have taxes. Please remove the taxes from line "
 "'%(line_name)s' to continue."
 msgstr ""
+"Un producto no facturable no puede tener impuestos. Elimina los impuestos de "
+"la línea '%(line_name)s' para continuar."
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__addenda
@@ -303,7 +313,7 @@ msgstr "Estado CFE"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_move__l10n_uy_edi_cfe_state
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__state
 msgid "CFE Status"
-msgstr "Status CFE"
+msgstr "Estado del CFE"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -421,7 +431,7 @@ msgstr "DGI Código Casa Principal o Sucursal"
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "Default Terminal Code"
-msgstr ""
+msgstr "Código de terminal predeterminado"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__demo
@@ -453,6 +463,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_product__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__display_name
@@ -617,7 +628,8 @@ msgstr "Error Fault - %(msg)s"
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "For e-Ticket and related DN and CN you can only report up to 700 lines"
 msgstr ""
-"Para e-Ticket y ND y NC relacionados solo puedes reportar hasta 700 líneas"
+"Para los e-Tickets y sus notas de débito y crédito relacionadas, solo puedes "
+"reportar hasta 700 líneas"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -655,6 +667,7 @@ msgstr "Terrestre"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__id
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_product__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__id
@@ -675,8 +688,8 @@ msgid ""
 "Incomplete Data to connect to UCFE Provider on company %(company)s: Please "
 "complete the UCFE data to test the connection: %(missing)s"
 msgstr ""
-"Datos incompletos para conectarse al proveedor UCFE en la empresa %(company)"
-"s: Completa los datos de UCFE para probar la conexión: %(missing)s"
+"Datos incompletos para conectarse al proveedor UCFE en la empresa %"
+"(company)s: Completa los datos de UCFE para probar la conexión: %(missing)s"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_journal_type
@@ -822,7 +835,7 @@ msgstr "No hay respuesta"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
 msgid "Non-Billable"
-msgstr ""
+msgstr "No facturable"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -842,15 +855,15 @@ msgid ""
 "Not valid Currency Rate, need to be greater than 0 to be accepted by DGI (%"
 "(used_rate)s)"
 msgstr ""
-"No es una cotización de moneda válida, necesita ser mayor que 0 para poder "
-"ser aceptada por DGI (%(used_rate)s)"
+"La cotización de la moneda no es válida. Debe ser mayor que 0 para que la "
+"DGI la acepte (%(used_rate)s)"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "Not valid Uruguayan tax, only VAT taxes are supported (%(taxes_name)s)"
 msgstr ""
-"Impuesto uruguayo no válido. Solo impuestos de iva son soportados (%"
+"Impuesto uruguayo no válido. Solo se admiten impuestos de IVA (%"
 "(taxes_name)s)"
 
 #. module: l10n_uy_edi
@@ -898,6 +911,11 @@ msgstr "Problema con el número de Identificación del receptor: %(exp_msg)s"
 #. module: l10n_uy_edi
 #: model:ir.model,name:l10n_uy_edi.model_product_template
 msgid "Product"
+msgstr "Producto"
+
+#. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_product_product
+msgid "Product Variant"
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -923,7 +941,7 @@ msgstr "Producción"
 #: model:ir.model.fields,help:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
 #: model:ir.model.fields,help:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
 msgid "Products with indicator 6 and 7 for EDI."
-msgstr ""
+msgstr "Productos con indicador 6 y 7 para EDI."
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__receiver
@@ -1070,7 +1088,7 @@ msgstr "La factura electrónica fue creada exitosamente"
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "The partner of the CFE needs to have a valid Uruguayan identification."
-msgstr ""
+msgstr "El contacto del CFE debe tener una identificación uruguaya válida."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -1138,8 +1156,8 @@ msgid ""
 "(company_name)s):\n"
 "\t- %(errors)s"
 msgstr ""
-"Para crear el comprobante CFE necesario completar la información de tu "
-"empresa (%(company_name)s):\n"
+"Para crear el CFE, primero completa los datos de tu empresa (%"
+"(company_name)s):\n"
 "\t- %(errors)s"
 
 #. module: l10n_uy_edi
@@ -1223,7 +1241,7 @@ msgstr "URL de consulta del proveedor UCFE"
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_journal__l10n_uy_edi_ucfe_terminal_code
 msgid "UCFE Provider Terminal Code"
-msgstr ""
+msgstr "Código de terminal del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_terminal_code
@@ -1270,7 +1288,7 @@ msgstr "INDICADOR DESCONOCIDO %(ind_fact)s"
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.product_template_form_view
 msgid "UY"
-msgstr ""
+msgstr "UY"
 
 #. module: l10n_uy_edi
 #: model:ir.actions.server,name:l10n_uy_edi.ir_cron_get_vendor_bills_received_ir_actions_server
@@ -1312,7 +1330,7 @@ msgstr "Actualizar Estado DGI"
 #. module: l10n_uy_edi
 #: model:ir.module.module,shortdesc:base.module_l10n_uy_edi
 msgid "Uruguay - Electronic Invoice"
-msgstr ""
+msgstr "Uruguay - Factura electrónica"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_document_id

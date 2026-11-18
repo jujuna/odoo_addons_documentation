@@ -34,3 +34,13 @@ class TestSalaryRuleCategory(TransactionCase):
             'country_id': self.env.ref('base.be').id,
         })
         self.assertTrue(category)
+
+    def test_premium_pay_amounts_currency(self):
+        category = self.env['hr.salary.rule.category'].create({
+            'name': 'US Category',
+            'code': 'US_CATEGORY',
+            'country_id': self.env.ref('base.us').id,
+        })
+        self.assertEqual(category.premium_currency_id, self.env.ref('base.USD'))
+        category.country_id = False
+        self.assertEqual(category.premium_currency_id, self.env.company.currency_id)

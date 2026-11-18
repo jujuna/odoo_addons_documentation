@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, date
+from datetime import datetime, date, UTC
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 
 from odoo.tests import tagged
@@ -231,6 +232,25 @@ class Test13thMonth(TestPayslipBase):
             'date_to': datetime(2026, 12, 31),
         })
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), version.wage, msg='It should count all months')
+
+    def test_13th_month_paid_amount_public_holiday_ending_at_midnight(self):
+        # New Year's Day (Thursday) ends at midnight: Friday 2 January is the first work day of January, which
+        # does not count when starting on Monday 5 January.
+        self.update_version(date(2026, 1, 5))
+        tz = ZoneInfo(self.version._get_tz())
+        self.env['resource.calendar.leaves'].create({
+            'name': "New Year's Day",
+            'company_id': self.employee.company_id.id,
+            'resource_id': False,
+            'date_from': datetime(2026, 1, 1, tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+            'date_to': datetime(2026, 1, 2, tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        })
+        self.payslip.write({
+            'date_from': datetime(2026, 12, 1),
+            'date_to': datetime(2026, 12, 31),
+        })
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * 11 / 12, msg='January should not count')
 
     def test_13th_month_become_part_time(self):
         self.update_version(date(2019, 1, 1), date(2019, 6, 30), wage=5000)
@@ -752,6 +772,57 @@ class Test13thMonth(TestPayslipBase):
             }])
         # Half day of sick time off doesn't interfere with the 14 consecutive days, but we remove half day in computation
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * (2 / 12 + ((1 / 31) / 12) + (13.5 / 30) / 12), places=2)
+
+    def test_13th_month_long_term_sick_back_to_work_not_enough_2026(self):
+        # Since 2026, the relapse period is 56 days instead of 14 days
+        self.update_version(date(2015, 1, 1))
+        self.env['hr.leave'].create([
+            {
+                'employee_id': self.employee.id,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'request_date_from': date(2025, 12, 1),
+                'request_date_to': date(2026, 3, 1),
+            },
+            {
+                'employee_id': self.employee.id,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'request_date_from': date(2026, 4, 15),
+                'request_date_to': date(2026, 12, 31),
+            }
+        ])
+        self.payslip.write({
+            'date_from': datetime(2026, 12, 1),
+            'date_to': datetime(2026, 12, 31),
+        })
+        # Already 31 days assimilated previous year -> only 29 left as the employee only came back for 44 days (< 56)
+        # January: 29 days assimilated, February: not taken, March: 30 days of work, April: 14 days of work
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * ((29 / 31) / 12 + (30 / 31) / 12 + (14 / 30) / 12), places=2)
+
+    def test_13th_month_long_term_sick_back_to_work_2026(self):
+        # Since 2026, the relapse period is 56 days instead of 14 days
+        self.update_version(date(2015, 1, 1))
+        self.env['hr.leave'].create([
+            {
+                'employee_id': self.employee.id,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'request_date_from': date(2025, 12, 1),
+                'request_date_to': date(2026, 3, 1),
+            },
+            {
+                'employee_id': self.employee.id,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'request_date_from': date(2026, 5, 1),
+                'request_date_to': date(2026, 12, 31),
+            }
+        ])
+        self.payslip.write({
+            'date_from': datetime(2026, 12, 1),
+            'date_to': datetime(2026, 12, 31),
+        })
+        # The employee came back for 60 days (>= 56) -> 60 days available for 2026
+        # January and February assimilated (59 days, 1st March being a Sunday), March and April worked,
+        # last remaining day assimilated on 1st May
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * (4 / 12 + (1 / 31) / 12), places=2)
 
     def test_13th_month_multiple_sicknesses(self):
         self.update_version(date(2015, 1, 1))

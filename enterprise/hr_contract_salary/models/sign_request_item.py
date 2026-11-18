@@ -5,7 +5,11 @@ class SignRequestItem(models.Model):
     _inherit = 'sign.request.item'
 
     def _get_auto_field_custom_value(self, field_record_sudo=None, item_type_sudo=None, record=None, auto_value=''):
-        """ Override to retrieve automatic value following other logic for specific models"""
+        """Adapt the automatic values of the sign items of ``hr.version`` documents.
+
+        The car and bike fields give the vehicle name (see :meth:`_get_vehicule_auto_value`),
+        and the Belgian group insurance and IP fields their displayed value.
+        """
         self.ensure_one()
         auto_field = item_type_sudo.auto_field
         auto_value = super()._get_auto_field_custom_value(
@@ -26,10 +30,16 @@ class SignRequestItem(models.Model):
 
     @api.model
     def _get_vehicule_auto_value(self, auto_value, version, auto_field, vehicule=""):
+        """Return the name of the vehicle of ``version`` for the ``transport_mode_<vehicule>`` field.
+
+        The existing vehicle, or the model of the new one; ``auto_value`` for any other field.
+
+        :param str vehicule: ``car`` or ``bike``
+        """
         # get field name depending on the vehicule
         assert (vehicule in ['car', 'bike'])
         transport = f"transport_mode_{vehicule}"
-        is_new = f"new_{vehicule}"
+        is_new = "has_new_car" if vehicule == "car" else "new_bike"
         new_vehicule = f"new_{vehicule}_model_id"
         exiting_vehicule = f"{vehicule}_id"
         if auto_field == transport and transport in version and version[transport]:
@@ -37,6 +47,6 @@ class SignRequestItem(models.Model):
             # creating a computed field to fallback either on {vehicule}_id.model_id or new_{vehicule}_model_id
             if not version[is_new] and version[exiting_vehicule]:
                 auto_value = version[exiting_vehicule].name
-            elif vehicule[is_new] and version[new_vehicule]:
+            elif version[is_new] and version[new_vehicule]:
                 auto_value = version[new_vehicule].name
         return auto_value

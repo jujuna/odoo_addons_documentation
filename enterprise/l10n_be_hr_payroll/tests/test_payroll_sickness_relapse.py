@@ -712,6 +712,33 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
         self.assertEqual(all_leaves[0].request_date_to, date(2026, 3, 6))
         self.assertEqual(all_leaves[0].work_entry_type_id, unpaid_work_entry_type)
 
+    def test_worker_sick_time_off_seniority_reached_during_incapacity(self):
+        """
+        A worker reaching one month of seniority during the incapacity gets the guaranteed salary for the remaining
+        days of the 30 days counted from the first day of incapacity
+        """
+        for worker_code, second_week_code in (('00015', '082.00'), ('00841', '072.01')):
+            values = {
+                'name': 'New Worker',
+                'date_version': '2026-03-01',
+                'contract_date_start': '2026-03-01',
+                'wage': 2000,
+                'l10n_be_worker_code_id': self.env.ref(f'l10n_be_hr_payroll.l10n_be_worker_code_{worker_code}').id,
+            }
+            if worker_code == '00841':
+                values.update({'contract_date_end': '2026-04-30', 'fixed_term': True, 'l10n_be_dimona_category': 'stu'})
+            worker_employee = self.env['hr.employee'].create(values)
+            self.env['hr.leave'].create({
+                'work_entry_type_id': self.sick_time_off_type.id,
+                'request_date_from': date(2026, 3, 20),
+                'request_date_to': date(2026, 4, 18),
+                'employee_id': worker_employee.id,
+            })
+            all_leaves = self.env['hr.leave'].search([('employee_id', '=', worker_employee.id)]).sorted('request_date_from')
+            # 20/03-31/03 (days 1-12) before one month of seniority: unpaid, then days 13-14 and 15-30
+            self.assertEqual([leave.work_entry_type_id.code for leave in all_leaves], ['122.00', second_week_code, '072.00'])
+            self.assertEqual(all_leaves.mapped('request_date_to'), [date(2026, 3, 31), date(2026, 4, 2), date(2026, 4, 18)])
+
     def test_worker_sick_time_off_02(self):
         """
         The 7 first days: paid 100%
@@ -922,6 +949,7 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
         The 7 first days: paid 100%
         From 8 to 30 days: paid 85.88%
         After 30 days: unpaid
+        Each work accident leave opens its own period, the previous work accident leaves are not counted.
         """
         worker_employee = self.env['hr.employee'].create({
             'name': 'Worker Employee',
@@ -930,10 +958,6 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
             'wage': 2000,
             'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015').id
         })
-
-        unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
-        first_week_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week')
-        first_month_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_second_week')
 
         self.env['hr.leave'].create([
             {
@@ -954,19 +978,13 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
             ('employee_id', '=', worker_employee.id)
         ]).sorted('request_date_from')
 
-        self.assertEqual(len(all_leaves), 3)
-
-        self.assertEqual(all_leaves[0].request_date_from, date(2026, 4, 1))
-        self.assertEqual(all_leaves[0].request_date_to, date(2026, 4, 7))
-        self.assertEqual(all_leaves[0].work_entry_type_id, first_week_work_entry_type)
-
-        self.assertEqual(all_leaves[1].request_date_from, date(2026, 4, 8))
-        self.assertEqual(all_leaves[1].request_date_to, date(2026, 4, 30))
-        self.assertEqual(all_leaves[1].work_entry_type_id, first_month_work_entry_type)
-
-        self.assertEqual(all_leaves[2].request_date_from, date(2026, 5, 1))
-        self.assertEqual(all_leaves[2].request_date_to, date(2026, 5, 31))
-        self.assertEqual(all_leaves[2].work_entry_type_id, unpaid_work_entry_type)
+        self.assertEqual([leave.work_entry_type_id.code for leave in all_leaves], ['009.00', '070.00', '009.00', '070.00', '110.00'])
+        self.assertEqual(all_leaves.mapped('request_date_from'), [
+            date(2026, 4, 1), date(2026, 4, 8), date(2026, 5, 1), date(2026, 5, 8), date(2026, 5, 31),
+        ])
+        self.assertEqual(all_leaves.mapped('request_date_to'), [
+            date(2026, 4, 7), date(2026, 4, 30), date(2026, 5, 7), date(2026, 5, 30), date(2026, 5, 31),
+        ])
 
     def test_employee_work_accident_01(self):
         """
@@ -1003,10 +1021,8 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
         """
         The 30 first days: paid 100%
         After 30 days: unpaid
+        Each work accident leave opens its own period, the previous work accident leaves are not counted.
         """
-        unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
-        first_month_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_guaranteed_monthly')
-
         self.env['hr.leave'].create([
             {
                 'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week').id,
@@ -1026,15 +1042,9 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
             ('employee_id', '=', self.employee_test.id)
         ]).sorted('request_date_from')
 
-        self.assertEqual(len(all_leaves), 2)
-
-        self.assertEqual(all_leaves[0].request_date_from, date(2026, 4, 1))
-        self.assertEqual(all_leaves[0].request_date_to, date(2026, 4, 30))
-        self.assertEqual(all_leaves[0].work_entry_type_id, first_month_work_entry_type)
-
-        self.assertEqual(all_leaves[1].request_date_from, date(2026, 5, 1))
-        self.assertEqual(all_leaves[1].request_date_to, date(2026, 5, 31))
-        self.assertEqual(all_leaves[1].work_entry_type_id, unpaid_work_entry_type)
+        self.assertEqual([leave.work_entry_type_id.code for leave in all_leaves], ['012.00', '012.00', '110.00'])
+        self.assertEqual(all_leaves.mapped('request_date_from'), [date(2026, 4, 1), date(2026, 5, 1), date(2026, 5, 31)])
+        self.assertEqual(all_leaves.mapped('request_date_to'), [date(2026, 4, 30), date(2026, 5, 30), date(2026, 5, 31)])
 
     def test_cdd_employe_sick_leave_less_than_1_month_occupation(self):
         """
@@ -1675,3 +1685,51 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
         self.assertTrue(long_term_sick_leaves)
         self.assertEqual(min(long_term_sick_leaves.mapped('request_date_from')), date(2027, 1, 12))
         self.assertEqual(max(long_term_sick_leaves.mapped('request_date_to')), date(2027, 1, 29))
+
+    def test_worker_work_accident_interrupted_day(self):
+        """
+        The work accident occurs in the afternoon: the interrupted work day counts as the
+        first day of the guaranteed weekly wage.
+        """
+        worker_employee = self.env['hr.employee'].create({
+            'name': 'Worker Employee',
+            'date_version': '2026-01-01',
+            'contract_date_start': '2026-01-01',
+            'wage': 2000,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015').id
+        })
+
+        unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
+        first_week_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week')
+        first_month_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_second_week')
+
+        self.env['hr.leave'].create([{
+            'work_entry_type_id': first_week_work_entry_type.id,
+            'request_date_from': date(2026, 10, 5),
+            'request_date_to': date(2026, 11, 30),
+            'request_date_from_period': 'pm',
+            'request_date_to_period': 'pm',
+            'employee_id': worker_employee.id,
+        }])
+
+        all_leaves = self.env['hr.leave'].search([
+            ('employee_id', '=', worker_employee.id)
+        ]).sorted('request_date_from')
+
+        self.assertEqual(len(all_leaves), 3)
+
+        self.assertEqual(all_leaves[0].request_date_from, date(2026, 10, 5))
+        self.assertEqual(all_leaves[0].request_date_from_period, 'pm')
+        self.assertEqual(all_leaves[0].request_date_to, date(2026, 10, 11))
+        self.assertEqual(all_leaves[0].request_date_to_period, 'pm')
+        self.assertEqual(all_leaves[0].work_entry_type_id, first_week_work_entry_type)
+        self.assertEqual(all_leaves[0].number_of_days, 4.5)
+
+        self.assertEqual(all_leaves[1].request_date_from, date(2026, 10, 12))
+        self.assertEqual(all_leaves[1].request_date_from_period, 'am')
+        self.assertEqual(all_leaves[1].request_date_to, date(2026, 11, 3))
+        self.assertEqual(all_leaves[1].work_entry_type_id, first_month_work_entry_type)
+
+        self.assertEqual(all_leaves[2].request_date_from, date(2026, 11, 4))
+        self.assertEqual(all_leaves[2].request_date_to, date(2026, 11, 30))
+        self.assertEqual(all_leaves[2].work_entry_type_id, unpaid_work_entry_type)

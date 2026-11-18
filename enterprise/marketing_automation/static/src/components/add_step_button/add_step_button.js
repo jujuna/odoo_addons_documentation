@@ -1,8 +1,9 @@
 import { _t } from "@web/core/l10n/translation";
-import { Component, useProps, types as t, usePlugin } from "@odoo/owl";
+import { Component, useProps, onWillStart, types as t, usePlugin } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { NotificationPlugin } from "@web/core/notifications/notification_plugin";
+import { user } from "@web/core/user";
 
 export class AddStepButton extends Component {
     static template = "marketing_automation.AddStepButton";
@@ -19,6 +20,10 @@ export class AddStepButton extends Component {
 
     setup() {
         this.notification = usePlugin(NotificationPlugin);
+
+        onWillStart(async () => {
+            this.canUserCreateServerAction = await user.checkAccessRight('ir.actions.server', 'create');
+        });
     }
 
     /**

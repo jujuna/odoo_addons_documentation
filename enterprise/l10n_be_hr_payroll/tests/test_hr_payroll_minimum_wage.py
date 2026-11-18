@@ -2,6 +2,7 @@
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 
 from odoo import fields
 from odoo.tests import tagged
@@ -221,6 +222,17 @@ class TestHrContractMinWage(TestPayrollCommon):
         warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
         self.check_warnings(warning_ids, 'Employees Under Minimum Wage', contract.employee_id, False)
 
+    def test_not_applicable_salary_scale(self):
+        """
+        Test that a contract with the "Not Applicable" salary scale has no minimum wage, hence no warning
+        """
+        self.employee_without_job.l10n_be_salary_scale_id = self.env.ref('l10n_be_hr_payroll.salary_scale_na')
+        contract = self.contract_without_job
+        contract.wage = 1000
+        self.assertEqual(contract._get_l10n_be_min_wage(), (0, False, 0))
+        warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
+        self.check_warnings(warning_ids, 'Employees Under Minimum Wage', contract.employee_id, False)
+
     def test_equal_min_wage_no_warning(self):
         """
         Test that a contract with wage exactly equal to the minimum wage does not show the warning
@@ -246,3 +258,49 @@ class TestHrContractMinWage(TestPayrollCommon):
 
         warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
         self.check_warnings(warning_ids, 'Employees Under Minimum Wage', contract.employee_id, False)
+
+    def test_min_wage_contract_template(self):
+        """ A CP200 contract template (a version without employee) has the minimum of its scale without seniority. """
+        template = self.env['hr.version'].create({
+            'name': 'CP200 Template',
+            'company_id': self.belgian_company.id,
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp200_b').id,
+            'contract_date_start': date(2026, 1, 1),
+            'wage': 100,
+        })
+        self.assertFalse(template.employee_id)
+        min_wage = template._get_l10n_be_min_wage()[0]
+        self.assertTrue(min_wage)
+        self.assertLess(template.wage, min_wage)
+
+    def test_flexi_min_wage_from_parameter(self):
+        """ The flexi minimum hourly wage is the dated rule parameter min_hourly_wage_flexi, at the
+        current date or at the start of a version starting later """
+        def flexi_version(date_from, date_to):
+            return self.create_employee({
+                'name': f'Flexi {date_from}',
+                'date_version': date_from,
+                'contract_date_start': date_from,
+                'contract_date_end': date_to,
+                'l10n_be_dimona_category': 'flx',
+                'wage_type': 'hourly',
+            }).version_id
+
+        version = flexi_version(date(2025, 6, 1), date(2025, 6, 30))
+        with freeze_time('2025-06-15'):
+            self.assertEqual(version._get_l10n_be_min_wage(), (11.64, 'hourly', 0))
+        with freeze_time('2026-04-15'):
+            self.assertEqual(version._get_l10n_be_min_wage(), (11.87, 'hourly', 0))
+        future_version = flexi_version(date(2027, 2, 1), date(2027, 3, 31))
+        with freeze_time('2026-09-15'):
+            self.assertEqual(version._get_l10n_be_min_wage(), (12.11, 'hourly', 0))
+            self.assertEqual(future_version._get_l10n_be_min_wage(), (12.11, 'hourly', 0))
+            self.env['hr.rule.parameter.value'].create({
+                'rule_parameter_id': self.env.ref('l10n_be_hr_payroll.rule_parameter_min_hourly_wage_flexi').id,
+                'date_from': date(2027, 1, 1),
+                'parameter_value': '12.5',
+            })
+            self.assertEqual(version._get_l10n_be_min_wage(), (12.11, 'hourly', 0))
+            self.assertEqual(future_version._get_l10n_be_min_wage(), (12.5, 'hourly', 0))

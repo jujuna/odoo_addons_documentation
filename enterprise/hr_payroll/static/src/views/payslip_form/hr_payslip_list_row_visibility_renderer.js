@@ -13,6 +13,15 @@ export class PayslipListRowVisibilityRenderer extends ListRenderer {
     static recordRowTemplate = "hr_payroll.PayslipListRecordRow";
 
     /**
+     * The salary_rule_style column only loads the style of the rule: it is never displayed.
+     * It can't be column_invisible in the arch, the fields of the rule are not read for an
+     * always invisible many2one.
+     */
+    getActiveColumns() {
+        return super.getActiveColumns().filter((col) => col.widget !== "salary_rule_style");
+    }
+
+    /**
      * Style of the salary rule of the line (bold, italic...), as on the printed payslip.
      * The rule comes with its style fields from the salary_rule_style widget.
      */
@@ -51,28 +60,28 @@ export class PayslipListRowVisibilityRenderer extends ListRenderer {
         return color ? `--o-payslip-line-color: ${color};` : "";
     }
 
+    isDefaultValue(column, record) {
+        const expr = column.attrs && column.attrs.is_default_value;
+        return Boolean(expr) && evaluateBooleanExpr(expr, record.evalContextWithVirtualIds);
+    }
+
+    // the value is not rendered but the cell is kept: a hidden cell leaves a hole in the row hover
+    isValueHidden(column, record) {
+        // a title only shows its name
+        if (column.name !== "name" && this.getRule(record).title) {
+            return true;
+        }
+        return !payslipShowAllState.showAll && this.isDefaultValue(column, record);
+    }
+
     getCellClass(column, record) {
         let classNames = super.getCellClass(column, record);
         const rule = this.getRule(record);
         if (column.name === "name" && rule.indented) {
             classNames += " ps-4";
         }
-        // a title only shows its name
-        if (column.name !== "name" && rule.title) {
-            return classNames + " invisible";
-        }
-        if (column.attrs && column.attrs.is_default_value) {
-            const isDefaultValue = evaluateBooleanExpr(
-                column.attrs.is_default_value,
-                record.evalContextWithVirtualIds
-            );
-            if (isDefaultValue) {
-                if (payslipShowAllState.showAll) {
-                    classNames += " text-muted";
-                } else {
-                    classNames += " invisible";
-                }
-            }
+        if (payslipShowAllState.showAll && this.isDefaultValue(column, record)) {
+            classNames += " text-muted";
         }
         return classNames;
     }

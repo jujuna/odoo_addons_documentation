@@ -42,7 +42,11 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
         })
 
         cls.snapshot_creation_cron = cls.env.ref('account_reports.ir_cron_create_snapshots')
-        cls.snapshot_garbage_collection_cron = cls.env.ref('account_reports.ir_cron_garbage_collect_snapshots')
+
+    def tearDown(self):
+        # Clear the cursor cache to avoid any interference with the previous tests
+        self.env.cr.cache.pop('report_batch_included_ids', None)
+        super().tearDown()
 
     @classmethod
     def _generate_options(cls, report, date_from, date_to, default_options=None):
@@ -79,7 +83,7 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
 
     @classmethod
     def _cleanup_snapshot_cron_triggers(cls):
-        cls.env['ir.cron.trigger'].search([('cron_id', 'in', (cls.snapshot_garbage_collection_cron + cls.snapshot_creation_cron).ids)]).unlink()
+        cls.env['ir.cron.trigger'].search([('cron_id', '=', cls.snapshot_creation_cron.id)]).unlink()
 
     def _run_snapshot_crons(self):
         self.env['account.report.snapshot'].sudo()._cron_garbage_collect_snapshots()

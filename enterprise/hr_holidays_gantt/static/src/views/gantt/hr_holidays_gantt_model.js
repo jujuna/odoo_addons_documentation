@@ -213,6 +213,8 @@ export class HrHolidaysGanttModel extends hrGanttView.Model {
                     ...this.searchParams.context,
                     multi_create: true,
                     multi_leave_request: true,  // see hr.leave._check_validity()
+                    // "Allocate and Add": the missing allocations are granted
+                    hr_holidays_gantt_grant_missing_allocation: !!multiCreateData.grantMissingAllocation,
                 },
             });
         }

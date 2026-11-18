@@ -16,22 +16,6 @@ _logger = logging.getLogger(__name__)
 class AccountReport(models.Model):
     _inherit = 'account.report'
 
-    def _init_options_buttons(self, options, previous_options):
-        super()._init_options_buttons(options, previous_options)
-        company = self.env.company
-        gstr2b_report = self.env.ref('l10n_in_reports.account_report_gstr2b').id
-
-        # Remove 'Returns' button if company is Indian and eFiling is disabled
-        if company.country_id.code == 'IN' and not self.env.company.l10n_in_gst_efiling_feature:
-            options['buttons'] = [
-                button for button in options['buttons']
-                if button.get('action') != 'action_open_returns'
-            ]
-        if gstr2b_report == options['report_id']:
-            for button in options['buttons']:
-                if button.get('action') == 'action_open_returns':
-                    button['name'] = 'Reconcile'
-
     def _is_available_for(self, companies):
         in_companies = self.env.companies.filtered(lambda c: c.account_fiscal_country_id.code == 'IN')
         if not in_companies:

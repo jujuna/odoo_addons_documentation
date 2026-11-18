@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import csv
 import datetime
+import io
 from dateutil.relativedelta import relativedelta
 
 from odoo.tests.common import tagged
@@ -1218,6 +1220,59 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         }
         self._validate_payslip(payslip, payslip_results)
 
+    def test_w2_box18_local_wages(self):
+        # Only the wages of the payslips withholding a local tax are local wages
+        self.work_address.state_id = self.env.ref('base.state_us_27')
+        self.work_address.city = "New York"
+        self.version.write({
+            'wage': 5000,
+            'schedule_pay': 'semi-monthly',
+        })
+        self.employee.write({
+            'l10n_us_w4_allowances_count': 3,
+            'l10n_us_state_filing_status': 'ny_status_2',
+            'l10n_us_filing_status': 'jointly',
+        })
+        nyc_payslip = self._generate_payslip(datetime.date(2026, 4, 1), datetime.date(2026, 4, 15))
+        self.work_address.city = "Albany"
+        other_payslip = self._generate_payslip(datetime.date(2026, 4, 16), datetime.date(2026, 4, 30))
+
+        w2 = self.env['l10n.us.w2'].create({'date_start': datetime.date(2026, 1, 1)})
+        w2.payslip_ids = nyc_payslip + other_payslip
+        w2.action_generate_csv()
+        row = next(csv.DictReader(io.StringIO(w2.csv_file.decode())))
+
+        self.assertEqual(row['16 State wages, tips, etc.'], '10000.0')
+        self.assertEqual(row['18 Local wages, tips, etc.'], '5000.0')
+        self.assertEqual(row['19 Local income tax'], '184.37')
+
+    def test_w2_box18_address_local_wages(self):
+        # Fayette levies a county occupational tax, Anderson doesn't
+        self.work_address.write({
+            'state_id': self.env.ref('base.state_us_18').id,
+            'city_id': self.env.ref('l10n_us.city_us_132').id,
+        })
+        self.version.write({
+            'wage': 2000,
+            'schedule_pay': 'bi-weekly',
+        })
+        self.employee.write({
+            'l10n_us_state_filing_status': 'ky_status_1',
+            'l10n_us_filing_status': 'single',
+        })
+        fayette_payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 14))
+        self.work_address.city_id = self.env.ref('l10n_us.city_us_3536')
+        anderson_payslip = self._generate_payslip(datetime.date(2026, 1, 15), datetime.date(2026, 1, 28))
+
+        w2 = self.env['l10n.us.w2'].create({'date_start': datetime.date(2026, 1, 1)})
+        w2.payslip_ids = fayette_payslip + anderson_payslip
+        w2.action_generate_csv()
+        row = next(csv.DictReader(io.StringIO(w2.csv_file.decode())))
+
+        self.assertEqual(row['16 State wages, tips, etc.'], '4000.0')
+        self.assertEqual(row['18 Local wages, tips, etc.'], '2000.0')
+        self.assertEqual(row['19 Local income tax'], '45.0')
+
     def test_078_ny_yonkers_tax_single_example_1(self):
         # Source https://www.tax.ny.gov/pdf/publications/withholding/nys50_t_y.pdf (Revised 1/26)
         self.work_address.state_id = self.env.ref('base.state_us_27')
@@ -1613,12 +1668,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'MEDICARE': -21.33,
             'MEDICAREADD': 0,
             'SST': -91.19,
-            'GAINCOMETAX': -15.79,
+            'GAINCOMETAX': -0.62,
             'COMPANYFUTA': 88.25,
             'COMPANYMEDICARE': 21.33,
             'COMPANYSOCIAL': 91.19,
             'COMPANYSUI': 39.71,
-            'NET': 1329.61,
+            'NET': 1344.77,
         }
         self._validate_payslip(payslip, payslip_results)
 
@@ -2670,7 +2725,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         })
 
         payslip = self._generate_payslip(datetime.date(2026, 3, 2), datetime.date(2026, 3, 8))
-        payslip_results = {'BASIC': 50.0, 'GROSS': 50.0, 'TAXABLE': 50.0, 'FIT': 0.0, 'SST': -3.1, 'MEDICARE': -0.73, 'MEDICAREADD': 0.0, 'VTINCOMETAX': 0.0, 'VTCHILDCARE': -0.06, 'COMPANYSOCIAL': 3.1, 'COMPANYMEDICARE': 0.73, 'COMPANYFUTA': 3.0, 'COMPANYSUI': 0.5, 'COMPANYVTCHILDCARE': 0.22, 'NET': 46.12}
+        payslip_results = {'BASIC': 50.0, 'GROSS': 50.0, 'TAXABLE': 50.0, 'FIT': 0.0, 'SST': -3.1, 'MEDICARE': -0.73, 'MEDICAREADD': 0.0, 'VTINCOMETAX': 0.0, 'VTCHILDCARE': -0.06, 'COMPANYSOCIAL': 3.1, 'COMPANYMEDICARE': 0.73, 'COMPANYFUTA': 3.0, 'COMPANYSUI': 0.5, 'COMPANYVTCHILDCARE': 0.17, 'NET': 46.12}
         self._validate_payslip(payslip, payslip_results)
 
     def test_074_dc_state_negative_taxable(self):
@@ -2693,7 +2748,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         self.employee.l10n_us_state_filing_status = 'or_status_1'
 
         payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
-        payslip_results = {'BASIC': 168.0, 'GROSS': 168.0, 'TAXABLE': 168.0, 'FIT': 0.0, 'ORINCOMETAX': -21.33}
+        payslip_results = {'BASIC': 168.0, 'GROSS': 168.0, 'TAXABLE': 168.0, 'FIT': 0.0, 'ORINCOMETAX': -21.92, 'ORTRANSITTAX': -0.17}
         self._validate_payslip(payslip, payslip_results, skip_lines=True)
 
     def test_076_nc_state_low_income(self):
@@ -2705,3 +2760,57 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
         payslip_results = {'BASIC': 168.0, 'GROSS': 168.0, 'TAXABLE': 168.0, 'FIT': 0.0, 'SST': -10.42, 'MEDICARE': -2.44, 'MEDICAREADD': 0.0, 'NCINCOMETAX': 0.0, 'COMPANYSOCIAL': 10.42, 'COMPANYMEDICARE': 2.44, 'COMPANYFUTA': 10.08, 'COMPANYSUI': 1.68, 'NET': 155.15}
         self._validate_payslip(payslip, payslip_results)
+
+    def test_077_co_aurora_opt_repealed(self):
+        # The Aurora occupational privilege tax is repealed since 2025
+        self.work_address.write({
+            'state_id': self.env.ref('base.state_us_6').id,
+            'city': 'Aurora',
+        })
+
+        payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
+        self.assertFalse(payslip.line_ids.filtered(lambda l: l.code in ('COOPTAURORA', 'COMPANYCOOPTAURORA')))
+
+    def test_078_dc_admin_funding_tax_cap(self):
+        # The cap applies to the wages of the year, not to the tax of a single payslip
+        self.work_address.state_id = self.env.ref('base.state_us_9')
+        self.version.write({
+            'wage': 5000,
+            'schedule_pay': 'monthly',
+        })
+        self.employee.l10n_us_state_filing_status = 'dc_status_1'
+
+        for month, admin_funding_tax in [(1, 10.0), (2, 8.0), (3, 0.0)]:
+            payslip = self._generate_payslip(datetime.date(2026, month, 1), datetime.date(2026, month, 1) + relativedelta(day=31))
+            self._validate_payslip(payslip, {'COMPANYDCADMIN': admin_funding_tax}, skip_lines=True)
+            payslip.action_payslip_done()
+
+    def test_079_id_state_tax_rounded_up(self):
+        # (2500 - 1342) * 5.3% = 61.374, rounded up to the next dollar
+        self.work_address.state_id = self.env.ref('base.state_us_13')
+        self.version.write({
+            'wage': 2500,
+            'schedule_pay': 'monthly',
+        })
+        self.employee.write({
+            'l10n_us_state_filing_status': 'id_status_1',
+            'l10n_us_w4_allowances_count': 2,
+        })
+
+        payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
+        payslip_results = {'TAXABLE': 2500.0, 'IDINCOMETAX': -62.0}
+        self._validate_payslip(payslip, payslip_results, skip_lines=True)
+
+    def test_080_or_fmli_cap(self):
+        # The FMLI contributions stop once the year wages reach the social security cap
+        self.work_address.state_id = self.env.ref('base.state_us_32')
+        self.version.write({
+            'wage': 100000,
+            'schedule_pay': 'monthly',
+        })
+        self.employee.l10n_us_state_filing_status = 'or_status_1'
+
+        for month, fmli, company_fmli in [(1, -600.0, 400.0), (2, -507.0, 338.0), (3, 0.0, 0.0)]:
+            payslip = self._generate_payslip(datetime.date(2026, month, 1), datetime.date(2026, month, 1) + relativedelta(day=31))
+            self._validate_payslip(payslip, {'ORFMLI': fmli, 'COMPANYORFMLI': company_fmli}, skip_lines=True)
+            payslip.action_payslip_done()

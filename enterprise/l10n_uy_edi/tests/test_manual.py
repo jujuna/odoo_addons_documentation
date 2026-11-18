@@ -294,6 +294,28 @@ class TestManual(common.TestUyEdi):
                 )
                 self.assertEqual(description, "", "Description mismatch for line with deleted description")
 
+    def test_115_account_move_line_cod_items(self):
+        """The internal reference and the barcode are reported in their own <CodItem> nodes"""
+        products = [
+            self.env["product.product"].create({"name": "No Codes"}),
+            self.env["product.product"].create({"name": "Internal Ref", "default_code": "INTREF"}),
+            self.env["product.product"].create({
+                "name": "Ref and Barcode", "default_code": "INTREF2", "barcode": "7730912350032"}),
+            self.env["product.product"].create({
+                "name": "Invalid Barcode", "default_code": "INTREF3", "barcode": "NOT-AN-EAN"}),
+        ]
+        invoice = self._create_move(
+            invoice_line_ids=[Command.create({"product_id": product.id}) for product in products],
+        )
+        expected = [
+            [],
+            [{"TpoCod": "INT1", "Cod": "INTREF"}],
+            [{"TpoCod": "INT1", "Cod": "INTREF2"}, {"TpoCod": "GTIN13", "Cod": "7730912350032"}],
+            [{"TpoCod": "INT1", "Cod": "INTREF3"}],  # invalid EAN-13 barcode is not reported
+        ]
+        for line, expected_cod_items in zip(invoice.invoice_line_ids, expected):
+            self.assertEqual(invoice._l10n_uy_edi_get_line_cod_items(line), expected_cod_items)
+
     def test_120_e_ticket_final_consumer(self):
         """ Create/post/send an e-ticket and check that the pre-generated XML is the same as the one expected """
         invoice = self._create_move(partner_id=self.env.ref("l10n_uy.partner_cfu").id)
@@ -661,3 +683,66 @@ class TestManual(common.TestUyEdi):
         # Since it is an internal pre-send validation, the CFE state/error must remain unset
         self.assertFalse(invoice.l10n_uy_edi_cfe_state)
         self.assertFalse(invoice.l10n_uy_edi_error)
+
+    def test_credit_note_tpo_cambio_ref_matches_accepted_invoice_rate(self):
+        """ Ensure that when both company currency and invoice currency are not UYU,
+        a credit note referencing an accepted invoice preserves the invoice's original
+        <TpoCambio> in <TpoCambioRef>, even if the exchange rate was updated afterwards.
+        """
+        # Configure company currency to USD (not UYU)
+        self._configure_usd_company_currency()
+
+        EUR = self.env.ref("base.EUR")
+        UYU = self.env.ref("base.UYU")
+        EUR.active = True
+
+        # 1. Setup initial rate on 2024-05-31
+        self.env["res.currency.rate"].create([
+            {
+                "name": "2024-05-31",
+                "company_id": self.company_uy.id,
+                "currency_id": EUR.id,
+                "rate": 1.0,
+            },
+            {
+                "name": "2024-05-31",
+                "company_id": self.company_uy.id,
+                "currency_id": UYU.id,
+                "rate": 40.0,
+            },
+        ])
+
+        invoice = self._create_move(
+            currency_id=EUR.id,
+            invoice_date="2024-06-01",
+        )
+        invoice.action_post()
+        self._send_and_print(invoice)
+
+        self.assertEqual(invoice.l10n_uy_edi_cfe_state, "accepted")
+        inv_xml = self.get_xml_tree_from_attachment(invoice.l10n_uy_edi_document_id.attachment_id)
+        original_inv_rate = inv_xml.findtext(".//{*}TpoCambio")
+        self.assertEqual(float(original_inv_rate), 40.0)
+
+        # 2. Simulate exchange rate sync after the invoice was accepted
+        self.env["res.currency.rate"].create({
+            "name": "2024-06-01",
+            "company_id": self.company_uy.id,
+            "currency_id": UYU.id,
+            "rate": 45.0,
+        })
+
+        # 3. Create a credit note later
+        refund = self._create_credit_note(invoice)
+        refund.invoice_date = "2024-06-05"
+        refund.action_post()
+        self._send_and_print(refund)
+
+        # 4. Check that TpoCambioRef in the credit note matches the original accepted CFE rate (40.0), not 45.0
+        refund_xml = self.get_xml_tree_from_attachment(refund.l10n_uy_edi_document_id.attachment_id)
+        ref_rate = refund_xml.findtext(".//{*}Referencia/{*}TpoCambioRef")
+        self.assertEqual(
+            float(ref_rate),
+            float(original_inv_rate),
+            "TpoCambioRef on credit note must match the accepted invoice's TpoCambio.",
+        )

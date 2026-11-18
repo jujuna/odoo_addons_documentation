@@ -73,9 +73,12 @@ class HrPayslipRun(models.Model):
             jc_999 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999', raise_if_not_found=False)
             if jc_999:
                 version_domain &= Domain([('l10n_be_joint_committee_id', '!=', jc_999.id)])
+        double_holiday_structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday', raise_if_not_found=False)
+        if double_holiday_structure and (structure_id or self.structure_id.id) == double_holiday_structure.id:
+            version_domain &= self.env['hr.version']._l10n_be_get_double_holiday_pay_domain()
         return version_domain
 
-    def _generate_payslips(self):
+    def _generate_payslips(self, versions=None):
         self.ensure_one()
         struct_n_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays')
         struct_n1_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays')
@@ -83,12 +86,13 @@ class HrPayslipRun(models.Model):
             # Termination holidays payslips have a specific generation process
             if not self.version_ids:
                 raise UserError(self.env._("You must have employee records in the payrun to generate payslip(s)."))
-            valid_versions = self.version_ids - self.slip_ids.version_id
+            candidate_versions = self.version_ids if versions is None else versions & self.version_ids
+            valid_versions = candidate_versions - self.slip_ids.version_id
             if self.structure_id:
                 valid_versions = valid_versions.filtered(lambda c: c.structure_type_id.id == self.structure_id.type_id.id)
             employees = valid_versions.mapped('employee_id')
             return employees.departure_id._generate_termination_holidays(payrun_id=self.id)
-        new_payslips = super()._generate_payslips()
+        new_payslips = super()._generate_payslips(versions=versions)
         new_payslips._l10n_be_generate_termination_documents(payslip_run=self)
         return new_payslips
 

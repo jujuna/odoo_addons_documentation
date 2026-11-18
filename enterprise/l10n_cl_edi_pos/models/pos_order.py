@@ -10,6 +10,11 @@ class PosOrder(models.Model):
 
     def _prepare_invoice_vals(self):
         vals = super()._prepare_invoice_vals()
+
+        journal = self.env['account.journal'].browse(vals['journal_id'])
+        if journal and not journal.l10n_latam_use_documents:
+            return vals
+
         invoice_types = self.mapped("invoice_type")
         if len(set(invoice_types)) > 1:
             raise ValueError("All orders must have the same invoice type")
@@ -66,7 +71,7 @@ class PosOrder(models.Model):
                     'l10n_cl_reference_doc_type_id': reversed_move_id.l10n_latam_document_type_id.id,
                     'reference_doc_code': reference_doc_code,
                     'reason': 'Anulación NC por aceptación con reparo (' + reversed_move_id.l10n_latam_document_number + ')',
-                    'date': move.date,
+                    'date': reversed_move_id.invoice_date,
                 })
         return move
 

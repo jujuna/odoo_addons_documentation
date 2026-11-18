@@ -3,17 +3,17 @@
 # * hr_recruitment_integration_base
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
-"PO-Revision-Date: 2026-09-18 03:37+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-09 12:59+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "hr_recruitment_integration_base/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -32,6 +32,13 @@ msgid ""
 "external\n"
 "api from different job boards like indeed, monster, linkedin, etc.\n"
 msgstr ""
+"\n"
+"İşe Alım entegrasyonu için temel modül.\n"
+"========================================\n"
+"Bu modül, Indeed, Monster, LinkedIn gibi çeşitli iş ilanı panolarının "
+"API'leriyle\n"
+"işe alımın entegre edilmesine yönelik\n"
+"bir temel sağlar.\n"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -94,7 +101,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_state
@@ -457,6 +464,8 @@ msgid "Job Board"
 msgstr "İş İlanları Panosu"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
+#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_kanban
 msgid "Job Board Posts"
 msgstr "İş İlan Panosu Gönderileri"
@@ -465,12 +474,6 @@ msgstr "İş İlan Panosu Gönderileri"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Job Boards"
 msgstr "İş Panoları"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
-#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
-msgid "Job Boards Posts"
-msgstr "İş İlanı Panosu Gönderileri"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_job
@@ -525,7 +528,7 @@ msgstr "Son Güncelleme"
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_error
@@ -683,13 +686,9 @@ msgstr "Güncellenecek Fiyat"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.actions.server,name:hr_recruitment_integration_base.action_publish_on_job_board
+#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid "Publish on Job Board"
 msgstr "İş İlan Panosunda Yayımla"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
-msgid "Publish on Jobs Board"
-msgstr "İş İlanları Panosunda Yayınlayın"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -700,8 +699,8 @@ msgstr "İş İlan Panosunda Yayımla"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.actions.act_window,help:hr_recruitment_integration_base.action_open_hr_job_post
-msgid "Publish one of our job position to a Jobs Board"
-msgstr "İş ilanlarımızdan birini İş İlanları Panosunda yayınlayın"
+msgid "Publish one of our job positions on a Job Board"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban_search
@@ -721,7 +720,7 @@ msgstr "İşe Alan"
 #. module: hr_recruitment_integration_base
 #: model:ir.module.module,shortdesc:base.module_hr_recruitment_integration_base
 msgid "Recruitment Integration Base"
-msgstr ""
+msgstr "İşe Alım Entegrasyonu Base"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_recruitment_platform
@@ -737,7 +736,7 @@ msgstr "Sorumlu Kullanıcı"
 #. odoo-javascript
 #: code:addons/hr_recruitment_integration_base/static/src/widget/integration_state_selection.js:0
 msgid "Ribbon"
-msgstr ""
+msgstr "Şerit"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_sms_error
@@ -813,9 +812,9 @@ msgid ""
 "job             position. The Recruiter is automatically added to all "
 "meetings with the Applicant."
 msgstr ""
-"İşveren, bu iş pozisyonundaki tüm Başvuru Sahipleri için varsayılan değer"
-"              olacaktır. İşe Alım Görevlisi, Başvuru Sahibiyle yapılan tüm "
-"toplantılara otomatik olarak eklenir."
+"İşveren, bu iş pozisyonundaki tüm Başvuru Sahipleri için varsayılan "
+"değer              olacaktır. İşe Alım Görevlisi, Başvuru Sahibiyle yapılan "
+"tüm toplantılara otomatik olarak eklenir."
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__campaign_end_date
@@ -911,8 +910,17 @@ msgstr "platform simgesi"
 msgid "updated"
 msgstr "güncellenmiş"
 
-msgid "Website Messages"
-msgstr "Websitesi Mesajları"
+#~ msgid "Job Boards Posts"
+#~ msgstr "İş İlanı Panosu Gönderileri"
 
-msgid "Website communication history"
-msgstr "Websitesi iletişim geçmişi"
+#~ msgid "Publish on Jobs Board"
+#~ msgstr "İş İlanları Panosunda Yayınlayın"
+
+#~ msgid "Publish one of our job position to a Jobs Board"
+#~ msgstr "İş ilanlarımızdan birini İş İlanları Panosunda yayınlayın"
+
+#~ msgid "Website Messages"
+#~ msgstr "Websitesi Mesajları"
+
+#~ msgid "Website communication history"
+#~ msgstr "Websitesi iletişim geçmişi"

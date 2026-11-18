@@ -220,7 +220,10 @@ class SocialInstagramCase(SocialInstagramCommon):
                         'name': 'total_interactions',
                         'total_value': {'value': 8},
                     }]
-
+                elif params.get('since') == 937041390:
+                    # Return `None` to simulate a failed request, which should be ignored
+                    # when computing the statistics.
+                    return None
             return {'data': data}
 
         def _meta_run_request_batch(env, queries):

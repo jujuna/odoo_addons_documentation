@@ -496,6 +496,10 @@ class AccountJournal(models.Model):
         if not pstl_addr_list:
             return None
         for addr_dict in pstl_addr_list:
+            # Northern Ireland's 'XI' is not an ISO 3166 country code, banks expect 'GB'
+            if addr_dict['country'] == 'XI':
+                addr_dict['country'] = 'GB'
+        for addr_dict in pstl_addr_list:
             if addr_dict['contact_type'] == 'employee':
                 return addr_dict
         return pstl_addr_list[0]

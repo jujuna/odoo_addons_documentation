@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import timedelta
+from datetime import timedelta, UTC
+from zoneinfo import ZoneInfo
 
 from odoo import fields, models
 from odoo.fields import Domain
@@ -12,17 +13,26 @@ class HrLeaveAllocationGenerateMultiWizard(models.TransientModel):
 
     public_holiday_id = fields.Many2one('resource.calendar.leaves', string='Public Holiday', readonly=True)
 
+    def _get_public_holiday_dates(self):
+        """The first and last days of the public holiday, stored in UTC, in the company's time zone."""
+        tz = ZoneInfo((self.public_holiday_id.company_id or self.env.company).tz or self.env.user.tz or 'UTC')
+        return (
+            self.public_holiday_id.date_from.replace(tzinfo=UTC).astimezone(tz).date(),
+            self.public_holiday_id.date_to.replace(tzinfo=UTC).astimezone(tz).date(),
+        )
+
     def _get_employee_domain(self):
         domain = super()._get_employee_domain()
         if not self.public_holiday_id:
             return domain
-        leave = self.public_holiday_id
+        leave_date_from, leave_date_to = self._get_public_holiday_dates()
         versions = self.env['hr.version'].search([
             ('l10n_be_worker_code_id', '!=', False),
-            ('contract_date_start', '<=', leave.date_to.date()),
+            ('l10n_be_joint_committee_id.egov3_code', '!=', '999'),
+            ('contract_date_start', '<=', leave_date_to),
             '|',
             ('contract_date_end', '=', False),
-            ('contract_date_end', '>=', leave.date_from.date()),
+            ('contract_date_end', '>=', leave_date_from),
         ])
         return Domain.AND([domain, [
             ('active', '=', True),
@@ -36,6 +46,7 @@ class HrLeaveAllocationGenerateMultiWizard(models.TransientModel):
 
         leave = self.public_holiday_id
         company = leave.company_id or self.env.company
+        leave_date_from, leave_date_to = self._get_public_holiday_dates()
 
         existing = self.env['hr.leave.allocation'].search([
             ('work_entry_type_id', '=', self.work_entry_type_id.id),
@@ -49,11 +60,8 @@ class HrLeaveAllocationGenerateMultiWizard(models.TransientModel):
         for employee in employees:
             days = 0
             for version in employee.version_ids.filtered('contract_date_start'):
-                overlap_start = max(leave.date_from.date(), version.date_start)
-                overlap_end = min(
-                    leave.date_to.date(),
-                    version.date_end or leave.date_to.date(),
-                )
+                overlap_start = max(leave_date_from, version.date_start)
+                overlap_end = min(leave_date_to, version.date_end or leave_date_to)
                 if overlap_end < overlap_start:
                     continue
                 current_date = overlap_start

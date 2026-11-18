@@ -29,10 +29,8 @@ class L10n_PeTaxPle141ReportHandler(models.AbstractModel):
 
     def export_to_txt(self, options):
         def format_float(amount):
-            """Avoid -0 on TXT report"""
-            if amount == 0:
-                return abs(amount)
-            return amount
+            """Format the amount with the two decimals SUNAT requires, avoiding -0 on TXT report"""
+            return "%.2f" % (amount or 0)
 
         options.update({"force_all_entries": True})
         lines = self._get_ple_report_data(options, "move_id")
@@ -96,7 +94,7 @@ class L10n_PeTaxPle141ReportHandler(models.AbstractModel):
                     "tax_ivap": not cancelled and format_float(columns["tax_ivap"]) or "0.00",
                     "vat_icbper": not cancelled and format_float(columns["vat_icbper"]) or "0.00",
                     "tax_oth": "0.00",
-                    "amount_total": not cancelled and columns["amount_total"] or "0.00",
+                    "amount_total": not cancelled and format_float(columns["amount_total"]) or "0.00",
                     "currency": columns["currency"],
                     "rate": ("%.3f" % abs(columns["rate"])) if columns["currency"] != "PEN" else "",
                     "emission_date_related": columns["emission_date_related"].strftime("%d/%m/%Y") if columns[

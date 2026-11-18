@@ -2,17 +2,18 @@
 # This file contains the translation of the following modules:
 # * ai
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:51+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
+"PO-Revision-Date: 2026-11-10 06:33+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/ai/tr/>\n"
 "Language: tr\n"
@@ -72,6 +73,56 @@ msgid ""
 "links.\n"
 "        "
 msgstr ""
+"\n"
+"            # Sohbette zengin kartlar olarak görüntülenecek kayıtlar için "
+"önizleme meta verilerini hazırlar.\n"
+"\n"
+"            ## Bunu YALNIZCA kullanıcı kayıtları kendisi görmek istediğinde "
+"çağırın -\n"
+"            örneğin, \"bana göster...\", \"liste...\", \"bul...\", \"öner/"
+"tavsiye et...?\", bu bağlamdaki herhangi bir şey veya\n"
+"            kullanıcının başka bir eylemde bulunmadan önce arama sonuçları "
+"arasında seçim yapabilmesi için önizlemenin yararlı olduğu durumlarda.\n"
+"            Bağlama göre, kayıtların kendisinin cevap olduğu durumları temel "
+"olarak belirleyebilirsiniz.\n"
+"\n"
+"            ## Aşağıdaki durumlarda ÇAĞIRMAYIN:\n"
+"            - Kayıtlar, başka bir araç çağrısına veri sağlayan ara veriler "
+"ise\n"
+"            (güncelleme, oluşturma, argüman oluşturma).\n"
+"            - Kullanıcı, kayıtların sadece yanıt verdiği bir soru "
+"sorduğunda\n"
+"            (sayılar, evet/hayır, toplamlar, \"kim...\", \"ne zaman...\"). "
+"Yanıtı\n"
+"            metin olarak verin; arkasındaki kayıtların önizlemesini "
+"göstermeyin.\n"
+"\n"
+"            `preview_metadata` değerini döndürür: kesin nihai değerler "
+"(hesaplanmış\n"
+"            fiyatlar, para birimi, bağlantılar). Cevabınızı bunlara "
+"dayandırın, asla önceki arama sonuçlarındaki\n"
+"            ham değerlere dayandırmayın.\n"
+"\n"
+"            ## Cevabınız:\n"
+"            ### Zengin kartlar/kayıt önizlemeleri mesajınızın altında "
+"otomatik olarak görünür. Önizlemeler zaten kayıt ayrıntılarını "
+"gösterdiğinden:\n"
+"            - Cevabınızın TAMAMINI tek bir kısa cümleyle sınırlayın (örn., "
+"\"İşte satın alabileceğiniz şeyler:\")\n"
+"            - Kayıt adlarını, açıklamalarını, fiyatlarını veya diğer "
+"ayrıntıları SIRASINIZ - önizlemeler bunu halleder\n"
+"            - Madde işaretleri veya numaralı listeler KULLANMAYIN ve "
+"yanıtınızda ASLA arama sonuçlarını sıralamayın, sayıları az olsa bile. "
+"Önizlemeler gerekli tüm kayıtları net bir biçimde gösterecektir.\n"
+"\n"
+"            ## Şu anda zengin önizleme kartlarına sahip modeller şunlardır:\n"
+"            - Ürünler (`product.template`, `product.product`), Randevular "
+"(`appointment.type`), Etkinlikler (`event.event`),\n"
+"            Blog Yazıları (`blog.post`), Kurslar (`slide.channel`), Dersler/"
+"Slaytlar (`slide.slide`) ve İş İlanları (`hr.job`).\n"
+"            - Diğer tüm kayıt önizlemeleri, normal kayıt bağlantıları olarak "
+"görüntülenir.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_adjust_search
@@ -83,6 +134,12 @@ msgid ""
 "\"Current View\" section of the context message.\n"
 "        "
 msgstr ""
+"\n"
+"            Arama filtrelerini, gruplandırma kriterlerini, görünüm türünü "
+"vb. düzenlemek için kullanıcı arayüzünü ayarlar.\n"
+"            Mevcut görünüm, etkin filtreler, özellikler vb. bağlam mesajının "
+"\"Mevcut Görünüm\" bölümünde gösterilir.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_compute_date
@@ -260,6 +317,13 @@ msgid ""
 "the view.\n"
 "        "
 msgstr ""
+"\n"
+"            Mevcut kullanıcı tarafından erişilebilen her menü için bu araç, "
+"menü kimliğini ve tam adını, ilgili eylem kimliğini, eylem türünü ve eylem "
+"açıklamasını,\n"
+"            mevcut görünüm türlerini, varsayılan görünüm türünü ve görünümün "
+"modelini döndürür.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_binary_content
@@ -269,6 +333,10 @@ msgid ""
 "any record.\n"
 "        "
 msgstr ""
+"\n"
+"            Herhangi bir kayıt için eklerin, resimlerin veya herhangi bir "
+"ikili alanın içeriğini okuyun.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_graph
@@ -278,6 +346,12 @@ msgid ""
 "            Ideal for trends, comparisons, distributions, visual KPIs.\n"
 "        "
 msgstr ""
+"\n"
+"            Kullanıcı arayüzünü, belirtilen menünün Grafik görünümüne "
+"yönlendirir\n"
+"            Trendler, karşılaştırmalar, dağılımlar ve görsel KPI'lar için "
+"idealdir.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_kanban
@@ -288,6 +362,11 @@ msgid ""
 "boards, workflow management\n"
 "        "
 msgstr ""
+"\n"
+"            Arayüzü verilen menünün Kanban görünümüne yönlendirir.\n"
+"            Şunlar için idealdir: aşama/durum görselleştirme, iş akışı "
+"görünümleri, görev panoları, iş akışı yönetimi\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_list
@@ -298,6 +377,12 @@ msgid ""
 "data\n"
 "        "
 msgstr ""
+"\n"
+"            Kullanıcı arayüzünü belirli bir menünün Liste görünümüne "
+"yönlendirir.\n"
+"            Kullanıcının verileri gözden geçirmesi, filtrelemesi, sıralaması "
+"veya dışa aktarması gerektiğinde idealdir\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_pivot
@@ -308,6 +393,12 @@ msgid ""
 "cross-tabulation, performance metrics, aggregate measures.\n"
 "        "
 msgstr ""
+"\n"
+"            Arayüzü verilen menünün Pivot görünümüne yönlendirir.\n"
+"            \"Raporlama\" uygulama menüleri, \"En iyi N\" sorguları, "
+"sıralamalar, çapraz tablolar, performans metrikleri ve toplu ölçümler için "
+"idealdir.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_menu_details
@@ -320,6 +411,13 @@ msgid ""
 "            Use it before opening a view.\n"
 "        "
 msgstr ""
+"\n"
+"            Verilen menü kimlikleri için action_id, teknik model adı, "
+"varsayılan filtreler ve gruplandırmalar, etki alanı ve arama görünümü "
+"ayrıntıları (aranabilir alanların listesi, kullanılabilir filtreler ve "
+"gruplandırma seçenekleri) dahil olmak üzere ayrıntılı bilgileri alır.\n"
+"            Bir görünümü açmadan önce kullanın.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_compute_report_measures
@@ -331,6 +429,12 @@ msgid ""
 "the menu's available measures\n"
 "        "
 msgstr ""
+"\n"
+"            Pivot/grafik görünümlerinde toplama işlemi için kullanılabilen "
+"sayısal alanları (ölçütleri) alır.\n"
+"            Menüde kullanılabilir ölçütleri almak için, bir pivot veya "
+"grafik menüsünü açmadan önce bu işlev çağrılmalıdır.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_fields
@@ -343,6 +447,13 @@ msgid ""
 "            Essential for updating records.\n"
 "        "
 msgstr ""
+"\n"
+"            Verilen model için, etki alanı filtrelerinde ve gruplamada "
+"kullanılabilecek aranabilir alanları alır.\n"
+"            Geçerli etki alanları oluşturmak için gereklidir. Etki "
+"alanlarında yalnızca bu araç tarafından döndürülen alanlar kullanılabilir.\n"
+"            Kayıtları güncellemek için gereklidir.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_models
@@ -355,6 +466,13 @@ msgid ""
 "before searching, creating, or updating records.\n"
 "        "
 msgstr ""
+"\n"
+"            Mevcut kullanıcı tarafından erişilebilen tüm Odoo modellerini "
+"(geçici ve soyut modeller hariç), teknik adları ve açıklamalarıyla birlikte "
+"döndürür.\n"
+"            Kayıtları aramadan, oluşturmadan veya güncellemeden önce doğru "
+"teknik model adını belirlemek için bu aracı kullanın.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_run_view_action
@@ -364,6 +482,10 @@ msgid ""
 "`ir.actions.report` in an Odoo database.\n"
 "        "
 msgstr ""
+"\n"
+"            Bir Odoo veritabanındaki `ir.actions.client` ve "
+"`ir.actions.report` tür\\u00fndeki görünümleri açmak için çalıştırılır.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_search
@@ -377,6 +499,15 @@ msgid ""
 "more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
+"\n"
+"            Veritabanındaki kayıtları ve değerlerini arayın.\n"
+"            \"... sahibim mi?\", \"Herhangi bir ... var mı\", \"... ad "
+"nedir\" gibi sorular, ilişkileri arama vb. durumlar için idealdir.\n"
+"            {records, total_count} değerini ve daha fazla satır kaldığında "
+"bir sayfalama ipucu döndürür; varsayılan olarak yalnızca display_name "
+"getirilir (daha fazlası için `fields` parametresini geçin) ve en fazla 50 "
+"satır (en çok 200) döndürülür.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
@@ -388,6 +519,12 @@ msgid ""
 "categories.\n"
 "        "
 msgstr ""
+"\n"
+"            Kayıtları arayarak belirli değerlere göre gruplandırın ve "
+"toplam, ortalama veya sayı gibi toplama hesaplamaları gerçekleştirin. "
+"Kullanıcılar toplamlar, istatistikler veya farklı kategorilerdeki veri "
+"dağılımlarını istediğinde bu aracı kullanın.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ask_user_question
@@ -484,6 +621,90 @@ msgid ""
 "is genuinely still missing.\n"
 "        "
 msgstr ""
+"\n"
+"            Kullanıcının bir yön veya eylem seçmesini istediğinizde bu aracı "
+"kullanın, böylece seçimleri bir sonraki adımınızı belirler. Bu, kullanıcının "
+"seçmesi için fikirler, öneriler, tavsiyeler, alternatifler, iyileştirmeler "
+"veya sonraki eylemler sunmayı içerir. Düz metin olarak seçenekleri "
+"listelemek yerine t\\u013ıklanabilir seçenekler sunar. İyileştirmeler "
+"önerirken, her öneriyi bu araçla seçilebilir bir eylem haline getirin; düz "
+"metin bir liste verip sonra uygulamayı teklif etmeyin.\n"
+"            ## KURALLAR\n"
+"            - 2-4 seçenekli, tek bir kararı çözen odaklanmış bir soru "
+"sorun.\n"
+"            - Her seçenek, o soru için doğrudan bir yanıt veya eylem "
+"olmalıdır. Birbiriyle ilgisiz birden fazla bilgiye ihtiyaç duyarsanız, "
+"soruları tek bir seçenek listesinde birleştirmek yerine her bilgi için bir "
+"soru sorun.\n"
+"            - Soru kendi başına tam, bağımsız bir soru olmalıdır - tam soru "
+"cümlesi, dilbilgisi veya anlam için önceki metne bağlı kalmadan kendi başına "
+"açık olmalıdır. Bir parça veya etiket değil (örn. \"Sahne hangi aydınlatma "
+"tarzını kullanmalı?\" yerine \"Aydınlatma tarzı:\" demeyin).\n"
+"            - Her seçenek, soruyu yeniden okumaya gerek kalmadan "
+"anlaşılabilir ve uygulanabilir, belirli bir eylem olarak bağımsız olmalıdır "
+"(örn. \"Aydınlatma atmosferi\" veya \"Evet\" yerine \"Sıcak ortam "
+"aydınlatması kullan\" demeyin). Birleştirmek anlamlı olmadıkça seçenekler "
+"birbirini dışlamalıdır; bu durumda multi_select'i true olarak ayarlayın, "
+"böylece kullanıcılar birden fazla seçim yapabilir, ancak asla toplu veya "
+"kapsayıcı bir seçenek eklemeyin (örn. \"Yukarıdakilerin tümü\", \"Hiçbiri\", "
+"\"Bunların kombinasyonu\", \"Seçeneklerin karışımı\"), çünkü multi_select "
+"kullanıcıların her seçeneği ayrı ayrı seçmesine zaten izin verir.\n"
+"            - Listeyi işsiz bir seçenekle doldurmayın (\"Geç\", \"Şimdi "
+"değil\", \"Daha sonra belki\"): kullanıcı soruyu geçebilir ve "
+"allow_free_text true olduğunda listelenmemiş bir yanıt yazabilir.\n"
+"            - Seçenekler yanıtın kendisidir, daha sonra genişleteceğiniz bir "
+"yanıtın etiketleri değildir. Kullanıcının seçimini takip ederek her etiketin "
+"arkasındaki içeriği zaten yazacak olsaydınız, soru sormuyorsunuz demektir - "
+"sadece yanıtı yazın.\n"
+"            - Asla \"Diğer\" / \"Başka bir şey\" / \"Özel\" seçeneği "
+"eklemeyin - allow_free_text true olduğunda zaten otomatik olarak serbest "
+"metin alternatifi sunulur (aşağıya bakın), false olduğunda ise hiç "
+"sunulmaz.\n"
+"            - Yanıt bağlamdan zaten bilindiğinde, makul bir varsayılan açık "
+"olduğunda veya başka bir araç kendi onay akışını yönettiğinde doğrudan bir "
+"yanıt veya eylem kullanın. İki anlamlı seçenekten daha azı varsa düz metin "
+"olarak sorun.\n"
+"            - Kayıtları oluştururken veya güncellerken küçük alan seçimleri "
+"hakkında soru sormayın. Kullanıcının istediklerini etkilemediği sürece makul "
+"bir varsayılan kullanın.\n"
+"            - Kullanıcının en son mesajında zaten yanıtladığı bir soruyu "
+"asla sormayın. Belirli sayıda fikir, seçenek veya strateji isterlerse, tam "
+"olarak o sayıda sağlayın. Bu aracı sadece bunlardan birini veya daha "
+"fazlasını seçmeleri veya uygulamaları gerektiğinde kullanın; aksi takdirde "
+"doğrudan yanıtlayın.\n"
+"            ## ÇOKLU SEÇİM\n"
+"            - multi_select'i true olarak sadece kullanıcı bu soru için "
+"birden fazla yanıt/eylem seçebilecekse ve her seçenek kendi başına bağımsız "
+"olarak anlamlıysa ayarlayın.\n"
+"            - Bağımsız olarak uygulanabilir birçok eylemi birleştiren bir "
+"seçenek (örn. \"Kopyalama ve düzen iyileştirmelerini uygula\"), ayrı olması "
+"gereken seçenekleri daralttığınızın bir işaretidir: her bağımsız eylemi "
+"kendi seçeneğine bölün ve multi_select'i true yapın.\n"
+"            - multi_select tüm liste için bir bayraktır: sadece her seçenek "
+"bağımsız olarak seçilebilir olduğunda true yapın. Eğer herhangi bir seçenek "
+"geri kalanıyla birbirini dışlıyorsa, false bırakın.\n"
+"            - Herhangi bir seçenek kombinasyonu tutarlı kalmalıdır: "
+"bunlardan ikisini birlikte seçmek çatışırsa veya mantıksız gelirse, aynı "
+"listeye ait değillerdir.\n"
+"            ## SERBEST METNE İZİN VER\n"
+"            - Kullanıcının listelenmemiş bir yanıt sağlayabilmesi için çoğu "
+"araç çağrısında allow_free_text'i açıkça true olarak ayarlayın.\n"
+"            - Sadece eksiksiz, sabit bir geçerli yanıt kümesi için false "
+"olarak ayarlayın - örn. basit bir evet/hayır sorusu, sabit bir arama/sorgu "
+"sonuçları kümesinden bir kayıt seçme veya geçerli her değerin zaten "
+"listelendiği sabit bir enumdan seçim yapma. Bu durumlarda listelenen "
+"seçeneklerin dışında hiçbir şey geçerli bir yanıt değildir.\n"
+"            ## KULLANICI YANITI\n"
+"            - Kullanıcının yanıtı, yaptığınız herhangi bir şeyle devam etmek "
+"için onaydır. Soru esas olarak bir eylemi gerçekleştirmek için gereken "
+"bilgiyi almak için sorulduğunda, yanıta hemen göre hareket edin; sadece "
+"seçimi tekrarlayıp ayrı bir \"uygula\", \"yap\" veya \"onayla\" mesajı "
+"beklemeyin.\n"
+"            - Bir sonraki sıranız seçimle sınırlandırılmalıdır, sadece "
+"seçilenle ilerleyin.\n"
+"            - Sadece *yeni* bir bilgi parçası hala gerçekten eksikse takip "
+"sorusu sorun.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_generate_image
@@ -497,18 +718,26 @@ msgid ""
 "when the user clearly requests it.\n"
 "        "
 msgstr ""
+"\n"
+"Bu aracı asla önceden kullanmayın. Yalnızca kullanıcı açıkça bir resim "
+"oluşturulmasını istediğinde ve sahnenin ayrıntılarını verdiğinde kullanın. "
+"Yalnızca kullanıcı açıkça bir resim oluşturulmasını istediğinde kullanın.\n"
+"En-Boy Oranı: Kullanıcı açıkça bir en-boy oranı belirtmezse, varsayılan "
+"olarak 1:1 (kare) resim formatını kullanın. Yalnızca kullanıcı açıkça talep "
+"ettiğinde farklı bir en-boy oranı kullanın.\n"
+"        "
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "%(nb_records)s records (%(record_model)s)"
-msgstr ""
+msgstr "%(nb_records)s kayıt (%(record_model)s)"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_patch.js:0
 msgid "%(send_text)s (Enter)"
-msgstr ""
+msgstr "%(send_text)s (Giriş)"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_enhance_image
@@ -573,12 +802,12 @@ msgstr "<span>argümanlar ile</span>"
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
 msgid "A rule with this Action and Model combination already exists."
-msgstr ""
+msgstr "Bu İşlem ve Model kombinasyonuna sahip bir kural zaten mevcut."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_child_wait
 msgid "A session waiting for a child must retain its pending tool call."
-msgstr ""
+msgstr "Alt birimi bekleyen bir oturum, bekleyen araç çağrısını korumalıdır."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent__skill_ids
@@ -586,16 +815,18 @@ msgid ""
 "A skill includes instructions and tools that guide Odoo AI in helping the "
 "user complete their tasks."
 msgstr ""
+"Bir beceri, Odoo Yapay Zeka'nın kullanıcının görevlerini tamamlamasına "
+"yardımcı olması için rehberlik eden talimatlar ve araçlar içerir."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_interaction_wait
 msgid "A waiting AI interaction must retain its continuation data."
-msgstr ""
+msgstr "Bekleyen bir yapay zeka etkileşimi, devam verilerini korumalıdır."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_web_page_url_uniq
 msgid "A web page for this URL already exists."
-msgstr ""
+msgstr "Bu URL için bir web sayfası zaten mevcut."
 
 #. module: ai
 #. odoo-javascript
@@ -630,7 +861,7 @@ msgstr "Yapay Zeka Aracı Kaynağı"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__ai_sources_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__ai_sources_ids
 msgid "AI Agent Sources"
-msgstr ""
+msgstr "Yapay Zeka Temsilcisi Kaynakları"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_discuss_channel_ai_channel_type_check
@@ -641,17 +872,17 @@ msgstr "AI Agent yalnızca ai_chat veya livechat kanalları için ayarlanabilir.
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "AI Chat Settings"
-msgstr ""
+msgstr "Yapay Zeka Sohbet Ayarları"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_embedding_mixin
 msgid "AI Embedding Mixin"
-msgstr ""
+msgstr "Yapay Zeka Gömme Mixin"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_embed_records_ir_actions_server
 msgid "AI Embedding: Create records embedding"
-msgstr ""
+msgstr "Yapay Zeka Gömme: Kayıt gömme oluştur"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_generate_embedding_ir_actions_server
@@ -661,12 +892,14 @@ msgstr "Yapay Zeka Gömme: Gömme Oluşturma"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_update_deprecated_embedding_models_ir_actions_server
 msgid "AI Embedding: Update deprecated embedding models"
-msgstr ""
+msgstr "Yapay Zeka Gömme: Kullanımdan kaldırılan gömme modellerini güncelle"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_attachment_vacuum
 msgid "AI Generated Attachments that aren't used and should be autovacuumed"
 msgstr ""
+"Kullanılmayan ve otomatik olarak temizlenmesi gereken Yapay Zeka tarafından "
+"oluşturulmuş ekler"
 
 #. module: ai
 #. odoo-javascript
@@ -683,17 +916,17 @@ msgstr "Yapay Zeka Şeması"
 #. module: ai
 #: model:ir.model,name:ai.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "Yapay Zeka Oturumu"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_session_event
 msgid "AI Session Event"
-msgstr ""
+msgstr "Yapay Zeka Oturum Etkinliği"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_tool
 msgid "AI Tool"
-msgstr ""
+msgstr "Yapay Zeka Aracı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_description
@@ -705,128 +938,128 @@ msgstr "Yapay Zeka Aracı Açıklaması"
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_name
 #: model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_name
 msgid "AI Tool Name"
-msgstr ""
+msgstr "Yapay Zeka Araç Adı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_thinking_text
 #: model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_thinking_text
 msgid "AI Tool Thinking Text"
-msgstr ""
+msgstr "Yapay Zeka Aracı Düşünme Metni"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_adjust_search
 msgid "AI Tool: Adjust Search"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Aramayı Ayarla"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_compute_date
 msgid "AI Tool: Compute Date"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Tarihi Hesapla"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_compute_report_measures
 msgid "AI Tool: Compute Report Measures"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Rapor Ölçümlerini Hesapla"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_continue_session
 msgid "AI Tool: Continue Session"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Oturuma Devam Et"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_create_records
 msgid "AI Tool: Create Records"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Kayıt Oluştur"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_ai_generate_image
 msgid "AI Tool: Generate an Image"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Görsel Oluştur"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_get_fields
 msgid "AI Tool: Get Fields"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Alanları Al"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_get_menu_details
 msgid "AI Tool: Get Menu Details"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menü Detaylarını Getir"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_get_menus
 msgid "AI Tool: Get Menus"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menüleri Getir"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_get_models
 msgid "AI Tool: Get Models"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Modelleri Getir"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_load_skills
 msgid "AI Tool: Load Skills"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Yetenekleri Yükle"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_open_menu_graph
 msgid "AI Tool: Open Menu Graph"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menü Grafiğini Aç"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_open_menu_kanban
 msgid "AI Tool: Open Menu Kanban"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menü Kanban Görünümünü Aç"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_open_menu_list
 msgid "AI Tool: Open Menu List"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menü Listesini Aç"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_open_menu_pivot
 msgid "AI Tool: Open Menu Pivot"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Menü Pivot Görünümünü Aç"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_preview_records
 msgid "AI Tool: Prepare Record Previews"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Kayıt Önizlemelerini Hazırla"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_binary_content
 msgid "AI Tool: Read Binary Content"
-msgstr ""
+msgstr "Yapay Zeka Aracı: İkili İçeriği Oku"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_group
 msgid "AI Tool: Read group"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Grubu oku"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_run_view_action
 msgid "AI Tool: Run view action"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Görünüm eylemini çalıştır"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_search
 msgid "AI Tool: Search"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Ara"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_start_session
 msgid "AI Tool: Start Session"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Oturum Başlat"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_update_records
 msgid "AI Tool: Update Records"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Kayıtları Güncelle"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_ai_web_search
 msgid "AI Tool: Web Search"
-msgstr ""
+msgstr "Yapay Zeka Aracı: Web Arama"
 
 #. module: ai
 #. odoo-javascript
@@ -838,17 +1071,17 @@ msgstr "Yapay Zeka Araçları"
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_page
 msgid "AI Web Page"
-msgstr ""
+msgstr "Yapay Zeka Web Sayfası"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_scraper_batch
 msgid "AI Web Scraper Batch"
-msgstr ""
+msgstr "Yapay Zeka Web Kazıyıcı Toplu İşlemi"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_run_web_scraper_ir_actions_server
 msgid "AI Web Scraper: Run Batches"
-msgstr ""
+msgstr "Yapay Zeka Web Kazıyıcı: Toplu İşleri Çalıştır"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__discuss_channel__channel_type__ai_chat
@@ -866,6 +1099,8 @@ msgstr "Yapay zeka dinliyor..."
 #: model:ir.model,name:ai.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
 msgstr ""
+"Metin taslağı hazırlama için Yapay Zeka modeli yapılandırmaları (Varsayılan "
+"İstemi)."
 
 #. module: ai
 #. odoo-python
@@ -877,17 +1112,19 @@ msgstr "AI'ya ulaşılamıyor, AI Agent bulunamadı."
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "AI session expired. Please start a new session."
-msgstr ""
+msgstr "Yapay zeka oturumunun süresi doldu. Lütfen yeni bir oturum başlatın."
 
 #. module: ai
 #: model:ir.module.module,description:base.module_ai
 msgid "AI-related features are accessible with limited configurability."
 msgstr ""
+"Yapay zeka ile ilgili özelliklere sınırlı yapılandırılabilirlikle "
+"erişilebilir."
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_ask_user_question
 msgid "AI: Ask User Question"
-msgstr ""
+msgstr "Yapay Zeka: Kullanıcı Sorusu Sor"
 
 #. module: ai
 #. odoo-javascript
@@ -911,7 +1148,7 @@ msgstr "Eylem \"%(action)s\" tamamlandı."
 #. odoo-javascript
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
 msgid "Actions"
-msgstr ""
+msgstr "Aksiyonlar"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__active
@@ -938,7 +1175,7 @@ msgstr "Ekleyin"
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Add \"%(record_name)s\""
-msgstr ""
+msgstr "\"%(record_name)s\" ekle"
 
 #. module: ai
 #. odoo-javascript
@@ -974,13 +1211,13 @@ msgstr "Ai Aracı"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__ai_composer_id
 msgid "Ai Composer"
-msgstr ""
+msgstr "Yapay Zeka Oluşturucu"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session_event__ai_session_id
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__ai_session_ids
 msgid "Ai Session"
-msgstr ""
+msgstr "Yapay Zeka Oturumu"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_has_schema
@@ -1003,18 +1240,19 @@ msgstr "Ai Aracı Uyarı Göster"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__allowed_agent_ids
 msgid "Allowed Agents"
-msgstr ""
+msgstr "İzin Verilen Temsilciler"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_request_data
 msgid "An active AI exchange must retain its complete model request data."
 msgstr ""
+"Aktif bir Yapay Zeka alıverişi, tüm model talep verilerini saklamalıdır."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
 msgid "An error occurred"
-msgstr ""
+msgstr "Bir hata oluştu"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_summarize_chatter
@@ -1034,17 +1272,34 @@ msgid ""
 "- John answered that in that case, he would have to think about it before "
 "signing the deal"
 msgstr ""
+"message_ids alanında depolanan, sağlanan Chatter akışı metnini analiz edin.\n"
+"Sistem tarafından oluşturulan tüm metinleri (örn. durum değişiklikleri, "
+"dosya yükleme bildirimleri, zaman damgası günlükleri, alan güncellemeleri) "
+"kesinlikle göz ardı edin.\n"
+"Temel anlatıyı çıkarmak için yalnızca insanlar tarafından yazılmış mesajlara "
+"odaklanın.\n"
+"Her biri kısa bir cümle içeren, net madde işaretlerinden oluşan bir yönetici "
+"özeti hazırlayın.\n"
+"Madde işaretlerini etkileyici ve profesyonel tutun. Genel selamlamaları "
+"(örn. \"Merhaba\", \"Teşekkürler\") eklemeyin.\n"
+"\n"
+"Örnek: \n"
+"- John Doe, indirim alıp alamayacaklarını sordu\n"
+"- Marc Demo, sezonluk indirimin süresinin dolduğunu açıkladı\n"
+"- John, bu durumda anlaşmayı imzalamadan önce bunu düşünmesi gerektiğini "
+"söyledi"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_fields
 msgid "Analyzing model"
-msgstr ""
+msgstr "Model analiz ediliyor"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Approved automatically because auto-approval is enabled for this chat."
 msgstr ""
+"Bu sohbet için otomatik onay etkinleştirildiğinden otomatik olarak onaylandı."
 
 #. module: ai
 #. odoo-javascript
@@ -1052,6 +1307,8 @@ msgstr ""
 msgid ""
 "Are you sure you want to delete this AI chat? All its content will be lost."
 msgstr ""
+"Bu Yapay Zeka sohbetini silmek istediğinizden emin misiniz? Tüm içeriği "
+"kaybolacak."
 
 #. module: ai
 #. odoo-javascript
@@ -1083,12 +1340,12 @@ msgstr "Ek Parçaları Gömme"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Auto-Approve Actions"
-msgstr ""
+msgstr "Eylemleri Otomatik Onayla"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__auto_confirm
 msgid "Automatically confirm tool calls for the session"
-msgstr ""
+msgstr "Oturum için araç çağrılarını otomatik olarak onayla"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__available_prompt_ids
@@ -1103,7 +1360,7 @@ msgstr "Avatar"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__pending
 msgid "Awaiting transcription"
-msgstr ""
+msgstr "Metne dönüştürülmesi bekleniyor"
 
 #. module: ai
 #: model:ir.model,name:ai.model_base
@@ -1113,12 +1370,12 @@ msgstr "Temel"
 #. module: ai
 #: model:ir.module.module,summary:base.module_ai
 msgid "Base module for AI features"
-msgstr ""
+msgstr "Yapay zeka özellikleri için temel modül"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__uuid
 msgid "Batch UUID"
-msgstr ""
+msgstr "Toplu İş UUID"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_template__body_html
@@ -1131,65 +1388,67 @@ msgid ""
 "Built-in agents ship with a sequence below 10 to be listed first; custom "
 "agents default after them."
 msgstr ""
+"Yerleşik temsilciler, ilk sırada listelenmek üzere 10'un altında bir sıra "
+"ile gelir; özel temsilciler varsayılan olarak bunlardan sonra gelir."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_skill__is_native_skill
 msgid "Built-in skill with fixed behavior that cannot be edited."
-msgstr ""
+msgstr "Düzenlenemeyen sabit davranışa sahip yerleşik beceri."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_date
 msgid "Calculating the date range"
-msgstr ""
+msgstr "Tarih aralığının hesaplanması"
 
 #. module: ai
 #: model:ir.model,name:ai.model_mail_call_artifact
 msgid "Call Artifact"
-msgstr ""
+msgstr "Arama Nesnesi"
 
 #. module: ai
 #: model:ir.model,name:ai.model_call_transcription_mixin
 msgid "Call Transcription Mixin"
-msgstr ""
+msgstr "Arama Metne Dönüştürme Mixin"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__callback_model
 msgid "Callback Model"
-msgstr ""
+msgstr "Geri Arama Modeli"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Can not enable %(key1)s and %(key2)s at the same time"
-msgstr ""
+msgstr "Aynı anda %(key1)s ve %(key2)s etkinleştirilemez"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_patch.xml:0
 msgid "Cancel"
-msgstr ""
+msgstr "İptal"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Cancel (%(keyboard_command)s)"
-msgstr ""
+msgstr "İptal (%(keyboard_command)s)"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__channel_id
 msgid "Channel"
-msgstr ""
+msgstr "Kanal"
 
 #. module: ai
 #: model:ir.model,name:ai.model_discuss_channel_member
 msgid "Channel Member"
-msgstr ""
+msgstr "Kanal Üyesi"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Chat"
-msgstr ""
+msgstr "Sohbet"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_discuss_channel__channel_type
@@ -1204,12 +1463,12 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__checksum
 msgid "Checksum"
-msgstr ""
+msgstr "Sağlama Toplamı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__child_ids
 msgid "Child Sources"
-msgstr ""
+msgstr "Alt Kaynaklar"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__content
@@ -1237,7 +1496,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Confirm"
-msgstr ""
+msgstr "Onayla"
 
 #. module: ai
 #: model:ir.model,name:ai.model_res_partner
@@ -1247,7 +1506,7 @@ msgstr "Kontak"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__content
 msgid "Content"
-msgstr ""
+msgstr "İçerik"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_compose_message__body
@@ -1258,17 +1517,17 @@ msgstr "İçerikler"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__default_prompt
 msgid "Context"
-msgstr ""
+msgstr "Bağlam"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_continue_session
 msgid "Continuing an agent"
-msgstr ""
+msgstr "Bir temsilciye devam ediliyor"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__channel_type
 msgid "Conversation Type"
-msgstr ""
+msgstr "Konuşma Türü"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_prompt_shortcut
@@ -1281,6 +1540,7 @@ msgstr "E-postadaki bir istemi dönüştürme"
 msgid ""
 "Convert to text (%(keyboard_command_1)s) or Send (%(keyboard_command_2)s)"
 msgstr ""
+"Metne dönüştür (%(keyboard_command_1)s) veya Gönder (%(keyboard_command_2)s)"
 
 #. module: ai
 #. odoo-python
@@ -1302,6 +1562,8 @@ msgid ""
 "Create a skill that leverages instructions and tools to direct Odoo AI in "
 "assisting the user with their tasks."
 msgstr ""
+"Odoo Yapay Zeka'nın, kullanıcının görevlerine yardımcı olması için "
+"talimatlardan ve araçlardan yararlanan bir beceri oluşturun."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_create_records
@@ -1317,6 +1579,16 @@ msgid ""
 "link (used in multiple records creation only)\n"
 "            - values: the list of records to create with their fields values."
 msgstr ""
+"Kayıtları oluştur\n"
+"        Bu araç, veritabanında yeni kayıtlar oluşturmak için kullanılır. Üç "
+"ana parametre sunar:\n"
+"            - explanation: Araç çağrısını, kullanıcıdan ONAY isteyen bir "
+"soru ile açıklayan bir mesaj.\n"
+"            - model_name: kayıt oluşturulacak modelin teknik adı\n"
+"            - preview_menu_id: bağlantı oluşturmak için kullanılacak menünün "
+"kimliği (yalnızca çoklu kayıt oluşturmada kullanılır)\n"
+"            - values: alan değerleriyle birlikte oluşturulacak kayıtların "
+"listesi."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__create_uid
@@ -1357,18 +1629,18 @@ msgstr ""
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_create_records
 msgid "Creating some records"
-msgstr ""
+msgstr "Bazı kayıtlar oluşturuluyor"
 
 #. module: ai
 #: model:iap.service,unit_name:ai.iap_service_odoo_ai
 msgid "Credits"
-msgstr ""
+msgstr "Krediler"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Current record"
-msgstr ""
+msgstr "Geçerli kayıt"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent__system_prompt
@@ -1382,6 +1654,8 @@ msgid ""
 "Declined by the user. Do not attempt to run this sub-agent again unless "
 "explicitly instructed."
 msgstr ""
+"Kullanıcı tarafından reddedildi. Açıkça talimat verilmedikçe bu alt "
+"temsilciyi tekrar çalıştırmayı denemeyin."
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_prompt_button
@@ -1389,6 +1663,8 @@ msgid ""
 "Default action prompt that can be attached to AI UI rules for quick access "
 "by the user."
 msgstr ""
+"Kullanıcı tarafından hızlı erişim için Yapay Zeka kullanıcı arayüzü "
+"kurallarına eklenebilen varsayılan işlem istemi."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_start_session
@@ -1396,12 +1672,14 @@ msgid ""
 "Delegate a focused task to an allowed agent. Returns its final answer and "
 "session ID."
 msgstr ""
+"Odaklanmış bir görevi izin verilen bir temsilciye devredin. Nihai cevabını "
+"ve oturum kimliğini döndürür."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/thread_actions_patch.js:0
 msgid "Delete AI chat"
-msgstr ""
+msgstr "Yapay Zeka sohbetini sil"
 
 #. module: ai
 #. odoo-javascript
@@ -1425,7 +1703,7 @@ msgstr "Metin dikte etme veya toplantı kaydetme"
 #: model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__dirty
 #: model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__dirty
 msgid "Dirty"
-msgstr ""
+msgstr "Kaba"
 
 #. module: ai
 #. odoo-javascript
@@ -1444,7 +1722,7 @@ msgstr "Mesajlaşma Kanalı"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
 msgid "Dismiss"
-msgstr ""
+msgstr "Reddet"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__display_name
@@ -1480,12 +1758,12 @@ msgstr "İsim Göster"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__done
 msgid "Done"
-msgstr ""
+msgstr "Yapıldı"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__done
 msgid "Done transcribing"
-msgstr ""
+msgstr "Metne dönüştürme tamamlandı"
 
 #. module: ai
 #. odoo-javascript
@@ -1497,7 +1775,7 @@ msgstr "Düzenle"
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
 msgid "Edit Prompt"
-msgstr ""
+msgstr "İstemi Düzenle"
 
 #. module: ai
 #. odoo-javascript
@@ -1508,7 +1786,7 @@ msgstr "Düzenleyici"
 #. module: ai
 #: model:ir.model,name:ai.model_mail_template
 msgid "Email Template"
-msgstr ""
+msgstr "E-posta Şablonu"
 
 #. module: ai
 #: model:ir.model,name:ai.model_mail_thread
@@ -1526,7 +1804,7 @@ msgstr "Gömme Modeli"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_status
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_status
 msgid "Embedding Status"
-msgstr ""
+msgstr "Gömme Durumu"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_vector
@@ -1536,39 +1814,39 @@ msgstr "Gömme Vektörü"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_error
 msgid "Embedding error"
-msgstr ""
+msgstr "Gömme hatası"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_resources_only
 msgid "Enable resource restriction for the session"
-msgstr ""
+msgstr "Oturum için kaynak kısıtlamasını etkinleştir"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_think_longer
 msgid "Enable think longer option for the session"
-msgstr ""
+msgstr "Oturum için daha uzun düşünme seçeneğini etkinleştir"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_web_search
 msgid "Enable web search capability for the session"
-msgstr ""
+msgstr "Oturum için web arama yeteneğini etkinleştir"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skill %s"
-msgstr ""
+msgstr "Etkinleştirilmiş Beceri %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skills %s"
-msgstr ""
+msgstr "Etkinleştirilmiş Beceriler %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__error
 msgid "Error"
-msgstr ""
+msgstr "Hata"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__error_details
@@ -1578,12 +1856,12 @@ msgstr "Hata Detayları"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__error
 msgid "Error, could not transcribe"
-msgstr ""
+msgstr "Hata, metne dönüştürülemedi"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__event_ids
 msgid "Event"
-msgstr ""
+msgstr "Etkinlik"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__failed
@@ -1604,25 +1882,26 @@ msgid ""
 "Failed to extract content from the attachment. Content must be at least 10 "
 "character long."
 msgstr ""
+"Ekteki içerik ayıklanamadı. İçerik en az 10 karakter uzunluğunda olmalıdır."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to fetch the content of this URL."
-msgstr ""
+msgstr "Bu URL'nin içeriği alınamadı."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process the content of this URL."
-msgstr ""
+msgstr "Bu URL'nin içeriği işlenemedi."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process this URL."
-msgstr ""
+msgstr "Bu URL işlenemedi."
 
 #. module: ai
 #. odoo-python
@@ -1631,17 +1910,19 @@ msgid ""
 "Failed to retrieve web page content. Content must be at least 10 characters "
 "long."
 msgstr ""
+"Web sayfası içeriği alınamadı. İçerik en az 10 karakter uzunluğunda "
+"olmalıdır."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to submit this URL for processing."
-msgstr ""
+msgstr "Bu URL işlenmek üzere gönderilemedi."
 
 #. module: ai
 #: model:ir.model,name:ai.model_ir_model_fields
 msgid "Field"
-msgstr ""
+msgstr "Alan"
 
 #. module: ai
 #. odoo-javascript
@@ -1652,12 +1933,12 @@ msgstr "Alan Seçici"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_model_fields__ttype
 msgid "Field Type"
-msgstr ""
+msgstr "Alan Türü"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_session__state
 msgid "Field that can be used to store data between tool calls"
-msgstr ""
+msgstr "Araç çağrıları arasında veri depolamak için kullanılabilecek alan"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__type__binary
@@ -1673,23 +1954,23 @@ msgstr "Dosya Boyutu"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "Filters"
-msgstr ""
+msgstr "Filtreler"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menu_details
 msgid "Finding the best view"
-msgstr ""
+msgstr "En iyi görünüm bulunuyor"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/core/html_editor/file_selector/file_selector_control_panel_patch.xml:0
 msgid "Generate Image with AI"
-msgstr ""
+msgstr "Yapay Zeka ile Görsel Oluştur"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__media_dialog
 msgid "Generate images inside the media manager"
-msgstr ""
+msgstr "Medya yöneticisi içinde görseller oluşturun"
 
 #. module: ai
 #. odoo-javascript
@@ -1701,7 +1982,7 @@ msgstr "Yapay zeka ile içerik oluşturun veya dönüştürün"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Generated image %s"
-msgstr ""
+msgstr "Oluşturulan görsel %s"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_customer_new_jersey
@@ -1712,11 +1993,16 @@ msgid ""
 "the name and email fields. Use the provided field names and don't search for "
 "the fields of res.partner model."
 msgstr ""
+"New Jersey'deki kontak listesini alın. Çıktı: Her bir öğenin \"Ad (E-posta)"
+"\" biçiminde olduğu, düzgün biçimlendirilmiş liste\n"
+"Verimlilik Notu: res.partner modelinde state_id.name aracılığıyla arama "
+"yapın ve ad ile e-posta alanlarını alın. Sağlanan alan adlarını kullanın ve "
+"res.partner modelinin alanlarını aramayın."
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__file_viewer_ai_button
 msgid "Get help on a file attachment"
-msgstr ""
+msgstr "Dosya eki konusunda yardım alın"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__chatter_ai_button
@@ -1726,7 +2012,7 @@ msgstr "Bir kayıt için yardım alın"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_load_skills
 msgid "Getting ready"
-msgstr ""
+msgstr "Hazırlanıyor"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__has_embedding_generation_failed
@@ -1736,12 +2022,12 @@ msgstr "Gömme Üretimi Başarısız mı Oldu"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__has_media_output
 msgid "Has Media Output"
-msgstr ""
+msgstr "Medya Çıktısı Var"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_call_history__has_transcript
 msgid "Has Transcript"
-msgstr ""
+msgstr "Transkript Var"
 
 #. module: ai
 #. odoo-javascript
@@ -1752,12 +2038,12 @@ msgstr "Merhaba, size nasıl yardımcı olabilirim?"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__hide_model_selection
 msgid "Hide Model Selection"
-msgstr ""
+msgstr "Model Seçimini Gizle"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__hide_prompt_button_page
 msgid "Hide Prompt Button Page"
-msgstr ""
+msgstr "Yönlendirme Düğmesini Gizle Sayfası"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__id
@@ -1800,6 +2086,12 @@ msgid ""
 "visually explicit image that reinterprets the same subject within a new, "
 "contextually meaningful scenario."
 msgstr ""
+"Referans bir resim varsa, bunu yalnızca konuyla ilgili kesin bir görsel "
+"dayanak olarak değerlendirin. Referans resim yoksa,\n"
+"metinsel açıklamayı ve mevcut bağlamı kullanarak konunun görünümünü kesin "
+"olarak tanımlayın. Göreviniz, aynı konuyu yeni ve bağlamsal olarak anlamlı "
+"bir senaryo içinde yeniden yorumlayan, yüksek kaliteli,\n"
+"görsel olarak açık bir resim oluşturmaktır."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent__restrict_to_sources
@@ -1820,7 +2112,7 @@ msgstr "Görsel"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__incomplete
 msgid "Incomplete"
-msgstr ""
+msgstr "Eksik"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__indexed
@@ -1839,6 +2131,8 @@ msgid ""
 "Indicates if this artifact is for Speech-to-Text (STT). If set, the media "
 "will be converted to a transcript."
 msgstr ""
+"Bu ögenin Konuşmadan Metne (STT) dönüştürme için olup olmadığını belirtir. "
+"Ayarlanırsa, medya bir transkripte dönüştürülür."
 
 #. module: ai
 #. odoo-javascript
@@ -1892,12 +2186,12 @@ msgstr "Geçersiz Kayıt"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_skill__is_native_skill
 msgid "Is Native Skill"
-msgstr ""
+msgstr "Yerel Beceri"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__is_stt
 msgid "Is STT Artifact"
-msgstr ""
+msgstr "STT Ögesi"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__is_system_default
@@ -1925,14 +2219,14 @@ msgstr ""
 #. module: ai
 #: model:ir.model,name:ai.model_discuss_call_history
 msgid "Keep the call history"
-msgstr ""
+msgstr "Arama geçmişini saklayın"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
 #: model:ir.model.fields,field_description:ai.field_ai_prompt_button__lang
 msgid "Language"
-msgstr ""
+msgstr "Dil"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__write_uid
@@ -1968,7 +2262,7 @@ msgstr "Son Güncelleme"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_patch.js:0
 msgid "Listening…"
-msgstr ""
+msgstr "Dinleniyor…"
 
 #. module: ai
 #. odoo-javascript
@@ -1986,12 +2280,12 @@ msgstr "Not olarak kaydet"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Looked up fields on %s"
-msgstr ""
+msgstr "Üzerindeki alanlar arandı: %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__loop_state
 msgid "Loop State"
-msgstr ""
+msgstr "Döngü Durumu"
 
 #. module: ai
 #: model:ir.model,name:ai.model_mail_composer_mixin
@@ -2012,12 +2306,12 @@ msgstr "Maksimum Uzunluk"
 #. module: ai
 #: model:ir.model,name:ai.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "Mesaj"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__message_body_suffix
 msgid "Message Body Suffix"
-msgstr ""
+msgstr "İleti Gövdesi Soneki"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__mimetype
@@ -2034,13 +2328,13 @@ msgstr "%(name)s için eksik tanım"
 #: model:ir.model.fields,field_description:ai.field_ai_composer__focused_model_id
 #: model:ir.model.fields,field_description:ai.field_ai_session__res_model
 msgid "Model"
-msgstr ""
+msgstr "Model"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "My Recent Chats"
-msgstr ""
+msgstr "Son Sohbetlerim"
 
 #. module: ai
 #. odoo-javascript
@@ -2053,49 +2347,49 @@ msgstr "Adı"
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be created."
-msgstr ""
+msgstr "Yerel beceriler oluşturulamaz."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be deleted."
-msgstr ""
+msgstr "Yerel beceriler silinemez."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be modified."
-msgstr ""
+msgstr "Yerel beceriler değiştirilemez."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
 msgid "New chat started."
-msgstr ""
+msgstr "Yeni sohbet başlatıldı."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No AI Chats yet."
-msgstr ""
+msgstr "Henüz Yapay Zeka sohbeti yok."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_fields_tools.py:0
 msgid "No allowed values are provided in the prompt."
-msgstr ""
+msgstr "Komut isteminde izin verilen değerler belirtilmemiştir."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "No attached sources found for this source folder."
-msgstr ""
+msgstr "Bu kaynak klasörü için ekli kaynak bulunamadı."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "No text content could be extracted from this URL."
-msgstr ""
+msgstr "Bu URL'den herhangi bir metin içeriği çıkarılamadı."
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ai_log_action
@@ -2106,25 +2400,25 @@ msgstr "Hiçbir araç infaz edilmemiştir."
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "No, I want something else"
-msgstr ""
+msgstr "Hayır, başka bir şey istiyorum"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "None"
-msgstr ""
+msgstr "Hiçbiri"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0 code:addons/ai/utils/ai_utils.py:0
 msgid "Not enough credits to use Odoo AI"
-msgstr ""
+msgstr "Odoo Yapay Zeka kullanmak için yeterli kredi yok"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Not enough credits to use Odoo AI."
-msgstr ""
+msgstr "Odoo Yapay Zeka kullanmak için yeterli kredi yok."
 
 #. module: ai
 #. odoo-javascript
@@ -2139,6 +2433,7 @@ msgid ""
 "Notifications collected during a turn, that will be shown after the final "
 "response"
 msgstr ""
+"Bir tur sırasında toplanan ve nihai yanıttan sonra gösterilecek bildirimler"
 
 #. module: ai
 #. odoo-python
@@ -2147,24 +2442,27 @@ msgid ""
 "Number of successive API calls exceeded, please try again with a more "
 "precise request."
 msgstr ""
+"Arka arkaya yapılan API çağrısı sayısı aşıldı, lütfen daha kesin bir istekle "
+"tekrar deneyin."
 
 #. module: ai
 #: model:iap.service,description:ai.iap_service_odoo_ai
 #: model:iap.service,name:ai.iap_service_odoo_ai
 msgid "Odoo AI"
-msgstr ""
+msgstr "Odoo Yapay Zeka"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Odoo AI failed to index this source."
-msgstr ""
+msgstr "Odoo Yapay Zeka bu kaynağı indeksleyemedi."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Odoo AI is currently unreachable. Please try again later."
 msgstr ""
+"Odoo Yapay Zeka şu anda ulaşılamaz durumda. Lütfen daha sonra tekrar deneyin."
 
 #. module: ai
 #. odoo-python
@@ -2176,43 +2474,43 @@ msgstr "URL'lerden yalnızca yöneticiler kaynak oluşturabilir."
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Only internal users can view tool parameters."
-msgstr ""
+msgstr "Araç parametrelerini yalnızca dahili kullanıcılar görüntüleyebilir."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/file_viewer/file_viewer.js:0
 msgid "Oops, AI cannot process videos!"
-msgstr ""
+msgstr "Hata, Yapay Zeka videoları işleyemez!"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_fields_tools.py:0
 msgid "Oops, an unexpected error occurred."
-msgstr ""
+msgstr "Oops, beklenmedik bir hata oluştu."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Oops, it looks like our AI is unreachable"
-msgstr ""
+msgstr "Hay aksi, Yapay Zeka özelliğimize şu an ulaşılamıyor!"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_fields_tools.py:0
 msgid "Oops, the connection failed."
-msgstr ""
+msgstr "Oops, bağlantı başarısız oldu."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_fields_tools.py:0
 msgid "Oops, the request timed out."
-msgstr ""
+msgstr "Oops, istek zaman aşımına uğradı."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_fields_tools.py:0
 msgid "Oops, the response could not be processed."
-msgstr ""
+msgstr "Oops, yanıt işlenemedi."
 
 #. module: ai
 #. odoo-python
@@ -2221,36 +2519,38 @@ msgid ""
 "Oops, the tool name is incorrect. The tool name must only contain letters (a–"
 "z, A–Z), digits (0–9), or underscores (_), and be at most 64 characters long."
 msgstr ""
+"Hata, araç adı hatalı. Araç adı yalnızca harfler (a–z, A–Z), rakamlar (0–9) "
+"veya alt çizgiler (_) içermeli ve en fazla 64 karakter uzunluğunda olmalıdır."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened %s"
-msgstr ""
+msgstr "Açıldı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the graph view for %s"
-msgstr ""
+msgstr "Şunun için grafik görünümü açıldı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the kanban view for %s"
-msgstr ""
+msgstr "Şunun için kanban görünümü açıldı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the list view for %s"
-msgstr ""
+msgstr "Şunun için liste görünümü açıldı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the pivot view for %s"
-msgstr ""
+msgstr "Şunun için pivot görünümü açıldı: %s"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__lang
@@ -2260,21 +2560,25 @@ msgid ""
 "usually be a placeholder expression that provides the appropriate language, "
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
+"Bir e-posta gönderirken seçmek için isteğe bağlı çeviri dili (ISO kodu). "
+"Ayarlanmazsa, ana ortağın dili kullanılacaktır. Bu genellikle uygun dili "
+"sağlayan bir yer tutucu ifade olmalıdır, örneğin {{ object.partner_id.lang }}"
+"."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_path
 msgid "Parent Path"
-msgstr ""
+msgstr "Üst Yol"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__parent_session_id
 msgid "Parent Session"
-msgstr ""
+msgstr "Üst Oturum"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_id
 msgid "Parent Source"
-msgstr ""
+msgstr "Ana Kaynak"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__partner_id
@@ -2284,32 +2588,32 @@ msgstr "İş Ortağı"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_graph
 msgid "Preparing your Graph view"
-msgstr ""
+msgstr "Grafik görünümünüzü hazırlama"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_kanban
 msgid "Preparing your Kanban view"
-msgstr ""
+msgstr "Kanban görünümünüzü hazırlama"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_list
 msgid "Preparing your List view"
-msgstr ""
+msgstr "Liste görünümünüzü hazırlama"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_pivot
 msgid "Preparing your Pivot view"
-msgstr ""
+msgstr "Pivot görünümünüzü hazırlama"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_update_records
 msgid "Preparing your update"
-msgstr ""
+msgstr "Güncellemeniz hazırlanıyor"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_run_view_action
 msgid "Preparing your view"
-msgstr ""
+msgstr "Görünümünüz hazırlanıyor"
 
 #. module: ai
 #. odoo-javascript
@@ -2320,7 +2624,7 @@ msgstr "Güzel Düzenleme"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_preview_records
 msgid "Previewing records"
-msgstr ""
+msgstr "Kayıtlar önizleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__processing
@@ -2356,12 +2660,12 @@ msgstr "\"AI\" eylemi tarafından kullanılan istem"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_read_binary_content
 msgid "Reading binary content"
-msgstr ""
+msgstr "İkili içerik okunuyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__ready
 msgid "Ready"
-msgstr ""
+msgstr "Hazır"
 
 #. module: ai
 #. odoo-javascript
@@ -2374,7 +2678,7 @@ msgstr "Kayıt"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_ids
 msgid "Record embedding ids"
-msgstr ""
+msgstr "Kayıt gömme kimlikleri"
 
 #. module: ai
 #. odoo-javascript
@@ -2386,12 +2690,12 @@ msgstr "Kayıt Seçici"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Refined the search on %s"
-msgstr ""
+msgstr "Şu öğe üzerinde arama daraltıldı: %s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_adjust_search
 msgid "Refining search filters"
-msgstr ""
+msgstr "Arama filtrelerini daraltma"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_regenerate_image
@@ -2426,69 +2730,97 @@ msgid ""
 "remain the dominant focal point of the image\n"
 "at all times."
 msgstr ""
+"Son oluşturulan versiyondan açık ve net bir şekilde farklı olmasını "
+"sağlayarak önceki görüntüyü yeniden oluşturun.\n"
+"Yeni görüntü, küçük bir varyasyon veya neredeyse aynısı olmamalıdır.\n"
+"\n"
+"Özgünlüğü ve önceki görüntüden net bir ayrımı garanti etmek için "
+"kompozisyon, perspektif, kamera açısı, kadraj, ışık koşulları, renk paleti,\n"
+"ortam ve genel atmosfer gibi önemli görsel değişiklikler yapın.\n"
+"\n"
+"Tüm görsel değişiklikler bağlamsal olarak anlamlı olmalı ve konunun gerçek "
+"dünyadaki amacı veya kullanım senaryosuyla doğrudan ilişkili olmalıdır.\n"
+"Çevredeki ortam, atmosfer ve görsel işleme, konuyu keyfi, dekoratif veya "
+"alakasız bir ortama yerleştirmek yerine,\n"
+"konunun nasıl kullanıldığını, deneyimlendiğini veya onunla nasıl etkileşim "
+"kurulduğunu aktif olarak göstermelidir.\n"
+"\n"
+"En önemlisi, görüntünün ana konusu, kullanıcıyla devam eden\n"
+"sohbette belirlenen konuyla tam olarak aynı kalmalıdır. Tüm belirleyici "
+"özellikleri koruyun. Konuyu uydurmayın, değiştirmeyin, yeniden yorumlamayın "
+"veya kaydırmayın.\n"
+"Konunun halihazırda bir parçası olmayan yeni ana nesneler, karakterler, "
+"temalar veya anlatı öğeleri\n"
+"eklemeyin.\n"
+"\n"
+"Amaç, aynı konuyu taze ve işlevsel temelli bir görsel senaryoda yeniden "
+"hayal etmektir; yeni bir\n"
+"konu yaratmak, süreklilik uydurmak veya alakasız öğeler eklemek değildir. "
+"Konu, her zaman görüntünün\n"
+"baskın odak noktası olarak kalmalıdır."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Remove \"%(record_name)s\""
-msgstr ""
+msgstr "\"%(record_name)s\" ögesini kaldır"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Remove all"
-msgstr ""
+msgstr "Hepsini kaldır"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_prompt_button__render_model
 msgid "Rendering Model"
-msgstr ""
+msgstr "İşleme Modeli"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Replace all by %(new_relations)s"
-msgstr ""
+msgstr "Tümünü şu ile değiştir: %(new_relations)s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_context
 msgid "Request Context"
-msgstr ""
+msgstr "İstek Bağlamı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_guest_id
 msgid "Request Guest"
-msgstr ""
+msgstr "İstek Misafiri"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_payload
 msgid "Request Payload"
-msgstr ""
+msgstr "İstek Yükü"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_round
 msgid "Request Round"
-msgstr ""
+msgstr "İstek Turu"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_round_limit
 msgid "Request Round Limit"
-msgstr ""
+msgstr "İstek Turu Sınırı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_user_id
 msgid "Request User"
-msgstr ""
+msgstr "İstek Kullanıcısı"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_uuid
 msgid "Request Uuid"
-msgstr ""
+msgstr "Talep UUID"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_webhook_secret
 msgid "Request Webhook Secret"
-msgstr ""
+msgstr "İstek Webhook Gizli Anahtarı"
 
 #. module: ai
 #. odoo-javascript
@@ -2499,7 +2831,7 @@ msgstr "Zorunlu"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__res_id
 msgid "Res"
-msgstr ""
+msgstr "Devam Et"
 
 #. module: ai
 #. odoo-javascript
@@ -2511,52 +2843,53 @@ msgstr "Kaynaklarla Sınırla"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__resume_token
 msgid "Resume Token"
-msgstr ""
+msgstr "Devam Etme Jetonu"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
 msgid "Resume previous chat"
-msgstr ""
+msgstr "Önceki sohbeti devam ettir"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved available measures for %s"
-msgstr ""
+msgstr "Şunun için mevcut ölçümler alındı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved menu details"
-msgstr ""
+msgstr "Menü detayları alındı"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved menus"
-msgstr ""
+msgstr "Menüler alındı"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved models"
-msgstr ""
+msgstr "Modeller alındı"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_load_skills
 msgid "Retrieves detailed information about skills, given a list of ids."
 msgstr ""
+"Bir kimlik listesi verildiğinde, beceriler hakkında ayrıntılı bilgi alır."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menus
 msgid "Retrieving menus"
-msgstr ""
+msgstr "Menüler alınıyor"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_models
 msgid "Retrieving models"
-msgstr ""
+msgstr "Modeller alınıyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_field_text_select
@@ -2580,33 +2913,35 @@ msgid ""
 "Scraped web page this source's content is fetched from, when the source type "
 "is 'url'."
 msgstr ""
+"Kaynak türü 'url' olduğunda bu kaynağın içeriğinin alındığı taranmış web "
+"sayfası."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__result
 msgid "Scraper Result"
-msgstr ""
+msgstr "Tarayıcı Sonucu"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Searched records in %s"
-msgstr ""
+msgstr "Şu konumda kayıtlar arandı: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Searched the web: %s"
-msgstr ""
+msgstr "İnternette arandı: %s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_search
 msgid "Searching the database"
-msgstr ""
+msgstr "Veritabanında arama"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_ai_web_search
 msgid "Searching the web"
-msgstr ""
+msgstr "Web aranıyor"
 
 #. module: ai
 #. odoo-javascript
@@ -2617,13 +2952,13 @@ msgstr "Bir kayıt seçin"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_report_measures
 msgid "Selecting the best measure"
-msgstr ""
+msgstr "En uygun ölçüyü seçme"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Send (%(keyboard_command)s)"
-msgstr ""
+msgstr "Gönder (%(keyboard_command)s)"
 
 #. module: ai
 #. odoo-javascript
@@ -2636,6 +2971,7 @@ msgstr "Mesaj Gönderin"
 msgid ""
 "Send another message to an idle direct child, retaining its conversation."
 msgstr ""
+"Boştaki doğrudan alt öğeye, konuşmasını koruyarak başka bir mesaj gönder."
 
 #. module: ai
 #. odoo-javascript
@@ -2676,53 +3012,55 @@ msgstr "Bunun ne işe yaradığına dair kısa açıklama"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Show Steps"
-msgstr ""
+msgstr "Adımları Göster"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__show_agent_steps
 msgid "Show agent steps"
-msgstr ""
+msgstr "Temsilci adımlarını göster"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__skill_ids
 msgid "Skills"
-msgstr ""
+msgstr "Yetenekler"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Skip"
-msgstr ""
+msgstr "Atla"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__skipped
 msgid "Skipped"
-msgstr ""
+msgstr "Bir soru cevapsız ve atlandı"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Some of the attached sources of this folder failed to be processed."
-msgstr ""
+msgstr "Bu klasörün ekli kaynaklarından bazıları işlenemedi."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Something else"
-msgstr ""
+msgstr "Başka bir şey"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Something went wrong. Please rephrase your prompt and try again."
 msgstr ""
+"Bir şeyler yanlış gitti. Lütfen isteminizi yeniden ifade edin ve tekrar "
+"deneyin."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__is_folder
 msgid "Source is a folder"
-msgstr ""
+msgstr "Kaynak bir klasördür"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__sources_ids
@@ -2733,7 +3071,7 @@ msgstr "Kaynaklar"
 #. odoo-javascript
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
 msgid "Start"
-msgstr ""
+msgstr "Başla"
 
 #. module: ai
 #. odoo-javascript
@@ -2750,13 +3088,13 @@ msgstr "Görüşmenin gerçek zamanlı dökümünü almak için kaydı başlatı
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_start_session
 msgid "Starting an agent"
-msgstr ""
+msgstr "Temsilci başlatılıyor"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__state
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__state
 msgid "State"
-msgstr ""
+msgstr "İl/Eyalet"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__status
@@ -2767,13 +3105,13 @@ msgstr "Durum"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/thread_patch.xml:0
 msgid "Steps taken"
-msgstr ""
+msgstr "Atılan adımlar"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
 msgid "Stop"
-msgstr ""
+msgstr "Durdur"
 
 #. module: ai
 #. odoo-javascript
@@ -2784,12 +3122,12 @@ msgstr "Kaydı Durdur"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__submitted_on
 msgid "Submission Date"
-msgstr ""
+msgstr "Teslim Tarihi"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__submitted
 msgid "Submitted"
-msgstr ""
+msgstr "Gönderildi"
 
 #. module: ai
 #. odoo-javascript
@@ -2835,19 +3173,19 @@ msgstr "Metin Seçimi"
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI is already responding in this chat."
-msgstr ""
+msgstr "Yapay Zeka bu sohbette halihazırda yanıt veriyor."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI is still waiting for its agents."
-msgstr ""
+msgstr "Yapay Zeka hala aracılarını bekliyor."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI prompt message was not found."
-msgstr ""
+msgstr "Yapay Zeka komut mesajı bulunamadı."
 
 #. module: ai
 #. odoo-python
@@ -2856,11 +3194,13 @@ msgid ""
 "The AI used too many successive tool rounds. Please try a more precise "
 "request."
 msgstr ""
+"Yapay Zeka çok fazla art arda araç turu kullandı. Lütfen daha kesin bir "
+"talep deneyin."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__res_id
 msgid "The ID of a linked record."
-msgstr ""
+msgstr "Bağlantılı bir kaydın kimliği."
 
 #. module: ai
 #. odoo-python
@@ -2873,22 +3213,24 @@ msgstr "'%s' eylemi bir yapay zeka aracı olarak kullanılamaz."
 #: code:addons/ai/models/ir_actions_server.py:0
 msgid "The action '%s' must have an AI Tool Name when used as an AI tool."
 msgstr ""
+"'%s' eylemi, yapay zeka aracı olarak kullanıldığında bir Yapay Zeka Araç "
+"Adına sahip olmalıdır."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_valid_request_round
 msgid "The active AI request round must be within its exchange limit."
-msgstr ""
+msgstr "Aktif Yapay Zeka istek turu, değişim sınırı içinde olmalıdır."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_request_uuid_unique
 msgid "The active IAP request UUID must be unique."
-msgstr ""
+msgstr "Aktif IAP istek UUID'si benzersiz olmalıdır."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "The attached sources could not be processed."
-msgstr ""
+msgstr "Ekteki kaynaklar işlenemedi."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_composer__name
@@ -2898,7 +3240,7 @@ msgstr "Arayüz bileşeninin aracı kuralı için tanımlayıcısı"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__res_model
 msgid "The model of a linked record"
-msgstr ""
+msgstr "Bağlantılı bir kaydın modeli"
 
 #. module: ai
 #. odoo-javascript
@@ -2915,24 +3257,24 @@ msgstr "Bir YZ aracısına bağlı ortak değiştirilemez"
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__prompt
 msgid "The prompt that will be sent to the AI when the button is clicked"
-msgstr ""
+msgstr "Düğmeye tıklandığında Yapay Zeka'ya gönderilecek komut"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "The record linked to the session was not found."
-msgstr ""
+msgstr "Oturumla bağlantılı kayıt bulunamadı."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "The session tree has reached its active-session limit."
-msgstr ""
+msgstr "Oturum ağacı, aktif oturum sınırına ulaştı."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__name
 msgid "The text shown on the button"
-msgstr ""
+msgstr "Düğmede gösterilen metin"
 
 #. module: ai
 #. odoo-python
@@ -2959,12 +3301,13 @@ msgstr ""
 msgid ""
 "The value of parameter '%(name)s' doesn't match any of the expected schemas."
 msgstr ""
+"'%(name)s Parametresinin değeri, beklenen şemalardan hiçbiriyle eşleşmiyor."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/tools_schema/validators.py:0
 msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
-msgstr ""
+msgstr "'%(name)s' parametresinin değeri en az %(minimum)s olmalıdır."
 
 #. module: ai
 #. odoo-python
@@ -2973,48 +3316,52 @@ msgid ""
 "The web grounding option is not supported with tools. Use the web search "
 "skill instead."
 msgstr ""
+"Web tabanlı kaynak gösterme seçeneği araçlarla desteklenmez. Bunun yerine "
+"web arama becerisini kullanın."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "These attachments are not available to this session."
-msgstr ""
+msgstr "Bu ekler bu oturum için mevcut değildir."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Think Longer"
-msgstr ""
+msgstr "Daha Uzun Düşün"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/thread_patch.xml:0
 msgid "Thinking"
-msgstr ""
+msgstr "düşünüyor"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "This AI confirmation choice is no longer available."
-msgstr ""
+msgstr "Bu Yapay Zeka onay seçeneği artık mevcut değil."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "This AI interaction is not available."
-msgstr ""
+msgstr "Bu Yapay Zeka etkileşimi mevcut değil."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "This AI question response is not valid."
-msgstr ""
+msgstr "Bu Yapay Zeka soru yanıtı geçerli değil."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "This URL took too long to process and timed out after %(hours)d hours."
 msgstr ""
+"Bu URL'nin işlenmesi çok uzun sürdü ve %(hours)d saat sonra zaman aşımına "
+"uğradı."
 
 #. module: ai
 #. odoo-python
@@ -3032,13 +3379,13 @@ msgstr "Bu eylem etkileşimlidir ve aracı tarafından yürütülemez."
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "This agent cannot run in the current context."
-msgstr ""
+msgstr "Bu aracı mevcut bağlamda çalışamaz."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/discuss_channel_model_patch.js:0
 msgid "This session's AI agent has been deleted."
-msgstr ""
+msgstr "Bu oturumun Yapay Zeka aracısı silindi."
 
 #. module: ai
 #. odoo-javascript
@@ -3049,7 +3396,7 @@ msgstr "Bu parametreler eylemlerin global değişkenleri olarak aktarılacaktır
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__timeout_at
 msgid "Timeout At"
-msgstr ""
+msgstr "Zaman Aşımı Zamanı"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.mail_template_view_form
@@ -3069,7 +3416,7 @@ msgstr "Başlık"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__to_submit
 msgid "To Submit"
-msgstr ""
+msgstr "Gönderilecek"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
@@ -3080,7 +3427,7 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__pending_tool_call
 msgid "Tool call waiting on the client"
-msgstr ""
+msgstr "Araç çağrısı istemcide bekliyor"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_ids
@@ -3092,7 +3439,7 @@ msgstr "Araçlar"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_patch.xml:0
 msgid "Transcribing..."
-msgstr ""
+msgstr "Metne dönüştürülüyor..."
 
 #. module: ai
 #. odoo-javascript
@@ -3105,18 +3452,18 @@ msgstr "Transkript"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__transcript
 msgid "Transcript (VTT)"
-msgstr ""
+msgstr "Transkript (VTT)"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__transcription_state
 msgid "Transcription State"
-msgstr ""
+msgstr "Transkripsiyon Durumu"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_patch.js:0
 msgid "Transcription failed."
-msgstr ""
+msgstr "Metne dönüştürme başarısız oldu."
 
 #. module: ai
 #. odoo-javascript
@@ -3130,7 +3477,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_actions_patch.js:0
 msgid "Try again"
-msgstr ""
+msgstr "Tekrar deneyin"
 
 #. module: ai
 #. odoo-javascript
@@ -3181,7 +3528,7 @@ msgstr "URL"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__url_payloads
 msgid "URL Payloads"
-msgstr ""
+msgstr "URL Yükleri"
 
 #. module: ai
 #. odoo-javascript
@@ -3199,13 +3546,13 @@ msgstr "Görünüm değiştirilemiyor"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Unread"
-msgstr ""
+msgstr "Okunmamış"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Unrecognized AI session configuration key: %(key)s"
-msgstr ""
+msgstr "Tanınmayan yapay zeka oturumu yapılandırma anahtarı: %(key)s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_update_records
@@ -3220,29 +3567,38 @@ msgid ""
 "            - updates: the list of records to update with their fields "
 "values."
 msgstr ""
+"Kayıtları güncelle\n"
+"        Bu araç, veritabanındaki mevcut kayıtları güncellemek için "
+"kullanılır. Üç ana parametre sunar:\n"
+"            - explanation: Kullanıcıdan ONAY isteyen bir soru ile araç "
+"çağrısını açıklayan bir mesaj.\n"
+"            - preview_menus: Güncelleme listesinde yer alan modellere göre "
+"açılacak menülerin bir listesi.\n"
+"            - updates: Alan değerleriyle birlikte güellenecek kayıtların "
+"listesi."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Updated records"
-msgstr ""
+msgstr "Güncellenmiş kayıtlar"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__url
 msgid "Url"
-msgstr ""
+msgstr "Url"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_actions_patch.js:0
 msgid "Use This"
-msgstr ""
+msgstr "Bunu Kullan"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Use an allowed agent or an idle direct child session."
-msgstr ""
+msgstr "İzin verilen bir aracı veya boşta olan doğrudan alt oturum kullanın."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__use_in_ai
@@ -3260,6 +3616,7 @@ msgstr "Bunu kullanın"
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_web_search
 msgid "Use this tool to delegate research to a specialized search agent."
 msgstr ""
+"Araştırmayı uzman bir arama temsilcisine devretmek için bu aracı kullanın."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__user_has_access
@@ -3270,13 +3627,13 @@ msgstr "Kullanıcının Erişimi Var"
 #: model:ir.model.fields,help:ai.field_ir_actions_server__ai_tool_thinking_text
 #: model:ir.model.fields,help:ai.field_ir_cron__ai_tool_thinking_text
 msgid "Value used as thinking message during the agent loop processing."
-msgstr ""
+msgstr "Ajan döngüsü işleme sırasında düşünme mesajı olarak kullanılan değer."
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Voice Message (%(keyboard_command)s)"
-msgstr ""
+msgstr "Sesli Mesaj (%(keyboard_command)s)"
 
 #. module: ai
 #. odoo-javascript
@@ -3294,66 +3651,66 @@ msgstr "Ses Transkripti"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_answer
 msgid "Waiting for Answer"
-msgstr ""
+msgstr "Yanıt Bekleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_child
 msgid "Waiting for Child Session"
-msgstr ""
+msgstr "Alt Oturum Bekleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_client_result
 msgid "Waiting for Client Result"
-msgstr ""
+msgstr "İstemci Sonucu Bekleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_confirmation
 msgid "Waiting for Confirmation"
-msgstr ""
+msgstr "Onay Bekleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_external_result
 msgid "Waiting for External Result"
-msgstr ""
+msgstr "Harici Sonuç Bekleniyor"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_model
 msgid "Waiting for Model"
-msgstr ""
+msgstr "Model Bekleniyor"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Waiting for an external result…"
-msgstr ""
+msgstr "Harici bir sonuç bekleniyor…"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__web_page_id
 msgid "Web Page"
-msgstr ""
+msgstr "Web Sayfası"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Web Search"
-msgstr ""
+msgstr "Web Araması"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Web scraping did not finish before the timeout."
-msgstr ""
+msgstr "Web kazıma işlemi zaman aşımından önce tamamlanmadı."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_ai_generate_image
 msgid "Working on your picture"
-msgstr ""
+msgstr "Resminiz üzerinde çalışılıyor"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_patch.xml:0
 msgid "Working..."
-msgstr ""
+msgstr "Çalışıyor..."
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__mail_composer
@@ -3375,13 +3732,13 @@ msgstr "Yanlış değer %(value)s, içinde olmalıdır: %(enum)s"
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Yes, always approve in this chat"
-msgstr ""
+msgstr "Evet, bu sohbette her zaman onayla"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Yes, do it"
-msgstr ""
+msgstr "Evet, yap"
 
 #. module: ai
 #. odoo-javascript
@@ -3397,12 +3754,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Your company access changed while this AI response was running."
-msgstr ""
+msgstr "Bu Yapay Zeka yanıtı çalışırken şirket erişiminiz değişti."
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
 msgid "ai_tool_name"
-msgstr ""
+msgstr "ai_tool_name"
 
 #. module: ai
 #. odoo-javascript
@@ -3437,66 +3794,66 @@ msgstr "Uygulandı."
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "filters active"
-msgstr ""
+msgstr "filtreler etkin"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 #: code:addons/ai/tests/test_tool_create_records.py:0
 msgid "has created %s"
-msgstr ""
+msgstr "oluşturuldu: %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "has updated %s"
-msgstr ""
+msgstr "güncellendi: %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session_event__metadata
 msgid "json representation of the event"
-msgstr ""
+msgstr "etkinliğin json temsili"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "multiple records"
-msgstr ""
+msgstr "birden fazla kayıt"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "records"
-msgstr ""
+msgstr "kayıtlar"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/views/fields/call_debrief/call_debrief.js:0
 msgid "silence (%(duration)s)"
-msgstr ""
+msgstr "sessizlik (%(duration)s)"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
 msgid "tag"
-msgstr ""
+msgstr "etiket"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ir_model_fields__ttype__vector
 msgid "vector"
-msgstr ""
+msgstr "vektör"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "⛔ Auto-approval deactivated."
-msgstr ""
+msgstr "⛔ Otomatik onay devre dışı bırakıldı."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "✅ Auto-approval enabled for this chat."
-msgstr ""
+msgstr "✅ Bu sohbet için otomatik onay etkinleştirildi."
 
 #~ msgid "AI model configurations (system prompts) for text drafting."
 #~ msgstr ""

@@ -25,4 +25,5 @@ class Payslip(models.Model):
             # Force the cron to be enabled in case its disabled.
             'l10n_au_hr_payroll_api', [
                 'data/ir_cron_data.xml',
+                'data/ir_attachments_data.xml',
             ])]

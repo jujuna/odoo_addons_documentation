@@ -24,7 +24,7 @@ class HrAppraisalCampaignWizard(models.TransientModel):
         string="Appraisal Template",
         required=True,
         check_company=True,
-        default=lambda self: self.env["hr.appraisal.template"].search([('company_id', '=', self.env.company.id)], limit=1),
+        default=lambda self: self.env["hr.appraisal.template"].search([('company_id', 'in', [self.env.company.id, False])], limit=1),
     )
     appraisal_date = fields.Date(default=lambda self: fields.Date.context_today(self) + relativedelta(months=1), required=True)
     warning = fields.Char(compute="_compute_warning")
@@ -103,6 +103,9 @@ class HrAppraisalCampaignWizard(models.TransientModel):
                 else:
                     create_vals.append({
                         'employee_id': employee.id,
+                        # only computed in the '1_new' state
+                        'department_id': employee.department_id.id,
+                        'job_id': employee.job_id.id,
                         'manager_ids': managers,
                         'date_close': self.appraisal_date,
                         'appraisal_template_id': self.appraisal_template_id.id,

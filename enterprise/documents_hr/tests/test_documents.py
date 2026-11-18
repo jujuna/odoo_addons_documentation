@@ -313,6 +313,13 @@ class TestCaseDocumentsBridgeHR(HttpCase, TransactionCaseDocumentsHr):
             self.employee.hr_employee_folder_id.with_user(self.hr_manager).write({'name': "Test2"})
         with self.assertRaises(AccessError):
             self.employee.hr_employee_folder_id.with_user(self.hr_user).write({'name': "Test"})
+        # Check employee folder creation under a folder linked to a record
+        new_company.documents_employee_folder_id.write(
+            {'res_model': 'res.partner', 'res_id': self.employee.user_partner_id.id})
+        employee_under_linked_folder = self.env['hr.employee'].create(
+            {'name': 'Under linked', 'company_id': new_company.id})
+        self.assertRecordValues(employee_under_linked_folder.hr_employee_folder_id,
+                                [{'res_model': 'hr.employee', 'res_id': employee_under_linked_folder.id}])
 
     def test_bridge_hr_settings_on_write(self):
         """

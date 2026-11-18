@@ -79,7 +79,9 @@ class HrAppraisal(models.Model):
     employee_feedback = fields.Html(compute='_compute_employee_feedback', store=True, readonly=False, groups="hr_appraisal.group_hr_appraisal_user")
     accessible_employee_feedback = fields.Html(compute='_compute_accessible_employee_feedback', inverse="_inverse_accessible_employee_feedback")
     show_employee_feedback_full = fields.Boolean(compute='_compute_show_employee_feedback_full')
-    manager_feedback = fields.Html(compute='_compute_manager_feedback', store=True, readonly=False, groups="hr_appraisal.group_hr_appraisal_user")
+    # The feedback is read and written through accessible_manager_feedback, which hides it until it can be seen: an
+    # appraisal officer can't see the manager feedback of their own appraisal before it is published
+    manager_feedback = fields.Html(compute='_compute_manager_feedback', store=True, readonly=False, groups="base.group_system")
     accessible_manager_feedback = fields.Html(compute='_compute_accessible_manager_feedback', inverse="_inverse_accessible_manager_feedback")
     show_manager_feedback_full = fields.Boolean(compute='_compute_show_manager_feedback_full')
     employee_feedback_published = fields.Boolean(string="Employee Feedback Published", default=False, tracking=True,
@@ -277,7 +279,7 @@ class HrAppraisal(models.Model):
             if appraisal.state == '1_new':
                 appraisal.manager_feedback = manager_template
             else:
-                appraisal.manager_feedback = appraisal.manager_feedback or manager_template
+                appraisal.manager_feedback = appraisal.sudo().manager_feedback or manager_template
 
     @api.depends('department_id', 'company_id', 'appraisal_template_id')
     def _compute_feedback_templates(self):
@@ -534,11 +536,11 @@ class HrAppraisal(models.Model):
             last_appraisal_date = employee.last_appraisal_id.date_close
             last_appraisal_months = last_appraisal_date and (
                 today.year - last_appraisal_date.year) * 12 + (today.month - last_appraisal_date.month)
+            months = (appraisal.date_close.year - employee.create_date.year) * \
+                12 + (appraisal.date_close.month - employee.create_date.month)
             if employee.user_id:
                 # an appraisal has been just created
                 if employee.appraisal_count == 1:
-                    months = (appraisal.date_close.year - employee.create_date.year) * \
-                        12 + (appraisal.date_close.month - employee.create_date.month)
                     note = self.env._("You arrived %s months ago. Your appraisal is created and you can fill it here.", months)
                 else:
                     note = self.env._("Your last appraisal was %s months ago. Your appraisal is created and you can fill it here.", last_appraisal_months)
@@ -546,19 +548,19 @@ class HrAppraisal(models.Model):
                     'mail.mail_activity_data_todo', today,
                     summary=self.env._('Appraisal to fill'),
                     note=note, user_id=employee.user_id.id)
-                for manager in managers.filtered('user_id'):
-                    if employee.appraisal_count == 1:
-                        note = self.env._(
-                            "The employee %(employee)s arrived %(months)s months ago. The appraisal is created and you can fill it here.",
-                            employee=employee._get_html_link(), months=months)
-                    else:
-                        note = self.env._(
-                            "The last appraisal of %(employee)s was %(months)s months ago. The appraisal is created and you can fill it here.",
-                            employee=appraisal.employee_id._get_html_link(), months=last_appraisal_months)
-                    appraisal.with_context(mail_activity_quick_update=True).activity_schedule(
-                        'mail.mail_activity_data_todo', today,
-                        summary=self.env._('Appraisal for %s to fill', employee.name),
-                        note=note, user_id=manager.user_id.id)
+            for manager in managers.filtered('user_id'):
+                if employee.appraisal_count == 1:
+                    note = self.env._(
+                        "The employee %(employee)s arrived %(months)s months ago. The appraisal is created and you can fill it here.",
+                        employee=employee._get_html_link(), months=months)
+                else:
+                    note = self.env._(
+                        "The last appraisal of %(employee)s was %(months)s months ago. The appraisal is created and you can fill it here.",
+                        employee=appraisal.employee_id._get_html_link(), months=last_appraisal_months)
+                appraisal.with_context(mail_activity_quick_update=True).activity_schedule(
+                    'mail.mail_activity_data_todo', today,
+                    summary=self.env._('Appraisal for %s to fill', employee.name),
+                    note=note, user_id=manager.user_id.id)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_new_or_cancel(self):

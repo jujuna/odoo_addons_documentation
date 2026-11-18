@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-20 12:15+0000\n"
+"POT-Creation-Date: 2026-11-06 17:49+0000\n"
+"PO-Revision-Date: 2026-11-04 14:37+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_intrastat/tr/>\n"
@@ -41,6 +41,9 @@ msgid ""
 "Intrastat Reports\n"
 "==================\n"
 msgstr ""
+"\n"
+"Intrastat Raporları\n"
+"==================\n"
 
 #. module: account_intrastat
 #. odoo-javascript
@@ -143,6 +146,7 @@ msgstr "Erken olanı kontrol et"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_commodity_code
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__commodity
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Commodity"
 msgstr "Ürün"
@@ -163,9 +167,8 @@ msgstr "Emtia kodları yapılandırması"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_company
-#, fuzzy
 msgid "Company"
-msgstr "Firma"
+msgstr "Şirket"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__company_country_id
@@ -193,7 +196,7 @@ msgstr "Menşei ülke"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Customers without a VAT number"
-msgstr ""
+msgstr "KDV numarası olmayan müşteriler"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_default_invoice_transaction_code_id
@@ -354,7 +357,7 @@ msgstr "Intrastat Raporu Özel Yöneticisi"
 #. module: account_intrastat
 #: model:ir.module.module,shortdesc:base.module_account_intrastat
 msgid "Intrastat Reports"
-msgstr ""
+msgstr "Intrastat Raporları"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_account_intrastat_services_report_handler
@@ -419,7 +422,7 @@ msgstr "Intrastat işlem kodu"
 #. odoo-python
 #: code:addons/account_intrastat/models/product.py:0
 msgid "Invalid Intrastat Code"
-msgstr ""
+msgstr "Geçersiz Intrastat Kodu"
 
 #. module: account_intrastat
 #. odoo-python
@@ -467,7 +470,6 @@ msgstr "Yevmiye Kalemi"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_line_tree_view_account_intrastat_transaction_codes
-#, fuzzy
 msgid "Journal Items"
 msgstr "Yevmiye Kalemleri"
 
@@ -562,7 +564,6 @@ msgstr "Ürün Varyantı"
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_region_code
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_region_code
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__region
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Region"
 msgstr "Bölge"
@@ -576,7 +577,7 @@ msgstr "Sıfırla"
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 msgid "Select a Product Country"
-msgstr ""
+msgstr "Bir ürün ülkesi seçin"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_commodity_code
@@ -797,7 +798,7 @@ msgstr "t/k"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__g
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__g
 msgid "g"
-msgstr ""
+msgstr "g"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__gi_f_/_s
@@ -812,6 +813,7 @@ msgid "journals items with no product"
 msgstr "ürünsüz yevmiye kayıtları"
 
 #. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_90_%_sdt
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_90_%_sdt
 msgid "kg 90 % sdt"
 msgstr "kg 90 % sdt"
@@ -847,7 +849,6 @@ msgid "kg NaOH"
 msgstr "kg NaOH"
 
 #. module: account_intrastat
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_p2o5
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_p2o5
 msgid "kg P2O5"
 msgstr "kg P2O5"
@@ -874,7 +875,7 @@ msgstr "kg/net eda"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l
 msgid "l"
-msgstr ""
+msgstr "l"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l_alc__100_%
@@ -886,7 +887,7 @@ msgstr "l alkol 100 %"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m2

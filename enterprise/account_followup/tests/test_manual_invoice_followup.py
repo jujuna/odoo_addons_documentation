@@ -1,4 +1,5 @@
 from odoo.tests import tagged
+from odoo.tools import html2plaintext, format_amount
 from odoo.addons.account.tests.test_account_move_send import TestAccountMoveSendCommon
 from odoo.addons.account_followup.tests.common import TestAccountFollowupCommon
 from odoo.addons.mail.tests.common import MailCommon
@@ -13,6 +14,23 @@ class TestManualInvoiceFollowup(TestAccountMoveSendCommon, TestAccountFollowupCo
         # reminder log is added on the partner, so fetch the message from the partner
         message = self._get_mail_message(partner)
         self.assertRecordValues(message.attachment_ids.sorted('name'), expected_attachments)
+
+    def _assert_partner_reminder_template_contains_value(self, partner, moves, value):
+        # check if the preview has the correct value
+        wizard = self.env['account_followup.manual_reminder'].create(
+            {
+                'move_ids': moves.ids,
+                'template_id': self.env.ref('account_followup.mail_template_partner_payment_kind_reminder', raise_if_not_found=False).id,
+            }
+        )
+
+        self.assertIn(value, html2plaintext(wizard.preview_body))
+
+        # check if the actual sent email has the correct value
+        with self.allow_pdf_render():
+            wizard.send_reminder()
+        message = self._get_mail_message(partner)
+        self.assertIn(value, html2plaintext(message.body))
 
     def test_single_invoice_manual_followup(self):
         """
@@ -134,3 +152,33 @@ class TestManualInvoiceFollowup(TestAccountMoveSendCommon, TestAccountFollowupCo
             },
         ]
         self._assert_partner_mail_message_attchments(self.partner_b, expected_attachment_values)
+
+    def test_differing_currency_from_company(self):
+        """
+        Ensure that the currency of the selected invoice(s) is respected and the amount is correct
+        despite the currently selected company having a different currency
+        """
+        euro_currency = self.env["res.currency"].search([["name", "=", "EUR"]])
+        self.assertNotEqual(euro_currency.id, self.env.company.currency_id.id)
+
+        invoice1 = self.init_invoice("out_invoice", partner=self.partner_a.id, invoice_date='2026-01-01', amounts=[100], currency=euro_currency.id, post=True)
+        invoice2 = self.init_invoice("out_invoice", partner=self.partner_a.id, invoice_date='2026-01-02', amounts=[200], currency=euro_currency.id, post=True)
+        moves = invoice1 + invoice2
+
+        self._assert_partner_reminder_template_contains_value(self.partner_a, moves, format_amount(self.env, 300, euro_currency))
+
+    def test_multiple_currency_invoices(self):
+        """
+        Ensure when sending out invoices with different currencies that the company
+        currency is used and the proper amount is present
+        """
+        euro_currency = self.env["res.currency"].search([["name", "=", "EUR"]])
+        comp_currency = self.env.company.currency_id
+        self.assertNotEqual(euro_currency.id, comp_currency.id)
+
+        invoice1 = self.init_invoice("out_invoice", partner=self.partner_a.id, invoice_date='2026-01-01', amounts=[100], currency=euro_currency.id, post=True)
+        invoice2 = self.init_invoice("out_invoice", partner=self.partner_a.id, invoice_date='2026-01-02', amounts=[200], currency=comp_currency.id, post=True)
+        moves = invoice1 + invoice2
+        total_amount = sum(inv.amount_residual_signed for inv in moves)
+
+        self._assert_partner_reminder_template_contains_value(self.partner_a, moves, format_amount(self.env, total_amount, comp_currency))

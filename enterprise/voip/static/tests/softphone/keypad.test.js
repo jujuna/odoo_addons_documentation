@@ -4,6 +4,7 @@ import { ImStatusMixin } from "@mail/core/common/im_status_mixin";
 import {
     click,
     contains,
+    focus,
     insertText,
     start,
     startServer,
@@ -11,6 +12,7 @@ import {
 } from "@mail/../tests/mail_test_helpers";
 import { setupVoipTests } from "@voip/../tests/voip_test_helpers";
 import { serializeDateTime } from "@web/core/l10n/dates";
+import { patch } from "@web/core/utils/patch";
 import { getService, onRpc, serverState } from "@web/../tests/web_test_helpers";
 
 describe.current.tags("desktop");
@@ -221,6 +223,34 @@ test("clicking DTMF keys during a demo call updates the keypad input", async () 
     await contains(".o-voip-Keypad-input[readonly]", { value: "1*#" });
     expect(userAgent.frontSession).toBe(session);
     expect(session.isOngoing).toBe(true);
+});
+
+test.tags("focus required");
+test("pressing Enter in the DTMF input doesn't attempt to start a new call", async () => {
+    const pyEnv = await startServer();
+    await start();
+    patch(getService("voip").userAgent, {
+        makeCall() {
+            expect.step("makeCall");
+            return super.makeCall(...arguments);
+        },
+    });
+    await click(".o_menu_systray [data-hotkey='Shift+S']");
+    await click("button[data-tab='dialer']");
+    await insertText(".o-voip-Keypad-input:focus", "9223372036854775807");
+    await triggerHotkey("Enter");
+    expect.verifySteps(["makeCall"]);
+    await advanceTime(3000);
+    expect(pyEnv["voip.call"].search_count([])).toBe(1);
+    await click(".o-voip-InCallView button:has([data-icon='dialpad'])");
+    await click(".o-voip-Keypad-digitBtn:nth-child(1)");
+    await click(".o-voip-Keypad-digitBtn:nth-child(2)");
+    await click(".o-voip-Keypad-digitBtn:nth-child(3)");
+    await contains(".o-voip-Keypad-input[readonly]", { value: "123" });
+    await focus(".o-voip-Keypad-input");
+    expect(".o-voip-Keypad-input").toBeFocused();
+    await triggerHotkey("Enter");
+    expect.verifySteps([]);
 });
 
 test("Search by T9 code works", async () => {

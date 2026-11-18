@@ -3,7 +3,7 @@ import { StreamPostCommentsReply } from '@social/js/stream_post_comments_reply';
 export class StreamPostCommentsReplyInstagram extends StreamPostCommentsReply {
 
     get authorPictureSrc() {
-        return '/social_instagram/static/src/img/instagram_user.png';
+        return `/web/image/social.account/${encodeURIComponent(this.props.mediaSpecificProps.accountId)}/image/48x48`;
     }
 
     get canAddImage() {

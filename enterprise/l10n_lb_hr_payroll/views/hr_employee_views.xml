@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.inherit.l10n_lb_hr_payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <group name="payroll_group" position="inside">
+                <group string="Lebanon Payroll" name="l10n_lb_payroll" invisible="company_country_code != 'LB'">
+                    <field name="l10n_lb_tax_category" class="o_hr_narrow_field"/>
+                    <field name="l10n_lb_spouse_working" invisible="marital != 'married'"/>
+                    <field name="l10n_lb_net_salary" string="Tax Borne by the Employer"/>
+                    <field name="l10n_lb_nssf_coverage" class="o_hr_narrow_field"/>
+                    <field name="l10n_lb_family_allowance" invisible="l10n_lb_nssf_coverage != 'full'"/>
+                </group>
+            </group>
+            <xpath expr="//field[@name='identification_id']" position="after">
+                <field name="l10n_lb_tax_number" invisible="company_country_code != 'LB'"/>
+                <field name="l10n_lb_nssf_number" invisible="company_country_code != 'LB'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

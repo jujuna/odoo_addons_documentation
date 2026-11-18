@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo auto_sequence="1">
+    <!-- By function (MoF Decision 0369, art. 2): each by-nature expense account goes to the function it mostly serves. -->
+    <record id="l10n_la_profit_and_loss" model="account.report">
+        <field name="name">Statement of Performance</field>
+        <field name="name@lo_LA">ໃບລາຍງານຜົນການດຳເນີນງານ</field>
+        <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="country_id" ref="base.la"/>
+        <field name="filter_analytic_groupby" eval="True"/>
+        <field name="filter_unfold_all" eval="True"/>
+        <field name="filter_line_comparison" eval="True"/>
+        <field name="filter_journals" eval="False"/>
+        <field name="filter_multi_company">selector</field>
+        <field name="filter_budgets" eval="True"/>
+        <field name="filter_hierarchy">by_default</field>
+        <field name="default_opening_date_filter">this_year</field>
+        <field name="column_ids">
+            <record id="l10n_la_profit_and_loss_balance" model="account.report.column">
+                <field name="name">Balance</field>
+                <field name="name@lo_LA">ຍອດເງິນ</field>
+                <field name="expression_label">balance</field>
+            </record>
+        </field>
+        <field name="line_ids">
+            <record id="l10n_la_pl_revenue" model="account.report.line">
+                <field name="name">Revenue</field>
+                <field name="name@lo_LA">ລາຍຮັບຈາກກິດຈະການປົກກະຕິ</field>
+                <field name="code">LA_PL_REVENUE</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">-70 - 71</field>
+            </record>
+            <record id="l10n_la_pl_cost_of_sales" model="account.report.line">
+                <field name="name">Cost of sales</field>
+                <field name="name@lo_LA">ຕົ້ນທຶນຂາຍ</field>
+                <field name="code">LA_PL_COST_SALES</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">60 + 611 + 686 + 786</field>
+            </record>
+            <record id="l10n_la_pl_gross_profit" model="account.report.line">
+                <field name="name">Gross profit</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບ ເບື້ອງຕົ້ນ</field>
+                <field name="code">LA_PL_GROSS</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_REVENUE.balance - LA_PL_COST_SALES.balance</field>
+            </record>
+            <record id="l10n_la_pl_other_income" model="account.report.line">
+                <field name="name">Other income</field>
+                <field name="name@lo_LA">ລາຍຮັບອື່ນໆ ຈາກການດຳເນີນງານປົກກະຕິ</field>
+                <field name="code">LA_PL_OTHER_INCOME</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">-74 - 75 - 78\(786)</field>
+            </record>
+            <record id="l10n_la_pl_distribution_costs" model="account.report.line">
+                <field name="name">Distribution costs</field>
+                <field name="name@lo_LA">ຕົ້ນທຶນການຈຳໜ່າຍ</field>
+                <field name="code">LA_PL_DISTRIBUTION</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">621 + 622 + 624</field>
+            </record>
+            <record id="l10n_la_pl_administrative_expenses" model="account.report.line">
+                <field name="name">Administrative expenses</field>
+                <field name="name@lo_LA">ຕົ້ນທຶນບໍລິຫານ</field>
+                <field name="code">LA_PL_ADMIN</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">61\(611) + 62\(621,622,624) + 63 + 64 + 651 + 653 + 68\(686)</field>
+            </record>
+            <record id="l10n_la_pl_other_expenses" model="account.report.line">
+                <field name="name">Other expenses</field>
+                <field name="name@lo_LA">ຄ່າໃຊ້ຈ່າຍອື່ນໆ ໃນການທຸລະກິດ</field>
+                <field name="code">LA_PL_OTHER_EXPENSES</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">652 + 654 + 655 + 656 + 657 + 658</field>
+            </record>
+            <record id="l10n_la_pl_operating_profit" model="account.report.line">
+                <field name="name">Operating profit (loss)</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບ ໃນການທຸລະກິດ</field>
+                <field name="code">LA_PL_OPERATING</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_GROSS.balance + LA_PL_OTHER_INCOME.balance - LA_PL_DISTRIBUTION.balance - LA_PL_ADMIN.balance - LA_PL_OTHER_EXPENSES.balance</field>
+            </record>
+            <record id="l10n_la_pl_finance_income" model="account.report.line">
+                <field name="name">Finance income</field>
+                <field name="name@lo_LA">ລາຍຮັບການເງິນ</field>
+                <field name="code">LA_PL_FIN_INCOME</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">-76</field>
+            </record>
+            <record id="l10n_la_pl_finance_cost" model="account.report.line">
+                <field name="name">Finance cost</field>
+                <field name="name@lo_LA">ລາຍຈ່າຍການເງິນ</field>
+                <field name="code">LA_PL_FIN_COST</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">66</field>
+            </record>
+            <record id="l10n_la_pl_profit_before_tax" model="account.report.line">
+                <field name="name">Profit or loss before tax</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບ ກ່ອນການເສຍອາກອນ</field>
+                <field name="code">LA_PL_PBT</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_OPERATING.balance + LA_PL_FIN_INCOME.balance - LA_PL_FIN_COST.balance</field>
+            </record>
+            <record id="l10n_la_pl_current_tax" model="account.report.line">
+                <field name="name">Current tax</field>
+                <field name="name@lo_LA">ອາກອນຕ້ອງຈ່າຍ ບ້ວງຜົນໄດ້ຮັບປົກກະຕິ</field>
+                <field name="code">LA_PL_CURRENT_TAX</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">691</field>
+            </record>
+            <record id="l10n_la_pl_deferred_tax" model="account.report.line">
+                <field name="name">Deferred tax</field>
+                <field name="name@lo_LA">ອາກອນເຍື້ອນຊຳລະ</field>
+                <field name="code">LA_PL_DEFERRED_TAX</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">694 + 699</field>
+            </record>
+            <record id="l10n_la_pl_profit_year" model="account.report.line">
+                <field name="name">Profit or loss for the year net of tax</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບສຸດທິ ຈາກການດຳເນີນງານ</field>
+                <field name="code">LA_PL_PROFIT_YEAR</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_PBT.balance - LA_PL_CURRENT_TAX.balance - LA_PL_DEFERRED_TAX.balance</field>
+            </record>
+            <record id="l10n_la_pl_oci_income" model="account.report.line">
+                <field name="name">Other comprehensive income</field>
+                <field name="name@lo_LA">ລາຍຮັບສັງລວມອື່ນໆ</field>
+                <field name="code">LA_PL_OCI_INCOME</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">-77</field>
+            </record>
+            <record id="l10n_la_pl_oci_expenses" model="account.report.line">
+                <field name="name">Other comprehensive expenses</field>
+                <field name="name@lo_LA">ລາຍຈ່າຍສັງລວມອື່ນໆ</field>
+                <field name="code">LA_PL_OCI_EXPENSES</field>
+                <field name="hierarchy_level">1</field>
+                <field name="groupby">account_id</field>
+                <field name="account_codes_formula">67</field>
+            </record>
+            <record id="l10n_la_pl_oci_net" model="account.report.line">
+                <field name="name">Other comprehensive income net of tax</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບສັງລວມອື່ນໆ ຫຼັງອາກອນ</field>
+                <field name="code">LA_PL_OCI</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_OCI_INCOME.balance - LA_PL_OCI_EXPENSES.balance</field>
+            </record>
+            <record id="l10n_la_pl_profit_period" model="account.report.line">
+                <field name="name">Profit or loss for the period net of tax</field>
+                <field name="name@lo_LA">ຜົນໄດ້ຮັບ ສຸດທິໃນປີ</field>
+                <field name="code">LA_PL_PROFIT_PERIOD</field>
+                <field name="hierarchy_level">0</field>
+                <field name="aggregation_formula">LA_PL_PROFIT_YEAR.balance + LA_PL_OCI.balance</field>
+            </record>
+            <!-- Not in the MoF template: the year-end closing entry (999999), as in Odoo's generic P&L. -->
+            <record id="l10n_la_pl_allocation" model="account.report.line">
+                <field name="name">Allocation of the result</field>
+                <field name="name@lo_LA">ການແບ່ງປັນ ຜົນໄດ້ຮັບ</field>
+                <field name="code">LA_PL_ALLOCATION</field>
+                <field name="hierarchy_level">1</field>
+                <field name="hide_if_zero" eval="True"/>
+                <field name="account_codes_formula">999999</field>
+            </record>
+        </field>
+    </record>
+</odoo>

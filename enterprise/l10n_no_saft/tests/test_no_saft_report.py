@@ -130,7 +130,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
             self.get_xml_tree_from_string(f'''
                 <AuditFile xmlns="urn:StandardAuditFile-Taxation-Financial:NO">
                     <Header>
-                        <AuditFileVersion>1.30</AuditFileVersion>
+                        <AuditFileVersion>1.40</AuditFileVersion>
                         <AuditFileCountry>NO</AuditFileCountry>
                         <AuditFileDateCreated>2019-12-31</AuditFileDateCreated>
                         <SoftwareCompanyName>Odoo SA</SoftwareCompanyName>
@@ -296,7 +296,6 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <AccountID>___ignore___</AccountID>
                                     <ValueDate>2019-01-01</ValueDate>
                                     <SourceDocumentID>___ignore___</SourceDocumentID>
-                                    <CustomerID>___ignore___</CustomerID>
                                     <Description>[PA] product_a</Description>
                                     <CreditAmount>
                                         <Amount>5000.00</Amount>
@@ -316,7 +315,6 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <AccountID>___ignore___</AccountID>
                                     <ValueDate>2019-01-01</ValueDate>
                                     <SourceDocumentID>___ignore___</SourceDocumentID>
-                                    <CustomerID>___ignore___</CustomerID>
                                     <Description>25%</Description>
                                     <CreditAmount>
                                         <Amount>1250.00</Amount>
@@ -349,7 +347,6 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <AccountID>___ignore___</AccountID>
                                     <ValueDate>2019-03-01</ValueDate>
                                     <SourceDocumentID>___ignore___</SourceDocumentID>
-                                    <CustomerID>___ignore___</CustomerID>
                                     <Description>[PA] product_a</Description>
                                     <DebitAmount>
                                         <Amount>3000.00</Amount>
@@ -369,7 +366,6 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <AccountID>___ignore___</AccountID>
                                     <ValueDate>2019-03-01</ValueDate>
                                     <SourceDocumentID>___ignore___</SourceDocumentID>
-                                    <CustomerID>___ignore___</CustomerID>
                                     <Description>25%</Description>
                                     <DebitAmount>
                                         <Amount>750.00</Amount>
@@ -407,7 +403,6 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <AccountID>___ignore___</AccountID>
                                     <ValueDate>2019-11-30</ValueDate>
                                     <SourceDocumentID>___ignore___</SourceDocumentID>
-                                    <CustomerID>___ignore___</CustomerID>
                                     <Description>MISC/2019/11/0001</Description>
                                     <CreditAmount>
                                         <Amount>0.00</Amount>
@@ -425,7 +420,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
 class TestNoSaftReportXmlValidity(TestNoSaftReportCommon):
     _test_user_groups = None  # FIXME list needed groups
 
-    @test_xsd(url='https://raw.githubusercontent.com/Skatteetaten/saf-t/master/SAF-T_Financial_1.3/Norwegian_SAF-T_Financial_Schema_v_1.30.xsd')
+    @test_xsd(url='https://raw.githubusercontent.com/Skatteetaten/saf-t/master/SAF-T_Financial_1.4/Norwegian_SAF-T_Financial_Schema_v_1.40.xsd')
     def test_xml_validity(self):
         report = self.env.ref('account_reports.general_ledger_report')
         options = self._generate_options(report, '2019-01-01', '2019-12-31')

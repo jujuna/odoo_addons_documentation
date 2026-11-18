@@ -174,11 +174,18 @@ class AccountTransferModel(models.Model):
         return current_moves[0] if current_moves else None
 
     def _determine_start_date(self):
-        """Determine the transfer start date which is the most recent between: the global lock date, the hard lock date and the start date of the model."""
+        """Determine the transfer start date which is the start date of the model, or the start of the period containing the most recent lock date if it is later."""
         self.ensure_one()
         global_lock_date = self.company_id.fiscalyear_lock_date or fields.Date.to_date('1900-01-01')
         hard_lock_date = self.company_id.hard_lock_date or fields.Date.to_date('1900-01-01')
-        return max(global_lock_date.replace(day=1), hard_lock_date.replace(day=1), self.date_start)
+        lock_date = max(global_lock_date, hard_lock_date)
+        if lock_date <= self.date_start:
+            return self.date_start
+        # Start from the period containing the lock date, so the quarters do not become December-February for example
+        period_months = {'month': 1, 'quarter': 3, 'year': 12}[self.frequency]
+        elapsed = relativedelta(lock_date, self.date_start)
+        completed_periods = (elapsed.years * 12 + elapsed.months) // period_months
+        return self.date_start + relativedelta(months=completed_periods * period_months)
 
     def _get_next_move_date(self, date):
         """Compute the date of the next transfer entry with date and frequency."""

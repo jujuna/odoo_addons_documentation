@@ -128,6 +128,11 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
             run: "edit 300",
         },
         {
+            content: "Set metro transport distance",
+            trigger: 'input[name="metro_transport_employee_kilometer_manual"]',
+            run: "edit 8",
+        },
+        {
             content: "Set metro periodicity",
             trigger: 'label:has(input[name="metro_transport_periodicity_radio"][data-value="yearly"])',
             run: "click",

@@ -274,7 +274,11 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
             _logger.info("Payslips Creation: --- %s seconds ---", time.time() - start_time)
 
         # Payslip Computation
-        with self.assertQueryCount(admin=1664):
+        # 1 query: the variable revenues of the employees with a loss on commission
+        # 3 queries: the rules of the variable revenues category, instead of fixed codes
+        # 1 query: the validated payslips of the year, for the intellectual property share
+        # 3 queries: the fiscal voluntarism per nature and the taxable salary of all the natures
+        with self.assertQueryCount(admin=1672):
             start_time = time.time()
             payslips.compute_sheet()
             # --- 9.298089027404785 seconds ---

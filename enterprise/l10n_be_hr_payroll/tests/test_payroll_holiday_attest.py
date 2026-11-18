@@ -1,7 +1,9 @@
+import math
 from datetime import date, datetime
 
 from freezegun import freeze_time
 
+from odoo.fields import Command
 from odoo.tests import tagged
 
 from .common import TestPayrollCommon
@@ -158,6 +160,91 @@ class TestHrPayrollHolidayAttest(TestPayrollCommon):
 
         professional_tax = self._get_termination_payslip_values(employee_with_sick_leave)
         self.assertEqual(professional_tax, 149.90, "The professional tax should not be 0 even with long-term sick leave.")
+
+    def _create_double_holiday_attest_calendar(self, days):
+        return self.env['resource.calendar'].create({
+            'name': f'Calendar {days}/5',
+            'company_id': self.belgian_company.id,
+            'full_time_required_hours': 38,
+            'attendance_ids': [
+                Command.create({'dayofweek': str(weekday), 'hour_from': hour_from, 'hour_to': hour_to})
+                for weekday in range(days)
+                for hour_from, hour_to in [(8, 12), (13, 16.6)]
+            ],
+        })
+
+    def _compute_double_holiday_with_attest(self, days, attest_hours, contract_date_start, attest_date_to):
+        """ Double holiday pay of June 2026 for a 4,000 full-time wage worked {days}/5, the previous employer's
+        certificate covering 2025 until attest_date_to at attest_hours/38, that employer having paid the double
+        holiday pay of its own fraction. """
+        employee = self.create_employee({
+            'name': 'Double Holiday Attest Employee',
+            'resource_calendar_id': self._create_double_holiday_attest_calendar(days).id,
+            'wage': 4000 * days / 5,
+            'internet': False,
+            'mobile': False,
+            'date_version': contract_date_start,
+            'contract_date_start': contract_date_start,
+            'l10n_be_dimona_category': 'oth',
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+        })
+        attest_months = attest_date_to.month / 12
+        attest = self._create_attestation(
+            employee,
+            attest_type='employee',
+            date_to=attest_date_to,
+            prev_work_hours_per_week=attest_hours,
+            prev_double_holiday_pay_paid=round(4000 * 0.92 * attest_hours / 38 * attest_months, 2),
+        )
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Double Holiday Pay 2026',
+            'employee_id': employee.id,
+            'date_from': date(2026, 6, 1),
+            'date_to': date(2026, 6, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+        })
+        payslip.compute_sheet()
+        codes = ['DOUBLE', 'DOUBLE_COMPLEMENTARY', 'DOUBLERECOVERY']
+        line_values = payslip._get_line_values(codes)
+        totals = {code: line_values[code][payslip.id]['total'] for code in codes}
+        return attest, totals['DOUBLE'] + totals['DOUBLE_COMPLEMENTARY'], totals['DOUBLERECOVERY']
+
+    def test_double_holiday_pay_attest_work_time_rates(self):
+        """ The certificate months are weighed by the certificate fraction over the current one, capped at 1: the
+        current pay already carries the current fraction. Hired 01/01/2026, certificate for the whole of 2025. """
+        # (current days per week, certificate hours per week, double holiday pay = recovery cap)
+        cases = [
+            (5, 38, 3680.0),    # full time on both sides
+            (4, 30.4, 2944.0),  # equal fractions: no prorata
+            (4, 15.2, 1472.0),  # the fraction increases: certificate fraction / current fraction
+            (2, 30.4, 1472.0),  # the fraction decreases: the current pay, no extra factor
+            (5, 15.2, 1472.0),  # increase to full time
+            (2, 38, 1472.0),    # decrease from full time
+        ]
+        for days, attest_hours, expected in cases:
+            with self.subTest(days=days, attest_hours=attest_hours):
+                attest, double_holiday_pay, recovery = self._compute_double_holiday_with_attest(
+                    days, attest_hours, date(2026, 1, 1), date(2025, 12, 31))
+                self.assertAlmostEqual(double_holiday_pay, expected, delta=0.01)
+                self.assertAlmostEqual(attest.double_holiday_pay_cap, expected, delta=0.01)
+                self.assertAlmostEqual(recovery, -expected, delta=0.01)
+
+    def test_double_holiday_pay_attest_and_own_months_part_time(self):
+        """ Hired 01/07/2025, certificate from 01/01/2025 to 30/06/2025, both part-time: the recovery of the
+        certificate never eats into the double holiday pay of the months worked here (6 / 12 of the pay). """
+        # (current days per week, certificate hours per week, double holiday pay, recovery)
+        cases = [
+            (4, 15.2, 2208.0, -730.34),  # 3200 * 92% * (6 + 6 * 0.4 / 0.8) / 12; cap 2944 * 129 / 260 * 0.5
+            (2, 30.4, 1472.0, -730.34),  # 1600 * 92% * (6 + 6) / 12; cap 1472 * 129 / 260
+        ]
+        for days, attest_hours, expected, expected_recovery in cases:
+            with self.subTest(days=days, attest_hours=attest_hours):
+                _attest, double_holiday_pay, recovery = self._compute_double_holiday_with_attest(
+                    days, attest_hours, date(2025, 7, 1), date(2025, 6, 30))
+                self.assertAlmostEqual(double_holiday_pay, expected, delta=0.01)
+                self.assertAlmostEqual(recovery, expected_recovery, delta=0.01)
+                own_double_holiday_pay = 4000 * days / 5 * 0.92 * 6 / 12
+                self.assertGreaterEqual(double_holiday_pay + recovery, own_double_holiday_pay)
 
     def test_get_number_of_months(self):
         """Fractional month count within a single calendar year (dates are
@@ -340,6 +427,17 @@ class TestHrPayrollHolidayAttest(TestPayrollCommon):
         )
 
     @freeze_time('2026-01-01')
+    def test_attestation_days_rounded_up(self):
+        """The days of a certificate converted to the current schedule are rounded up to the unit, the hours stay."""
+        employee = self._create_attest_employee()
+        attestation = self._create_attestation(
+            employee, attest_type='employee', prev_days_earned=7,
+            prev_work_hours_per_week=35, prev_reference_work_hours_per_week=35)
+        hours_per_day = employee.version_id.resource_calendar_id.hours_per_day
+        days = attestation.hours_to_allocate / hours_per_day
+        self.assertNotEqual(days, round(days * 2) / 2)
+        self.assertEqual(attestation.days_to_allocate, math.ceil(days))
+
     def test_worker_attestation_recovery_and_allocation(self):
         """A worker certificate grants employee leave and recovers holiday pay after solidarity."""
         former_worker = self._create_attest_employee()
@@ -390,8 +488,37 @@ class TestHrPayrollHolidayAttest(TestPayrollCommon):
         holiday_pay_regularization = december_payslip._get_line_values(['HolPayReg'])['HolPayReg'][
             december_payslip.id
         ]['total']
-        # Remaining 10% of 2500 x 3/13 recovered in December.
-        self.assertAlmostEqual(holiday_pay_regularization, -57.69, places=2)
+        # The cap prorated to the hours taken: 990 x 38 / 76 = 495, the 519.23 recovered are 24.23 too much.
+        self.assertAlmostEqual(holiday_pay_regularization, 24.23, places=2)
+
+    @freeze_time('2026-01-01')
+    def test_attestation_amount_recovered(self):
+        """The amounts recovered on the validated payslips, negative lines, are the recovered amounts of the attest."""
+        former_worker = self._create_attest_employee()
+        attest = self._create_attestation(former_worker, date_from=date(2025, 1, 1), date_to=date(2025, 11, 18))
+        self.assertEqual(attest.simple_holiday_pay_cap, 990)
+        self.assertEqual(attest.double_holiday_pay_cap, 990)
+
+        self.assertAlmostEqual(self._create_regular_payslip_with_leave(attest), -519.23, places=2)
+        self.assertEqual(self._get_double_holiday_recovery(former_worker, 2026), -990)
+        self.env['hr.payslip'].search([('employee_id', '=', former_worker.id)]).action_payslip_done()
+        december_payslip = self.env['hr.payslip'].create({
+            'name': 'December 2026',
+            'employee_id': former_worker.id,
+            'date_from': date(2026, 12, 1),
+            'date_to': date(2026, 12, 31),
+            'struct_id': self.payslip_structure_type.id,
+        })
+        december_payslip.compute_sheet()
+        # The regularization refunds what exceeds the cap prorated to the hours taken: 990 x 38 / 76 = 495
+        self.assertAlmostEqual(attest.hours_to_allocate, 76, places=2)
+        self.assertAlmostEqual(
+            december_payslip._get_line_values(['HolPayReg'])['HolPayReg'][december_payslip.id]['total'], 24.23, places=2)
+        december_payslip.action_payslip_done()
+
+        attest.invalidate_recordset(['simple_holiday_pay_amount_recovered', 'double_holiday_pay_amount_recovered'])
+        self.assertAlmostEqual(attest.simple_holiday_pay_amount_recovered, 495, places=2)
+        self.assertEqual(attest.double_holiday_pay_amount_recovered, 990)
 
     @freeze_time('2026-01-01')
     def test_worker_attestation_for_current_worker(self):
@@ -408,3 +535,248 @@ class TestHrPayrollHolidayAttest(TestPayrollCommon):
         )
         self.assertEqual(self._create_regular_payslip_with_leave(attest), 0)
         self.assertEqual(self._get_double_holiday_recovery(worker, 2026), 0)
+
+    def test_departure_double_holiday_pay_n1_without_previous_employer(self):
+        """
+        The exit double holiday pay of the previous year is 7.67% of the gross earned at this employer: the months
+        of the previous employer's certificate were paid by the previous employer.
+        """
+        for departure_date, double_paid_in_june in ((date(2026, 3, 31), False), (date(2026, 8, 31), True)):
+            employee = self.create_employee({
+                'name': 'Hired with a certificate',
+                'date_version': date(2025, 7, 1),
+                'contract_date_start': date(2025, 7, 1),
+                'wage': 3000,
+            })
+            self._create_attestation(
+                employee,
+                attest_type='employee',
+                date_from=date(2025, 1, 1),
+                date_to=date(2025, 6, 30),
+                prev_days_earned=10,
+                prev_simple_holiday_pay_paid=1380,
+                prev_double_holiday_pay_paid=1380,
+            )
+            self.create_and_validate_payslips(employee, 2025, list(range(7, 13)))
+            double_paid = 0
+            if double_paid_in_june:
+                # the double holiday pay of June covers the certificate's months and recovers what the previous
+                # employer paid
+                double_payslip = self.create_and_validate_payslips(employee, 2026, 6, {
+                    'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+                })
+                codes = ['DH_BASIC', 'DOUBLERECOVERYONSS', 'DOUBLERECOVERYNOONSS']
+                values = double_payslip._get_line_values(codes, compute_sum=True)
+                self.assertTrue(values['DOUBLERECOVERYONSS']['sum']['total'])
+                double_paid = sum(values[code]['sum']['total'] for code in codes)
+            departure = self.env['hr.employee.departure'].create({
+                'employee_id': employee.id,
+                'dismissal_date': departure_date,
+                'departure_date': departure_date,
+                'departure_reason_id': self.leaving_type_fired.id,
+                'departure_description': 'Test',
+            })
+            departure._generate_termination_holidays()
+            payslip_n1 = self.env['hr.payslip'].search([
+                ('employee_id', '=', employee.id),
+                ('struct_id', '=', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays').id),
+            ])
+            self.assertEqual(len(payslip_n1), 1)
+            self.assertAlmostEqual(payslip_n1._get_input_line_amount('GROSS_REF'), 18000, places=2)
+            values = payslip_n1._get_line_values(['PAY_DOUBLE', 'PAY_DOUBLE_COMPLEMENTARY'], compute_sum=True)
+            double_holiday_pay = values['PAY_DOUBLE']['sum']['total'] + values['PAY_DOUBLE_COMPLEMENTARY']['sum']['total']
+            self.assertAlmostEqual(double_holiday_pay, max(0, 18000 * 0.0767 - double_paid), places=1,
+                                   msg=f"Departure on {departure_date}")
+
+    def test_departure_simple_holiday_pay_n1_without_recovered_days(self):
+        """
+        The leave days covered by the previous employer's certificate are paid by that employer: the wage paid for
+        them is recovered (HolPayRec). They are not simple holiday pay already paid by this employer when the
+        departing employer settles the simple holiday pay of the previous year.
+        """
+        employee = self.create_employee({
+            'name': 'Hired with a certificate',
+            'date_version': date(2025, 7, 1),
+            'contract_date_start': date(2025, 7, 1),
+            'wage': 3000,
+        })
+        attestation = self._create_attestation(
+            employee,
+            attest_type='employee',
+            date_from=date(2025, 1, 1),
+            date_to=date(2025, 6, 30),
+            prev_days_earned=10,
+            prev_simple_holiday_pay_paid=1380,
+            prev_double_holiday_pay_paid=1380,
+        )
+        self.create_and_validate_payslips(employee, 2025, list(range(7, 13)))
+        recovered = self._create_regular_payslip_with_leave(attestation)
+        self.assertTrue(recovered)
+        january_payslip = self.env['hr.payslip'].search([
+            ('employee_id', '=', employee.id),
+            ('date_from', '=', date(2026, 1, 1)),
+        ])
+        january_payslip.action_payslip_done()
+        holiday_pay = january_payslip._get_worked_days_line_values(['016.00'], ['amount'], True)['016.00']['sum']['amount']
+        self.assertTrue(holiday_pay)
+
+        departure = self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'dismissal_date': '2026-03-31',
+            'departure_date': '2026-03-31',
+            'departure_reason_id': self.leaving_type_fired.id,
+            'departure_description': 'Test',
+        })
+        departure._generate_termination_holidays()
+        payslip_n1 = self.env['hr.payslip'].search([
+            ('employee_id', '=', employee.id),
+            ('struct_id', '=', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays').id),
+        ])
+        simple_holiday_pay = payslip_n1._get_line_values(['PAY_SIMPLE'], compute_sum=True)['PAY_SIMPLE']['sum']['total']
+        # 7.67% of the gross of 2025 at this employer, minus the holiday pay this employer kept paying
+        self.assertAlmostEqual(simple_holiday_pay, 18000 * 0.0767 - (holiday_pay + recovered), places=1)
+
+    def test_holiday_pay_regularization_on_last_monthly_payslip(self):
+        """
+        The final settlement of the simple holiday pay recovery happens in December or at the end of the contract,
+        also without a termination fees payslip.
+        """
+        employee = self._create_attest_employee()
+        attestation = self._create_attestation(employee, attest_type='employee')
+        recovered = self._create_regular_payslip_with_leave(attestation)
+        self.assertTrue(recovered)
+        january_payslip = self.env['hr.payslip'].search([
+            ('employee_id', '=', employee.id),
+            ('date_from', '=', date(2026, 1, 1)),
+        ])
+        january_payslip.action_payslip_done()
+        holiday_pay = january_payslip._get_worked_days_line_values(['016.00'], ['amount'], True)['016.00']['sum']['amount']
+
+        self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'dismissal_date': '2026-05-31',
+            'departure_date': '2026-05-31',
+            'departure_reason_id': self.leaving_type_fired.id,
+            'departure_description': 'Test',
+        })
+        self.assertEqual(employee.departure_date, date(2026, 5, 31))
+        may_payslip = self._create_payslip(employee, date(2026, 5, 1), date(2026, 5, 31))
+        regularization = may_payslip._get_line_values(['HolPayReg'])['HolPayReg'][may_payslip.id]['total']
+        # the leave taken, within the certificate's cap prorated to the 38 hours taken
+        prorated_cap = attestation.simple_holiday_pay_cap * 38 / attestation.hours_to_allocate
+        self.assertAlmostEqual(regularization, -(min(holiday_pay, prorated_cap) + recovered), places=2)
+        self.assertTrue(regularization)
+
+        # a termination fees payslip does not recover it a second time
+        termination_payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'date_from': date(2026, 5, 1),
+            'date_to': date(2026, 5, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees').id,
+        })
+        termination_payslip.compute_sheet()
+        self.assertAlmostEqual(termination_payslip._get_line_values(['HolPayReg'])['HolPayReg'][termination_payslip.id]['total'], 0, places=2)
+
+    def test_departure_gross_reference_current_contract_only(self):
+        """
+        The exit holiday pay of an earlier contract of the same year was paid at its own end: the gross reference
+        of a later departure only counts the payslips of the current contract.
+        """
+        employee = self.create_employee({
+            'name': 'Rehired',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': date(2026, 3, 31),
+            'wage': 3000,
+        })
+        first_version = employee.version_id
+        first_payslips = self.create_and_validate_payslips(employee, 2026, [1, 2, 3], {'version_id': first_version.id})
+        second_version = employee.create_version({
+            'date_version': date(2026, 9, 1),
+            'contract_date_start': date(2026, 9, 1),
+            'contract_date_end': False,
+        })
+        self.assertNotEqual(first_version, second_version)
+        second_payslips = self.create_and_validate_payslips(employee, 2026, [9, 10, 11], {'version_id': second_version.id})
+        departure = self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'dismissal_date': '2026-11-30',
+            'departure_date': '2026-11-30',
+            'departure_reason_id': self.leaving_type_fired.id,
+            'departure_description': 'Test',
+        })
+        self.assertEqual(departure.l10n_be_first_contract_date, date(2026, 9, 1))
+        self.assertEqual(departure.l10n_be_payslip_n_ids, second_payslips)
+        self.assertFalse(departure.l10n_be_payslip_n_ids & first_payslips)
+
+    def test_holiday_pay_regularization_hours_of_the_certificate(self):
+        """
+        The settlement of the holiday pay recovery covers the hours the certificate allocates (4 weeks of the
+        previous schedule, 152 h), not its days times the hours a day of the new schedule (20 x 9.5 = 190 h): the
+        days of the employer's own allocation are not recovered.
+        """
+        calendar = self.env['resource.calendar'].create({
+            'name': '4 days of 9.5 hours',
+            'company_id': self.belgian_company.id,
+            'attendance_ids': [(0, 0, {
+                'dayofweek': str(day), 'hour_from': 8, 'hour_to': 17.5,
+            }) for day in range(4)],
+        })
+        employee = self.create_employee({
+            'name': 'Four days',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'resource_calendar_id': calendar.id,
+            'wage': 3000,
+        })
+        attestation = self._create_attestation(
+            employee,
+            attest_type='employee',
+            prev_days_earned=20,
+            prev_simple_holiday_pay_paid=5000,
+            prev_double_holiday_pay_paid=5000,
+        )
+        self.assertEqual(attestation.hours_to_allocate, 152)
+        attestation.leave_allocation_id.action_approve()
+        own_allocation = self.env['hr.leave.allocation'].create({
+            'name': 'Own paid time off',
+            'employee_id': employee.id,
+            'work_entry_type_id': attestation.leave_allocation_id.work_entry_type_id.id,
+            'number_of_days': 10,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 12, 31),
+        })
+        own_allocation.action_approve()
+        # 20 days of 9.5 hours (190 h): 16 days of the certificate and 4 own days
+        for date_from, date_to in ((date(2026, 1, 5), date(2026, 1, 29)), (date(2026, 2, 2), date(2026, 2, 5))):
+            self.env['hr.leave'].create({
+                'name': 'Holidays',
+                'employee_id': employee.id,
+                'work_entry_type_id': attestation.leave_allocation_id.work_entry_type_id.id,
+                'request_date_from': date_from,
+                'request_date_to': date_to,
+            })._action_validate()
+        payslips = self._create_payslip(employee, date(2026, 1, 1), date(2026, 1, 31))
+        payslips |= self._create_payslip(employee, date(2026, 2, 1), date(2026, 2, 28))
+        holiday_hours = sum(payslips.worked_days_line_ids.filtered(lambda wd: wd.code == '016.00').mapped('number_of_hours'))
+        self.assertAlmostEqual(holiday_hours, 190, places=2)
+        december_payslip = self.env['hr.payslip'].create({
+            'name': 'December 2026',
+            'employee_id': employee.id,
+            'date_from': date(2026, 12, 1),
+            'date_to': date(2026, 12, 31),
+            'struct_id': self.payslip_structure_type.id,
+        })
+        december_payslip.compute_sheet()
+        recovered = (payslips + december_payslip)._get_line_values(['HolPayRec', 'HolPayReg'], compute_sum=True)
+        total_recovered = recovered['HolPayRec']['sum']['total'] + recovered['HolPayReg']['sum']['total']
+        hourly_wage = 3000 * 3 / 13 / 38
+        self.assertLess(152 * hourly_wage, attestation.simple_holiday_pay_cap)
+        self.assertAlmostEqual(total_recovered, -152 * hourly_wage, places=1)
+
+    def test_issues_without_dates(self):
+        # The form computes the issues while a date is still empty
+        attestation = self.env['l10n.be.holiday.attest'].new({'date_from': date(2025, 1, 1), 'date_to': False})
+        self.assertFalse(attestation.issues)
+        attestation = self.env['l10n.be.holiday.attest'].new({'date_from': date(2025, 2, 1), 'date_to': date(2025, 1, 1)})
+        self.assertTrue(attestation.issues)

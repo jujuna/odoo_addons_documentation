@@ -10,6 +10,14 @@
         <field name="context">{'default_employee_ids': active_ids}</field>
     </record>
 
+    <record id="allocating_paid_time_off_warning_action" model="ir.actions.act_window">
+        <field name="name">Paid Time Off Allocation</field>
+        <field name="res_model">hr.payroll.alloc.paid.leave</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
     <record id="hr_payroll_allocating_paid_time_off_view_form" model="ir.ui.view">
         <field name="name">hr.payroll.alloc.paid.leave.view.form</field>
         <field name="model">hr.payroll.alloc.paid.leave</field>
@@ -17,8 +25,12 @@
             <form string="Paid Time Off Allocation" create="0">
                 <header>
                     <button name="generate_allocation" string="Generate Allocations" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button name="action_refresh_allocations" string="Refresh" type="object"/>
                 </header>
                 <sheet>
+                    <group>
+                        <field name="year" class="oe_inline"/>
+                    </group>
                     <field name="employee_ids" invisible="1"/>
                     <field name="has_time_off_to_postpone" invisible="1"/>
                     <field name="alloc_employee_ids" widget="holiday_pay_list_widget" nolabel="1"/>
@@ -35,13 +47,23 @@
                 <field name="employee_id" widget="many2one_avatar_employee"/>
                 <field name="holiday_attest_balance" string="Attestations"/>
                 <field name="paid_time_off_hours" string="Accrued Hours" optional="hide"/>
-                <field name="paid_time_off" string="Accrued Days"/>
+                <field name="paid_time_off" string="Accrued Days" widget="paid_time_off_tooltip"/>
                 <field name="contract_next_year_id" column_invisible="True" />
                 <field name="resource_calendar_id"/>
                 <field name="already_allocated_paid_time_off"/>
                 <field name="paid_time_off_to_allocate" string="To Allocate"/>
                 <field name="paid_time_off_to_postpone_n1" column_invisible="not parent.has_time_off_to_postpone" width="120px"/>
                 <field name="paid_time_off_to_postpone_n2" column_invisible="not parent.has_time_off_to_postpone" width="120px"/>
+                <!-- Fields for the tooltip -->
+                <field name="accrued_days_from_work" column_invisible="True"/>
+                <field name="accrued_hours_from_work"  column_invisible="True"/>
+                <field name="accrued_days_from_holiday_attest" column_invisible="True"/>
+                <field name="total_accrued_hours"  column_invisible="True"/>
+                <field name="total_accrued_days"  column_invisible="True"/>
+                <field name="worked_periods" column_invisible="True"/>
+                <field name="expected_paid_time_off_to_allocate"  column_invisible="True"/>
+                <field name="expected_hours_to_allocate"  column_invisible="True"/>
+                <field name="current_resource_calendar_id" optional="hide"/>
             </list>
         </field>
     </record>

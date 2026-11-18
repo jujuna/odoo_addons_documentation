@@ -21,6 +21,8 @@ from odoo.addons.mail.tests.common import mail_new_test_user
 @patch.object(CertificateCertificate, '_decode_certificate_for_be_onss_xml', lambda contract, xml_str: b'dummy\r\nsignature\r\n')
 class TestFlexiAtWork(TestPayrollCommon):
 
+    _minimal_payroll_setup = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
+from odoo.tools import clean_context
 from odoo.tools.date_utils import get_month
 
 
@@ -76,6 +77,16 @@ class HrPayslipRun(models.Model):
     _check_dates = models.Constraint('CHECK(date_start <= date_end)', 'The start date must be before or equal to the end date.')
 
     def _get_name_for_period(self, vals=None, cache=None):
+        """Return the default pay run name for a period, e.g. ``"Mar 2026"`` or ``"1 Mar 2026 - 15 Mar 2026"``.
+
+        The structure name is appended when it is not the default structure of its type.
+
+        :param dict vals: ``date_start`` and ``date_end`` (date, datetime or ISO string, required),
+            optionally ``structure_id``.
+        :param dict cache: date formatting cache shared between calls.
+        :raise UserError: if a date is missing.
+        :rtype: str
+        """
 
         def normalize_date(val):
             if isinstance(val, date):
@@ -101,22 +112,34 @@ class HrPayslipRun(models.Model):
         format_date_cached = self.env["hr.payslip"]._format_date_cached
         if date_end.year == date_start.year:
             if date_end.month - date_start.month == 11:
-                name += format_date_cached(cache, date_start, date_format="Y")
+                name += format_date_cached(cache, date_start, date_format="y")
             elif date_end.month == date_start.month:
                 if (date_start, date_end) == get_month(date_start):
-                    name += format_date_cached(cache, date_start, date_format="MMM Y")
+                    name += format_date_cached(cache, date_start, date_format="MMM y")
                 elif date_start.day == date_end.day:
-                    name += format_date_cached(cache, date_start, date_format="d MMM Y")
+                    name += format_date_cached(cache, date_start, date_format="d MMM y")
                 else:
-                    name += format_date_cached(cache, date_start, date_format="d MMM Y") + " - " + format_date_cached(cache, date_end, date_format="d MMM Y")
+                    name += format_date_cached(cache, date_start, date_format="d MMM y") + " - " + format_date_cached(cache, date_end, date_format="d MMM y")
             else:
-                name += format_date_cached(cache, date_start, date_format="MMM Y") + " - " + format_date_cached(cache, date_end, date_format="MMM Y")
+                name += format_date_cached(cache, date_start, date_format="MMM y") + " - " + format_date_cached(cache, date_end, date_format="MMM y")
         else:
-            name += format_date_cached(cache, date_start, date_format="Y") + " - " + format_date_cached(cache, date_end, date_format="Y")
+            name += format_date_cached(cache, date_start, date_format="y") + " - " + format_date_cached(cache, date_end, date_format="y")
         if structure_id:
             structure_id = self.env["hr.payroll.structure"].browse(structure_id)
-            if structure_id.country_code:
-                name += f" ({structure_id.country_code})"
+            if structure_id != structure_id.type_id.default_struct_id:
+                name += " - " + structure_id.name
+        return name
+
+    def _get_unique_name(self, name, taken_names=()):
+        self.ensure_one()
+        if (self.company_id.id, name) in taken_names or self.search_count([
+            ("name", "=", name),
+            ("company_id", "=", self.company_id.id),
+            ("state", "!=", "04_cancel"),
+            ("id", "not in", self.ids),
+        ], limit=1):
+            now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+            name += " - " + now.strftime("%d/%m/%Y %H:%M")
         return name
 
     def _get_valid_versions(
@@ -128,6 +151,20 @@ class HrPayslipRun(models.Model):
         employee_type_ids=None,
         employee_ids=None,
     ):
+        """Return the versions for which payslips can be generated in the pay run.
+
+        One version per employee contract running in the period (see
+        ``hr.employee._get_contracts()``), filtered by :meth:`_get_valid_versions_domain_payrun`.
+        Missing arguments default to the pay run values.
+
+        :param date date_start: period start.
+        :param date date_end: period end.
+        :param int structure_id: ``hr.payroll.structure`` id.
+        :param int company_id: ``res.company`` id.
+        :param list[int] employee_type_ids: ``hr.employee.type`` ids.
+        :param list[int] employee_ids: restrict to these ``hr.employee`` ids.
+        :rtype: hr.version
+        """
         date_start = date_start or self.date_start
         date_end = date_end or self.date_end
         version_domain = self._get_valid_versions_domain_payrun(date_start, date_end, structure_id, company_id, employee_type_ids)
@@ -140,6 +177,14 @@ class HrPayslipRun(models.Model):
         return valid_versions
 
     def _get_valid_versions_domain_payrun(self, date_start=None, date_end=None, structure_id=None, company_id=None, employee_type_ids=None):
+        """Return the ``hr.version`` domain of the versions eligible for the pay run.
+
+        Versions of active employees of the company, with the structure type of the structure,
+        started before ``date_end``, and with an allowed employee type (the given employee types,
+        intersected with the structure ones if any).
+
+        :rtype: odoo.fields.Domain
+        """
         structure = self.env["hr.payroll.structure"].browse(structure_id) if structure_id else self.structure_id
         company = company_id or self.company_id.id
         version_domain = Domain([
@@ -160,17 +205,26 @@ class HrPayslipRun(models.Model):
     @api.depends('date_start', 'date_end', 'structure_id')
     def _compute_name(self):
         formated_date_cache = {}
+        taken_names = set()
         for payrun in self:
             if not payrun.name:
-                payrun.name = payrun._get_name_for_period({
+                name = payrun._get_name_for_period({
                     'date_start': payrun.date_start,
                     'date_end': payrun.date_end,
                     'structure_id': payrun.structure_id.id,
                     'employee_type_ids': payrun.employee_type_ids.ids,
                 }, formated_date_cache)
+                payrun.name = payrun._get_unique_name(name, taken_names)
+                taken_names.add((payrun.company_id.id, name))
 
     @api.depends('slip_ids')
     def _compute_version_ids(self):
+        """Keep ``version_ids`` in sync with the payslips.
+
+        A new pay run without payslips gets all the valid versions (:meth:`_get_valid_versions`).
+        Afterwards, the versions of added payslips are added and, once the pay run is not draft
+        anymore, the versions without payslip are removed.
+        """
         for payrun in self:
             if payrun.slip_ids or payrun.version_ids:
                 versions_with_slips = payrun.slip_ids.version_id
@@ -205,6 +259,14 @@ class HrPayslipRun(models.Model):
 
     @api.depends("slip_ids.state", "version_ids")
     def _compute_state(self):
+        """Compute the pay run state from its versions and payslips.
+
+        * ``00_draft``: some versions have no payslip yet;
+        * ``01_ready``: at least one draft payslip;
+        * ``02_close`` (Done): else, at least one validated payslip;
+        * ``03_paid``: else, at least one paid payslip;
+        * ``04_cancel``: all payslips cancelled (or no payslip and no version).
+        """
         for payslip_run in self:
             missing_slips = payslip_run.version_ids - payslip_run.slip_ids.version_id
             if missing_slips:
@@ -244,6 +306,7 @@ class HrPayslipRun(models.Model):
 
     @api.depends('structure_id', 'company_id')
     def _compute_date_start(self):
+        """Default the start date to the day after the last done or paid pay run of the same structure and company, or to the start of the current period of the structure schedule."""
         payrun_groups = self.env['hr.payslip.run']._read_group(
             domain=[
                 ('id', 'not in', self.ids),
@@ -271,6 +334,7 @@ class HrPayslipRun(models.Model):
 
     @api.depends('date_start')
     def _compute_date_end(self):
+        """Default the end date to the end of the period starting at ``date_start``, from the structure type schedule."""
         for payslip_run in self:
             schedule_pay = payslip_run.structure_id.type_id.default_schedule_pay
             if schedule_pay:
@@ -309,6 +373,13 @@ class HrPayslipRun(models.Model):
         return [('company_id.partner_id.country_id', operator, value)]
 
     def action_draft(self):
+        """Reset the payslips of the pay run to draft and remove the payment report.
+
+        Resetting payslips to draft regenerates their worked days and lines (see
+        ``hr.payslip.write()``).
+
+        :raise ValidationError: if some payslips are paid.
+        """
         if self.slip_ids.filtered(lambda s: s.state == 'paid'):
             raise ValidationError(self.env._('You cannot reset a pay run to draft if some of the payslips have already been paid.'))
         self.env['ir.attachment'].sudo().search([
@@ -354,12 +425,19 @@ class HrPayslipRun(models.Model):
     # TODO master: remove, call slip_ids.action_payslip_paid() instead
     # will be done in task 6633055
     def action_paid(self):
+        """Mark the payslips as paid, see ``hr.payslip.action_payslip_paid()``."""
         self.mapped('slip_ids').action_payslip_paid()
 
     def action_unpaid(self):
+        """Set the paid payslips back to validated, see ``hr.payslip.action_payslip_unpaid()``."""
         self.slip_ids.action_payslip_unpaid()
 
     def action_correct(self):
+        """Create a correction pay run for a done or paid pay run and open its payslips.
+
+        All the non refund payslips are refunded (``_action_refund_payslips()``) and corrected
+        (``_action_correct_payslips()``); the refunds and corrections are moved to the new pay run.
+        """
         self.ensure_one()
         if self.state not in ('02_close', '03_paid'):
             raise UserError(self.env._("You can only correct a validated or paid pay run."))
@@ -384,6 +462,11 @@ class HrPayslipRun(models.Model):
         return correction_run.action_open_payslips()
 
     def action_validate(self):
+        """Validate the computed, non cancelled payslips (``hr.payslip.action_payslip_done()``).
+
+        :raise UserError: for users who are not payroll officers if there are warnings or errors.
+        :return: the action returned by the validation, if any.
+        """
         if not (self.env.user.has_group('hr_payroll.group_hr_payroll_officer') or
                 self.env.user.has_group('base.group_system') or self.env.is_superuser()):
             if self.payslips_with_warnings > 0 or self.payslips_with_errors > 0:
@@ -391,11 +474,14 @@ class HrPayslipRun(models.Model):
                     "You do not have sufficient permissions to validate a Pay Run with warnings or errors.\n"
                     "Please ask a Payroll Officer or Manager to review."
                 ))
+        # The default values of the pay run (e.g. default_state from a view grouped by state) must not
+        # apply to the records created by the validation (accounting entries, declarations, ...)
         return self.slip_ids.filtered(
             lambda slip: slip.state != 'cancel' and slip.line_ids
-        ).action_payslip_done()
+        ).with_context(clean_context(self.env.context)).action_payslip_done()
 
     def action_confirm(self):
+        """Compute the draft payslips of the pay run."""
         self.slip_ids.filtered(lambda slip: slip.state == 'draft').compute_sheet()
 
     def action_add_employees(self):
@@ -414,6 +500,10 @@ class HrPayslipRun(models.Model):
         return action
 
     def action_open_payslips(self):
+        """Open the payslips of the pay run, generating the missing ones first if the pay run is draft (see :meth:`_generate_payslips`).
+
+        :rtype: dict
+        """
         self.ensure_one()
         if self.state == '00_draft':
             self._generate_payslips()
@@ -436,8 +526,18 @@ class HrPayslipRun(models.Model):
 
     @api.model
     def _get_start_payrun_warnings(self, versions, date_start, date_end):
-        """ Check for the most common issues before starting a brand new pay
-        run (missing employee data, pending time offs, no time off recorded). """
+        """Check for the most common issues before starting a brand new pay run.
+
+        Missing or incorrect employee data, time off to approve or blocked, and no time off at all
+        in the period (for calendar based versions).
+
+        :param hr.version versions: versions of the new pay run.
+        :param date date_start: period start.
+        :param date date_end: period end.
+        :return: ``[{'title': str, 'body': str, 'reviewLabel': str, 'reviewAction': dict}]``,
+            empty if there is nothing to review.
+        :rtype: list[dict]
+        """
         warnings = []
         if versions.filtered(lambda v: v.review_state in ('2_to_review', '3_anomaly')):
             warnings.append({
@@ -525,6 +625,12 @@ class HrPayslipRun(models.Model):
 
     @api.model
     def action_start_payrun_with_warnings(self, vals):
+        """Start a pay run (see :meth:`action_start_payrun`) or, if :meth:`_get_start_payrun_warnings` finds issues, return a client action displaying them first.
+
+        :param dict vals: values of the pay run to create (``date_start``, ``date_end``,
+            ``structure_id``, ``company_id``, ``employee_type_ids``, ...).
+        :rtype: dict
+        """
         vals = dict(vals)
         date_start = fields.Date.from_string(vals.get('date_start'))
         date_end = fields.Date.from_string(vals.get('date_end'))
@@ -545,14 +651,27 @@ class HrPayslipRun(models.Model):
 
     @api.model
     def action_start_payrun(self, vals):
+        """Create a pay run, generate its payslips and open them.
+
+        :param dict vals: values of the pay run to create.
+        :rtype: dict
+        """
         return self.create(vals).action_open_payslips()
 
     def action_add_versions(self, employee_ids):
+        """Add the valid versions of the given employees to the pay run.
+
+        :param list[int] employee_ids: ``hr.employee`` ids.
+        """
         self.ensure_one()
         valid_versions = self._get_valid_versions(employee_ids=employee_ids)
         self.version_ids = [Command.link(vid) for vid in valid_versions.ids]
 
     def action_assign_versions(self, employee_ids):
+        """Replace the versions of the pay run by the valid versions of the given employees.
+
+        :param list[int] employee_ids: ``hr.employee`` ids.
+        """
         self.ensure_one()
         valid_versions = self._get_valid_versions(employee_ids=employee_ids)
         self.version_ids = [Command.set(valid_versions.ids)]
@@ -592,13 +711,27 @@ class HrPayslipRun(models.Model):
             }
         }
 
-    def _generate_payslips(self):
+    def _generate_payslips(self, versions=None):
+        """Create and compute the payslips of the versions of the pay run that have none yet.
+
+        The payslips cover the pay run period, with the pay run structure (or the default
+        structure of the version structure type). Versions of another structure type are skipped.
+        The system parameter ``hr_payroll.payslip_run_creation_no_message`` disables the creation
+        message of the payslips.
+
+        :param versions: ``hr.version`` records to generate the payslips of, all the versions of
+            the pay run by default
+        :raise UserError: if the pay run has no version.
+        :return: the new payslips.
+        :rtype: hr.payslip
+        """
         self.ensure_one()
 
         if not self.version_ids:
             raise UserError(self.env._("You must have employee records in the payrun to generate payslip(s)."))
 
-        valid_versions = self.version_ids - self.slip_ids.version_id
+        candidate_versions = self.version_ids if versions is None else versions & self.version_ids
+        valid_versions = candidate_versions - self.slip_ids.version_id
         if self.structure_id:
             valid_versions = valid_versions.filtered(lambda c: c.structure_type_id.id == self.structure_id.type_id.id)
 
@@ -624,12 +757,35 @@ class HrPayslipRun(models.Model):
         new_payslips.compute_sheet()
         return new_payslips
 
+    def _add_missing_employee(self, employee):
+        new_payslips = self.env['hr.payslip']
+        for payrun in self:
+            if payrun.state not in ['00_draft', '01_ready']:
+                continue
+            versions = payrun._get_valid_versions(employee_type_ids=payrun.employee_type_ids.ids, employee_ids=employee.ids)
+            if not versions:
+                continue
+            payrun.version_ids |= versions
+            new_payslips |= payrun._generate_payslips(versions=versions)
+        if not new_payslips:
+            raise UserError(self.env._(
+                "%(employee)s can't be added to the pay run(s) %(payruns)s: they are no longer in draft, "
+                "or the employee has no running contract matching their period, structure and employee types.",
+                employee=employee.name,
+                payruns=', '.join(self.mapped('name')),
+            ))
+        return new_payslips
+
     @api.ondelete(at_uninstall=False)
     def _unlink_if_draft_or_cancel(self):
         if any(self.mapped('slip_ids').filtered(lambda payslip: payslip.state not in ('draft', 'cancel'))):
             raise UserError(self.env._("You can't delete a pay run with payslips if they are not draft or cancelled."))
 
     def _are_payslips_ready(self):
+        """Return whether at least one payslip of the pay runs is validated or cancelled.
+
+        :rtype: bool
+        """
         return any(slip.state in ['validated', 'cancel'] for slip in self.mapped('slip_ids'))
 
     @api.model
@@ -649,9 +805,11 @@ class HrPayslipRun(models.Model):
             payslip_run.total_employer_cost = sum(payslip_run.slip_ids.filtered(lambda p: p.state != "cancel").mapped("employer_cost"))
 
     def _get_last_three_payruns(self):
-        """
-            Get the payruns from the last payment periods including the current one,
-            of the same structure and company, Also try to filter correction ones.
+        """Return the pay run and the two previous done or paid pay runs of the same structure and company (correction pay runs excluded).
+
+        Used by the work time and payroll line reports.
+
+        :rtype: hr.payslip.run
         """
         res = self
 
@@ -696,21 +854,45 @@ class HrPayslipRun(models.Model):
         return action
 
     def action_re_compute_payslips(self):
+        """Recompute the draft payslips of a draft or ready pay run.
+
+        :raise UserError: if the pay run is done, paid or cancelled.
+        """
         self.ensure_one()
         if self.state not in ['00_draft', '01_ready']:
             raise UserError(self.env._("You can only re-compute payslips in a pay run that is in draft or ready state."))
         self.slip_ids.filtered(lambda slip: slip.state == 'draft').compute_sheet()
 
     def off_cycle_version(self, version_id):
+        """Remove a version from the pay run and detach its payslips from it (they become off-cycle payslips).
+
+        :param int version_id: ``hr.version`` id.
+        :return: a ``soft_reload`` client action.
+        """
         self.ensure_one()
         self.write({'version_ids': [Command.unlink(version_id)]})
         payslips = self.slip_ids.filtered_domain([('version_id', '=', version_id)])
         if payslips:
-            payslips.payslip_run_id = Command.unlink(self.id)
+            payslips.payslip_run_id = False
         self.flush_model(['version_ids', 'slip_ids'])
         return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
+    def _unlink_emptied_payruns(self):
+        """Delete the pay runs whose payslips are all being deleted.
+
+        The payslips are detached first, so that they are deleted by their own ``unlink``
+        instead of the database cascade.
+        """
+        self.slip_ids.payslip_run_id = False
+        self.unlink()
+
     def _cron_generate_payrun_for_employee_types_with_auto_post(self):
+        """Create, compute and validate the monthly pay runs of the employee types with ``payroll_auto_post``.
+
+        For each employee type and company, a pay run is created for the month of the last
+        ``payroll_closing_date`` of the employee type, unless it already exists or there is no
+        valid version.
+        """
         employee_types_with_auto_post = self.env['hr.employee.type'].search([('payroll_auto_post', '=', True)])
         if not employee_types_with_auto_post:
             return
@@ -786,12 +968,6 @@ class HrPayslipRun(models.Model):
                     continue
 
                 payrun = self.create({
-                    'name': self._get_name_for_period({
-                        'date_start': date_start,
-                        'date_end': date_end,
-                        'employee_type_ids': [employee_type.id],
-                        'structure_id': default_struct.id,
-                    }),
                     'date_start': date_start,
                     'date_end': date_end,
                     'employee_type_ids': [employee_type.id],
@@ -804,10 +980,49 @@ class HrPayslipRun(models.Model):
                 payrun.action_validate()
 
     def action_move_to_off_cycle(self, employee_id):
+        """Remove the versions of an employee from the pay run and detach their payslips from it (they become off-cycle payslips).
+
+        :param int employee_id: ``hr.employee`` id.
+        :return: a ``soft_reload`` client action.
+        """
         versions = self.version_ids.filtered(lambda v: v.employee_id.id == employee_id)
         if versions:
             self.write({'version_ids': [Command.unlink(v.id) for v in versions]})
         payslips = self.slip_ids.filtered(lambda s: s.version_id in versions)
         if payslips:
-            self.write({'slip_ids': [Command.unlink(payslips.ids)]})
+            payslips.payslip_run_id = False
         return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+    @api.model
+    def _get_next_payrun(self, company, date_start, schedule_pay, employee_types=None):
+        domain = [
+            ('company_id', '=', company.id),
+            ('date_start', '>=', date_start),
+        ]
+        if employee_types:
+            domain += [
+            '|',
+            ('employee_type_ids', 'in', employee_types.ids),
+            ('employee_type_ids', '=', None)
+            ]
+        payruns_per_month = self.env['hr.payslip.run']._read_group(
+        domain,
+        groupby=['date_start:day', 'date_end:day'],
+        aggregates=['id:recordset'],
+        order='date_start:day asc, date_end:day asc',
+        )
+        if not payruns_per_month:
+            return None, date_start
+        expected_start_date = date_start
+        today = fields.Date.context_today(self)
+        payruns = None
+        for payrun_group in payruns_per_month:
+            expected_end_date = expected_start_date + self.env["hr.payslip"]._schedule_timedelta(schedule_pay, expected_start_date, company.country_code)
+            payrun_group_start, payrun_group_end, payruns = payrun_group
+            if expected_start_date != payrun_group_start:
+                return None, expected_start_date
+            elif (expected_end_date >= today >= expected_start_date):
+                return payruns, payrun_group_start
+            else:
+                expected_start_date = payrun_group_end + relativedelta(days=1)
+        return None, expected_start_date

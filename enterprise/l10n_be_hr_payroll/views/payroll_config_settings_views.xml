@@ -9,7 +9,7 @@
                 <div class="d-flex align-items-baseline gap-2" invisible="country_code != 'BE'" groups="hr_payroll.group_hr_payroll_user">
                     <label for="l10n_be_company_number" class="text-nowrap"/>
                     <field name="l10n_be_company_number" placeholder="e.g. 0412345614"
-                        required="1"
+                        required="not parent_id"
                         readonly="parent_id"/>
                 </div>
             </xpath>
@@ -23,7 +23,7 @@
                         <label for="onss_registration_number"/>
                         <div class="o_row">
                             <field name="onss_registration_number" placeholder="e.g. 083012308"
-                                required="l10n_be_has_employees"
+                                required="l10n_be_has_employees and not parent_id"
                                 readonly="parent_id"
                                 help="The ONSS Registration Number is a 9-digit code given by ONSS."/>
                             <a href="https://employer-identification-consult.socialsecurity.be/" target="_blank" class="text-nowrap">
@@ -32,10 +32,10 @@
                         </div>
                         <field name="l10n_be_employer_category_id" placeholder="e.g. 010" required="l10n_be_has_employees" help="The 3-digit code that defines your employer category in DMFA filings."/>
                         <field name="l10n_be_revenue_code" placeholder="e.g. 1230" 
-                            required="l10n_be_has_employees" 
+                            required="l10n_be_has_employees and not parent_id"
                             readonly="parent_id"
                             help="The company's official revenue (ONSS/RSZ) code used for Belgian payroll declarations."/>
-                        <field name="l10n_be_main_joint_committee" placeholder="e.g. 200, 302" domain="[('id', 'in', allowed_joint_committee_ids)]" required="1"/>
+                        <field name="l10n_be_main_joint_committee" placeholder="e.g. 200, 302" domain="[('id', 'in', allowed_joint_committee_ids)]" required="l10n_be_has_employees"/>
                     </group>
 
                     <group name="company_information" string="Company Information">
@@ -43,12 +43,12 @@
                         <div class="o_row">
                             <field name="onss_importance_code" 
                                 placeholder="Based on number of employees" 
-                                required="l10n_be_has_employees"
+                                required="l10n_be_has_employees and not parent_id"
                                 readonly="parent_id"
                                 help="Determined by the ONSS directly based on the average of employees your company had. Contact the ONSS or your social secretariat to get to correct information."/>
                             
-                            <label for="exemption_sme_status" class="fw-bold ms-3 me-1" invisible="onss_importance_code not in ('7', '8', '9')"/>
-                            <field name="exemption_sme_status" invisible="onss_importance_code not in ('7', '8', '9')" readonly="parent_id"/>
+                            <label for="exemption_sme_status" class="fw-bold ms-3 me-1" invisible="onss_importance_code in ('6', '7', '8', '9')"/>
+                            <field name="exemption_sme_status" invisible="onss_importance_code in ('6', '7', '8', '9')" readonly="parent_id"/>
                         </div>   
                         <field name="l10n_be_in_difficulty" 
                             invisible="context.get('l10n_be_company_setup')"
@@ -59,7 +59,7 @@
                             readonly="parent_id"
                             help="The contribution for 'at-risk groups' is a specific employer contribution paid to the ONSS (National Social Security Office) in Belgium, intended to finance training and professional integration initiatives for certain categories of workers."/>
                         <field name="l10n_be_ffe_employer_type" 
-                            required="l10n_be_has_employees" 
+                            required="l10n_be_has_employees and not parent_id"
                             readonly="parent_id"
                             help="Determined by the ONSS. Contact the ONSS or your social secretariat to get to correct information."/>
                         <field name="l10n_be_nace_code_id" placeholder="e.g. 010" 
@@ -68,7 +68,7 @@
                             help="The NACE code is the official statistical classification system used by the European Union to categorize businesses and economic activities by industry sector."/>
                         <field name="l10n_be_employee_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for employees." invisible="context.get('l10n_be_company_setup')"/>
                         <field name="l10n_be_worker_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for workers." invisible="context.get('l10n_be_company_setup')"/>
-                        <field name="l10n_be_sector" readonly="parent_id" required="1"/>
+                        <field name="l10n_be_sector" readonly="parent_id" required="not parent_id"/>
                         <field name="l10n_be_ipa_reduction" 
                             invisible="context.get('l10n_be_company_setup')"
                             readonly="parent_id"

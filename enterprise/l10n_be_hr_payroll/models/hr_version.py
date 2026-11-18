@@ -39,6 +39,12 @@ BIK_RULE_PARAMETERS = {
 with file_open('l10n_be_hr_payroll/data/dimona_api_data.json') as f_api_data:
     API_DATA = json.load(f_api_data)
 DIMONA_TIMEOUT = 30
+# Joint committees that must be declared as such in a Dimona (3 digits, even for their
+# sub-committees), every other committee is declared as "XXX" (other sectors).
+# Source: ONSS administrative instructions, Dimona, main data, joint committee
+# https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/obligations/obligations_nsso/dimona/principaldata.html#h22
+# and the Dimona glossary, zone 00046 (JointCommissionNbr).
+DIMONA_JOINT_COMMITTEES = frozenset({'124', '140', '144', '145', '149', '302', '320', '322'})
 
 _logger = logging.getLogger(__name__)
 
@@ -121,7 +127,11 @@ class HrVersion(models.Model):
     def _get_possible_model_domain(self, vehicle_type='car'):
         return [('can_be_requested', '=', True), ('vehicle_type', '=', vehicle_type)]
 
-    allowed_joint_committee_ids = fields.Many2many(related="payroll_config_id.allowed_joint_committee_ids", groups="hr_payroll.group_hr_payroll_user")
+    allowed_joint_committee_ids = fields.Many2many('l10n.be.joint.committee', compute='_compute_allowed_joint_committee_ids', groups="hr_payroll.group_hr_payroll_user")
+    employee_type_id = fields.Many2one('hr.employee.type', "Employee Type",
+                                       index='btree_not_null',
+                                       default=lambda self: self.env.ref('hr.contract_type_employee',
+                                                                         raise_if_not_found=False) if self.env.company.country_id.code == "BE" else self.env['hr.employee.type'])
     l10n_be_reorganisation_measure_ids = fields.Many2many(related="resource_calendar_id.l10n_be_reorganisation_measure_ids", groups="hr_payroll.group_hr_payroll_user")
     l10n_be_daily_wage = fields.Monetary(
         string="Daily Wage (Belgium)",
@@ -202,8 +212,9 @@ class HrVersion(models.Model):
     l10n_be_scale_seniority_months = fields.Integer(groups="hr.group_hr_user", tracking=1, help="Number of months that will be taken into account for the accruals and the notice period")
     l10n_be_salary_scale_id = fields.Many2one(
         "l10n_be.salary.scale", string="Salary Scale", groups="hr_payroll.group_hr_payroll_user",
-        domain="[('l10n_be_joint_committee', '=', l10n_be_joint_committee_id), '|', ('employer_category_id', '=', False), ('employer_category_id', '=', l10n_be_employer_category_id)]")
-    display_l10n_be_scale = fields.Boolean(compute='_compute_display_be', groups="hr_payroll.group_hr_payroll_user")
+        # The scales of the occasional workers of the employer category too (e.g. 317 for 017)
+        domain="[('l10n_be_joint_committee', 'in', [l10n_be_joint_committee_id, False]), '|', '|', ('employer_category_id', '=', False), ('employer_category_id', '=', l10n_be_employer_category_id), ('employer_category_id.regular_category_id', '=', l10n_be_employer_category_id)]")
+    display_l10n_be_scale = fields.Boolean(compute='_compute_display_be_scale', groups="hr_payroll.group_hr_payroll_user")
     l10n_be_is_sale_representative = fields.Boolean(string="Sales Representative", groups="hr_payroll.group_hr_payroll_user")
     l10n_be_apprenticeship_contract_number = fields.Char(string='Apprenticeship Contract Number', help="The reference of the apprentice contract.", groups="hr_payroll.group_hr_payroll_user")
     l10n_be_apprenticeship_contract_type = fields.Selection([
@@ -306,6 +317,8 @@ class HrVersion(models.Model):
         groups='hr_payroll.group_hr_payroll_user')
     l10n_be_thirteen_month_eligible = fields.Boolean(related='departure_id.l10n_be_thirteen_month_eligible',
         groups='hr_payroll.group_hr_payroll_user')
+    l10n_be_holiday_attest_blocked_reason = fields.Char(related='departure_id.l10n_be_holiday_attest_blocked_reason',
+        groups='hr_payroll.group_hr_payroll_user')  # To hide the Holiday Attests button in the termination documents dropdown.
     l10n_be_salary_december_2013 = fields.Selection(related='departure_id.l10n_be_salary_december_2013',
         groups='hr_payroll.group_hr_payroll_user')
     l10n_be_salary_visibility = fields.Boolean(related='departure_id.l10n_be_salary_visibility',
@@ -377,6 +390,37 @@ class HrVersion(models.Model):
         self.ensure_one()
         return self.l10n_be_worker_code_id.dmfa_code in ['046', '047'] or self.l10n_be_worker_status in ['A1', 'A2']
 
+    def _l10n_be_is_director_under_employment_contract(self):
+        """A worker under an employment contract who also has a paid mandate of director in the company.
+
+        An employee for the social security (ONSS, DmfA, Dimona), but a company director for the withholding tax:
+        by the attraction principle, all the remunerations are director remunerations (274.20, 281.20 with its
+        box 17).
+        """
+        self.ensure_one()
+        # The cached id of the type, called for each payslip of the declarations: env.ref() would query its existence
+        director_type_id = self.env['ir.model.data']._xmlid_to_res_id(
+            'l10n_be_hr_payroll.l10n_be_contract_type_director_employment_contract', raise_if_not_found=False)
+        return bool(director_type_id) and self.employee_type_id.id == director_type_id
+
+    def _l10n_be_is_company_director(self):
+        """A company director for the withholding tax (274.20, 281.20): the directors of the joint committee 999,
+        without employment contract, and the directors under an employment contract."""
+        self.ensure_one()
+        return self.l10n_be_joint_committee_id.egov3_code == '999' or self._l10n_be_is_director_under_employment_contract()
+
+    @api.depends('employee_type_id', 'payroll_config_id.allowed_joint_committee_ids', 'l10n_be_worker_code_id.dmfa_code')
+    def _compute_allowed_joint_committee_ids(self):
+        company_exec = self.env.ref("hr.contract_type_company_executive", raise_if_not_found=False)
+        for version in self:
+            if version.is_worker():
+                version.allowed_joint_committee_ids = version.payroll_config_id.allowed_joint_committee_ids.filtered(lambda jc: jc.egov3_code not in ("200", "999"))
+                continue
+            if version.employee_type_id != company_exec:
+                version.allowed_joint_committee_ids = version.payroll_config_id.allowed_joint_committee_ids.filtered(lambda jc: jc.egov3_code != "999")
+                continue
+            version.allowed_joint_committee_ids = version.payroll_config_id.allowed_joint_committee_ids
+
     @api.depends('l10n_be_egov3_code', 'payroll_config_id.l10n_be_nace_code_id.egov3_code')
     def _compute_l10n_be_allowed_dimona_categories(self):
         selection_options = self._fields['l10n_be_dimona_category']._description_selection(self.env)
@@ -389,16 +433,25 @@ class HrVersion(models.Model):
             else:
                 version.l10n_be_allowed_dimona_categories = all_keys
 
-    @api.depends('company_id', 'l10n_be_joint_committee_id')
-    def _compute_display_be(self):
+    @api.depends('company_id', 'l10n_be_joint_committee_id', 'l10n_be_employer_category_id')
+    def _compute_display_be_scale(self):
+        belgian_versions = self.filtered(lambda v: v.company_id.country_id.code == "BE")
+        versions_with_scales = belgian_versions._l10n_be_filter_with_salary_scales()
         for version in self:
-            version.display_l10n_be_scale = (
-                version.company_id.country_id.code == "BE"
-                and version.l10n_be_joint_committee_id
-                and version.l10n_be_joint_committee_id.egov3_code in ["200", "302"]
-                if version.company_id
-                else False
-            )
+            version.display_l10n_be_scale = version in versions_with_scales
+
+    def _l10n_be_filter_with_salary_scales(self):
+        """ Returns the versions whose joint committee has salary scales available for their employer category """
+        scales = self.env['l10n_be.salary.scale'].sudo().search_fetch(
+            [('l10n_be_joint_committee', 'in', self.l10n_be_joint_committee_id.ids)],
+            ['l10n_be_joint_committee', 'employer_category_id'],
+        )
+
+        category_ids_by_committee = defaultdict(set)
+        for scale in scales:
+            category_ids_by_committee[scale.l10n_be_joint_committee.id].add(scale.employer_category_id.id)
+        # include scales without employer category in the filter (they apply to every employer of its joint committee)
+        return self.filtered(lambda v: category_ids_by_committee.get(v.l10n_be_joint_committee_id.id, set()) & {False, v.l10n_be_employer_category_id.id})
 
     spouse_fiscal_status = fields.Selection([
         ('high_income', 'With High Income'),
@@ -438,7 +491,11 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     )
     fiscal_voluntarism_percentage = fields.Float(default=0.0, tracking=1, groups="hr_payroll.group_hr_payroll_user")
     # Transport
-    transport_mode_car = fields.Boolean('Uses company car', groups="hr_payroll.group_hr_payroll_user", tracking=1)
+
+    # transport_mode_car is used by the salary configurator as a checkbox. Used to discard user car choice when unticked.
+    transport_mode_car = fields.Boolean('Uses company car',
+        compute="_compute_transport_mode_car",
+        groups="hr_payroll.group_hr_payroll_user", store=True, readonly=False, tracking=1)
     car_id = fields.Many2one(
         'fleet.vehicle', string='Company Car',
         tracking=1, compute="_compute_car_id", store=True, index='btree_not_null', readonly=False,
@@ -471,7 +528,11 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         groups="fleet.fleet_group_manager",
         compute='_compute_recurring_cost_amount_depreciated',
         inverse="_inverse_recurring_cost_amount_depreciated", tracking=1)
-    transport_mode_bike = fields.Boolean('Uses Bike', groups='hr.group_hr_user', tracking=1)
+    # transport_mode_bike is used by the salary configurator as the checkbox of the company bike: ticked with
+    # a company bike or a new bike requested, unticking it discards them.
+    transport_mode_bike = fields.Boolean('Uses company bike',
+        compute='_compute_transport_mode_bike',
+        groups='hr.group_hr_user', store=True, readonly=False, tracking=1)
     bike_id = fields.Many2one(
         'fleet.vehicle', string="Company Bike",
         tracking=1,
@@ -525,7 +586,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     bike_transport_employee_kilometer = fields.Float(
         'Bike Ride', groups="hr_payroll.group_hr_payroll_user", tracking=1)
     private_car_employee_kilometer = fields.Integer(
-        'Private Car Ride', groups="hr_payroll.group_hr_payroll_user", tracking=1)
+        'Private Car Ride',
+        compute='_compute_private_car_employee_kilometer',
+        readonly=False, store=True,
+        groups="hr_payroll.group_hr_payroll_user", tracking=1)
 
     warrant_value_employee = fields.Monetary(
         compute='_compute_commission_cost', string="Warrant monthly value for the employee", groups="hr_payroll.group_hr_payroll_user")
@@ -647,6 +711,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         help="Monthly amount the employee receives for a self-employed supplementary pension.",
         groups="hr_payroll.group_hr_payroll_user"
     )
+    # Not shown anywhere: the private bicycle cost also follows the company bike (transport_mode_bike). To remove in master.
     has_bicycle = fields.Boolean(string="Bicycle to work", default=False, groups="hr.group_hr_user",
         help="Use a bicycle as a transport mode to go to work", tracking=1)
     meal_voucher_amount = fields.Monetary(
@@ -858,7 +923,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     l10n_be_dimona_planned_hours = fields.Integer("Student Planned Hours", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_be_dimona_planned_start_time = fields.Float(groups="hr_payroll.group_hr_payroll_user", default=0.0, tracking=1)
     l10n_be_dimona_planned_end_time = fields.Float(groups="hr_payroll.group_hr_payroll_user", default=8.0, tracking=1)
-    l10n_be_flexi_hourly_wage = fields.Monetary('Flexi Hourly Wage', tracking=1, help="Employee's hourly gross wage.", groups="hr_payroll.group_hr_payroll_user")
+    # the hourly scales have four decimals (e.g. 14.8839 in CP 302), the pay is the hours at that exact rate
+    l10n_be_flexi_hourly_wage = fields.Float('Flexi Hourly Wage', digits=(16, 4), tracking=1, help="Employee's hourly gross wage.", groups="hr_payroll.group_hr_payroll_user")
     l10n_be_flexi_monthly_wage = fields.Monetary('Flexi Monthly Wage', tracking=1, help="Employee's monthly gross wage.", groups="hr_payroll.group_hr_payroll_user")
     l10n_be_refused_flexijob = fields.Boolean(string="Refused Flexi-job", default=False, groups="hr_payroll.group_hr_payroll_user", tracking=1, help="Flag to identify if a flexi-job dimona declaration has been refused by the ONSS with anomaly 460 or 510.")
 
@@ -1083,6 +1149,21 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 if start_time >= end_time:
                     raise ValidationError(self.env._("For a same-day flexi-job, the planned start time must be before the planned end time."))
 
+    @api.constrains('l10n_be_dimona_planned_hours', 'l10n_be_dimona_category', 'contract_date_start')
+    def _check_l10n_be_dimona_planned_hours(self):
+        """ The hours planned for a student (Dimona STU) can't go beyond the yearly quota of the student hours """
+        for version in self.sudo():
+            if not version.is_student() or not version.l10n_be_dimona_planned_hours:
+                continue
+            quota = self.env['hr.rule.parameter']._get_parameter_from_code(
+                'l10n_be_student_hours_quota', version.contract_date_start, raise_if_not_found=False)
+            if version.l10n_be_dimona_planned_hours < 0:
+                raise ValidationError(self.env._("The planned hours of a student can't be negative."))
+            if quota and version.l10n_be_dimona_planned_hours > quota:
+                raise ValidationError(self.env._(
+                    "The planned hours of a student (%(hours)s) can't exceed the yearly quota of %(quota)s hours of"
+                    " student work.", hours=version.l10n_be_dimona_planned_hours, quota=quota))
+
     @api.constrains("l10n_be_group_insurance_rate")
     def _check_l10n_be_group_insurance_rate(self):
         for version in self:
@@ -1292,7 +1373,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     @api.depends('l10n_be_time_credit', 'resource_calendar_id.calendar_type',
                 'resource_calendar_id.attendance_ids.work_entry_type_id.l10n_be_is_time_credit',
                 'resource_calendar_id.attendance_ids.duration_hours',
-                'reference_calendar_id.hours_per_week')
+                'reference_calendar_id.hours_per_week',
+                'company_id.resource_calendar_id.hours_per_week')
     def _compute_work_time_rate(self):
         fixed_time_credit_versions = self.filtered(
             lambda v: not v._is_flexible() and v.l10n_be_time_credit and v.resource_calendar_id.calendar_type == 'fixed'
@@ -1350,8 +1432,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         date_from, date_to = date(year, 1, 1), date(year, 12, 31)
         for calendar in (
             self.resource_calendar_id,
-            self.reference_calendar_id,
-            self.company_id.resource_calendar_id,
+            self._get_reference_calendar(),
         ):
             if not calendar:
                 continue
@@ -1366,8 +1447,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         self.ensure_one()
         for calendar in (
             self.resource_calendar_id,
-            self.reference_calendar_id,
-            self.company_id.resource_calendar_id,
+            self._get_reference_calendar(),
         ):
             if calendar and calendar.days_per_week:
                 return calendar.days_per_week
@@ -1436,12 +1516,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             time_credit = any(attendance.sudo().work_entry_type_id.l10n_be_is_time_credit for attendance in version.resource_calendar_id.attendance_ids)
             version.l10n_be_time_credit = time_credit
 
-    @api.depends('l10n_be_joint_committee_id', 'work_time_rate')
+    @api.depends('l10n_be_joint_committee_id', 'work_time_rate', 'l10n_be_dimona_category')
     def _compute_eco_checks(self):
         eco_config = self.env['hr.rule.parameter']._get_parameter_from_code('eco_voucher_config', raise_if_not_found=False) or {}
         for version in self:
             jc = version.l10n_be_joint_committee_id
-            if not jc or jc.egov3_code not in eco_config:
+            if version.is_student() or not jc or jc.egov3_code not in eco_config:
                 version.eco_checks = 0
                 continue
             jc_config = eco_config[jc.egov3_code]
@@ -1459,36 +1539,63 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 # Other JCs: max_amount * work_rate (capped at 100%)
                 version.eco_checks = max_amount * min(1, work_time_rate)
 
-    @api.depends('employee_type_id.l10n_be_joint_committee_id')
+    @api.depends('employee_type_id', 'allowed_joint_committee_ids', 'payroll_config_id.l10n_be_main_joint_committee')
     def _compute_l10n_be_joint_committee_id(self):
         company_exec = self.env.ref("hr.contract_type_company_executive", raise_if_not_found=False)
-        joint_committe_999 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_999", raise_if_not_found=False)
+        joint_committee_999 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_999", raise_if_not_found=False)
 
         for version in self:
+            main_jc = version.payroll_config_id.l10n_be_main_joint_committee
+            allowed_jc = version.allowed_joint_committee_ids
+            employee_type_jc = version.employee_type_id.l10n_be_joint_committee_id
+            if not version.employee_type_id:
+                version.l10n_be_joint_committee_id = main_jc
+                continue
             if version.employee_type_id == company_exec:
-                version.l10n_be_joint_committee_id = joint_committe_999
-            else:
-                version.l10n_be_joint_committee_id = version.employee_type_id.l10n_be_joint_committee_id or version.payroll_config_id.l10n_be_main_joint_committee
+                version.l10n_be_joint_committee_id = joint_committee_999
+                continue
+            if allowed_jc:
+                version.l10n_be_joint_committee_id = (version.l10n_be_joint_committee_id if version.l10n_be_joint_committee_id.id in allowed_jc.ids else False)\
+                    or (employee_type_jc if employee_type_jc.id in allowed_jc.ids else False)\
+                    or (main_jc if main_jc.id in allowed_jc.ids else False)
+                continue
+            version.l10n_be_joint_committee_id = False
 
     def _get_l10n_be_available_worker_codes(self):
         self.ensure_one()
         return self.l10n_be_allowed_worker_code_ids.filtered(
-            lambda c: not c.employee_type_ids or self.employee_type_id in c.employee_type_ids)
+            lambda c: not c.employee_type_ids or self.employee_type_id.id in c.employee_type_ids.ids
+        )
 
     @api.depends('l10n_be_allowed_worker_code_ids', 'employee_type_id')
     def _compute_l10n_be_worker_code_is_single(self):
         for version in self:
             version.l10n_be_worker_code_is_single = len(version._get_l10n_be_available_worker_codes()) == 1
 
-    @api.depends('employee_type_id.l10n_be_worker_code_ids', 'structure_type_id', 'l10n_be_allowed_worker_code_ids')
+    @api.depends('employee_type_id.l10n_be_worker_code_ids', 'structure_type_id', 'l10n_be_allowed_worker_code_ids', 'l10n_be_joint_committee_id')
     def _compute_l10n_be_worker_code_id(self):
+        # The directors under an employment contract are ordinary employees for the social security
+        ordinary_emp_types = [
+            employee_type.id for employee_type in (
+                self.env.ref("hr.contract_type_employee", raise_if_not_found=False),
+                self.env.ref("l10n_be_hr_payroll.l10n_be_contract_type_director_employment_contract", raise_if_not_found=False),
+            ) if employee_type
+        ]
+        ordinary_emp_wc = self.env.ref("l10n_be_hr_payroll.l10n_be_worker_code_00495", raise_if_not_found=False)
+        not_subject_to_onss = self.env.ref("l10n_be_hr_payroll.l10n_be_worker_code_00000", raise_if_not_found=False)
         for version in self:
             if version.company_id.country_id.code != 'BE':
                 continue
+            # A company executive is not subject to ONSS, a version that stops being one gets a sub-type with ONSS rates
+            if version.l10n_be_joint_committee_id.egov3_code == '999':
+                version.l10n_be_worker_code_id = not_subject_to_onss
+                continue
+            if version.l10n_be_worker_code_id == not_subject_to_onss:
+                version.l10n_be_worker_code_id = False
             available_codes = version._get_l10n_be_available_worker_codes()
-            version.l10n_be_worker_code_id = (available_codes if len(available_codes) == 1 else None)\
-                    or version.l10n_be_worker_code_id\
-                    or self.env.ref("l10n_be_hr_payroll.l10n_be_worker_code_00495", raise_if_not_found=False)
+            version.l10n_be_worker_code_id = (available_codes if len(available_codes) == 1 else False)\
+                    or (version.l10n_be_worker_code_id if version.l10n_be_worker_code_id.id in available_codes.ids else False)\
+                    or (ordinary_emp_wc if version.employee_type_id.id in ordinary_emp_types else False)
 
     @api.depends('train_transport_employee_kilometer', 'l10n_be_joint_committee_id')
     def _compute_train_transport_reimbursed_amount(self):
@@ -1673,6 +1780,60 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     technical_usage='l10n_be_hr_payroll_fictive_hiring_date_verification',
                 )
 
+    def _get_l10n_be_employee_residence_region(self):
+        # NIS codes of the municipalities of the German-speaking Community.
+        # Update manually if NIS codes for these municipalities are added or changed.
+        # Municipalities: https://www.ostbelgienlive.be/desktopdefault.aspx/tabid-223/
+        # NIS codes: https://statbel.fgov.be/en/open-data/code-refnis-0
+        self.ensure_one()
+        german_speaking_nis_codes = {
+            '63001',  # Amel
+            '63012',  # Büllingen
+            '63013',  # Bütgenbach
+            '63023',  # Eupen
+            '63040',  # Kelmis
+            '63048',  # Lontzen
+            '63061',  # Raeren
+            '63067',  # Sankt Vith
+            '63087',  # Burg-Reuland
+        }
+        nis_code = self.l10n_be_city_nis_code or ''
+        if len(nis_code) == 5:
+            if nis_code in german_speaking_nis_codes:
+                return 'cg'
+            if nis_code.startswith('21'):
+                return 'br'
+            if nis_code.startswith(('1', '23', '24', '3', '4', '7')):
+                return 'fl'
+            if nis_code.startswith(('25', '5', '6', '8', '9')):
+                return 'wa'
+        return False
+
+    def _get_l10n_be_impulsion_start_date(self):
+        """
+        Return the start date of the Impulsion plan right of this version.
+
+        Go back through the previous versions of the employee as long as they have the same plan
+        and are uninterrupted. An information version (without contract) holds the grant date:
+        it is continuous with the next contract and ends the chain, the versions before it belong
+        to another right. Without information version, it is the contract start date.
+        """
+        self.ensure_one()
+        plan = self.l10n_be_impulsion_plan
+        if not plan:
+            return False
+        previous_versions = self.employee_id.version_ids.filtered(
+            lambda v: v.date_version < self.date_version
+        ).sorted('date_version', reverse=True)
+        earliest_version = self
+        for previous_version in previous_versions:
+            if not earliest_version.contract_date_start or previous_version.l10n_be_impulsion_plan != plan:
+                break
+            if previous_version.contract_date_start and not previous_version._is_continuous_with(earliest_version):
+                break
+            earliest_version = previous_version
+        return earliest_version.contract_date_start or earliest_version.date_version
+
     def _is_continuous_with(self, next_version):
         self.ensure_one()
         if self.country_code != 'BE':
@@ -1701,14 +1862,16 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             'seniority_lost_period_days': lost_period.get('days'),
         }
 
-    @api.depends('address_id', 'country_code')
+    @api.depends('address_id', 'company_id', 'country_code')
     def _compute_l10n_be_location_unit(self):
         for version in self:
             if version.country_code != 'BE':
                 version.l10n_be_location_unit = False
                 continue
             version.l10n_be_location_unit = self.env['hr.work.location'].search([
-                    ('address_id', '=', version.address_id.id), ('location_type', '=', 'dmfa_unit')], limit=1) if version.address_id else False
+                    ('address_id', '=', version.address_id.id),
+                    ('company_id', 'in', (version.company_id.id, False)),
+                    ('location_type', '=', 'dmfa_unit')], limit=1) if version.address_id else False
 
     @api.depends('employee_id.version_ids.date_version', 'employee_id.version_ids.contract_date_start', 'employee_id.version_ids.l10n_be_is_retired')
     def _compute_retirement_date(self):
@@ -1746,7 +1909,6 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
                 if version_sudo.l10n_be_joint_committee_id.egov3_code == '999':
                     if old_values[version_sudo]['l10n_be_joint_committee_id'] != version_sudo.l10n_be_joint_committee_id:
-                        version_sudo.l10n_be_worker_code_id = False
                         version_sudo.l10n_be_dimona_category = False
                         version_sudo.l10n_be_dimona_next_action = False
                     continue
@@ -1811,10 +1973,19 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         version._l10n_be_dimona_autodeclare()
 
     def _check_dimona_out_requirements(self):
+        """Whether the Dimona period of this version must now be closed by a Dimona OUT.
+
+        Only a period declared without end date (open-ended contracts, whatever the
+        worker code) needs a departure: the end date of fixed-term periods (students,
+        flexi-jobs, ...) is already part of the entrance. The departure is only
+        requested once a departure reason is set, so that changing the contract end
+        date alone does not notify the ONSS.
+        """
         self.ensure_one()
-        is_eligible_code_495_active = self.l10n_be_worker_code_id.dmfa_code == '495' and not self.l10n_be_dimona_declaration_id.date_end
+        declaration = self.l10n_be_dimona_declaration_id
+        is_period_open = declaration and not declaration.date_end
         is_departure_reason_set = self.employee_id.departure_reason_id
-        return bool(is_eligible_code_495_active and is_departure_reason_set) \
+        return bool(is_period_open and is_departure_reason_set) \
             and not self._l10n_be_dimona_already_declared('dimona_out')
 
     def _l10n_be_dimona_already_declared(self, declaration_type):
@@ -1944,26 +2115,28 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             else:
                 version.car_id = False
 
-    @api.depends('new_bike', 'new_bike_model_id')
+    @api.depends('transport_mode_bike', 'new_bike', 'new_bike_model_id')
     def _compute_bike_id(self):
         for version in self:
-            if version.new_bike or version.new_bike_model_id:
+            if not version.transport_mode_bike or version.new_bike or version.new_bike_model_id:
                 version.bike_id = False
 
-    @api.depends('bike_id')
+    @api.depends('transport_mode_bike', 'bike_id')
     def _compute_new_bike_model_id(self):
         for version in self:
-            if version.bike_id:
-                version.update({
-                    'new_bike_model_id': False,
-                    'new_bike': False,
-                })
+            # the model of the new bike is kept while a new bike is requested
+            if not version.transport_mode_bike or version.bike_id:
+                version.new_bike_model_id = False
 
-    @api.depends('new_bike_model_id')
+    @api.depends('transport_mode_bike', 'bike_id', 'new_bike_model_id')
     def _compute_new_bike(self):
         for version in self:
-            if version.new_bike_model_id:
+            if version.bike_id:
+                version.new_bike = False
+            elif version.new_bike_model_id:
                 version.new_bike = True
+            elif not version.transport_mode_bike:
+                version.new_bike = False
 
     @api.depends('car_id')
     def _compute_car_model_name(self):
@@ -1972,6 +2145,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 version.car_model_name = version.car_id.model_id.display_name
             else:
                 version.car_model_name = False
+
+    @api.depends('car_id')
+    def _compute_private_car_employee_kilometer(self):
+        for version in self:
+            if version.car_id:
+                version.private_car_employee_kilometer = 0
 
     @api.depends('car_id')
     def _compute_fuel_type(self):
@@ -1988,13 +2167,13 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 version.company_car_total_depreciated_cost = version.car_id.total_depreciated_cost
 
     @api.depends('new_bike', 'bike_id', 'new_bike_model_id', 'bike_id.total_depreciated_cost',
-        'bike_id.co2_fee', 'new_bike_model_id.default_total_depreciated_cost', 'transport_mode_bike')
+        'bike_id.co2_fee', 'new_bike_model_id.default_total_depreciated_cost')
     def _compute_company_bike_depreciated_cost(self):
         for version in self:
             version.company_bike_depreciated_cost = False
-            if not version.new_bike and version.transport_mode_bike and version.bike_id:
+            if not version.new_bike and version.bike_id:
                 version.company_bike_depreciated_cost = version.bike_id.total_depreciated_cost
-            elif not version.transport_mode_bike and version.new_bike and version.new_bike_model_id:
+            elif version.new_bike and version.new_bike_model_id:
                 version.company_bike_depreciated_cost = version.new_bike_model_id.default_recurring_cost_amount_depreciated
 
     @api.depends('car_id.log_contracts.state')
@@ -2032,21 +2211,30 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 version._get_available_cars_domain(),
             )
 
+    @api.depends('has_new_car', 'car_id')
+    def _compute_transport_mode_car(self):
+        for version in self:
+            version.transport_mode_car = bool(version.has_new_car or version.car_id)
+
+    @api.depends('new_bike', 'bike_id')
+    def _compute_transport_mode_bike(self):
+        for version in self:
+            version.transport_mode_bike = bool(version.new_bike or version.bike_id)
+
     @api.onchange('new_bike')
     def _onchange_new_bike(self):
         if self.new_bike:
             self.bike_id = False
-            self.bike_transport_employee_kilometer = False
         else:
             self.new_bike_model_id = False
 
-    @api.depends('commission_on_target')
+    @api.depends('commission_on_target', 'l10n_be_worker_code_id', 'l10n_be_dimona_category')
     def _compute_commission_cost(self):
         for version in self:
             version.warrants_cost = version.commission_on_target * 1.326 / 1.05
             warrant_commission = version.warrants_cost * 3.0
             cash_commission = version.commission_on_target * 9.0
-            version.yearly_commission_cost = warrant_commission + cash_commission * (1 + EMPLOYER_ONSS)
+            version.yearly_commission_cost = warrant_commission + cash_commission * (1 + version._l10n_be_get_employer_onss_rate())
             version.yearly_commission = warrant_commission + cash_commission
             version.warrant_value_employee = version.commission_on_target * 1.326 * (1.00 - 0.535)
 
@@ -2073,7 +2261,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _get_monthly_nb_meal_voucher(self, holidays=None):
         return 220.0 / 12
 
-    def _get_train_transport_reimbursed_amount(self):
+    def _get_train_transport_reimbursed_amount(self, ref_date=None):
+        """Return the monthly employer intervention in the train subscription of the employee.
+
+        :param date ref_date: date of the SNCB table and of the intervention ratio (the payslip
+            date), today by default
+        """
         self.ensure_one()
         if self.country_code != 'BE' or not self.train_transport_employee_kilometer:
             return 0
@@ -2081,12 +2274,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         rate = 1 / 12 if self.train_transport_periodicity == 'yearly' else 1
         if code == '200':
             rule = 'train_cp200_reimbursement_ratio'
-            amount = self._get_train_equivalent_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity)
+            amount = self._get_train_equivalent_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity, ref_date=ref_date)
         else:
             rule = 'train_cp302_reimbursement_ratio'
-            amount = self._get_train_71_8_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity)
+            amount = self._get_train_71_8_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity, ref_date=ref_date)
         reimbursement_rate = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
-            rule, date=self.env.context.get('payslip_date'), raise_if_not_found=False) or 0
+            rule, date=ref_date, raise_if_not_found=False) or 0
         return amount * rate * reimbursement_rate
 
     def _difference_years_months(self, start_date, end_date):
@@ -2436,12 +2629,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             return  # No previous occupation
 
         previous_salary_scale = previous_version.l10n_be_salary_scale_id.code
-        if not previous_salary_scale:
+        if not previous_salary_scale.isnumeric():
             return
         wage_type = 'monthly' if self.wage_type == 'monthly' and int(previous_salary_scale) > 3 and int(self.l10n_be_salary_scale_id.code) > 3 else 'hourly'
         previous_computed_seniority = previous_version.l10n_be_computed_seniority_years
         previous_parameter_rules = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')[previous_salary_scale][wage_type]
-        previous_wage = previous_parameter_rules[int(previous_computed_seniority)]
+        previous_wage = previous_parameter_rules[min(int(previous_computed_seniority), max(previous_parameter_rules))]
 
         current_parameter_rules = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')[new_salary_scale][wage_type]
 
@@ -2452,7 +2645,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 break
         self.l10n_be_base_computed_seniority = seniority
 
-    def _get_public_transport_amount_302(self, field):
+    def _get_public_transport_amount_302(self, field, ref_date=None):
         """ CP 302 - Employer contribution to public transport costs (bus, tram, metro; train excluded).
 
         80% of the amount actually paid by the employee, capped at the amount of the 71.8% train
@@ -2465,10 +2658,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         amount = self[f'{field}_transport_employee_amount']
         periodicity = self[f'{field}_transport_periodicity']
         rate = 1 / 12 if periodicity == 'yearly' else 1
-        train_71_8_amount_16km = self._get_train_71_8_amount(16, 'yearly' if periodicity == 'yearly' else 'monthly')
+        train_71_8_amount_16km = self._get_train_71_8_amount(16, 'yearly' if periodicity == 'yearly' else 'monthly', ref_date=ref_date)
         return min(amount * 0.8, train_71_8_amount_16km) * rate
 
-    def _get_public_transport_amount_200(self, field):
+    def _get_public_transport_amount_200(self, field, ref_date=None):
         """ CP 200 - Employer contribution to public transport costs (bus, tram, metro; train excluded).
 
         - Fixed price (independent of the distance): 71.8% of the amount actually
@@ -2487,9 +2680,9 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         kilometer = self[f'{field}_transport_employee_kilometer']
         rate = 1 / 12 if periodicity == 'yearly' else 1
         if periodicity == 'fixed':
-            train_71_8_amount_7km = self._get_train_71_8_amount(7, 'monthly')
+            train_71_8_amount_7km = self._get_train_71_8_amount(7, 'monthly', ref_date=ref_date)
             return min(amount * 0.718, train_71_8_amount_7km)
-        train_71_8_amount = self._get_train_71_8_amount(kilometer, periodicity)
+        train_71_8_amount = self._get_train_71_8_amount(kilometer, periodicity, ref_date=ref_date)
         return min(train_71_8_amount, 0.75 * amount) * rate
 
     def _get_l10n_be_min_wage(self):
@@ -2501,9 +2694,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             min_wage = float_round(self._get_l10n_be_min_wage_apprenticeship(), 2)
             return min_wage, wage_type, self.l10n_be_computed_seniority_years
 
-        current_date = fields.Date.context_today(self)
-        flexi_hourly_wage = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_be_flexi_minimum_wage', current_date, raise_if_not_found=False) or 11.87
         if self.is_flexi():
+            today = fields.Date.context_today(self)
+            date_to = self.date_start if self.date_start and self.date_start > today else today
+            flexi_hourly_wage = self.env['hr.rule.parameter']._get_parameter_from_code('min_hourly_wage_flexi', date_to)
             if self.wage_type == 'monthly':
                 return round(flexi_hourly_wage * self.resource_calendar_id.hours_per_week * 52 / 12, 2), 'monthly', 0
             return flexi_hourly_wage, 'hourly', 0
@@ -2580,8 +2774,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _get_l10n_be_min_wage_cp302(self):
         self.ensure_one()
         wage_type = 'monthly' if self.wage_type == 'monthly' and int(self.l10n_be_salary_scale_id.code) > 3 else 'hourly'
-        minimum_wage = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')[self.l10n_be_salary_scale_id.code][wage_type][int(self.l10n_be_computed_seniority_years)]
-        minimum_wage *= self.work_time_rate
+        scale = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')[self.l10n_be_salary_scale_id.code][wage_type]
+        # the scale stops at a given seniority, which applies beyond it
+        minimum_wage = scale[min(int(self.l10n_be_computed_seniority_years), max(scale))]
+        if wage_type == 'monthly':
+            # an hourly minimum doesn't depend on the work time rate
+            minimum_wage *= self.work_time_rate
         if self.l10n_be_dimona_category == 'stu':
             minimum_wage *= self._get_student_wage_rate()
         return minimum_wage, wage_type, self.l10n_be_computed_seniority_years
@@ -2620,7 +2818,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 company_seniority = relativedelta(date_to, self.employee_id._get_first_contract_date())
                 seniority = self.l10n_be_scale_seniority + company_seniority.years + (company_seniority.months + self.l10n_be_scale_seniority_months) // 12
             else:
-                company_seniority = 0
+                company_seniority = relativedelta()
                 seniority = 0
             hours_per_week = self.resource_calendar_id.hours_per_week
             min_monthly_wage = self._get_employee_min_wage(
@@ -2647,7 +2845,11 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
         return min_wage, wage_type, scale_key
 
-    def _get_public_transport_reimbursed_amount(self, field):
+    def _get_public_transport_reimbursed_amount(self, field, ref_date=None):
+        """Return the monthly employer intervention in the ``field`` (bus, tram or metro) subscription.
+
+        :param date ref_date: date of the train reimbursement tables (the payslip date), today by default
+        """
         self.ensure_one()
         if field not in ['bus', 'tram', 'metro']:
             raise NotImplementedError()
@@ -2656,8 +2858,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             return 0
         code = self.l10n_be_joint_committee_id.egov3_code
         if code == '200':
-            return self._get_public_transport_amount_200(field)
-        return self._get_public_transport_amount_302(field)
+            return self._get_public_transport_amount_200(field, ref_date=ref_date)
+        return self._get_public_transport_amount_302(field, ref_date=ref_date)
 
     def _get_private_car_daily_amount(self, ref_date):
         self.ensure_one()
@@ -2665,31 +2867,33 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         cp_scales = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
             'private_car_daily_reimbursement', date=ref_date, raise_if_not_found=False,
         )
-        daily_amount = 0.0
-        if cp_scales:
-            code = self.l10n_be_joint_committee_id.egov3_code
-            km_scales = cp_scales.get(code)
-            sorted_keys = sorted(km_scales.keys(), key=int)
-            daily_amount = km_scales[sorted_keys[-1]]
-            for km_threshold in sorted_keys:
-                if kilometer <= int(km_threshold):
-                    daily_amount = km_scales[km_threshold]
-                    break
-        return daily_amount
+        code = self.l10n_be_joint_committee_id.egov3_code
+        km_scales = cp_scales and cp_scales.get(code)
+        # CP 200: intervention from 3 km only (CCT of 15/01/2026), the 1-2 km rows don't apply
+        if not km_scales or (code == '200' and kilometer < 3):
+            return 0.0
+        return self._get_distance_table_value(km_scales, kilometer) or 0.0
 
-    def _get_private_car_reimbursed_amount(self):
+    def _get_private_car_reimbursed_amount(self, ref_date=None):
+        """Return the monthly employer intervention in the private car transport costs.
+
+        :param date ref_date: date of the reimbursement tables (the payslip date), today by default
+        """
         self.ensure_one()
         if self.country_code != 'BE' or not self.private_car_employee_kilometer:
             return 0
         code = self.l10n_be_joint_committee_id.egov3_code
         kilometer = self.private_car_employee_kilometer
-        ref_date = self.env.context.get('payslip_date') or fields.Date.today()
+        ref_date = ref_date or fields.Date.today()
         if code in ['200', '302'] and ref_date >= date(2026, 2, 1):
-            daily_amount = self._get_private_car_daily_amount(ref_date=ref_date)
-            return round(daily_amount * 21.67 * self.work_time_rate, 2)
+            # Monthly amount = daily amount x 5 days x 13 weeks / 3 months
+            monthly_amount = self._get_private_car_daily_amount(ref_date=ref_date) * 5 * 13 / 3
+            return round(monthly_amount * self.work_time_rate, 2)
 
+        # Before the daily scales of February 2026, and outside CP 200 and 302 (no sector scale
+        # in Odoo, see the private car warning): a share of the train price for the distance.
         amount = 0
-        train_equivalent_amount = self._get_train_equivalent_amount(kilometer)
+        train_equivalent_amount = self._get_train_equivalent_amount(kilometer, ref_date=ref_date)
         # CP 302 pays its students as its other workers
         if (code == '200' or (self.l10n_be_dimona_category == 'stu' and code != '302')) and kilometer >= 3:
             amount = train_equivalent_amount * 0.5
@@ -2705,45 +2909,26 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
         reference_date = reference_date or fields.Date.today()
         code = self.l10n_be_joint_committee_id.egov3_code
-        if code == "200":
-            rule_param_per_km = "cp200_cycle_reimbursement_per_km"
-        elif code == "302":
+        rule_param_per_km = "cp200_cycle_reimbursement_per_km"
+        if code == "302":
             rule_param_per_km = "cp302_cycle_reimbursement_per_km"
-        else:
-            rule_param_per_km = "bike_reimbursement"
 
         cycle_reimbursement_per_km = self.env["hr.rule.parameter"].sudo()._get_parameter_from_code(
             rule_param_per_km, date=reference_date, raise_if_not_found=False) or 0
         amount = cycle_reimbursement_per_km * self.bike_transport_employee_kilometer * 2
         if code == '200':
             maximum_daily_amount = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
-                'bike_max_reimbursement_daily_cp200', date=reference_date, raise_if_not_found=False) or 0
+                'cp200_cycle_reimbursement_max', date=reference_date, raise_if_not_found=False) or 0
             amount = min(maximum_daily_amount, amount)
         return amount
 
-    @api.onchange('transport_mode_car', 'private_car_employee_kilometer', 'train_transport_employee_kilometer',
-        'bus_transport_employee_kilometer', 'tram_transport_employee_kilometer', 'metro_transport_employee_kilometer',
-        'bike_transport_employee_kilometer', 'new_bike')
+    @api.onchange('bus_transport_employee_kilometer', 'tram_transport_employee_kilometer', 'metro_transport_employee_kilometer')
     def _onchange_transport_mode(self):
-        if not self.transport_mode_car:
-            self.company_car_total_depreciated_cost = 0
         for field in ['bus', 'tram', 'metro']:
             amount_field = f'{field}_transport_employee_amount'
             kilometer_field = f'{field}_transport_employee_kilometer'
             if self[kilometer_field] == 0:
                 self[amount_field] = 0
-        if self.transport_mode_car:
-            self.private_car_employee_kilometer = 0
-            self.has_bicycle = False
-        else:
-            self.car_id = False
-        if self.transport_mode_bike:
-            self.new_bike = False
-            self.new_bike_model_id = False
-        else:
-            self.bike_id = False
-        if self.sudo().car_id:
-            self.private_car_employee_kilometer = False
 
     @api.model
     def _get_sacrifice_fields(self):
@@ -2782,17 +2967,103 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
         return fixed
 
-    @api.depends('schedule_pay', 'no_onss', 'l10n_be_cafeteria_plan_net_contribution')
+    @api.depends('schedule_pay', 'no_onss', 'l10n_be_cafeteria_plan_net_contribution', 'l10n_be_joint_committee_id',
+                 'l10n_be_worker_code_id', 'l10n_be_dimona_category')
     def _compute_final_yearly_costs(self):
-        return super()._compute_final_yearly_costs()
+        return super(HrVersion, self._l10n_be_with_benefits_employer_onss_costs())._compute_final_yearly_costs()
+
+    def _inverse_final_yearly_costs(self):
+        return super(HrVersion, self._l10n_be_with_benefits_employer_onss_costs())._inverse_final_yearly_costs()
+
+    def _l10n_be_get_employer_onss_rate(self):
+        """ Employer ONSS rate (basic and wage moderation contributions) of the employer cost estimation:
+        the ONSS rates imported for the employer category of the company and the worker code of the
+        version (as `hr.payslip._get_onss_global_rates`), or the flat `EMPLOYER_ONSS` rate without them.
+        """
+        self.ensure_one()
+        # sudo: hr.version - the employer cost is also estimated in the salary configurator, the rates
+        # and the employer category are only read
+        version_sudo = self.sudo()
+        employer_class = version_sudo._l10n_be_get_employer_category_dmfa_code(
+            version_sudo.company_id.current_payroll_config_id.l10n_be_employer_category_id)
+        contribution_type = '1' if version_sudo.is_worker() else '0'
+        if version_sudo.is_student():
+            worker_code = '840' if contribution_type == '1' else '841'
+            contribution_type = '0'
+        else:
+            worker_code = version_sudo.l10n_be_worker_code_id.dmfa_code
+        rates = None
+        if employer_class and worker_code:
+            rates = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+                f'l10n_be_onss_rates_{employer_class}_{worker_code}_{contribution_type}', raise_if_not_found=False)
+        if not rates:
+            return EMPLOYER_ONSS
+        return (rates['employer_rate'] + rates['salary_moderation_rate']) / 100
+
+    def _get_benefits_costs(self):
+        return super()._get_benefits_costs() + self._l10n_be_get_benefits_employer_onss_costs()
+
+    def _l10n_be_get_benefits_employer_onss_costs(self):
+        """ Yearly employer ONSS due on the benefits whose salary rules are subject to ONSS
+        (ONSS_BASE category), e.g. 12 x 4 € (phone subscription benefit in kind) x employer rate.
+        Nothing is due for the company executives (JC 999) or the versions without ONSS.
+        """
+        self.ensure_one()
+        costs = self.env.context.get('l10n_be_benefits_employer_onss_costs')
+        if costs is None or self.id not in costs:
+            costs = self._l10n_be_get_benefits_employer_onss_costs_by_version()
+        return costs[self.id]
+
+    def _l10n_be_with_benefits_employer_onss_costs(self):
+        """ The versions with the employer ONSS of their benefits in the context, computed together (a payslip
+        simulation by version) instead of once by call of `_get_benefits_costs`.
+        """
+        return self.with_context(
+            l10n_be_benefits_employer_onss_costs=self._l10n_be_get_benefits_employer_onss_costs_by_version())
+
+    def _l10n_be_get_benefits_employer_onss_costs_by_version(self):
+        """ See `_l10n_be_get_benefits_employer_onss_costs`.
+
+        :return: {version id: yearly employer ONSS of the benefits}
+        """
+        # by id, new versions included (`ids` leaves out the new records without origin)
+        costs = {version.id: 0.0 for version in self}
+        cp200 = self.env.ref('hr.structure_type_employee_cp200')
+        versions = self.filtered(lambda version: version.structure_type_id == cp200
+            and not version.no_onss and version.l10n_be_egov3_code != '999')
+        # The category is missing while upgrading a database, the costs are recomputed before the data is loaded
+        onss_base_category = self.env.ref('l10n_be_hr_payroll.ONSS_BASE', raise_if_not_found=False)
+        if not versions or not onss_base_category:
+            return costs
+        benefits = self.env['hr.contract.salary.benefit'].search([
+            ('active', '=', True),
+            ('structure_type_id', '=', cp200.id),
+            ('cost_res_field_id', '!=', False),
+            ('salary_rule_ids', 'any', [('category_ids', 'in', onss_base_category.ids)]),
+        ])
+        # Only the benefits the versions actually have
+        benefits_by_version = {
+            version: version_benefits
+            for version in versions
+            if (version_benefits := benefits.filtered(
+                lambda benefit: benefit.cost_field in version and version[benefit.cost_field]))
+        }
+        for version, onss_values in benefits._l10n_be_get_onss_values(benefits_by_version).items():
+            employer_onss_rate = version._l10n_be_get_employer_onss_rate()
+            for benefit, onss_value in onss_values.items():
+                onss_cost = onss_value * employer_onss_rate
+                if benefit.benefit_type_id.periodicity == 'monthly':
+                    onss_cost *= 12
+                costs[version.id] += onss_cost
+        return costs
 
     def _get_salary_costs_factor(self):
         self.ensure_one()
         res = super()._get_salary_costs_factor()
-        if self.structure_type_id == self.env.ref('hr.structure_type_employee_cp200'):
+        if self.structure_type_id == self.env.ref('hr.structure_type_employee_cp200') and self.l10n_be_egov3_code != '999':
             res = 13.92
             if not self.no_onss:
-                res += 13.0 * EMPLOYER_ONSS
+                res += 13.0 * self._l10n_be_get_employer_onss_rate()
         if self.l10n_be_group_insurance_rate:
             return res * (1.0 - self.l10n_be_group_insurance_rate)
         return res
@@ -2927,40 +3198,91 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         for version in self:
             version.no_onss = version.l10n_be_dimona_category in ['dwd', 'o17', 's17', 't17', 'stg', 'tri']
 
-    @api.model
-    def _get_train_equivalent_amount(self, kilometer, periodicity='monthly'):
-        train_table = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
-            'train_reimbursement', date=self.env.context.get('payslip_date'), raise_if_not_found=False)
-        if not train_table:
-            return 0
-        train_table_keys = sorted(train_table.keys())
-        kilometer_key = train_table_keys[0]
-        for train_km in train_table_keys:
-            if kilometer >= train_km:
-                kilometer_key = train_km
-            else:
-                break
-        return train_table[kilometer_key][periodicity]
+    def _l10n_be_get_employer_category_dmfa_code(self, employer_category=None):
+        """DMFA employer category code to use for this version's payslips/declarations.
+
+        An occasional worker (DIMONA category "ext") is reported under the dedicated occasional
+        code of the payroll configuration's employer category when there is one (e.g. 317 for a
+        Horeca employer configured as 017), instead of requiring a dedicated payroll configuration.
+
+        :param employer_category: the employer category to use instead of the one of the payroll
+            configuration of the version
+        """
+        self.ensure_one()
+        category = self.payroll_config_id.l10n_be_employer_category_id if employer_category is None else employer_category
+        if self.l10n_be_dimona_category == 'ext':
+            return category._get_occasional_worker_dmfa_code()
+        return category.dmfa_code
 
     @api.model
-    def _get_train_71_8_amount(self, kilometer, periodicity='monthly'):
+    def _get_distance_table_value(self, table, kilometer):
+        """Return the value of the distance bracket of ``kilometer`` in a distance table.
+
+        The value under the key n applies to the distances in [n, next key[, the value of the
+        last key to any longer distance. A distance below the first key (e.g. a missing
+        home-work distance) has no value.
+
+        :param dict table: values by distance in km (int or str keys)
+        :param int kilometer: home-work distance
+        :return: the value of the bracket, ``None`` below the first key
+        """
+        for km_threshold in sorted(table, key=int, reverse=True):
+            if kilometer >= int(km_threshold):
+                return table[km_threshold]
+        return None
+
+    @api.model
+    def _get_train_equivalent_amount(self, kilometer, periodicity='monthly', ref_date=None):
         train_table = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
-            'train_reimbursement_71_8', date=self.env.context.get('payslip_date'), raise_if_not_found=False)
+            'train_reimbursement', date=ref_date, raise_if_not_found=False)
+        amounts = self._get_distance_table_value(train_table, kilometer) if train_table else None
+        return amounts[periodicity] if amounts else 0
+
+    @api.model
+    def _get_train_71_8_amount(self, kilometer, periodicity='monthly', ref_date=None):
+        train_table = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+            'train_reimbursement_71_8', date=ref_date, raise_if_not_found=False)
         if not train_table:
-            return 0.718 * self._get_train_equivalent_amount(kilometer, periodicity)
-        train_table_keys = sorted(train_table.keys())
-        kilometer_key = train_table_keys[0]
-        for train_km in train_table_keys:
-            if kilometer >= train_km:
-                kilometer_key = train_km
-            else:
-                break
-        return train_table[kilometer_key][periodicity]
+            return 0.718 * self._get_train_equivalent_amount(kilometer, periodicity, ref_date=ref_date)
+        amounts = self._get_distance_table_value(train_table, kilometer)
+        return amounts[periodicity] if amounts else 0
 
     @api.model
     def _generate_work_entries_postprocess_adapt_to_calendar(self, vals):
         res = super()._generate_work_entries_postprocess_adapt_to_calendar(vals)
         return res and not vals.get('l10n_be_is_time_credit')
+
+    def _l10n_be_counts_interrupted_transport_shifts(self):
+        self.ensure_one()
+        return (
+            self.l10n_be_joint_committee_id.egov3_code == '302'
+            and (self.private_car_employee_kilometer > 0 or self.bike_transport_employee_kilometer > 0)
+        )
+
+    @api.model
+    def _get_work_entry_merge_key(self, vals):
+        key = super()._get_work_entry_merge_key(vals)
+        if '_l10n_be_shift_key' in vals:
+            key += (vals['_l10n_be_shift_key'],)
+        return key
+
+    @api.model
+    def _generate_work_entries_postprocess(self, vals_list):
+        # Tag each attendance shift with its own start/stop before super() pops them: without
+        # this merge key, the split shifts of a day would be merged into a single work entry.
+        vals_list = [
+            dict(vals, _l10n_be_shift_key=(vals['date_start'], vals['date_stop']))
+            if (
+                vals.get('date_start') and vals.get('date_stop')
+                and vals.get('work_entry_type_id') and vals['work_entry_type_id'].code == '002.00'
+                and vals['version_id']._l10n_be_counts_interrupted_transport_shifts()
+            ) else vals
+            for vals in vals_list
+        ]
+        vals_list = super()._generate_work_entries_postprocess(vals_list)
+        for vals in vals_list:
+            vals.pop('_l10n_be_shift_key', None)
+        return vals_list
 
     def _get_work_hours_split_half(self, date_from, date_to, work_entries_vals):
         """
@@ -3116,28 +3438,6 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             return result
 
         if result.code == "006.00":
-            # The public holidays are paid only during the 14 first days of unemployment
-            public_holiday_during_unemployment = self.env['hr.leave'].search([
-                ('employee_id', '=', employee.id),
-                ('request_date_to', '>=', date_from.date()),
-                ('request_date_from', '<=', date_from.date()),
-                ('work_entry_type_id.code', '=', '006.11'),
-                ('state', '=', 'validate'),
-            ], limit=1)
-            if public_holiday_during_unemployment:
-                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_public_holiday_temporary_unemployment')
-
-            economic_unemployments = self.env['hr.leave'].search([
-                ('employee_id', '=', employee.id),
-                ('request_date_to', '>=', date_to.date()),
-                ('request_date_from', '<=', date_from.date()),
-                ('work_entry_type_id.code', 'in', ['137.20', '137.00']),
-                ('state', '=', 'validate'),
-            ], limit=1)
-            if economic_unemployments and not self.is_worker():
-                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_economic_unemployement_employee')
-            if economic_unemployments and self.is_worker():
-                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_economic_unemployment')
             # The public holidays are paid only during the period of 30 days following the start of the
             # suspension of the employment contract due to illness or accident, work accident or
             # occupational disease, pregnancy or childbirth leave, strike or lockout;
@@ -3152,16 +3452,52 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             # worker and short-term employee scheme too: each part keeps the suspension going.
             paid_sick_codes = ['013.00', '010.00', '082.00', '072.00', '072.01']
             paid_work_accident_codes = ['009.00', '012.00', '070.00', '082.01']
-            absent_less_than_X_days_before = self.env['hr.leave'].search([
-                ('employee_id', '=', self.employee_id.id),
-                ('request_date_to', '>=', leave_date + relativedelta(days=-30)),
-                ('request_date_from', '<=', leave_date),
-                ('work_entry_type_id.code', 'in', [
-                    '128.00', '007.05', '128.05', '122.04', '123.00', '122.00', '110.00',
-                    *paid_sick_codes, *paid_work_accident_codes,
-                ]),
+            suspension_codes = [
+                '128.00', '007.05', '128.05', '122.04', '123.00', '122.00', '110.00',
+                *paid_sick_codes, *paid_work_accident_codes,
+            ]
+            unemployment_codes = ['137.20', '137.00']
+            force_majeure_codes = ['156.50']
+            # This runs for each public holiday of each generation: the time off of the checks below are
+            # read at once, then each check selects its own.
+            date_from_day, date_to_day = date_from.date(), date_to.date()
+            all_leaves = self.env['hr.leave'].search([
+                ('employee_id', 'in', (employee | self.employee_id).ids),
+                ('request_date_to', '>=', min(date_from_day, date_to_day, leave_date + relativedelta(days=-30))),
+                ('request_date_from', '<=', max(date_from_day, leave_date)),
+                ('work_entry_type_id.code', 'in', ['006.11', *unemployment_codes, *suspension_codes, *force_majeure_codes]),
                 ('state', '=', 'validate'),
             ], order="request_date_from asc")
+
+            def select_leaves(employee, codes, date_to_min, date_from_max):
+                return all_leaves.filtered(lambda l: (
+                    l.employee_id == employee
+                    and l.work_entry_type_id.code in codes
+                    and l.request_date_to and l.request_date_to >= date_to_min
+                    and l.request_date_from and l.request_date_from <= date_from_max
+                ))
+
+            # The public holidays are paid only during the 14 first days of unemployment
+            if select_leaves(employee, ['006.11'], date_from_day, date_from_day):
+                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_public_holiday_temporary_unemployment')
+
+            economic_unemployments = select_leaves(employee, unemployment_codes, date_to_day, date_from_day)
+            if economic_unemployments and not self.is_worker():
+                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_economic_unemployement_employee')
+            if economic_unemployments and self.is_worker():
+                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_economic_unemployment')
+            # During a temporary unemployment for force majeure, the public holidays are paid only during the 14
+            # first days of the suspension, its first day included: after them, the holiday is a day of temporary
+            # unemployment for force majeure, paid by the ONEM. The period starts again after a work resumption.
+            force_majeure = select_leaves(employee, force_majeure_codes, leave_date + relativedelta(days=-14), leave_date)
+            current_force_majeure = force_majeure.filtered(lambda l: l.request_date_from <= leave_date <= l.request_date_to)[-1:]
+            if current_force_majeure and all(
+                any(l.request_date_from <= leave_date - relativedelta(days=offset) <= l.request_date_to for l in force_majeure)
+                for offset in range(15)
+            ):
+                return current_force_majeure.work_entry_type_id
+            absent_less_than_X_days_before = select_leaves(
+                self.employee_id, suspension_codes, leave_date + relativedelta(days=-30), leave_date)
             current_absence = absent_less_than_X_days_before.filtered_domain([
                 ('request_date_from', '<=', leave_date),
                 ('request_date_to', '>=', leave_date),
@@ -3175,8 +3511,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 elif unpaid_work_entry_type.code in paid_work_accident_codes:
                     unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid', False)
                 is_absent = True
+                # Paid during the first 30 days of the suspension, its first day included (AR 18 April 1974, art. 12):
+                # unpaid only when the employee was also absent on each of the 30 days before the holiday
                 paid_duration = 30
-                for offset in range(paid_duration):
+                for offset in range(paid_duration + 1):
                     day = leave_date + relativedelta(days=-offset)
                     if all(l.request_date_from > day or l.request_date_to < day for l in absent_less_than_X_days_before):
                         is_absent = False
@@ -3190,18 +3528,16 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             if not leave.holiday_id:
                 return result
 
-            sick_work_entry_type = self.env.ref('hr_work_entry.be_work_entry_type_sick_leave')
-            partial_sick_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period')
-            long_sick_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_long_sick')
-            sick_work_entry_types = sick_work_entry_type + partial_sick_work_entry_type + long_sick_work_entry_type
-
+            # This runs for each day of sick leave of each generation: the types are only looked
+            # up when they are needed.
             cutoff_date = leave.holiday_id._get_l10n_be_long_term_sick_cutoff_date()
             if date_from.date() >= cutoff_date:
-                return long_sick_work_entry_type
+                return self.env.ref('hr_work_entry.l10n_be_work_entry_type_long_sick')
 
             if result.code == '122.00':
                 return result
 
+            partial_sick_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period')
             current_leave_duration = (date_from - leave.holiday_id.date_from).days + 1
             if current_leave_duration > 30:
                 return partial_sick_work_entry_type
@@ -3209,6 +3545,9 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             if not leave.holiday_id.l10n_be_sickness_relapse:
                 return result
 
+            sick_work_entry_type = self.env.ref('hr_work_entry.be_work_entry_type_sick_leave')
+            long_sick_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_long_sick')
+            sick_work_entry_types = sick_work_entry_type + partial_sick_work_entry_type + long_sick_work_entry_type
             all_sick_leaves = self.env["hr.leave"].search(
                 [
                     ("employee_id", "=", self.employee_id.id),
@@ -3250,8 +3589,28 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         ]
 
     def _is_same_occupation(self, version):
+        """
+        Also compare the Belgian occupation data and the Dimona periods: an occupation line never
+        covers two Dimona periods declared separately (e.g. the daily Dimona of the day contracts of
+        a flexi-job or of a Horeca extra, even on consecutive days), while a Dimona period of several
+        days is one occupation. Without a Dimona period known on both versions, a contract of a worker
+        declared with Dimona periods (flexi-job, occasional worker, student) is its own Dimona period.
+        Occasional workers: "il doit y avoir autant de lignes d'occupation qu'il y a de Dimona"
+        (https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/socialsecuritycontributions/calculationbase/occasionals_horeca.html).
+
+        :rtype: bool
+        """
         self.ensure_one()
         res = super()._is_same_occupation(version)
+        # sudo: hr.version - the Dimona declaration of a version is a payroll field, the occupations are read by
+        # the holiday attests too
+        period, version_period = (v.sudo().l10n_be_dimona_declaration_id.period_id for v in (self, version))
+        if period and version_period and period != version_period:
+            return False
+        if not (period and version_period) \
+                and {self.l10n_be_dimona_category, version.l10n_be_dimona_category} & {'flx', 'ext', 'stu'} \
+                and (self.contract_date_start, self.contract_date_end) != (version.contract_date_start, version.contract_date_end):
+            return False
         time_credit_type = self.resource_calendar_id.attendance_ids.work_entry_type_id.filtered('l10n_be_is_time_credit')
         version_time_credit_type = version.resource_calendar_id.attendance_ids.work_entry_type_id.filtered('l10n_be_is_time_credit')
         is_starterjob = self.l10n_be_is_starterjob
@@ -3260,15 +3619,21 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             and self.l10n_be_time_credit == version.l10n_be_time_credit \
             and time_credit_type == version_time_credit_type \
             and self.l10n_be_joint_committee_id == version.l10n_be_joint_committee_id \
-            and is_starterjob == version.l10n_be_is_starterjob
+            and is_starterjob == version.l10n_be_is_starterjob \
+            and bool(self.contract_date_start) == bool(version.contract_date_start)
 
     def is_worker(self):
         self.ensure_one()
+        # sudo: hr.version - the time off officers check the kind of worker when approving the time off
+        version_sudo = self.sudo()
+        # _xmlid_to_res_id is cached: env.ref() would run an exists() query on every call
+        worker_type_id = self.env['ir.model.data']._xmlid_to_res_id('l10n_be_hr_payroll.l10n_be_contract_type_be_worker', raise_if_not_found=False)
+        if worker_type_id and version_sudo.employee_type_id.id == worker_type_id:
+            return True
         workers_worker_codes = self.env["hr.rule.parameter"]._get_parameter_from_code('l10n_be_workers_worker_codes', raise_if_not_found=False)
         if not workers_worker_codes:
             return False
-        # sudo: hr.version - the time off officers check the kind of worker when approving the time off
-        worker_code = self.sudo().l10n_be_worker_code_id
+        worker_code = version_sudo.l10n_be_worker_code_id
         return worker_code and worker_code.dmfa_code in workers_worker_codes
 
     def is_employee(self):
@@ -3288,11 +3653,16 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             return False
         return self.contract_date_end < self.contract_date_start + relativedelta(months=3, days=-1)
 
+    def _l10n_be_is_subsidised_contract(self):
+        """ Whether the version is a subsidised contract (ACS, 'contractuel subventionne'), from its worker code """
+        self.ensure_one()
+        return self.l10n_be_worker_code_id.dmfa_code in ['024', '025', '029', '484', '485']
+
     def _l10n_be_is_eligible_for_acs_deduction(self):
         self.ensure_one()
         return (
             self.company_id.country_code == 'BE' and
-            self.l10n_be_worker_code_id.dmfa_code in ['024', '025', '029', '484', '485'] and
+            self._l10n_be_is_subsidised_contract() and
             self.l10n_be_working_region == 'br'
         )
 
@@ -3302,6 +3672,20 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         self.ensure_one()
         return self.l10n_be_worker_code_id.dmfa_code in ['046', '047'] or self._l10n_be_is_eligible_for_acs_deduction()
 
+    @api.model
+    def _l10n_be_get_double_holiday_pay_domain(self):
+        """ Versions earning a double holiday pay from the employer: not the individual vocational trainings (PFI),
+        the students, nor the former workers paid a supplementary indemnity (bridging pension, dismissal, career
+        break), who are outside the employees' annual holiday scheme, nor the workers of a foreign employer without a
+        place of business in Belgium (employer category 212), not liable for the annual holiday contribution """
+        excluded_worker_code_ids = [
+            self.env.ref(f'l10n_be_hr_payroll.l10n_be_worker_code_00{dmfa_code}').id for dmfa_code in ['879', '883', '885']
+        ]
+        return Domain([
+            ('l10n_be_dimona_category', 'not in', ['ivt', 'stu']),
+            ('l10n_be_worker_code_id', 'not in', excluded_worker_code_ids),
+        ]) & ~Domain('payroll_config_id.l10n_be_employer_category_id.dmfa_code', '=', '212')  # keeps a version without category
+
     def is_student(self):
         self.ensure_one()
         return self.l10n_be_dimona_category == 'stu'
@@ -3309,6 +3693,26 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def is_PFI(self):
         self.ensure_one()
         return self.l10n_be_dimona_category == 'ivt'
+
+    def _l10n_be_has_year_end_bonus_paid_by_fund(self, date_ref):
+        """ Whether the year-end bonus of the worker is paid by a fund, not by the employer (e.g. the fidelity
+        stamps of the construction) """
+        self.ensure_one()
+        joint_committee = self.l10n_be_joint_committee_id
+        fund_joint_committee_codes = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+            'l10n_be_year_end_bonus_paid_by_fund_joint_committees', date_ref, raise_if_not_found=False) or []
+        if not joint_committee or not fund_joint_committee_codes:
+            return False
+        fund_joint_committees = self.env['l10n.be.joint.committee'].with_context(active_test=False).search([
+            ('egov3_code', 'in', fund_joint_committee_codes)])
+        return joint_committee.is_descendant_of(fund_joint_committees)
+
+    def _l10n_be_has_internship_withholding_tax_rate(self):
+        """ The allowances of the professional immersion contracts (IVT) and of the transition internships
+        (Dimona STG, the First internship of the Brussels region, and TRI) bear a flat withholding tax rate
+        instead of the scale """
+        self.ensure_one()
+        return self.is_PFI() or self.l10n_be_dimona_category in ('stg', 'tri')
 
     def is_flexi(self):
         self.ensure_one()
@@ -3346,7 +3750,6 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             'mobile',
             'mobile_amount',
             'internet',
-            'transport_mode_car',
             'train_transport_employee_kilometer',
             'train_transport_periodicity',
             'bus_transport_employee_amount',
@@ -3384,7 +3787,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         self.ensure_one()
         periods = self.env['l10n.be.dimona.period'].search([
             ('employee_id', '=', self.employee_id.id),
-            ('company_id', '=', self.company_id.id),
+            # fetched by the root company, for all its branches
+            ('company_id', 'child_of', self.company_id.root_id.id),
             ('date_start', '!=', False),
             ('date_start', '<=', end_date),
             '|', ('date_end', '=', False), ('date_end', '>=', start_date),
@@ -3465,6 +3869,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         senior_youth_leaves = 0
         european_leaves = 0
         paid_leaves = 0
+        postponed_leaves = 0
         non_equivalent_days = 0
         european_leaves_amount = 0
         non_equivalent_codes = self.env['hr.work.entry.type'].search([('category_ids.code', '=', 'UNASSIMILATED')]).mapped('code')
@@ -3478,6 +3883,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 european_leaves_amount += wd.amount
             elif wd.code == "016.00":
                 paid_leaves += wd.number_of_days
+            elif wd.code in ("142.24", "142.26"):
+                postponed_leaves += wd.number_of_days
             if wd.code in non_equivalent_codes:
                 non_equivalent_days += wd.number_of_days
 
@@ -3488,16 +3895,18 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             'senior_youth_leaves': senior_youth_leaves,
             'european_leaves': european_leaves,
             'paid_leaves': paid_leaves,
+            'postponed_leaves': postponed_leaves,
             'non_equivalent_days': non_equivalent_days,
             'european_leaves_amount': european_leaves_amount,
         }
 
-    def _get_dimona_api_routes(self):
-        routes = API_DATA['routes'].get(self.company_id.l10n_be_dimona_environment)
+    def _get_dimona_api_routes(self, company=None):
+        company = company or self.company_id
+        routes = API_DATA['routes'].get(company.root_id.l10n_be_dimona_environment)
         if not routes:
             raise UserError(self.env._(
                 'The Dimona declarations of %(company)s are not filed over the ONSS REST API.',
-                company=self.company_id.name))
+                company=company.name))
         return routes
 
     def _l10n_be_dimona_can_declare(self):
@@ -3528,6 +3937,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         return response_json
 
     def _get_dimona_jwt(self, company):
+        # The access of the employer, for all its branches
+        company = company.root_id
         expeditor_number = company.onss_expeditor_number
         if not expeditor_number:
             raise UserError(self.env._('No expeditor number defined on the payroll settings.'))
@@ -3538,7 +3949,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         certificate_sudo = company.sudo().onss_certificate_id
         if not certificate_sudo:
             raise UserError(self.env._('No Certificate defined on the Payroll Configuration'))
-        if not self.l10n_be_dimona_category:
+        # No version when all the declarations of the company are fetched
+        if self and not self.l10n_be_dimona_category:
             raise UserError(self.env._('The DIMONA category is missing for employee %s. Please set it before opening a DIMONA declaration.', self.employee_id.name))
         unique_id = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(20))
         now = int(time.time())
@@ -3588,7 +4000,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         }
 
         try:
-            response = request(**self._get_dimona_api_routes()['authentification'], data=data, headers=headers, timeout=DIMONA_TIMEOUT)
+            response = request(**self._get_dimona_api_routes(company)['authentification'], data=data, headers=headers, timeout=DIMONA_TIMEOUT)
         except HTTPError as e:
             raise UserError(self.env._('Cannot connect with the ONSS servers. Please contact an administrator. (%s)', e))
         if response.status_code == 200:
@@ -3607,7 +4019,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _dimona_send(self, data):
         """Hand `data` over to the ONSS and return the reference it answers with."""
         self.ensure_one()
-        if self.company_id.l10n_be_dimona_environment == 'sandbox':
+        if self.company_id.root_id.l10n_be_dimona_environment == 'sandbox':
             # sandbox: send nothing, just generate a random reference
             timestamp = fields.Datetime.now().strftime('%Y%m%d%H%M%S')
             return f"{timestamp}{random.randint(100, 999)}"
@@ -3696,7 +4108,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         if declaration_type in ('in', 'update') and not self.l10n_be_dimona_category:
             issues.append(self.env._('- The DIMONA category is missing for employee %s', self.employee_id.name))
         if declaration_type == 'in':
-            if not self.payroll_config_id.onss_registration_number and self.company_id.l10n_be_dimona_environment != 'sandbox':
+            if not self.payroll_config_id.onss_registration_number and self.company_id.root_id.l10n_be_dimona_environment != 'sandbox':
                 issues.append(self.env._('- No ONSS registration number is defined for company %s', self.company_id.name))
             if self.l10n_be_dimona_declaration_id and self.l10n_be_dimona_declaration_id.state != 'B':
                 issues.append(self.env._('- There is already a IN declaration for this contract.'))
@@ -3784,6 +4196,22 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         if issues := self._l10n_be_dimona_issues(declaration_type, foreigner=foreigner):
             raise UserError('\n'.join(issues))
 
+    def _l10n_be_dimona_joint_committee_number(self):
+        """ The joint committee number (zone 00046) declared in a Dimona: always present,
+            either one of the committees listed by the ONSS reduced to 3 digits, or "XXX". """
+        self.ensure_one()
+        egov3_code = self.l10n_be_joint_committee_id.egov3_code or ''
+        # The service-voucher workers of the temporary work sector (322.01) may never be
+        # declared under the temporary work committee 322 (same instructions).
+        if egov3_code.startswith('322.01'):
+            return 'XXX'
+        committee = egov3_code.split('.')[0]
+        # CP 302 (Horeca) is only declared for occasional workers (EXT).
+        # Any other worker category in CP 302 must be declared as 'XXX'.
+        if committee == '302' and self.l10n_be_dimona_category != 'ext':
+            return 'XXX'
+        return committee if committee in DIMONA_JOINT_COMMITTEES else 'XXX'
+
     def _l10n_be_dimona_payload(self, declaration_type, foreigner=False):
         """The declaration this version owes, in the shape the ONSS expects."""
         self.ensure_one()
@@ -3850,7 +4278,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             "dimonaIn": {
                 "startDate": self.contract_date_start.strftime("%Y-%m-%d"),
                 "features": {
-                    "jointCommissionNumber": self.l10n_be_joint_committee_id.egov3_code or "XXX",
+                    "jointCommissionNumber": self._l10n_be_dimona_joint_committee_number(),
                     "workerType": self.l10n_be_dimona_category,
                 }
             }
@@ -3972,7 +4400,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 "The DIMONA declarations of %(company)s are followed up outside of this database.",
                 company=self.company_id.name))
 
-        if self.company_id.l10n_be_dimona_environment == 'sandbox':
+        if self.company_id.root_id.l10n_be_dimona_environment == 'sandbox':
             fake_response = self._get_fake_dimona_check_response()
             check_response = self.env['l10n.be.check.dimona.sandbox'].create({
                 'version_id': self.id,
@@ -4033,7 +4461,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
     @api.model
     def action_fetch_all_dimona(self):
-        if not self.env.user.has_group('hr_payroll.group_hr_payroll_user'):
+        # Called from the cron, for all the companies
+        if not self.env.su and not self.env.user.has_group('hr_payroll.group_hr_payroll_user'):
             raise UserError(self.env._("You don't have the right to call this action"))
 
         payroll_configs_per_company = self.env['payroll.config.settings']._read_group(
@@ -4053,7 +4482,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             }
 
             # 1: Fetch all relations
-            next_page = self._get_dimona_api_routes()['search_relations']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
+            next_page = self._get_dimona_api_routes(company)['search_relations']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
             relations_to_create = []
             while next_page:
                 try:
@@ -4064,7 +4493,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     }
                     _logger.info("Fetching Dimona Relations: %s", next_page)
                     response = request(
-                        self._get_dimona_api_routes()['search_relations']['method'],
+                        self._get_dimona_api_routes(company)['search_relations']['method'],
                         next_page,
                         json=data, headers=headers, timeout=DIMONA_TIMEOUT)
                     if response.status_code == 200:
@@ -4073,7 +4502,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                         for item in result['items']:
                             relation_reference = item['worker']['ssin']
                             existing_period = self.env['l10n.be.dimona.relation'].search([
-                                ('company_id', '=', company.id),
+                                ('company_id', 'child_of', company.id),
                                 ('name', '=', relation_reference)])
                             if not existing_period:
                                 relations_to_create.append({
@@ -4093,7 +4522,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             self.env['l10n.be.dimona.relation'].create(relations_to_create)
 
             # 2: Fetch all periods
-            next_page = self._get_dimona_api_routes()['search_periods']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
+            next_page = self._get_dimona_api_routes(company)['search_periods']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
             periods_to_create = []
             while next_page:
                 try:
@@ -4104,7 +4533,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     }
                     _logger.info("Fetching Dimona Periods: %s", next_page)
                     response = request(
-                        self._get_dimona_api_routes()['search_periods']['method'],
+                        self._get_dimona_api_routes(company)['search_periods']['method'],
                         next_page,
                         json=data, headers=headers, timeout=DIMONA_TIMEOUT)
                     if response.status_code == 200:
@@ -4113,7 +4542,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                         for item in result['items']:
                             period_reference = item['periodId']
                             existing_period = self.env['l10n.be.dimona.period'].search([
-                                ('company_id', '=', company.id),
+                                ('company_id', 'child_of', company.id),
                                 ('name', '=', period_reference)])
                             if not existing_period:
                                 periods_to_create.append({
@@ -4133,7 +4562,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             self.env['l10n.be.dimona.period'].create(periods_to_create)
 
             # 3: Fetch all declarations
-            next_page = self._get_dimona_api_routes()['search_declarations']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
+            next_page = self._get_dimona_api_routes(company)['search_declarations']['url'] + '?' + url_encode({'pageSize': 50, 'page': 1})
             declarations_to_create = []
             while next_page:
                 try:
@@ -4144,7 +4573,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     }
                     _logger.info("Fetching Dimona Declarations: %s", next_page)
                     response = request(
-                        self._get_dimona_api_routes()['search_declarations']['method'],
+                        self._get_dimona_api_routes(company)['search_declarations']['method'],
                         next_page,
                         json=data, headers=headers, timeout=DIMONA_TIMEOUT)
                     if response.status_code == 200:
@@ -4153,7 +4582,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                         for item in result['items']:
                             declaration_reference = item['declarationStatus']['declarationId']
                             existing_declaration = self.env['l10n.be.dimona.declaration'].search([
-                                ('company_id', '=', company.id),
+                                ('company_id', 'child_of', company.id),
                                 ('name', '=', declaration_reference)])
                             if not existing_declaration:
                                 declarations_to_create.append({
@@ -4184,7 +4613,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _get_mobility_budget_cost(self, base_wage):
         self.ensure_one()
         mobility_cost = base_wage * self._get_mobility_budget_cost_ratio() / 5.0
-        mobility_cost += self.employee_id._get_last_year_variable_revenues(date_from=fields.Date.today()) / 5.0
+        if self.employee_id:
+            mobility_cost += self.employee_id._get_last_year_variable_revenues(date_from=fields.Date.today()) / 5.0
 
         # add group insurance
         company_gi_amount = self.l10n_be_group_insurance_company_contribution * (

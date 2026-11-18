@@ -66,7 +66,7 @@ class L10nHkIr56m(models.Model):
         return super()._validate_employee_identification(individuals)
 
     def _get_report_version_domain(self):
-        """Filters to ONLY include Freelancers / Contractors who meet the income thresholds."""
+        """Filters to ONLY include Freelancers / Contractors who meet the income thresholds over the tax year."""
         self.ensure_one()
         contractor_type = self.env.ref("l10n_hk_hr_payroll.l10n_hk_contract_type_contractor")
         non_employee_type = self.env.ref("l10n_hk_hr_payroll.l10n_hk_contract_type_non_employee")
@@ -76,6 +76,7 @@ class L10nHkIr56m(models.Model):
             ("company_id", "=", self.company_id.id),
             ("date_to", ">=", self.start_period),
             ("date_to", "<=", self.end_period),
+            ("struct_id.country_id", "=", self.env.ref("base.hk").id),
             ("version_id.employee_type_id", "in", [
                 non_employee_type.id,
                 contractor_type.id,
@@ -85,19 +86,19 @@ class L10nHkIr56m(models.Model):
         if not payslips:
             return Domain.FALSE
 
+        # The IRD thresholds depend on what is paid over the tax year (note 2 of the IR6036C): the subcontracting fees
+        # above 200000, or the other fees (commissions, royalties, consultancy, ...) above 25000.
+        # Only the latest version is kept, so that the employee is not reported again on another sheet of the period.
+        line_values = payslips._get_line_values(set(payslips.line_ids.mapped('code')), compute_sum=True)
         valid_version_ids = []
-        for version, version_payslips in payslips.grouped('version_id').items():
-            threshold = (200000 if version.employee_type_id == contractor_type else 25000)
-            if sum(version_payslips.mapped('net_wage')) >= threshold:
-                valid_version_ids.append(version.id)
+        for employee_payslips in payslips.grouped('employee_id').values():
+            _, categories_totals = employee_payslips._l10n_hk_aggregate_totals(line_values)
+            subcontracting_fees = categories_totals['FEE_SUBCON']
+            if subcontracting_fees > 200000 or categories_totals['FEE'] - subcontracting_fees > 25000:
+                valid_version_ids.append(max(employee_payslips.version_id, key=lambda v: (v.date_version, v.id)).id)
 
         return Domain([
             ('company_id', '=', self.company_id.id),
-            ('contract_date_start', '!=', False),
-            ('contract_date_start', '<=', self.end_period),
-            '|',
-            ('contract_date_end', '=', False),
-            ('contract_date_end', '>', self.end_period),
             ('id', 'in', valid_version_ids),
         ])
 
@@ -130,14 +131,15 @@ class L10nHkIr56m(models.Model):
             for code in all_lines_values:
                 active_slips = [p for p in payslips if all_lines_values.get(code, {}).get(p.id, {}).get("total", 0.0) > 0]
                 if active_slips:
-                    min_date = min(p.date_from for p in active_slips)
+                    # A payslip ending in the period may start before it: the service is reported from the start of the period
+                    min_date = max(self.start_period, min(p.date_from for p in active_slips))
                     max_date = max(p.date_to for p in active_slips)
                     mapped_periods[code] = f"{min_date.strftime('%d/%m/%Y')} - {max_date.strftime('%d/%m/%Y')}"
                 else:
                     mapped_periods[code] = ""
 
             is_company = employee.work_contact_id.is_company
-            payslip_start = min(payslips.mapped('date_from'))
+            payslip_start = max(self.start_period, min(payslips.mapped('date_from')))
             payslip_end = max(payslips.mapped('date_to'))
             other_lines = payslips.mapped('line_ids').filtered(lambda l: l.code == 'OTHER' and l.total > 0)
             other_names = list(set(other_lines.mapped('name')))

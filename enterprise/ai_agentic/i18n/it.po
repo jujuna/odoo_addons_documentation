@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 17:46+0000\n"
-"PO-Revision-Date: 2026-10-23 16:22+0000\n"
+"PO-Revision-Date: 2026-11-03 14:34+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "ai_agentic/it/>\n"
@@ -67,6 +67,52 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            Crea e aggiorna automazioni persistenti per azioni da eseguire "
+"in seguito, ripetutamente o in risposta a un evento di un record. Usa questo "
+"strumento quando l'utente ti chiede di eseguire un'azione o inviare un "
+"promemoria in un momento futuro, con una pianificazione ricorrente o quando "
+"i record vengono creati, modificati, eliminati, ricevono messaggi o "
+"soddisfano condizioni specificate.\n"
+"            Quando si crea una nuova automazione, `name`, `description`, "
+"`trigger`, `ai_action_prompt` e `explanation` sono obbligatori.\n"
+"            Quando si modifica un'automazione esistente, `automation_id` e "
+"`explanation` sono obbligatori. Per gli altri parametri, fornisci solo "
+"quelli che devono essere aggiornati.\n"
+"            ## Tipo di trigger\n"
+"            Preferisci i trigger basati sul tempo (`on_time_created`, "
+"`on_time_updated`, `on_time`) rispetto a quelli sincroni (`on_create`, "
+"`on_create_or_write`): vengono eseguiti poco dopo l'evento invece che "
+"durante il salvataggio dell'utente. \"Quando viene creato un ticket, …\" "
+"corrisponde a `on_time_created` con un ritardo di 1 minuto; \"ogni volta che "
+"un lead viene aggiornato, …\" corrisponde a `on_time_updated`. Usa "
+"`on_create` / `on_create_or_write` solo quando l'utente richiede "
+"esplicitamente un'azione sincrona immediata o per una transizione su campi "
+"specifici che necessita di `filter_pre_domain`.\n"
+"            ## Esempi di trigger\n"
+"            - Aggiungi un tag a ogni nuovo ticket (trigger di creazione "
+"preferito): `{\"trigger\": {\"type\": \"on_time_created\", \"target_model\": "
+"\"helpdesk.ticket\", \"date_offset_or_interval\": {\"amount\": 1, \"unit\": "
+"\"minutes\"}}}`\n"
+"            - Attiva quando il tag \"Bug\" viene aggiunto alle mie attività "
+"(una transizione di campo quindi `on_create_or_write`): `{\"trigger\": "
+"{\"type\": \"on_create_or_write\", \"observed_fields\": [\"tag_ids\"], "
+"\"filter_pre_domain\": \"[('tag_ids', 'not in', ['Bug'])]\", "
+"\"filter_domain\": \"[('tag_ids', 'in', ['Bug']), ('user_id', '=', 3)]\"}}` "
+"(se l'ID dell'utente è 3).\n"
+"            - Attiva il giorno prima della data di chiusura prevista: `"
+"{\"trigger\": {\"type\": \"on_time\", \"observed_fields\": "
+"\"date_deadline\", \"date_offset_or_interval\": {\"direction\": \"before\", "
+"\"amount\": 1, \"unit\": \"day\"}}}`\n"
+"            - Attiva alla creazione se il record non è assegnato: `"
+"{\"trigger\": {\"type\": \"on_time_created\", \"filter_domain\": \"["
+"('user_id', '=', False)]\", \"date_offset_or_interval\": {\"amount\": 5, "
+"\"unit\": \"minutes\"}}}`\n"
+"            - Attiva ogni lunedì: `{\"trigger\": {\"type\": \"on_schedule\", "
+"\"date_offset_or_interval\": {\"amount\": 7, \"unit\": \"day\", "
+"\"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (se il prossimo lunedì è "
+"il 24/08/2026)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -86,6 +132,23 @@ msgid ""
 "instead, that leaves the user without the Run button.\n"
 "        "
 msgstr ""
+"\n"
+"            Esegue subito un'automazione basata sul tempo, esattamente come "
+"farebbe la sua pianificazione: genera un duplicato dell'agente che esegue le "
+"istruzioni delle azioni in un'esecuzione headless e ne mostra il risultato "
+"nella chat.\n"
+"            Usalo quando l'utente chiede di eseguire, testare o provare "
+"un'automazione ora, invece di eseguire personalmente i passaggi "
+"dell'automazione nella conversazione. Solo le automazioni basate sul tempo "
+"(azioni pianificate e regole temporali) possono essere eseguite su "
+"richiesta. Una regola basata su eventi si testa creando o aggiornando un "
+"record che corrisponde al suo trigger.\n"
+"            Dopo aver creato un'automazione basata sul tempo, offri "
+"all'utente di eseguirla una volta CHIAMANDO subito questo strumento: la sua "
+"scheda di conferma (\"Esegui\"/\"Non ora\") rappresenta l'offerta. Non "
+"chiedere mai \"devo eseguirla?\" nel testo del messaggio, poiché ciò "
+"lascerebbe l'utente senza il pulsante Esegui.\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.module.module,description:base.module_ai_agentic
@@ -111,27 +174,31 @@ msgstr ""
 msgid ""
 "\"%s\" ran. The full transcript is in its own chat, under the Automation tab."
 msgstr ""
+"\"%s\" è stato eseguito. La trascrizione completa è disponibile nella "
+"relativa chat, sotto la scheda Automazione."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/base_automation.py:0
 msgid "%(agent)s: %(automation)s"
-msgstr ""
+msgstr "%(agent)s: %(automation)s"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archive"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archivia"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Delete"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Elimina"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Unarchive"
 msgstr ""
+"<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Annulla "
+"archiviazione"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -163,82 +230,82 @@ msgstr "AI"
 #: model:ir.model,name:ai_agentic.model_ai_agent
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "Agente AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_agent_source
 msgid "AI Agent Source"
-msgstr ""
+msgstr "Origine agente AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_automation_trigger
 msgid "AI Automation Trigger"
-msgstr ""
+msgstr "Trigger automazione AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_automation_trigger_ids
 msgid "AI Automation Triggers"
-msgstr ""
+msgstr "Trigger automazione AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "Sessione AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_tool
 msgid "AI Tool"
-msgstr ""
+msgstr "Strumento AI"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "AI Tool: Create or Update Automation"
-msgstr ""
+msgstr "Strumento AI: crea o aggiorna automazione"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_run_automation
 msgid "AI Tool: Run Automation"
-msgstr ""
+msgstr "Strumento AI: esegui automazione"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "AI Tools"
-msgstr ""
+msgstr "Strumenti AI"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ir_actions_server_view_form
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_list.xml:0
 msgid "Add"
-msgstr ""
+msgstr "Aggiungi"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Links"
-msgstr ""
+msgstr "Aggiungi link"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Sources"
-msgstr ""
+msgstr "Aggiungi fonti"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Add a Link"
-msgstr ""
+msgstr "Aggiungi un link"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.js:0
 msgid "Add skills to expand what your agent can do."
-msgstr ""
+msgstr "Aggiungi competenze per espandere le funzionalità dell'agente."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -246,12 +313,16 @@ msgstr ""
 msgid ""
 "Add sources to give your agent the information it needs to answer accurately."
 msgstr ""
+"Aggiungi fonti per fornire al tuo agente le informazioni necessarie per "
+"rispondere in modo accurato."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add sources to your AI Agent to get answers based on specific content."
 msgstr ""
+"Aggiungi fonti al tuo agente AI per avere risposte in base a contenuti "
+"specifici."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -260,24 +331,27 @@ msgid ""
 "Add triggers to let your agent run automatically on a schedule or when key "
 "events happen."
 msgstr ""
+"Aggiungi trigger per consentire all'agente di essere eseguito "
+"automaticamente secondo una pianificazione o quando si verificano eventi "
+"chiave."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Adding sources..."
-msgstr ""
+msgstr "Aggiungi fonti..."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Creation"
-msgstr ""
+msgstr "Dopo la creazione"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Update"
-msgstr ""
+msgstr "Dopo l'aggiornamento"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -289,19 +363,19 @@ msgstr "Agente"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Name"
-msgstr ""
+msgstr "Nome agente"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Subtitle"
-msgstr ""
+msgstr "Sottotitolo agente"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/thread_actions_patch.js:0
 msgid "Agent configuration"
-msgstr ""
+msgstr "Configurazione agente"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_base_automation__ai_agent_id
@@ -309,6 +383,9 @@ msgid ""
 "Agent that runs the AI actions of this automation rule. Its tool calls are "
 "auto-confirmed and each run is kept in a chat for inspection."
 msgstr ""
+"Agente che esegue le azioni AI di questa regola di automazione. Le chiamate "
+"ai suoi strumenti vengono confermate automaticamente e ogni esecuzione viene "
+"conservata in una chat per l'ispezione."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -327,12 +404,12 @@ msgstr "Gli agenti ti aiutano a gestire e organizzare le tue operazioni AI."
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_action_prompt
 msgid "Ai Action Prompt"
-msgstr ""
+msgstr "Prompt azione AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_next_trigger_date
 msgid "Ai Next Trigger Date"
-msgstr ""
+msgstr "Prossima data di attivazione AI"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -343,19 +420,19 @@ msgstr "Tutti i modelli"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.js:0
 msgid "Allow this Agent to ask for help to other Agents"
-msgstr ""
+msgstr "Consenti a questo agente di chiedere aiuto ad altri agenti"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__architect
 msgid "Architect"
-msgstr ""
+msgstr "Architetto"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Archive"
-msgstr ""
+msgstr "Archivia"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -367,18 +444,18 @@ msgstr "In archivio"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to archive this agent?"
-msgstr ""
+msgstr "Sei sicuro di voler archiviare questo agente?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to delete this agent?"
-msgstr ""
+msgstr "Sei sicuro di voler eliminare questo agente?"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__artist
 msgid "Artist"
-msgstr ""
+msgstr "Artista"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -387,40 +464,40 @@ msgstr ""
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__automation_id
 msgid "Automation"
-msgstr ""
+msgstr "Automazione"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_base_automation
 msgid "Automation Rule"
-msgstr ""
+msgstr "Regola di automazione"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Automation Rule %(name)s"
-msgstr ""
+msgstr "Regola di automazione %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__automation_ids
 msgid "Automation rules that run this agent by themselves."
-msgstr ""
+msgstr "Regole di automazione che eseguono l'agente automaticamente."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.js:0
 msgid "Automation triggered!"
-msgstr ""
+msgstr "Automazione attivata!"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__avatar_role
 msgid "Avatar Role"
-msgstr ""
+msgstr "Ruolo avatar"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Based on a Date Field"
-msgstr ""
+msgstr "Basato su un campo data"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -436,13 +513,14 @@ msgstr "Chiama l'agente"
 #: model:ir.model.fields,help:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "Channel opened by an automation rule or scheduled action."
 msgstr ""
+"Canale aperto da una regola di automazione oppure da un'azione pianificata."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
 #. module: ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_config_menu
@@ -452,7 +530,7 @@ msgstr "Configurazione"
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ai_agent_action_create
 msgid "Create Agent"
-msgstr ""
+msgstr "Crea agente"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_skill
@@ -460,6 +538,8 @@ msgid ""
 "Create a skill that leverages instructions and tools to direct Odoo AI in "
 "assisting the user with their tasks."
 msgstr ""
+"Crea una competenza che sfrutti istruzioni e strumenti per guidare l’AI di "
+"Odoo nell’assistere l’utente nei suoi compiti."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_agent_action
@@ -475,17 +555,17 @@ msgstr "Crea la prima competenza!"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Created a Trigger"
-msgstr ""
+msgstr "Trigger creato"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Data creazione"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -495,7 +575,7 @@ msgstr "Regole personalizzate"
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Custom Skills"
-msgstr ""
+msgstr "Competenze personalizzate"
 
 #. module: ai_agentic
 #: model:ir.actions.act_window,name:ai_agentic.ai_composer_action
@@ -513,35 +593,39 @@ msgid ""
 "- What can it do?\n"
 "- How should it work?"
 msgstr ""
+"Definisci il quadro operativo del tuo agente:\n"
+"- Quale ruolo dovrebbe assumere?\n"
+"- Cosa può fare?\n"
+"- Come dovrebbe funzionare?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__detective
 msgid "Detective"
-msgstr ""
+msgstr "Detective"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Disable"
-msgstr ""
+msgstr "Disattiva"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "Abbandona"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Canale di discussione"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__display_name
@@ -561,19 +645,19 @@ msgstr "Nome visualizzato"
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Dropdown menu"
-msgstr ""
+msgstr "Menu a discesa"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Enable"
-msgstr ""
+msgstr "Attiva"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
@@ -584,28 +668,28 @@ msgstr "Spiega all'agente cosa deve fare..."
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "File"
-msgstr ""
+msgstr "File"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "From AI Automation"
-msgstr ""
+msgstr "Dall'automazione AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__headset
 msgid "Headset"
-msgstr ""
+msgstr "Cuffie"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__hoodie
 msgid "Hoodie"
-msgstr ""
+msgstr "Felpa"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "I need help to choose"
-msgstr ""
+msgstr "Ho bisogno di aiuto per scegliere"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__id
@@ -618,7 +702,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__id
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -626,12 +710,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Instructions"
-msgstr ""
+msgstr "Istruzioni"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Interval"
-msgstr ""
+msgstr "Intervallo"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__avatar_role
@@ -639,6 +723,8 @@ msgid ""
 "Job role the agent depicts. Setting it redraws the avatar in the agent's own "
 "color."
 msgstr ""
+"Ruolo che rappresenta l'agente. La configurazione ridisegna l'avatar con il "
+"colore dell'agente."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -649,22 +735,22 @@ msgstr "Chiave"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Knowledge"
-msgstr ""
+msgstr "Knowledge"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__prev_trigger_date
 msgid "Last Trigger Date"
-msgstr ""
+msgstr "Data ultimo trigger"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -673,17 +759,19 @@ msgid ""
 "Let's create a new Trigger together, I'm not sure what setup is best for my "
 "use case."
 msgstr ""
+"Creiamo insieme un nuovo trigger, non sono sicuro di quale configurazione "
+"sia la migliore per il mio caso d'uso."
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__librarian
 msgid "Librarian"
-msgstr ""
+msgstr "Bibliotecario"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "Link"
-msgstr ""
+msgstr "Link"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -694,7 +782,7 @@ msgstr "Modello e-mail con richiesta aggiuntiva"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_agent.py:0
 msgid "My agent"
-msgstr ""
+msgstr "Il mio agente"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
@@ -707,7 +795,7 @@ msgstr "Nome"
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__next_trigger_date
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Next Trigger Date"
-msgstr ""
+msgstr "Prossima data di attivazione"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_composer_action
@@ -723,13 +811,13 @@ msgstr "Nessuno strumento trovato!"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No automation runs yet."
-msgstr ""
+msgstr "Nessun'automazione in corso ancora."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "No valid URLs found to process."
-msgstr ""
+msgstr "Non è stato trovato nessun URL da elaborare."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -738,23 +826,25 @@ msgid ""
 "No valid files to upload. Only PDF, Word, PowerPoint, Excel, Text, CSV, "
 "OpenDocument, and Markdown files are allowed."
 msgstr ""
+"Nessun file valido da caricare. Sono consentiti solo file PDF, Word, "
+"PowerPoint, Excel, testo, CSV, OpenDocument e Markdown."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Not now"
-msgstr ""
+msgstr "Non ora"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent_source__file_sources_count
 msgid "Number of file sources"
-msgstr ""
+msgstr "Numero di file sorgente"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "On a Schedule"
-msgstr ""
+msgstr "Secondo pianificazione"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -765,7 +855,7 @@ msgstr "Nel modello"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Paste your links, one per line"
-msgstr ""
+msgstr "Copia i tuoi link, uno per riga"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
@@ -782,25 +872,27 @@ msgstr "Proprietà"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Ran the trigger %(name)s"
-msgstr ""
+msgstr "Trigger attivato %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid ""
 "Read-only rendering of the Markdown instructions, shown in the agent panel."
 msgstr ""
+"Rendering in sola lettura delle istruzioni Markdown, visualizzato nel "
+"pannello agente."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Remove"
-msgstr ""
+msgstr "Rimuovi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid "Rendered Instructions"
-msgstr ""
+msgstr "Istruzioni fornite"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -812,7 +904,7 @@ msgstr "Rielabora"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_panel_sources.xml:0
 msgid "Restrict answers to Sources"
-msgstr ""
+msgstr "Limita le risposte alle fonti"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -831,53 +923,54 @@ msgstr "Nome regola"
 #: code:addons/ai_agentic/models/ai_tool.py:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.xml:0
 msgid "Run"
-msgstr ""
+msgstr "Esegui"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run automatically at a set frequency, e.g. on Mondays 8AM"
 msgstr ""
+"Esegui automaticamente a una frequenza impostata, ad es. il lunedì alle 8:00"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run once per record, when a specific date is reached"
-msgstr ""
+msgstr "Esegui una volta per record, al raggiungimento di una data specifica"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Run this automation now?"
-msgstr ""
+msgstr "Esegui subito questa automazione?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a new record is added"
-msgstr ""
+msgstr "Esegui ogni volta che viene aggiunto un nuovo record"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a specific field gets updated"
-msgstr ""
+msgstr "Esegui ogni volta che un campo specifico viene aggiornato"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_run_automation
 msgid "Running the automation"
-msgstr ""
+msgstr "Esecuzione dell'automazione"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__sales
 msgid "Sales"
-msgstr ""
+msgstr "Vendite"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -887,7 +980,7 @@ msgstr "Seleziona un'azione..."
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ir_actions_server
 msgid "Server Action"
-msgstr ""
+msgstr "Azione server"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_search
@@ -909,6 +1002,7 @@ msgstr "Competenze"
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Skills configured by the user, excluding built-in native skills."
 msgstr ""
+"Competenze configurate dall'utente, escluse le competenze native integrate."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_skill_action
@@ -923,6 +1017,8 @@ msgid ""
 "Some URLs are invalid and were skipped. URLs must start with http://, "
 "https://, or ftp://"
 msgstr ""
+"Alcuni URL non sono validi e sono stati ignorati. Gli URL devono iniziare "
+"con http://, https:// o ftp://"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -931,6 +1027,8 @@ msgid ""
 "Some files have invalid formats and were skipped: %s. Only PDF, Word, "
 "PowerPoint, Excel, Text, CSV, and OpenDocument files are allowed."
 msgstr ""
+"Alcuni file hanno formati non validi e sono stati ignorati: %s. Sono "
+"consentiti solo file PDF, Word, PowerPoint, Excel, testo, CSV e OpenDocument."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
@@ -942,7 +1040,7 @@ msgstr "Fonti"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.xml:0
 msgid "Subagents"
-msgstr ""
+msgstr "Agenti secondari"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
@@ -1001,31 +1099,31 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__automation_ids
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "Triggers"
-msgstr ""
+msgstr "Trigger"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Unarchive"
-msgstr ""
+msgstr "Annulla archiviazione"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Unread"
-msgstr ""
+msgstr "Non letto"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Updated a Trigger"
-msgstr ""
+msgstr "Trigger aggiornato"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Upload a File"
-msgstr ""
+msgstr "Carica un file"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_tool_view_search
@@ -1036,7 +1134,7 @@ msgstr "Uso AI configurato"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "When should your agent be triggered?"
-msgstr ""
+msgstr "Quando dovrebbe essere attivato il tuo agente?"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -1046,12 +1144,12 @@ msgstr "Quando gli utenti hanno bisogno di"
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__worker
 msgid "Worker"
-msgstr ""
+msgstr "Operaio"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "Working on your automation"
-msgstr ""
+msgstr "Elaborazione dell'automazione in corso"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -1083,13 +1181,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "has run %s"
-msgstr ""
+msgstr "ha eseguito %s"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "self-updated its configuration"
-msgstr ""
+msgstr "ha aggiornato automaticamente la propria configurazione"
 
 #~ msgid "Model"
 #~ msgstr "Modello"

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-10-23 16:22+0000\n"
+"PO-Revision-Date: 2026-10-26 13:09+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "ai_helpdesk/it/>\n"
@@ -22,22 +22,22 @@ msgstr ""
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text order-2\">Closed</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text order-2\">Chiuso</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text order-2\">Similar</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text order-2\">Simile</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text\">Searching...</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Ricerca in corso...</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "AI"
-msgstr ""
+msgstr "AI"
 
 #. module: ai_helpdesk
 #: model:ir.module.module,shortdesc:base.module_ai_helpdesk
@@ -48,26 +48,29 @@ msgstr "Helpdesk AI"
 #: model:ir.model,name:ai_helpdesk.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
 msgstr ""
+"Configurazioni del modello AI (prompt predefinito) per la redazione di testi."
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ai_agent_id
 msgid "Agent"
-msgstr ""
+msgstr "Agente"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Agent that will be used when interacting with tickets of this team."
 msgstr ""
+"Agente che verrà utilizzato durante l’interazione con i ticket di questo "
+"team."
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__similar_closed_tickets_count
 msgid "Amount of similar closed tickets"
-msgstr ""
+msgstr "Numero di ticket simili chiusi"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__similar_tickets_count
 msgid "Amount of similar tickets"
-msgstr ""
+msgstr "Numero di ticket simili"
 
 #. module: ai_helpdesk
 #: model:ir.module.module,summary:base.module_ai_helpdesk
@@ -78,17 +81,19 @@ msgstr "Potenzia l'helpdesk con agenti AI."
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Controls how far in the past should the search for similar tickets go."
 msgstr ""
+"Controlla fino a che punto nel passato deve estendersi la ricerca di ticket "
+"simili."
 
 #. module: ai_helpdesk
 #: model:ir.model,website_form_label:ai_helpdesk.model_helpdesk_ticket
 msgid "Create a Ticket"
-msgstr ""
+msgstr "Crea ticket"
 
 #. module: ai_helpdesk
 #. odoo-python
 #: code:addons/ai_helpdesk/models/helpdesk_ticket.py:0
 msgid "Default agent not found, cannot find similar records."
-msgstr ""
+msgstr "Agente predefinito non trovato, impossibile trovare record simili."
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_ai_composer__display_name
@@ -101,18 +106,18 @@ msgstr "Nome visualizzato"
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__embedding_status
 msgid "Embedding Status"
-msgstr ""
+msgstr "Stato integrazione"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__use_ai
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__use_ai
 msgid "Enable AI features"
-msgstr ""
+msgstr "Abilita funzionalità AI"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__forever
 msgid "Forever"
-msgstr ""
+msgstr "Per sempre"
 
 #. module: ai_helpdesk
 #: model_terms:ai.prompt.button,prompt:ai_helpdesk.ai_prompt_solution_similar_tickets
@@ -152,21 +157,57 @@ msgid ""
 "contain the email body alone, ready to be sent or edited, with nothing "
 "before or after it."
 msgstr ""
+"Aiuta l'operatore dell'assistenza a trovare una soluzione per questo ticket "
+"utilizzando i ticket simili presenti nel tuo contesto.\n"
+"\n"
+"Stai parlando con l'operatore dell'assistenza, non con il cliente. Non "
+"formulare mai la tua risposta come una risposta per il cliente.\n"
+"\n"
+"## Regole di risoluzione\n"
+"\n"
+"- Leggi i ticket simili nel tuo contesto e controlla come sono stati "
+"effettivamente risolti: i messaggi di chiusura nel loro chatter, cosa ha "
+"fatto l'operatore, cosa ha confermato il cliente.\n"
+"- Se uno o più di essi contengono una soluzione, riassumila in pochi "
+"passaggi concreti e cita i ticket da cui proviene. Se indicano soluzioni "
+"diverse, elencale mettendo per prima quella più probabile.\n"
+"- Se esistono ticket simili ma nessuno di essi è stato risolto, segnalalo e "
+"riporta ciò che è già stato tentato in quei ticket.\n"
+"- Se nel tuo contesto non è presente alcun ticket simile, comunica "
+"all'operatore che non ne hai trovato nessuno e chiedi se desidera che tu "
+"cerchi altrove (altri ticket nel database o nell'app Knowledge). Attendi la "
+"sua risposta.\n"
+"- Non proporre mai una soluzione che non provenga dai ticket, a meno che "
+"l'operatore non l'abbia espressamente richiesto. Quando lo fai, dichiara "
+"chiaramente che non è supportata da ticket precedenti.\n"
+"- Il tuo primo messaggio deve riportare ciò che indicano i ticket, non "
+"chiedere all'operatore come procedere.\n"
+"\n"
+"## Passaggio successivo\n"
+"\n"
+"- Una volta ottenuta una soluzione chiara, inseriscila nell'argomento "
+"`question` dello strumento `ai_tool_ask_user_question` e concludi il testo "
+"proponendo di scrivere la risposta per il cliente, ad esempio: \"Vuoi che "
+"prepari una bozza dell'e-mail per il cliente?\". La soluzione deve trovarsi "
+"all'interno di tale argomento.\n"
+"- Scrivi l'e-mail solo una volta che l'operatore ha acconsentito. Tale "
+"messaggio deve quindi contenere solo il corpo dell'e-mail, pronto per essere "
+"inviato o modificato, senza nulla prima o dopo."
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_helpdesk_team
 msgid "Helpdesk Team"
-msgstr ""
+msgstr "Team assistenza clienti"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_helpdesk_ticket
 msgid "Helpdesk Ticket"
-msgstr ""
+msgstr "Ticket assistenza clienti"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,help:ai_helpdesk.field_helpdesk_team__ticket_similarity_threshold
 msgid "How close tickets should be to be considered similar."
-msgstr ""
+msgstr "Quanto devono essere vicini i ticket per essere considerati simili."
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_ai_composer__id
@@ -174,52 +215,52 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__id
 #: model:ir.model.fields,field_description:ai_helpdesk.field_mail_message__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ticket_similarity_time_range
 msgid "Include Tickets from"
-msgstr ""
+msgstr "Includi ticket da"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__3m
 msgid "Last 3 Months"
-msgstr ""
+msgstr "Ultimi 3 mesi"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__1y
 msgid "Last 365 days"
-msgstr ""
+msgstr "Ultimi 365 giorni"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__6m
 msgid "Last 6 Months"
-msgstr ""
+msgstr "Ultimi 6 mesi"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__1w
 msgid "Last Week"
-msgstr ""
+msgstr "Ultima settimana"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Look for Similar Tickets"
-msgstr ""
+msgstr "Cerca ticket simili"
 
 #. module: ai_helpdesk
 #: model:ir.actions.server,name:ai_helpdesk.action_recompute_ticket_embeddings
 msgid "Look for similar tickets"
-msgstr ""
+msgstr "Cerca ticket simili"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "Messaggio"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__embedding_ids
 msgid "Record embedding ids"
-msgstr ""
+msgstr "ID integrazioni record"
 
 #. module: ai_helpdesk
 #: model_terms:ai.prompt.button,prompt:ai_helpdesk.ai_prompt_top_ticket_cause
@@ -239,9 +280,9 @@ msgstr ""
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ticket_similarity_threshold
 msgid "Similarity Threshold"
-msgstr ""
+msgstr "Soglia di affinità"
 
 #. module: ai_helpdesk
 #: model:ir.model.constraint,message:ai_helpdesk.constraint_helpdesk_team_ticket_similarity_threshold_is_between_0_and_1
 msgid "The ticket similarity threshold must be between 0 and 1.0"
-msgstr ""
+msgstr "La soglia di affinità dei ticket deve essere compresa tra 0 e 1,0"

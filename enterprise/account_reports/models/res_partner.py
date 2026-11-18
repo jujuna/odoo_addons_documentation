@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
@@ -86,6 +87,8 @@ class ResPartner(models.Model):
 
     def set_commercial_partner_main(self):
         self.ensure_one()
+        if not self.has_vat:
+            raise UserError(_("Only a partner with a Tax ID can be set as main."))
 
         main_partner = self
         duplicated_partners = self.env['res.partner'].search([
@@ -97,6 +100,7 @@ class ResPartner(models.Model):
             'parent_id': main_partner.id,
             'type': 'invoice',
         })
-        duplicate_partners_vat = self.env.context.get('duplicate_partners_vat', [])
-        remaining_vats = [pvat for pvat in duplicate_partners_vat if pvat != main_partner.vat]
+        remaining_vats = [pvat for pvat in self.env.context.get('duplicate_partners_vat', []) if pvat != main_partner.vat]
+        if not remaining_vats:
+            return False
         return self.env['account.ec.sales.report.handler.common']._get_duplicate_vat_partners(remaining_vats)

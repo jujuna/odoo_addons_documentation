@@ -2,6 +2,7 @@ import re
 from odoo import models
 from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
 from odoo.tools import BinaryBytes
+from odoo.tools.func import deprecated
 
 
 class AccountReturn(models.Model):
@@ -17,6 +18,7 @@ class AccountReturn(models.Model):
         self._add_attachment(POKUPKI_txt_file)
         self._add_attachment(PRODAGBI_txt_file)
 
+    @deprecated("Attachments are now generated on submit and not validate, use `add_attachments_and_submit` instead")
     def add_attachments_and_validate(self, content, file_name, options):
         # Allow the l10n_bg_saft_file_attachment_error_wizard to continue the validation process
         self._add_attachment({
@@ -26,12 +28,55 @@ class AccountReturn(models.Model):
         self._attach_purchase_and_sale_txt_reports(options)
         return super().action_validate()
 
+    def add_attachments_and_submit(self, content, file_name, options):
+        # Allow the l10n_bg_saft_file_attachment_error_wizard to continue the submmission process
+        self._add_attachment({
+            'file_content': content,
+            'file_name': file_name,
+        })
+        self._attach_purchase_and_sale_txt_reports(options)
+        return super().action_submit()
+
+    def action_submit(self):
+        # Extends account_reports
+        self.ensure_one()
+
+        if (
+            self.type_external_id != 'l10n_bg_reports.bg_tax_return_type'
+            or self.env['ir.config_parameter'].sudo().get_bool("l10n_bg_saft.create_on_validate")
+        ):
+            return super().action_submit()
+
+        options = {**self._get_closing_report_options(), 'export_mode': 'file'}
+        report = self.env.ref('account_reports.general_ledger_report')
+        customer_handler = self.env[report.custom_handler_model_name]
+
+        try:
+            saft_attachment = customer_handler.l10n_bg_export_saft_to_xml(
+                report.get_options(previous_options=options),
+            )
+            self._add_attachment(saft_attachment)
+            self._attach_purchase_and_sale_txt_reports(options)
+            return super().action_submit()
+
+        except AccountReportFileDownloadException as e:
+            if e.content:
+                e.content['file_content'] = e.content['file_content'].decode()
+            return self.open_l10n_bg_saft_file_attachment_error_wizard(
+                e.errors,
+                e.content,
+                options,
+            )
+
     def action_validate(self):
         # Extends account_reports
 
         self.ensure_one()
 
-        if self.type_external_id != 'l10n_bg_reports.bg_tax_return_type':
+        if (
+            self.type_external_id != 'l10n_bg_reports.bg_tax_return_type'
+            or not self.env['ir.config_parameter'].sudo().get_bool("l10n_bg_saft.create_on_validate")
+        ):
             return super().action_validate()
 
         options = {**self._get_closing_report_options(), 'export_mode': 'file'}

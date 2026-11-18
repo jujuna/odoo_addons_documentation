@@ -4,12 +4,13 @@ import { mountView } from "@web/../tests/web_test_helpers";
 import { defineHrPayrollModels } from "@hr_payroll/../tests/hr_payroll_test_helpers";
 import { HrPayslip } from "@hr_payroll/../tests/mock_server/mock_models/hr_payslip";
 import { HrPayslipLine } from "@hr_payroll/../tests/mock_server/mock_models/hr_payslip_line";
+import { HrSalaryRule } from "@hr_payroll/../tests/mock_server/mock_models/hr_salary_rule";
 import { payslipShowAllState } from "../src/views/payslip_form/hr_payslip_list_row_visibility_renderer";
 import { animationFrame } from "@odoo/hoot-mock";
 
 defineHrPayrollModels();
 
-test("default value cells switch from invisible to muted when toggling show all", async () => {
+test("default value cells switch from empty to muted when toggling show all", async () => {
     HrPayslipLine._records.push(
         { id: 1, quantity: 1.0, rate: 100.0, amount: 100.0, total: 100.0, slip_id: 1, appears_on_payslip: "always", name: "1) default values, always appears" },
         { id: 2, quantity: 2.0, rate: 50.0, amount: 80.0, total: 100.0, slip_id: 1, appears_on_payslip: "always", name: "2) non default values, always appears" },
@@ -63,7 +64,8 @@ test("default value cells switch from invisible to muted when toggling show all"
 
         var default_always_cell = default_always.querySelector(`td[name="${field}"]`);
         var non_default_always_cell = non_default_always.querySelector(`td[name="${field}"]`);
-        expect(default_always_cell.classList.contains("invisible")).toBe(true);
+        expect(default_always_cell.classList.contains("invisible")).toBe(false);
+        expect(default_always_cell.textContent).toBe("");
         expect(default_always_cell.classList.contains("text-muted")).toBe(false);
         expect(non_default_always_cell.classList.contains("invisible")).toBe(false);
         expect(non_default_always_cell.classList.contains("text-muted")).toBe(false);
@@ -113,5 +115,92 @@ test("default value cells switch from invisible to muted when toggling show all"
 
         expect(default_always_cell.textContent).toBe("7.00");
         expect(default_always_cell.classList.contains("text-muted")).toBe(false);
+    }
+});
+
+test("the style of the salary rule applies on the row, without a rule column", async () => {
+    HrSalaryRule._records.push(
+        { id: 1, name: "Bold rule", bold: true, italic: true },
+        { id: 2, name: "Plain rule" },
+    );
+    HrPayslipLine._records.push(
+        { id: 1, quantity: 2.0, total: 80.0, slip_id: 1, salary_rule_id: 1, appears_on_payslip: "always", name: "Bold line" },
+        { id: 2, quantity: 2.0, total: 80.0, slip_id: 1, salary_rule_id: 2, appears_on_payslip: "always", name: "Plain line" },
+    );
+    HrPayslip._records.push({ id: 1, line_ids: [1, 2] });
+    payslipShowAllState.showAll = true;
+
+    await mountView({
+        type: "form",
+        resModel: "hr.payslip",
+        resId: 1,
+        arch: `
+            <form>
+                <field name="line_ids" widget="payslip_lines_2many">
+                    <list editable="bottom" create="0">
+                        <field name="name"/>
+                        <field name="salary_rule_id" widget="salary_rule_style" readonly="1"/>
+                        <field name="quantity"/>
+                        <field name="total"/>
+                        <field name="appears_on_payslip" column_invisible="1"/>
+                    </list>
+                </field>
+            </form>
+        `,
+    });
+
+    const allLines = [...document.querySelectorAll("tr")];
+    const boldLine = allLines.find((tr) => tr.textContent.includes("Bold line"));
+    const plainLine = allLines.find((tr) => tr.textContent.includes("Plain line"));
+    expect(boldLine.classList.contains("fw-bold")).toBe(true);
+    expect(boldLine.classList.contains("fst-italic")).toBe(true);
+    expect(plainLine.classList.contains("fw-bold")).toBe(false);
+    // the rule is only loaded for its style, it has no column
+    expect(document.querySelector('th[data-name="salary_rule_id"]')).toBe(null);
+    expect(boldLine.querySelector('td[name="salary_rule_id"]')).toBe(null);
+});
+
+test("title rows keep their cells but only show the name", async () => {
+    HrSalaryRule._records.push(
+        { id: 1, name: "Title rule", title: true },
+        { id: 2, name: "Regular rule", title: false },
+    );
+    HrPayslipLine._records.push(
+        { id: 1, quantity: 2.0, total: 80.0, slip_id: 1, salary_rule_id: 1, appears_on_payslip: "always", name: "Title line" },
+        { id: 2, quantity: 2.0, total: 80.0, slip_id: 1, salary_rule_id: 2, appears_on_payslip: "always", name: "Regular line" },
+    );
+    HrPayslip._records.push({ id: 1, line_ids: [1, 2] });
+    payslipShowAllState.showAll = true;
+
+    await mountView({
+        type: "form",
+        resModel: "hr.payslip",
+        resId: 1,
+        arch: `
+            <form>
+                <field name="line_ids" widget="payslip_lines_2many">
+                    <list editable="bottom" create="0">
+                        <field name="name"/>
+                        <field name="salary_rule_id" widget="salary_rule_style" readonly="1"/>
+                        <field name="quantity"/>
+                        <field name="total"/>
+                        <field name="appears_on_payslip" column_invisible="1"/>
+                    </list>
+                </field>
+            </form>
+        `,
+    });
+
+    const allLines = [...document.querySelectorAll("tr")];
+    const titleLine = allLines.find((tr) => tr.textContent.includes("Title line"));
+    const regularLine = allLines.find((tr) => tr.textContent.includes("Regular line"));
+    expect(titleLine.querySelector('td[name="name"]').textContent).toBe("Title line");
+    for (const field of ["quantity", "total"]) {
+        // the cell is kept (and colored on hover), only its value is left out
+        const titleCell = titleLine.querySelector(`td[name="${field}"]`);
+        expect(titleCell).not.toBe(null);
+        expect(titleCell.classList.contains("invisible")).toBe(false);
+        expect(titleCell.textContent).toBe("");
+        expect(regularLine.querySelector(`td[name="${field}"]`).textContent).not.toBe("");
     }
 });

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <record id="base.partner_demo_company_in" model="res.partner" forcecreate="1">
             <field name="name">IN Company</field>
             <field name="street">Block no. 401</field>
@@ -46,9 +46,22 @@
             <field name="company_id" ref="base.demo_company_in"/>
         </record>
 
+        <record id="l10n_in_hr_job_developer" model="hr.job">
+            <field name="name">Experienced Developer</field>
+            <field name="company_id" ref="base.demo_company_in"/>
+        </record>
+        <record id="l10n_in_hr_job_consultant" model="hr.job">
+            <field name="name">Consultant</field>
+            <field name="company_id" ref="base.demo_company_in"/>
+        </record>
+        <record id="l10n_in_hr_job_hrm" model="hr.job">
+            <field name="name">Human Resources Manager</field>
+            <field name="company_id" ref="base.demo_company_in"/>
+        </record>
+
         <record id="l10n_in_default_contract_template" model="hr.version">
             <field name="name">Software Developer</field>
-            <field name="job_id" ref="hr.job_developer"/>
+            <field name="job_id" ref="l10n_in_hr_payroll.l10n_in_hr_job_developer"/>
             <field name="department_id" ref="l10n_in_hr_payroll.l10n_in_hr_department_rd"/>
             <field name="hr_responsible_id" ref="base.user_admin"/>
             <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -154,7 +167,7 @@
             <field name="private_country_id" ref="base.in"/>
             <field name="private_phone">+91 7654321098</field>
             <field name="private_email">vihaan.sengupta123@example.com</field>
-            <field name="job_id" ref="hr.job_consultant"/>
+            <field name="job_id" ref="l10n_in_hr_payroll.l10n_in_hr_job_consultant"/>
             <field name="job_title">Software Developer</field>
             <field name="work_contact_id" ref="l10n_in_hr_payroll.l10n_in_res_partner_vihaan"/>
             <field name="emergency_contact">Harshiv Sengupta (Father)</field>
@@ -214,7 +227,7 @@
         <record id="l10n_in_hr_employee_shaurya" model="hr.employee">
             <field name="name">Shaurya Khurana</field>
             <field name="work_email">shaurya.khurana@example.com</field>
-            <field name="job_id" ref="hr.job_developer"/>
+            <field name="job_id" ref="l10n_in_hr_payroll.l10n_in_hr_job_developer"/>
             <field name="sex">male</field>
             <field name="department_id" ref="l10n_in_hr_payroll.l10n_in_hr_department_tech_support"/>
             <field name="work_contact_id" ref="l10n_in_hr_payroll.l10n_in_partner_shaurya_khurana"/>
@@ -273,7 +286,7 @@
         <record id="l10n_in_hr_employee_alisha_sharma" model="hr.employee">
             <field name="name">Alisha Sharma</field>
             <field name="work_email">alisha.sharma@example.com</field>
-            <field name="job_id" ref="hr.job_hrm"/>
+            <field name="job_id" ref="l10n_in_hr_payroll.l10n_in_hr_job_hrm"/>
             <field name="work_contact_id" ref="l10n_in_hr_payroll.l10n_in_partner_aisha_sharma"/>
             <field name="sex">female</field>
             <field name="tz">Asia/Kolkata</field>

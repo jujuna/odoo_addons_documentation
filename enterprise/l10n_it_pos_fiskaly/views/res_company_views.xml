@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.l10n_it_pos_fiskaly</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <page name="general_info" position="after">
+                <page string="Fiskaly" name="l10n_it_fiskaly" invisible="country_code != 'IT'">
+                    <group>
+                        <group string="API Credentials" invisible="parent_id" groups="base.group_system">
+                            <field name="parent_id" invisible="1"/>
+                            <!-- Needed by the invisible modifiers: the fiskaly API credentials are only set on the root company -->
+                            <field name="l10n_it_fiskaly_access_token" invisible="1"/>
+                            <!-- Needed by the invisible modifiers of the warning banner and of the Registration group -->
+
+                            <field name="l10n_it_fiskaly_test_mode" widget="boolean_toggle" groups="base.group_system"
+                                readonly="l10n_it_fiskaly_access_token"/>
+                            <field name="l10n_it_fiskaly_api_key" string="API Key"/>
+                            <field name="l10n_it_fiskaly_api_secret" string="API Secret" password="1"/>
+                            <button name="action_l10n_it_fiskaly_authenticate_organization" type="object"
+                                string="Authenticate Keys" class="btn-primary" groups="base.group_system"
+                                invisible="l10n_it_fiskaly_access_token"/>
+                        </group>
+                        <group string="Fisconline Credentials" invisible="parent_id">
+                            <field name="l10n_it_fisconline_tax_id" placeholder="RSSMRA85M01H501Z"/>
+                            <field name="l10n_it_fisconline_pin" password="1"/>
+                            <label for="l10n_it_fisconline_password"/>
+                            <div class="o_row">
+                                <field name="l10n_it_fisconline_password" password="1" nolabel="1"/>
+                                <button name="action_l10n_it_fiskaly_update_fisconline_password" type="object"
+                                    string="Update AdE Password" class="btn-secondary" groups="base.group_system"
+                                    confirm="The taxpayer will be suspended while the Fisconline password is sent to fiskaly. Make sure the password has already been changed on the Agenzia delle Entrate portal."
+                                    invisible="parent_id or not l10n_it_fiskaly_taxpayer_id"/>
+                            </div>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" groups="base.group_system"
+                        invisible="parent_id or l10n_it_fiskaly_access_token or not l10n_it_fiskaly_api_key or not l10n_it_fiskaly_api_secret">
+                        Your fiskaly credentials are configured, but you are not authenticated. Save the company first, then click "Authenticate Keys" to start the registration.
+                    </div>
+                    <group>
+                        <group string="Registration" groups="base.group_system">
+                            <label for="l10n_it_fiskaly_organization_id" invisible="parent_id or not l10n_it_fiskaly_access_token"/>
+                            <div class="o_row" invisible="parent_id or not l10n_it_fiskaly_access_token">
+                                <field name="l10n_it_fiskaly_organization_id" nolabel="1" readonly="1"
+                                    invisible="not l10n_it_fiskaly_organization_id"/>
+                                <button name="action_l10n_it_fiskaly_create_organization" type="object"
+                                    string="Create Organization" class="btn-primary" groups="base.group_system"
+                                    invisible="l10n_it_fiskaly_organization_id"/>
+                            </div>
+                            <label for="l10n_it_fiskaly_subject_id" invisible="parent_id or not l10n_it_fiskaly_access_token"/>
+                            <div class="o_row" invisible="parent_id or not l10n_it_fiskaly_access_token">
+                                <field name="l10n_it_fiskaly_subject_id" nolabel="1" readonly="1"
+                                    invisible="not l10n_it_fiskaly_subject_id"/>
+                                <button name="action_l10n_it_fiskaly_create_subject" type="object"
+                                    string="Create Subject" class="btn-primary" groups="base.group_system"
+                                    invisible="not l10n_it_fiskaly_organization_id or l10n_it_fiskaly_subject_id"/>
+                            </div>
+                            <label for="l10n_it_fiskaly_taxpayer_id" invisible="parent_id or not l10n_it_fiskaly_access_token"/>
+                            <div class="o_row" invisible="parent_id or not l10n_it_fiskaly_access_token">
+                                <field name="l10n_it_fiskaly_taxpayer_id" nolabel="1" readonly="1"
+                                    invisible="not l10n_it_fiskaly_taxpayer_id"/>
+                                <button name="action_l10n_it_fiskaly_create_taxpayer" type="object"
+                                    string="Create Taxpayer" class="btn-primary" groups="base.group_system"
+                                    confirm="The name, address, VAT and tax number of this company will be sent to the Agenzia delle Entrate through fiskaly. Make sure they are correct."
+                                    invisible="not l10n_it_fiskaly_subject_id or l10n_it_fiskaly_taxpayer_id"/>
+                                <button name="action_l10n_it_fiskaly_update_taxpayer" type="object"
+                                    string="Update Taxpayer" class="btn-secondary" groups="base.group_system"
+                                    confirm="The name, address, VAT and tax number of this company will be sent to the Agenzia delle Entrate through fiskaly. The taxpayer is suspended while the update is applied."
+                                    invisible="l10n_it_fiskaly_taxpayer_state != 'COMMISSIONED'"/>
+                            </div>
+                            <label for="l10n_it_fiskaly_taxpayer_state"
+                                invisible="not l10n_it_fiskaly_taxpayer_id"/>
+                            <div class="o_row" invisible="not l10n_it_fiskaly_taxpayer_id">
+                                <field name="l10n_it_fiskaly_taxpayer_state" nolabel="1" readonly="1"/>
+                                <button name="action_l10n_it_fiskaly_commission_taxpayer" type="object"
+                                    string="Commission" class="btn-primary" groups="base.group_system"
+                                    invisible="l10n_it_fiskaly_taxpayer_state == 'COMMISSIONED'"/>
+                            </div>
+                            <label for="l10n_it_fiskaly_location_id"/>
+                            <div class="o_row">
+                                <field name="l10n_it_fiskaly_location_id" nolabel="1" readonly="1"
+                                    invisible="not l10n_it_fiskaly_location_id"/>
+                                <button name="action_l10n_it_fiskaly_create_location" type="object"
+                                    string="Create Location" class="btn-primary" groups="base.group_system"
+                                    invisible="l10n_it_fiskaly_location_id"/>
+                                <button name="action_l10n_it_fiskaly_update_location" type="object"
+                                    string="Update Location" class="btn-secondary" groups="base.group_system"
+                                    confirm="The name and address of this company will be sent to the Agenzia delle Entrate through fiskaly. The location is suspended while the update is applied."
+                                    invisible="l10n_it_fiskaly_location_state != 'COMMISSIONED'"/>
+                            </div>
+                            <label for="l10n_it_fiskaly_location_state"
+                                invisible="not l10n_it_fiskaly_location_id"/>
+                            <div class="o_row" invisible="not l10n_it_fiskaly_location_id">
+                                <field name="l10n_it_fiskaly_location_state" nolabel="1" readonly="1"/>
+                                <button name="action_l10n_it_fiskaly_commission_location" type="object"
+                                    string="Commission" class="btn-primary" groups="base.group_system"
+                                    invisible="l10n_it_fiskaly_location_state == 'COMMISSIONED'"/>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

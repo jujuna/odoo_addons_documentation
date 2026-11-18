@@ -18,7 +18,7 @@ class HrSalaryAttachmentGenerateMultiWizard(models.TransientModel):
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", required=True,
         domain=[('input_usage_payslip', '=', True)])
-    description = fields.Char(string="Note")
+    description = fields.Char(string="Payslip Description")
     # in the unit of the salary rule, as on the adjustment
     amount = fields.Float('Payslip Amount', digits=False, required=True, help='Amount to pay each payslip.')
     is_recurring = fields.Boolean('Repeat')

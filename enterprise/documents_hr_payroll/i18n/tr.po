@@ -3,18 +3,20 @@
 # * documents_hr_payroll
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# setenayp <seat@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:49+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:51+0000\n"
+"PO-Revision-Date: 2026-11-09 16:35+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "documents_hr_payroll/tr/>\n"
 "Language: tr\n"
@@ -30,17 +32,22 @@ msgid ""
 "\n"
 "Employee payslips will be automatically integrated to the Document app.\n"
 msgstr ""
+"\n"
+"Çalışan maaş bordroları otomatik olarak Belge uygulamasına entegre "
+"edilecektir.\n"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "%(payslips)s payslip(s), sent to %(employees)s employee(s)"
-msgstr ""
+msgstr "%(payslips)s maaş bordrosu, %(employees)s çalışana gönderildi"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
 msgid ", <br/><br/>Please find the following payslip(s):<br/><br/>"
 msgstr ""
+", <br/><br/>Lütfen aşağıdaki maaş bordrosunu/bordrolarını inceleyin:<br/><br/"
+">"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
@@ -49,6 +56,9 @@ msgid ""
 "            Have a nice day,<br/>\n"
 "            The HR Team"
 msgstr ""
+"<br/>\n"
+"            İyi günler dileriz,<br/>\n"
+"            İK Ekibi"
 
 #. module: documents_hr_payroll
 #: model:mail.template,body_html:documents_hr_payroll.mail_template_new_declaration
@@ -57,15 +67,15 @@ msgid ""
 "margin:0px auto;\">\n"
 "                <tbody>\n"
 "                        <t t-set=\"document_access_link\" t-"
-"value=\"object.document_id.access_url\"/>\n"
+"value=\"object.document_id.access_url\"></t>\n"
 "                    <tr>\n"
 "                        <td valign=\"top\" style=\"text-align: left; font-"
 "size: 14px;\">\n"
-"                            Dear <t t-out=\"object.employee_id.name\"/>, a "
-"new declaration file is available for you.<br/><br/>\n"
+"                            Dear <t t-out=\"object.employee_id.name\"></t>, "
+"a new declaration file is available for you.<br><br>\n"
 "                                <t t-"
 "if=\"object.employee_id.user_id\">Please find the PDF in your employee "
-"portal.<br/><br/></t>\n"
+"portal.<br><br></t>\n"
 "                                <div t-if=\"document_access_link\" "
 "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
 "                                    <a t-attf-"
@@ -75,7 +85,7 @@ msgid ""
 "                                    View Declaration\n"
 "                                </a>\n"
 "                            </div>\n"
-"                            Have a nice day,<br/>\n"
+"                            Have a nice day,<br>\n"
 "                            The HR Team\n"
 "                        </td>\n"
 "                    </tr>\n"
@@ -83,6 +93,34 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\">\n"
+"                <tbody>\n"
+"                        <t t-set=\"document_access_link\" t-"
+"value=\"object.document_id.access_url\"></t>\n"
+"                    <tr>\n"
+"                        <td valign=\"top\" style=\"text-align: left; font-"
+"size: 14px;\">\n"
+"                            Sayın <t t-out=\"object.employee_id.name\"></t>, "
+"yeni bir beyan dosyası sizin için hazırdır.<br><br>\n"
+"                                <t t-if=\"object.employee_id.user_id\">"
+"Lütfen PDF'i çalışan portalınızda bulun.<br><br></t>\n"
+"                                <div t-if=\"document_access_link\" "
+"style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+"                                    <a t-attf-href=\"{{ "
+"document_access_link }}\" target=\"_blank\" style=\"background-color: "
+"#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; "
+"border-radius: 5px; font-size:13px;\">\n"
+"                                    Beyanı Gör\n"
+"                                </a>\n"
+"                            </div>\n"
+"                            İyi günler dileriz,<br>\n"
+"                            İK Ekibi\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </tbody>\n"
+"            </table>\n"
+"        "
 
 #. module: documents_hr_payroll
 #: model:mail.template,body_html:documents_hr_payroll.mail_template_new_payslip
@@ -90,13 +128,13 @@ msgid ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
 "        <t t-set=\"document_access_link\" t-"
-"value=\"object.document_access_url\"/>\n"
+"value=\"object.document_access_url\"></t>\n"
 "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
 "\">\n"
-"            Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
-"available for you.<br/><br/>\n"
+"            Dear <t t-out=\"object.employee_id.name\"></t>, a new payslip is "
+"available for you.<br><br>\n"
 "            <t t-if=\"object.employee_id.user_id\">Please find the PDF in "
-"your employee portal.<br/><br/></t>\n"
+"your employee portal.<br><br></t>\n"
 "            <div t-if=\"document_access_link\" style=\"text-align: center; "
 "padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
 "                <a t-attf-href=\"{{ document_access_link }}\" "
@@ -106,7 +144,7 @@ msgid ""
 "                    Your Payslip\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br/>\n"
+"            Have a nice day,<br>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
@@ -114,27 +152,27 @@ msgid ""
 msgstr ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
-"       <t t-set=\"document_access_link\" t-"
-"value=\"object.document_access_url\"/>\n"
-"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
-"\">\n"
-"            Sayın <t t-out=\"object.employee_id.name\"/>, sizin için yeni "
-"bir maaş bordrosu hazırlanmıştır.<br/><br/>\n"
-"           <t t-if=\"object.employee_id.user_id\">Lütfen PDF dosyasını "
-"çalışan portalınızda bulabilirsiniz.<br/><br/></t>\n"
+"        <t t-set=\"document_access_link\" t-"
+"value=\"object.document_access_url\"></t>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">"
+"\n"
+"            Sayın <t t-out=\"object.employee_id.name\"></t>, yeni bir bordro "
+"sizin için hazırdır.<br><br>\n"
+"            <t t-if=\"object.employee_id.user_id\">Lütfen PDF'i çalışan "
+"portalınızda bulun.<br><br></t>\n"
 "            <div t-if=\"document_access_link\" style=\"text-align: center; "
 "padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
-"               <a t-attf-href=\"{{ document_access_link }}\" "
+"                <a t-attf-href=\"{{ document_access_link }}\" "
 "target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
-"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
-"\">\n"
-"                    Maaş Bordronuz\n"
-"               </a>\n"
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
+"size:13px;\">\n"
+"                    Bordronuz\n"
+"                </a>\n"
 "            </div>\n"
-"            İyi günler dilerim,<br/>\n"
+"            İyi günler dileriz,<br>\n"
 "            İK Ekibi\n"
-"       </td></tr>\n"
-"   </tbody></table>\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
 "                "
 
 #. module: documents_hr_payroll
@@ -147,12 +185,12 @@ msgstr ""
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__body_html
 msgid "Body"
-msgstr ""
+msgstr "Gövde"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Şirket"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_res_config_settings
@@ -162,49 +200,49 @@ msgstr "Yapılandırma Ayarları"
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "Confirm"
-msgstr ""
+msgstr "Onayla"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_payroll_overwrite_employee_declaration
 msgid "Confirm Overwrite Employee Declaration"
-msgstr ""
+msgstr "Çalışan Beyanı Üzerine Yazmayı Onayla"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,button_name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "Create Contacts"
-msgstr ""
+msgstr "Kontaklar Oluştur"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_uid
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Oluşturan"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_date
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Tarihinde düzenlendi"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__custom_comment
 msgid "Custom Comment"
-msgstr ""
+msgstr "Özel Yorum"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
 msgid "Dear"
-msgstr ""
+msgstr "Sayın"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__declaration_ids
 msgid "Declarations"
-msgstr ""
+msgstr "Tebligat"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "Discard"
-msgstr ""
+msgstr "İptal"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__display_name
@@ -240,7 +278,7 @@ msgstr "Belgeler"
 #. module: documents_hr_payroll
 #: model:ir.module.module,shortdesc:base.module_documents_hr_payroll
 msgid "Documents - Payroll"
-msgstr ""
+msgstr "Belgeler - Bordro"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_declaration_mixin__documents_count
@@ -267,14 +305,14 @@ msgstr ""
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "File Name"
-msgstr ""
+msgstr "Dosya Adı"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "File(s) already exist"
-msgstr ""
+msgstr "Dosya(lar) zaten mevcut"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,help:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id
@@ -283,11 +321,13 @@ msgid ""
 "Group given editor access on the Employees and Payroll folders created from "
 "now on. Changing it does not affect the existing folders."
 msgstr ""
+"Bundan sonra oluşturulan Çalışanlar ve Bordro klasörlerinde düzenleyici "
+"erişimi verilen grup. Bunu değiştirmek mevcut klasörleri etkilemez."
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_employee__hr_employee_payroll_folder_id
 msgid "HR Employee Payroll Folder"
-msgstr ""
+msgstr "İK Çalışan Bordro Klasörü"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__id
@@ -307,46 +347,46 @@ msgstr "ID"
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/documents_document.py:0
 msgid "Impossible to delete an employee \"Payroll\" folder"
-msgstr ""
+msgstr "Bir çalışan \"Bordro\" klasörünün silinmesi imkansızdır"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,description:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "It will not be possible to send payslips to the employee"
-msgstr ""
+msgstr "Çalışana maaş bordrosu göndermek mümkün olmayacak"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_uid
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Son Güncellemeyi Yapan:"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_date
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Son Güncelleme Tarihi:"
 
 #. module: documents_hr_payroll
 #: model:hr.payroll.warning,name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
 msgid "Missing Contact Information"
-msgstr ""
+msgstr "Eksik İletişim Bilgileri"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payroll_overwrite_employee_declaration.py:0
 msgid "Overwrite confirmed. Files will be posted shortly."
-msgstr ""
+msgstr "Üzerine yazma onaylandı. Dosyalar kısa süre içinde gönderilecektir."
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
 msgid "PDFs will be posted in Documents shortly"
-msgstr ""
+msgstr "PDF'ler kısa süre içinde Belgeler'de yayınlanacaktır"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip_run
 msgid "Pay Run"
-msgstr ""
+msgstr "Bordro İcmali"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip
@@ -357,18 +397,18 @@ msgstr "Bordro"
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 msgid "Payroll"
-msgstr ""
+msgstr "Bordro"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/res_company.py:0
 msgid "Payroll (%(company_name)s)"
-msgstr ""
+msgstr "Bordro (%(company_name)s)"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.res_config_settings_view_form
 msgid "Payroll Access Group"
-msgstr ""
+msgstr "Bordro Erişim Grubu"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payroll_declaration_mixin
@@ -379,7 +419,7 @@ msgstr "Bordro Beyan Karışımı"
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__documents_hr_payroll_group_id
 msgid "Payroll Documents Default Group"
-msgstr ""
+msgstr "Bordro Belgeleri Varsayılan Grubu"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payroll_employee_declaration
@@ -400,12 +440,12 @@ msgstr "Bordro: Yeni Maaş Bordrosu Belgesi"
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "Payslip %(date_from)s - %(date_to)s"
-msgstr ""
+msgstr "Maaş bordrosu %(date_from)s - %(date_to)s"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__payslip_ids
 msgid "Payslips"
-msgstr ""
+msgstr "Maaş bordroları"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__pdf_to_post
@@ -422,7 +462,7 @@ msgstr "PDF Gönderin"
 #. odoo-javascript
 #: code:addons/documents_hr_payroll/static/src/views/employee_declaration_list/documents_hr_payroll_employee_declaration_list_controller.xml:0
 msgid "Post Reports ("
-msgstr ""
+msgstr "Raporları gönder ("
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_posted
@@ -432,7 +472,7 @@ msgstr "Yayınlanmış PDF"
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Preview"
-msgstr ""
+msgstr "Önizleme"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_to_post
@@ -442,12 +482,12 @@ msgstr "Kuyruğa alınmış PDF gönderimi"
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__employee_ids
 msgid "Recipients"
-msgstr ""
+msgstr "Alıcılar"
 
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__document_count
 msgid "Related Document Count"
-msgstr ""
+msgstr "İlgili Belge Sayısı"
 
 #. module: documents_hr_payroll
 #. odoo-python
@@ -471,7 +511,7 @@ msgstr "E-Posta ile Gönder"
 #: code:addons/documents_hr_payroll/models/hr_employee.py:0
 #: code:addons/documents_hr_payroll/models/hr_payslip.py:0
 msgid "Send Email"
-msgstr ""
+msgstr "E-posta Gönder"
 
 #. module: documents_hr_payroll
 #. odoo-python
@@ -482,17 +522,18 @@ msgstr "Maaş Bordrosunu E-posta ile Gönder"
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Send Payslips"
-msgstr ""
+msgstr "Maaş Bordrolarını Gönder"
 
 #. module: documents_hr_payroll
 #: model:ir.model,name:documents_hr_payroll.model_hr_payslip_send_mail
 msgid "Send payslips to Employee by email"
-msgstr ""
+msgstr "Maaş bordrolarını Çalışan'a e-posta ile gönder"
 
 #. module: documents_hr_payroll
 #: model:mail.template,description:documents_hr_payroll.mail_template_new_declaration
 msgid "Sent to employee to notify them about their new declaration file"
 msgstr ""
+"Yeni beyanname dosyası hakkında bilgilendirmek için çalışana gönderildi"
 
 #. module: documents_hr_payroll
 #: model:mail.template,description:documents_hr_payroll.mail_template_new_payslip
@@ -515,18 +556,19 @@ msgstr "İl/Eyalet"
 #. module: documents_hr_payroll
 #: model:ir.module.module,summary:base.module_documents_hr_payroll
 msgid "Store employee payslips in the Document app"
-msgstr ""
+msgstr "Çalışan maaş bordrolarını Belge uygulamasında sakla"
 
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
 msgid "The following file(s) already exist. Do you want to overwrite them?"
 msgstr ""
+"Aşağıdaki dosya(lar) zaten mevcut. Bunları üzerine yazmak istiyor musunuz?"
 
 #. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
 msgid "The payslip has been sent to the employee by email."
-msgstr ""
+msgstr "Maaş bordrosu çalışana e-posta yoluyla gönderildi."
 
 #. module: documents_hr_payroll
 #. odoo-python
@@ -537,7 +579,7 @@ msgstr "Çalışana gönderilecek geçerli bir maaş bordrosu yoktur."
 #. module: documents_hr_payroll
 #: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
 msgid "Write your custom message here..."
-msgstr ""
+msgstr "Özel mesajınızı buraya yazın..."
 
 #. module: documents_hr_payroll
 #. odoo-python
@@ -551,11 +593,126 @@ msgstr "Belge bağlantısını çalışana gönderemezsiniz."
 msgid ""
 "{{ object.employee_id.name }}, a new declaration file is available for you"
 msgstr ""
+"{{ object.employee_id.name }}, sizin için yeni bir beyan dosyası mevcut"
 
 #. module: documents_hr_payroll
 #: model:mail.template,subject:documents_hr_payroll.mail_template_new_payslip
 msgid "{{ object.employee_id.name }}, a new payslip is available for you"
 msgstr "{{ object.employee_id.name }}, sizin için yeni bir maaş bordrosu hazır"
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\">\n"
+#~ "                <tbody>\n"
+#~ "                        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_id.access_url\"/>\n"
+#~ "                    <tr>\n"
+#~ "                        <td valign=\"top\" style=\"text-align: left; font-"
+#~ "size: 14px;\">\n"
+#~ "                            Dear <t t-out=\"object.employee_id.name\"/>, "
+#~ "a new declaration file is available for you.<br/><br/>\n"
+#~ "                                <t t-"
+#~ "if=\"object.employee_id.user_id\">Please find the PDF in your employee "
+#~ "portal.<br/><br/></t>\n"
+#~ "                                <div t-if=\"document_access_link\" "
+#~ "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;"
+#~ "\">\n"
+#~ "                                    <a t-attf-"
+#~ "href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-"
+#~ "color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "#fff; border-radius: 5px; font-size:13px;\">\n"
+#~ "                                    View Declaration\n"
+#~ "                                </a>\n"
+#~ "                            </div>\n"
+#~ "                            Have a nice day,<br/>\n"
+#~ "                            The HR Team\n"
+#~ "                        </td>\n"
+#~ "                    </tr>\n"
+#~ "                </tbody>\n"
+#~ "            </table>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\">\n"
+#~ "                <tbody>\n"
+#~ "                        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_id.access_url\"/>\n"
+#~ "                    <tr>\n"
+#~ "                        <td valign=\"top\" style=\"text-align: left; font-"
+#~ "size: 14px;\">\n"
+#~ "                            Sayın <t t-out=\"object.employee_id.name\"/>, "
+#~ "sizin için yeni bir beyan dosyası mevcut.<br/><br/>\n"
+#~ "                                <t t-"
+#~ "if=\"object.employee_id.user_id\">Lütfen PDF dosyasını çalışan "
+#~ "portalınızda bulabilirsiniz.<br/><br/></t>\n"
+#~ "                                <div t-if=\"document_access_link\" "
+#~ "style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;"
+#~ "\">\n"
+#~ "                                    <a t-attf-"
+#~ "href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-"
+#~ "color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "#fff; border-radius: 5px; font-size:13px;\">\n"
+#~ "                                    Beyanı Görüntüle\n"
+#~ "                                </a>\n"
+#~ "                            </div>\n"
+#~ "                            İyi günler dileriz,<br/>\n"
+#~ "                            İK Ekibi\n"
+#~ "                        </td>\n"
+#~ "                    </tr>\n"
+#~ "                </tbody>\n"
+#~ "            </table>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "        <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_access_url\"/>\n"
+#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+#~ "\">\n"
+#~ "            Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
+#~ "available for you.<br/><br/>\n"
+#~ "            <t t-if=\"object.employee_id.user_id\">Please find the PDF in "
+#~ "your employee portal.<br/><br/></t>\n"
+#~ "            <div t-if=\"document_access_link\" style=\"text-align: "
+#~ "center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+#~ "                <a t-attf-href=\"{{ document_access_link }}\" "
+#~ "target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
+#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
+#~ "size:13px;\">\n"
+#~ "                    Your Payslip\n"
+#~ "                </a>\n"
+#~ "            </div>\n"
+#~ "            Have a nice day,<br/>\n"
+#~ "            The HR Team\n"
+#~ "        </td></tr>\n"
+#~ "    </tbody></table>\n"
+#~ "                "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "       <t t-set=\"document_access_link\" t-"
+#~ "value=\"object.document_access_url\"/>\n"
+#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+#~ "\">\n"
+#~ "            Sayın <t t-out=\"object.employee_id.name\"/>, sizin için yeni "
+#~ "bir maaş bordrosu hazırlanmıştır.<br/><br/>\n"
+#~ "           <t t-if=\"object.employee_id.user_id\">Lütfen PDF dosyasını "
+#~ "çalışan portalınızda bulabilirsiniz.<br/><br/></t>\n"
+#~ "            <div t-if=\"document_access_link\" style=\"text-align: "
+#~ "center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+#~ "               <a t-attf-href=\"{{ document_access_link }}\" "
+#~ "target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
+#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
+#~ "size:13px;\">\n"
+#~ "                    Maaş Bordronuz\n"
+#~ "               </a>\n"
+#~ "            </div>\n"
+#~ "            İyi günler dilerim,<br/>\n"
+#~ "            İK Ekibi\n"
+#~ "       </td></tr>\n"
+#~ "   </tbody></table>\n"
+#~ "                "
 
 #~ msgid ""
 #~ "Folder used when an employee with no user exists in the company, to store "

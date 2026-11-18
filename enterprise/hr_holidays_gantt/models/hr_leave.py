@@ -120,7 +120,66 @@ class HrLeave(models.Model):
                     hour_from, hour_to = 12.0 - half_day, 12.0 + half_day
                 vals.setdefault("request_hour_from", hour_from)
                 vals.setdefault("request_hour_to", hour_to)
+        if self.env.context.get('hr_holidays_gantt_grant_missing_allocation') \
+                and self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            self._gantt_allocate_missing_allocation(vals_list)
         return super().create(vals_list)
+
+    def _gantt_allocate_missing_allocation(self, vals_list):
+        """Grant the allocations missing to create the time off of ``vals_list`` ("Allocate and Add" of the
+        Gantt multi-create popover, for the time off officers).
+
+        For each employee and time type requiring an allocation, the amount requested that the allocations
+        valid on the period don't cover is granted by a new allocation, without end date, starting with the
+        first time off, and approved.
+        """
+        # (employee_id, work_entry_type_id) -> [amount requested, earliest date_from, latest date_to]
+        requested = defaultdict(lambda: [0, None, None])
+        for vals in vals_list:
+            employee = self.env['hr.employee'].browse(vals.get('employee_id'))
+            work_entry_type = self.env['hr.work.entry.type'].browse(vals.get('work_entry_type_id'))
+            if not (employee and work_entry_type and work_entry_type.requires_allocation):
+                continue
+            new_leave = self.new(vals)
+            entry = requested[employee.id, work_entry_type.id]
+            entry[0] += new_leave.number_of_hours if work_entry_type.unit_of_measure == 'hour' else new_leave.number_of_days
+            entry[1] = new_leave.date_from.date() if entry[1] is None else min(entry[1], new_leave.date_from.date())
+            entry[2] = new_leave.date_to.date() if entry[2] is None else max(entry[2], new_leave.date_to.date())
+        if not requested:
+            return
+        employee_ids, work_entry_type_ids = zip(*requested)
+        # amount left on the validated allocations covering the period requested
+        available = defaultdict(float)
+        for allocation in self.env['hr.leave.allocation'].search([
+            ('employee_id', 'in', employee_ids),
+            ('work_entry_type_id', 'in', work_entry_type_ids),
+            ('state', '=', 'validate'),
+        ]):
+            key = allocation.employee_id.id, allocation.work_entry_type_id.id
+            if key not in requested:
+                continue
+            _amount, date_from, date_to = requested[key]
+            if allocation.date_from > date_to or (allocation.date_to and allocation.date_to < date_from):
+                continue
+            available[key] += allocation.virtual_remaining_leaves
+
+        allocation_vals_list = []
+        for (employee_id, work_entry_type_id), (requested_amount, date_from, _date_to) in requested.items():
+            missing_amount = requested_amount - available[employee_id, work_entry_type_id]
+            if missing_amount > 0:
+                is_hour = self.env['hr.work.entry.type'].browse(work_entry_type_id).unit_of_measure == 'hour'
+                allocation_vals_list.append({
+                    'employee_id': employee_id,
+                    'work_entry_type_id': work_entry_type_id,
+                    'date_from': date_from,
+                    'number_of_hours' if is_hour else 'number_of_days': missing_amount,
+                })
+        allocations = self.env['hr.leave.allocation'].create(allocation_vals_list)
+        # approved at once, twice for the time types validated by the time off officer and the manager
+        for _step in range(2):
+            allocations = allocations.filtered(lambda allocation: allocation.state != 'validate')
+            if allocations:
+                allocations.action_approve()
 
     @api.model
     def _get_leave_interval(self, date_from, date_to, employee_ids):
@@ -431,6 +490,28 @@ class HrLeave(models.Model):
         })
         leaves_to_restore.flush_recordset(['date_from', 'date_to'])
         return True
+
+    @api.model
+    def _get_time_off_overview_action(self):
+        """ Overview menu: Time Off officers get the editable gantt of all time off
+        (Management > Time Off) instead of the read-only report calendar. """
+        dashboard_action = self.env['ir.actions.act_window']._for_xml_id('hr_holidays.action_hr_holidays_dashboard')
+        if not self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            return dashboard_action
+        action = self.env['ir.actions.act_window']._for_xml_id('hr_holidays.hr_leave_action_action_approve_department')
+        gantt_views = [view for view in action['views'] if view[1] == 'gantt']
+        if not gantt_views:
+            return dashboard_action
+        action.update({
+            'name': dashboard_action['name'],
+            'view_mode': 'gantt',
+            'views': gantt_views,
+            # same scope as the read-only overview: active employees, no refused (or cancelled) time off
+            'domain': "[('employee_id.company_id', 'in', allowed_company_ids), ('employee_id.active', '=', True), ('state', 'not in', ('refuse', 'cancel'))]",
+            # drop the approval filters ("waiting for me") of the Management action
+            'context': {'hide_employee_name': 1},
+        })
+        return action
 
 def tag_employee_rows(rows):
     """

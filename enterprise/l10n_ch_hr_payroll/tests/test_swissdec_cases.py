@@ -430,6 +430,28 @@ class TestSwissdecTestCases(TestSwissdec5Common):
         self.assertEqual(lpp_report_2.year, 2025)
         self.assertEqual(lpp_report_2.month, '12')
 
+    @freeze_time("2024-01-01")
+    def test_lpp_basis_report_with_contract_template(self):
+        """
+        Contract templates (no employee) with an LPP insurance must be ignored by the LPP basis report.
+        """
+        version = self.yearly_prospective_2023_01.lpp_basis_line_ids[0].employee_id.version_id
+        template = version.copy({
+            'name': 'LPP Contract Template',
+            'employee_id': False,
+            'date_start': date(2023, 1, 1),
+            'date_end': False,
+        })
+        self.assertTrue(template.l10n_ch_lpp_insurance_id)
+
+        lpp_report = self.env['l10n.ch.lpp.basis.report'].create({
+            'year': 2023,
+            'month': '1',
+            'company_id': self.muster_ag_company.id,
+        })
+        lpp_report.action_prepare_data()
+        self.assertEqual(lpp_report.lpp_basis_line_ids.employee_id, self.yearly_prospective_2023_01.lpp_basis_line_ids.employee_id)
+
     @freeze_time("2023-01-01")
     def test_is_declaration_perception_2022_06(self):
         # Load perception commission IS Rates

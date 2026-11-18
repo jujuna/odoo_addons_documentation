@@ -50,6 +50,37 @@ class TestDRSHealthInsurance(TestDRSCommon):
         self.assertEqual(incapacity.risk_end_date, date(2026, 7, 31))
 
     @freeze_time('2026-07-20 10:00:00')
+    def test_zima001_company_car(self):
+        # The benefit in kind of the company car follows the car of the version, not "Uses company car"
+        self._create_validated_leave(self.employee, 'be_work_entry_type_sick_leave', date(2026, 6, 1), date(2026, 7, 12))
+        incapacity = self._get_declarations(self.employee, 'ZIMA001')
+        version = self.employee.version_id
+        self.assertFalse(incapacity._get_zima001_declaration_data(version)['nature_advantages'])
+
+        brand = self.env['fleet.vehicle.model.brand'].create({'name': 'ZIMA Brand'})
+        car = self.env['fleet.vehicle'].create({
+            'model_id': self.env['fleet.vehicle.model'].create({'name': 'ZIMA Model', 'brand_id': brand.id}).id,
+            'company_id': self.belgian_company.id,
+            'acquisition_date': date(2025, 1, 1),
+            'car_value': 30000.0,
+            'fuel_type': 'diesel',
+            'co2': 120.0,
+        })
+        version.write({'car_id': car.id, 'transport_mode_car': False})
+        self.assertEqual(version.car_id, car)
+        self.assertFalse(version.transport_mode_car)
+        self.assertTrue(version.car_atn)
+        self.assertEqual(incapacity._get_zima001_declaration_data(version)['nature_advantages'], [{
+            'amount': round(version.car_atn * 12 / 312 * 100),
+            'start': '2026-06-01',
+        }])
+
+        # A new car requested but not delivered yet gives no benefit in kind
+        version.write({'car_id': False, 'has_new_car': True})
+        self.assertTrue(version.transport_mode_car)
+        self.assertFalse(incapacity._get_zima001_declaration_data(version)['nature_advantages'])
+
+    @freeze_time('2026-07-20 10:00:00')
     def test_zima001_birth_leave(self):
         # The days paid by the employer alone aren't declared
         self._create_validated_leave(self.employee, 'l10n_be_work_entry_type_paternity_company', date(2026, 6, 1), date(2026, 6, 3))
@@ -228,3 +259,21 @@ class TestDRSHealthInsurance(TestDRSCommon):
 
         with self.assertRaisesRegex(ValidationError, 'reserved to women'):
             self._get_drs_dict(self._create_drs(self.employee, 'drs_risk_zima003_001', 2026, 3))
+
+    @freeze_time('2026-07-20 10:00:00')
+    def test_zima_filling_dates(self):
+        self._create_validated_leave(self.employee, 'be_work_entry_type_sick_leave', date(2026, 6, 1), date(2026, 7, 12))
+        incapacity = self._get_declarations(self.employee, 'ZIMA001')
+        # At the latest the first working day of the month following the start of the risk
+        self.assertFalse(incapacity.earliest_filling_date)
+        self.assertEqual(incapacity.latest_filling_date, date(2026, 7, 1))
+        # Not before the return to work, at the latest the first working day of the second month after it
+        work_recovery = self._get_declarations(self.employee, 'ZIMA006')
+        self.assertEqual(work_recovery.earliest_filling_date, date(2026, 7, 13))
+        self.assertEqual(work_recovery.latest_filling_date, date(2026, 9, 1))
+
+        # 1 March 2026 is a Sunday
+        self._create_validated_leave(self.mother, 'be_work_entry_type_sick_leave', date(2026, 2, 2), date(2026, 3, 27))
+        self.assertEqual(self._get_declarations(self.mother, 'ZIMA001').latest_filling_date, date(2026, 3, 2))
+        # A Saturday is a working day ("jour ouvrable")
+        self.assertEqual(self.env['l10n.be.drs']._get_first_working_day_from(date(2026, 8, 1)), date(2026, 8, 1))

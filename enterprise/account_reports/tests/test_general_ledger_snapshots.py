@@ -53,17 +53,7 @@ class TestGeneralLedgerSnapshots(TestAccountReportsCommon):
 
         (cls.move_2016 + cls.move_2017).action_post()
 
-        cls._cleanup_cron_triggers()
-
-    @classmethod
-    def _cleanup_cron_triggers(cls):
-        cls.env['ir.cron.trigger'].search([('cron_id', 'in', (cls.snapshot_garbage_collection_cron + cls.snapshot_creation_cron).ids)]).unlink()
-
-    def _run_snapshot_crons(self):
-        self.env['account.report.snapshot'].sudo()._cron_garbage_collect_snapshots()
-        while creation_trigger := self.env['ir.cron.trigger'].search([('cron_id', '=', self.snapshot_creation_cron.id)], limit=1):
-            creation_trigger.unlink()
-            self.env['account.report.snapshot'].sudo()._cron_create_snapshots()
+        cls._cleanup_snapshot_cron_triggers()
 
     def _get_general_ledger_snapshots(self):
         return self.env['account.report.snapshot'].sudo().search([('report_id', '=', self.report.id)]).sorted(lambda snapshot: snapshot.groupby or '')

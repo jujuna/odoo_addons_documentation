@@ -15,11 +15,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:50+0000\n"
-"PO-Revision-Date: 2026-10-19 08:28+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 06:50+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-20/sign/de/"
-">\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/sign/de/>"
+"\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -389,6 +389,16 @@ msgstr "<small class=\"text-muted\">Absender</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Unterzeichner</small>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"<small>SMS Verification: The signatory has confirmed their control of the "
+"phone number using a unique code sent by SMS</small>"
+msgstr ""
+"<small>SMS-Verifizierung: Der Unterzeichner hat die Prüfung der "
+"Telefonnummer mithilfe eines per SMS gesendeten eindeutigen Codes bestätigt."
+"</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -2064,6 +2074,21 @@ msgid "Email Subject"
 msgstr "E-Mail-Betreff"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Email Verification"
+msgstr "E-Mail-Verifizierung"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"Email Verification: The signatory has confirmed control of their email inbox "
+"by clicking on a unique link"
+msgstr ""
+"E-Mail-Verifizierung: Die unterzeichnende Person hat bestätigt, dass sie "
+"Zugriff auf ihr E-Mail-Postfach hat, indem sie auf einen eindeutigen Link "
+"geklickt hat."
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2114,12 +2139,12 @@ msgstr "Abgelaufen"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__external_signature_failures
 msgid "External Signature Failures"
-msgstr ""
+msgstr "Fehler bei externer Signatur"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__external_signature_session_token
 msgid "External Signature Session Token"
-msgstr ""
+msgstr "Sitzungstoken für externe Signatur"
 
 #. module: sign
 #. odoo-python
@@ -2172,7 +2197,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_fields_panel.xml:0
 msgid "Fields cannot be edited in view only mode."
-msgstr ""
+msgstr "Felder können im reinen Ansichtsmodus nicht bearbeitet werden."
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_item
@@ -2281,7 +2306,7 @@ msgstr "Rahmenwert"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_document__frozen_file
 msgid "Frozen File"
-msgstr ""
+msgstr "Eingefrorene Datei"
 
 #. module: sign
 #. odoo-javascript
@@ -2390,6 +2415,9 @@ msgid ""
 "The service has no way of knowing, so it would keep handing back the same "
 "one."
 msgstr ""
+"Wie oft eine Signatur dieses Unterzeichners unbrauchbar zurückkam. Da der "
+"Dienst dies nicht erkennen kann, würde er weiterhin dieselbe Signatur "
+"zurückgeben."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -2502,18 +2530,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
 "If you do not want to receive these notifications anymore, you can disable "
-"the extra-authentication step in the\n"
-"                        <code>\n"
-"                            Sign &gt; Configuration &gt; Roles\n"
-"                        </code>\n"
-"                        menu."
+"the extra-authentication step\n"
+"                        in the signer settings of your sign templates."
 msgstr ""
 "Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, können Sie "
-"sie im Schritt für Extra-Authentifizierung im Menü für \n"
-"                        <code>\n"
-"                            E-Signatur &gt; Konfiguration &gt; Rollen\n"
-"                        </code>\n"
-"                        deaktivieren."
+"den zusätzlichen Authentifizierungsschritt in den Unterzeichnereinstellungen "
+"Ihrer E-Signatur-Vorlagen deaktivieren."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -2524,7 +2546,7 @@ msgstr ""
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_request_document__state__in_progress
 msgid "In Progress"
-msgstr ""
+msgstr "In Bearbeitung"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__in_progress_count
@@ -2842,12 +2864,12 @@ msgstr "Fehlerhafter Ausdruck: %(exp)s"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Manage & Buy Identification Credits"
-msgstr ""
+msgstr "Identifikationsguthaben verwalten & kaufen"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Manage & Buy QES Credits"
-msgstr ""
+msgstr "QES-Guthaben verwalten & kaufen"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
@@ -3110,7 +3132,7 @@ msgstr "Nächster Unterzeichner ("
 #. module: sign
 #: model:res.groups.privilege,placeholder:sign.res_groups_privilege_sign
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_all_request_action
@@ -3250,6 +3272,8 @@ msgid ""
 "Only the template responsible or Sign Administrators can change the "
 "Authorized Users or Authorized Groups."
 msgstr ""
+"Nur der Vorlagenverantwortliche oder E-Signatur-Administratoren können die "
+"autorisierten Benutzer oder autorisierten Gruppen ändern."
 
 #. module: sign
 #. odoo-python
@@ -3311,7 +3335,7 @@ msgstr "Optionen"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #. module: sign
 #. odoo-javascript
@@ -3346,7 +3370,7 @@ msgstr "Papiereinsparungen"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
 msgid "Partially signed"
-msgstr ""
+msgstr "Teilweise unterzeichnet"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -3469,7 +3493,7 @@ msgstr "Gedruckt am"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign._doc_sign
 msgid "Proceed to Signing"
-msgstr ""
+msgstr "Zur Unterzeichnung"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__progress
@@ -3491,7 +3515,7 @@ msgstr "Öffentlicher Benutzer"
 #. module: sign
 #: model:iap.service,name:sign.iap_service_sign_qes
 msgid "Qualified Electronic Signatures"
-msgstr ""
+msgstr "Qualifizierte elektronische Signaturen"
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__radio
@@ -3654,7 +3678,7 @@ msgstr "Berichte"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__request_document_ids
 msgid "Request Documents Binaries"
-msgstr ""
+msgstr "Binärdateien der Dokumente anfragen"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__request_item_infos
@@ -3711,7 +3735,7 @@ msgstr "Erforderlich"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__requires_external_signature
 msgid "Requires External Signature"
-msgstr ""
+msgstr "Erfordert externe Signatur"
 
 #. module: sign
 #. odoo-javascript
@@ -3782,6 +3806,11 @@ msgstr "SMS versendet"
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sms_token
 msgid "SMS Token"
 msgstr "SMS-Token"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "SMS Verification"
+msgstr "SMS-Verifizierung"
 
 #. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
@@ -3871,11 +3900,6 @@ msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Suchen <span class=\"nolabel\"> (im Dokument)</span>"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Secure Link"
-msgstr ""
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__access_token
 msgid "Security Token"
@@ -3957,13 +3981,13 @@ msgstr "Eine Erinnerung senden"
 #. module: sign
 #: model:ir.module.module,summary:base.module_sign
 msgid "Send and request electronic signatures."
-msgstr ""
+msgstr "Elektronische Signaturen senden und anfordern"
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "Send by Email"
-msgstr ""
+msgstr "Per E-Mail versenden"
 
 #. module: sign
 #. odoo-javascript
@@ -4023,7 +4047,7 @@ msgstr "Serveraktion"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request_item__external_signature_session_token
 msgid "Session token returned by the external signing service."
-msgstr ""
+msgstr "Vom externen Signaturdienst zurückgegebenes Sitzungstoken."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -4082,7 +4106,7 @@ msgstr "Geteilt"
 #: model:ir.model.fields.selection,name:sign.selection__sign_request__send_channel__shared
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Shared Link"
-msgstr ""
+msgstr "Geteilter Link"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -4090,11 +4114,14 @@ msgid ""
 "Shared Link Verification: the signature request was shared as a link. Anyone "
 "with access to the link can sign."
 msgstr ""
+"Verifizierung des geteilten Links: Die Signaturanfrage wurde als Link "
+"geteilt. Jeder, der Zugriff auf diesen Link hat, kann eine E-Signatur "
+"leisten."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
 msgid "Sharing"
-msgstr ""
+msgstr "Teilen"
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__field_size__short_text
@@ -4206,7 +4233,7 @@ msgstr "E-Signaturanfrage - %(template_name)s - %(res_name)s"
 #. module: sign
 #: model:ir.model,name:sign.model_sign_request_document
 msgid "Sign Request Document"
-msgstr ""
+msgstr "Dokument der Signaturanfrage"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_log__sign_request_item_id
@@ -4377,6 +4404,7 @@ msgstr "Hash des Unterzeichners:"
 #: model:ir.model.fields.selection,name:sign.selection__mail_activity_type__category__sign_request
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__signature
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__sign
+#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model:mail.activity.type,summary:sign.mail_activity_data_signature_request
 #: model:sign.item.type,name:sign.sign_item_type_signature
 #: model:sign.item.type,placeholder:sign.sign_item_type_signature
@@ -4458,7 +4486,6 @@ msgstr "Unterschriftsverweigerung"
 #: model:ir.model,name:sign.model_sign_request
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__sign_request_id
-#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Signature Request"
 msgstr "Signaturanfrage"
@@ -4505,7 +4532,7 @@ msgstr "Signaturanfrage"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 msgid "Signature Saved"
-msgstr ""
+msgstr "Signatur gespeichert"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__start_sign
@@ -4665,7 +4692,7 @@ msgstr "Anzahl Unterzeichner"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request_document__applied_item_ids
 msgid "Signers whose values are already stamped on the file."
-msgstr ""
+msgstr "Unterzeichner, deren Werte bereits in die Datei gestempelt wurden."
 
 #. module: sign
 #. odoo-javascript
@@ -4697,7 +4724,7 @@ msgstr "Signierauftrag"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__signing_order_mandatory
 msgid "Signing Order Mandatory"
-msgstr ""
+msgstr "Unterzeichnungsreihenfolge obligatorisch"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__signing_certificate_id
@@ -4708,7 +4735,7 @@ msgstr "Signaturzertifikat"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 msgid "Signing link sent"
-msgstr ""
+msgstr "Unterzeichnungslink gesendet"
 
 #. module: sign
 #. odoo-javascript
@@ -4866,11 +4893,6 @@ msgstr "Den hervorgehobenen Bereich durchstreichen"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__subject
 msgid "Subject"
 msgstr "Betreff"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "System Account"
-msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
@@ -5085,6 +5107,9 @@ msgid ""
 "The documents of this request are too large to be signed with a qualified "
 "electronic signature. They cannot exceed %s MB in total."
 msgstr ""
+"Die Dokumente dieser Anfrage sind zu groß, um mit einer qualifizierten "
+"elektronischen Signatur unterzeichnet zu werden. Sie dürfen insgesamt %s MB "
+"nicht überschreiten."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5102,6 +5127,8 @@ msgid ""
 "The following signers are missing an email address:\n"
 "%s"
 msgstr ""
+"Bei den folgenden Unterzeichnern fehlt eine E-Mail-Adresse:\n"
+"%s"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
@@ -5218,7 +5245,7 @@ msgstr "Die Signatur-E-Mail wurde gesendet."
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "The signature of"
-msgstr ""
+msgstr "Die Unterschrift von"
 
 #. module: sign
 #. odoo-javascript
@@ -5230,25 +5257,27 @@ msgstr "Die Signaturanfrage wurde erfolgreich erneut gesendet."
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "The signature service could not be found."
-msgstr ""
+msgstr "Der Signaturdienst konnte nicht gefunden werden."
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "The signature service could not be reached. Please try again later."
 msgstr ""
+"Der Signaturdienst konnte nicht erreicht werden. Bitte versuchen Sie es "
+"später noch einmal."
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "The signers before you have not signed yet."
-msgstr ""
+msgstr "Die Unterzeichner vor Ihnen haben noch nicht unterschrieben."
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "The signing link was sent to"
-msgstr ""
+msgstr "Der Unterzeichnungslink wurde gesendet an"
 
 #. module: sign
 #. odoo-javascript
@@ -5331,6 +5360,8 @@ msgstr "Dieses Dokumente wurde"
 msgid ""
 "This document is being signed by another signer. Please try again later."
 msgstr ""
+"Dieses Dokument wird gerade von einer anderen Person unterzeichnet. Bitte "
+"versuchen Sie es später erneut."
 
 #. module: sign
 #. odoo-python
@@ -5354,6 +5385,8 @@ msgid ""
 "This is a qualified signature request. You will need to authenticate "
 "yourself using"
 msgstr ""
+"Dies ist eine qualifizierte Signaturanfrage. Sie müssen sich "
+"authentifizieren mit"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__reference
@@ -5561,14 +5594,8 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Einmaliger Code über SMS"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Unique Link via Email"
-msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5666,7 +5693,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__authorized_group_ids
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_search
 msgid "Used by"
-msgstr ""
+msgstr "Verwendet von"
 
 #. module: sign
 #. odoo-javascript
@@ -5733,11 +5760,6 @@ msgid "Value already exists!"
 msgstr "Wert existiert bereits!"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Verification method"
-msgstr ""
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "Verify"
@@ -5749,6 +5771,8 @@ msgid ""
 "Verify signatories identities with itsme® and enable eIDAS Qualified "
 "Electronic Signatures (QES)"
 msgstr ""
+"Verifizieren Sie Identitäten der Unterzeichner mit itsme® und ermöglichen "
+"Sie eIDAS-konforme qualifizierte elektronische Signaturen (QES)"
 
 #. module: sign
 #. odoo-javascript
@@ -5853,6 +5877,8 @@ msgid ""
 "Whether signers with this role cryptographically sign the document "
 "themselves, using an external service."
 msgstr ""
+"Ob Unterzeichner mit dieser Rolle das Dokument selbst kryptografisch mittels "
+"eines externen Dienstes mit einer E-Signatur versehen."
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__width
@@ -5888,6 +5914,8 @@ msgid ""
 "You already approved this document, so the changes you just made cannot be "
 "part of the signature being produced."
 msgstr ""
+"Sie haben dieses Dokument bereits genehmigt, daher können die von Ihnen "
+"soeben vorgenommenen Änderungen nicht Teil der zu erstellenden Signatur sein."
 
 #. module: sign
 #. odoo-python
@@ -5926,7 +5954,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "You cannot change the email of a signatory"
-msgstr ""
+msgstr "Die E-Mail-Adresse eines Unterzeichners kann nicht geändert werden."
 
 #. module: sign
 #. odoo-python
@@ -5974,7 +6002,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "You don't have access to the linked document."
-msgstr ""
+msgstr "Sie haben keinen Zugriff auf das verknüpfte Dokument."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
@@ -6070,6 +6098,8 @@ msgstr "Ihr Name"
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "Your signature is being finalized. Please try again in a moment."
 msgstr ""
+"Ihre Unterschrift wird derzeit abgeschlossen. Bitte versuchen Sie es in "
+"einem Moment erneut."
 
 #. module: sign
 #. odoo-javascript
@@ -6178,7 +6208,7 @@ msgstr "alle"
 #. odoo-javascript
 #: code:addons/sign/static/src/core/web/activity_patch.xml:0
 msgid "from"
-msgstr ""
+msgstr "von"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
@@ -6195,7 +6225,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "has been saved."
-msgstr ""
+msgstr "wurde gespeichert."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
@@ -6243,11 +6273,13 @@ msgstr ""
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "is next. They can sign now on this device, or later by email."
 msgstr ""
+"ist an der Reihe. Sie können jetzt auf diesem Gerät oder später per E-Mail "
+"unterzeichnen."
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__module_sign_itsme
 msgid "itsme®"
-msgstr ""
+msgstr "itsme®"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -6351,7 +6383,7 @@ msgstr "Mal verwendet."
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "to confirm your identity and signature."
-msgstr ""
+msgstr ", um Ihre Identität und Unterschrift zu bestätigen."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -6409,26 +6441,19 @@ msgid "{{0}} Summary"
 msgstr "Zusammenfassung von {{0}}"
 
 #~ msgid ""
-#~ "<small>SMS Verification: The signatory has confirmed their control of the "
-#~ "phone number using a unique code sent by SMS</small>"
+#~ "If you do not want to receive these notifications anymore, you can "
+#~ "disable the extra-authentication step in the\n"
+#~ "                        <code>\n"
+#~ "                            Sign &gt; Configuration &gt; Roles\n"
+#~ "                        </code>\n"
+#~ "                        menu."
 #~ msgstr ""
-#~ "<small>SMS-Verifizierung: Der Unterzeichner hat die Prüfung der "
-#~ "Telefonnummer mithilfe eines per SMS gesendeten eindeutigen Codes "
-#~ "bestätigt.</small>"
-
-#~ msgid "Email Verification"
-#~ msgstr "E-Mail-Verifizierung"
-
-#~ msgid ""
-#~ "Email Verification: The signatory has confirmed control of their email "
-#~ "inbox by clicking on a unique link"
-#~ msgstr ""
-#~ "E-Mail-Verifizierung: Die unterzeichnende Person hat bestätigt, dass sie "
-#~ "Zugriff auf ihr E-Mail-Postfach hat, indem sie auf einen eindeutigen Link "
-#~ "geklickt hat."
-
-#~ msgid "SMS Verification"
-#~ msgstr "SMS-Verifizierung"
+#~ "Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, können Sie "
+#~ "sie im Schritt für Extra-Authentifizierung im Menü für \n"
+#~ "                        <code>\n"
+#~ "                            E-Signatur &gt; Konfiguration &gt; Rollen\n"
+#~ "                        </code>\n"
+#~ "                        deaktivieren."
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr ""

@@ -57,9 +57,11 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
         return calendar.hours_per_week / days_per_week if days_per_week else 0
 
     def _cap_days_and_hours(self, hours, hours_per_day, day_cap):
-        if not hours_per_day:
+        if not hours_per_day or hours <= 0:
             return 0, 0
-        days = float_round(hours / hours_per_day, precision_rounding=0.5, rounding_method='DOWN')
+        # The days are rounded up to the unit, the hours stay those of the days not rounded. Pre-round so that a
+        # float error (7.0000001) doesn't give one more day when rounding up.
+        days = float_round(float_round(hours / hours_per_day, precision_digits=4), precision_rounding=1, rounding_method='UP')
         days = min(days, day_cap)
         hours = min(hours, day_cap * hours_per_day)
         return days, hours
@@ -73,7 +75,8 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
         sundays = full_weeks + ((6 - date_start.weekday()) % 7 < remaining_days)
         return total_days - sundays
 
-    def _get_allocation_data(self):
+    def _get_allocation_data(self, employees=None):
+        """ :param employees: limit the computation to these employees (default: the employees of the wizard, or all) """
         paid_time_off_work_entry_type = self._get_default_paid_time_off_work_entry_type()
         postponed_n1_work_entry_type = self._get_default_postponed_n1_work_entry_type()
         postponed_n2_work_entry_type = self._get_default_postponed_n2_work_entry_type()
@@ -86,6 +89,8 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
         next_period_end = period_end + relativedelta(years=1)
 
         period_work_days_count = self._get_working_days_count(period_start, period_end)
+        if employees is None:
+            employees = self.employee_ids._origin
 
         # Each version only covers its own effective period (from its date_version
         # to the day before the next version, within the contract dates)
@@ -127,7 +132,7 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             start=period_start,
             stop=period_end,
             company=tuple(self.env.companies.ids),
-            employee_check=SQL("AND e.id IN %s", tuple(self.employee_ids.ids)) if self.employee_ids else SQL(),
+            employee_check=SQL("AND e.id IN %s", tuple(employees.ids)) if employees else SQL(),
         )
         self.env.cr.execute(query)
 
@@ -135,6 +140,8 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
         # that period's hours/week), kept separate rather than summed: the cap against next
         # year's rate applies per period, not once on the grand total. Days are derived last.
         alloc_employees = defaultdict(lambda: ([], None))
+        # the details of the worked periods, shown in the tooltip of the wizard
+        worked_periods_by_employee = defaultdict(list)
         for vals in self.env.cr.dictfetchall():
             periods, version_id = alloc_employees[vals['employee_id']]
 
@@ -152,10 +159,35 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             work_days_count = self._get_working_days_count(date_start, date_end)
             work_days_ratio = work_days_count / period_work_days_count  # In case the employee didn't work over the whole period
             periods.append((work_days_ratio * 4, calendar.hours_per_week))
+            worked_periods_by_employee[vals['employee_id']].append({
+                'date_start': date_start,
+                'date_end': date_end,
+                'calendar': calendar,
+                'hours': work_days_ratio * 4 * calendar.hours_per_week,
+            })
 
             alloc_employees[vals['employee_id']] = (periods, version_id)
 
-        # alloc_employees is only populated by the loop above, so this must be built after it,
+        # Only the days worked and assimilated give holidays: the unassimilated absences of the year (validated
+        # payslips) are a negative period, 4 weeks of holidays lost per 52 weeks of absence
+        unassimilated_hours = self.env['hr.payslip.worked_days']._read_group(
+            domain=[
+                ('employee_id', 'in', list(alloc_employees)),
+                ('payslip_id.state', 'in', ['validated', 'paid']),
+                ('payslip_id.struct_id.code', '=', 'BEMONTHLY'),
+                ('payslip_id.date_from', '>=', period_start),
+                ('payslip_id.date_to', '<=', period_end),
+                ('work_entry_type_id.category_ids.code', '=', 'UNASSIMILATED'),
+            ],
+            groupby=['employee_id', 'version_id'],
+            aggregates=['number_of_hours:sum'],
+        )
+        for employee, version, hours in unassimilated_hours:
+            hours_per_week = version.resource_calendar_id.hours_per_week
+            if hours and hours_per_week:
+                alloc_employees[employee.id][0].append((-hours / hours_per_week * 4 / 52, hours_per_week))
+
+        # alloc_employees is only populated by the loops above, so this must be built after them,
         # not before: browse()-ing it any earlier would freeze employees empty.
         employees = self.env['hr.employee'].browse(alloc_employees.keys())
 
@@ -224,6 +256,7 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             already_postponed_n1 = 0
             already_postponed_n2 = 0
             holiday_attest_balance = 0
+            employee_reference_calendar = employee.version_id._get_reference_calendar()
             if contract_next_period is None:
                 # We need the contract currently active for the next period for each employee to allocate the correct time off based on this contract.
                 contract_next_period = next_period_version_by_employee.get(employee_id, self.env['hr.version'])
@@ -263,6 +296,18 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
                 hours_per_day = self._get_calendar_nominal_hours_per_day(employee.version_id._get_reference_calendar())
             paid_time_off, paid_time_off_hours = self._cap_days_and_hours(accrued_hours, hours_per_day, 4 * days_in_week)
 
+            # Details for the tooltip: the days earned by the worked periods and by the holiday attests are
+            # counted as the paid time off above (same calendar, same cap), so that they add up to it
+            worked_periods = sorted(worked_periods_by_employee[employee_id], key=lambda period: period['date_start'])
+            accrued_hours_from_work = sum(period['hours'] for period in worked_periods)
+            accrued_days_from_work = min(self._cap_days_and_hours(accrued_hours_from_work, hours_per_day, 4 * days_in_week)[0], paid_time_off)
+            # The accrued time off in the current schedule, before its proration to the schedule of next year
+            current_calendar = worked_periods[-1]['calendar'] if worked_periods else employee_reference_calendar
+            total_accrued_days, _hours = self._cap_days_and_hours(
+                accrued_hours,
+                self._get_calendar_nominal_hours_per_day(current_calendar),
+                4 * self._get_calendar_nominal_days_per_week(current_calendar))
+
             if employee.first_contract_date and int(self.year) == employee.first_contract_date.year:
                 holiday_attest_balance = sum(employee.l10n_be_holiday_attest_ids
                     .filtered(lambda a: a.year == int(self.year))
@@ -282,6 +327,18 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
                 'hours_to_allocate': hours_to_allocate,
                 'contract_next_year_id': contract_next_period.id,
                 'holiday_attest_balance': holiday_attest_balance,
+                'current_resource_calendar_id': current_calendar.id,
+                'accrued_hours_from_work': accrued_hours_from_work,
+                'accrued_days_from_work': accrued_days_from_work,
+                'accrued_days_from_holiday_attest': paid_time_off - accrued_days_from_work,
+                'total_accrued_hours': accrued_hours,
+                'total_accrued_days': total_accrued_days,
+                'worked_periods': [{
+                    'date_start': fields.Date.to_string(period['date_start']),
+                    'date_end': fields.Date.to_string(period['date_end']),
+                    'calendar_name': period['calendar'].name,
+                    'hours': period['hours'],
+                } for period in worked_periods],
             }
 
         return allocation_data_by_employee
@@ -389,6 +446,10 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             'view_mode': 'list,form',
             'type': 'ir.actions.act_window',
         }
+
+    def action_refresh_allocations(self):
+        self.ensure_one()
+        self._compute_alloc_employee_ids()
 
     def _get_postponed_inputs_by_employee(self, employees, year):
         december_payslips = self.env['hr.payslip'].search([
@@ -517,8 +578,33 @@ class HrPayrollAllocEmployee(models.TransientModel):
         "Hours To Allocate", readonly=True,
         help="Number of hours of paid time off granted for the period, computed independently from the number of days")
     contract_next_year_id = fields.Many2one('hr.version', string="Contract Active Next Year")
-    resource_calendar_id = fields.Many2one(related='contract_next_year_id.resource_calendar_id', string="Current Working Schedule", readonly=True)
+    resource_calendar_id = fields.Many2one(related='contract_next_year_id.resource_calendar_id', string="Future Working Schedule", readonly=True)
     alloc_paid_leave_id = fields.Many2one('hr.payroll.alloc.paid.leave')
     paid_time_off_to_postpone_n1 = fields.Float('To Postpone (N+1)')
     paid_time_off_to_postpone_n2 = fields.Float('To Postpone (N+2)')
     holiday_attest_balance = fields.Float(help='Remaining time off from previous employer')
+    # Details of the paid time off, shown in a tooltip
+    current_resource_calendar_id = fields.Many2one(
+        'resource.calendar', string="Current Working Schedule", compute='_compute_allocation_details')
+    accrued_hours_from_work = fields.Float(compute='_compute_allocation_details')
+    accrued_days_from_work = fields.Float(compute='_compute_allocation_details')
+    accrued_days_from_holiday_attest = fields.Float(compute='_compute_allocation_details')
+    total_accrued_hours = fields.Float(compute='_compute_allocation_details')
+    total_accrued_days = fields.Float(compute='_compute_allocation_details')
+    worked_periods = fields.Json(compute='_compute_allocation_details')
+
+    @api.depends('employee_id', 'alloc_paid_leave_id.year')
+    def _compute_allocation_details(self):
+        for wizard, lines in self.grouped('alloc_paid_leave_id').items():
+            employees = lines.employee_id._origin
+            # without employees, the allocation data would be computed for all the employees
+            allocation_data = wizard._get_allocation_data(employees) if wizard and employees else {}
+            for line in lines:
+                data = allocation_data.get(line.employee_id._origin, {})
+                line.current_resource_calendar_id = data.get('current_resource_calendar_id', False)
+                line.accrued_hours_from_work = data.get('accrued_hours_from_work', 0)
+                line.accrued_days_from_work = data.get('accrued_days_from_work', 0)
+                line.accrued_days_from_holiday_attest = data.get('accrued_days_from_holiday_attest', 0)
+                line.total_accrued_hours = data.get('total_accrued_hours', 0)
+                line.total_accrued_days = data.get('total_accrued_days', 0)
+                line.worked_periods = data.get('worked_periods', [])

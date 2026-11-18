@@ -95,7 +95,7 @@
             <kanban>
                 <header>
                     <button name="action_post_job"
-                        string="Publish on Jobs Board"
+                        string="Publish on Job Board"
                         type="object"
                         class="btn-primary"
                         display="always"/>
@@ -193,13 +193,13 @@
     </record>
 
     <record id="action_open_hr_job_post" model="ir.actions.act_window">
-        <field name="name">Job Boards Posts</field>
+        <field name="name">Job Board Posts</field>
         <field name="res_model">hr.job.post</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="hr_job_post_view_kanban_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Publish one of our job position to a Jobs Board
+                Publish one of our job positions on a Job Board
             </p>
             <a name="%(hr.action_create_job_position)d" class="btn btn-link" type="action">
                 Or you can start with the creation of a new open job position
@@ -208,7 +208,7 @@
     </record>
 
     <menuitem
-        name="Job Boards Posts"
+        name="Job Board Posts"
         parent="hr_recruitment.menu_crm_case_categ0_act_job"
         id="menu_hr_job_boards"
         action="action_open_hr_job_post"

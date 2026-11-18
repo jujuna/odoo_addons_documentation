@@ -28,6 +28,7 @@
         </record>
         <record id="account.menu_board_journal_1" model="ir.ui.menu">
             <field name="parent_id" ref="menu_accounting"/>
+            <field name="group_ids" eval="[(4, ref('account.group_account_readonly'))]"/>
         </record>
 
         <menuitem id="account.menu_account_config" name="Settings" parent="account.menu_finance_configuration" sequence="0" groups="base.group_system"/>

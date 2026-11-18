@@ -44,6 +44,34 @@ export function setCanReachBackend() {
     }, "Backend reachable");
 }
 
+export function waitBackendOnline() {
+    return {
+        trigger: "body",
+        content: "Wait for the heartbeat to bring the PoS back online",
+        timeout: 15000,
+        async run({ waitUntil }) {
+            await waitUntil(() => !posmodel.data.network.offline, { timeout: 10000 });
+        },
+    };
+}
+
+export function waitForPaidOrdersSync() {
+    return {
+        content: "Wait until the paid orders are synced with the backend",
+        trigger: "body",
+        timeout: 5000,
+        async run({ waitUntil }) {
+            await waitUntil(
+                () => {
+                    const paidOrders = posmodel.models["pos.order"].filter((o) => o.finalized);
+                    return paidOrders.length > 0 && paidOrders.every((o) => o.isSynced);
+                },
+                { timeout: 5000 }
+            );
+        },
+    };
+}
+
 export function setCanReachBlackbox() {
     return run(() => {
         window.blackboxTestEnv.canReachBlackbox = true;

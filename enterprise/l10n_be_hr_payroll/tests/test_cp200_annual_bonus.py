@@ -526,3 +526,127 @@ class TestCP200AnnualBonus(TestPayrollCommon):
             self.assertGreater(total_single, 0.0, "Work bonus (EmpBonus.1) should be triggered")
             self.assertAlmostEqual(total_bonus_first, total_single, places=2)
             self.assertAlmostEqual(total_salary_first, total_single, places=2)
+
+    def test_employment_bonus_year_end_premium_beyond_the_reference_wage(self):
+        """
+        The reference wage (S) of the employment bonus is the gross wage of the calendar month, without the year-end
+        premium up to S (ONSS administrative instructions): a 13th month paid apart in the month adds the part of it
+        beyond S to S, nothing when it is under S.
+        """
+        def line_total(payslips, code):
+            return sum(payslips.line_ids.filtered(lambda l: l.code == code).mapped('total'))
+
+        bonus_rule = self.env['hr.salary.rule'].search([
+            ('code', '=', 'BONUS_SALARY'), ('country_id.code', '=', 'BE')], limit=1)
+        thirteen_month = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month')
+        with freeze_time('2026-06-01'):
+            employee_values = {
+                'resource_calendar_id': self.ref_calendar_6d.id,
+                'reference_calendar_id': self.ref_calendar_6d.id,
+                'l10n_be_joint_committee_id': self.cp200.id,
+                'date_version': date(2025, 1, 1),
+                'contract_date_start': date(2025, 1, 1),
+                'contract_date_end': False,
+                'wage': 2200.0,
+            }
+            reference, above, under = self.create_employee([
+                {'name': 'No 13th Month Worker', **employee_values},
+                {'name': '13th Month Above Worker', **employee_values},
+                {'name': '13th Month Under Worker', **employee_values},
+            ])
+            reference_slip = self._june_2026_payslip(reference)
+            wage = line_total(reference_slip, 'ONSS_BASE_TOTAL')
+            bonus = line_total(reference_slip, 'EmpBonus.1')
+            self.assertGreater(bonus, 0.0, "This scenario needs an employment bonus")
+            for employee, premium, excess in ((above, wage + 500.0, 500.0), (under, wage - 100.0, 0.0)):
+                year_end = self.env['hr.payslip'].create({
+                    'name': '13th month',
+                    'employee_id': employee.id,
+                    'version_id': employee.version_id.id,
+                    'struct_id': thirteen_month.id,
+                    'date_from': date(2026, 6, 1),
+                    'date_to': date(2026, 6, 30),
+                    'company_id': self.belgian_company.id,
+                    'line_ids': [(0, 0, {
+                        'salary_rule_id': bonus_rule.id, 'name': 'BONUS_SALARY', 'sequence': bonus_rule.sequence,
+                        'amount': premium, 'quantity': 1.0, 'rate': 100.0, 'total': premium,
+                    })],
+                })
+                year_end.write({'state': 'validated'})
+                payslip = self._june_2026_payslip(employee)
+                # a full month: S = W, the 13th month is not in W
+                self.assertAlmostEqual(line_total(payslip, 'ONSS_BASE_TOTAL'), wage, places=2)
+                self.assertAlmostEqual(payslip._l10n_be_get_work_bonus_year_end_excess(wage, year_end), excess, places=2)
+                if excess:
+                    self.assertLess(line_total(payslip, 'EmpBonus.1'), bonus)
+                else:
+                    self.assertAlmostEqual(line_total(payslip, 'EmpBonus.1'), bonus, places=2)
+
+    def test_withholding_reduction_work_bonus_split_payslips(self):
+        """
+        The fiscal work bonus (P.P.DED) of the month is the reduction of the month's work bonus, capped by the
+        month's withholding tax: a second payslip of the month with a small withholding tax must not take back
+        the reduction granted on the first one.
+        """
+        def line_total(payslips, code):
+            return sum(payslips.line_ids.filtered(lambda l: l.code == code).mapped('total'))
+
+        with freeze_time('2026-06-01'):
+            employee = self.create_employee({
+                'name': 'Split Worker',
+                'resource_calendar_id': self.ref_calendar_6d.id,
+                'reference_calendar_id': self.ref_calendar_6d.id,
+                'l10n_be_joint_committee_id': self.cp200.id,
+                'date_version': date(2025, 1, 1),
+                'contract_date_start': date(2025, 1, 1),
+                'contract_date_end': False,
+            })
+            employee.version_id.l10n_be_sectorial_bonus_compensatory_amount = 1000.0
+            salary_slip = self._june_2026_payslip(employee)
+            salary_slip.write({'state': 'validated'})
+            employee.version_id.l10n_be_sectorial_bonus_compensatory_amount = 0.0
+            bonus_slip = self._june_2026_payslip(employee, ignore_worked_day_lines=True)
+            payslips = salary_slip | bonus_slip
+            self.assertGreater(line_total(salary_slip, 'P.P.DED'), 0.0)
+            month_withholding_tax = -(line_total(payslips, 'P.P') + line_total(payslips, 'P.P.DEDEH'))
+            month_reduction = (
+                line_total(payslips, 'EmpBonus.A') * bonus_slip._rule_parameter('work_bonus_volet_A_rate')
+                + line_total(payslips, 'EmpBonus.B') * bonus_slip._rule_parameter('work_bonus_volet_B_rate'))
+            # the work bonus of the month went down, the reduction too: 95.36 on the first payslip, 48.45 for the month
+            self.assertAlmostEqual(line_total(payslips, 'P.P.DED'), min(month_withholding_tax, month_reduction), places=1)
+            self.assertAlmostEqual(line_total(bonus_slip, 'P.P.DED'), -46.91, places=2)
+
+    def _compute_employment_bonus_payslip(self, wage, date_from, date_to):
+        employee = self.create_employee({
+            'name': f'Employment bonus {wage}',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'resource_calendar_id': self.resource_calendar_40.id,
+            'wage': wage,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': employee.name,
+            'employee_id': employee.id,
+            'company_id': employee.company_id.id,
+            'version_id': employee.version_id.id,
+            'date_from': date_from,
+            'date_to': date_to,
+        })
+        payslip.compute_sheet()
+        return {line.code: line.total for line in payslip.line_ids}
+
+    def test_employment_bonus_volet_b_not_negative(self):
+        """ Full time, complete month of August 2026, S = 2937.92 just below the middle bound (2937.93): the
+        formula of the volet B gives 171.99 - 0.2699 * (2937.92 - 2300.62) = -0.017, the bonus is 0 """
+        lines = self._compute_employment_bonus_payslip(2937.92, date(2026, 8, 1), date(2026, 8, 31))
+        self.assertAlmostEqual(lines['EmpBonus.A'], 127.54, places=2)
+        self.assertEqual(lines['EmpBonus.B'], 0)
+        self.assertAlmostEqual(lines['EmpBonus.1'], 127.54, places=2)
+
+    def test_employment_bonus_volet_a_not_negative(self):
+        """ Full time, complete month of September 2026, S = 3403.62 on the high bound: the formula of the
+        volet A gives 127.54 - 0.2739 * (3403.62 - 2937.93) = -0.0135, the bonus is 0 """
+        lines = self._compute_employment_bonus_payslip(3403.62, date(2026, 9, 1), date(2026, 9, 30))
+        self.assertEqual(lines['EmpBonus.A'], 0)
+        self.assertEqual(lines['EmpBonus.B'], 0)
+        self.assertEqual(lines['EmpBonus.1'], 0)

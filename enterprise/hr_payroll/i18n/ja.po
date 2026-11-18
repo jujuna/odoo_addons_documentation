@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:50+0000\n"
-"PO-Revision-Date: 2026-10-16 03:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-12 02:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll/ja/>\n"
@@ -25,27 +25,6 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 2026.8.1\n"
-
-#. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_payroll_warning__closing_on
-msgid ""
-"\n"
-"        Defines the reference date used to compute when the warning becomes "
-"due.\n"
-"        - Today: Uses the current date as the reference point, so the "
-"warning stays a fixed distance away.\n"
-"        - Next Payslip: Uses the payrun closing date as the reference "
-"point.\n"
-"        - Contract Start / Contract End: Uses the employee's contract start "
-"or end date as the reference point.\n"
-"        - End of Month / Quarter / Year: Uses the end of the current month / "
-"quarter / year as the reference point.\n"
-"        - Payroll Start Date: Uses the payroll start date as the reference "
-"point.\n"
-"        The warning date is then calculated by applying the Offset (Days) to "
-"this reference.\n"
-"    "
-msgstr ""
 
 #. module: hr_payroll
 #: model:hr.payroll.warning,description:hr_payroll.hr_payroll_warning_welcome
@@ -108,6 +87,15 @@ msgstr ""
 #: code:addons/hr_payroll/models/hr_salary_attachment.py:0
 msgid "%(display_name)s %(attachment_type)s"
 msgstr "%(display_name)s %(attachment_type)s"
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_payslip_run.py:0
+msgid ""
+"%(employee)s can't be added to the pay run(s) %(payruns)s: they are no "
+"longer in draft, or the employee has no running contract matching their "
+"period, structure and employee types."
+msgstr ""
 
 #. module: hr_payroll
 #. odoo-python
@@ -614,6 +602,16 @@ msgid "<span>% Hourly Rate</span>"
 msgstr ""
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
+msgid "<span>/ Day</span>"
+msgstr ""
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
+msgid "<span>/ Hour</span>"
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
 msgid "<span>/ hour</span>"
@@ -677,16 +675,6 @@ msgid ""
 msgstr ""
 "<span>給与明細は、今回の給与引き上げの影響を受けており、修正が必要になる可能"
 "性があります。</span>"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
-msgid "<span>€ / Day</span>"
-msgstr ""
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_category_form
-msgid "<span>€ / Hour</span>"
-msgstr ""
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.report_payslip
@@ -788,26 +776,15 @@ msgid ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0px auto;\"><tbody>\n"
 "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"        Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
-"available for you.<br/><br/>\n"
-"        Please find the PDF in your employee portal.<br/><br/>\n"
-"        Have a nice day,<br/>\n"
+"        Dear <t t-out=\"object.employee_id.name\"></t>, a new payslip is "
+"available for you.<br><br>\n"
+"        Please find the PDF in your employee portal.<br><br>\n"
+"        Have a nice day,<br>\n"
 "        The HR Team\n"
 "    </td></tr>\n"
 "</tbody></table>\n"
 "            "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
-"margin:0px auto;\"><tbody>\n"
-"    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"        <t t-out=\"object.employee_id.name\"/>さん、お疲れさまです。新しい給"
-"与明細の用意ができました。<br/><br/>\n"
-"        従業員ポータルよりPDFファイルをご確認ください。<br/><br/>\n"
-"        よろしくお願いいたします。<br/>\n"
-"        人事部\n"
-"    </td></tr>\n"
-"</tbody></table>\n"
-"            "
 
 #. module: hr_payroll
 #: model_terms:ir.actions.act_window,help:hr_payroll.action_hr_payslip_run
@@ -1016,6 +993,12 @@ msgid "Add Payslip Adjustments"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_version.py:0
+msgid "Add Payslip to Pay Run"
+msgstr ""
+
+#. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/js/tours/hr_payroll.js:0
 msgid "Add a <strong>name</strong> to the contract."
@@ -1041,12 +1024,6 @@ msgstr "印刷された給与明細書にメモを追加してください。"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_employee_view_list
 msgid "Add an adjustment"
 msgstr ""
-
-#. module: hr_payroll
-#. odoo-python
-#: code:addons/hr_payroll/models/hr_version.py:0
-msgid "Add payslip to Pay Run"
-msgstr "給与明細を給与計算に追加"
 
 #. module: hr_payroll
 #. odoo-javascript
@@ -2484,18 +2461,22 @@ msgid "Date To Review"
 msgstr "見直し予定日"
 
 #. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_employee__departure_action_date
-#: model:ir.model.fields,help:hr_payroll.field_hr_version__departure_action_date
-msgid "Date at which the departure actually takes place."
-msgstr "実際に退職する日付。"
-
-#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_employee__dismissal_date
 #: model:ir.model.fields,help:hr_payroll.field_hr_version__dismissal_date
 msgid ""
 "Date at which the departure process starts. Differs from the actual "
 "departure date in case of a notice period."
 msgstr "退職手続きの開始日。予告期間がある場合、実際の退職日とは異なります。"
+
+#. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_employee__departure_action_date
+#: model:ir.model.fields,help:hr_payroll.field_hr_version__departure_action_date
+msgid ""
+"Date at which the employee (and their user, if they have no other active "
+"employee) is archived, by default the day after the departure. If it is "
+"today or earlier, the departure is applied on confirmation; otherwise it is "
+"scheduled for that date."
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__date_end
@@ -2648,6 +2629,24 @@ msgid "Defines the frequency of the wage payment."
 msgstr "賃金の支払い頻度を定義します。"
 
 #. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_payroll_warning__closing_on
+msgid ""
+"Defines the reference date used to compute when the warning becomes due.\n"
+"\n"
+"- Today: Uses the current date as the reference point, so the warning stays "
+"a fixed distance away.\n"
+"- Next Payslip: Uses the payrun closing date as the reference point.\n"
+"- Contract Start / Contract End: Uses the employee's contract start or end "
+"date as the reference point.\n"
+"- End of Month / Quarter / Year: Uses the end of the current month / "
+"quarter / year as the reference point.\n"
+"- Payroll Start Date: Uses the payroll start date as the reference point.\n"
+"\n"
+"The warning date is then calculated by applying the Offset (Days) to this "
+"reference."
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip__struct_id
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_input__struct_id
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_line__struct_id
@@ -2714,6 +2713,12 @@ msgstr "退職"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.mail_message_view_search_payroll_audit
 msgid "Description"
 msgstr "説明"
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_generate_multi_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_view_form
+msgid "Description shown on the payslip"
+msgstr ""
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
@@ -3036,6 +3041,11 @@ msgstr "従業員の仕事"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.report_payslip
 msgid "Employee Information"
 msgstr "従業員情報"
+
+#. module: hr_payroll
+#: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_missing_payrun
+msgid "Employee Not In Payrun"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_payslip_new
@@ -3590,6 +3600,11 @@ msgstr "人事給与スケジュール設定ウィザード"
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_contract_salary_benefit__has_admin_access
 msgid "Has Admin Access"
 msgstr "管理者アクセス権あり"
+
+#. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_resource_calendar_attendance__has_category_options
+msgid "Has Category Options"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__has_done_payslip
@@ -4382,13 +4397,6 @@ msgid "Line"
 msgstr "ライン"
 
 #. module: hr_payroll
-#: model:ir.model.fields,help:hr_payroll.field_hr_salary_rule_category__parent_id
-msgid ""
-"Linking a salary category to its parent is used only for the reporting "
-"purpose."
-msgstr "給与の分類をその親項目に連係させるのは、報告書の目的のためだけです。"
-
-#. module: hr_payroll
 #: model:ir.ui.menu,name:hr_payroll.hr_payroll_logs_menu
 msgid "Logs"
 msgstr ""
@@ -4416,7 +4424,7 @@ msgstr "給与明細管理"
 #. module: hr_payroll
 #: model:ir.module.module,summary:base.module_hr_payroll
 msgid "Manage your employee payroll"
-msgstr ""
+msgstr "従業員の給与計算を管理"
 
 #. module: hr_payroll
 #: model:ir.model.fields.selection,name:hr_payroll.selection__res_company__payslip_generate_and_send_trigger__never
@@ -4504,11 +4512,6 @@ msgstr ""
 #: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_employee_without_bank_account
 msgid "Missing Bank Account"
 msgstr "銀行口座未設定"
-
-#. module: hr_payroll
-#: model:hr.payroll.warning,name:hr_payroll.hr_payroll_warning_missing_payrun
-msgid "Missing Payrun"
-msgstr "給与計算未設定"
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_employee__mobile_invoice
@@ -4717,12 +4720,6 @@ msgstr "新規"
 
 #. module: hr_payroll
 #. odoo-javascript
-#: code:addons/hr_payroll/static/src/components/payroll_config_timeline/payroll_config_timeline.xml:0
-msgid "New Config Record"
-msgstr ""
-
-#. module: hr_payroll
-#. odoo-javascript
 #: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 msgid "New Employee Record"
 msgstr ""
@@ -4741,9 +4738,21 @@ msgid "New Payslip Adjustment"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_employee.py:0
+msgid "New Payslips"
+msgstr ""
+
+#. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.js:0
 msgid "New Salary Attachment"
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/components/payroll_config_timeline/payroll_config_timeline.xml:0
+msgid "New Version"
 msgstr ""
 
 #. module: hr_payroll
@@ -4940,8 +4949,6 @@ msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__note
-#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__description
-#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__description
 msgid "Note"
 msgstr "メモ"
 
@@ -4988,18 +4995,12 @@ msgstr "従業員が年間に取得する有給休暇の日数。"
 msgid ""
 "Number of days used to compute the warning date based on the selected "
 "'Closing On' rule.\n"
-"        - For contract start/end: the warning will trigger this many days "
-"before the contract start or end dates.\n"
-"        - For next payslip: the offset is applied before or after the payrun "
-"closing date.\n"
-"    "
+"\n"
+"- For contract start/end: the warning will trigger this many days before the "
+"contract start or end dates.\n"
+"- For next payslip: the offset is applied before or after the payrun closing "
+"date."
 msgstr ""
-"選択した「締日」ルールに基づいて警告日を計算するために使用する日数。\n"
-"        - 契約開始 / 終了の場合: 契約開始日または終了日の指定日数前に警告が実"
-"行されます。\n"
-"        - 次回給与明細の場合: 給与計算の締め日の前後にオフセット(日数)が適用"
-"されます。\n"
-"    "
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__message_has_error_counter
@@ -5143,16 +5144,11 @@ msgid "Optional on"
 msgstr ""
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_generate_multi_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_view_form
-msgid "Optional reason, or reference"
-msgstr "理由または参照(任意)"
-
-#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_leave__category_options_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip_worked_days__category_options_ids
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_leave_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_work_days_view_search_report
+#: model_terms:ir.ui.view,arch_db:hr_payroll.resource_calendar_attendance_multi_create_view_form
 msgid "Options"
 msgstr "オプション"
 
@@ -5695,6 +5691,12 @@ msgid "Payslip Count"
 msgstr "給与明細数"
 
 #. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__description
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__description
+msgid "Payslip Description"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model,name:hr_payroll.model_hr_payslip_input
 msgid "Payslip Input"
 msgstr "給与明細の入力"
@@ -5961,6 +5963,11 @@ msgid "Postpone time off after payslip validation"
 msgstr "給与明細の確定後に休暇を繰り延べる"
 
 #. module: hr_payroll
+#: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule_category__premium_currency_id
+msgid "Premium Currency"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_salary_rule_category_premium
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule_category__is_premium_pay
 #: model:ir.ui.menu,name:hr_payroll.menu_hr_salary_rule_category_premium
@@ -5981,7 +5988,7 @@ msgstr ""
 #. module: hr_payroll
 #: model:ir.model.fields.selection,name:hr_payroll.selection__hr_payroll_warning__warning_color_class__primary
 msgid "Primary"
-msgstr "プライマリ"
+msgstr "メイン"
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
@@ -6765,7 +6772,7 @@ msgstr "給与体系タイプを検索"
 #. module: hr_payroll
 #: model:ir.model.fields.selection,name:hr_payroll.selection__hr_payroll_warning__warning_color_class__secondary
 msgid "Secondary"
-msgstr "セカンダリ"
+msgstr "サブ"
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule__input_section
@@ -7320,6 +7327,12 @@ msgstr ""
 #. module: hr_payroll
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_version.py:0
+msgid "The employee is missing in the following pay runs: %s"
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_version.py:0
 msgid "The employee is not in any pay run for %s"
 msgstr "従業員は、以下の給与一括処理に含まれていません%s"
 
@@ -7410,6 +7423,13 @@ msgstr "給与明細はドラフトまたは待機ステータスである必要
 
 #. module: hr_payroll
 #. odoo-python
+#: code:addons/hr_payroll/models/hr_salary_rule.py:0
+msgid ""
+"The salary rule %s is not defined in the payroll data and cannot be reset."
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-python
 #: code:addons/hr_payroll/models/hr_payslip.py:0
 msgid "The selected payslips should be linked to the same batch"
 msgstr "選択された給与明細は同一のバッチタイプに属している必要があります。"
@@ -7442,6 +7462,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_rule_form
 msgid "The total returned by the salary rule is calculated as:"
 msgstr "給与規則によって返される合計額は、以下の通り計算されます："
+
+#. module: hr_payroll
+#: model:ir.model.fields,help:hr_payroll.field_hr_salary_rule_category__parent_id
+msgid ""
+"The totals of the rules of this category are also added to its parent "
+"category (and its ancestors) during the payslip computation."
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip_input__version_id
@@ -8756,8 +8783,8 @@ msgstr ""
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_correction_wizard_form
-msgid "been affected by this version's changes."
-msgstr "このバージョンの変更の影響を受けています。"
+msgid "been affected by these changes."
+msgstr ""
 
 #. module: hr_payroll
 #. odoo-python
@@ -8949,6 +8976,68 @@ msgstr "年"
 #: model:mail.template,subject:hr_payroll.mail_template_new_payslip
 msgid "{{ object.employee_id.name }}, a new payslip is available for you"
 msgstr "{{ object.employee_id.name }}、新規給与明細の用意ができました。"
+
+#~ msgid "Date at which the departure actually takes place."
+#~ msgstr "実際に退職する日付。"
+
+#~ msgid ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+#~ "        Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is "
+#~ "available for you.<br/><br/>\n"
+#~ "        Please find the PDF in your employee portal.<br/><br/>\n"
+#~ "        Have a nice day,<br/>\n"
+#~ "        The HR Team\n"
+#~ "    </td></tr>\n"
+#~ "</tbody></table>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
+#~ "    <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+#~ "        <t t-out=\"object.employee_id.name\"/>さん、お疲れさまです。新しい"
+#~ "給与明細の用意ができました。<br/><br/>\n"
+#~ "        従業員ポータルよりPDFファイルをご確認ください。<br/><br/>\n"
+#~ "        よろしくお願いいたします。<br/>\n"
+#~ "        人事部\n"
+#~ "    </td></tr>\n"
+#~ "</tbody></table>\n"
+#~ "            "
+
+#~ msgid "Optional reason, or reference"
+#~ msgstr "理由または参照(任意)"
+
+#~ msgid "been affected by this version's changes."
+#~ msgstr "このバージョンの変更の影響を受けています。"
+
+#~ msgid "Add payslip to Pay Run"
+#~ msgstr "給与明細を給与計算に追加"
+
+#~ msgid ""
+#~ "Linking a salary category to its parent is used only for the reporting "
+#~ "purpose."
+#~ msgstr ""
+#~ "給与の分類をその親項目に連係させるのは、報告書の目的のためだけです。"
+
+#~ msgid "Missing Payrun"
+#~ msgstr "給与計算未設定"
+
+#~ msgid ""
+#~ "Number of days used to compute the warning date based on the selected "
+#~ "'Closing On' rule.\n"
+#~ "        - For contract start/end: the warning will trigger this many days "
+#~ "before the contract start or end dates.\n"
+#~ "        - For next payslip: the offset is applied before or after the "
+#~ "payrun closing date.\n"
+#~ "    "
+#~ msgstr ""
+#~ "選択した「締日」ルールに基づいて警告日を計算するために使用する日数。\n"
+#~ "        - 契約開始 / 終了の場合: 契約開始日または終了日の指定日数前に警告"
+#~ "が実行されます。\n"
+#~ "        - 次回給与明細の場合: 給与計算の締め日の前後にオフセット(日数)が適"
+#~ "用されます。\n"
+#~ "    "
 
 #~ msgid "Pay Run Name"
 #~ msgstr "給与処理名"

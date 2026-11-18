@@ -1,5 +1,6 @@
 import {
     Component,
+    computed,
     markup,
     onWillStart,
     onMounted,
@@ -22,14 +23,16 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { formatList } from "@web/core/l10n/utils";
 import { pyToJsLocale } from "@web/core/l10n/utils/locales";
-import { KeepLast } from "@web/core/utils/concurrency";
+import { KeepLast, Mutex } from "@web/core/utils/concurrency";
 import { TimesheetInlineForm } from "@timesheet_grid/components/timesheet_inline_form/timesheet_inline_form";
 import { user } from "@web/core/user";
+import { searchHighlight } from "@mail/core/common/message_search_hook";
 import { formatDurationTimesheet, roundTimeSpent } from "@timesheet_grid/utils/timer";
 import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { DocumentationLink } from "@web/views/widgets/documentation_link/documentation_link";
 import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 import { FakeEventsPlugin } from "./fake_events_plugin";
+import { useSuggestionsDraggable } from "@timesheet_grid/hooks/use_aw_suggestions_draggable";
 import { TimesheetAssistantModel } from "./aw_timesheet_model";
 import { TimesheetsAssistantTimeline } from "./timeline/timeline";
 import { TimesheetsAssistantByProject } from "./by_project/by_project";
@@ -52,14 +55,18 @@ export class TimesheetsAssistant extends Component {
 
     formatDuration = formatDurationTimesheet;
     suggestionsContentRef = signal.ref();
+    timesheetsSectionRef = signal.ref();
 
     debugMode = usePlugin(DebugModePlugin);
     fakeEvents = usePlugin(FakeEventsPlugin);
+    searchInput = signal.ref();
 
     setup() {
         this.keepLast = new KeepLast();
+        this.updateMutex = new Mutex();
         const orm = useService("orm");
         const notification = useService("notification");
+        this.notification = notification;
         this.dialog = useService("dialog");
         this.uiService = useService("ui");
         this.model = new TimesheetAssistantModel(
@@ -81,10 +88,21 @@ export class TimesheetsAssistant extends Component {
             isSelecting: false,
             focusedIndex: -1, // the currently highlighted row
             lastSelectedIndex: -1, // the anchor point for MAJ (Shift) selection
+            searchQuery: "",
+            dragOverTimesheetId: null,
+            isDraggingSuggestions: false,
+            pendingUnselect: null,
         });
         this.selectedTimesheet = null;
         this.pendingScrollToTimesheetId = null;
 
+        useSuggestionsDraggable({
+            ref: this.suggestionsContentRef,
+            elements: ".o_suggestions_suggestion.o_isSelected",
+            component: this,
+        });
+
+        this._debouncedSearch = useDebounced((val) => this.setSearchQuery(val), 200);
         onWillStart(async () => {
             await this.model.loadAssistantData();
             await this.keepLast.add(this.model.load());
@@ -95,18 +113,22 @@ export class TimesheetsAssistant extends Component {
         this._onClickOutsideBound = this.onClickOutside.bind(this);
         this._onKeyDown = this.onKeyDown.bind(this);
         onMounted(() => {
-            window.addEventListener("mouseup", this._onMouseUp);
+            window.addEventListener("pointerup", this._onMouseUp);
+            window.addEventListener("pointercancel", this._onMouseUp);
             window.addEventListener("keydown", this._onKeyDown, { capture: true });
-            window.addEventListener("mousedown", this._onMouseDownAll);
+            window.addEventListener("pointerdown", this._onMouseDownAll);
+            window.addEventListener("click", this._onClickOutsideBound);
             const savedStep = localStorage.getItem("aw_install_wizard_step");
             if (savedStep === "2") {
                 this.openInstallDialog(2);
             }
         });
         onWillUnmount(() => {
-            window.removeEventListener("mouseup", this._onMouseUp);
+            window.removeEventListener("pointerup", this._onMouseUp);
+            window.removeEventListener("pointercancel", this._onMouseUp);
             window.removeEventListener("keydown", this._onKeyDown);
-            window.removeEventListener("mousedown", this._onMouseDownAll);
+            window.removeEventListener("pointerdown", this._onMouseDownAll);
+            window.removeEventListener("click", this._onClickOutsideBound);
         });
         onPatched(() => {
             if (this.pendingScrollToTimesheetId !== null) {
@@ -124,6 +146,9 @@ export class TimesheetsAssistant extends Component {
             isSelecting: false,
             focusedIndex: -1, // the currently highlighted row
             lastSelectedIndex: -1, // the anchor point for MAJ (Shift) selection
+            dragOverTimesheetId: null,
+            isDraggingSuggestions: false,
+            pendingUnselect: null,
         };
     }
 
@@ -146,11 +171,81 @@ export class TimesheetsAssistant extends Component {
     }
 
     onClickOutside(ev) {
-        const cards = document.querySelector(".o_suggestion");
-        if (cards && !cards.contains(ev.target)) {
+        if (ev.target.closest(".modal, .o-overlay-container")) {
+            return;
+        }
+        // the creation form reads the selected rows, so it must not clear them
+        if (!ev.target.closest(".o_activitywatch_sync")) {
             this.initSelectedRows();
         }
     }
+
+    setSearchQuery(query) {
+        this.state.searchQuery = query;
+        // indexes point into the visible records, which the query has just changed
+        this.state.focusedIndex = -1;
+        this.state.lastSelectedIndex = -1;
+    }
+
+    clearSearch() {
+        this._debouncedSearch.cancel();
+        this.setSearchQuery("");
+        this.searchInput()?.focus();
+    }
+
+    highlight(text) {
+        return searchHighlight(this.state.searchQuery, text);
+    }
+
+    get searchFields() {
+        return ["title", "project", "task", "description"];
+    }
+
+    get activitySearchFields() {
+        return ["description"];
+    }
+
+    filteredRecords = computed(() => {
+        const q = this.state.searchQuery.trim().toLowerCase();
+        if (!q) {
+            return this.records;
+        }
+        const fields = this.searchFields;
+        return this.records.filter((r) =>
+            fields.some((f) => (r[f] || "").toLowerCase().includes(q))
+        );
+    });
+
+    filteredGrouped = computed(() => {
+        const q = this.state.searchQuery.trim().toLowerCase();
+        if (!q) {
+            return this.model.data.grouped;
+        }
+
+        const activityFields = this.activitySearchFields;
+        const result = {};
+
+        for (const [groupKey, groupData] of Object.entries(this.model.data.grouped)) {
+            const { project_id, task_id } = JSON.parse(groupKey);
+            const projectName = (this.model.projectName(project_id) || "").toLowerCase();
+            const taskName = (this.model.taskName(task_id) || "").toLowerCase();
+            if (projectName.includes(q) || taskName.includes(q)) {
+                result[groupKey] = groupData;
+                continue;
+            }
+
+            for (const [title, activity] of Object.entries(groupData.suggestions)) {
+                const activityMatch =
+                    title.toLowerCase().includes(q) ||
+                    activityFields.some((f) => (activity[f] || "").toLowerCase().includes(q));
+                if (activityMatch) {
+                    result[groupKey] ??= { ...groupData, suggestions: {} };
+                    result[groupKey].suggestions[title] = activity;
+                }
+            }
+        }
+        return result;
+    });
 
     onDateChange(ev) {
         this.model.data.currentDate = DateTime.fromISO(ev.target.value);
@@ -236,20 +331,21 @@ export class TimesheetsAssistant extends Component {
         );
     }
 
-    get visualRecords() {
+    visualRecords = computed(() => {
         if (this.state.groupBy === "project") {
-            return Object.keys(this.model.data.grouped)
+            const grouped = this.filteredGrouped();
+            return Object.keys(grouped)
                 .sort()
                 .flatMap((groupKey) =>
-                    Object.values(this.model.data.grouped[groupKey].suggestions).map((item) => ({
+                    Object.values(grouped[groupKey].suggestions).map((item) => ({
                         ...item,
                         groupKey: groupKey,
                     }))
                 )
                 .filter((a) => a.type !== "afk" && this.model.isVisible(a));
         }
-        return this.records;
-    }
+        return this.filteredRecords();
+    });
 
     /**
      * @param {KeyboardEvent} ev
@@ -262,13 +358,18 @@ export class TimesheetsAssistant extends Component {
             }
             return;
         }
-        if (ev.target.closest(".o_timesheet_inline_form,.o_dialog") || !this.visualRecords.length) {
+        if (
+            ev.target.closest(".o_timesheet_inline_form,.o_dialog,.modal") ||
+            ["INPUT", "TEXTAREA"].includes(ev.target.tagName) ||
+            ev.target.isContentEditable ||
+            !this.visualRecords().length
+        ) {
             return;
         }
         // Arrows: move focus | Space: toggle selection (sets anchor)
         // Shift + Arrows: select continuous range from anchor to focus
         // Esc: discard all selections and close form
-        const records = this.visualRecords;
+        const records = this.visualRecords();
 
         if (ev.key === " " || ev.key === "Enter") {
             if (ev.target.classList.contains("o_suggestions_suggestion")) {
@@ -327,7 +428,7 @@ export class TimesheetsAssistant extends Component {
 
     selectRange(startIndex, endIndex, autoOpenForm = true) {
         this.clearSelectedTimesheet();
-        const records = this.visualRecords;
+        const records = this.visualRecords();
         const start = Math.min(startIndex, endIndex);
         const end = Math.max(startIndex, endIndex);
         for (let i = start; i <= end; i++) {
@@ -357,7 +458,7 @@ export class TimesheetsAssistant extends Component {
         } else {
             cssClasses = "bg-view";
         }
-        const records = this.visualRecords;
+        const records = this.visualRecords();
         if (this.state.focusedIndex !== -1 && records[this.state.focusedIndex]) {
             const focusedRecord = records[this.state.focusedIndex];
             if (this.isSameRecord(focusedRecord, groupKey, title, start)) {
@@ -383,7 +484,13 @@ export class TimesheetsAssistant extends Component {
         }
         this.disableTextSelection();
         this.state.isSelecting = true;
-        const records = this.visualRecords;
+        const key = this.keyFor(groupKey, title, start);
+        if (this.state.selectedRows.has(key)) {
+            this.state.pendingUnselect = { groupKey, title, start };
+            return;
+        }
+
+        const records = this.visualRecords();
         const clickedIndex = records.findIndex((r) => this.isSameRecord(r, groupKey, title, start));
         if (ev?.shiftKey && this.state.lastSelectedIndex !== -1) {
             this.selectRange(this.state.lastSelectedIndex, clickedIndex);
@@ -396,6 +503,9 @@ export class TimesheetsAssistant extends Component {
     }
 
     onMouseEnter(groupKey, title, start = false) {
+        if (this.state.isDraggingSuggestions) {
+            return;
+        }
         /*
         When hovering over suggestion with the mouse button pressed, the new suggestions are not added to the form
         directly. Their data is first stored inside the state.selectRow, then once the user release the mouse button
@@ -436,6 +546,12 @@ export class TimesheetsAssistant extends Component {
     }
 
     onMouseUp() {
+        if (this.state.pendingUnselect && !this.state.isDraggingSuggestions) {
+            const { groupKey, title, start } = this.state.pendingUnselect;
+            this.toggleSelect(groupKey, title, true, start);
+        }
+        this.state.pendingUnselect = null;
+
         if (this.state.isSelectedRowDirty) {
             this.state.isSelectedRowDirty = false;
             this.updateRecordInForm();
@@ -446,18 +562,21 @@ export class TimesheetsAssistant extends Component {
     }
 
     toggleSelect(groupKey, title, autoOpenForm = true, start = false) {
-        this.clearSelectedTimesheet();
+        if (!this.selectedTimesheet) {
+            this.clearSelectedTimesheet();
+        }
+
         const key = this.keyFor(groupKey, title, start);
         if (this.state.selectedRows.has(key)) {
             this.state.selectedRows.delete(key);
-            if (this.state.selectedRows.size === 0) {
+            if (this.state.selectedRows.size === 0 && !this.selectedTimesheet) {
                 this.state.showCreateForm = false;
             } else {
                 this.updateRecordInForm();
             }
         } else {
             this.state.selectedRows.add(key);
-            if (autoOpenForm && !this.state.showCreateForm) {
+            if (autoOpenForm && !this.state.showCreateForm && !this.selectedTimesheet) {
                 this.state.showCreateForm = true;
             } else if (this.currentRecord) {
                 this.updateRecordInForm();
@@ -465,10 +584,54 @@ export class TimesheetsAssistant extends Component {
         }
     }
 
-    updateRecordInForm() {
-        if (!this.currentRecord) {
+    async updateEditedTimesheetDuration(record, addedMinutes) {
+        if (record !== this.currentRecord || !this.selectedTimesheet) {
             return;
         }
+
+        const currentAmount = record.data.unit_amount || 0;
+        let formState = this.suggestionFormState;
+
+        if (!formState || formState.record !== record) {
+            formState = this.suggestionFormState = {
+                record,
+                baseAmount: currentAmount,
+                lastAmount: currentAmount,
+            };
+        }
+
+        const baseAmount = formState.baseAmount + currentAmount - formState.lastAmount;
+
+        const unitAmount =
+            addedMinutes > 0
+                ? roundTimeSpent({
+                      minutesSpent: baseAmount * 60 + addedMinutes,
+                      ...this.model.roundingValues,
+                  }) / 60
+                : baseAmount;
+
+        await record.update({ unit_amount: unitAmount });
+
+        formState.baseAmount = baseAmount;
+        formState.lastAmount = record.data.unit_amount;
+    }
+
+    updateRecordInForm() {
+        const record = this.currentRecord;
+        if (!record) {
+            return;
+        }
+
+        if (this.selectedTimesheet) {
+            const addedMinutes = this.model.getSelectedSuggestionsDuration(
+                this.state.selectedRows,
+                this.state.groupBy
+            );
+            return this.updateMutex.exec(() =>
+                this.updateEditedTimesheetDuration(record, addedMinutes)
+            );
+        }
+
         const selectedData = this.selectedData;
         const vals = {
             name: selectedData.name,
@@ -486,7 +649,58 @@ export class TimesheetsAssistant extends Component {
                 display_name: this.model.taskById[this.selectedData.task_id],
             };
         }
-        this.currentRecord.update(vals);
+        record.update(vals);
+    }
+
+    onDragSuggestion() {
+        this.state.isDraggingSuggestions = true;
+        this.clearSelectedTimesheet();
+    }
+
+    async onDropSuggestions(dragOverTimesheetId) {
+        if (!dragOverTimesheetId || this.state.selectedRows.size === 0) {
+            return;
+        }
+
+        const timesheet = this.model.getTimesheets().find((t) => t.id === dragOverTimesheetId);
+        if (timesheet) {
+            await this._mergeSuggestionsIntoTimesheet(timesheet);
+        }
+    }
+
+    async _mergeSuggestionsIntoTimesheet(timesheet) {
+        const undoData = await this.model.mergeSuggestionsIntoTimesheet(
+            timesheet,
+            new Set(this.state.selectedRows),
+            this.state.groupBy
+        );
+        if (!undoData) {
+            return;
+        }
+
+        this.dismissAllForms();
+
+        const closeNotification = this.notification.add(_t("Time added"), {
+            type: "success",
+            buttons: [
+                {
+                    name: _t("Undo"),
+                    onClick: () => {
+                        closeNotification();
+                        return this.undoAddedTime(undoData);
+                    },
+                },
+            ],
+            autocloseDelay: 5000,
+        });
+    }
+
+    async undoAddedTime(undoData) {
+        if (!(await this.model.undoAddedTime(undoData))) {
+            return;
+        }
+        this.initSelectedRows();
+        this.notification.add(_t("Time removed"), { type: "success" });
     }
 
     initSelectedRows() {
@@ -499,15 +713,7 @@ export class TimesheetsAssistant extends Component {
         if (!selectedRows.length) {
             return "";
         }
-        const selectedRecords = selectedRows
-            .map((row) => {
-                const { groupKey, title, start } = JSON.parse(row);
-                if (this.state.groupBy === "timeline") {
-                    return this.model.data.recordsByStart[start];
-                }
-                return this.model.data.grouped[groupKey]?.suggestions?.[title];
-            })
-            .filter(Boolean);
+        const selectedRecords = this.getSelectedRecords(selectedRows);
         const groupedRecords = Map.groupBy(
             selectedRecords,
             ({ template, description, title }) => description || template || title
@@ -525,6 +731,18 @@ export class TimesheetsAssistant extends Component {
             groupNames.push(groupName);
         }
         return groupNames.join("; ");
+    }
+
+    getSelectedRecords(selectedRows) {
+        return selectedRows
+            .map((row) => {
+                const { groupKey, title, start } = JSON.parse(row);
+                if (this.state.groupBy === "timeline") {
+                    return this.model.data.recordsByStart[start];
+                }
+                return this.model.data.grouped[groupKey]?.suggestions?.[title];
+            })
+            .filter(Boolean);
     }
 
     get selectedData() {
@@ -591,8 +809,23 @@ export class TimesheetsAssistant extends Component {
         return this.model.onTake(groupKey, title, start, this.state.groupBy);
     }
 
-    onDelete(groupKey, title, refresh = true, isConsumed = false, start = false) {
-        return this.model.onDelete(groupKey, title, refresh, isConsumed, start, this.state.groupBy);
+    onDelete(
+        groupKey,
+        title,
+        refresh = true,
+        isConsumed = false,
+        start = false,
+        timesheetId = false
+    ) {
+        return this.model.onDelete(
+            groupKey,
+            title,
+            refresh,
+            isConsumed,
+            start,
+            this.state.groupBy,
+            timesheetId
+        );
     }
 
     onDeleteSelected() {
@@ -609,15 +842,12 @@ export class TimesheetsAssistant extends Component {
         for (const row of this.state.selectedRows) {
             const { groupKey, title, start } = JSON.parse(row);
             const matchKey = this.model.getMatchKey(groupKey, title, start, this.state.groupBy);
-            this.onDelete(groupKey, title, false, true, start);
+            this.onDelete(groupKey, title, false, true, start, timesheet.data.id);
 
             this.model.frequencyViewerLocalConfig.addMatching(matchKey, localConfigVals);
         }
 
-        this.model.addTimesheet(timesheet.data, this.state.selectedRows.size > 0);
-        if (this.state.selectedRows.size > 0) {
-            this.model.recordAssistantTimesheet(timesheet.data.id);
-        }
+        this.model.addTimesheet(timesheet.data);
         this.dismissAllForms();
     }
 
@@ -627,6 +857,12 @@ export class TimesheetsAssistant extends Component {
     }
 
     onClickExistingTimesheet(timesheet) {
+        // If suggestions are selected, clicking instantly merges them
+        if (this.state.selectedRows.size > 0) {
+            this._mergeSuggestionsIntoTimesheet(timesheet);
+            return;
+        }
+
         // Check if there's a currently selected timesheet with unsaved changes
         if (this.selectedTimesheet && this.currentRecord && this.currentRecord.dirty) {
             this.dialog.add(ConfirmationDialog, {
@@ -653,7 +889,6 @@ export class TimesheetsAssistant extends Component {
         this.dismissAllForms();
         this.selectedTimesheet = timesheet;
         timesheet.showEditForm = true;
-        this.state.isSelecting = true;
 
         // Mark that we need to scroll to this form when onPatched
         this.pendingScrollToTimesheetId = timesheet.id;
@@ -681,6 +916,7 @@ export class TimesheetsAssistant extends Component {
         if (!this.state.showCreateForm) {
             this.currentRecord = null;
         }
+        this.suggestionFormState = null;
     }
 
     dismissAllForms() {
@@ -691,8 +927,23 @@ export class TimesheetsAssistant extends Component {
     }
 
     onWriteTimesheet(timesheet) {
+        if (this.state.selectedRows.size > 0) {
+            // the selected rows are now taken by this timesheet: recompute the suggestions, so
+            // that their time is not deducted a second time as manual time of the timesheet, and
+            // learn its project/task for them, like when taking them
+            const localConfigVals = this.model.getLocalConfigValsOnTake(timesheet.data);
+            for (const row of this.state.selectedRows) {
+                const { groupKey, title, start } = JSON.parse(row);
+                const matchKey = this.model.getMatchKey(groupKey, title, start, this.state.groupBy);
+                this.onDelete(groupKey, title, false, true, start, timesheet.data.id);
+                this.model.frequencyViewerLocalConfig.addMatching(matchKey, localConfigVals);
+            }
+            this.model.refreshTimesheetsOnUpdate(timesheet.data);
+            this.model.computeSuggestions();
+        } else {
+            this.model.updateTimesheet(timesheet.data);
+        }
         this.dismissAllForms();
-        this.model.updateTimesheet(timesheet.data);
     }
 
     async generateSampleData() {
@@ -702,6 +953,7 @@ export class TimesheetsAssistant extends Component {
     async onLinkedRecordSaved() {
         const editedTimesheetId = this.selectedTimesheet?.id;
         await this.keepLast.add(this.model.loadTimesheets());
+        this.model.computeSuggestions();
         const timesheet = this.model.data.timesheets.find((ts) => ts.id === editedTimesheetId);
         if (timesheet) {
             this.switchToTimesheet(timesheet);

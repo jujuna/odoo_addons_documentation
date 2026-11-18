@@ -18,15 +18,18 @@
         </xpath>
     </template>
 
-    <!--  dk saft report  -->
+    <!-- SAF-T 1.0 DK-specific fields -->
     <template id="saft_template" inherit_id="account_saft.saft_template" primary="True">
         <xpath expr="//Header" position="inside">
             <TaxEntity t-out="company.name[:70]"/>
         </xpath>
 
         <!-- Map to the basic 4-digit account code -->
-        <xpath expr="//MasterFiles/GeneralLedgerAccounts/Account/StandardAccountID" position="attributes">
-            <attribute name="t-out">account.code[:4]</attribute>
+        <xpath expr="//StandardAccountID" position="replace">
+            <t t-if="company.account_fiscal_country_id.code != 'DK'">$0</t>
+            <t t-else="">
+                <StandardAccountID t-out="account.code[:4]"/>
+            </t>
         </xpath>
 
         <xpath expr="//TaxTable//TaxTableEntry//TaxCodeDetails" position="before">
@@ -50,5 +53,101 @@
         <xpath expr="//Supplier/t[@t-call='account_saft.addresses_contacts']" position="attributes">
             <attribute name="t-call">l10n_dk_reports.addresses_contacts</attribute>
         </xpath>
+    </template>
+
+    <template id="company_header_2_0" inherit_id="l10n_dk_reports.company_header" primary="True">
+        <xpath expr="//RegistrationNumber" position="replace">
+            <CVR t-if="cvr" t-out="cvr"/>
+            <RegistrationNumber t-elif="company_identifier" t-out="company_identifier[:35]"/>
+        </xpath>
+    </template>
+
+    <template id="tax_information_2_0" inherit_id="account_saft.tax_information" primary="True">
+        <xpath expr="//TaxAmount/t[@t-if]" position="replace">
+            <CurrencyCode t-out="tax_vals['currency_code']"/>
+            <CurrencyAmount t-out="format_float(sign * tax_vals['amount_currency'])"/>
+            <ExchangeRate t-out="format_float(tax_vals['rate'], digits=8)"/>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         SAF-T 2.0 DK template
+         Inherits the v1.0 DK template and applies all breaking changes
+         introduced by Danish_SAF-T_Financial_Schema_v_2_0.
+         ================================================================ -->
+    <template id="saft_2_0_template" inherit_id="l10n_dk_reports.saft_template" primary="True">
+        <xpath expr="//Header/Company/t[@t-call='l10n_dk_reports.company_header']" position="attributes">
+            <attribute name="t-call">l10n_dk_reports.company_header_2_0</attribute>
+        </xpath>
+        <xpath expr="//TaxTable//TaxTableEntry/Description" position="replace">
+            <Description>VAT</Description>
+        </xpath>
+        <xpath expr="//TaxTable//TaxCodeDetails//FlatTaxRate/Amount" position="after">
+            <CurrencyCode t-out="company.currency_id.name"/>
+            <CurrencyAmount t-out="format_float(tax_vals['amount'])"/>
+            <ExchangeRate t-out="format_float(1.0, digits=8)"/>
+        </xpath>
+        <xpath expr="//MasterFiles/GeneralLedgerAccounts/Account" position="before">
+            <NameOfStandardAccount>Standardkontoplanen</NameOfStandardAccount>
+            <VersionOfStandardAccount t-out="version_of_standard_account"/>
+        </xpath>
+
+        <!-- Unlike the SAF-T V1.0, where the ID follows the company structure
+             (Name, Address, Contact, ...), the DK 2.0 XSD requires CustomerID / SupplierID / OwnerID
+             to be the first child of their node. -->
+        <xpath expr="//Customers/Customer/t[@t-call='l10n_dk_reports.addresses_contacts']" position="before">
+            <xpath expr="//Customers/Customer/CustomerID" position="move"/>
+        </xpath>
+        <xpath expr="//Suppliers/Supplier/t[@t-call='l10n_dk_reports.addresses_contacts']" position="before">
+            <xpath expr="//Suppliers/Supplier/SupplierID" position="move"/>
+        </xpath>
+        <xpath expr="//Owners/Owner/t[@t-call='l10n_dk_reports.company_header']" position="before">
+            <xpath expr="//Owners/Owner/OwnerID" position="move"/>
+        </xpath>
+        <xpath expr="//Owners/Owner/t[@t-call='l10n_dk_reports.company_header']" position="attributes">
+            <attribute name="t-call">l10n_dk_reports.company_header_2_0</attribute>
+        </xpath>
+
+        <xpath expr="//GeneralLedgerEntries/Journal/Transaction/Line" position="before">
+            <SystemID t-out="move_vals['system_id']"/>
+        </xpath>
+
+        <xpath expr="//GeneralLedgerEntries/Journal/Transaction/Line/t[@t-call='account_saft.line_debit_credit_amount']" position="replace">
+            <t t-call="l10n_dk_reports.line_debit_credit_amount_2_0"/>
+        </xpath>
+
+        <xpath expr="//GeneralLedgerEntries/Journal/Transaction/Line/TaxInformation" position="replace">
+            <TaxInformation t-foreach="line_vals.get('tax_detail_vals_list', [])" t-as="tax_vals">
+                <t t-set="sign" t-value="-1 if line_vals['credit'] else 1"/>
+                <t t-call="l10n_dk_reports.tax_information_2_0"/>
+            </TaxInformation>
+        </xpath>
+    </template>
+
+    <template id="line_debit_credit_amount_2_0">
+        <DebitAmount t-if="line_vals['debit']">
+            <Amount t-out="format_float(line_vals['debit'])"/>
+            <CurrencyCode t-out="line_vals.get('currency_code') or company.currency_id.name"/>
+            <CurrencyAmount t-out="format_float(abs(line_vals['amount_currency'] if line_vals.get('amount_currency') is not None else line_vals['debit']))"/>
+            <ExchangeRate t-out="format_float(line_vals.get('rate', 1.0), digits=8)"/>
+        </DebitAmount>
+        <CreditAmount t-if="line_vals['credit']">
+            <Amount t-out="format_float(line_vals['credit'])"/>
+            <CurrencyCode t-out="line_vals.get('currency_code') or company.currency_id.name"/>
+            <CurrencyAmount t-out="format_float(abs(line_vals['amount_currency'] if line_vals.get('amount_currency') is not None else line_vals['credit']))"/>
+            <ExchangeRate t-out="format_float(line_vals.get('rate', 1.0), digits=8)"/>
+        </CreditAmount>
+        <DebitAmount t-if="not line_vals.get('debit') and not line_vals.get('credit') and line_vals.get('move_type', '') in ('in_invoice', 'out_refund')">
+            <Amount t-out="format_float(line_vals['debit'])"/>
+            <CurrencyCode t-out="line_vals.get('currency_code') or company.currency_id.name"/>
+            <CurrencyAmount t-out="format_float(abs(line_vals.get('amount_currency') or 0.0))"/>
+            <ExchangeRate t-out="format_float(line_vals.get('rate', 1.0), digits=8)"/>
+        </DebitAmount>
+        <CreditAmount t-if="not line_vals.get('debit') and not line_vals.get('credit') and line_vals.get('move_type', '') in ('out_invoice', 'in_refund', 'entry')">
+            <Amount t-out="format_float(line_vals['credit'])"/>
+            <CurrencyCode t-out="line_vals.get('currency_code') or company.currency_id.name"/>
+            <CurrencyAmount t-out="format_float(abs(line_vals.get('amount_currency') or 0.0))"/>
+            <ExchangeRate t-out="format_float(line_vals.get('rate', 1.0), digits=8)"/>
+        </CreditAmount>
     </template>
 </odoo>

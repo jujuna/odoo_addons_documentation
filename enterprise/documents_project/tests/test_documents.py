@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from odoo.exceptions import UserError
 from odoo.fields import Domain
 from odoo.tests.common import Command, users
@@ -80,6 +82,33 @@ class TestDocumentsBridgeProject(TestProjectCommon, TransactionCaseDocuments):
         """
         parent_folder = self.env.company.documents_project_folder_id
         self.assertEqual(self.project_pigs.documents_folder_id.folder_id, parent_folder, "The folder of the project should be a child of the 'Projects' folder.")
+
+    def test_change_visibility_with_many_task_documents(self):
+        """Project access changes must propagate across batches in both directions."""
+        document_count = 5
+        project = self.project_pigs
+        documents = self.env['documents.document'].create([
+            {
+                'name': f'large-project-document-{index}',
+                'type': 'url',
+                'url': 'https://example.com',
+                'folder_id': project.documents_folder_id.id,
+                'res_model': 'project.task',
+                'res_id': self.task_1.id,
+                'access_internal': 'none',
+            }
+            for index in range(document_count)
+        ])
+        project.privacy_visibility = 'followers'
+        with patch('odoo.addons.documents.models.documents_document.ACCESS_UPDATE_BATCH_SIZE', 2):
+            project.privacy_visibility = 'employees'
+        self.assertEqual(len(project.document_ids), document_count)
+        self.assertEqual(project.documents_folder_id.access_internal, 'edit')
+        self.assertTrue(all(access == 'edit' for access in documents.mapped('access_internal')))
+        with patch('odoo.addons.documents.models.documents_document.ACCESS_UPDATE_BATCH_SIZE', 2):
+            project.privacy_visibility = 'followers'
+        self.assertEqual(project.documents_folder_id.access_internal, 'none')
+        self.assertTrue(all(access == 'none' for access in documents.mapped('access_internal')))
 
     def test_project_folder_creation(self):
         project = self.env['project.project'].create({

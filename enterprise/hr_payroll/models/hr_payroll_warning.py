@@ -31,6 +31,10 @@ class HrPayrollWarning(models.Model):
         return [('model', 'in', allowed_models)]
 
     def _get_allowed_models(self):
+        """Return the models on which a payroll warning can be defined.
+
+        :rtype: list[str]
+        """
         return ['hr.employee', 'hr.version', 'hr.payslip', 'hr.leave']
 
     name = fields.Char(required=True, translate=True)
@@ -76,10 +80,11 @@ class HrPayrollWarning(models.Model):
     evaluation_code = fields.Text(string='Python Code')
     sequence = fields.Integer(default=10)
     warning_offset_days = fields.Integer(string="Warning Offset (Days)",
-        help="""Number of days used to compute the warning date based on the selected 'Closing On' rule.
-        - For contract start/end: the warning will trigger this many days before the contract start or end dates.
-        - For next payslip: the offset is applied before or after the payrun closing date.
-    """)
+        help=(
+            "Number of days used to compute the warning date based on the selected 'Closing On' rule.\n\n"
+            "- For contract start/end: the warning will trigger this many days before the contract start or end dates.\n"
+            "- For next payslip: the offset is applied before or after the payrun closing date."
+        ))
     closing_on = fields.Selection(selection=[
         ('today', "Today"),
         ('next_payslip', "Next Payslip"),
@@ -89,15 +94,15 @@ class HrPayrollWarning(models.Model):
         ('end_of_quarter', "End of the Quarter"),
         ('end_of_year', "End of the Year"),
         ('payroll_start_date', "Payroll Start Date"),
-    ], default="next_payslip", required=True, help="""
-        Defines the reference date used to compute when the warning becomes due.
-        - Today: Uses the current date as the reference point, so the warning stays a fixed distance away.
-        - Next Payslip: Uses the payrun closing date as the reference point.
-        - Contract Start / Contract End: Uses the employee's contract start or end date as the reference point.
-        - End of Month / Quarter / Year: Uses the end of the current month / quarter / year as the reference point.
-        - Payroll Start Date: Uses the payroll start date as the reference point.
-        The warning date is then calculated by applying the Offset (Days) to this reference.
-    """)
+    ], default="next_payslip", required=True, help=(
+        "Defines the reference date used to compute when the warning becomes due.\n\n"
+        "- Today: Uses the current date as the reference point, so the warning stays a fixed distance away.\n"
+        "- Next Payslip: Uses the payrun closing date as the reference point.\n"
+        "- Contract Start / Contract End: Uses the employee's contract start or end date as the reference point.\n"
+        "- End of Month / Quarter / Year: Uses the end of the current month / quarter / year as the reference point.\n"
+        "- Payroll Start Date: Uses the payroll start date as the reference point.\n\n"
+        "The warning date is then calculated by applying the Offset (Days) to this reference."
+    ))
     email_alert_days = fields.Integer(string="Email Alert", help="After these many days from the warning date, an alert email will be sent.")
     email_message = fields.Html("Email Message", translate=html_translate, help="This message body will be sent as an email.")
     is_email_message_empty = fields.Boolean(compute='_compute_is_email_empty', store=True)
@@ -113,6 +118,11 @@ class HrPayrollWarning(models.Model):
                 raise ValidationError(_("A payroll warning must be displayed on at least one target (Dashboard and/or Model View and/or DMFA)."))
 
     def _models_connected_to_contract(self):
+        """Return the models supporting the "Running Contracts" option, with their contract date fields.
+
+        :return: ``{model_name: (contract_date_start_path, contract_date_end_path)}``.
+        :rtype: dict
+        """
         return {
             "hr.employee": ("contract_date_start", "contract_date_end"),
             "hr.version":  ("contract_date_start", "contract_date_end"),
@@ -141,21 +151,24 @@ class HrPayrollWarning(models.Model):
         self.snooze_date = fields.Date.today() + relativedelta(days=25)
 
     def _get_schedule_closing_date(self, schedule, closing_date):
-        """Return the schedule's pay run closing date.
+        """Return the next pay run closing date of a pay schedule.
+
+        Non-monthly schedules use hardcoded reference dates:
+
+        * ``daily``: today;
+        * ``weekly``: next Monday;
+        * ``bi-weekly``: every other Monday (starting from the 2nd Monday of the year);
+        * ``semi-monthly``: the 1st or the 15th;
+        * ``bi-monthly``: same day as monthly, but every other month (from the company
+          ``first_payrun_date``);
+        * ``quarterly``: end of the current quarter (31st March, 30th June, 30th September,
+          31st December);
+        * ``semi-annually``: 30th June and 31st December;
+        * ``annually``: 31st December.
 
         :param str schedule: structure type schedule.
         :param date closing_date: monthly closing date.
-        :rtype date | None
-
-        Non-monthly schedules use hardcoded reference dates:
-        - daily: today
-        - weekly: every Monday
-        - bi-weekly: every other Monday (starting from the 2nd Monday of the year)
-        - semi-monthly: 1st or 15th
-        - bi-monthly: same day as monthly, but every other month
-        - quarterly: end dates of all the quarters (31st March, 30th June, 31st Oct, and 31st Dec)
-        - half-yearly: 30th June and 31st December
-        - yearly: 31st December
+        :rtype: date or None
         """
         if not closing_date:
             return None
@@ -211,6 +224,10 @@ class HrPayrollWarning(models.Model):
         return closing_date
 
     def _get_schedule_pay(self, record):
+        """Return the pay schedule of a warning record: the default schedule of its structure type, or of its employee structure type, or ``'monthly'``.
+
+        :rtype: str
+        """
         if 'structure_type_id' in record and record.structure_type_id:
             return record.structure_type_id.default_schedule_pay
         if 'employee_id' in record and record.employee_id.structure_type_id:
@@ -218,11 +235,11 @@ class HrPayrollWarning(models.Model):
         return 'monthly'
 
     def _get_warning_date(self, warning_record, closing_date):
-        """Return the computed warning date.
+        """Return the due date of the warning for a record, according to ``closing_on`` and ``warning_offset_days``.
 
-        :param recordset warning_record: record associated with the warning.
-        :param date closing_date: structure type closing date.
-        :rtype date | None
+        :param warning_record: record associated with the warning.
+        :param date closing_date: monthly closing date, adapted to the record schedule.
+        :rtype: date or None
         """
         self.ensure_one()
 
@@ -272,13 +289,14 @@ class HrPayrollWarning(models.Model):
         return warning_date
 
     def _filter_warning_records_by_contract_period(self, warning_records, period_start, period_end):
-        """Return the filtered records with duration applied.
+        """Return the records with a contract running during the period (see :meth:`_models_connected_to_contract`).
 
-        :param recordset warning_records: records associated with the warning.
+        Records of models without contract dates are all returned.
+
+        :param warning_records: records associated with the warning.
         :param date period_start: last month's closing date + 1 day.
         :param date period_end: this month's closing date.
-        :rtype recordset
-        :return: records with applied duration (if applicable), else all records.
+        :rtype: recordset
         """
         contract_date_start_field, contract_date_end_field = self._models_connected_to_contract().get(
             warning_records._name,
@@ -297,6 +315,11 @@ class HrPayrollWarning(models.Model):
         return warning_records
 
     def _group_records_by_schedule(self, warning_records):
+        """Group the records by pay schedule (see :meth:`_get_schedule_pay`).
+
+        :return: ``{schedule: recordset}``.
+        :rtype: dict
+        """
         grouped_ids = defaultdict(list)
         for record in warning_records:
             schedule = self._get_schedule_pay(record)
@@ -307,6 +330,11 @@ class HrPayrollWarning(models.Model):
         }
 
     def _group_by_warning_and_date(self, warning, records, closing_date):
+        """Group the records by warning due date (today if none, see :meth:`_get_warning_date`).
+
+        :return: ``{(warning_id, warning_date): recordset}``.
+        :rtype: dict
+        """
         grouped_ids = defaultdict(list)
         for record in records:
             warning_date = warning._get_warning_date(record, closing_date)
@@ -320,6 +348,10 @@ class HrPayrollWarning(models.Model):
         }
 
     def _dashboard_default_action(self, name, records, additional_context=None):
+        """Return the default action of the warning card button: the form of the record, or the list of the records.
+
+        :rtype: dict
+        """
         self.ensure_one()
         if not additional_context:
             additional_context = {}
@@ -352,6 +384,10 @@ class HrPayrollWarning(models.Model):
         }
 
     def _get_next_payrun(self, company, date_start, date_end, employee_types=None):
+        """Return the pay runs of the company included in the period (optionally of the given employee types).
+
+        :rtype: hr.payslip.run
+        """
         domain = [
             ('company_id', '=', company.id),
             ('date_start', '>=', date_start),
@@ -362,6 +398,13 @@ class HrPayrollWarning(models.Model):
         return self.env["hr.payslip.run"].search(domain)
 
     def _get_monthly_payroll_next_closing_date(self, payroll_closing_date):
+        """Return the next monthly closing date for a closing day of the month.
+
+        Closing days up to the 9th refer to the next month.
+
+        :param payroll_closing_date: day of the month (``int`` or ``str``).
+        :rtype: date or None
+        """
         if not payroll_closing_date:
             return None
         today = fields.Date.context_today(self)
@@ -374,6 +417,13 @@ class HrPayrollWarning(models.Model):
         return closing_date
 
     def _get_effective_warning_domain(self, company, *, block_payslips=False, with_email_message=False):
+        """Return the domain of the warnings applicable to the company (its country or no country) and not snoozed.
+
+        :param res.company company: the company.
+        :param bool block_payslips: only the warnings blocking the payslip validation.
+        :param bool with_email_message: only the warnings with an email message.
+        :rtype: odoo.fields.Domain
+        """
         effective_domain = Domain.AND([
             ['|', ('country_id', '=', company.country_id.id), ('country_id', '=', False)],
             ['|', ('snooze_date', '=', False), ('snooze_date', '<', 'today')]
@@ -385,26 +435,46 @@ class HrPayrollWarning(models.Model):
         return effective_domain
 
     def _get_applicable_payroll_warnings(self, company, **kwargs):
-        """Returns the structured list of warnings
+        """Return the structured list of warnings.
 
-        Eager version of :meth:`_iter_applicable_payroll_warnings`, see it for
-        the accepted arguments and the shape of the returned dicts.
+        Eager version of :meth:`_iter_applicable_payroll_warnings`, see it for the accepted
+        arguments and the shape of the returned dicts.
 
-        :rtype List[dict]
+        :rtype: list[dict]
         """
         return list(self._iter_applicable_payroll_warnings(company, **kwargs))
 
     def _iter_applicable_payroll_warnings(self, company, *, block_payslips=False, with_email_message=False, include_model_warnings=False):
-        """Yields the structured warnings, one at a time
+        """Yield the structured warnings, one at a time.
 
-        :param res.company company: to get provided company specific warnings
+        Evaluates the warnings of ``self`` (or all the warnings of
+        :meth:`_get_effective_warning_domain` if ``self`` is empty), and yields one dict per
+        warning, pay schedule and due date having records. Yielding lazily lets the dashboard stream
+        each card as soon as it is ready.
+
+        :param res.company company: to get provided company specific warnings.
         :param bool block_payslips: to filter warnings that block payslip enabled.
         :param bool with_email_message: to filter warnings that have not null email_message.
-        :rtype Iterator[dict]
+        :param bool include_model_warnings: also evaluate the warnings not displayed on the
+            dashboard (only displayed on records).
+        :return: iterator of dicts containing all the information required to display the
+            warning on the dashboard or to send email if the warning is overdue::
 
-        :returns: An iterator of structured warnings, containing all the information required
-            to display the warning or dashboard or to send email if warning is overdue.
-            Yielding lazily lets the dashboard stream each card as soon as it is ready.
+                {
+                    'warning': hr.payroll.warning,
+                    'warning_id': int,
+                    'warning_name': str,
+                    'warning_description': str,
+                    'warning_color_class': str,
+                    'warning_button_name': str,
+                    'structure_type_schedule': str,
+                    'records': recordset,
+                    'warning_date': date,
+                    'count': int,  # -1 means len(records)
+                    'button_action': dict,
+                }
+
+        :rtype: Iterator[dict]
         """
         closing_date = company._get_monthly_payroll_next_closing_date()
 
@@ -506,6 +576,13 @@ class HrPayrollWarning(models.Model):
                     }
 
     def _get_warning_domain_records(self, companies, records_to_check=None):
+        """Return the records matching the domain of a ``domain`` warning, restricted to the companies (and the warning country).
+
+        :param res.company companies: allowed companies.
+        :param records_to_check: if of the warning model, filter these records instead of searching.
+        :raise UserError: if the domain is invalid.
+        :rtype: recordset
+        """
         try:
             warning_model = self.env[self.sudo().model_id.model]
             warning_domain = literal_eval(self.warning_domain or '[]')
@@ -530,7 +607,7 @@ class HrPayrollWarning(models.Model):
             if records_to_check is not None and records_to_check._name == warning_model._name:
                 return records_to_check.filtered_domain(warning_domain)
             return warning_model.search(warning_domain)
-        except Exception as e:  # noqa: BLE001
+        except (ValueError, SyntaxError, TypeError) as e:
             raise UserError(
                 self.env._(
                     "Wrong warning domain defined for:\n- Warning: %(warning)s\n- Error: %(error)s",
@@ -540,6 +617,26 @@ class HrPayrollWarning(models.Model):
             )
 
     def _get_warning_python_records(self, localdict):
+        """Evaluate the code of a ``python`` warning.
+
+        The code is evaluated with ``safe_eval`` in ``localdict``, completed with ``date``,
+        ``datetime``, ``relativedelta``, ``dateutil``, ``float_compare``, ``defaultdict``,
+        ``json``, ``_get_payroll_translation``, ``self`` (the warning) and, if the warning has a
+        model, ``model`` and ``records`` (the records of ``active_ids`` unless given). The callers
+        also provide ``active_ids`` (payslip issues), or ``company``, ``closing_date``, ``Domain``
+        and ``literal_eval`` (dashboard).
+
+        The code sets the output variables: ``warning_records`` (recordset, required),
+        ``warning_details`` (``{record: [{'message', 'level', 'action_text', 'action'}]}``, issues
+        shown on the records), ``warning_title``, ``warning_description``, ``warning_deadline``,
+        ``warning_button``, ``warning_count``, ``warning_action`` (button action),
+        ``additional_context`` and ``warning_multi_results`` (several dashboard cards).
+
+        :param dict localdict: evaluation context, updated in place.
+        :raise UserError: if the code fails.
+        :return: ``(warning_records, warning_details, additional_context, localdict)``.
+        :rtype: tuple
+        """
         self.ensure_one()
         localdict.update({
             'date': safe_eval_datetime.date,
@@ -569,7 +666,7 @@ class HrPayrollWarning(models.Model):
 
         try:
             safe_eval(self.evaluation_code, localdict, mode='exec')
-        except Exception as e:  # noqa: BLE001
+        except (ValueError, SyntaxError, TypeError, ZeroDivisionError) as e:
             raise UserError(
                 self.env._(
                     "Wrong warning computation code defined for:\n- Warning: %(warning)s\n- Error: %(error)s",
@@ -580,6 +677,11 @@ class HrPayrollWarning(models.Model):
         return localdict.get('warning_records'), localdict.get('warning_details'), localdict.get('additional_context'), localdict
 
     def _get_warning_issue(self):
+        """Return the issue displayed on a record matching the warning.
+
+        :return: ``{'message': str, 'level': 'danger' or 'warning'}``.
+        :rtype: dict
+        """
         return {
             'message': self.description or self.name,
             'level': self.warning_color_class if self.warning_color_class in ['warning', 'danger'] else 'warning',
@@ -615,7 +717,16 @@ class HrPayrollWarning(models.Model):
 
     @api.model
     def get_payroll_dashboard_warning_cards(self, warning_ids, *, block_payslips=False, with_email_message=False, include_model_warnings=False):
-        """Return the serialized dashboard warning cards for the provided warning ids."""
+        """Return the serialized dashboard warning cards for the provided warning ids.
+
+        With no id, all the applicable warnings of the current company are evaluated (see
+        :meth:`_iter_applicable_payroll_warnings` for the arguments). Also used by
+        ``hr.payslip.action_payslip_done()`` to find the blocking warnings.
+
+        :param list[int] warning_ids: ``hr.payroll.warning`` ids.
+        :return: list of cards, see :meth:`_serialize_card`.
+        :rtype: list[dict]
+        """
         company = self.env.company
         warnings = self.browse(warning_ids)
         return [
@@ -629,6 +740,13 @@ class HrPayrollWarning(models.Model):
         ]
 
     def _serialize_card(self, warning_data):
+        """Convert a warning dict of :meth:`_iter_applicable_payroll_warnings` into a dashboard card.
+
+        :return: ``{'id', 'key', 'name', 'sequence', 'description', 'structure_type_suffix',
+            'warning_records', 'count', 'color_class', 'warning_date', 'button_name',
+            'button_action'}``.
+        :rtype: dict
+        """
         warning_id = warning_data['warning_id']
         schedule = warning_data['structure_type_schedule']
         records = warning_data['records']
@@ -651,6 +769,11 @@ class HrPayrollWarning(models.Model):
         }
 
     def _serialize_error_card(self, error_data):
+        """Return the dashboard card displayed when the warning could not be computed.
+
+        :param dict error_data: serialized exception, with a ``message`` key.
+        :rtype: dict
+        """
         return {
             'id': self.id,
             'key': f"error_{self.id}",
@@ -676,9 +799,11 @@ class HrPayrollWarning(models.Model):
         """Send email alerts for overdue payroll warnings.
 
         The process:
+
         - Fetch all dashboard warnings (company-wise) with a non-null email_message.
         - Filter warnings whose alert date matches today, based on email_alert_days.
-        - Determine recipients from the Payroll User group.
+        - Determine recipients: the payroll users, officers or admins of the company, or the
+          employees (or their managers) of the records flagged by the warning.
         - For each matched warning, prepare individual email messages and send.
         """
         companies = self.env['res.company'].search([
@@ -705,14 +830,23 @@ class HrPayrollWarning(models.Model):
             payroll_manager_group = self.env.ref('hr_payroll.group_hr_payroll_manager')
             for warning_data in missed_warnings_data:
                 warning = warning_data['warning']
-                if warning.email_visibility_type_id == 'employee':
-                    warning_domain = literal_eval(warning.warning_domain or '[]')
-                    employees = self.env['hr.employee'].search(warning_domain)
+                if warning.email_visibility_type_id in ('employee', 'employee_manager'):
+                    # The employees of the records flagged by the warning, whatever its model
+                    records = warning_data['records']
+                    employees = self.env['hr.employee']
+                    if isinstance(records, models.BaseModel):
+                        if records._name == 'hr.employee':
+                            employees = records
+                        else:
+                            employee_fname = next((
+                                fname for fname in ('employee_id', 'employee_ids')
+                                if fname in records._fields and records._fields[fname].comodel_name == 'hr.employee'
+                            ), None)
+                            if employee_fname:
+                                employees = records[employee_fname]
+                    if warning.email_visibility_type_id == 'employee_manager':
+                        employees = employees.parent_id
                     recipients_emails = ','.join(employees.filtered('work_email').mapped('work_email'))
-                elif warning.email_visibility_type_id == 'employee_manager':
-                    warning_domain = literal_eval(warning.warning_domain or '[]')
-                    employees_managers = self.env['hr.employee'].search(warning_domain).mapped("parent_id")
-                    recipients_emails = ','.join(employees_managers.filtered('work_email').mapped('work_email'))
                 else:
                     payroll_group = payroll_user_group
                     if warning.email_visibility_type_id == 'officer':
@@ -735,6 +869,14 @@ class HrPayrollWarning(models.Model):
             self.env['mail.mail'].sudo().create(warning_mails).send()
 
     def _get_payroll_translation(self, text, **kwargs):
+        """Return the translation of a source term used in the warnings code.
+
+        Terms evaluated in data are not extracted for translation: each known term has an explicit
+        ``self.env._()`` call. Unknown terms are logged and returned as is, formatted with ``kwargs``.
+
+        :param str text: source term.
+        :rtype: str
+        """
         # Please order alphabetically to easily spot duplicates
         if text == "A payslip adjustment has been created":
             return self.env._("A payslip adjustment has been created")

@@ -1142,3 +1142,35 @@ test("Right-click to deep search focuses the search bar", async function () {
     await runAllTimers();
     expect(".o_searchview_input").toBeFocused();
 });
+
+test("orderBy is updated when navigating between 'Recent' and 'All'", async function () {
+    // Assert the `order` sent to web_search_read rather than the model config.
+    let lastOrder;
+    const setLastOrder = ({ kwargs }) => {
+        lastOrder = kwargs.order;
+    };
+    onRpc("web_read_group", setLastOrder);
+    onRpc("web_search_read", setLastOrder);
+
+    const serverData = getDocumentsTestServerModelsData([
+        { id: 2, folder_id: 1, name: "b.txt" },
+        { id: 3, folder_id: 1, name: "a.txt" },
+    ]);
+    await makeDocumentsMockEnv({ serverData });
+
+    const kanbanViewDefaultOrder = "create_date DESC, id DESC";
+    await mountDocumentsKanbanView({
+        arch: basicDocumentsKanbanArch.replace(
+            `<kanban js_class="documents_kanban" draggable="true">`,
+            `<kanban js_class="documents_kanban" draggable="true" default_order="${kanbanViewDefaultOrder}">`
+        ),
+    });
+
+    await contains("span.o_search_panel_label_title:contains('Recent')").click();
+    await animationFrame();
+    expect(lastOrder).toBe("is_folder ASC, last_access_date_group DESC, write_date DESC");
+
+    await contains("span.o_search_panel_label_title:contains('All')").click();
+    await animationFrame();
+    expect(lastOrder).toBe(kanbanViewDefaultOrder);
+});

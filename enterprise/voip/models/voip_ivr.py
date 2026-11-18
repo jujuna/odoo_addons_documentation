@@ -1,7 +1,7 @@
 import re
 
 from odoo import Command, _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 from .pbx_service import PBX_DESTINATION_MODELS
 from .voip_sound import PBX_AUDIO_SYNC_FIELDS
@@ -211,7 +211,88 @@ class VoipIvr(models.Model):
                 self.env["voip.pbx.service"]._call_after_commit_for_deleted(
                     "voip.ivr", list(pbx_ivr_id_by_id), _delete,
                 )
-        self.menu_sound_id.unlink()
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_did_routes(self):
+        # A "Play Audio" node's Menu is part of that node, but it could still
+        # be picked as the destination of something outside of a Call Flow:
+        # deleting it would leave that routing calls nowhere, silently.
+        # Check before the inherited hook clears DID assignments, otherwise
+        # those references would disappear before we could refuse deletion.
+        references = self.filtered("is_audio_message")._get_external_pbx_references()
+        if references:
+            raise UserError(self.env._(
+                'A "Play Audio" node is still used as a destination:\n%(references)s\n'
+                "Reassign those destinations first.",
+                references="\n".join(
+                    f"- {record._description} {record.display_name}: {ivr.display_name}"
+                    for ivr, records in references.items()
+                    for record in records
+                ),
+            ))
+        return super()._unlink_did_routes()
+
+    def _get_external_pbx_references(self):
+        """Return, for each Menu of self, the records routing calls to it
+        from outside of a Call Flow.
+
+        The destinations of a Call Flow's records are rewritten from its
+        graph (see voip.call.flow's _sync_graph_routes): they are no such
+        use.
+        """
+        references = {}
+        for ivr in self:
+            records = [
+                record
+                for model_name, owners in ivr._get_pbx_reference_owners().items()
+                for record in owners
+                if not ("callflow_id" in record._fields and record.callflow_id)
+                and (model_name != "voip.did.number" or record.destination_ref == ivr)
+            ]
+            if records:
+                references[ivr] = records
+        return references
+
+    @api.autovacuum
+    def _gc_orphan_audio_messages(self):
+        """Delete "Play Audio" Menus of a Call Flow that was never saved:
+        they are created as soon as a sound is picked in the editor (see
+        get_or_create_audio_message_wrapper), but are not reachable from
+        anywhere once outside a Call Flow. The delay spares those of a Call
+        Flow still being edited. Those used as a destination elsewhere are
+        kept: deleting them is refused, which would abort the whole cleanup."""
+        orphans = self.search([
+            ("is_audio_message", "=", True),
+            ("callflow_id", "=", False),
+            ("create_date", "<", "-1d"),
+        ])._filter_orphan_audio_messages()
+        (orphans - self.browse().union(orphans._get_external_pbx_references())).unlink()
+
+    def _filter_orphan_audio_messages(self):
+        """Return the "Play Audio" Menus of self that no Call Flow uses.
+
+        Archiving a Call Flow used to release its "Play Audio" Menus like
+        any other record (see voip.call.flow's _sync_graph_memberships):
+        those are only referenced by its graph anymore, but unarchiving it
+        still needs them.
+        """
+        audio_messages = self.filtered(lambda ivr: ivr.is_audio_message and not ivr.callflow_id)
+        if not audio_messages:
+            return audio_messages
+        archived_call_flows = self.env["voip.call.flow"].with_context(active_test=False).search([
+            ("active", "=", False),
+        ])
+        # Match the referenced model: older graphs could select an audio
+        # wrapper through "Open a Menu", giving it an ordinary IVR node type.
+        used_ids = {
+            node["record"].get("resId")
+            for call_flow in archived_call_flows
+            for node in (call_flow.graph_data or {}).get("nodes") or []
+            if isinstance(node, dict)
+            and isinstance(node.get("record"), dict)
+            and node["record"].get("resModel") == self._name
+        }
+        return audio_messages.filtered(lambda ivr: ivr.id not in used_ids)
 
     def _sync_pbx(self, excluded_option_ids=()):
         if self.env.context.get("voip_skip_pbx_sync"):

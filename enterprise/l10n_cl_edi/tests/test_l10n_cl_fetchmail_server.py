@@ -451,9 +451,24 @@ class TestClFetchmailServer(TestL10nClEdiCommon):
         move = self.env['fetchmail.server']._process_incoming_supplier_document(
             file_data, from_address, self.company_data['company'].id
         )
-        self.assertEqual(move.currency_id, self.env.ref('l10n_cl.UF'))
+        self.assertEqual(move.currency_id.name, 'CLP')
         self.assertEqual(move.invoice_line_ids.price_unit, 100.0)
         self.assertEqual(move.amount_total, 119.0)
+
+    def test_create_invoice_34_clp_with_line_other_currency(self):
+        """DTE in CLP (no TpoMoneda/OtraMoneda in the header) whose lines carry an informative OtrMnda in USD"""
+        att_name = 'incoming_invoice_34_clp_with_line_other_currency.xml'
+        from_address = 'incoming_dte@test.com'
+        with file_open(f'l10n_cl_edi/tests/fetchmail_dtes/{att_name}', 'rb', filter_ext=('.xml',)) as f:
+            content = f.read()
+            file_data = {'name': att_name, 'raw': content, 'xml_tree': etree.fromstring(content)}
+
+        move = self.env['fetchmail.server']._process_incoming_supplier_document(
+            file_data, from_address, self.company_data['company'].id
+        )
+        self.assertEqual(move.currency_id.name, 'CLP')
+        self.assertEqual(move.invoice_line_ids.mapped('price_unit'), [10000, 10000])
+        self.assertEqual(move.amount_total, 30000)
 
     def test_create_invoice_34_from_attachment(self):
         """Include Invoice Reference"""

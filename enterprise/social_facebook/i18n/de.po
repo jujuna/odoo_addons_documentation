@@ -14,9 +14,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 02:54+0000\n"
+"PO-Revision-Date: 2026-11-02 08:40+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "social_facebook/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -52,6 +52,11 @@ msgid ""
 "                    </span>\n"
 "                    <b class=\"me-1\">My Page</b> <span>7h</span>"
 msgstr ""
+"<span class=\"o_social_preview_icon_wrapper d-inline-block rounded-circle "
+"overflow-hidden me-2\">\n"
+"                        <i class=\"oi oi-2x\" data-icon=\"oi_facebook\"/>\n"
+"                    </span>\n"
+"                    <b class=\"me-1\">Meine Seite</b> <span>7 Std.</span>"
 
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.facebook_preview
@@ -88,7 +93,7 @@ msgstr "App-Geheimnis"
 #. odoo-python
 #: code:addons/social_facebook/utils.py:0
 msgid "At least one access token should be set."
-msgstr ""
+msgstr "Es sollte mindestens ein Zugriffstoken festgelegt werden."
 
 #. module: social_facebook
 #. odoo-javascript
@@ -129,7 +134,7 @@ msgstr "Konfigurationseinstellungen"
 #. module: social_facebook
 #: model:ir.model,name:social_facebook.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Diskussionskanal"
 
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_social_post__display_facebook_preview
@@ -255,7 +260,7 @@ msgstr "Facebook-Vorschau"
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_social_post__facebook_scheduled_date
 msgid "Facebook Scheduled for"
-msgstr ""
+msgstr "Facebook geplant für"
 
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_social_live_post__facebook_is_story_expired
@@ -270,7 +275,7 @@ msgstr "URL der Facebook-Story"
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_res_config_settings__facebook_webhook_verify_token
 msgid "Facebook Webhook Verify Token"
-msgstr ""
+msgstr "Facebook-Webhook-Verifizierungstoken"
 
 #. module: social_facebook
 #. odoo-python
@@ -290,48 +295,49 @@ msgstr "Facebook hat kein gültiges Zugriffstoken zur Verfügung gestellt."
 #. odoo-python
 #: code:addons/social_facebook/models/social_account.py:0
 msgid "Failed to delete the webhook: %s"
-msgstr ""
+msgstr "Webhook konnte nicht gelöscht werden: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Failed to fetch the conversations: %s"
-msgstr ""
+msgstr "Fehler beim Abrufen der Unterhaltungen: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Failed to fetch the messages: %s"
-msgstr ""
+msgstr "Fehler beim Abrufen der Nachrichten: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Failed to find the conversation: %s"
-msgstr ""
+msgstr "Unterhaltung nicht gefunden: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Failed to react: %s"
-msgstr ""
+msgstr "Reaktion fehlgeschlagen: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/social_account.py:0
+#, fuzzy
 msgid "Failed to register the webhook: %s"
-msgstr ""
+msgstr "Webhook konnte nicht registriert werden: %s"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Failed to send the message: %s"
-msgstr ""
+msgstr "Senden der Nachricht fehlgeschlagen: %s"
 
 #. module: social_facebook
 #: model:ir.model,name:social_facebook.model_mail_guest
 msgid "Guest"
-msgstr ""
+msgstr "Gast"
 
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_social_post__has_facebook_account
@@ -356,7 +362,7 @@ msgstr "ID"
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.social_post_view_form
 msgid "Immediately"
-msgstr ""
+msgstr "Sofort"
 
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_social_stream_post__facebook_is_event_post
@@ -379,7 +385,7 @@ msgstr "Likes"
 #: model:ir.module.module,description:base.module_social_facebook
 #: model:ir.module.module,summary:base.module_social_facebook
 msgid "Manage your Facebook pages and schedule posts"
-msgstr ""
+msgstr "Verwaltung Ihrer Facebook-Seiten und Planung von Beiträgen"
 
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.social_post_template_view_form
@@ -399,7 +405,7 @@ msgstr "Nachricht"
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_mail_guest__meta_user_id
 msgid "Meta User Identifier"
-msgstr ""
+msgstr "Meta-Benutzerkennung"
 
 #. module: social_facebook
 #. odoo-python
@@ -408,6 +414,8 @@ msgid ""
 "Meta cannot download attachment from HTTP endpoint, update the web.base.url "
 "to use https."
 msgstr ""
+"Meta kann den Anhang nicht vom HTTP-Endpunkt herunterladen. Aktualisieren "
+"Sie die web.base.url auf die Verwendung von https."
 
 #. module: social_facebook
 #. odoo-python
@@ -432,7 +440,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/social_facebook/models/social_account.py:0
 msgid "Oops, we couldn't show this file."
-msgstr ""
+msgstr "Hoppla, diese Datei konnte nicht angezeigt werden."
 
 #. module: social_facebook
 #: model:social.stream.type,name:social_facebook.stream_type_page_mentions
@@ -461,7 +469,7 @@ msgstr "Bild posten"
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.social_post_view_form
 msgid "Post On"
-msgstr ""
+msgstr "Veröffentlichen am"
 
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.social_post_template_view_form
@@ -508,7 +516,7 @@ msgstr "Geplanter erster Kommentar"
 #. odoo-python
 #: code:addons/social_facebook/models/social_account.py:0
 msgid "See in Facebook"
-msgstr ""
+msgstr "In Facebook anzeigen"
 
 #. module: social_facebook
 #. odoo-javascript
@@ -530,7 +538,7 @@ msgstr "Social-Media-Konto"
 #. module: social_facebook
 #: model:ir.module.module,shortdesc:base.module_social_facebook
 msgid "Social Facebook"
-msgstr ""
+msgstr "Social Facebook"
 
 #. module: social_facebook
 #: model:ir.model,name:social_facebook.model_social_live_post
@@ -578,13 +586,13 @@ msgstr "Unbekannt"
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "Unknown File"
-msgstr ""
+msgstr "Unbekannte Datei"
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/controllers/meta.py:0
 msgid "Unknown user %s"
-msgstr ""
+msgstr "Unbekannter Benutzer %s"
 
 #. module: social_facebook
 #: model:ir.model.fields,field_description:social_facebook.field_res_config_settings__facebook_use_own_account
@@ -608,7 +616,7 @@ msgstr "Benutzer-Likes"
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.res_config_settings_view_form
 msgid "Verify Token"
-msgstr ""
+msgstr "Token verifizieren"
 
 #. module: social_facebook
 #. odoo-javascript
@@ -639,7 +647,7 @@ msgstr ""
 #. module: social_facebook
 #: model_terms:ir.ui.view,arch_db:social_facebook.res_config_settings_view_form
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #. module: social_facebook
 #: model:ir.model.fields,help:social_facebook.field_social_post__facebook_image_ids
@@ -652,12 +660,14 @@ msgstr "Ihrem Beitrag werden Bilder angehängt."
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "You can upload many images at a time or only one file at a time."
 msgstr ""
+"Sie können mehrere Bilder gleichzeitig oder nur eine Datei auf einmal "
+"hochladen."
 
 #. module: social_facebook
 #. odoo-python
 #: code:addons/social_facebook/models/discuss_channel.py:0
 msgid "You cannot send a text message and attachments at the same time."
-msgstr ""
+msgstr "Sie können nicht gleichzeitig eine Textnachricht und Anhänge senden."
 
 #. module: social_facebook
 #. odoo-python

@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='ISO-8859-15'?>
+<Finvoice Version="3.0">
+  <MessageTransmissionDetails>
+    <MessageSenderDetails>
+      <FromIdentifier>FI Company</FromIdentifier>
+      <FromIntermediator>FI Company</FromIntermediator>
+    </MessageSenderDetails>
+    <MessageReceiverDetails>
+      <ToIdentifier>Random Partner</ToIdentifier>
+      <ToIntermediator>Random Partner</ToIntermediator>
+    </MessageReceiverDetails>
+    <MessageDetails>
+      <MessageIdentifier>INV/2020/00001</MessageIdentifier>
+      <MessageTimeStamp>2025-03-20T15:19:36</MessageTimeStamp>
+    </MessageDetails>
+  </MessageTransmissionDetails>
+  <SellerPartyDetails>
+    <SellerOrganisationName>FI Company</SellerOrganisationName>
+  </SellerPartyDetails>
+  <BuyerPartyDetails>
+    <BuyerOrganisationName>Random Partner</BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName>Rue dudu</BuyerStreetName>
+      <BuyerTownName>Li&#232;ge</BuyerTownName>
+      <BuyerPostCodeIdentifier>4000</BuyerPostCodeIdentifier>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryPartyDetails>
+    <DeliveryOrganisationName>Random Partner</DeliveryOrganisationName>
+    <DeliveryPostalAddressDetails>
+      <DeliveryStreetName>Rue dudu</DeliveryStreetName>
+      <DeliveryTownName>Li&#232;ge</DeliveryTownName>
+      <DeliveryPostCodeIdentifier>4000</DeliveryPostCodeIdentifier>
+    </DeliveryPostalAddressDetails>
+  </DeliveryPartyDetails>
+  <Invoice>
+    <InvoiceTypeText>INVOICE</InvoiceTypeText>
+    <InvoiceTotalVatIncludedAmount AmountCurrencyIdentifier="EUR">300.0</InvoiceTotalVatIncludedAmount>
+    <InvoiceNumber>INV/2020/00001</InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD">20200701</InvoiceDate>
+  </Invoice>
+  <InvoiceLine>
+    <ProductName>Random Product 1</ProductName>
+    <OrderedQuantity QuantityUnitCode="Units">1.0</OrderedQuantity>
+    <UnitPriceNetAmount AmountCurrencyIdentifier="EUR">100.0</UnitPriceNetAmount>
+    <UnitPriceVatIncludedAmount AmountCurrencyIdentifier="EUR">100.0</UnitPriceVatIncludedAmount>
+  </InvoiceLine>
+  <InvoiceLine>
+    <ArticleName>Random Product 2</ArticleName>
+    <OrderedQuantity QuantityUnitCode="Units">4.0</OrderedQuantity>
+    <UnitPriceNetAmount AmountCurrencyIdentifier="EUR">200.0</UnitPriceNetAmount>
+    <UnitPriceVatIncludedAmount AmountCurrencyIdentifier="EUR">200.0</UnitPriceVatIncludedAmount>
+  </InvoiceLine>
+  <EpiDetails>
+    <EpiIdentificationDetails>
+      <EpiDate Format="CCYYMMDD">20250320</EpiDate>
+      <EpiReference>2020000017</EpiReference>
+    </EpiIdentificationDetails>
+    <EpiPartyDetails>
+      <EpiBfiPartyDetails></EpiBfiPartyDetails>
+      <EpiBeneficiaryPartyDetails>
+        <EpiAccountID IdentificationSchemeName="IBAN">FI5345455393644585</EpiAccountID>
+      </EpiBeneficiaryPartyDetails>
+    </EpiPartyDetails>
+    <EpiPaymentInstructionDetails>
+      <EpiInstructedAmount AmountCurrencyIdentifier="EUR">300.0</EpiInstructedAmount>
+      <EpiCharge>SHA</EpiCharge>
+      <EpiDateOptionDate Format="CCYYMMDD">20200801</EpiDateOptionDate>
+    </EpiPaymentInstructionDetails>
+  </EpiDetails>
+</Finvoice>

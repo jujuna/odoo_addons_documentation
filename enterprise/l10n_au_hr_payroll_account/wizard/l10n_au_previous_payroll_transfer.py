@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, Command, fields, models, _
+from odoo import api, Command, fields, models
 from odoo.addons.l10n_au_hr_payroll.models.hr_version import INCOME_STREAM_TYPES
+from odoo.exceptions import UserError
 
 
 class L10n_AuPreviousPayrollTransfer(models.TransientModel):
@@ -26,7 +27,7 @@ class L10n_AuPreviousPayrollTransfer(models.TransientModel):
 
     def write(self, vals):
         if "fiscal_year_start_date" in vals:
-            vals["fiscal_year_start_date"] = self.env["l10n_au.payslip.ytd"]._get_start_date(vals["fiscal_year_start_date"])
+            vals["fiscal_year_start_date"] = self.env["l10n_au.payslip.ytd"]._get_start_date(fields.Date.to_date(vals["fiscal_year_start_date"]))
         return super().write(vals)
 
     @api.depends("previous_bms_id")
@@ -93,8 +94,14 @@ class L10n_AuPreviousPayrollTransfer(models.TransientModel):
                 }
             )
             return created_ytd.with_context(search_default_filter_group_employee_id=1, search_default_filter_group_income_stream=1)\
-                ._get_records_action(name=_("Opening Balances"))
+                ._get_records_action(name=self.env._("Opening Balances"))
         return {"type": "ir.actions.act_window_close"}
+
+    @api.model
+    def default_get(self, fields):
+        if self.env.company.country_id.code != "AU":
+            raise UserError(self.env._("You must be logged in an Australian company to use that feature."))
+        return super().default_get(fields)
 
 
 class L10n_AuPreviousPayrollTransferEmployee(models.TransientModel):

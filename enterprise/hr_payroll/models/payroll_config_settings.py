@@ -109,8 +109,10 @@ class PayrollConfigSettings(models.Model):
         return res
 
     def write(self, vals):
+        shared_fields = [field for field in self._get_fields_to_copy_from_parent() if field in vals]
+        previous_values = {config: {field: config[field] for field in shared_fields} for config in self} if shared_fields else {}
         res = super().write(vals)
-        self._push_changed_fields_to_child_configs(vals)
+        self._push_changed_fields_to_child_configs(vals, previous_values)
         return res
 
     def _convert_field_value_for_create(self, field_name, value):
@@ -145,7 +147,14 @@ class PayrollConfigSettings(models.Model):
                 branch_vals_list.append(vals)
         return branch_vals_list
 
-    def _push_changed_fields_to_child_configs(self, vals):
+    def _push_changed_fields_to_child_configs(self, vals, previous_values=None):
+        """ The branches follow the changes of their parent company. A field the branches can edit is only
+        changed on the branches that kept the previous value of their parent (or no value).
+
+        :param previous_values: {parent config: {field: value before the change}}
+        """
+        previous_values = previous_values or {}
+        editable_fields = set(self._get_branch_editable_fields())
         fields_to_copy = self._get_fields_to_copy_from_parent()
         changed_shared_fields = [field for field in fields_to_copy if field in vals]
         if not changed_shared_fields:
@@ -160,4 +169,10 @@ class PayrollConfigSettings(models.Model):
         for parent, children in children_by_parent.items():
             for child in children:
                 for field in changed_shared_fields:
-                    child[field] = parent[field] if not child[field] else child[field]
+                    if field in editable_fields and child[field] and field in previous_values.get(parent, {}) \
+                            and child[field] != previous_values[parent][field]:
+                        # set on the branch
+                        continue
+                    # Unchanged values aren't written: the payslips check the configuration didn't change since
+                    if child[field] != parent[field]:
+                        child[field] = parent[field]

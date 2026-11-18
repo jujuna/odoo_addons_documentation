@@ -1,10 +1,17 @@
 <?xml version="1.0"?>
 <odoo>
 
+<!-- The translated copy of a Belgian payslip tells which document holds legal value -->
+<template id="report_payslip_translation_message" inherit_id="hr_payroll.report_payslip">
+    <xpath expr="//div[@t-if='is_invalid']/div" position="attributes">
+        <attribute name="t-out">is_invalid if o.env.context.get('translated_from') else None</attribute>
+    </xpath>
+</template>
+
 <template id="report_termination_holiday_n1" inherit_id="hr_payroll.report_payslip" primary="True">
     <xpath expr="//h2[@id='payslip_name']/span" position="replace">
         <span>
-            Holiday Certificate : Exercise <t t-out="(o.date_to-relativedelta(years=1)).strftime('%Y')"/> - Holiday year <t t-out="o.date_to.strftime('%Y')"/>
+            Holiday Pay (<t t-out="(o.date_to-relativedelta(years=1)).strftime('%Y')"/>)
         </span>
     </xpath>
     <div id="departure_date" position="after">
@@ -27,7 +34,7 @@
 <template id="report_termination_holiday_n" inherit_id="hr_payroll.report_payslip" primary="True">
     <xpath expr="//h2[@id='payslip_name']/span" position="replace">
         <span>
-            Holiday Certificate : Exercise <t t-out="o.date_to.strftime('%Y')"/> - Holiday year <t t-out="(o.date_to+relativedelta(years=1)).strftime('%Y')"/>
+            Holiday Pay (<t t-out="o.date_to.strftime('%Y')"/>)
         </span>
     </xpath>
     <div id="departure_date" position="after">
@@ -88,9 +95,10 @@
         <attribute name="t-if">o.version_id.l10n_be_egov3_code != '999'</attribute>
     </xpath>
     <div id="working_schedule" position="after">
-        <div id="employee_salary_scale" t-if="o.version_id.l10n_be_salary_scale_id">
+        <div id="employee_salary_scale" t-if="o.version_id.l10n_be_salary_scale_id or o.version_id.display_l10n_be_scale">
             <strong class="me-2">Salary Scale:</strong>
-            <span t-out="o.version_id.l10n_be_salary_scale_id.name"/>
+            <span t-if="o.version_id.l10n_be_salary_scale_id" t-out="o.version_id.l10n_be_salary_scale_id.name"/>
+            <span t-else="">Unknown</span>
         </div>
     </div>
     <div id="wage" position="after">
@@ -127,8 +135,110 @@
             </div>
         </t>
     </td>
+    <xpath expr="//div[@id='worked_days_table']/table" position="before">
+        <h2 id="l10n_be_salary_heading" class="h4 mt-4">Salary</h2>
+    </xpath>
     <div id="to_pay" position="after">
-        <div id="third_party" style="page-break-before:always;">
+        <t t-set="supplementary_hours" t-value="o._l10n_be_get_report_supplementary_hours()"/>
+        <t t-set="show_supplementary_hours" t-value="any(round(hours, 2) for hours in supplementary_hours.values())"/>
+        <t t-set="counters" t-value="o._l10n_be_get_report_time_off_counters()"/>
+        <t t-set="time_off_counters" t-value="counters['time_off']"/>
+        <t t-set="compensatory_overtime" t-value="counters['overtime']"/>
+        <div t-if="show_supplementary_hours or time_off_counters or compensatory_overtime" id="l10n_be_counters">
+            <h2 id="l10n_be_counters_heading" class="h4 mt-4">Overtime &amp; Counters</h2>
+            <div t-if="show_supplementary_hours" id="l10n_be_supplementary_hours_table" style="page-break-inside: avoid;">
+                <table class="table table-sm table-borderless">
+                    <thead class="o_black_border">
+                        <tr>
+                            <th id="supplementary_hours_header_name">Supplementary Hours With and Without Reduction</th>
+                            <th id="supplementary_hours_header_balance" class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplementary_hours_lines">
+                        <tr>
+                            <td id="supplementary_hours_month_with"><span>This month with reduced tax burden</span></td>
+                            <td id="supplementary_hours_month_with_balance" class="text-end">
+                                <span t-out="round(supplementary_hours['month_with'], 2)" t-options="{'widget': 'float_time'}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="supplementary_hours_year_with" class="ps-4"><span>Yearly total with reduced tax burden</span></td>
+                            <td id="supplementary_hours_year_with_balance" class="text-end">
+                                <span t-out="round(supplementary_hours['year_with'], 2)" t-options="{'widget': 'float_time'}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="supplementary_hours_month_without"><span>This month without reduced tax burden</span></td>
+                            <td id="supplementary_hours_month_without_balance" class="text-end">
+                                <span t-out="round(supplementary_hours['month_without'], 2)" t-options="{'widget': 'float_time'}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="supplementary_hours_year_without" class="ps-4"><span>Yearly total without reduced tax burden</span></td>
+                            <td id="supplementary_hours_year_without_balance" class="text-end">
+                                <span t-out="round(supplementary_hours['year_without'], 2)" t-options="{'widget': 'float_time'}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div t-if="time_off_counters or compensatory_overtime" id="l10n_be_time_off_counters_table" style="page-break-inside: avoid;">
+                <table class="table table-sm table-borderless">
+                    <thead class="o_black_border">
+                        <tr>
+                            <th id="time_off_counters_header_name">Time Off Counters</th>
+                            <th id="time_off_counters_header_initial" class="text-end">Initial Allocation</th>
+                            <th id="time_off_counters_header_previous" class="text-end">Before</th>
+                            <th id="time_off_counters_header_earned" class="text-end">Earned</th>
+                            <th id="time_off_counters_header_taken" class="text-end">Taken</th>
+                            <th id="time_off_counters_header_final" class="text-end">New Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody t-if="time_off_counters" id="time_off_counters_lines">
+                        <tr><td id="time_off_counters_subsection" colspan="6" class="fw-bold">Time Off</td></tr>
+                        <tr t-foreach="time_off_counters" t-as="counter">
+                            <td id="time_off_counter_name">
+                                <span t-out="counter['name']"/>
+                                <span t-if="counter['unit'] == 'hour'">(hours)</span>
+                                <span t-else="">(days)</span>
+                            </td>
+                            <t t-foreach="['initial', 'previous', 'earned', 'taken', 'final']" t-as="key">
+                                <td t-attf-id="time_off_counter_{{key}}" class="text-end">
+                                    <span t-out="round(counter[key], 2)"
+                                        t-options="{'widget': 'float_time' if counter['unit'] == 'hour' else 'float', 'precision': 2}"/>
+                                </td>
+                            </t>
+                        </tr>
+                    </tbody>
+                    <tbody t-if="compensatory_overtime" id="compensatory_overtime_lines">
+                        <tr><td id="compensatory_overtime_subsection" colspan="6" class="fw-bold">Overtime</td></tr>
+                        <tr t-foreach="compensatory_overtime" t-as="counter">
+                            <td id="compensatory_overtime_name">
+                                <span t-out="counter['name']"/>
+                                <span>(hours)</span>
+                            </td>
+                            <td id="compensatory_overtime_initial"/>
+                            <t t-foreach="['previous', 'earned', 'taken', 'final']" t-as="key">
+                                <td t-attf-id="compensatory_overtime_{{key}}" class="text-end">
+                                    <span t-out="round(counter[key], 2)" t-options="{'widget': 'float_time'}"/>
+                                </td>
+                            </t>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <t t-set="payroll_config" t-value="o.payroll_config_id"/>
+        <t t-set="has_third_party_info" t-value="any([
+            o.version_id.is_employee() and (payroll_config.employee_accident_insurance_name or payroll_config.employee_accident_insurance_number),
+            o.version_id.is_worker() and (payroll_config.worker_accident_insurance_name or payroll_config.worker_accident_insurance_number),
+            payroll_config.group_insurance_name,
+            payroll_config.group_insurance_number,
+            payroll_config.l10n_be_SEPPT_name,
+            payroll_config.l10n_be_SEPPT_number,
+        ])"/>
+        <div id="third_party" t-if="has_third_party_info" style="page-break-before:always;">
+            <h2 id="l10n_be_extra_information_heading" class="h4 mt-4">Extra Information</h2>
             <table class="table table-sm table-borderless">
                 <thead class="o_black_border">
                     <tr>

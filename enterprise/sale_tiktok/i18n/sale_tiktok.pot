@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.5a1+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-08-28 17:50+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-06 17:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -133,10 +133,10 @@ msgid ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-as=\"error\">\n"
 "                            <th>\n"
-"                                <t t-out=\"', '.join(error['default_codes'])\"/>\n"
+"                                <t t-out=\"', '.join(error['default_codes'])\"></t>\n"
 "                            </th>\n"
 "                            <td>\n"
-"                                <t t-if=\"error['message']\" t-out=\"error['message']\"/>\n"
+"                                <t t-if=\"error['message']\" t-out=\"error['message']\"></t>\n"
 "                                <t t-else=\"\">\n"
 "                                    An unknown error occurred during the synchronisation with TikTok Shop.\n"
 "                                    Unfortunately you need to manually check if the available quantity for the product is correct or not.\n"
@@ -348,6 +348,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Failed to fetch label. Please wait and try again later. %s"
+msgstr ""
+
+#. module: sale_tiktok
+#. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
+msgid "Failed to fetch the detail of TikTok order %(ref)s: %(error)s"
 msgstr ""
 
 #. module: sale_tiktok
@@ -892,11 +898,18 @@ msgstr ""
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
+msgid "This order has no TikTok package yet. Please try again later."
+msgstr ""
+
+#. module: sale_tiktok
+#. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "This picking is not linked to a TikTok order."
 msgstr ""
 
 #. module: sale_tiktok
 #. odoo-python
+#: code:addons/sale_tiktok/models/stock_picking.py:0
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "TikTok API rate limit reached. Please try again later."
 msgstr ""

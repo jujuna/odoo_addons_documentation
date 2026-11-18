@@ -1,3 +1,4 @@
+from odoo import fields
 from .common import TestCoEdiCommon
 from odoo.tests import tagged
 
@@ -92,3 +93,14 @@ class TestColombianInvoice(TestCoEdiCommon):
             self.assertFalse(person.is_company)
             person.write({'additional_identifiers': False, 'vat': '900108281'})
             self.assertTrue(person.is_company)
+
+    def test_direct_payment_only_on_edi_documents(self):
+        """ The payment option is required on direct payments but hidden on
+        the moves that are not sent to the DIAN (ex: bank journal entries)
+        """
+        entry = self.create_line_for_reconciliation(100.0, 100.0, self.company_data['currency'], fields.Date.today(), account_1=self.company_data['default_account_receivable']).move_id
+        entry.invoice_date_due = entry.date  # entries don't get a due date by default
+        invoice = self.init_invoice('out_invoice', partner=self.partner_a, invoice_date=fields.Date.today(), products=self.product_a)
+        self.assertEqual(invoice.date, invoice.invoice_date_due)
+        self.assertFalse(entry.l10n_co_edi_is_direct_payment)
+        self.assertTrue(invoice.l10n_co_edi_is_direct_payment)

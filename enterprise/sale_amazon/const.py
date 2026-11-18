@@ -43,6 +43,10 @@ API_OPERATIONS_MAPPING = {
 STATUS_TO_SYNCHRONIZE = {"AMAZON": ["SHIPPED"], "MERCHANT": ["UNSHIPPED"]}
 
 
+# Limit of records per feed submission
+JSON_LISTINGS_FEED_SIZE_LIMIT = 25_000
+
+
 # Mapping of Amazon Carrier Names
 # See https://images-na.ssl-images-amazon.com/images/G/01/rainier/help/xsd/release_4_1/amzn-base.xsd
 AMAZON_CARRIER_NAMES_MAPPING = {

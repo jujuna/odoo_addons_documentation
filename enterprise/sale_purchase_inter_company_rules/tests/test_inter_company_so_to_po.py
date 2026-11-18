@@ -25,8 +25,10 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
 
         return sale_order.save()
 
-    def generate_sale_order(self, company, partner, user):
+    def generate_sale_order(self, company, partner, user, analytic_distribution=None):
         sale_order = self._generate_draft_sale_order(company, partner, user)
+        if analytic_distribution:
+            sale_order.order_line.analytic_distribution = analytic_distribution
         sale_order.action_confirm()
 
     def validate_generated_purchase_order(self, company, partner):
@@ -280,3 +282,15 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
         self.assertEqual(po_b.company_id, self.company_b)
         self.assertEqual(po_b.partner_id, vendor)
         self.assertEqual(po_b.order_line.product_id, service_purchase)
+
+    def test_analytic_distribution_propagated_to_po(self):
+        """ Test that the analytic distribution of the SO line is copied to the generated PO line,
+        without the analytic accounts restricted to the SO company.
+        """
+        self.company_b.intercompany_generate_purchase_orders = True
+        self.generate_sale_order(self.company_a, self.company_b.partner_id, self.res_users_company_a, analytic_distribution={
+            f'{self.analytic_account_shared.id}': 60,
+            f'{self.analytic_account_company_a.id}': 40,
+        })
+        po = self.env['purchase.order'].search([('company_id', '=', self.company_b.id)], limit=1)
+        self.assertEqual(po.order_line.analytic_distribution, {str(self.analytic_account_shared.id): 60})

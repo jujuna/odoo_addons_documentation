@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
+"POT-Creation-Date: 2026-10-30 17:48+0000\n"
 "PO-Revision-Date: 2026-10-22 04:38+0000\n"
 "Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/"
@@ -223,7 +223,7 @@ msgstr "หลังกลุ่มสินค้า"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__all
 msgid "All"
 msgstr "ทั้งหมด"
@@ -311,8 +311,8 @@ msgid ""
 "An error occurred: value of company_prefix_length (%"
 "(company_prefix_length)s) must be between 6 and 12 inclusive."
 msgstr ""
-"เกิดข้อผิดพลาด: ค่าของ company_prefix_length (%(company_prefix_length)s) ต้องอยู่ระห"
-"ว่าง 6 ถึง 12 (รวมทั้งสองค่า)"
+"เกิดข้อผิดพลาด: ค่าของ company_prefix_length (%(company_prefix_length)s) "
+"ต้องอยู่ระหว่าง 6 ถึง 12 (รวมทั้งสองค่า)"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -657,7 +657,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/apply_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Discard"
@@ -818,13 +818,13 @@ msgstr "การตรวจสอบความถูกต้องครั
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Lot Number"
 msgstr "เลขล็อตแรก"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Serial Number"
 msgstr "หมายเลขซีเรียลแรก"
 
@@ -846,8 +846,7 @@ msgstr "มีการสร้างการสั่งซื้อล่ว
 msgid ""
 "Following scanned products are not reserved for this transfer. Are you sure "
 "you want to add them?"
-msgstr ""
-"สินค้าที่สแกนต่อไปนี้ไม่ได้ถูกจองไว้สำหรับการโอนนี้ คุณต้องการเพิ่มหรือไม่?"
+msgstr "สินค้าที่สแกนต่อไปนี้ไม่ได้ถูกจองไว้สำหรับการโอนนี้ คุณต้องการเพิ่มหรือไม่?"
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__barcode_allow_extra_product
@@ -896,13 +895,13 @@ msgstr "บาร์โค้ดสินค้าที่จัดรูปแ
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Lot numbers"
 msgstr "สร้างหมายเลขล็อต"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Serial numbers"
 msgstr "สร้างหมายเลขประจำตัวสินค้า"
 
@@ -1083,8 +1082,7 @@ msgstr "รายการ"
 msgid ""
 "Lines of same product at same location appear grouped. Not to use for "
 "cluster picking"
-msgstr ""
-"รายการสินค้าที่เหมือนกันที่อยู่สถานที่เดียวกันจะถูกจัดกลุ่มเข้าด้วยกัน เพื่อไม่หยิบแบบเดี่ยว"
+msgstr "รายการสินค้าที่เหมือนกันที่อยู่สถานที่เดียวกันจะถูกจัดกลุ่มเข้าด้วยกัน เพื่อไม่หยิบแบบเดี่ยว"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_product_uom
@@ -1115,7 +1113,7 @@ msgstr "ออกจากระบบ"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Lot Number"
 msgstr "หมายเลขล็อต"
 
@@ -1291,13 +1289,13 @@ msgstr "ไม่ใช่การสแกนที่คาดไว้"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Number of SN"
 msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__only_one
 msgid "Only One"
 msgstr ""
@@ -1602,7 +1600,7 @@ msgstr "ปริมาณที่ทำเสร็จแล้ว"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity Received"
 msgstr ""
 
@@ -1618,7 +1616,7 @@ msgstr "ปริมาณในหน่วยบรรจุภัณฑ์"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity per Lot"
 msgstr ""
 
@@ -2090,7 +2088,7 @@ msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Serial Number"
 msgstr ""
 
@@ -2458,7 +2456,7 @@ msgstr ""
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Validate"
 msgstr "ตรวจสอบ"
@@ -2612,7 +2610,7 @@ msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "e.g. LOT-PR-00012"
 msgstr ""
 

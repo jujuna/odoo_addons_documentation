@@ -15,7 +15,6 @@ from odoo.addons.voip.models.pbx_service import (
     PBX_USER_FORWARD_DESTINATION_TYPES,
     SHARED_DESTINATION_TYPE_BY_MODEL,
 )
-from odoo.addons.voip.models.phone_service_api import get_buy_credits_action
 from odoo.addons.voip.models.res_users_settings import (
     E164_NUMBER_RE,
     HELP_EXTERNAL_DEVICE,
@@ -29,7 +28,6 @@ from odoo.addons.voip.models.res_users_settings import (
 from odoo.addons.voip.tools.linphone import (
     PROVISIONING_KIND_BOOTSTRAP,
     PROVISIONING_KIND_REFRESH,
-    PROVISIONING_URI_SCHEME,
     PROVISIONING_TOKEN_EXPIRATION_HOURS,
     PROVISIONING_TOKEN_SCOPE,
 )
@@ -136,9 +134,9 @@ class ResUsers(models.Model):
     linphone_provisioning_qr_code = fields.Char(
         string="Provisioning",
         help="1) Install Linphone on your smartphone\n"
-             "2) Scan the QR code\n"
+             "2) Scan the QR code from Linphone, or tap it if Odoo is open on that smartphone\n"
              "\n"
-             "Linphone holds a single account, so scanning replaces the one already configured on that smartphone.",
+             "Linphone holds a single account, so setting it up replaces the one already configured on that smartphone.",
         compute="_compute_linphone_provisioning",
         groups="base.group_user",
     )
@@ -339,7 +337,7 @@ class ResUsers(models.Model):
                 url = user._get_linphone_provisioning_url()
                 qr_code = self.env["ir.actions.report"].barcode(
                     "QR",
-                    f"{PROVISIONING_URI_SCHEME}{url}",
+                    url,
                     width=512,
                     height=512,
                     barLevel="M",
@@ -682,7 +680,7 @@ class ResUsers(models.Model):
             "mainNumberFormatted": (
                 main_did.did_number and main_did._phone_get_formatted(main_did.did_number)
             ) or main_did.did_number or None,
-            "buyCreditsUrl": get_buy_credits_action(self.env)["url"] if did.state == "suspended" else None,
+            "buyCreditsUrl": "/voip/buy_credits" if did.state == "suspended" else None,
             "usesOdooProvider": uses_odoo_provider,
             "mode": provider.mode or "demo",
             "missedCalls": self.env["voip.call"]._get_number_of_missed_calls(),

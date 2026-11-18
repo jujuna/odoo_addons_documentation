@@ -1,5 +1,8 @@
+from lxml import etree
+
 from freezegun import freeze_time
 from .common import TestMxEdiCommon
+from odoo import Command
 from odoo.tests import tagged, Form
 
 
@@ -109,3 +112,70 @@ class TestCFDIAccountMove(TestMxEdiCommon):
             cfdi_node = self.get_xml_tree_from_string(bytes(document.attachment_id.raw))
             concepto = cfdi_node.xpath("//*[local-name()='Concepto']")[0]
             self.assertEqual(concepto.get('Unidad'), 'PIEZAS')
+
+    @freeze_time('2017-01-01')
+    def test_cfdi_line_name_partner_specific_code_not_duplicated(self):
+        """ When a customer has their own product code (product.supplierinfo),
+        the invoice line description uses it (e.g. "[CUSTOM-CODE] Product"),
+        exactly like on a sale order line. _l10n_mx_edi_get_cfdi_line_name must
+        not re-resolve the product's display_name without that customer in
+        context, or it would find a different string ("[product_mx] product_mx")
+        and prepend it, duplicating the product name in the CFDI Descripcion. """
+        self.env['product.supplierinfo'].create({
+            'partner_id': self.partner_mx.id,
+            'product_tmpl_id': self.product.product_tmpl_id.id,
+            'product_code': 'CUSTOM-CODE',
+        })
+        line_name = self.product.with_context(partner_id=self.partner_mx.id).display_name
+        invoice = self._create_invoice_mx(invoice_line_ids=[
+            Command.create({'product_id': self.product.id, 'name': line_name}),
+        ])
+        with self.with_mocked_pac_sign_success():
+            invoice._l10n_mx_edi_cfdi_invoice_try_send()
+        self.assertEqual(invoice.l10n_mx_edi_cfdi_state, 'sent', f'Error: {invoice.l10n_mx_edi_document_ids.message}')
+
+        xml_tree = self.get_xml_tree_from_attachment(invoice.l10n_mx_edi_cfdi_attachment_id)
+        concepto = xml_tree.xpath("//*[local-name()='Concepto']")[0]
+        self.assertEqual(concepto.get('Descripcion'), line_name)
+
+    @freeze_time('2017-01-01')
+    def test_cfdi_line_name_standard_code_not_duplicated(self):
+        """ An existing description containing the standard product name must
+        not gain the customer-specific name in the CFDI Descripcion. """
+        invoice = self._create_invoice_mx(invoice_line_ids=[
+            Command.create({'product_id': self.product.id, 'name': self.product.display_name}),
+        ])
+        line_name = invoice.invoice_line_ids.name
+        self.env['product.supplierinfo'].create({
+            'partner_id': self.partner_mx.id,
+            'product_tmpl_id': self.product.product_tmpl_id.id,
+            'product_code': 'CUSTOM-CODE',
+        })
+        with self.with_mocked_pac_sign_success():
+            invoice._l10n_mx_edi_cfdi_invoice_try_send()
+        self.assertEqual(invoice.l10n_mx_edi_cfdi_state, 'sent', f'Error: {invoice.l10n_mx_edi_document_ids.message}')
+
+        xml_tree = self.get_xml_tree_from_attachment(invoice.l10n_mx_edi_cfdi_attachment_id)
+        concepto = xml_tree.xpath("//*[local-name()='Concepto']")[0]
+        self.assertEqual(concepto.get('Descripcion'), line_name)
+
+    def test_import_cfdi_line_keeps_original_description(self):
+        """The importer must preserve bracketed notes in Descripcion when matching a product."""
+        xml_tree = self.get_xml_tree_from_string(
+            self.file_read('l10n_mx_edi/tests/test_files/import/test_import_bill.xml').content,
+        )
+        concepto = xml_tree.find('{*}Conceptos/{*}Concepto')
+        description = f'[URGENT] {self.product.display_name}'
+        concepto.set('Descripcion', description)
+
+        bill = self._upload_document_on_journal(
+            journal=self.company_data['default_journal_purchase'],
+            content=etree.tostring(xml_tree),
+            filename='test_import_bill.xml',
+        )
+        self.assertEqual(bill.l10n_mx_edi_cfdi_state, 'received')
+        self.assertRecordValues(bill.invoice_line_ids, [{
+            'product_id': self.product.id,
+            # The current importer appends NoIdentificacion after the original description.
+            'name': f"{description} | {concepto.get('NoIdentificacion')}",
+        }])

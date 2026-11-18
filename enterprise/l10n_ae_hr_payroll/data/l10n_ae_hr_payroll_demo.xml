@@ -130,6 +130,15 @@
         <field name="company_id" ref="base.demo_company_ae"/>
     </record>
 
+    <record id="ae_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_ae"/>
+    </record>
+    <record id="ae_hr_job_consultant" model="hr.job">
+        <field name="name">Consultant</field>
+        <field name="company_id" ref="base.demo_company_ae"/>
+    </record>
+
     <record id="hr_employee_aisha" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).name"/>
         <field name="job_title">Technical Lead</field>
@@ -160,7 +169,7 @@
         <field name="study_field">Engineering</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ae_hr_payroll.res_partner_bank_account_aisha'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_ae_hr_payroll.ae_hr_job_developer"/>
         <field name="department_id" ref="l10n_ae_hr_payroll.ae_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_ae_hr_payroll.uae_employee_payroll_structure_type"/>
         <field name="wage_type">monthly</field>
@@ -201,7 +210,7 @@
         <field name="study_field">Computer Science</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ae_hr_payroll.res_partner_bank_account_saeed'))]"/>
-        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="job_id" ref="l10n_ae_hr_payroll.ae_hr_job_consultant"/>
         <field name="department_id" ref="l10n_ae_hr_payroll.ae_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_ae_hr_payroll.uae_employee_payroll_structure_type"/>
         <field name="wage_type">monthly</field>

@@ -19,10 +19,18 @@ class TestDRS(TestDRSCommon):
         # Senior: age at Dec 31, 2025 = 60 (>= 50 → senior risk, code 002)
         cls.employee_youth = cls._create_drs_employee('Youth Worker', birthday=date(2003, 6, 1), wage=2000.0)
         cls.employee_senior = cls._create_drs_employee('Senior Worker', birthday=date(1965, 6, 1), wage=2000.0, lang='nl_NL')
-        cls.employee_impulsion_12mo = cls._create_drs_employee('Impulsion 12mo Worker', l10n_be_impulsion_plan='12mo')
+        namur = cls.env['res.city'].create({
+            'name': 'Namur', 'zipcode': '5000', 'country_id': cls.env.ref('base.be').id, 'l10n_be_nis_code': '92094'})
+        cls.employee_impulsion_12mo = cls._create_drs_employee('Impulsion 12mo Worker', l10n_be_impulsion_plan='12mo', private_city_id=namur.id)
         cls.employee_impulsion_25yo_young = cls._create_drs_employee(
-            'Impulsion 25yo Young Worker', birthday=date(2003, 6, 1), l10n_be_impulsion_plan='25yo')
-        cls.employee_impulsion_25yo_old = cls._create_drs_employee('Impulsion 25yo Old Worker', l10n_be_impulsion_plan='25yo')
+            'Impulsion 25yo Young Worker', birthday=date(2003, 6, 1), l10n_be_impulsion_plan='25yo', private_city_id=namur.id)
+        cls.employee_impulsion_25yo_old = cls._create_drs_employee('Impulsion 25yo Old Worker', l10n_be_impulsion_plan='25yo', private_city_id=namur.id)
+
+    def test_drs_list_shows_state_with_certificate(self):
+        drs_model = self.env['l10n.be.drs'].with_company(self.belgian_company)
+        self.assertTrue(drs_model.action_list_view()['context']['onss_certificate_id'])
+        self.belgian_company.onss_certificate_id = False
+        self.assertFalse(drs_model.action_list_view()['context']['onss_certificate_id'])
 
     @freeze_time('2026-10-20 10:00:00')
     def test_drs_invalid_file_not_sent(self):
@@ -58,6 +66,7 @@ class TestDRS(TestDRSCommon):
         with self.assertRaisesRegex(ValidationError, 'third-party payers'):
             self._get_drs_dict(drs)
         payroll_config.l10n_be_employer_category_id = employer_category
+        version.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_100').id
         self.assertTrue(self._get_drs_dict(drs))
 
         # An expired risk can't be declared anymore
@@ -124,6 +133,48 @@ class TestDRS(TestDRSCommon):
         self._notify_drs(cancellation, '3400048ENN00E')
         new_declaration = self._create_drs(self.employee_senior, 'drs_risk_wech009_002', 2026, 9)
         self.assertEqual(self._get_drs_dict(new_declaration)['WECH009']['Form']['AttestationStatus'], '0')
+
+    @freeze_time('2026-10-20 10:00:00')
+    def test_drs_mark_done_manually(self):
+        """ A declaration filed manually on the portal of the social security is marked as done """
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 9, 14), date(2026, 9, 14))
+        drs = self._get_declarations(self.employee_senior, 'WECH009')
+        self.assertEqual(drs.state, 'draft')
+        drs.action_mark_done()
+        self.assertEqual(drs.state, 'done')
+        # It stays done when the state is computed again
+        self.env.add_to_compute(drs._fields['state'], drs)
+        self.assertEqual(drs.state, 'done')
+        drs.action_reset_to_draft()
+        self.assertEqual(drs.state, 'draft')
+
+        # Marked as done after the generation of the file, then posted: the answer of the ONSS wins
+        self._get_drs_dict(drs)
+        self.assertEqual(drs.state, 'ready')
+        drs.action_mark_done()
+        self.assertEqual(drs.state, 'done')
+        self._notify_drs(drs, '3400048ENN00A', accepted=False)
+        self.assertEqual(drs.state, 'refused')
+
+        # Other batch declarations are not affected
+        dmfa = self.env['l10n_be.dmfa'].create({
+            'year': '2026', 'quarter': '3', 'company_id': self.belgian_company.id, 'declaration_method': 'batch'})
+        dmfa.state = 'done'
+        self.env.add_to_compute(dmfa._fields['state'], dmfa)
+        self.assertEqual(dmfa.state, 'draft')
+
+    def test_drs_filling_dates(self):
+        """ The filling dates defined by the instructions of the social security """
+        monthly_hours = self._create_drs(self.employee_senior, 'drs_risk_wech005_001', 2026, 9)
+        self.assertEqual(monthly_hours.earliest_filling_date, date(2026, 10, 1))
+        self.assertFalse(monthly_hours.latest_filling_date)
+        adapted_work = self._create_drs(self.employee_senior, 'drs_risk_zima002_001', 2026, 2)
+        self.assertFalse(adapted_work.earliest_filling_date)
+        self.assertEqual(adapted_work.latest_filling_date, date(2026, 2, 28))
+        # No deadline defined
+        port_work = self._create_drs(self.employee_senior, 'drs_risk_wech011_001', 2026, 9)
+        self.assertFalse(port_work.earliest_filling_date)
+        self.assertFalse(port_work.latest_filling_date)
 
     def test_drs_allowed_risks(self):
         drs = self._create_drs(self.employee_senior, 'drs_risk_wech008_001', 2026, 9)
@@ -203,11 +254,29 @@ class TestDRS(TestDRSCommon):
             self._get_drs_dict(wech010)
 
     @freeze_time('2026-06-26 10:00:00')
+    def test_wech010_senior_half_day(self):
+        senior_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_senior_time_off')
+        self.assertRecordValues(senior_type, [{'name': 'Senior Holiday', 'unit_of_measure': 'day', 'request_unit': 'half_day'}])
+        leave = self._create_validated_leave(
+            self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 5, 4), date(2026, 5, 4),
+            request_date_from_period='am', request_date_to_period='am')
+        self.assertEqual(leave.number_of_days, 0.5)
+
+        wech010 = self._get_declarations(self.employee_senior, 'WECH010')
+        self.assertRecordValues(wech010, [{'code': '002', 'month': '5'}])
+        # Only the hours of the morning are declared
+        nature_of_days = wech010._get_wech010_nature_of_day()
+        self.assertEqual([(day['day'], day['nature_code'], day['hours_amount']) for day in nature_of_days], [(date(2026, 5, 4), '3.4', 400)])
+        self.assertFalse(wech010._get_wech010_errors(self.employee_senior.version_id))
+        self._get_drs_dict(wech010)
+
+    @freeze_time('2026-06-26 10:00:00')
     def test_wech008(self):
         risk_010 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_010')
         risk_011 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_011')
         # The fixed-term contract of the old worker ends after the month of the declaration
-        self.employee_impulsion_25yo_old.version_id.contract_date_end = date(2026, 4, 30)
+        with patch.object(self.env.registry['hr.version'], '_l10n_be_dimona_autodeclare'):
+            self.employee_impulsion_25yo_old.version_id.contract_date_end = date(2026, 4, 30)
 
         employees = (
             self.employee_impulsion_12mo,

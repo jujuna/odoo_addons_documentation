@@ -96,7 +96,8 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
                 contribution_type = child.find('ContributionType').text
                 personal_rate = float(child.find('PersonalRate').text)
                 employer_rate = float(child.find('EmployerRate').text)
-                salary_moderation_rate = float(child.find('SalaryModerationRate').text)
+                # optional in the ONSS schema (minOccurs="0")
+                salary_moderation_rate = float(child.findtext('SalaryModerationRate', '0'))
                 total_rate = float(child.find('TotalRate').text)
 
                 if employer_class in employer_categories:
@@ -126,7 +127,7 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
             tree = ET.parse(io.BytesIO(xml_file_bytes))
         except Exception:  # noqa: BLE001
             _logger.warning("Failed to parse the file %s", filename)
-            return [], [], [], []
+            return [], [], [], [], {}
         root = tree.getroot()
 
         belgium = self.env.ref('base.be').id
@@ -272,11 +273,21 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
                 }
             }
 
-        employer_categories = self.env.companies.current_payroll_config_id.l10n_be_employer_category_id.mapped('dmfa_code')
-        if not employer_categories:
+        configured_employer_categories = self.env.companies.current_payroll_config_id.l10n_be_employer_category_id
+        if not configured_employer_categories:
             raise UserError(self.env._('Please first set the employer category on your company in the Payroll Settings.'))
+        # Also import the rates of the dedicated occasional-worker code of configured categories
+        # (e.g. 317 for a Horeca employer configured as 017), since it is never set directly on a
+        # payroll configuration but still needed to compute occasional workers' payslips.
+        employer_categories = set(configured_employer_categories.mapped('dmfa_code'))
+        employer_categories |= {
+            category._get_occasional_worker_dmfa_code() for category in configured_employer_categories
+        }
+        employer_categories = list(employer_categories)
 
-        for file in self.onss_rates_file_ids:
+        # in the order of their download, from the oldest quarter: the allowed worker codes are the ones of the
+        # last combination file imported (the attachments are ordered by descending id)
+        for file in self.onss_rates_file_ids.sorted('id'):
             try:
                 with zipfile.ZipFile(io.BytesIO(file.raw), 'r') as z:
                     for filename in z.namelist():
@@ -321,8 +332,12 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
         _logger.info("Downloading ONSS rates ZIP from %s", url)
 
         try:
-            response = requests.get(url, timeout=30)
+            # an unpublished quarter is redirected to an HTML error page
+            response = requests.get(url, timeout=30, allow_redirects=False)
             response.raise_for_status()
+            if response.status_code != 200 or response.content[:2] != b'PK':
+                _logger.warning("No ONSS rates ZIP available at %s", url)
+                return
 
             filename = url.split('/')[-1]
             self.env['ir.attachment'].create({
@@ -371,11 +386,17 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
         # First, import the whole file for the year and quarter given
         wizard.import_all = True
         wizard._download_file(year, quarter)
-        wizard.action_import_files()
+        result = wizard.action_import_files()
         wizard.onss_rates_file_ids = False
 
-        # Then, import only changes up to today
+        # Then, import only changes of the next quarters up to today
         wizard.import_all = False
+        quarter += 1
+        if quarter > 4:
+            quarter = 1
+            year += 1
+        if not (year < today_year or (year == today_year and quarter <= today_quarter)):
+            return result
         while year < today_year or (year == today_year and quarter <= today_quarter):
             wizard._download_file(year, quarter)
             quarter += 1
@@ -386,4 +407,9 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
 
     @api.model
     def _cron_fetch_onss_rates(self):
+        # The rates are imported for the employer categories of the companies: without any, the import would fail
+        # every day (and the cron would end up deactivated)
+        if not self.env.companies.current_payroll_config_id.l10n_be_employer_category_id:
+            _logger.info("No employer category set: the ONSS rates are not imported")
+            return
         self.env['l10n.be.onss.rates.import.wizard']._fetch_onss_rates_since(datetime.today().year - 1, 1)

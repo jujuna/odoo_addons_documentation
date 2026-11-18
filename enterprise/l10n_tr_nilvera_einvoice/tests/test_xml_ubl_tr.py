@@ -242,6 +242,40 @@ class TestUBLTR(TestUBLTRCommon):
         ])
         self.assertEqual(invoice.narration, '<p>Payment within 30 days</p>')
 
+    def test_import_bill_export(self):
+        with file_open("l10n_tr_nilvera_einvoice/tests/expected_xmls/invoice_export_earchive.xml", "rb") as xml_file:
+            bill = self._create_invoice_from_xml(xml_file.read())
+        bill.action_post()
+
+        self.assertRecordValues(bill, [{
+            'move_type': 'in_invoice',
+            'l10n_tr_is_export_invoice': True,
+            'l10n_tr_gib_invoice_type': 'ISTISNA',
+            'l10n_tr_exemption_code_id': self.reason_301.id,
+            'l10n_tr_shipping_type': '1',
+        }])
+
+    def test_import_bill_export_registered(self):
+        with file_open("l10n_tr_nilvera_einvoice/tests/expected_xmls/invoice_export_ipac_einvoice.xml", "rb") as xml_file:
+            bill = self._create_invoice_from_xml(xml_file.read())
+        bill.action_post()
+
+        self.assertRecordValues(bill, [{
+            'move_type': 'in_invoice',
+            'l10n_tr_is_export_invoice': False,
+            'l10n_tr_gib_invoice_scenario': 'TEMELFATURA',
+            'l10n_tr_gib_invoice_type': 'IHRACKAYITLI',
+            'l10n_tr_exemption_code_id': self.reason_702.id,
+            'l10n_tr_shipping_type': False,
+        }])
+
+    def test_gib_return_type_is_reset_on_an_invoice(self):
+        credit_note = self._generate_invoice(self.einvoice_partner)._reverse_moves()
+        self.assertEqual(credit_note.l10n_tr_gib_invoice_type, 'IADE')
+
+        credit_note.action_switch_move_type()
+        self.assertRecordValues(credit_note, [{'move_type': 'out_invoice', 'l10n_tr_gib_invoice_type': 'SATIS'}])
+
     def test_xml_invoice_earchive_ecommerce_sale_without_transfer(self):
         with freeze_time('2025-03-05'):
             invoice = self._generate_invoice(

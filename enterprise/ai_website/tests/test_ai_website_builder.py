@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 import requests
 from lxml import html as lxml_html
+from urllib3.connection import _WrappedAndVerifiedSocket
 
 from odoo.tests import tagged, users
 
@@ -75,7 +76,7 @@ def _mock_image_transport(responses=(), peers=('93.184.216.34',)):
         patch(_SESSION_SEND, _ORIGINAL_SESSION_SEND),
         patch('urllib3.util.connection.create_connection', side_effect=sockets) as connect,
         patch('urllib3.connection._ssl_wrap_socket_and_match_hostname',
-              side_effect=lambda sock, **kwargs: Mock(socket=sock, is_verified=True)),
+              side_effect=lambda sock, **kwargs: _WrappedAndVerifiedSocket(socket=sock, is_verified=True)),
         patch('urllib3.connectionpool.is_connection_dropped', return_value=False),
     ):
         yield connect, sockets
@@ -916,7 +917,7 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
         def wrap_socket(sock, **kwargs):
             wrapped = Mock(socket=sock, makefile=sock.makefile, sendall=sock.sendall,
                            close=sock.close, settimeout=sock.settimeout)
-            return Mock(socket=wrapped, is_verified=True)
+            return _WrappedAndVerifiedSocket(socket=wrapped, is_verified=True)
 
         with (
             _mock_image_transport([_image_http_response()]) as (_connect, sockets),

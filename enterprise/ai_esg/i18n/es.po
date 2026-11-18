@@ -3,15 +3,17 @@
 # * ai_esg
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:44+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
-"ai_esg/es/>\n"
+"PO-Revision-Date: 2026-11-02 15:33+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/ai_esg/"
+"es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,14 +24,12 @@ msgstr ""
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_generation_wizard__company_size__medium
 #: model:ir.model.fields.selection,name:ai_esg.selection__res_company__esg_company_size__medium
-#, fuzzy
 msgid "250 - 1000 employees"
 msgstr "250 - 1000 empleados"
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_generation_wizard__company_size__small
 #: model:ir.model.fields.selection,name:ai_esg.selection__res_company__esg_company_size__small
-#, fuzzy
 msgid "< 250 employees"
 msgstr "< 250 empleados"
 
@@ -45,6 +45,14 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p>La solicitud para asignar factores de emisión a tus "
+"líneas de emisión usando IA se ha completado. Ten en cuenta que algunas "
+"emisiones no pudieron asignarse debido a errores inesperados.</p>\n"
+"                    <p>Puedes revisar las emisiones asignadas en tu "
+"aplicación ASG.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: ai_esg
 #: model:mail.template,body_html:ai_esg.mail_template_data_ai_esg_assign_emission_factors_success
@@ -57,56 +65,59 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p>La solicitud para asignar factores de emisión a tus "
+"líneas de emisión usando IA se ha completado con éxito.</p>\n"
+"                    <p>Puedes revisar las emisiones asignadas en tu "
+"aplicación ASG.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_generation_wizard__company_size__large
 #: model:ir.model.fields.selection,name:ai_esg.selection__res_company__esg_company_size__large
-#, fuzzy
 msgid "> 1000 employees"
 msgstr "> 1000 empleados"
 
 #. module: ai_esg
 #: model:ir.module.module,shortdesc:base.module_ai_esg
 msgid "AI - ESG"
-msgstr ""
+msgstr "IA - ASG"
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.ir_cron_ai_esg_assign_emission_factors_to_emission_line_ir_actions_server
 msgid "AI ESG: Cron to Assign Emission Factors to Emission Line"
-msgstr ""
+msgstr "IA ASG: Cron para asignar factores de emisión a la línea de emisión"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.esg_metric_kanban_view
 #: model_terms:ir.ui.view,arch_db:ai_esg.esg_metric_list_view
-#, fuzzy
 msgid "AI Suggest"
 msgstr "Sugerencia de la IA"
 
 #. module: ai_esg
 #. odoo-python
 #: code:addons/ai_esg/wizard/metrics_ai_generation_wizard.py:0
-#, fuzzy
 msgid "AI Suggested Metrics"
 msgstr "Métricas sugeridas por la IA"
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.ir_actions_server_ai_esg_assign_emission_factors_to_carbon_line
 msgid "AI Tool: Assign Emission Factors to Emission Line"
-msgstr ""
+msgstr "Herramienta de IA: Asignar factores de emisión a la línea de emisión"
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.ir_actions_server_ai_esg_get_emission_factor
 msgid "AI Tool: Get Emission Factor"
-msgstr ""
+msgstr "Herramienta de IA: Obtener factor de emisión"
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.ir_actions_server_ai_esg_get_emission_sources
 msgid "AI Tool: Get Emission Sources"
-msgstr ""
+msgstr "Herramienta de IA: Obtener fuentes de emisión"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_metrics_ai_generation_wizard
-#, fuzzy
 msgid "AI generation of suggestions of ESG Metrics based on Company Data"
 msgstr ""
 "Generación con IA de sugerencias de métricas ASG según la información de la "
@@ -115,7 +126,7 @@ msgstr ""
 #. module: ai_esg
 #: model:ir.module.module,summary:base.module_ai_esg
 msgid "AI integration with ESG"
-msgstr ""
+msgstr "Integración de IA con ASG"
 
 #. module: ai_esg
 #. odoo-python
@@ -125,35 +136,34 @@ msgid ""
 "few minutes. It runs in the background, so you can leave this page and "
 "you'll be notified by email when it's finished."
 msgstr ""
+"La IA está asignando factores de emisión a las emisiones seleccionadas. Esto "
+"puede tardar unos minutos. Se ejecuta en segundo plano, así que puedes "
+"abandonar esta página y se te notificará por correo electrónico cuando "
+"termine."
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_metrics_ai_suggestion_line
-#, fuzzy
 msgid "AI suggestion of ESG Metric"
 msgstr "Sugerencia de IA sobre la métrica ASG"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_metrics_ai_suggestion_wizard
-#, fuzzy
 msgid "AI suggestions of ESG Metrics"
 msgstr "Sugerencias de la IA sobre las métricas ASG"
 
 #. module: ai_esg
 #: model:ir.actions.act_window,name:ai_esg.metrics_ai_generation_wizard_action
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "About Your Company"
 msgstr "Sobre tu empresa"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_suggestion_wizard_form_view
-#, fuzzy
 msgid "Add"
 msgstr "Añadir"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_suggestion_wizard_form_view
-#, fuzzy
 msgid "Add All"
 msgstr "Añadir todo"
 
@@ -161,33 +171,30 @@ msgstr "Añadir todo"
 #: model:ir.model.fields,field_description:ai_esg.field_account_move_line__ai_esg_to_assign_emission_factor_cron
 #: model:ir.model.fields,field_description:ai_esg.field_esg_carbon_emission_report__ai_esg_to_assign_emission_factor_cron
 msgid "Ai Esg To Assign Emission Factor Cron"
-msgstr ""
+msgstr "Cron de IA ASG para asignar factor de emisión"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Assets"
 msgstr "Activos"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__assets_value
-#, fuzzy
 msgid "Assets Value"
 msgstr "Valor de los activos"
 
 #. module: ai_esg
 #: model:ir.actions.server,ai_tool_description:ai_esg.ir_actions_server_ai_esg_assign_emission_factors_to_carbon_line
 msgid "Assign Emission Factor to Emission Line."
-msgstr ""
+msgstr "Asignar factor de emisión a la línea de emisión."
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.action_emission_factors_ai_auto_assignment
 msgid "Assign with AI"
-msgstr ""
+msgstr "Asignar con IA"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__attachment_id
-#, fuzzy
 msgid "Attachment"
 msgstr "Archivo adjunto"
 
@@ -197,6 +204,8 @@ msgid ""
 "Automatic email sent to the user after failing to assign emission factors to "
 "some selected emissions using AI"
 msgstr ""
+"Correo electrónico automático enviado al usuario después de no poder al "
+"asignar factores de emisión a algunas emisiones seleccionadas usando IA"
 
 #. module: ai_esg
 #: model:mail.template,description:ai_esg.mail_template_data_ai_esg_assign_emission_factors_success
@@ -204,52 +213,47 @@ msgid ""
 "Automatic email sent to the user after successfully assigning emission "
 "factors to all selected emissions using AI"
 msgstr ""
+"Correo electrónico automático enviado al usuario después de asignar "
+"correctamente factores de emisión a todas las emisiones seleccionadas usando "
+"IA"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Business Description"
 msgstr "Descripción del negocio"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__category
-#, fuzzy
 msgid "Category"
 msgstr "Categoría"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_suggestion_wizard_form_view
-#, fuzzy
 msgid "Close"
 msgstr "Cerrar"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__code
-#, fuzzy
 msgid "Code"
 msgstr "Código"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_res_company
-#, fuzzy
 msgid "Company"
-msgstr "Compañía"
+msgstr "Empresa"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_esg_emission_factor__company_name
-#, fuzzy
 msgid "Company Name"
-msgstr "Nombre de la compañía"
+msgstr "Nombre de la empresa"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__company_size
-#, fuzzy
 msgid "Company Size"
 msgstr "Tamaño de la empresa"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__core_business_description
-#, fuzzy
 msgid "Core Business Description"
 msgstr "Descripción de la actividad empresarial principal"
 
@@ -257,7 +261,6 @@ msgstr "Descripción de la actividad empresarial principal"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__create_uid
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__create_uid
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__create_uid
-#, fuzzy
 msgid "Created by"
 msgstr "Creado por"
 
@@ -265,42 +268,36 @@ msgstr "Creado por"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__create_date
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__create_date
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__create_date
-#, fuzzy
 msgid "Created on"
 msgstr "Creado el"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__currency_id
-#, fuzzy
 msgid "Currency"
 msgstr "Moneda"
 
 #. module: ai_esg
 #: model:ir.model.fields,help:ai_esg.field_esg_emission_factor__currency_name
-#, fuzzy
 msgid "Currency Code (ISO 4217)"
 msgstr "Código de moneda (ISO 4217)"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_esg_emission_factor__currency_name
 msgid "Currency Name"
-msgstr ""
+msgstr "Nombre de la moneda"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Describe the activities of your core business in a paragraphs..."
 msgstr "Describe tus actividades empresariales principales en un párrafo…"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__detail
-#, fuzzy
 msgid "Detail"
 msgstr "Detalle"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Discard"
 msgstr "Descartar"
 
@@ -312,35 +309,32 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__display_name
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__display_name
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__display_name
-#, fuzzy
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: ai_esg
 #: model:mail.template,subject:ai_esg.mail_template_data_ai_esg_assign_emission_factors_failure
 #: model:mail.template,subject:ai_esg.mail_template_data_ai_esg_assign_emission_factors_success
 msgid "ESG - AI Assign of Emission Factors"
-msgstr ""
+msgstr "ASG - Asignación de factores de emisión mediante IA"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_esg_carbon_emission_report
-#, fuzzy
 msgid "ESG Carbon Emissions Report"
 msgstr "Informe ASG de emisiones de carbono"
 
 #. module: ai_esg
 #: model:mail.template,name:ai_esg.mail_template_data_ai_esg_assign_emission_factors_failure
 msgid "ESG: AI Assign of Emission Factors - Failure"
-msgstr ""
+msgstr "ASG: Asignación de factores de emisión mediante IA - Error"
 
 #. module: ai_esg
 #: model:mail.template,name:ai_esg.mail_template_data_ai_esg_assign_emission_factors_success
 msgid "ESG: AI Assign of Emission Factors - Success"
-msgstr ""
+msgstr "ASG: Asignación de factores de emisión mediante IA - Correcto"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_esg_emission_factor
-#, fuzzy
 msgid "Emission Factor"
 msgstr "Factor de emisión"
 
@@ -350,68 +344,61 @@ msgstr "Factor de emisión"
 msgid ""
 "Emission factor of emission line %(line_name)s updated to %(factor_name)s"
 msgstr ""
+"Factor de emisión de la línea de emisión %(line_name)s actualizado a %"
+"(factor_name)s"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__esg_assets_value
-#, fuzzy
 msgid "Esg Assets Value"
 msgstr "Valor de los activos ASG"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__esg_company_size
-#, fuzzy
 msgid "Esg Company Size"
 msgstr "Tamaño de la empresa ASG"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__esg_core_business_description
-#, fuzzy
 msgid "Esg Core Business Description"
 msgstr "Descripción de la actividad empresarial principal ASG"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__esg_nace_id
-#, fuzzy
 msgid "Esg Nace"
-msgstr "NACE ESG"
+msgstr "NACE ASG"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__esg_revenues_value
-#, fuzzy
 msgid "Esg Revenues Value"
 msgstr "Valor de los ingresos ASG"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__esrs_id
-#, fuzzy
 msgid "Esrs"
 msgstr "ESRS"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Generate Metrics"
 msgstr "Generar métricas"
 
 #. module: ai_esg
 #: model:ir.actions.server,ai_tool_description:ai_esg.ir_actions_server_ai_esg_get_emission_factor
 msgid "Get the most relevant Emission Factor."
-msgstr ""
+msgstr "Obtén el factor de emisión más relevante."
 
 #. module: ai_esg
 #: model:ir.actions.server,ai_tool_description:ai_esg.ir_actions_server_ai_esg_get_emission_sources
 msgid "Get the most relevant Emission Sources."
-msgstr ""
+msgstr "Obtén las fuentes de emisión más relevantes."
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__company_id
-#, fuzzy
 msgid "Group Reporting Company"
 msgstr "Empresa del grupo que presenta los informes"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__has_one_or_more_selected
-#, fuzzy
 msgid "Has One Or More Selected"
 msgstr "Tiene, como mínimo, un elemento seleccionado"
 
@@ -423,25 +410,21 @@ msgstr "Tiene, como mínimo, un elemento seleccionado"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__id
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__id
 #: model:ir.model.fields,field_description:ai_esg.field_res_company__id
-#, fuzzy
 msgid "ID"
 msgstr "ID"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Industry Sector"
 msgstr "Sector industrial"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__is_selected
-#, fuzzy
 msgid "Is Selected"
 msgstr "Está seleccionado"
 
 #. module: ai_esg
 #: model:ir.model,name:ai_esg.model_account_move_line
-#, fuzzy
 msgid "Journal Item"
 msgstr "Apunte contable"
 
@@ -449,7 +432,6 @@ msgstr "Apunte contable"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__write_uid
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__write_uid
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__write_uid
-#, fuzzy
 msgid "Last Updated by"
 msgstr "Última actualización por"
 
@@ -457,39 +439,33 @@ msgstr "Última actualización por"
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__write_date
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__write_date
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__write_date
-#, fuzzy
 msgid "Last Updated on"
 msgstr "Última actualización el"
 
 #. module: ai_esg
 #. odoo-python
 #: code:addons/ai_esg/wizard/metrics_ai_suggestion_wizard.py:0
-#, fuzzy
 msgid "Metrics have been successfully created."
 msgstr "Se han creado las métricas correctamente."
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__nace_id
-#, fuzzy
 msgid "Nace"
 msgstr "NACE"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__name
-#, fuzzy
 msgid "Name"
 msgstr "Nombre"
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_suggestion_line__type__negative_impact
-#, fuzzy
 msgid "Negative Impact"
 msgstr "Impacto negativo"
 
 #. module: ai_esg
 #. odoo-python
 #: code:addons/ai_esg/wizard/metrics_ai_generation_wizard.py:0
-#, fuzzy
 msgid ""
 "No additional relevant sustainability metrics found.\n"
 "\n"
@@ -507,58 +483,52 @@ msgid ""
 "No valid emissions were selected. Please select emissions linked to journal "
 "items."
 msgstr ""
+"No se ha seleccionado ninguna emisión válida. Por favor, selecciona "
+"emisiones vinculadas a apuntes contables."
 
 #. module: ai_esg
 #. odoo-python
 #: code:addons/ai_esg/wizard/metrics_ai_generation_wizard.py:0
-#, fuzzy
 msgid "Oops, it looks like our AI is unreachable."
 msgstr "¡Vaya! Parece que la IA no está disponible."
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_suggestion_line__type__opportunity
-#, fuzzy
 msgid "Opportunity"
 msgstr "Oportunidad"
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_suggestion_line__type__positive_impact
-#, fuzzy
 msgid "Positive Impact"
 msgstr "Impacto positivo"
 
 #. module: ai_esg
 #: model_terms:ir.ui.view,arch_db:ai_esg.metrics_ai_generation_wizard_form_view
-#, fuzzy
 msgid "Revenues"
 msgstr "Ingresos"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_generation_wizard__revenues_value
-#, fuzzy
 msgid "Revenues Value"
 msgstr "Valor de los ingresos"
 
 #. module: ai_esg
 #: model:ir.model.fields.selection,name:ai_esg.selection__metrics_ai_suggestion_line__type__risk
-#, fuzzy
 msgid "Risk"
 msgstr "Riesgo"
 
 #. module: ai_esg
 #: model:ir.actions.server,name:ai_esg.emission_factors_ai_auto_assignment
 msgid "Server Action: Assign with AI"
-msgstr ""
+msgstr "Acción de servidor: Asignar con IA"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_wizard__suggestion_line_ids
-#, fuzzy
 msgid "Suggestion Line"
 msgstr "Línea de sugerencias"
 
 #. module: ai_esg
 #: model:ir.model.fields,help:ai_esg.field_metrics_ai_generation_wizard__company_id
-#, fuzzy
 msgid ""
 "This company defines the fiscal year and main company information used for "
 "the Group CSRD report. Information entered in the CSRD creation wizard will "
@@ -573,18 +543,16 @@ msgstr ""
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__type
-#, fuzzy
 msgid "Type"
 msgstr "Tipo"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_esg_emission_factor__uom_name
 msgid "UoM Name"
-msgstr ""
+msgstr "Nombre de la UdM"
 
 #. module: ai_esg
 #: model:ir.model.fields,field_description:ai_esg.field_metrics_ai_suggestion_line__wizard_id
-#, fuzzy
 msgid "Wizard"
 msgstr "Asistente"
 
@@ -594,6 +562,8 @@ msgid ""
 "Your company's total annual turnover (net revenue), in your reporting "
 "currency"
 msgstr ""
+"Volumen de negocios anual total de tu empresa (ingresos netos), en tu moneda "
+"de informe"
 
 #. module: ai_esg
 #: model:ir.model.fields,help:ai_esg.field_metrics_ai_generation_wizard__assets_value
@@ -601,3 +571,5 @@ msgid ""
 "Your company's total balance sheet assets (total assets, not just the fixed "
 "ones), as of your last financial year-end, in your reporting currency"
 msgstr ""
+"Activos totales del balance de tu empresa (activos totales, no solo los "
+"fijos), al cierre de tu último ejercicio financiero, en tu moneda de informe"

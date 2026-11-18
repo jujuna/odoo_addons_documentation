@@ -80,6 +80,11 @@
         <field name="rule_parameter_id" ref="rule_parameter_il_line_1_allowances"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_il_line_1_allowances_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">2925</field>
+        <field name="rule_parameter_id" ref="rule_parameter_il_line_1_allowances"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+    </record>
 
     <record id="rule_parameter_il_line_2_allowances" model="hr.rule.parameter">
         <field name="name">US: Illinois Line 2 Allowances</field>
@@ -770,7 +775,7 @@
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_nc_tax_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">3.99</field>
+        <field name="parameter_value">4.09</field>
         <field name="rule_parameter_id" ref="rule_parameter_nc_tax_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -973,6 +978,34 @@
         <field name="rule_parameter_id" ref="rule_parameter_or_annual_tax_brackets"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_or_annual_tax_brackets_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">{
+            'below_cap': {
+                'single': [
+                    (0, 4550, 4.75, 0, 263),
+                    (4550, 11400, 6.75, 4550, 479),
+                    (11400, 50000, 8.75, 11400, 941),
+                ],
+                'married': [
+                    (0, 9100, 4.75, 0, 263),
+                    (9100, 22800, 6.75, 9100, 695),
+                    (22800, 50000, 8.75, 22800, 1620),
+                ],
+            },
+            'above_cap': {
+                'single': [
+                    (38340, 125000, 8.75, 11400, 678),
+                    (125000, 99999999999999, 9.90, 125000, 10618),
+                ],
+                'married': [
+                    (35430, 250000, 8.75, 22800, 1357),
+                    (250000, 99999999999999, 9.90, 250000, 21237),
+                ],
+            }
+        }</field>
+        <field name="rule_parameter_id" ref="rule_parameter_or_annual_tax_brackets"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+    </record>
 
     <record id="rule_parameter_or_withholding_allowances" model="hr.rule.parameter">
         <field name="name">US: Oregon Withholding - Withholding Allowances</field>
@@ -1010,7 +1043,7 @@
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_or_transit_tax_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">0.2</field>
+        <field name="parameter_value">0.1</field>
         <field name="rule_parameter_id" ref="rule_parameter_or_transit_tax_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -1081,6 +1114,19 @@
 }</field>
         <field name="rule_parameter_id" ref="rule_parameter_vt_withholding_allowances_table"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_vt_withholding_allowances_table_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">{
+    'weekly': 103.85,
+    'bi-weekly': 207.69,
+    'semi-monthly': 225.00,
+    'monthly': 450.00,
+    'quarterly': 1350.00,
+    'annually': 5400.00,
+    'daily': 20.77,
+}</field>
+        <field name="rule_parameter_id" ref="rule_parameter_vt_withholding_allowances_table"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
 
     <record id="rule_parameter_vt_tax_rate_tables" model="hr.rule.parameter">
@@ -1192,6 +1238,110 @@
         <field name="rule_parameter_id" ref="rule_parameter_vt_tax_rate_tables"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_vt_tax_rate_table_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">{
+    'weekly': {
+        'single': [
+            (0, 75, 0.00, 0, 0.00),
+            (75, 1051, 3.35, 75, 0.00),
+            (1051, 2438, 6.60, 1051, 32.70),
+            (2438, 5004, 7.60, 2438, 124.24),
+            (5004, 99999999999999, 8.75, 5004, 319.25)],
+        'married': [
+            (0, 226, 0.00, 0, 0.00),
+            (226, 1855, 3.35, 226, 0.00),
+            (1855, 4164, 6.60, 1855, 54.57),
+            (4164, 6227, 7.60, 4164, 206.96),
+            (6227, 99999999999999, 8.75, 6227, 363.75)],
+    },
+    'bi-weekly': {
+        'single': [
+            (0, 151, 0.00, 0, 0.00),
+            (151, 2103, 3.35, 151, 0.00),
+            (2103, 4876, 6.60, 2103, 65.39),
+            (4876, 10009, 7.60, 4876, 248.41),
+            (10009, 99999999999999, 8.75, 10009, 638.52)],
+        'married': [
+            (0, 453, 0.00, 0, 0.00),
+            (453, 3711, 3.35, 453, 0.00),
+            (3711, 8328, 6.60, 3711, 109.14),
+            (8328, 12455, 7.60, 8328, 413.87),
+            (12455, 99999999999999, 8.75, 12455, 727.52)],
+    },
+    'semi-monthly': {
+        'single': [
+            (0, 164, 0.00, 0, 0.00),
+            (164, 2278, 3.35, 164, 0.00),
+            (2278, 5282, 6.60, 2278, 70.82),
+            (5282, 10843, 7.60, 5282, 269.08),
+            (10843, 99999999999999, 8.75, 10843, 691.72)],
+        'married': [
+            (0, 491, 0.00, 0, 0.00),
+            (491, 4020, 3.35, 491, 0.00),
+            (4020, 9022, 6.60, 4020, 118.22),
+            (9022, 13493, 7.60, 9022, 448.35),
+            (13493, 99999999999999, 8.75, 13493, 788.15)],
+    },
+    'monthly': {
+        'single': [
+            (0, 327, 0.00, 0, 0.00),
+            (327, 4556, 3.35, 327, 0.00),
+            (4556, 10565, 6.60, 4556, 141.67),
+            (10565, 21685, 7.60, 10565, 538.27),
+            (21685, 99999999999999, 8.75, 21685, 1383.39)],
+        'married': [
+            (0, 981, 0.00, 0, 0.00),
+            (981, 8040, 3.35, 981, 0.00),
+            (8040, 18044, 6.60, 8040, 236.48),
+            (18044, 26985, 7.60, 18044, 896.74),
+            (26985, 99999999999999, 8.75, 26985, 1576.26)],
+    },
+    'quarterly': {
+        'single': [
+            (0, 981, 0.00, 0, 0.00),
+            (981, 13669, 3.35, 981, 0.00),
+            (13669, 31694, 6.60, 13669, 425.05),
+            (31694, 65056, 7.60, 31694, 1614.70),
+            (65056, 99999999999999, 8.75, 65056, 4150.21)],
+        'married': [
+            (0, 2944, 0.00, 0, 0.00),
+            (2944, 24119, 3.35, 2944, 0.00),
+            (24119, 54131, 6.60, 24119, 709.36),
+            (54131, 80956, 7.60, 54131, 2690.15),
+            (80956, 99999999999999, 8.75, 80956, 4728.85)],
+    },
+    'annually': {
+        'single': [
+            (0, 3925, 0.00, 0, 0.00),
+            (3925, 54675, 3.35, 3925, 0.00),
+            (54675, 126775, 6.60, 54675, 1700.13),
+            (126775, 260225, 7.60, 126775, 6458.73),
+            (260225, 99999999999999, 8.75, 260225, 16600.93)],
+        'married': [
+            (0, 11775, 0.00, 0, 0.00),
+            (11775, 96475, 3.35, 11775, 0.00),
+            (96475, 216525, 6.60, 96475, 2837.45),
+            (216525, 323825, 7.60, 216525, 10760.75),
+            (323825, 99999999999999, 8.75, 323825, 18915.55)],
+    },
+    'daily': {
+        'single': [
+            (0, 15.10, 0.00, 0, 0.00),
+            (15.10, 210.30, 3.35, 15.10, 0.00),
+            (210.30, 487.60, 6.60, 210.30, 6.54),
+            (487.60, 1000.90, 7.60, 487.60, 24.84),
+            (1000.90, 99999999999999, 8.75, 1000.90, 63.85)],
+        'married': [
+            (0, 45.30, 0.00, 0, 0.00),
+            (45.30, 371.10, 3.35, 45.30, 0.00),
+            (371.10, 832.80, 6.60, 371.10, 10.91),
+            (832.80, 1245.50, 7.60, 832.80, 41.39),
+            (1245.50, 99999999999999, 8.75, 1245.50, 72.75)],
+    },
+}</field>
+        <field name="rule_parameter_id" ref="rule_parameter_vt_tax_rate_tables"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+    </record>
 
     <record id="rule_parameter_id_tax_rate" model="hr.rule.parameter">
         <field name="name">US: Idaho Withholding - Tax Rate</field>
@@ -1239,6 +1389,36 @@
         <field name="rule_parameter_id" ref="rule_parameter_id_tax_brackets"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_id_tax_brackets_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">{
+    'weekly': {
+        'single': 310,
+        'married': 619,
+    },
+    'bi-weekly': {
+        'single': 619,
+        'married': 1238,
+    },
+    'semi-monthly': {
+        'single': 671,
+        'married': 1342,
+    },
+    'monthly': {
+        'single': 1342,
+        'married': 2683,
+    },
+    'annually': {
+        'single': 16100,
+        'married': 32200,
+    },
+    'daily': {
+        'single': 62,
+        'married': 124,
+    },
+}</field>
+        <field name="rule_parameter_id" ref="rule_parameter_id_tax_brackets"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+    </record>
 
     <record id="rule_parameter_id_child_tax_credit_withholding_allowances" model="hr.rule.parameter">
         <field name="name">US: Idaho Child Tax Credit Withholding Allowances</field>
@@ -1256,6 +1436,18 @@
 }</field>
         <field name="rule_parameter_id" ref="rule_parameter_id_child_tax_credit_withholding_allowances"/>
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_id_child_tax_credit_withholding_allowances_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">{
+    'weekly': 0,
+    'bi-weekly': 0,
+    'semi-monthly': 0,
+    'monthly': 0,
+    'annually': 0,
+    'daily': 0,
+}</field>
+        <field name="rule_parameter_id" ref="rule_parameter_id_child_tax_credit_withholding_allowances"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
 
     <record id="rule_parameter_ca_tax_rate_tables" model="hr.rule.parameter">
@@ -2577,7 +2769,7 @@
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_wa_pfml_family_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">-0.54419</field>
+        <field name="parameter_value">-0.543078</field>
         <field name="rule_parameter_id" ref="rule_parameter_wa_pfml_family_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -2598,7 +2790,7 @@
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_wa_pfml_medical_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">-0.26296</field>
+        <field name="parameter_value">-0.264081</field>
         <field name="rule_parameter_id" ref="rule_parameter_wa_pfml_medical_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -5409,7 +5601,7 @@
         <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
     <record id="l10n_us_employee_salary_vt_employer_childcare_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">0.44</field>
+        <field name="parameter_value">0.33</field>
         <field name="rule_parameter_id" ref="l10n_us_employee_salary_vt_employer_childcare_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -6434,7 +6626,7 @@
         <field name="country_id" ref="base.us"/>
     </record>
     <record id="rule_parameter_ga_income_tax_rate_2026" model="hr.rule.parameter.value">
-        <field name="parameter_value">5.19</field>
+        <field name="parameter_value">4.99</field>
         <field name="rule_parameter_id" ref="rule_parameter_ga_income_tax_rate"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
@@ -6446,14 +6638,14 @@
     </record>
     <record id="rule_parameter_ga_standard_deduction_2026" model="hr.rule.parameter.value">
         <field name="parameter_value">{
-    'daily': {'joint': 65.75, 'single': 32.88, 'separate': 32.88},
-    'weekly': {'joint': 461.54, 'single': 230.77, 'separate': 230.77},
-    'bi-weekly': {'joint': 923.08, 'single': 461.54, 'separate': 461.54},
-    'semi-monthly': {'joint': 1000.00, 'single': 500.00, 'separate': 500.00},
-    'monthly': {'joint': 2000.00, 'single': 1000.00, 'separate': 1000.00},
-    'quarterly': {'joint': 6000.00, 'single': 3000.00, 'separate': 3000.00},
-    'semi-annually': {'joint': 12000.00, 'single': 6000.00, 'separate': 6000.00},
-    'annually': {'joint': 24000.00, 'single': 12000.00, 'separate': 12000.00},
+    'daily': {'joint': 82.19, 'single': 41.10, 'separate': 41.10},
+    'weekly': {'joint': 576.92, 'single': 288.46, 'separate': 288.46},
+    'bi-weekly': {'joint': 1153.85, 'single': 576.92, 'separate': 576.92},
+    'semi-monthly': {'joint': 1250.00, 'single': 625.00, 'separate': 625.00},
+    'monthly': {'joint': 2500.00, 'single': 1250.00, 'separate': 1250.00},
+    'quarterly': {'joint': 7500.00, 'single': 3750.00, 'separate': 3750.00},
+    'semi-annually': {'joint': 15000.00, 'single': 7500.00, 'separate': 7500.00},
+    'annually': {'joint': 30000.00, 'single': 15000.00, 'separate': 15000.00},
 }</field>
         <field name="rule_parameter_id" ref="rule_parameter_ga_standard_deduction"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
@@ -6466,14 +6658,14 @@
     </record>
     <record id="rule_parameter_ga_dependent_allowance_2026" model="hr.rule.parameter.value">
         <field name="parameter_value">{
-    'daily': 10.96,
-    'weekly': 76.92,
-    'bi-weekly': 153.85,
-    'semi-monthly': 166.67,
-    'monthly': 333.33,
-    'quarterly': 1000.00,
-    'semi-annually': 2000.00,
-    'annually': 4000.00,
+    'daily': 13.70,
+    'weekly': 96.15,
+    'bi-weekly': 192.31,
+    'semi-monthly': 208.33,
+    'monthly': 416.67,
+    'quarterly': 1250.00,
+    'semi-annually': 2500.00,
+    'annually': 5000.00,
 }</field>
         <field name="rule_parameter_id" ref="rule_parameter_ga_dependent_allowance"/>
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>

@@ -20,17 +20,18 @@
 # Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2022
 # Ediz Duman <neps1192@gmail.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:46+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 14:37+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "hr_appraisal/tr/>\n"
 "Language: tr\n"
@@ -68,6 +69,33 @@ msgid ""
 "viewed in a PDF form.\n"
 "* Meeting Requests are created manually according to employees appraisals.\n"
 msgstr ""
+"\n"
+"Periyodik Çalışan Değerlendirmesi\n"
+"==============================\n"
+"\n"
+"Bu uygulamayı kullanarak çalışanlarınızın performansını periyodik olarak "
+"değerlendirerek motivasyonu sürdürebilirsiniz. İnsan kaynaklarının yapacağı "
+"düzenli değerlendirmeler, hem çalışanlarınıza hem de kurumunuza fayda "
+"sağlayabilir.\n"
+"\n"
+"Her çalışana bir değerlendirme planı atanabilir. Bu planlar, periyodik "
+"kişisel değerlendirmelerinizin sıklığını ve nasıl yönetileceğini tanımlar.\n"
+"\n"
+"Temel Özellikler\n"
+"------------\n"
+"* Çalışanın değerlendirmesini/değerlendirmelerini oluşturabilme.\n"
+"* Değerlendirmeler, çalışanın yöneticisi tarafından veya çalışan formunda "
+"tanımlanan programa göre otomatik olarak oluşturulabilir.\n"
+"* Değerlendirme, çeşitli anketlerin oluşturulabileceği bir plana göre "
+"yapılır. Her anket, çalışanların hiyerarşisinde belirli bir seviyedeki "
+"çalışan tarafından yanıtlanabilir. Son gözden geçirme ve değerlendirme "
+"yönetici tarafından yapılır.\n"
+"* Yönetici, çalışma arkadaşı, ortak çalışan ve çalışanın kendisi periyodik "
+"bir değerlendirme yapılması doğrultusunda e-posta alır.\n"
+"* Çalışanlar, çalışma arkadaşları, ortak çalışanlar tarafından doldurulan "
+"her Değerlendirme Formu PDF olarak görüntülenebilir.\n"
+"* Toplantı Talepleri çalışanların değerlendirmelerine göre manuel olarak "
+"oluşturulur.\n"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -119,7 +147,7 @@ msgid ""
 "\">\n"
 "                        Dear <t t-out=\"ctx.get('employee_to_name')"
 "\">employee</t>,\n"
-"                        <br/>\n"
+"                        <br>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
 "\">addison.olson28@example.com</t>) has requested an appraisal.\n"
@@ -148,37 +176,36 @@ msgid ""
 "            "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                       <t t-out=\"ctx.get('employee_to_name')\"> 'ın değerli "
-"çalışanı</t>,\n"
-"                       <br/>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\"> Addison "
-"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) bir değerlendirme talebinde "
-"bulunmuştur.\n"
-"                       <t t-if=\"ctx.get('user_body')\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Sayın <t t-out=\"ctx.get('employee_to_name')\">"
+"çalışan</t>,\n"
+"                        <br>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t> (<t t-out=\"ctx.get('author_mail', '')\">"
+"addison.olson28@example.com</t>) bir değerlendirme talebinde bulundu.\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #8A9A8A\"> \n"
-"                               <t t-out=\"ctx.get('user_body')\"> Yıllık "
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">Yıllık "
 "değerlendirme.</t>\n"
 "                            </div>\n"
-"                       </t>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\"> \n"
-"                           <p style=\"margin: 16px 0px 16px 0px; padding: "
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
 "                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
-"style=\" margin: auto; background-color: "
-"{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
-"padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\"> \n"
+"style=\" margin: auto; background-color: {"
+"{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
+"padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
 "                                    Değerlendirmeyi Görüntüle\n"
-"                               </a>\n"
-"                            </p> \n"
-"                       </t>\n"
-"                    </p> \n"
-"               </div> \n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
 "            "
 
 #. module: hr_appraisal
@@ -189,12 +216,12 @@ msgid ""
 "\">\n"
 "                        Hi <t t-out=\"ctx.get('employee_to_name')"
 "\">[employee]</t>,\n"
-"                        <br/>\n"
+"                        <br>\n"
 "                        Just a quick reminder that your next appraisal with "
 "<t t-out=\"ctx.get('manager_names')\"> [Appraisers]</t>\n"
 "                        is scheduled for <t t-out=\"ctx.get('date_close')"
 "\">[deadline]</t>.\n"
-"                        <br/>\n"
+"                        <br>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div class=\"my-3 py-2 px-3\" style=\"background-"
 "color: #8A9A8A\">\n"
@@ -217,14 +244,55 @@ msgid ""
 "                        </t>\n"
 "                        If you have any questions or need to reschedule, "
 "feel free to reach out.\n"
-"                        <br/>\n"
-"                        <br/>\n"
-"                        <t t-out=\"ctx.get('author_signature')\"/>\n"
-"                        <br/>\n"
+"                        <br>\n"
+"                        <br>\n"
+"                        <t t-out=\"ctx.get('author_signature')\"></t>\n"
+"                        <br>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Merhaba <t t-out=\"ctx.get('employee_to_name')\">"
+"[çalışan]</t>,\n"
+"                        <br>\n"
+"                        <t t-out=\"ctx.get('manager_names')\"> "
+"[Değerlendirenler]</t> ile bir sonraki değerlendirmenizin <t t-out=\"ctx.get"
+"('date_close')\">[son tarih]</t> tarihinde planlandığını kısaca hatırlatmak "
+"isteriz.\n"
+"                        <br>\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">[İsteğe "
+"bağlı yorum]</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            Değerlendirme formunuza buradan "
+"erişebilirsiniz:\n"
+"                            <p class=\"text-center my-3 py-2 px-3\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">"
+"\n"
+"                                    Değerlendirmeyi Görüntüle\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        Sorularınız varsa veya yeniden planlama yapmanız "
+"gerekiyorsa, bize ulaşmaktan çekinmeyin.\n"
+"                        <br>\n"
+"                        <br>\n"
+"                        <t t-out=\"ctx.get('author_signature')\"></t>\n"
+"                        <br>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
@@ -234,10 +302,10 @@ msgid ""
 "\">\n"
 "                        The appraisal for <t t-"
 "out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        Please proceed with the appraisal discussion based "
 "on the scheduled date.\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; text-"
 "align: center;\">\n"
@@ -254,6 +322,30 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        <t t-out=\"ctx.get('employee_to_name')\">çalışan</t> "
+"için değerlendirme onaylandı.\n"
+"                        <br><br>\n"
+"                        Lütfen planlanan tarihe göre değerlendirme "
+"görüşmesine devam edin.\n"
+"                        <br><br>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">"
+"\n"
+"                                    Değerlendirmeyi Görüntüle\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -443,6 +535,8 @@ msgid ""
 "<span class=\"o_stat_text\">Appraisals</span>\n"
 "                        <span class=\"o_stat_value\">New</span>"
 msgstr ""
+"<span class=\"o_stat_text\">Değerlendirmeler</span>\n"
+"                        <span class=\"o_stat_value\">Yeni</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -1049,7 +1143,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
 #: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
@@ -1067,7 +1161,7 @@ msgstr "Aktivite Türü İmgesi"
 #: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
 msgid "Activity Types"
-msgstr ""
+msgstr "Aktivite Türleri"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
@@ -1075,6 +1169,10 @@ msgid ""
 "Activity plans are used to assign a list of activities in just a few clicks\n"
 "                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
 msgstr ""
+"Aktivite planları, birkaç tıklamayla bir aktivite listesi atamak için "
+"kullanılır\n"
+"                (örn. \"Yıl Ortası Değerlendirmesi\", \"Yıllık "
+"Değerlendirme\", ...)"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1116,7 +1214,7 @@ msgstr "Tüm şirketler"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Already Processed"
-msgstr ""
+msgstr "Zaten İşlenmiş"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1201,7 +1299,7 @@ msgstr "Değerlendirme Hedefi"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
 msgid "Appraisal Goal Tag"
-msgstr ""
+msgstr "Değerlendirme Hedef Etiketi"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1217,7 +1315,7 @@ msgstr "Değerlendirme Planı Yayınlandı"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
 msgid "Appraisal Plans"
-msgstr ""
+msgstr "Değerlendirme Planları"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
@@ -1240,6 +1338,8 @@ msgstr "Değerlendirme Talebi"
 msgid ""
 "Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
 msgstr ""
+"Şu kişiden Değerlendirme Talebi: {{ hasattr(object, 'name') and object.name "
+"or '' }}"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1303,6 +1403,8 @@ msgid ""
 "Appraisal's managers have been updated due to the end of collaboration with "
 "an employee."
 msgstr ""
+"Bir çalışanla iş birliğinin sona ermesi nedeniyle değerlendirme yöneticileri "
+"güncellendi."
 
 #. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
@@ -1369,7 +1471,7 @@ msgstr "Diğer çalışanlara anket doldurmalarını isteme"
 #. module: hr_appraisal
 #: model:ir.module.module,summary:base.module_hr_appraisal
 msgid "Assess your employees"
-msgstr ""
+msgstr "Çalışanlarınızı değerlendirin"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1458,7 +1560,7 @@ msgstr "Yönetici Yayınlanmışı Görebilir"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
 msgid "Children Progression"
-msgstr ""
+msgstr "Alt Öğe İlerlemesi"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -1532,7 +1634,7 @@ msgstr "Devam edin"
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
 msgid "Create a Appraisal Activity Plan"
-msgstr ""
+msgstr "Bir Değerlendirme Aktivite Planı oluşturun"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1712,12 +1814,12 @@ msgstr "Taslak"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 msgid "Edit Feedback"
-msgstr ""
+msgstr "Geri Bildirimi Düzenle"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
 msgid "Email Template"
-msgstr ""
+msgstr "E-posta Şablonu"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
@@ -1747,7 +1849,7 @@ msgstr "Çalışan Otomatik Tamamlama"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee_departure
 msgid "Employee Departure"
-msgstr ""
+msgstr "Çalışanın İşten Ayrılması"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
@@ -1811,12 +1913,12 @@ msgstr "Beklentileri aşıyor"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Expand Employee's Feedback"
-msgstr ""
+msgstr "Çalışan Geri Bildirimini Genişlet"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Expand Manager's Feedback"
-msgstr ""
+msgstr "Yönetici Geri Bildirimini Genişlet"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -2246,7 +2348,7 @@ msgstr "Yapıldı Olarak İşaretle"
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2362,7 +2464,7 @@ msgstr "Sonraki Değerleme Tarihi"
 #. module: hr_appraisal
 #: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2551,7 +2653,7 @@ msgstr "İlerleme:"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
 msgid "Progression"
-msgstr ""
+msgstr "İlerleme"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2645,6 +2747,7 @@ msgstr "Bir Değerlendirme Talebi"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Request an Appraisal with your manager to assess your work."
 msgstr ""
+"İşinizi değerlendirmesi için yöneticinizden bir Değerlendirme talep edin."
 
 #. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
@@ -2658,6 +2761,8 @@ msgid ""
 "Resetting the appraisal will erase all manually entered content in the "
 "Employee and Manager Feedback sections. Do you want to continue?"
 msgstr ""
+"Değerlendirmeyi sıfırlamak, Çalışan ve Yönetici Geri Bildirimi bölümlerinde "
+"manuel olarak girilen tüm içeriği silecektir. Devam etmek istiyor musunuz?"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_user_id
@@ -2727,7 +2832,7 @@ msgstr "Gönder"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
 msgid "Send By Email"
-msgstr ""
+msgstr "E-Posta ile Gönder"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2806,7 +2911,7 @@ msgstr "Sosyal Beceriler"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Some appraisals were already in another state and were skipped."
-msgstr ""
+msgstr "Bazı değerlendirmeler zaten başka bir durumda olduğundan atlandı."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -3031,6 +3136,7 @@ msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "field: %(inaccessible_field)s"
 msgstr ""
+"Maalesef şu alanın değerini değiştirme yetkiniz yok: %(inaccessible_field)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3039,6 +3145,8 @@ msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "fields: %(inaccessible_fields)s"
 msgstr ""
+"Maalesef şu alanların değerini değiştirme yetkiniz yok: %"
+"(inaccessible_fields)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3049,7 +3157,7 @@ msgstr "Yayında Değil"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 msgid "Update"
-msgstr ""
+msgstr "Güncelle"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -3195,7 +3303,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "You cannot modify a finished appraisal."
-msgstr ""
+msgstr "Tamamlanmış bir değerlendirmeyi değiştiremezsiniz."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3268,6 +3376,74 @@ msgstr "yayınlandıktan sonra"
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: Değerlendirme Onaylandı"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        Dear <t t-out=\"ctx.get('employee_to_name')"
+#~ "\">employee</t>,\n"
+#~ "                        <br/>\n"
+#~ "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+#~ "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+#~ "\">addison.olson28@example.com</t>) has requested an appraisal.\n"
+#~ "                        <t t-if=\"ctx.get('user_body')\">\n"
+#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
+#~ "padding: 8px 16px 8px 16px; background-color: #8A9A8A\">\n"
+#~ "                                <t t-out=\"ctx.get('user_body')\">Annual "
+#~ "appraisal.</t>\n"
+#~ "                            </div>\n"
+#~ "                        </t>\n"
+#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
+#~ "                            <p style=\"margin: 16px 0px 16px 0px; "
+#~ "padding: 8px 16px 8px 16px; text-align: center;\">\n"
+#~ "                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+#~ "style=\" margin: auto; background-color: "
+#~ "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; "
+#~ "border-radius: 5px;\">\n"
+#~ "                                    View Appraisal\n"
+#~ "                                </a>\n"
+#~ "                            </p>\n"
+#~ "                        </t>\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                       <t t-out=\"ctx.get('employee_to_name')\"> 'ın "
+#~ "değerli çalışanı</t>,\n"
+#~ "                       <br/>\n"
+#~ "                        <t t-out=\"ctx.get('author_name', '')\"> Addison "
+#~ "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+#~ "\">addison.olson28@example.com</t>) bir değerlendirme talebinde "
+#~ "bulunmuştur.\n"
+#~ "                       <t t-if=\"ctx.get('user_body')\">\n"
+#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
+#~ "padding: 8px 16px 8px 16px; background-color: #8A9A8A\"> \n"
+#~ "                               <t t-out=\"ctx.get('user_body')\"> Yıllık "
+#~ "değerlendirme.</t>\n"
+#~ "                            </div>\n"
+#~ "                       </t>\n"
+#~ "                        <t t-if=\"ctx.get('recipient_users')\"> \n"
+#~ "                           <p style=\"margin: 16px 0px 16px 0px; padding: "
+#~ "8px 16px 8px 16px; text-align: center;\">\n"
+#~ "                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+#~ "style=\" margin: auto; background-color: "
+#~ "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; "
+#~ "border-radius: 5px;\"> \n"
+#~ "                                    Değerlendirmeyi Görüntüle\n"
+#~ "                               </a>\n"
+#~ "                            </p> \n"
+#~ "                       </t>\n"
+#~ "                    </p> \n"
+#~ "               </div> \n"
+#~ "            "
 
 #~ msgid "Website Messages"
 #~ msgstr "Websitesi Mesajları"

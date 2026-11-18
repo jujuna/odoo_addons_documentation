@@ -24,6 +24,9 @@
         'views/ai_menus.xml',
         'views/ai_prompt_button_views.xml',
     ],
+    'demo': [
+        'data/ai_agent_demo.xml',
+    ],
     'assets': {
         'web.assets_backend': [
             'ai_agentic/static/src/**/*',

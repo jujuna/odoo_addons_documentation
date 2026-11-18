@@ -4,23 +4,22 @@ from freezegun import freeze_time
 from datetime import date, datetime
 
 from odoo.tests import tagged
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestBelgianCompanyCommon
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install', 'eco_vouchers')
-class TestEcoVouchers(AccountTestInvoicingCommon, TestBelgiumCommon):
+class TestEcoVouchers(TestBelgianCompanyCommon, TestBelgiumCommon):
 
     _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @AccountTestInvoicingCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.group_ids += cls.quick_ref('hr_holidays.group_hr_holidays_manager') \
             | cls.quick_ref('hr_payroll.group_hr_payroll_officer')
         cls.cp200 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
-        cls.company_data['company'].current_payroll_config_id.l10n_be_employer_category_id = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010')
+        cls.env.company.current_payroll_config_id.l10n_be_employer_category_id = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010')
 
     @freeze_time("2021-01-01")
     def test_eco_vouchers(self):
@@ -221,3 +220,50 @@ class TestEcoVouchers(AccountTestInvoicingCommon, TestBelgiumCommon):
         june_payslip.action_refresh_from_work_entries()
         june_payslip.action_payslip_done()
         self.assertAlmostEqual(june_payslip._get_eco_vouchers_amount(), 0.0, places=2)
+
+    @freeze_time("2026-06-01")
+    def test_eco_vouchers_sectoral_compensatory_rest(self):
+        # The compensatory rest days of a sectoral reduction of the working time (165.00) are paid by a third party,
+        # not by the employer, but remain assimilated to working days: the employee on such rest days during the
+        # whole reference period 01/06/2025 -> 31/05/2026 is granted the full amount.
+        full_time_calendar = self.env['resource.calendar'].sudo().create([{
+            'name': "Test Calendar : 38 Hours/Week",
+            'company_id': self.env.company.id,
+            'hours_per_week': 38.0,
+            'full_time_required_hours': 38.0,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'dayofweek': dayofweek,
+                'hour_from': hour_from,
+                'hour_to': hour_to,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id
+            }) for dayofweek in ['0', '1', '2', '3', '4'] for hour_from, hour_to in [(8.0, 12.0), (13.0, 16.6)]],
+        }]).sudo(False)
+        employee = self.env['hr.employee'].sudo().create({
+            'name': 'Test Rest Employee',
+            'date_version': date(2025, 6, 1),
+            'contract_date_start': date(2025, 6, 1),
+            'resource_calendar_id': full_time_calendar.id,
+            'wage': 1000,
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'lang': 'fr_BE',
+        }).sudo(False)
+        rest_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_sectoral_compensatory_rest')
+        self.env['resource.calendar.leaves'].sudo().create({
+            'name': 'Sectoral compensatory rest',
+            'calendar_id': full_time_calendar.id,
+            'company_id': self.env.company.id,
+            'resource_id': employee.resource_id.id,
+            'date_from': datetime(2025, 6, 1, 0, 0),
+            'date_to': datetime(2026, 5, 31, 23, 59),
+            'count_as': 'working_time',
+            'work_entry_type_id': rest_type.id,
+        })
+        june_payslip = self.env['hr.payslip'].create({
+            'version_id': employee.version_id.id,
+            'date_from': datetime(2026, 6, 1),
+            'date_to': datetime(2026, 6, 30),
+            'employee_id': employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        self.assertAlmostEqual(june_payslip._get_eco_vouchers_amount(), 250.0, places=2)

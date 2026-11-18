@@ -15,6 +15,7 @@ export class TimesheetsAssistantTimeline extends Component {
         records: t.array(),
         showAwayTime: t.boolean(),
         selectedRowsSize: t.number(),
+        highlight: t.function(),
         isSelected: t.function(),
         getSelectionClass: t.function(),
         onMouseDown: t.function(),

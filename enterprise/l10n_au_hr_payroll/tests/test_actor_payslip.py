@@ -2,6 +2,8 @@
 from datetime import date
 from unittest import skip
 
+from freezegun import freeze_time
+
 from odoo.tests import tagged
 
 from .common import TestPayrollCommon
@@ -101,6 +103,32 @@ class TestPayrollActor(TestPayrollCommon):
             payslip_date_from=payslip_date,
             payslip_date_to=payslip_end_date,
         )
+
+    @freeze_time(date(2023, 7, 3))
+    def test_actor_payslip_underage_bi_weekly(self):
+        """ A bi-weekly pay schedule must be supported for underage actors. """
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Employee',
+            'employment_basis_code': 'F',
+            'l10n_au_training_loan': False,
+            'tax_treatment_option_actor': 'P',
+            'birthday': date(2010, 1, 1),
+            'wage_type': 'monthly',
+            'schedule_pay': 'bi-weekly',
+            'wage': 600,
+            'casual_loading': 0,
+            'performances_per_week': 1,
+        })
+        payslip = self.env["hr.payslip"].create({
+            "name": "payslip",
+            "employee_id": employee.id,
+            "version_id": contract.id,
+            "struct_id": self.default_payroll_structure.id,
+            "date_from": date(2023, 7, 3),
+            "date_to": date(2023, 7, 16),
+        })
+        underage_threshold = payslip._rule_parameter("l10n_au_withholding_schedule_3")["promotional"]["underage"]["bi-weekly"]
+        self.assertEqual(payslip._l10n_au_tax_schedule_parameters(), underage_threshold)
 
     @skip("Daily actors with number of performances to be implemented")
     def test_actor_payslip_3(self):

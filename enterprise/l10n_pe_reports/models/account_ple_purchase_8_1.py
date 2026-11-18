@@ -15,10 +15,8 @@ class L10n_PeTaxPle81ReportHandler(models.AbstractModel):
 
     def export_to_txt(self, options):
         def format_float(amount):
-            """Avoid -0 on TXT report"""
-            if amount == 0:
-                return abs(amount)
-            return amount
+            """Format the amount with the two decimals SUNAT requires, avoiding -0 on TXT report"""
+            return "%.2f" % (amount or 0)
 
         lines = self._get_ple_report_data(options, "move_id")
         data = []
@@ -44,7 +42,7 @@ class L10n_PeTaxPle81ReportHandler(models.AbstractModel):
                     "customer_id": columns["partner_lit_code"],
                     "customer_vat": columns["customer_vat"] or "",
                     "customer": columns["customer"],
-                    "base_igv": format_float(columns["base_igv"]) or "0.0",
+                    "base_igv": format_float(columns["base_igv"]) or "0.00",
                     "tax_igv": format_float(columns["tax_igv"]) or "0.00",
                     "base_igv_mixto": format_float(columns["base_igv_g_ng"]) or "0.00",
                     "tax_igv_mixto": format_float(columns["vat_igv_g_ng"]) or "0.00",
@@ -55,7 +53,7 @@ class L10n_PeTaxPle81ReportHandler(models.AbstractModel):
                     "tax_isc": format_float(columns["tax_isc"]) or "0.00",
                     "tax_bl": format_float(columns["vat_icbper"]) or "0.00",
                     "vat_other": format_float(columns["vat_other"]) or "0.00",
-                    "amount_total": columns["amount_total"] or "0.00",
+                    "amount_total": format_float(columns["amount_total"]) or "0.00",
                     "currency": columns["currency"],
                     "rate": ("%.3f" % abs(columns["rate"])) if columns["currency"] != "PEN" else "",
                     "emission_date_related": columns["emission_date_related"].strftime("%d/%m/%Y") if columns[

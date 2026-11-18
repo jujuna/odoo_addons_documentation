@@ -259,6 +259,31 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
             self.get_xml_tree_from_string(expected_xml)
         )
 
+    def test_return_check_duplicate_partner_vat(self):
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
+        vat_listing_return = self.env['account.return'].create({
+            'name': "Partner VAT Listing",
+            'type_id': self.env.ref('l10n_be_reports.be_vat_listing_return_type').id,
+            'company_id': self.env.company.id,
+            'date_from': '2022-01-01',
+            'date_to': '2022-12-31',
+        })
+
+        partner_a_be_copy = self.partner_a_be.copy({'name': 'Partner Z (BE)'})
+        self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=10, product_price_unit=300)
+        self.create_and_post_account_move('out_invoice', partner_a_be_copy.id, '2022-06-01', product_quantity=10, product_price_unit=400)
+
+        vat_listing_return.refresh_checks()
+        check = vat_listing_return.check_ids.filtered(lambda c: c.code == 'be_vat_listing_duplicate_partner_vat')
+        self.assertRecordValues(check, [{'result': 'anomaly', 'records_count': 2}])
+        self.assertEqual(check.action['context']['duplicate_partners_vat'], ['BE0246697724'])
+
+        self.partner_a_be.with_context(duplicate_partners_vat=check.action['context']['duplicate_partners_vat']).set_commercial_partner_main()
+
+        vat_listing_return.refresh_checks()
+        self.assertRecordValues(check, [{'result': 'reviewed', 'records_count': 0}])
+        self.assertFalse(check.action)
+
     def test_ignore_VAT_partners(self):
         self.partner_ignore_be = self.env['res.partner'].create({
             'name': 'Partner C (BE)',

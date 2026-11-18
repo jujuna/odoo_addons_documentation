@@ -3,13 +3,15 @@
 # * l10n_tr_currency_live_rate
 #
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 18:14+0000\n"
-"PO-Revision-Date: 2026-10-20 12:16+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"PO-Revision-Date: 2026-11-09 16:34+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "l10n_tr_currency_live_rate/tr/>\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +32,15 @@ msgid ""
 "This module fetches both rates from the TCMB feed and lets the buying or the\n"
 "selling one be picked on invoices, bills and payments.\n"
 msgstr ""
+"\n"
+"TCMB, para birimi başına ayrı bir alış ve satış döviz kuru yayınlar,\n"
+"ancak Odoo yalnızca tek bir kur tutar. Türk muhasebesi, tek bir ortalama kur "
+"yerine\n"
+"alış veya satış kurunun açıkça uygulanmasını gerektirir.\n"
+"\n"
+"Bu modül, her iki kuru da TCMB beslemesinden alır ve faturalarda, gider "
+"faturalarında ve ödemelerde\n"
+"alış veya satış kurunun seçilmesine olanak tanır.\n"
 
 #. module: l10n_tr_currency_live_rate
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_account_payment_form
@@ -37,6 +48,11 @@ msgid ""
 "<span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != 'sell'\">Selling Rate</span>\n"
 "                        <span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != 'buy'\">Buying Rate</span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != "
+"'sell'\"></span>\n"
+"                        <span class=\"text-muted\" "
+"invisible=\"l10n_tr_currency_rate_type != 'buy'\">Satış Kurları Alım "
+"Kurları</span>"
 
 #. module: l10n_tr_currency_live_rate
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_account_payment_register_form
@@ -45,12 +61,17 @@ msgid ""
 "<span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != 'sell'\">Selling Rate</span>\n"
 "                    <span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != 'buy'\">Buying Rate</span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"l10n_tr_currency_rate_type != "
+"'sell'\"></span>\n"
+"                        <span class=\"text-muted\" "
+"invisible=\"l10n_tr_currency_rate_type != 'buy'\">Satış Kurları Alım "
+"Kurları</span>"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_partner__l10n_tr_bill_currency_rate_type
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_users__l10n_tr_bill_currency_rate_type
 msgid "Bill/Refund"
-msgstr ""
+msgstr "Fatura/İade"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__account_move__l10n_tr_currency_rate_type__buy
@@ -59,73 +80,73 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__res_partner__l10n_tr_bill_currency_rate_type__buy
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__res_partner__l10n_tr_invoice_currency_rate_type__buy
 msgid "Buying"
-msgstr ""
+msgstr "Satın Alma"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency_rate.py:0
 msgid "Buying %(company_currency_name)s per %(rate_currency_name)s"
-msgstr ""
+msgstr "Alış %(company_currency_name)s / %(rate_currency_name)s"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency_rate.py:0
 msgid "Buying %(rate_currency_name)s per %(company_currency_name)s"
-msgstr ""
+msgstr "Alış %(rate_currency_name)s / %(company_currency_name)s"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency.py:0
 msgid "Buying %s per Unit"
-msgstr ""
+msgstr "Alış %s / Birim"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency.py:0
 msgid "Buying Unit per %s"
-msgstr ""
+msgstr "Alış Birim / %s"
 
 #. module: l10n_tr_currency_live_rate
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_account_payment_form
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_account_payment_register_form
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_move_form
 msgid "Click to toggle between the Selling and Buying rate"
-msgstr ""
+msgstr "Satış ve Alım kuru arasında geçiş yapmak için tıklayın"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Firma"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Kontak"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,website_form_label:l10n_tr_currency_live_rate.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "Müşteri Oluşturun"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_res_currency
 msgid "Currency"
-msgstr ""
+msgstr "Kur"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_res_currency_rate
 msgid "Currency Rate"
-msgstr ""
+msgstr "Geçerli Kur"
 
 #. module: l10n_tr_currency_live_rate
 #: model_terms:ir.ui.view,arch_db:l10n_tr_currency_live_rate.view_partner_property_form
 msgid "Currency Rates"
-msgstr ""
+msgstr "Para Birimi Çevrim Değerleri"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_account_payment__l10n_tr_payment_currency_rate
 msgid "Currency rate from company currency to payment currency."
-msgstr ""
+msgstr "Şirket para biriminden ödeme para birimine döviz kuru."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_move__display_name
@@ -136,7 +157,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency_rate__display_name
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_partner__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Görünüm Adı"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_partner__l10n_tr_invoice_currency_rate_type
@@ -145,6 +166,8 @@ msgid ""
 "Exchange rate type defaulted on this partner's invoices and credit notes. "
 "Leave empty to use the regular per-document default."
 msgstr ""
+"Bu iş ortağının faturalarında ve alacak dekontlarında varsayılan döviz kuru "
+"türü. Belge bazlı normal varsayılanı kullanmak için boş bırakın."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_partner__l10n_tr_bill_currency_rate_type
@@ -153,12 +176,14 @@ msgid ""
 "Exchange rate type defaulted on this partner's vendor bills and refunds. "
 "Leave empty to use the regular per-document default."
 msgstr ""
+"Bu iş ortağının tedarikçi faturalarında ve iadelerinde varsayılan döviz kuru "
+"türü. Belge bazlı normal varsayılanı kullanmak için boş bırakın."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.module.module,summary:base.module_l10n_tr_currency_live_rate
 msgid ""
 "Fetch and apply the buying/selling exchange rates published by the TCMB"
-msgstr ""
+msgstr "TCMB tarafından yayınlanan alış/satış döviz kurlarını getir ve uygula"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_move__id
@@ -169,28 +194,28 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency_rate__id
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_partner__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_partner__l10n_tr_invoice_currency_rate_type
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_users__l10n_tr_invoice_currency_rate_type
 msgid "Invoice/Credit Note"
-msgstr ""
+msgstr "Fatura/Alacak Dekontu"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "Yevmiye Kaydı"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency__l10n_tr_buy_rate
 msgid "L10N Tr Buy Rate"
-msgstr ""
+msgstr "L10N Tr Alış Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_company_buy_rate
 msgid "L10N Tr Company Buy Rate"
-msgstr ""
+msgstr "L10N Tr Şirket Alış Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_bank_statement_line__l10n_tr_currency_rate_type
@@ -198,37 +223,37 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_payment__l10n_tr_currency_rate_type
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_payment_register__l10n_tr_currency_rate_type
 msgid "L10N Tr Currency Rate Type"
-msgstr ""
+msgstr "L10N Tr Döviz Kuru Türü"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency__l10n_tr_inverse_buy_rate
 msgid "L10N Tr Inverse Buy Rate"
-msgstr ""
+msgstr "L10N Tr Ters Alış Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_inverse_company_buy_rate
 msgid "L10N Tr Inverse Company Buy Rate"
-msgstr ""
+msgstr "L10N Tr Ters Şirket Alış Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_account_payment__l10n_tr_payment_currency_rate
 msgid "L10N Tr Payment Currency Rate"
-msgstr ""
+msgstr "L10N Tr Ödeme Döviz Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency__l10n_tr_show_buy_rate
 msgid "L10N Tr Show Buy Rate"
-msgstr ""
+msgstr "L10N Tr Alış Kurunu Göster"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_account_payment_register
 msgid "Pay"
-msgstr ""
+msgstr "Öde"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model,name:l10n_tr_currency_live_rate.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "Ödeme"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__account_move__l10n_tr_currency_rate_type__sell
@@ -237,62 +262,62 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__res_partner__l10n_tr_bill_currency_rate_type__sell
 #: model:ir.model.fields.selection,name:l10n_tr_currency_live_rate.selection__res_partner__l10n_tr_invoice_currency_rate_type__sell
 msgid "Selling"
-msgstr ""
+msgstr "Satış"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency_rate.py:0
 msgid "Selling %(company_currency_name)s per %(rate_currency_name)s"
-msgstr ""
+msgstr "Her %(rate_currency_name)s için %(company_currency_name)s satışı"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency_rate.py:0
 msgid "Selling %(rate_currency_name)s per %(company_currency_name)s"
-msgstr ""
+msgstr "Her %(company_currency_name)s için %(rate_currency_name)s satışı"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency.py:0
 msgid "Selling %s per Unit"
-msgstr ""
+msgstr "Birim başına %s satışı"
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
 #: code:addons/l10n_tr_currency_live_rate/models/res_currency.py:0
 msgid "Selling Unit per %s"
-msgstr ""
+msgstr "Her %s için birim satışı"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,field_description:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_buy_rate
 msgid "Technical Buy Rate"
-msgstr ""
+msgstr "Teknik Alış Kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.constraint,message:l10n_tr_currency_live_rate.constraint_res_currency_rate_l10n_tr_buy_rate_check
 msgid "The buying rate must be strictly positive."
-msgstr ""
+msgstr "Alış kuru mutlaka pozitif olmalıdır."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_buy_rate
 msgid "The buying rate of the currency to the currency of rate 1"
-msgstr ""
+msgstr "Para biriminin 1 no'lu kur para birimine alış kuru"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_inverse_company_buy_rate
 msgid "The buying rate of the currency to the currency of rate 1 "
-msgstr ""
+msgstr "Para biriminin 1 no'lu kur para birimine alış kuru "
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_currency__l10n_tr_buy_rate
 msgid "The buying rate of the currency to the currency of rate 1."
-msgstr ""
+msgstr "Para biriminin 1 no'lu kur para birimine alış kuru."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_currency__l10n_tr_inverse_buy_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_res_currency_rate__l10n_tr_company_buy_rate
 msgid "The currency of rate 1 to the buying rate of the currency."
-msgstr ""
+msgstr "1 no'lu kur para biriminin para birimine alış kuru."
 
 #. module: l10n_tr_currency_live_rate
 #. odoo-python
@@ -301,11 +326,13 @@ msgid ""
 "The name for the current rate is empty.\n"
 "Please set it."
 msgstr ""
+"Geçerli kur için 'ad' boş.\n"
+"Lütfen ayarlayın."
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.module.module,shortdesc:base.module_l10n_tr_currency_live_rate
 msgid "Türkiye - Live Currency Exchange Rate (Buying/Selling)"
-msgstr ""
+msgstr "Türkiye - Canlı Döviz Kuru (Alış/Satış)"
 
 #. module: l10n_tr_currency_live_rate
 #: model:ir.model.fields,help:l10n_tr_currency_live_rate.field_account_bank_statement_line__l10n_tr_currency_rate_type

@@ -23,7 +23,7 @@
 minimum_salary = version.l10n_ch_lpp_insurance_id._get_minimum_lpp_salary(payslip.date_from)
 coordination_deduction, max_amount = version.l10n_ch_lpp_insurance_id._find_coordination_amount(payslip.date_from)
 additional_wage_types = ['1200', '1205', '1207', '1208'] # 13th and 14th month should be computed in the base
-base = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_lpp_retroactive or rule.l10n_ch_lpp_forecast or rule.l10n_ch_code in additional_wage_types)
+base = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_lpp_retroactive or rule.l10n_ch_lpp_forecast or rule.l10n_ch_code in additional_wage_types])
 result = min(max((coordination_deduction - minimum_salary) if base >= minimum_salary else 0, base - coordination_deduction), max_amount)
         </field>
         <field name="struct_ids" eval="[(6, 0, [

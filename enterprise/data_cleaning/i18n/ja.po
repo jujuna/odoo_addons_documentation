@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:58+0000\n"
-"PO-Revision-Date: 2026-10-08 15:34+0000\n"
+"POT-Creation-Date: 2026-11-06 17:58+0000\n"
+"PO-Revision-Date: 2026-10-27 13:33+0000\n"
 "Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "data_cleaning/ja/>\n"
@@ -251,7 +251,8 @@ msgstr "連絡先"
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__ref_merge_ir_act_server_id
 msgid ""
 "Contextual menu action that redirects to the deduplicate view of data_merge."
-msgstr "data_merge の重複排除ビューにリダイレクトするコンテキストメニューアクション。"
+msgstr ""
+"data_merge の重複排除ビューにリダイレクトするコンテキストメニューアクション。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__country_id
@@ -309,7 +310,7 @@ msgstr "会社間"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__current_value
 msgid "Current"
-msgstr "流動"
+msgstr "現在"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__custom_merge_method
@@ -448,6 +449,12 @@ msgid "Duplicates"
 msgstr "重複"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Duplicates Match Reasons"
+msgstr ""
+
+#. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_model.py:0
 msgid "Duplicates to Merge"
@@ -572,8 +579,8 @@ msgid ""
 "If True, this record is used for contextual menu action \"Merge\" on the "
 "target model."
 msgstr ""
-"TRUEの場合、このレコードはターゲットモデルのコンテキストメニューの"
-"アクション\"マージ\"に使用されます。"
+"TRUEの場合、このレコードはターゲットモデルのコンテキストメニューのアクション"
+"\"マージ\"に使用されます。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
@@ -699,8 +706,8 @@ msgid ""
 "Automatic merge mode: Duplicates with a similarity percentage above this "
 "threshold will be merged automatically."
 msgstr ""
-"手動統合モード：類似度パーセンテージがこの閾値を下回る重複は、提案されません"
-"。\n"
+"手動統合モード：類似度パーセンテージがこの閾値を下回る重複は、提案されませ"
+"ん。\n"
 "自動統合モード：類似度パーセンテージがこの閾値を超える重複は、自動的に統合さ"
 "れます。"
 
@@ -807,6 +814,12 @@ msgstr "モデルルール"
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_merge_model__notify_frequency_period__months
 msgid "Months"
 msgstr "月"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Moved Related Records"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__name
@@ -929,6 +942,12 @@ msgid "Records must be of the same model"
 msgstr "レコードは同一モデルのものである必要があります。"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Retained and Removed Fields"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__rule_ids
 msgid "Rule"
 msgstr "規則"
@@ -983,7 +1002,8 @@ msgstr "テキストフィールドが正確に共通している量に基づく
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
 msgid "Suggest to merge records matching at least one of these rules"
-msgstr "これらの規則の少なくとも1つに一致するレコードをマージするよう提案します。"
+msgstr ""
+"これらの規則の少なくとも1つに一致するレコードをマージするよう提案します。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__suggested_value_display
@@ -1007,8 +1027,8 @@ msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
 msgstr ""
-"Pythonモジュール `phonenumbers` がインストールされていません。"
-"フォーマットフォンは動作しません。"
+"Pythonモジュール `phonenumbers` がインストールされていません。フォーマット"
+"フォンは動作しません。"
 
 #. module: data_cleaning
 #. odoo-javascript
@@ -1111,13 +1131,50 @@ msgstr "週"
 msgid ""
 "Which spaces are trimmed by the rule. Leading, trailing, and successive "
 "spaces are considered superfluous."
-msgstr "トリムされる空白の規則。前、後、連続する空白は余分な空白と見なされます。"
+msgstr ""
+"トリムされる空白の規則。前、後、連続する空白は余分な空白と見なされます。"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_record.py:0
 msgid "You must select at least two %s in order to merge them."
 msgstr "マージするには少なくとも2つの%sを選択する必要があります。"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseMaster"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseRelations"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseRuleValues"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.MasterExclusiveData"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.RelationsMergedData"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.RuleValuesData"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate

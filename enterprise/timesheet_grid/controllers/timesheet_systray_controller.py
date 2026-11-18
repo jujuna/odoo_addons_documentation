@@ -8,6 +8,8 @@ from odoo.http import Controller, request, route
 class TimesheetSystrayController(Controller):
     @route("/timesheet_grid/timesheet_systray_user_data", type="jsonrpc", auth="user", readonly=True)
     def timesheet_systray_user_data(self, **kwargs):
+        if kwargs.get('context'):
+            request.update_context(**kwargs.get('context'))
         employee = request.env.user.employee_id
         if not employee:
             return {"employee": None, "timesheets": []}
@@ -39,7 +41,9 @@ class TimesheetSystrayController(Controller):
         }
 
     @route("/timesheet_grid/get_timer_start_time", type="jsonrpc", auth="user", readonly=True)
-    def get_timer_start_time(self):
+    def get_timer_start_time(self, **kwargs):
+        if kwargs.get('context'):
+            request.update_context(**kwargs.get('context'))
         employee = request.env.user.employee_id
         if not employee:
             return {"elapsed_seconds": 0}

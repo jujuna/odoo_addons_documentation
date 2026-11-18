@@ -469,7 +469,7 @@ else:
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_vacation_pay_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_vacation_pay_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="l10n_ch_5_cents_rounding" eval="False"/>
@@ -4491,7 +4491,7 @@ result_name = inputs['WT_2040_NET'].name
         <field name="l10n_ch_code">2050</field>
         <field name="sequence">20</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = 'WT_2050' in inputs or any(wt in inputs for wt in payslip._get_third_party_payment_wage_types())</field>        <field name="amount_select">code</field>
+        <field name="condition_python">result = 'WT_2050' in inputs or any([wt in inputs for wt in payslip._get_third_party_payment_wage_types()])</field>        <field name="amount_select">code</field>
         <field name="amount_python_compute">
 if 'WT_2050' in inputs:
     result = -inputs['WT_2050'].amount
@@ -5198,7 +5198,7 @@ result_name = inputs['WT_3037'].name
         <field name="l10n_ch_code">4900</field>
         <field name="sequence">20</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = 'WT_4900' in inputs or any(wage_type in inputs for wage_type in payslip._get_net_compensation_wage_types())</field>
+        <field name="condition_python">result = 'WT_4900' in inputs or any([wage_type in inputs for wage_type in payslip._get_net_compensation_wage_types()])</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 if 'WT_4900' in inputs:
@@ -5237,7 +5237,7 @@ else:
         <field name="condition_python">result = version.l10n_ch_thirteen_month</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_included])
 result_rate = version.l10n_ch_contractual_13th_month_rate
         </field>
         <field name="appears_on_payslip">never</field>
@@ -5258,7 +5258,7 @@ result_rate = version.l10n_ch_contractual_13th_month_rate
         <field name="condition_python">result = version.l10n_ch_14th_month</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_included])
 result_rate = version.l10n_ch_contractual_13th_month_rate
         </field>
         <field name="l10n_ch_5_cents_rounding" eval="False"/>
@@ -5279,7 +5279,7 @@ result_rate = version.l10n_ch_contractual_13th_month_rate
         <field name="condition_python">result = version.l10n_ch_thirteen_month</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_hourly_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_hourly_included])
 result_rate = version.l10n_ch_contractual_13th_month_rate
         </field>
         <field name="appears_on_payslip">never</field>
@@ -5300,7 +5300,7 @@ result_rate = version.l10n_ch_contractual_13th_month_rate
         <field name="condition_python">result = version.l10n_ch_14th_month</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_hourly_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_13th_month_hourly_included])
 result_rate = version.l10n_ch_contractual_13th_month_rate
         </field>
         <field name="l10n_ch_5_cents_rounding" eval="False"/>
@@ -5456,7 +5456,7 @@ else:
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_gross_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_gross_included])
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm'),
@@ -5475,7 +5475,7 @@ result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_ac_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_ac_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -6305,7 +6305,7 @@ result_rate = payslip.l10n_ch_social_insurance_id._get_additional_ac_rates(rate_
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result =  sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_aanp_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_aanp_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -6448,7 +6448,7 @@ result = result_rules['LAASALARY']['total']
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_laac_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_laac_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -6762,7 +6762,7 @@ result_rate = rate * (employer_rate) / 100
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_ijm_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_ijm_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -7281,7 +7281,7 @@ result = total_compensation
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_source_tax_included)
+result = sum([result_rules[rule.code]['total'] for rule in payslip.struct_id.rule_ids if rule.l10n_ch_source_tax_included])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -7299,7 +7299,7 @@ result = sum(result_rules[rule.code]['total'] for rule in payslip.struct_id.rule
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 periodic_rules = [rule for rule in payslip.struct_id.rule_ids if rule.l10n_ch_source_tax_included and rule.l10n_ch_is_periodic]
-result = sum(result_rules[rule.code]['total'] for rule in periodic_rules)
+result = sum([result_rules[rule.code]['total'] for rule in periodic_rules])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -7317,7 +7317,7 @@ result = sum(result_rules[rule.code]['total'] for rule in periodic_rules)
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 periodic_rules = [rule for rule in payslip.struct_id.rule_ids if rule.l10n_ch_source_tax_included and not rule.l10n_ch_is_periodic]
-result = sum(result_rules[rule.code]['total'] for rule in periodic_rules)
+result = sum([result_rules[rule.code]['total'] for rule in periodic_rules])
         </field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [

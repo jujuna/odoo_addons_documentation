@@ -18,4 +18,15 @@
             </xpath>
         </field>
     </record>
+
+    <record id="planning_slot_view_search" model="ir.ui.view">
+        <field name="name">planning.slot.search.inherited.helpdesk_planning_field_service</field>
+        <field name="model">planning.slot</field>
+        <field name="inherit_id" ref="planning_field_service.planning_slot_view_search"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="helpdesk_ticket_id" string="Ticket" invisible="1"/>
+            </field>
+        </field>
+    </record>
 </odoo>

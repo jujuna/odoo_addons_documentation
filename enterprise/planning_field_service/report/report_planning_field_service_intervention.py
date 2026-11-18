@@ -9,7 +9,9 @@ class ReportPlanning_Field_ServiceIntervention(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        docs = self.env['planning.slot'].sudo().browse(docids)
+        docs = self.env['planning.slot'].browse(docids)
+        docs.check_access('read')
+        docs = docs.sudo()
         return {
             'doc_ids': docids,
             'doc_model': 'planning.slot',

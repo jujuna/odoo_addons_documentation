@@ -8,7 +8,7 @@
             <group id="payment_report_group" position="inside">
                 <field name="l10n_hk_autopay_payment_set_code" invisible="export_format not in ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_bea_csv')"/>
                 <field name="l10n_hk_autopay_first_party_reference" invisible="export_format not in ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_boc_non_payment', 'l10n_hk_bea_csv')"/>
-                <field name="l10n_hk_autopay_partner_bank_id" invisible="export_format not in ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_boc_non_payment', 'l10n_hk_bea_csv') and payslip_ids.length > 0" domain="[('country_code', '=', 'HK')]" options='{"no_create": True}'/>
+                <field name="l10n_hk_autopay_partner_bank_id" invisible="export_format not in ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_boc_non_payment', 'l10n_hk_bea_csv', 'l10n_hk_citi_autopay', 'l10n_hk_citi_autopay_payroll') and payslip_ids.length > 0" domain="[('country_code', '=', 'HK')]" options='{"no_create": True}'/>
             </group>
         </field>
     </record>

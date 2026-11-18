@@ -19,7 +19,6 @@ class TestWorkOrder(TestMrpWorkorderCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.env.ref('base.group_user').write({'implied_ids': [
-            Command.link(cls.env.ref('mrp.group_mrp_routings').id),
             Command.link(cls.env.ref('stock.group_production_lot').id),
         ]})
         # Products and lots
@@ -663,7 +662,10 @@ class TestShopFloor(HttpCase, TestMrpWorkorderCommon):
         component that is about to be destroyed by the navigation.
         Two MOs are created so the tour can also verify that the gear button
         on a *different* WO card is disabled when navigation is pending."""
+        admin = self.env.ref('base.user_admin')
+        admin.company_id = self.company
         self.bom_2.bom_line_ids = False
+        self.env['hr.employee'].create({'name': 'Test Operator', 'user_id': admin.id})
         mos = self.env['mrp.production'].create([{
             'product_id': self.product_5.id,
             'product_qty': 1,
@@ -671,4 +673,4 @@ class TestShopFloor(HttpCase, TestMrpWorkorderCommon):
         } for _ in range(2)])
         mos.action_confirm()
         mos.button_plan()
-        self.start_tour("/odoo/shop-floor", "test_gear_disabled_during_open_mo", login='hilda')
+        self.start_tour("/odoo/shop-floor", "test_gear_disabled_during_open_mo", login='admin')

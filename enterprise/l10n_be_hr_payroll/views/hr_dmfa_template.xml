@@ -442,7 +442,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
              -->
-            <EmployerClass t-out="employer_class"/>
+            <EmployerClass t-out="worker.employer_class"/>
             <!-- 00037
                 DESCRIPTION:    Ce code permet d'identifier le type de travailleur pour lequel une cotisation spécifique est exigée (cotisation ordinaire, cotisation Fedris, cotisation spéciale prépensionné, cotisation spéciale personnel statutaire licencié, cotisation spéciale étudiant ou cotisation spéciale indemnités complémentaires).
                 DOMAINE DE DEFINITION:  Voir annexe 2 - Liste des codes travailleurs pour lesquels des cotisations sont dues ; uniquement les codes travailleurs pour lesquels la présence est égale à 1 ou 3.
@@ -1857,12 +1857,14 @@
     <template id="dmfa_pdf_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="wizard">
-                <t t-set="data" t-value="wizard._get_rendering_data()"/>
+                <t t-set="data" t-value="wizard.sudo()._get_rendering_data(
+                    preview=dmfa_preview, preview_company=wizard.env['res.company'].browse(preview_company_id or []))"/>
                 <t t-call="web.internal_layout" wizard="wizard.with_context(lang=wizard.env.lang)">
                     <div class="page container-fluid">
                         <div class="row text-center fw-bold">
                             <div class="col-12">
                                 <div><h1 style="font-size: 3em;">DmfA Declaration (<t t-out="data['quarter_display']"/>)</h1></div>
+                                <div t-if="dmfa_preview"><h2>Preview<t t-if="data.get('preview_company')">: <t t-out="data['preview_company'].name"/></t></h2></div>
                             </div>
                         </div>
                     </div>
@@ -2291,7 +2293,7 @@
                                         </tr>
                                         <t t-foreach="data['employer_contributions_summary']" t-as="contribution">
                                             <tr>
-                                                <td><t t-out="data['employer_class']"/></td>
+                                                <td><t t-out="contribution['employer_class']"/></td>
                                                 <td><t t-out="contribution['code']"/></td>
                                                 <td>
                                                     <t t-if="contribution['contribution_type'] != -1">
@@ -2319,7 +2321,7 @@
                                         <t t-foreach="data['worker_deductions_summary']" t-as="deduction">
                                             <t t-if="deduction['amount'] > 0">
                                                 <tr>
-                                                    <td><t t-out="data['employer_class']"/></td>
+                                                    <td><t t-out="deduction['employer_class']"/></td>
                                                     <td><t t-out="deduction['worker_code']"/></td>
                                                     <td><t t-out="deduction['code']"/></td>
                                                     <td>

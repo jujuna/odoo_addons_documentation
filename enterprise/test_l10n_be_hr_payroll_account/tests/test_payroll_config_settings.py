@@ -87,7 +87,7 @@ class TestPayrollConfigSettingsFlow(TestPayrollAccountCommon):
 
     def test_main_joint_committee_fallback(self):
         """A version with no employee type falls back to the configured main joint committee."""
-        self.config.l10n_be_main_joint_committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
+        self.config.l10n_be_main_joint_committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_150')
         version = self.env['hr.version'].with_company(self.company_id).create({
             'name': 'JC Fallback Version',
             'wage': 2500,
@@ -97,7 +97,7 @@ class TestPayrollConfigSettingsFlow(TestPayrollAccountCommon):
         })
         self.assertEqual(
             version.l10n_be_joint_committee_id,
-            self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302'),
+            self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_150'),
         )
 
     # ------------------------------------------------------------------

@@ -51,7 +51,7 @@ class HrLeave(models.Model):
         Returns a dict {leave: (can_relapse, allowed_origin_leave_ids, origin_leave_id)}.
         Shared by `_compute_can_relapse` and `_compute_l10n_be_sickness_relapse_origin_leave_id` so both stay in sync.
         """
-        sick_work_entry_types_codes = ['013.00', '122.00', '123.00', '010.00', '082.00', '072.00', '082.01', '072.01']
+        sick_work_entry_types_codes = ['013.00', '122.00', '123.00', '010.00', '082.00', '072.00', '072.01']
 
         # Only a sickness can be the relapse of an earlier one.
         # Without this the field shows up on any leave, an attendance included.
@@ -446,7 +446,7 @@ class HrLeave(models.Model):
         if self._l10n_be_is_progressive_resumption_neutralised():
             return [(unpaid_sick_work_entry_type, leave_duration)]
 
-        sick_work_entry_type_codes = ['013.00', '122.00', '123.00', '010.00', '082.00', '072.00', '082.01', '072.01']
+        sick_work_entry_type_codes = ['013.00', '122.00', '123.00', '010.00', '082.00', '072.00', '072.01']
         sick_work_entry_types = self.env['hr.work.entry.type'].search([
             ('code', 'in', sick_work_entry_type_codes),
             ('country_id.code', '=', 'BE')
@@ -473,8 +473,16 @@ class HrLeave(models.Model):
 
         if is_worker or is_short_term_employee:
             first_contract_date = self.employee_id.sudo()._get_first_version_date()
-            if not first_contract_date or (self.request_date_from < first_contract_date + relativedelta(months=1)):
+            if not first_contract_date or self.request_date_to < first_contract_date + relativedelta(months=1):
                 return [(unpaid_sick_work_entry_type, leave_duration)]
+            # One month of seniority reached during the incapacity: the days before it are unpaid, the remaining
+            # days of the guaranteed salary are paid, still counted from the first day of incapacity
+            seniority_date = first_contract_date + relativedelta(months=1)
+            if self.request_date_from < seniority_date:
+                days_without_seniority = (seniority_date - self.request_date_from).days
+                result.append((unpaid_sick_work_entry_type, days_without_seniority))
+                prev_sick_leaves_sum += days_without_seniority
+                leave_duration -= days_without_seniority
 
             first_week_sick_work_entry_type = sick_work_entry_types.filtered(lambda w: w.code == '010.00')
             second_week_sick_work_entry_type = (
@@ -577,11 +585,18 @@ class HrLeave(models.Model):
             ~ For a regular CDI employee (Employé):
                 - The first 30 days: paid 100% (012.00)
                 - after 30 days: unpaid (110.00)
+        The interrupted work day (accident occurring in the afternoon) counts as the first full day of the
+        guaranteed salary period.
+        The work accident law has no relapse notion, so each leave opens its own guaranteed salary period
+        regardless of the previous work accident leaves.
         Returns an *ordered* list of tuples where the key is the work entry type and the value the number of days
         """
         self.ensure_one()
 
-        leave_duration = self._get_calendar_days()
+        interrupted_day_offset = (
+            0.5 if self.work_entry_type_request_unit == "half_day" and self.request_date_from_period == "pm" else 0.0
+        )
+        leave_duration = self._get_calendar_days() + interrupted_day_offset
         version = self.employee_id.sudo()._get_version(date=self.date_from)
         # Student manual workers (840) follow the worker guaranteed wage scheme, white-collar students (841) on a
         # contract of less than three months the short-term employees' one
@@ -591,37 +606,11 @@ class HrLeave(models.Model):
 
         unpaid_work_accident_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
 
-        work_accident_type_codes = ['009.00', '110.00', '012.00', '070.00', '082.01']
+        work_accident_type_codes = ['009.00', '012.00', '070.00', '082.01']
         work_accident_work_entry_types = self.env['hr.work.entry.type'].search([
             ('code', 'in', work_accident_type_codes),
             ('country_id.code', '=', 'BE')
         ])
-
-        all_previous_work_accident_leaves = self.env['hr.leave'].search(
-            [
-                ('employee_id', '=', self.employee_id.id),
-                ('date_from', '<', self.date_from),
-                ('work_entry_type_id', 'in', work_accident_work_entry_types.ids),
-                ('state', '=', 'validate'),
-            ],
-            order="date_from desc",
-        )
-
-        prev_work_accident_leaves_sum = 0
-        prev_work_accident_leave = self
-
-        for leave in all_previous_work_accident_leaves:
-            duration_between_leaves = self._get_calendar_days_between_leaves(leave, prev_work_accident_leave)
-            if duration_between_leaves > 0:
-                break
-
-            prev_work_accident_leaves_sum += leave._get_calendar_days()
-
-            if prev_work_accident_leaves_sum > 30:
-                # after 30 work accident days, it becomes unpaid
-                return [(unpaid_work_accident_work_entry_type, leave_duration)]
-
-            prev_work_accident_leave = leave
 
         result = []
 
@@ -634,19 +623,19 @@ class HrLeave(models.Model):
             )
             total_counted_days = 0
 
-            first_week_paid_days = min(leave_duration, max(0, 7 - prev_work_accident_leaves_sum))
+            first_week_paid_days = min(leave_duration, 7)
             total_counted_days += first_week_paid_days
             if first_week_paid_days:
                 result.append((first_week_work_accident_work_entry_type, first_week_paid_days))
             if total_counted_days >= leave_duration:
-                return result
+                return self._remove_l10n_be_interrupted_day_offset(result, interrupted_day_offset)
 
-            first_month_paid_days = min(leave_duration - 7, max(0, 30 - prev_work_accident_leaves_sum - total_counted_days))
+            first_month_paid_days = min(leave_duration, 30) - total_counted_days
             total_counted_days += first_month_paid_days
             if first_month_paid_days:
                 result.append((first_month_work_accident_work_entry_type, first_month_paid_days))
             if total_counted_days >= leave_duration:
-                return result
+                return self._remove_l10n_be_interrupted_day_offset(result, interrupted_day_offset)
 
             unpaid_days = leave_duration - total_counted_days
             if unpaid_days:
@@ -655,15 +644,23 @@ class HrLeave(models.Model):
         else:
             # Regular CDI employee: 30d 012.00 (100%), then 110.00 (unpaid)
             first_month_work_accident_work_entry_type = work_accident_work_entry_types.filtered(lambda w: w.code == '012.00')
-            remaining_paid_days = max(0, 30 - prev_work_accident_leaves_sum)
-            paid_days = min(leave_duration, remaining_paid_days)
+            paid_days = min(leave_duration, 30)
             if paid_days:
                 result.append((first_month_work_accident_work_entry_type, paid_days))
             unpaid_days = leave_duration - paid_days
             if unpaid_days:
                 result.append((unpaid_work_accident_work_entry_type, unpaid_days))
 
-        return result
+        return self._remove_l10n_be_interrupted_day_offset(result, interrupted_day_offset)
+
+    def _remove_l10n_be_interrupted_day_offset(self, leave_split, interrupted_day_offset):
+        if not interrupted_day_offset or not leave_split:
+            return leave_split
+        work_entry_type, nbr_days = leave_split[0]
+        nbr_days -= interrupted_day_offset
+        if nbr_days:
+            return [(work_entry_type, nbr_days), *leave_split[1:]]
+        return leave_split[1:]
 
     def _get_l10n_be_economic_unemployment_split(self):
         """
@@ -883,6 +880,41 @@ class HrLeave(models.Model):
 
         return segments
 
+    def _l10n_be_check_horeca_net_overtime_threshold(self):
+        """The overtime of the hotel industry paid net (039.00, 039.05) is exempt within a yearly limit of hours: 360
+        hours with a registered cash system, 300 hours without one (box 17 of the 281.10)."""
+        self.ensure_one()
+        cp302 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
+        joint_committee = self.employee_id.sudo().l10n_be_joint_committee_id
+        if not joint_committee or not joint_committee.is_descendant_of(cp302):
+            return
+        white_cash_register = self.employee_id.company_id.sudo()._l10n_be_has_white_cash_register()
+        threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+            f"cp302_net_overtime_threshold_{'' if white_cash_register else 'not_'}white_cash_register",
+            self.request_date_from, raise_if_not_found=False)
+        if not threshold:
+            return
+        net_overtime_types = self.env['hr.work.entry.type'].sudo().search([
+            ('category_ids', 'in', self.env.ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME').ids)])
+        declared_hours = sum(self.env['hr.leave'].search([
+            ('id', '!=', self.id),
+            ('employee_id', '=', self.employee_id.id),
+            ('request_date_from', '>=', date(self.request_date_from.year, 1, 1)),
+            ('request_date_to', '<=', date(self.request_date_from.year, 12, 31)),
+            ('work_entry_type_id', 'in', net_overtime_types.ids),
+            ('state', '=', 'validate'),
+        ]).mapped('number_of_hours'))
+        if declared_hours + self.number_of_hours > threshold:
+            raise ValidationError(self.env._(
+                "Net Overtime Threshold Exceeded: %(employee_name)s has already %(declared_hours)s hours of overtime "
+                "paid net. Validating this new time of %(amount)s hours would exceed the yearly threshold of "
+                "%(threshold)s hours.",
+                employee_name=self.employee_id.name,
+                declared_hours=round(declared_hours, 2),
+                amount=round(self.number_of_hours, 2),
+                threshold=threshold,
+            ))
+
     def _action_validate(self, check_state=True):
         activity_type_id = self.env.ref('mail.mail_activity_data_todo').id
         res_model_id = self.env.ref('hr_holidays.model_hr_leave').id
@@ -945,8 +977,11 @@ class HrLeave(models.Model):
                     })
                 # TDE TODO: batch schedule with record-based note
                 self.env['mail.activity'].create(activity_vals)
+            horeca_net_overtime = self.env.ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME')
+            # sudo: the time off officers validate the time off without access to the payroll categories
+            if leave.employee_id.company_id.country_id.code == "BE" and horeca_net_overtime in leave.work_entry_type_id.sudo().category_ids:
+                leave._l10n_be_check_horeca_net_overtime_threshold()
             if leave.employee_id.company_id.country_id.code == "BE" and wet_code in ['040.27', '040.28', '039.23']:
-                cp200 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_200")
                 cp302 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_302")
                 voluntary_threshold_codes = {
                     ('200', '039.23'): 'cp200_voluntary_overtime_no_onss_threshold',
@@ -957,12 +992,9 @@ class HrLeave(models.Model):
                     ('302', 'OTHER', False): 'cp302_voluntary_overtime_threshold_not_white_cash_register',
                 }
                 jc = leave.employee_id.l10n_be_joint_committee_id
-                # The sub-committees follow the rules of their joint committee
-                jc_code = False
-                if jc and jc.is_descendant_of(cp302):
-                    jc_code = '302'
-                elif jc and jc.is_descendant_of(cp200):
-                    jc_code = '200'
+                # The voluntary overtime is a legal regime: the hotel industry (and its sub-committees) has its own
+                # caps, all the other employers the ones of the CP 200
+                jc_code = '302' if jc and jc.is_descendant_of(cp302) else '200'
                 key = (jc_code, wet_code if wet_code == '039.23' else 'OTHER')
                 if jc_code == '302':
                     key += (leave.employee_id.company_id._l10n_be_has_white_cash_register(),)

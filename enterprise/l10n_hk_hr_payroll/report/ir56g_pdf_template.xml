@@ -61,7 +61,7 @@
                                     <td class="text-uppercase" style="width: 36rem;">
                                         Particulars of employee who will be leaving Hong Kong on or about:
                                     </td>
-                                    <td><span t-out="report_data.get('leave_hk_date')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/></td>
+                                    <td><span t-out="report_data.get('leave_hk_date')" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
                                 </tr>
                                 <tr>
                                     <td>Employee's Tax File No. with this Department (if known):</td>
@@ -212,9 +212,9 @@
                                     <td style="width: 8mm;">10.</td>
                                     <td>Period of employment from 1 April to the date of cessation of employment:</td>
                                     <td class="text-end">
-                                        <span class="fw-bold fs-5" t-out="emp_start_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
+                                        <span class="fw-bold fs-5" t-out="emp_start_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}" />
                                         <span class="fs-4 px-1">to</span>
-                                        <span class="fw-bold fs-5" t-out="emp_end_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
+                                        <span class="fw-bold fs-5" t-out="emp_end_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}" />
                                         <span class="d-inline-block ps-1">****</span>
                                     </td>
                                 </tr>
@@ -535,7 +535,7 @@
                                     <td/>
                                     <td>
                                         <span class="align-middle fs-5" t-out="'☑' if report_data.get('will_return_hk') else '☐'"></span>
-                                        <span class="align-middle">Yes, probable date of return is</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:75mm;" t-out="report_data.get('date_return')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
+                                        <span class="align-middle">Yes, probable date of return is</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:75mm;" t-out="report_data.get('date_return')" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                                         <span class="align-middle ps-4 fs-5" t-out="'☐' if report_data.get('will_return_hk') else '☑'"></span>
                                         <span class="align-middle">No / Very unlikely</span>
                                     </td>
@@ -558,7 +558,7 @@
                                     <td/>
                                     <td>
                                         <span class="align-middle fs-5" t-out="'☑' if report_data.get('has_non_exercised_stock_options') else '☐'"></span>
-                                        <span class="align-middle">Yes, no. of shares not yet exercised:</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:45mm;" t-out="report_data.get('amount_non_exercised_stock_options', '')"/><span class="align-middle">; date of grant:</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:45mm;" t-out="report_data.get('date_grant')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
+                                        <span class="align-middle">Yes, no. of shares not yet exercised:</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:45mm;" t-out="report_data.get('amount_non_exercised_stock_options', '')"/><span class="align-middle">; date of grant:</span><span class="align-bottom d-inline-block border-bottom border-dark pb-1" style="width:45mm;" t-out="report_data.get('date_grant')" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                                         <span class="align-middle ps-4 fs-5" t-out="'☐' if report_data.get('has_non_exercised_stock_options') else '☑'"></span>
                                         <span class="align-middle">No</span>
                                     </td>
@@ -578,7 +578,7 @@
                                     <td style="width: 14rem">Signature:</td>
                                     <td style="width: 10.5rem">Name:<span class="ps-2" t-out="report_data.get('NAME_OF_SIGNER')" /></td>
                                     <td style="width: 14rem">Designation:<span class="ps-2" t-out="report_data.get('Designation')" /></td>
-                                    <td>Date:<span class="ps-2" t-out="report_data.get('SubDate')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" /></td>
+                                    <td>Date:<span class="ps-2" t-out="report_data.get('SubDate')" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}" /></td>
                                 </tr>
                             </table>
                         </div>

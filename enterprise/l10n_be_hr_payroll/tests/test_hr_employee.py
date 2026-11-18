@@ -20,6 +20,33 @@ class TestHrEmployeeBelgiumForm(TransactionCase):
             'company_id': self.be_company.id,
         })
 
+    @freeze_time('2026-10-26 10:00:00')
+    def test_dmfa_unit_presence(self):
+        location = self.env['hr.work.location'].create({
+            'name': 'DMFA Unit',
+            'location_type': 'dmfa_unit',
+            'address_id': self.env['res.partner'].create({'name': 'DMFA Unit Address'}).id,
+        })
+        for exceptional in (False, True):
+            with self.subTest(exceptional=exceptional):
+                employee = self.env['hr.employee'].create({
+                    'name': 'Employee at DMFA Unit',
+                    'monday_location_id': False if exceptional else location.id,
+                })
+                if exceptional:
+                    self.env['hr.employee.location'].create({
+                        'employee_id': employee.id,
+                        'work_location_id': location.id,
+                        'date': '2026-10-26',
+                    })
+                public_employee = self.env['hr.employee.public'].browse(employee.id)
+                for record in (employee, public_employee):
+                    self.assertEqual(record.hr_icon_display, 'presence_other')
+                    self.assertEqual(record.work_location_type, 'other')
+                    self.assertTrue(record.show_hr_icon_display)
+                    self.assertEqual(record.work_location_name, location.name)
+        self.assertEqual(location.location_type, 'dmfa_unit')
+
     def test_belgian_employee_creation_via_form(self):
         with Form(self.env['hr.employee'].with_company(self.be_company)) as employee_form:
             employee_form.name = 'Tony Stark'
@@ -151,6 +178,11 @@ class TestHrEmployeeBelgiumForm(TransactionCase):
             'date_from': datetime(2026, 7, 31, 22, 0, 0),
             'date_to': datetime(2026, 8, 1, 21, 59, 59),
         })
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Next Year Public Holiday',
+            'date_from': datetime(2027, 4, 30, 22, 0, 0),
+            'date_to': datetime(2027, 5, 1, 21, 59, 59),
+        })
 
         emp_flora, emp_stella, emp_musa = self.env['hr.employee'].create([
             {
@@ -190,3 +222,70 @@ class TestHrEmployeeBelgiumForm(TransactionCase):
         self.assertFalse(allocations_by_employee.get(emp_flora))
         self.assertEqual(sum(allocations_by_employee.get(emp_stella).mapped('number_of_days')), 1)
         self.assertEqual(sum(allocations_by_employee.get(emp_musa).mapped('number_of_days')), 1)
+
+    @freeze_time('2026-08-01')
+    def test_create_public_holiday_allocation_next_year(self):
+        """ The public holidays of the year the contract starts in are compensated at the hiring, the ones of
+        the following years only once the generate allocations wizard compensated them for the others. """
+        next_year_holiday, later_holiday = self.env['resource.calendar.leaves'].create([{
+            'name': 'Next Year Public Holiday',
+            'date_from': datetime(2027, 4, 30, 22, 0, 0),
+            'date_to': datetime(2027, 5, 1, 21, 59, 59),
+        }, {
+            'name': 'Later Public Holiday',
+            'date_from': datetime(2027, 8, 14, 22, 0, 0),
+            'date_to': datetime(2027, 8, 15, 21, 59, 59),
+        }])
+        employee_values = {
+            'company_id': self.be_company.id,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495').id,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp200_b').id,
+        }
+
+        def get_compensated_holidays(employee):
+            return self.env['hr.leave.allocation'].search([('employee_id', '=', employee.id)]).public_holiday_id
+
+        # Hired this year: the holidays of next year aren't compensated yet
+        this_year_hire = self.env['hr.employee'].create({
+            **employee_values, 'name': 'This Year Hire', 'contract_date_start': date(2026, 9, 1)})
+        self.assertFalse(get_compensated_holidays(this_year_hire))
+
+        # Hired from next January, encoded this year: the holidays of next year are compensated
+        next_year_hire = self.env['hr.employee'].create({
+            **employee_values, 'name': 'Next Year Hire', 'contract_date_start': date(2027, 1, 1)})
+        self.assertEqual(get_compensated_holidays(next_year_hire), next_year_holiday + later_holiday)
+
+        # Hired this year once the holidays of next year are compensated for the others: compensated too
+        other_hire = self.env['hr.employee'].create({
+            **employee_values, 'name': 'Other Hire', 'contract_date_start': date(2026, 9, 1)})
+        self.assertEqual(get_compensated_holidays(other_hire), next_year_holiday + later_holiday)
+
+    def test_export_work_entries_employee_without_niss(self):
+        # A foreign worker or a student waiting for a BIS number has no NISS yet
+        employee = self.env['hr.employee'].with_company(self.be_company).create({
+            'name': 'Jean Sans Niss',
+            'company_id': self.be_company.id,
+        })
+        self.assertFalse(employee.niss)
+        export = self.env['hr.export.work.entries'].with_company(self.be_company).new({})
+        line = export._generate_line(employee, date(2026, 10, 1), self.be_company, {
+            'work_entries': [{'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance')}],
+            'duration': 8 * 3600,
+        })
+        self.assertEqual(line.split(';')[8], '')
+
+    def test_export_work_entries_duration_in_hours(self):
+        # A day of 7.6 hours (full time 38 hours a week) must not be exported as 7
+        employee = self.env['hr.employee'].with_company(self.be_company).create({
+            'name': 'Jean Trente-Huit',
+            'company_id': self.be_company.id,
+        })
+        export = self.env['hr.export.work.entries'].with_company(self.be_company).new({})
+        for duration, expected in [(7.6, '7.60'), (3.8, '3.80'), (0.5, '0.50'), (8, '8.00')]:
+            with self.subTest(duration=duration):
+                line = export._generate_line(employee, date(2026, 10, 1), self.be_company, {
+                    'work_entries': [{'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance')}],
+                    'duration': duration * 3600,
+                })
+                self.assertEqual(line.strip().split(';')[9], expected)

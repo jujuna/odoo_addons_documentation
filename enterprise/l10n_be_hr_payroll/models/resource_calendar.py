@@ -138,17 +138,21 @@ class ResourceCalendar(models.Model):
 
     def _l10n_be_get_work_time_rate_time_credit_included(self, date_from, date_to, ref_calendar):
         self.ensure_one()
+        if self._is_flexible():
+            if self._is_fully_flexible():
+                return 1
+            hours_per_week = self.hours_per_week
+        else:
+            period_start, period_end = date_from + relativedelta(weekday=MO(-1)), date_to + relativedelta(weekday=SU(1))
+            days = (period_end - period_start).days + 1
 
-        period_start, period_end = date_from + relativedelta(weekday=MO(-1)), date_to + relativedelta(weekday=SU(1))
-        days = (period_end - period_start).days + 1
+            attendances_by_date = self._get_attendances_by_date(period_start, period_end)
+            total_hours = sum(
+                sum(attendances.filtered(lambda a: a._is_work_period() or a.work_entry_type_id.l10n_be_is_time_credit).mapped('duration_hours'))
+                for attendances in attendances_by_date.values()
+            )
 
-        attendances_by_date = self._get_attendances_by_date(period_start, period_end)
-        total_hours = sum(
-            sum(attendances.filtered(lambda a: a._is_work_period() or a.work_entry_type_id.l10n_be_is_time_credit).mapped('duration_hours'))
-            for attendances in attendances_by_date.values()
-        )
-
-        hours_per_week = total_hours / (days / 7) if days else 0
+            hours_per_week = total_hours / (days / 7) if days else 0
         return float_round(hours_per_week / ref_calendar.hours_per_week, precision_digits=2) if ref_calendar.hours_per_week else 1
 
     def _l10n_be_get_time_credit_proration(self, date_from, date_to):

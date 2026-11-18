@@ -85,7 +85,7 @@ registry.category("web_tour.tours").add("test_cl_partner_missing_info", {
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickInvoiceButton(),
             PaymentScreen.clickValidate(),
-            Notification.has("Please fill out missing fields to proceed:"),
+            Notification.has("Please fill out missing fields to proceed: DTE Email"),
         ].flat(),
 });
 

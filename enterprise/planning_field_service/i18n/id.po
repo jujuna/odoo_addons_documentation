@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-23 07:33+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-10-27 07:19+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "planning_field_service/id/>\n"
@@ -107,8 +107,8 @@ msgid ""
 "<b>Start onsite</b><br/><i>Start the shift when you arrive at the customer "
 "location.</i>"
 msgstr ""
-"<b>Mulai di lokasi</b><br/><i>Mulai shift saat Anda tiba di lokasi "
-"pelanggan.</i>"
+"<b>Mulai di lokasi</b><br/><i>Mulai shift saat Anda tiba di lokasi pelanggan."
+"</i>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_details
@@ -116,18 +116,18 @@ msgid ""
 "<div>\n"
 "    <t t-set=\"date_begin\" t-value=\"format_datetime(object.start_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
+"\"></t>\n"
 "    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
+"\"></t>\n"
 "    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\"></t>,<br><br>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
 "        <t t-if=\"object.start_datetime.date() == object.end_datetime.date()"
 "\">\n"
@@ -144,57 +144,16 @@ msgid ""
 "    <t t-else=\"\">\n"
 "        Your intervention is scheduled.\n"
 "    </t>\n"
-"    <br/><br/>\n"
+"    <br><br>\n"
 "    Best regards,\n"
 "    <t t-if=\"user.signature\">\n"
-"        <br/>\n"
-"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"        <br>\n"
+"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "    </t>\n"
 "</div>\n"
 "        "
 msgstr ""
-"<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.start_datetime, "
-"dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
-"    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
-"time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
-"dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
-"    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
-"time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
-"\n"
-"    Kepada <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/>\n"
-"    <t t-if=\"date_begin and date_end\">\n"
-"        <t t-if=\"object.start_datetime.date() == object.end_datetime.date()"
-"\">\n"
-"            Intervensi Anda dijadwalkan untuk <t t-out=\"date_begin or "
-"''\">17 Nov</t> dari <t t-out=\"time_begin or ''\">08.00</t> hingga <t t-"
-"out=\"time_end or ''\">10.00</t>.\n"
-"        </t>\n"
-"        <t t-else=\"\">\n"
-"            Intervensi Anda dijadwalkan dari <t t-out=\"date_begin or "
-"''\">17 Nov</t> pukul <t t-out=\"time_begin or ''\">08.00</t> hingga <t t-"
-"out=\"date_end or ''\">18 Nov</t> pukul <t t-out=\"time_end or ''\">10.00</"
-"t>.\n"
-"        </t>\n"
-"    </t>\n"
-"    <t t-else=\"\">\n"
-"        Intervensi Anda dijadwalkan.\n"
-"    </t>\n"
-"    <br/><br/>\n"
-"    Salam hormat,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br/>\n"
-"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
-"    </t>\n"
-"</div>\n"
-"        "
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -250,25 +209,16 @@ msgstr ""
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\"/>,<br/"
-"><br/>\n"
+"                Dear <t t-out=\"object.partner_id.name or 'Customer'\"></t>,"
+"<br><br>\n"
 "                Please find attached the field service report for the recent "
-"intervention. <br/><br/>\n"
+"intervention. <br><br>\n"
 "                If you have any questions, please don't hesitate to contact "
-"us.<br/><br/>\n"
-"                Best regards,<br/><br/>\n"
+"us.<br><br>\n"
+"                Best regards,<br><br>\n"
 "            </p>\n"
 "        "
 msgstr ""
-"<p>\n"
-"                Kepada <t t-out=\"object.partner_id.name or 'Customer'\"/>,"
-"<br/><br/>\n"
-"                Terlampir laporan Layanan Lapangan untuk intervensi terbaru. "
-"<br/><br/>\n"
-"                Jika ada pertanyaan, silakan hubungi kami.<br/><br/>\n"
-"                Salam hormat,<br/><br/>\n"
-"           </p> \n"
-"        "
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -341,21 +291,23 @@ msgstr "<strong>Teknisi: </strong>"
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.rating_shift_request_email_template
 msgid ""
-"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>\n"
-"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"></"
+"t>\n"
+"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></"
+"t>\n"
 "            <t t-set=\"date_start\" t-"
 "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
+"tz=partner.tz, lang_code=partner.lang)\"></t>\n"
 "            <t t-set=\"date_end\" t-"
 "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
+"tz=partner.tz, lang_code=partner.lang)\"></t>\n"
 "            <div>\n"
 "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "                    <tbody>\n"
 "                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "                            Hello <t t-out=\"partner.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
+"Freeman</t>,<br><br>\n"
 "                            Please take a moment to rate your experience "
 "with the field service intervention on <t t-out=\"date_end or date_start or "
 "''\">Nov 25</t>.\n"
@@ -367,7 +319,7 @@ msgid ""
 "                                <tr><td style=\"font-size: 14px; text-"
 "align:center;\">\n"
 "                                    <strong>How satisfied were you with the "
-"intervention?</strong><br/>\n"
+"intervention?</strong><br>\n"
 "                                    <span style=\"text-color: "
 "#888888\">(click one of the smileys below to let us know)</span>\n"
 "                                </td></tr>\n"
@@ -380,7 +332,7 @@ msgid ""
 "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Happy\" "
-"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                            <td>\n"
@@ -388,7 +340,7 @@ msgid ""
 "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Neutral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                            <td>\n"
@@ -396,7 +348,7 @@ msgid ""
 "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Unhappy\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                        </tr>\n"
@@ -413,77 +365,6 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>\n"
-"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
-"            <t t-set=\"date_start\" t-"
-"value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
-"            <t t-set=\"date_end\" t-"
-"value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
-"            <div>\n"
-"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"style=\"width:100%; margin:0;\">\n"
-"                    <tbody>\n"
-"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
-"                            Halo <t t-out=\"partner.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                            Mohon luangkan waktu sejenak untuk menilai "
-"pengalaman Anda dengan intervensi layanan lapangan kami pada <t t-"
-"out=\"date_end or date_start or ''\">25 Nov</t>.\n"
-"                        </td></tr>\n"
-"                        <tr><td style=\"text-align: center;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
-"inline-table;\">\n"
-"                                <tr><td style=\"font-size: 14px; text-"
-"align:center;\">\n"
-"                                    <strong>Seberapa puas Anda dengan "
-"intervensi kami?</strong><br/>\n"
-"                                    <span style=\"text-color: "
-"#888888\">(klik emoji berikut untuk menilai)</span>\n"
-"                                </td></tr>\n"
-"                                <tr><td style=\"font-size: 14px;\">\n"
-"                                    <table style=\"width:100%;text-"
-"align:center;margin-top:2rem;\">\n"
-"                                        <tr>\n"
-"                                            <td>\n"
-"                                                <a t-attf-href=\"/rate/"
-"{{ access_token }}/5\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\">\n"
-"                                                    <img alt=\"Puas\" src=\"/"
-"rating/static/src/img/rating_5.png\" title=\"Puas\"/>\n"
-"                                                </a>\n"
-"                                            </td>\n"
-"                                            <td>\n"
-"                                                <a t-attf-href=\"/rate/"
-"{{ access_token }}/3\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\">\n"
-"                                                    <img alt=\"Netral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Netral\"/>\n"
-"                                                </a>\n"
-"                                            </td>\n"
-"                                            <td>\n"
-"                                                <a t-attf-href=\"/rate/"
-"{{ access_token }}/1\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\">\n"
-"                                                    <img alt=\"Tidak Puas\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Tidak Puas\"/>\n"
-"                                                </a>\n"
-"                                            </td>\n"
-"                                        </tr>\n"
-"                                    </table>\n"
-"                                </td></tr>\n"
-"                            </table>\n"
-"                        </td></tr>\n"
-"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
-"                            Terima kasih atas masukannya. Masukan Anda "
-"membantu kami untuk terus berkembang.\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__access_warning
@@ -612,7 +493,7 @@ msgstr "Tutup"
 #: model:ir.model,name:planning_field_service.model_res_company
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__company_id
 msgid "Company"
-msgstr ""
+msgstr "Perusahaan"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_base_document_layout
@@ -644,23 +525,23 @@ msgstr "Selesai"
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Pengaturan Konfig"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_email
 msgid "Confirmation Email"
-msgstr ""
+msgstr "Email Konfirmasi"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Kontak"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_country_id
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_country_id
 msgid "Country"
-msgstr ""
+msgstr "Negara"
 
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_res_partner
@@ -670,7 +551,7 @@ msgstr "Buat Pelanggan"
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "Buat Shift"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
@@ -684,7 +565,7 @@ msgstr "Buat Rencana Aktivitas Shift"
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Customer"
-msgstr ""
+msgstr "Pelanggan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__access_url
@@ -706,24 +587,24 @@ msgstr "Status Pelanggan"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "Customer:"
-msgstr ""
+msgstr "Pelanggan:"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Date"
-msgstr ""
+msgstr "Tanggal"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Debug"
-msgstr ""
+msgstr "Debug"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_decorator
 msgid "Decorator"
-msgstr ""
+msgstr "Dekorator"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__role_id
@@ -740,7 +621,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Depart at"
-msgstr ""
+msgstr "Berangkat pada"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_base_document_layout__display_name
@@ -763,28 +644,28 @@ msgstr "Nama Tampilan"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Distance"
-msgstr ""
+msgstr "Jarak"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_in
 msgid "Distance from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "Jarak dari shift sebelumnya (atau lokasi kerja) ke shift ini."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_out
 msgid "Distance from this shift to the next (or work location)."
-msgstr ""
+msgstr "Jarak dari shift ini ke shift berikutnya (atau lokasi kerja)."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Duration"
-msgstr ""
+msgstr "Durasi"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_electrician
 msgid "Electrician"
-msgstr ""
+msgstr "Teknisi Listrik"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_mail_template
@@ -802,7 +683,7 @@ msgstr "Email dikirim saat shift selesai."
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Employee"
-msgstr ""
+msgstr "Karyawan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__end_datetime
@@ -821,17 +702,17 @@ msgstr "Layanan Lapangan"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_email
 msgid "Field Service Confirmation Email"
-msgstr ""
+msgstr "Email Konfirmasi Layanan Lapangan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Email Template"
-msgstr ""
+msgstr "Template Email Konfirmasi Layanan Lapangan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Mail Template"
-msgstr ""
+msgstr "Template Email Konfirmasi Layanan Lapangan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__rating_shift_request_mail_template_id
@@ -892,7 +773,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Pengikut"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_partner_ids
@@ -902,7 +783,7 @@ msgstr "Pengikut (Partner)"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Future Activities"
-msgstr ""
+msgstr "Aktivitas Mendatang"
 
 #. module: planning_field_service
 #. odoo-python
@@ -914,7 +795,7 @@ msgstr "Koordinat GPS: %(localisation_start)s (%(latitude)s, %(longitude)s)"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Generate Sample Data"
-msgstr ""
+msgstr "Buat Data Sampel"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__has_message
@@ -932,12 +813,12 @@ msgstr "Teknisi Pemanas"
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "High"
-msgstr ""
+msgstr "Tinggi"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "History"
-msgstr ""
+msgstr "Riwayat"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_base_document_layout__id
@@ -954,12 +835,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_res_users__id
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Ikon"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_icon
@@ -981,7 +862,7 @@ msgstr "Jika dicentang, beberapa pesan mempunyai kesalahan pengiriman."
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_slot__state__3_in_progress
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "In Progress"
-msgstr ""
+msgstr "Dalam Proses"
 
 #. module: planning_field_service
 #: model:mail.template,subject:planning_field_service.mail_template_data_intervention_details
@@ -1001,13 +882,13 @@ msgstr ""
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_activity
 msgid "Interventions"
-msgstr ""
+msgstr "Intervensi"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 msgid "Invalid Intervention."
-msgstr ""
+msgstr "Intervensi Tidak Sah."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1018,33 +899,33 @@ msgstr "Data tanda tangan tidak valid."
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "Adalah Pengikut"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "Jane smith"
-msgstr ""
+msgstr "Jane smith"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
 msgid "Just now"
-msgstr ""
+msgstr "Baru saja"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_landscaper
 msgid "Landscaper"
-msgstr ""
+msgstr "Penata Taman"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Late Activities"
-msgstr ""
+msgstr "Aktivitas Terlambat"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
 msgid "Live Latitude"
-msgstr ""
+msgstr "Lintang Terkini"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_location_last_update
@@ -1054,19 +935,19 @@ msgstr "Pembaruan Terakhir Lokasi Langsung"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_longitude
 msgid "Live Longitude"
-msgstr ""
+msgstr "Bujur Terkini"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_live_map
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_live_map
 msgid "Live Map"
-msgstr ""
+msgstr "Peta Live"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Location error"
-msgstr ""
+msgstr "Kesalahan lokasi"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1077,7 +958,7 @@ msgstr "Lokasi error: %s"
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_locksmith
 msgid "Locksmith"
-msgstr ""
+msgstr "Tukang Kunci"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__0
@@ -1085,46 +966,46 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Low"
-msgstr ""
+msgstr "Rendah"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_my_map
 msgid "Map"
-msgstr ""
+msgstr "Peta"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "MapBox servers unreachable"
-msgstr ""
+msgstr "Server MapBox tidak terjangkau"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Mapbox could not be reached."
-msgstr ""
+msgstr "Mapbox tidak dapat dijangkau."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Mapbox could not compute the route."
-msgstr ""
+msgstr "Mapbox tidak dapat menghitung rute."
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_by_resource
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_maps
 msgid "Maps"
-msgstr ""
+msgstr "Peta"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "Marc Demo"
-msgstr ""
+msgstr "Marc Demo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ikon Material Symbols, misalnya checklist"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
@@ -1141,12 +1022,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Medium"
-msgstr ""
+msgstr "Medium"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error
@@ -1156,17 +1037,17 @@ msgstr "Pengiriman Pesan error"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Pesan"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
 msgid "My"
-msgstr ""
+msgstr "Saya"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "My Activities"
-msgstr ""
+msgstr "Aktivitas Saya"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__my_activity_date_deadline
@@ -1176,18 +1057,18 @@ msgstr "Batas Waktu Aktivitas Saya"
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_my_map
 msgid "My Map"
-msgstr ""
+msgstr "Peta Saya"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/__init__.py:0
 msgid "My Planning"
-msgstr ""
+msgstr "Perencanaan Saya"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_name
 msgid "Name"
-msgstr ""
+msgstr "Nama"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1195,7 +1076,7 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_calendar/common/planning_calendar_common_popover.xml:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "Navigate"
-msgstr ""
+msgstr "Navigasi"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_calendar_event_id
@@ -1258,28 +1139,28 @@ msgstr "Jumlah pesan dengan kesalahan pengiriman"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "Open Map"
-msgstr ""
+msgstr "Buka Peta"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_phone
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
 msgid "Phone"
-msgstr ""
+msgstr "Telepon"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "Phone:"
-msgstr ""
+msgstr "Telepon:"
 
 #. module: planning_field_service
 #: model:ir.module.module,summary:base.module_planning_field_service
 msgid "Plan intervention in planning"
-msgstr ""
+msgstr "Rencanakan intervensi dalam perencanaan"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_my_planning_internal_user
 msgid "Planning"
-msgstr ""
+msgstr "Perencanaan"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_analysis_report
@@ -1296,12 +1177,12 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_slot
 msgid "Planning Shift"
-msgstr ""
+msgstr "Shift Perencanaan"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_plumber
 msgid "Plumber"
-msgstr ""
+msgstr "Tukang Pipa"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__access_url
@@ -1311,7 +1192,7 @@ msgstr "URL Akses Portal"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Print"
-msgstr ""
+msgstr "Cetak"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__priority
@@ -1319,7 +1200,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Priority"
-msgstr ""
+msgstr "Prioritas"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1336,74 +1217,74 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_graph_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_pivot_planning_field_service
 msgid "Rating (1-5)"
-msgstr ""
+msgstr "Rating (1-5)"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_avg_text
 msgid "Rating Avg Text"
-msgstr ""
+msgstr "Nilai Rata-Rata Teks"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr ""
+msgstr "Nilai Masukan Terakhir"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_image
 msgid "Rating Last Image"
-msgstr ""
+msgstr "Nilai Gambar Terakhir"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_value
 msgid "Rating Last Value"
-msgstr ""
+msgstr "Nilai Value Terakhir"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_percentage_satisfaction
 msgid "Rating Satisfaction"
-msgstr ""
+msgstr "Nilai Kepuasan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_text
 msgid "Rating Text"
-msgstr ""
+msgstr "Nilai Teks"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_count
 msgid "Rating count"
-msgstr ""
+msgstr "Nilai jumlah"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "Rating"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_replacement_requested
 #: model:mail.message.subtype,name:planning_field_service.mt_replacement_requested
 msgid "Replacement Requested"
-msgstr ""
+msgstr "Penggantian Diajukan"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "Tindakan Laporan"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_resource_resource
 msgid "Resource"
-msgstr ""
+msgstr "Sumber Daya"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__resource_ids
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Resources"
-msgstr ""
+msgstr "Sumber Daya"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "Penanggung Jawab"
 
 #. module: planning_field_service
 #: model:portal.entry,description:planning_field_service.portal_field_service
@@ -1414,7 +1295,7 @@ msgstr "Periksa dan tandatangani laporan intervensi Anda"
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__role_id
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Role"
-msgstr ""
+msgstr "Peran"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_sms_error
@@ -1424,7 +1305,7 @@ msgstr "Pengiriman SMS error"
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_safety
 msgid "Safety Technician"
-msgstr ""
+msgstr "Teknisi Keselamatan"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_by_resource
@@ -1439,12 +1320,12 @@ msgstr ""
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Scheduled"
-msgstr ""
+msgstr "Dijadwalkan"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.action_intervention_send_mail
 msgid "Send Email"
-msgstr ""
+msgstr "Kirim Email"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1455,17 +1336,17 @@ msgstr "Kirim Laporan Layanan Lapangan"
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_send
 msgid "Send Planning"
-msgstr ""
+msgstr "Kirim Perencanaan"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.action_intervention_send_report
 msgid "Send Report"
-msgstr ""
+msgstr "Kirim Laporan"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.res_config_settings_view_form
 msgid "Send a confirmation email to the customer when a shift is published"
-msgstr ""
+msgstr "Kirim email konfirmasi ke pelanggan saat shift dipublikasikan"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.rating_shift_request_email_template
@@ -1483,31 +1364,31 @@ msgstr "Dikirim ke pelanggan saat shift dipublikasikan"
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_assigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_assigned
 msgid "Shift Assigned"
-msgstr ""
+msgstr "Shift Ditugaskan"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_reassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_reassigned
 msgid "Shift Re-assigned"
-msgstr ""
+msgstr "Shift Ditugaskan Ulang"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_rescheduled
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_rescheduled
 msgid "Shift Rescheduled"
-msgstr ""
+msgstr "Shift Dijadwalkan Ulang"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_unassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_unassigned
 msgid "Shift Unassigned"
-msgstr ""
+msgstr "Shift Belum Ditugaskan"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1516,18 +1397,18 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 #: code:addons/planning_field_service/static/src/views/planning_kanban/planning_slot_kanban_button.js:0
 msgid "Shift started"
-msgstr ""
+msgstr "Shift dimulai"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_model.js:0
 msgid "Shifts to Schedule"
-msgstr ""
+msgstr "Shift untuk Dijadwalkan"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Show all records whose next activity date is past"
-msgstr ""
+msgstr "Tunjukkan semua record yang tanggal kegiatan berikutnya di masa lalu"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -1538,14 +1419,14 @@ msgstr "Tanda Tangan Laporan Layanan Lapangan"
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Report"
-msgstr ""
+msgstr "Tandatangani Laporan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__worksheet_signature
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "Signature"
-msgstr ""
+msgstr "Tanda Tangan"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1558,18 +1439,18 @@ msgstr "Belum ada tanda tangan."
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Signed"
-msgstr ""
+msgstr "Ditandatangani"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__worksheet_signed_by
 msgid "Signed By"
-msgstr ""
+msgstr "Ditandatangani oleh"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Some routing points are too far apart"
-msgstr ""
+msgstr "Beberapa poin routing terlalu jauh satu sama lain"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1579,25 +1460,25 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form_in_gantt
 msgid "Start"
-msgstr ""
+msgstr "Mulai"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__start_datetime
 msgid "Start Date"
-msgstr ""
+msgstr "Tanggal Mulai"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__state
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_intervention_status_changed
 #: model:mail.message.subtype,name:planning_field_service.mt_intervention_status_changed
 msgid "Status Changed"
-msgstr ""
+msgstr "Status Berubah"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_state
@@ -1616,28 +1497,28 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street
 msgid "Street"
-msgstr ""
+msgstr "Jalan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street2
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street2
 msgid "Street2"
-msgstr ""
+msgstr "Jalan2"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Technician"
-msgstr ""
+msgstr "Teknisi"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Technicians"
-msgstr ""
+msgstr "Teknisi"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_telecom
 msgid "Telecom Installer"
-msgstr ""
+msgstr "Teknisi Telekomunikasi"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1682,19 +1563,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This method must take two slots in argument."
-msgstr ""
+msgstr "Metode ini harus mengambil dua slot di argument."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This shift is already completed."
-msgstr ""
+msgstr "Shift ini sudah selesai."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This shift is already in progress."
-msgstr ""
+msgstr "Shift ini sedang berlangsung."
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
@@ -1709,31 +1590,31 @@ msgstr ""
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_map_timeline
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_map_timeline
 msgid "Timeline"
-msgstr ""
+msgstr "Timeline"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "To Review"
-msgstr ""
+msgstr "Untuk Ditinjau"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Today Activities"
-msgstr ""
+msgstr "Aktivitas Hari ini"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Token invalid"
-msgstr ""
+msgstr "Token tidak valid"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Too many requests, try again in a few minutes"
-msgstr ""
+msgstr "Terlalu banyak permintaan, coba lagi dalam beberapa menit"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1753,55 +1634,56 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_in
 msgid "Travel Distance In"
-msgstr ""
+msgstr "Jarak Tempuh Berangkat"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_out
 msgid "Travel Distance Out"
-msgstr ""
+msgstr "Jarak Tempuh Pulang"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_in
 msgid "Travel Time In"
-msgstr ""
+msgstr "Waktu Tempuh Berangkat"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_out
 msgid "Travel Time Out"
-msgstr ""
+msgstr "Waktu Tempuh Pulang"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.xml:0
 msgid "Travel Times"
-msgstr ""
+msgstr "Waktu Tempuh"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_times_up_to_date
 msgid "Travel Times Up To Date"
-msgstr ""
+msgstr "Waktu Tempuh Terkini"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Travel time"
-msgstr ""
+msgstr "Waktu tempuh"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_in
 msgid "Travel time from previous shift (or work location) to this shift."
 msgstr ""
+"Waktu perjalanan dari shift sebelumnya (atau lokasi kerja) ke shift ini."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_out
 msgid "Travel time from this shift to the next (or work location)."
-msgstr ""
+msgstr "Waktu tempuh dari shift ini ke shift berikutnya (atau lokasi kerja)."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_model.js:0
 msgid "Travel times updated"
-msgstr ""
+msgstr "Waktu tempuh diperbarui"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_decoration
@@ -1812,19 +1694,19 @@ msgstr "Jenis aktivitas pengecualian pada record."
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Unauthorized connection"
-msgstr ""
+msgstr "Koneksi tidak sah"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_controller.js:0
 msgid "Untitled"
-msgstr ""
+msgstr "Belum ada judul"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.js:0
 msgid "Update travel times as they are out-of-date"
-msgstr ""
+msgstr "Perbarui waktu tempuh karena sudah kedaluwarsa"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__3
@@ -1832,30 +1714,30 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Urgent"
-msgstr ""
+msgstr "Mendesak"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_users
 msgid "User"
-msgstr ""
+msgstr "User"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "View Intervention"
-msgstr ""
+msgstr "Lihat Intervensi"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "View Report"
-msgstr ""
+msgstr "Lihat Laporan"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
 msgid "View location"
-msgstr ""
+msgstr "Lihat lokasi"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1870,6 +1752,8 @@ msgid ""
 "You can't move this shift to draft because it is already in progress or "
 "completed."
 msgstr ""
+"Anda tidak dapat memindahkan shift ini ke draft karena sedang berlangsung "
+"atau sudah selesai."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1878,6 +1762,8 @@ msgid ""
 "You can't unschedule this shift because it's already in progress or "
 "completed."
 msgstr ""
+"Anda tidak dapat membatalkan jadwal shift ini karena sedang berlangsung atau "
+"sudah selesai."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1889,18 +1775,18 @@ msgstr "Anda tidak dapat mengatur slot ke draf."
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_zip
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_zip
 msgid "ZIP"
-msgstr ""
+msgstr "ZIP"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "break"
-msgstr ""
+msgstr "istirahat"
 
 #. module: planning_field_service
 #: model:ir.actions.report,print_report_name:planning_field_service.intervention_report
 msgid "object._get_report_base_filename()"
-msgstr ""
+msgstr "object._get_report_base_filename()"
 
 #. module: planning_field_service
 #: model:mail.template,subject:planning_field_service.rating_shift_request_email_template
@@ -1910,6 +1796,268 @@ msgid ""
 msgstr ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Permintaan "
 "Penilaian Layanan"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "    <t t-set=\"date_begin\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
+#~ "dt_format='MMM d', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "\n"
+#~ "    Dear <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/>\n"
+#~ "    <t t-if=\"date_begin and date_end\">\n"
+#~ "        <t t-if=\"object.start_datetime.date() == "
+#~ "object.end_datetime.date()\">\n"
+#~ "            Your intervention is scheduled for <t t-out=\"date_begin or "
+#~ "''\">Nov 17</t> from <t t-out=\"time_begin or ''\">8 AM</t> to <t t-"
+#~ "out=\"time_end or ''\">10 AM</t>.\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Your intervention is scheduled from <t t-out=\"date_begin or "
+#~ "''\">Nov 17</t> at <t t-out=\"time_begin or ''\">8 AM</t> to <t t-"
+#~ "out=\"date_end or ''\">Nov 18</t> at <t t-out=\"time_end or ''\">10 AM</"
+#~ "t>.\n"
+#~ "        </t>\n"
+#~ "    </t>\n"
+#~ "    <t t-else=\"\">\n"
+#~ "        Your intervention is scheduled.\n"
+#~ "    </t>\n"
+#~ "    <br/><br/>\n"
+#~ "    Best regards,\n"
+#~ "    <t t-if=\"user.signature\">\n"
+#~ "        <br/>\n"
+#~ "        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "    </t>\n"
+#~ "</div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "    <t t-set=\"date_begin\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
+#~ "dt_format='MMM d', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "\n"
+#~ "    Kepada <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/"
+#~ ">\n"
+#~ "    <t t-if=\"date_begin and date_end\">\n"
+#~ "        <t t-if=\"object.start_datetime.date() == "
+#~ "object.end_datetime.date()\">\n"
+#~ "            Intervensi Anda dijadwalkan untuk <t t-out=\"date_begin or "
+#~ "''\">17 Nov</t> dari <t t-out=\"time_begin or ''\">08.00</t> hingga <t t-"
+#~ "out=\"time_end or ''\">10.00</t>.\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Intervensi Anda dijadwalkan dari <t t-out=\"date_begin or "
+#~ "''\">17 Nov</t> pukul <t t-out=\"time_begin or ''\">08.00</t> hingga <t t-"
+#~ "out=\"date_end or ''\">18 Nov</t> pukul <t t-out=\"time_end or "
+#~ "''\">10.00</t>.\n"
+#~ "        </t>\n"
+#~ "    </t>\n"
+#~ "    <t t-else=\"\">\n"
+#~ "        Intervensi Anda dijadwalkan.\n"
+#~ "    </t>\n"
+#~ "    <br/><br/>\n"
+#~ "    Salam hormat,\n"
+#~ "    <t t-if=\"user.signature\">\n"
+#~ "        <br/>\n"
+#~ "        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "    </t>\n"
+#~ "</div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<p>\n"
+#~ "                Dear <t t-out=\"object.partner_id.name or 'Customer'\"/>,"
+#~ "<br/><br/>\n"
+#~ "                Please find attached the field service report for the "
+#~ "recent intervention. <br/><br/>\n"
+#~ "                If you have any questions, please don't hesitate to "
+#~ "contact us.<br/><br/>\n"
+#~ "                Best regards,<br/><br/>\n"
+#~ "            </p>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<p>\n"
+#~ "                Kepada <t t-out=\"object.partner_id.name or 'Customer'\"/"
+#~ ">,<br/><br/>\n"
+#~ "                Terlampir laporan Layanan Lapangan untuk intervensi "
+#~ "terbaru. <br/><br/>\n"
+#~ "                Jika ada pertanyaan, silakan hubungi kami.<br/><br/>\n"
+#~ "                Salam hormat,<br/><br/>\n"
+#~ "           </p> \n"
+#~ "        "
+
+#~ msgid ""
+#~ "<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"date_start\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <t t-set=\"date_end\" t-"
+#~ "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <div>\n"
+#~ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            Hello <t t-out=\"partner.name or ''\">Brandon "
+#~ "Freeman</t>,<br/><br/>\n"
+#~ "                            Please take a moment to rate your experience "
+#~ "with the field service intervention on <t t-out=\"date_end or date_start "
+#~ "or ''\">Nov 25</t>.\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td style=\"text-align: center;\">\n"
+#~ "                            <table border=\"0\" cellpadding=\"0\" "
+#~ "cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
+#~ "inline-table;\">\n"
+#~ "                                <tr><td style=\"font-size: 14px; text-"
+#~ "align:center;\">\n"
+#~ "                                    <strong>How satisfied were you with "
+#~ "the intervention?</strong><br/>\n"
+#~ "                                    <span style=\"text-color: "
+#~ "#888888\">(click one of the smileys below to let us know)</span>\n"
+#~ "                                </td></tr>\n"
+#~ "                                <tr><td style=\"font-size: 14px;\">\n"
+#~ "                                    <table style=\"width:100%;text-"
+#~ "align:center;margin-top:2rem;\">\n"
+#~ "                                        <tr>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Happy\" "
+#~ "src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Neutral\" "
+#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Unhappy\" "
+#~ "src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                        </tr>\n"
+#~ "                                    </table>\n"
+#~ "                                </td></tr>\n"
+#~ "                            </table>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            We appreciate your feedback. It helps us "
+#~ "continuously improve.\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"date_start\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <t t-set=\"date_end\" t-"
+#~ "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <div>\n"
+#~ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            Halo <t t-out=\"partner.name or ''\">Brandon "
+#~ "Freeman</t>,<br/><br/>\n"
+#~ "                            Mohon luangkan waktu sejenak untuk menilai "
+#~ "pengalaman Anda dengan intervensi layanan lapangan kami pada <t t-"
+#~ "out=\"date_end or date_start or ''\">25 Nov</t>.\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td style=\"text-align: center;\">\n"
+#~ "                            <table border=\"0\" cellpadding=\"0\" "
+#~ "cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
+#~ "inline-table;\">\n"
+#~ "                                <tr><td style=\"font-size: 14px; text-"
+#~ "align:center;\">\n"
+#~ "                                    <strong>Seberapa puas Anda dengan "
+#~ "intervensi kami?</strong><br/>\n"
+#~ "                                    <span style=\"text-color: "
+#~ "#888888\">(klik emoji berikut untuk menilai)</span>\n"
+#~ "                                </td></tr>\n"
+#~ "                                <tr><td style=\"font-size: 14px;\">\n"
+#~ "                                    <table style=\"width:100%;text-"
+#~ "align:center;margin-top:2rem;\">\n"
+#~ "                                        <tr>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Puas\" "
+#~ "src=\"/rating/static/src/img/rating_5.png\" title=\"Puas\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Netral\" "
+#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Netral\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Tidak "
+#~ "Puas\" src=\"/rating/static/src/img/rating_1.png\" title=\"Tidak Puas\"/"
+#~ ">\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                        </tr>\n"
+#~ "                                    </table>\n"
+#~ "                                </td></tr>\n"
+#~ "                            </table>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            Terima kasih atas masukannya. Masukan Anda "
+#~ "membantu kami untuk terus berkembang.\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid ""
 #~ "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "

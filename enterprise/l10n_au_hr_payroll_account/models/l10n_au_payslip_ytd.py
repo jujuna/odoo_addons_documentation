@@ -2,7 +2,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.addons.l10n_au_hr_payroll.models.hr_version import INCOME_STREAM_TYPES
 
@@ -97,12 +97,12 @@ class L10n_AuPayslipYtd(models.Model):
                 ("state", "in", ("validated", "paid")),
                 ("date_from", "<=", end_date),
                 ("date_from", ">=", start_date)]):
-                raise UserError(_("You can't create or update YTD opening balances for %s, because there are "
+                raise UserError(self.env._("You can't create or update YTD opening balances for %s, because there are "
                                   "validated payslips for this employee during the selected fiscal year.", (rec.employee_id.name)))
 
     def write(self, vals):
         if any(finalised for finalised in self.mapped("finalised")) and vals.get("finalised", True):
-            raise UserError(_("YTD Balances cannot be updated once finalised."))
+            raise UserError(self.env._("YTD Balances cannot be updated once finalised."))
         is_negative = self.filtered(lambda x: x.rule_id.code in ["WORKPLACE.GIVING", "WITHHOLD.TOTAL"])
         if self in is_negative and "start_value" in vals:
             vals["start_value"] = -abs(vals["start_value"])
@@ -165,6 +165,12 @@ class L10n_AuPayslipYtd(models.Model):
         for rtw in rtw_lines:
             res[rtw["employee_id"]] += rtw["ytd_amount"]
         return res
+
+    @api.model
+    def action_list_view(self):
+        if self.env.company.country_id.code != "AU":
+            raise UserError(self.env._("You must be logged in an Australian company to use that feature."))
+        return self.env["ir.actions.act_window"]._for_xml_id("l10n_au_hr_payroll_account.l10n_au_payslip_ytd_action")
 
 
 class L10nAUPayslipYTDInput(models.Model):

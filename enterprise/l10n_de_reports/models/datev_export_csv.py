@@ -95,7 +95,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         array[9] = datetime.strftime(move.date, '%-d%m')
         array[10] = receipt1[-36:]
         array[11] = receipt2
-        array[13] = reference_text or ''
+        # "Buchungstext" shouldn't contain special whitespace chars (tab, newline,...) and shouldn't exceed 60 chars
+        array[13] = re.sub(r'[\n\r\t]+', ' ', reference_text or '')[:60]
         if move.message_main_attachment_id:
             array[19] = f'BEDI "{move._l10n_de_datev_get_guid()}"'
 
@@ -162,9 +163,9 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 else:
                     # ZIP for Data => csv
                     set_move_line_ids = set(move_line_ids)
-                    zf.writestr('EXTF_accounting_entries.csv', self._l10n_de_datev_get_csv(options, moves))
-                    zf.writestr('EXTF_customer_accounts.csv', self._l10n_de_datev_get_partner_list(options, set_move_line_ids, customer=True))
-                    zf.writestr('EXTF_vendor_accounts.csv', self._l10n_de_datev_get_partner_list(options, set_move_line_ids, customer=False))
+                    zf.writestr('EXTF_accounting_entries.csv', self._l10n_de_datev_get_csv(options, moves).encode('utf-8-sig'))
+                    zf.writestr('EXTF_customer_accounts.csv', self._l10n_de_datev_get_partner_list(options, set_move_line_ids, customer=True).encode('utf-8-sig'))
+                    zf.writestr('EXTF_vendor_accounts.csv', self._l10n_de_datev_get_partner_list(options, set_move_line_ids, customer=False).encode('utf-8-sig'))
             buf.seek(0)
             content = buf.read()
 

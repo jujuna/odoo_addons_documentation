@@ -13,6 +13,8 @@ class TestSalarySimulation(HttpCase):
             'name': 'Standard 38 hours/week',
             'company_id': False,
             'hours_per_day': 7.6,
+            # a calendar without company is its own full time, unless told otherwise
+            'full_time_required_hours': 40,
             'attendance_ids': [(5, 0, 0),
                                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
                                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 16.6}),

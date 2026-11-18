@@ -404,11 +404,10 @@ class TestPayrollExpense(TestHrPayrollAccountCommon, TestExpenseCommon):
         ])
 
     @freeze_time('2022-01-25')
-    def test_expense_payslip_with_existing_bill(self):
+    def test_expense_payslip_with_bill_sent_separately(self):
         """
-        Test flow for expense paid by employee, with an existing bill and refund on payslip
+        Test flow for expense paid by employee, with a bill sent separately and refund on payslip
         """
-        # Create the existing bill
         partner = self.env['res.partner'].create({'name': 'test supplier'})
         bill = self.env['account.move'].create({
             'partner_id': partner.id,
@@ -423,6 +422,7 @@ class TestPayrollExpense(TestHrPayrollAccountCommon, TestExpenseCommon):
                 'price_unit': 100,
             })]
         })
+        bill.action_post()
 
         # Create expense for the same amount as the bill
         expense = self.create_expenses({
@@ -431,22 +431,20 @@ class TestPayrollExpense(TestHrPayrollAccountCommon, TestExpenseCommon):
             'vendor_id': partner.id,
             'total_amount_currency': bill.amount_total,
             'has_existing_bill': True,
-            'existing_bill_id': bill.id,
         })
         expense.action_submit()
         expense.action_approve()
         self.assertTrue(expense.refund_in_payslip)
 
-        # Should have created a debt transfer entry, and the existing bill should have been marked as paid
+        # Should have created a debt transfer entry, the bill being matched afterward by the user
         payable_line = bill.line_ids.filtered(lambda line: line.account_type == 'liability_payable')
         account_id = payable_line.account_id.id
-        expense_move = expense.account_move_id
         expected_expense_move_lines = [
-            {'account_id': account_id, 'balance': 100.0, 'reconciled_lines_ids': payable_line.ids},
+            {'account_id': account_id, 'balance': 100.0, 'reconciled_lines_ids': []},
             {'account_id': self.expense_payable_account.id, 'balance': -100.0, 'reconciled_lines_ids': []},
         ]
-        self.assertRecordValues(expense_move.line_ids, expected_expense_move_lines)
-        self.assertEqual(bill.payment_state, 'paid')
+        self.assertRecordValues(expense.account_move_id.line_ids, expected_expense_move_lines)
+        self.assertEqual(bill.payment_state, 'not_paid')
         self.assertEqual(expense.state, 'approved')
 
         # Create the payslip and draft and unlink expense move
@@ -459,17 +457,22 @@ class TestPayrollExpense(TestHrPayrollAccountCommon, TestExpenseCommon):
             'refund_in_payslip': False,
         }])
 
-        # Approve expense and validate payslip
+        # Approve expense again and match the bill with the vendor side of the new debt transfer entry
         expense.action_approve()
+        vendor_line = expense.account_move_id.line_ids.filtered(lambda line: line.partner_id == partner)
+        bill.js_assign_outstanding_line(vendor_line.id)
+        self.assertEqual(bill.payment_state, 'paid')
+
+        # Validate the payslip
         payslip.action_payslip_draft()
         self.payslip_run.slip_ids.compute_sheet()
         self.payslip_run.action_validate()
         payslip.move_id.action_post()
 
-        # Should have reconciled the expense move with the payslip move
+        # Should have reconciled the expense move with the bill and the payslip move
+        expected_expense_move_lines[0]['reconciled_lines_ids'] = payable_line.ids
         expected_expense_move_lines[-1]['reconciled_lines_ids'] = [payslip.move_id.line_ids.filtered(lambda l: l.account_id == self.expense_payable_account).id]
-        expense_move = expense.account_move_id
-        self.assertRecordValues(expense_move.line_ids, expected_expense_move_lines)
+        self.assertRecordValues(expense.account_move_id.line_ids, expected_expense_move_lines)
         self.assertEqual(expense.state, 'posted')
 
         # Finally, pay the salary -> the expense is marked as paid

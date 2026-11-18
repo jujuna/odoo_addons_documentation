@@ -72,6 +72,7 @@ class AccountReturn(models.Model):
     def _run_cis_checks(self, check_codes_to_ignore):
         self.ensure_one()
         checks = []
+        cash_basis = self.env['ir.config_parameter'].sudo().get_bool('l10n_uk_reports_cis.cash_basis')
         if 'check_cis_company_data' not in check_codes_to_ignore:
             no_cis_fields = not self.env.company.l10n_uk_hmrc_unique_taxpayer_reference or not self.env.company.l10n_uk_hmrc_account_office_reference
             checks.append({
@@ -83,11 +84,10 @@ class AccountReturn(models.Model):
             })
 
         if 'check_cis_unregistered_partners' not in check_codes_to_ignore:
-            unregistered_partners = self.env['account.move']._read_group(
+            unregistered_partners = self.env['account.move'].with_context(account_report_cash_basis=cash_basis)._read_group(
                 domain=[
                     ('l10n_uk_cis_inactive_partner', '=', True),
-                    ('date', '>=', self.date_from),
-                    ('date', '<=', self.date_to),
+                    ('line_ids', 'any', [('date', '>=', self.date_from), ('date', '<=', self.date_to)]),
                 ],
                 aggregates=['partner_id:recordset'],
             )[0][0]
@@ -117,7 +117,7 @@ class AccountReturn(models.Model):
 
         if 'check_cis_materials_breakdown' not in check_codes_to_ignore:
             purchase_base_tags = self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_purchase_expr_base')._get_matching_tags()
-            cis_bill_amls = self.env['account.move.line'].search([
+            cis_bill_amls = self.env['account.move.line'].with_context(account_report_cash_basis=cash_basis).search([
                 ('move_type', 'in', self.env['account.move'].get_purchase_types()),
                 ('date', '>=', self.date_from),
                 ('date', '<=', self.date_to),
@@ -144,14 +144,16 @@ class AccountReturn(models.Model):
             purchase_deduction_tags = self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_purchase_expr_deduction')._get_matching_tags()
             sales_deduction_tags = self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_sale_expr_deduction')._get_matching_tags()
             cis_deduction_tags = purchase_deduction_tags + sales_deduction_tags
-            employee_partners = self.env['account.move']._read_group(
+            employee_partners = self.env['account.move'].with_context(account_report_cash_basis=cash_basis)._read_group(
                 domain=[
-                    ('date', '>=', self.date_from),
-                    ('date', '<=', self.date_to),
                     ('company_id', 'in', self.company_ids.ids),
                     ('state', '=', 'posted'),
                     ('partner_id.employee', '=', True),
-                    ('line_ids.tax_tag_ids', 'in', cis_deduction_tags.ids),
+                    ('line_ids', 'any', [
+                        ('date', '>=', self.date_from),
+                        ('date', '<=', self.date_to),
+                        ('tax_tag_ids', 'in', cis_deduction_tags.ids),
+                    ]),
                 ],
                 aggregates=['partner_id:recordset'],
             )[0][0]
@@ -179,7 +181,8 @@ class AccountReturnType(models.Model):
     def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
         if country_code == 'GB':
-            # Auto generate CIS returns for every period that has CIS move lines
+            # Auto generate CIS returns for every period that has CIS move lines, on the payment dates once the cash basis is enabled
+            cash_basis = self.env['ir.config_parameter'].sudo().get_bool('l10n_uk_reports_cis.cash_basis')
             cis_return_type = self.env.ref('l10n_uk_reports_cis.uk_cis_tax_return_type')
             cis_tax_tags = (
                 self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_purchase_expr_deduction')._get_matching_tags()
@@ -192,7 +195,7 @@ class AccountReturnType(models.Model):
             periods = [today + relativedelta(months=months_offset * i) for i in range(-3, 2)]
 
             periods_has_move_lines_map = {
-                period_bounds: bool(self.env['account.move.line'].search_count([
+                period_bounds: bool(self.env['account.move.line'].with_context(account_report_cash_basis=cash_basis).search_count([
                     ('tax_tag_ids', 'in', cis_tax_tags.ids),
                     *self.env['account.move.line']._check_company_domain(company_ids.ids),
                     ('date', '>=', period_bounds[0]),

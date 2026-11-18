@@ -478,14 +478,14 @@ class TestEcEdiXmls(TestEcEdiCommon):
                             <codigo>2</codigo>
                             <codigoPorcentaje>4</codigoPorcentaje>
                             <tarifa>15.000000</tarifa>
-                            <baseImponible>140.000000</baseImponible>
-                            <valor>21.00</valor>
+                            <baseImponible>60.000000</baseImponible>
+                            <valor>9.00</valor>
                         </impuesto>
                         <impuesto>
                             <codigo>2</codigo>
                             <codigoPorcentaje>0</codigoPorcentaje>
                             <tarifa>0.000000</tarifa>
-                            <baseImponible>140.000000</baseImponible>
+                            <baseImponible>60.000000</baseImponible>
                             <valor>0.00</valor>
                         </impuesto>
                     </impuestos>

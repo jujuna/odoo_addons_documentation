@@ -154,8 +154,8 @@ class TestWhatsAppStatistics(MarketingAutomationCommon, WhatsAppCommon):
         self.assertRecordValues(
             self.activity_whatsapp,
             [{
-                'processed': 0,
-                'rejected': 2,
+                'processed': 5,
+                'rejected': 1,
                 'total_click': 2,
                 'total_open': 2,
                 'total_reply': 1,

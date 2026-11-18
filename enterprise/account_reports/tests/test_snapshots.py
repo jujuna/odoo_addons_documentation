@@ -58,16 +58,11 @@ class TestSnapshots(TestAccountReportsCommon):
 
         cls._cleanup_snapshot_cron_triggers()
 
-    def _simulate_crons_after_lock_date_change(self, expected_snapshot_nber, stop_when_reached=False, only_creation=False):
-        if not only_creation:
-            self.assertEqual(0, self.env['ir.cron.trigger'].search_count([('cron_id', '=', self.snapshot_creation_cron.id)]))
+    @classmethod
+    def _cleanup_cron_triggers(cls, creation=True, gc=True):
+        cls.env['ir.cron.trigger'].search([('cron_id', '=', cls.snapshot_creation_cron.id)]).unlink()
 
-            gc_triggers = self.env['ir.cron.trigger'].search([('cron_id', '=', self.snapshot_garbage_collection_cron.id)])
-            self.assertTrue(gc_triggers)
-            gc_triggers.unlink()
-
-            self.env['account.report.snapshot'].sudo()._cron_garbage_collect_snapshots()
-
+    def _simulate_cron_after_lock_date_change(self, expected_snapshot_nber, stop_when_reached=False):
         created_snapshots_count = 0
         while creation_trigger := self.env['ir.cron.trigger'].search([('cron_id', '=', self.snapshot_creation_cron.id)], limit=1):
             creation_trigger.unlink()
@@ -114,7 +109,7 @@ class TestSnapshots(TestAccountReportsCommon):
         self.env.company.fiscalyear_lock_date = '2020-12-31'
 
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1)
+            self._simulate_cron_after_lock_date_change(1)
 
         # A snapshot exists at this date ; the engine shouldn't be called at all
         with self.snapshot_test_patch(self, report, 0, 1):
@@ -197,11 +192,11 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # snapshot the earliest fiscal year
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # ...then fills the gap up to the lock date
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         self.assertRecordValues(
             self.env['account.report.snapshot'].search([('report_id', '=', report.id)], order='date'),
@@ -288,17 +283,17 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Snapshots of company 0
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Snapshots of company 1
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         # Snapshots match the date exactly, no query should be executed, and both snapshots should be combined to build the result
         with self.snapshot_test_patch(self, report, 0, 2):
@@ -331,6 +326,10 @@ class TestSnapshots(TestAccountReportsCommon):
         main_company = self.env.company
         branch = self.env['res.company'].create({'name': 'branch', 'parent_id': main_company.id, 'account_fiscal_country_id': self.fake_country.id})
         sub_branch = self.env['res.company'].create({'name': 'branch branch', 'parent_id': branch.id, 'account_fiscal_country_id': self.fake_country.id})
+
+        self.cr.precommit.run()  # loads the CoA on branches, forcing their fiscal country to that of the CoA
+        branch.account_fiscal_country_id = self.fake_country
+        sub_branch.account_fiscal_country_id = self.fake_country
 
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=(self.env.company + branch + sub_branch).ids))
 
@@ -375,24 +374,24 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Snapshots of main company
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Snapshots of branch
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Snapshots of sub branch
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         # The engine shouldn't be called, and the 3 snapshots created for the companies should be combined
         with self.snapshot_test_patch(self, report, 0, 3):
@@ -483,17 +482,17 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Snapshots of company 0
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Snapshots of company 1
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         # Snapshots match the date exactly for company 0, but not company 1: 1 call to the engine for company 1 + 2 snapshots to combine with the result
         with self.snapshot_test_patch(self, report, 1, 3):
@@ -526,6 +525,10 @@ class TestSnapshots(TestAccountReportsCommon):
         main_company = self.env.company
         branch = self.env['res.company'].create({'name': 'branch', 'parent_id': main_company.id, 'account_fiscal_country_id': self.fake_country.id})
         sub_branch = self.env['res.company'].create({'name': 'branch branch', 'parent_id': branch.id, 'account_fiscal_country_id': self.fake_country.id})
+
+        self.cr.precommit.run()  # loads the CoA on branches, forcing their fiscal country to that of the CoA
+        branch.account_fiscal_country_id = self.fake_country
+        sub_branch.account_fiscal_country_id = self.fake_country
 
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=(self.env.company + branch + sub_branch).ids))
 
@@ -574,17 +577,17 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Snapshots of branch
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Snapshots of sub_branch
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 1, 2):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         # The engine should be called for main company and the non-snapshot part of sub_branch ; the result should be combined with the existing 2 snapshots
         with self.snapshot_test_patch(self, report, 1, 3):
@@ -654,11 +657,11 @@ class TestSnapshots(TestAccountReportsCommon):
         # 5 snapshots will be generated
         # The first snapshot is created without merging it with anything that came before
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         # Each following snapshot shout merge its computed result with the previous snapshot
         with self.snapshot_test_patch(self, report, 5, 2):
-            self._simulate_crons_after_lock_date_change(5, only_creation=True)
+            self._simulate_cron_after_lock_date_change(5)
 
         with self.snapshot_test_patch(self, report, 0, 1):
             self.assertLinesValues(
@@ -779,10 +782,10 @@ class TestSnapshots(TestAccountReportsCommon):
         self.env.company.fiscalyear_lock_date = '2021-12-31'
 
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         with self.snapshot_test_patch(self, report, 2, 2):
-            self._simulate_crons_after_lock_date_change(2, only_creation=True)
+            self._simulate_cron_after_lock_date_change(2)
 
         # With snapshots
         with self.snapshot_test_patch(self, report, 0, 1):
@@ -844,7 +847,7 @@ class TestSnapshots(TestAccountReportsCommon):
         self.env.company.fiscalyear_lock_date = '2020-12-31'
 
         with self.snapshot_test_patch(self, report, 1, 1):
-            self._simulate_crons_after_lock_date_change(1)
+            self._simulate_cron_after_lock_date_change(1)
 
         # A snapshot now fully covers the period: the engine shouldn't be called at all.
         with self.snapshot_test_patch(self, report, 0, 1):
@@ -890,7 +893,7 @@ class TestSnapshots(TestAccountReportsCommon):
         for lock_date_field, lock_date in [('hard_lock_date', '2020-01-01'), ('fiscalyear_lock_date', '2021-01-01'), ('tax_lock_date', '2022-01-01')]:
             self._cleanup_snapshot_cron_triggers()
             self.env.company.write({lock_date_field: lock_date})
-            self._simulate_crons_after_lock_date_change(1)
+            self._simulate_cron_after_lock_date_change(1)
 
         tax_report_snapshots = self.env['account.report.snapshot'].search([('report_id', '=', tax_report.id)])
         self.assertEqual(tax_report_snapshots.mapped('date'), [date(2022, 1, 1)])
@@ -911,7 +914,7 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Create snapshots
         self.env.company.fiscalyear_lock_date = '2021-12-31'
-        self._simulate_crons_after_lock_date_change(6)
+        self._simulate_cron_after_lock_date_change(6)
 
         self.assertEqual(
             self.env['account.report.snapshot'].search([('report_id', '=', report.id)]).mapped('date'),
@@ -927,7 +930,7 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Chaging the lock date should garbage collect the following snapshots
         self.env.company.fiscalyear_lock_date = '2019-12-31'
-        self._simulate_crons_after_lock_date_change(0)
+        self._simulate_cron_after_lock_date_change(0)
 
         self.assertEqual(
             self.env['account.report.snapshot'].search([('report_id', '=', report.id)]).mapped('date'),
@@ -948,7 +951,7 @@ class TestSnapshots(TestAccountReportsCommon):
         })
 
         lock_date_wizard.change_lock_date()
-        self._simulate_crons_after_lock_date_change(0)
+        self._simulate_cron_after_lock_date_change(0)
 
         self.assertEqual(
             self.env['account.report.snapshot'].search([('report_id', '=', report.id)]).mapped('date'),
@@ -960,7 +963,7 @@ class TestSnapshots(TestAccountReportsCommon):
 
         # Revoking the exception should regenerate the snapshots
         lock_date_wizard.action_revoke_min_fiscalyear_lock_date_exception_for_me()
-        self._simulate_crons_after_lock_date_change(2, only_creation=True)
+        self._simulate_cron_after_lock_date_change(2)
 
         self.assertEqual(
             self.env['account.report.snapshot'].search([('report_id', '=', report.id)]).mapped('date'),
@@ -981,7 +984,7 @@ class TestSnapshots(TestAccountReportsCommon):
         })
 
         lock_date_wizard.change_lock_date()
-        self._simulate_crons_after_lock_date_change(0)
+        self._simulate_cron_after_lock_date_change(0)
         self.assertFalse(self.env['account.report.snapshot'].search([('report_id', '=', report.id)]))
 
     def test_merge_result_partitions_groupby_lists(self):
@@ -1021,9 +1024,21 @@ class TestSnapshots(TestAccountReportsCommon):
         self._cleanup_snapshot_cron_triggers()
         self.env.company.fiscalyear_lock_date = '2021-12-31'
         with self.mock_datetime_and_now(datetime(2026, 1, 1, 10, 1)):
-            self._simulate_crons_after_lock_date_change(1, stop_when_reached=True)
+            self._simulate_cron_after_lock_date_change(1, stop_when_reached=True)
 
         self.assertTrue(self.env['account.report.snapshot'].search([('report_id', '=', report.id)]))
+
+        # Create and revoke an exception in the past, just to make sure it does not interfere with the handling of the exceptions added after it.
+        with self.mock_datetime_and_now(datetime(2025, 1, 1, 10, 2)):
+            self.env['account.change.lock.date'].create({
+                'fiscalyear_lock_date': False,
+                'exception_applies_to': 'me',
+                'exception_duration': 'forever',
+            }).change_lock_date()
+
+        with self.mock_datetime_and_now(datetime(2025, 1, 1, 10, 3)):
+            self._simulate_cron_after_lock_date_change(0)
+            self.env['account.change.lock.date'].create({}).action_revoke_min_fiscalyear_lock_date_exception_for_me()
 
         # An exception without a lock date unlocks the whole period. Snapshots must be removed
         # and cannot be recreated while it is active.
@@ -1035,7 +1050,7 @@ class TestSnapshots(TestAccountReportsCommon):
             }).change_lock_date()
 
         with self.mock_datetime_and_now(datetime(2026, 1, 1, 10, 3)):
-            self._simulate_crons_after_lock_date_change(0)
+            self._simulate_cron_after_lock_date_change(0)
 
         self.assertFalse(self.env['account.report.snapshot'].search([('report_id', '=', report.id)]))
 
@@ -1044,7 +1059,7 @@ class TestSnapshots(TestAccountReportsCommon):
             self.env['account.change.lock.date'].create({}).action_revoke_min_fiscalyear_lock_date_exception_for_me()
 
         with self.mock_datetime_and_now(datetime(2026, 1, 1, 10, 5)):
-            self._simulate_crons_after_lock_date_change(1, only_creation=True)
+            self._simulate_cron_after_lock_date_change(1)
 
         created_snapshot_1 = self.env['account.report.snapshot'].search([('report_id', '=', report.id), ('date', '=', '2021-12-31')])
         self.assertEqual(1, len(created_snapshot_1))
@@ -1053,7 +1068,7 @@ class TestSnapshots(TestAccountReportsCommon):
             self.env['account.change.lock.date'].create({'fiscalyear_lock_date': '2022-01-10'}).change_lock_date()
 
         with self.mock_datetime_and_now(datetime(2026, 1, 1, 10, 7)):
-            self._simulate_crons_after_lock_date_change(1)
+            self._simulate_cron_after_lock_date_change(1)
 
         created_snapshot_2 = self.env['account.report.snapshot'].search([('report_id', '=', report.id), ('date', '=', '2022-01-10')])
         self.assertEqual(1, len(created_snapshot_2))
@@ -1066,7 +1081,7 @@ class TestSnapshots(TestAccountReportsCommon):
             }).change_lock_date()
 
         with self.mock_datetime_and_now(datetime(2026, 1, 1, 10, 9)):
-            self._simulate_crons_after_lock_date_change(1)
+            self._simulate_cron_after_lock_date_change(1)
 
         # snasphot 2 should have been deleted ; snapshot 1 should still be there
         all_snapshots = self.env['account.report.snapshot'].search([('report_id', '=', report.id)])

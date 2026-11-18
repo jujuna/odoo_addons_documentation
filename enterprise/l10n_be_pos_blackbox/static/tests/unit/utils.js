@@ -389,6 +389,20 @@ export const waitForDelayedCalls = () => {
     return { promise, resolver };
 };
 
+export const fdmErrorResponse = () =>
+    new Response(
+        JSON.stringify({
+            errors: [
+                {
+                    message: "The FDM is locked",
+                    path: ["signWorkIn"],
+                    extensions: { code: "FDM_LOCKED", category: "FDM" },
+                },
+            ],
+        }),
+        { headers: { "Content-Type": "application/json" } }
+    );
+
 export const setOrderFdmSignature = (
     order,
     {

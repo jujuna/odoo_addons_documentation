@@ -3,12 +3,11 @@
 import ast
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from lxml import html
 from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models, tools, _
 from odoo.fields import Command, Domain
-from odoo.tools import html_sanitize, LazyTranslate, SQL
+from odoo.tools import LazyTranslate, SQL
 from odoo.addons.web.controllers.utils import clean_action
 from odoo.exceptions import UserError
 
@@ -1047,23 +1046,8 @@ class HelpdeskTicket(models.Model):
             and message.subtype_id == self._creation_subtype()
             and message.message_type == 'email'
             and tools.email_normalize(self.partner_email) == tools.email_normalize(message.email_from)
-            and message.body  # TDE FIXME: use html empty
         ):
-            # Remove the signature from the email body
-            source_html = message.body
-            doc = html.fromstring(source_html)
-
-            signature_xpath = (
-                '//*[@data-o-mail-quote="1"] | '
-                '//span[normalize-space(.) = "--"]'
-            )
-
-            for element in doc.xpath(signature_xpath):
-                element.getparent().remove(element)
-
-            cleaned_html = html.tostring(doc, encoding='unicode').strip()
-            self.description = html_sanitize(cleaned_html)
-
+            self.description = message.body
         return super()._message_post_after_hook(message)
 
     def _track_template_parameters(self, tracked_fields):

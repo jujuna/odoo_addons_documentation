@@ -45,9 +45,10 @@ class L10nBeDimonaRelation(models.Model):
                 (year, month, day) = relation.content['endDate'].split('-')
                 relation.date_end = date(int(year), int(month), int(day))
 
+            # The Dimona of the employer are for the employees of all its branches
             relation.employee_id = self.env['hr.employee'].with_context(active_test=False).search([
                 ('niss', '=', relation.name),
-                ('company_id', '=', relation.company_id.id),
+                ('company_id', 'child_of', relation.company_id.id),
             ], order="active DESC", limit=1)
             if relation.employee_id:
                 relation.employee_id.l10n_be_dimona_relation_id = relation

@@ -45,6 +45,7 @@ Accounting Reports
         'views/account_return_views.xml',
         'views/account_return_check_views.xml',
         'views/account_journal_dashboard_view.xml',
+        'views/account_journal_views.xml',
         'views/res_config_settings_views.xml',
         'views/res_partner_views.xml',
         'views/report_template.xml',

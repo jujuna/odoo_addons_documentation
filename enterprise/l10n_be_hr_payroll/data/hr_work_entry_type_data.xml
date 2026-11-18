@@ -214,11 +214,9 @@
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_sectoral_compensatory_rest" model="hr.work.entry.type">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.ONSS_BASE'),
-            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
-        ])]"/>
+        <!-- Paid by a third party (e.g. Constructiv for the construction), not by the employer -->
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="amount_rate">0.0</field>
         <field name="l10n_be_egov3_code">1202005</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="dmfa_code">12</field>
@@ -325,6 +323,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Holidays within the framework of the coordinated laws of 28 June 1971 on annual holidays for workers, the royal decree of 30 March 1967, the royal decree of 19 November 1998 regulating the annual holidays of certain members of staff of federal administrations (this concerns statutory civil servants), but also holidays according to the regulations specific to administrative bodies (this concerns statutory civil servants).</field>
         <field name="l10n_be_drs_nature">3.1</field>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_extra_legal_sectoral_holiday" model="hr.work.entry.type">
@@ -383,7 +382,10 @@ The code can only be used by an employer active in a sector corresponding to the
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_youth_time_off" model="hr.work.entry.type">
+        <field name="name">Youth Holiday</field>
         <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="unit_of_measure">day</field>
+        <field name="request_unit">half_day</field>
         <field name="dmfa_code">73</field>
         <field name="l10n_be_egov3_code">2204001</field>
         <field name="l10n_be_egov3_base">daily</field>
@@ -396,7 +398,10 @@ The code can only be used by an employer active in a sector corresponding to the
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_senior_time_off" model="hr.work.entry.type">
+        <field name="name">Senior Holiday</field>
         <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="unit_of_measure">day</field>
+        <field name="request_unit">half_day</field>
         <field name="dmfa_code">73</field>
         <field name="l10n_be_egov3_code">2204001</field>
         <field name="l10n_be_egov3_base">daily</field>
@@ -428,6 +433,7 @@ These are the hours of absence covered by a guaranteed daily wage
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
         ])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_incapacity_first_week" model="hr.work.entry.type">
@@ -436,6 +442,7 @@ These are the hours of absence covered by a guaranteed daily wage
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1205002</field>
@@ -688,6 +695,7 @@ This code must be declared if the worker is no longer entitled to guaranteed wag
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1206002</field>
@@ -705,6 +713,7 @@ This code must be declared if the worker is no longer entitled to guaranteed wag
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1206003</field>
@@ -1011,6 +1020,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.MEAL_VOUCHER'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">5</field>
         <field name="l10n_be_egov3_code">1209002</field>
@@ -1028,6 +1038,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">5</field>
         <field name="l10n_be_egov3_code">1209002</field>
@@ -1044,6 +1055,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.MEAL_VOUCHER'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">5</field>
         <field name="l10n_be_egov3_code">1209002</field>
@@ -1116,6 +1128,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">2210004</field>
@@ -1128,9 +1141,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_paternity_legal" model="hr.work.entry.type">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
-        ])]"/>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
         <field name="dmfa_code">52</field>
         <field name="l10n_be_egov3_code">1298006</field>
         <field name="l10n_be_egov3_base">daily</field>
@@ -1146,6 +1157,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">2210006</field>
@@ -1207,7 +1219,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
-        <field name="dmfa_code">4</field>
+        <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1298001</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">This is a day paid by the employer
@@ -1310,7 +1322,6 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
     <record id="hr_work_entry.l10n_be_work_entry_type_unpredictable" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.UNASSIMILATED'),
-            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">24</field>
         <field name="l10n_be_egov3_code">1299001</field>
@@ -1425,16 +1436,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299011</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are days or hours not worked and not paid during which the person is not bound by a contract or status.</field>
-    </record>
-
-    <record id="hr_work_entry.be_work_entry_type_home_working" model="hr.work.entry.type">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.ONSS_BASE'),
-            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
-        ])]"/>
-        <field name="leave_right">True</field>
-        <field name="l10n_be_drs_nature">1</field>
+        <field name="round_days_type">HALF-UP</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_solicitation_time_off" model="hr.work.entry.type">
@@ -1457,8 +1459,10 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.MEAL_VOUCHER'),
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
         ])]"/>
+        <field name="leave_right" eval="True"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_drs_nature">1</field>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_unpaid_leave" model="hr.work.entry.type">
@@ -1468,6 +1472,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         ])]"/>
         <field name="dmfa_code">30</field>
         <field name="l10n_be_drs_nature">7</field>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <!-- 020.49 -->
@@ -1647,6 +1652,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1101001</field>
@@ -1698,6 +1704,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.MEAL_VOUCHER'),
             ref('l10n_be_hr_payroll.PRIVATE_CAR'),
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
+            ref('l10n_be_hr_payroll.VARIABLE_SALARY_LOSS'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_drs_nature">1</field>
@@ -1711,33 +1718,37 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('hr_payroll.EXTRA_HOURS'),
             ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
-        <!-- the hours are recovered later: only the 50% premium is paid with the overtime -->
+        <!-- the hours are recovered later: only the 50% premium is paid with the overtime, the DmfA declares the
+             hours when they are recovered (046.00) -->
         <field name="amount_rate">0.5</field>
-        <field name="dmfa_code">1</field>
+        <field name="dmfa_code">-1</field>
         <field name="l10n_be_egov3_code">1102001</field>
         <field name="l10n_be_egov3_base">both</field>
         <field name="l10n_be_drs_nature">1.5</field>
     </record>
 
-    <!-- The work entry types of hr_work_entry are not updated: their tax categories reach the existing databases -->
-    <function model="hr.work.entry.type" name="write">
-        <value eval="[
-            ref('hr_work_entry.be_work_entry_type_overtime'),
-            ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_150'),
-            ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_200'),
-            ref('hr_work_entry.l10n_be_work_entry_type_overtime_recoverable'),
-            ref('hr_work_entry.be_work_entry_type_additional_hours_50'),
-            ref('hr_work_entry.be_work_entry_type_additional_hours_100'),
-        ]"/>
-        <value eval="{'category_ids': [(4, ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'))]}"/>
-    </function>
-    <function model="hr.work.entry.type" name="write">
-        <value eval="[
-            ref('hr_work_entry.l10n_be_work_entry_type_overtime_no_onss'),
-            ref('hr_work_entry.l10n_be_work_entry_type_overtime_no_onss_horeca'),
-        ]"/>
-        <value eval="{'category_ids': [(4, ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME'))]}"/>
-    </function>
+    <record id="work_entry_type_overtime_recoverable_100" model="hr.work.entry.type">
+        <field name="name">Overtime hours (recoverable) - 100%</field>
+        <field name="code">026.01</field>
+        <field name="display_code">OT1</field>
+        <field name="color">4</field>
+        <field name="country_id" ref="base.be"/>
+        <field name="count_as">working_time</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.ONSS_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
+        ])]"/>
+        <!-- the hours are recovered later: only the 100% premium is paid with the overtime (e.g. on a Sunday or a
+             public holiday) -->
+        <field name="amount_rate">1.0</field>
+        <field name="dmfa_code">1</field>
+        <field name="l10n_be_egov3_code">1102001</field>
+        <field name="l10n_be_egov3_base">both</field>
+        <field name="l10n_be_drs_nature">1.5</field>
+    </record>
 
 </data>
 </odoo>

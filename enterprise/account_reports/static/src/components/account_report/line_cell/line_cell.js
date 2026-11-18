@@ -9,6 +9,7 @@ import { Component, computed, markup, signal, t, useEffect, usePlugin, useProps 
 
 import { AccountReportCarryoverPopover } from "@account_reports/components/account_report/line_cell/popover/carryover_popover";
 import { AccountReportController } from "@account_reports/components/account_report/controller";
+import { DeferralWarningPopover } from "@account_reports/components/account_report/line_cell/popover/deferral_warning_popover";
 
 
 export class AccountReportLineCell extends Component {
@@ -156,6 +157,39 @@ export class AccountReportLineCell extends Component {
             {
                 closeOnClickAway: true,
                 position: localization.direction === "rtl" ? "bottom" : "right",
+            },
+        );
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Deferral Warning popover
+    //------------------------------------------------------------------------------------------------------------------
+    showDeferralWarningPopover(ev) {
+        const close = () => {
+            this.popoverCloseFn();
+            this.popoverCloseFn = null;
+        };
+
+        if (this.popoverCloseFn)
+            close();
+
+        const actionFn = () => {
+            close();
+            this.controller.reportAction(ev, 'open_deferred_lines_without_deferral_entry', {
+                account_ids: this.props.cell.deferral_warning_popup_data.deferred_accounts_with_warning.map((accountId) => accountId()),
+                column_group_index: this.props.cell.column_group_index(),
+            });
+        };
+
+        this.popoverCloseFn = this.popover.add(
+            ev.currentTarget,
+            DeferralWarningPopover,
+            {
+                warning_action: actionFn,
+            },
+            {
+                closeOnClickAway: true,
+                position: localization.direction === "rtl" ? "left" : "right",
             },
         );
     }

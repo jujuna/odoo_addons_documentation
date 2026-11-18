@@ -23,6 +23,8 @@ class AwRule(models.Model):
         required=True,
         help="This tells Odoo which activity to track from ActivityWatch. Each activity that matches this pattern will create a new event, and all following related actions are counted as part of it until a different activity starts. Only activities longer than 1 minute are tracked.\n\n"
              "Example pattern: Meet - (.*)\\|https://meet.google.com captures each Google Meet meeting.\n\n"
+             "For code editors, the pattern is matched against \"<repository>|<branch>\", "
+             "e.g. odoo-dev/enterprise|master-1234-dev.\n\n"
              "Tip: The parts in parentheses (…) are captured automatically and can be used in the Template or in the Description.\n\n"
              "Example of a new event:\n"
              "Open Customer A Meeting → a new event is created\n"

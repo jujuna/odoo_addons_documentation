@@ -46,6 +46,15 @@ class TestDianPos(TestL10nCoEdiPosCommon):
         self.assertEqual(order.l10n_co_edi_pos_dian_state, 'invoice_pending')
         return order
 
+    def test_order_without_dian_certificate(self):
+        """ A Colombian company without DIAN certificate doesn't use electronic invoicing:
+        its POS orders must be validated without being sent to the DIAN. """
+        self.certificate_demo.unlink()
+        with self._pos_session():
+            order = self._create_order(self.default_pos_order_ui_data)
+            self.assertFalse(order.company_id.l10n_co_edi_pos_dian_enabled)
+            self.assertRecordValues(order, [{'state': 'paid', 'l10n_co_edi_pos_document_ids': []}])
+
     def test_get_status_zip_warnings(self):
         """ SendTestSetAsync then GetStatusZip which returns warnings but the document is valid. """
         # Step 1: SendTestSetAsync

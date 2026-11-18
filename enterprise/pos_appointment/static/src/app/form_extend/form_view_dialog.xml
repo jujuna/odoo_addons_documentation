@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="pos_appointment.QuickCreateButtons" t-inherit="web.FormViewDialog.ToOne.buttons">
+        <xpath expr="//button[hasclass('o_form_button_save')]" position="attributes">
+            <attribute name="t-att-class">{'flex-fill': this.ui.isSmall}</attribute>
+        </xpath>
+        <xpath expr="//button[hasclass('o_form_button_cancel')]" position="attributes">
+            <attribute name="t-att-class">{'flex-fill': this.ui.isSmall}</attribute>
+        </xpath>
         <xpath expr="//button[hasclass('o_form_button_cancel')]" position="after">
-            <div class="d-flex gap-1 ms-auto o_appointment_status_btns_container">
+            <div class="d-flex gap-2 ms-auto o_appointment_status_btns_container" t-att-class="{
+                    'w-100 order-first justify-content-between border-bottom pb-1 mb-2': this.ui.isSmall,
+                }">
                 <button class="btn"
                     t-attf-class="{{ this.getButtonClass('booked') }}"
                     t-on-click="() => this.onClickAppointmentStatus('booked')">

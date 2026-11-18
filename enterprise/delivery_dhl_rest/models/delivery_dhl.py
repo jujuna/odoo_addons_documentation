@@ -393,8 +393,11 @@ class ProviderDHL(models.Model):
                     'isRequested': True,
                     'invoiceType': 'commercial',
                 })
+                value_added_services = shipment_request.setdefault('valueAddedServices', [])
+                value_added_services.append({'serviceCode': 'WY'})
             if self.supports_shipping_insurance and self.shipping_insurance:
-                shipment_request['valueAddedServices'] = [srm._get_insurance_vals(self.shipping_insurance, total_value, currency_name)]
+                value_added_services = shipment_request.setdefault('valueAddedServices', [])
+                value_added_services.append(srm._get_insurance_vals(self.shipping_insurance, total_value, currency_name))
             self._dhl_add_extra_data_to_request(shipment_request, 'ship')
             dhl_response = srm._send_shipment(shipment_request)
             tracking_number = dhl_response['shipmentTrackingNumber']
@@ -472,6 +475,7 @@ class ProviderDHL(models.Model):
                 'templateName': self.dhl_label_template,
             }]
         }
+        shipment_request['valueAddedServices'] = [{'serviceCode': 'PV'}]
         if picking._should_generate_commercial_invoice():
             shipment_request['content']['exportDeclaration'] = srm._get_export_declaration_vals(self, picking)
             shipment_request['content']['declaredValueCurrency'] = currency_name
@@ -482,7 +486,7 @@ class ProviderDHL(models.Model):
                 'isRequested': True,
                 'invoiceType': 'commercial',
             })
-        shipment_request['valueAddedServices'] = [{'serviceCode': 'PV'}]
+            shipment_request['valueAddedServices'].append({'serviceCode': 'WY'})
         self._dhl_add_extra_data_to_request(shipment_request, 'return')
         dhl_response = srm._send_shipment(shipment_request)
         tracking_number = dhl_response['shipmentTrackingNumber']

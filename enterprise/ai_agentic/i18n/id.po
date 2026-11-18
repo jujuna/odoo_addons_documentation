@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 17:46+0000\n"
-"PO-Revision-Date: 2026-10-12 10:37+0000\n"
+"PO-Revision-Date: 2026-11-13 10:38+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "ai_agentic/id/>\n"
@@ -69,6 +69,52 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            Buat dan perbarui otomatisasi persisten untuk tindakan yang "
+"harus Anda lakukan nanti, berulang kali, atau sebagai respons terhadap "
+"peristiwa record. Gunakan alat ini saat user meminta Anda untuk melakukan "
+"tindakan atau mengirim pengingat pada waktu mendatang, dengan jadwal "
+"berulang, atau saat record dibuat, diubah, dihapus, dikirim pesan, atau "
+"memenuhi kondisi tertentu.\n"
+"            Saat membuat otomatisasi baru, `name`, `description`, `trigger`, "
+"`ai_action_prompt`, dan `explanation` wajib diisi.\n"
+"            Saat mengedit otomatisasi yang sudah ada, `automation_id` dan "
+"`explanation` wajib diisi. Untuk parameter lainnya, hanya berikan parameter "
+"yang perlu diperbarui.\n"
+"            ## Tipe pemicu (Trigger)\n"
+"            Pilih pemicu berbasis waktu (`on_time_created`, "
+"`on_time_updated`, `on_time`) dibandingkan pemicu sinkron (`on_create`, "
+"`on_create_or_write`): pemicu berbasis waktu berjalan tak lama setelah "
+"peristiwa terjadi, bukan saat user menyimpan data. \"Saat tiket dibuat, …\" "
+"adalah `on_time_created` dengan penundaan 1 menit; \"kapan pun prospek "
+"diperbarui, …\" adalah `on_time_updated`. Gunakan `on_create` / "
+"`on_create_or_write` hanya jika user secara eksplisit meminta tindakan "
+"langsung dan sinkron, atau untuk transisi pada field tertentu yang "
+"memerlukan `filter_pre_domain`.\n"
+"            ## Contoh pemicu (Trigger)\n"
+"            - Beri tag pada setiap tiket baru (pemicu pembuatan yang "
+"disarankan): `{\"trigger\": {\"type\": \"on_time_created\", "
+"\"target_model\": \"helpdesk.ticket\", \"date_offset_or_interval\": "
+"{\"amount\": 1, \"unit\": \"minutes\"}}}`\n"
+"            - Pemicu saat tag \"Bug\" ditambahkan pada tugas saya (transisi "
+"field, maka `on_create_or_write`): `{\"trigger\": {\"type\": "
+"\"on_create_or_write\", \"observed_fields\": [\"tag_ids\"], "
+"\"filter_pre_domain\": \"[('tag_ids', 'not in', ['Bug'])]\", "
+"\"filter_domain\": \"[('tag_ids', 'in', ['Bug']), ('user_id', '=', 3)]\"}}` "
+"(jika ID User adalah 3).\n"
+"            - Pemicu satu hari sebelum tanggal penutupan yang diharapkan: `"
+"{\"trigger\": {\"type\": \"on_time\", \"observed_fields\": "
+"\"date_deadline\", \"date_offset_or_interval\": {\"direction\": \"before\", "
+"\"amount\": 1, \"unit\": \"day\"}}}`\n"
+"            - Pemicu saat pembuatan jika record tidak ditetapkan: `"
+"{\"trigger\": {\"type\": \"on_time_created\", \"filter_domain\": \"["
+"('user_id', '=', False)]\", \"date_offset_or_interval\": {\"amount\": 5, "
+"\"unit\": \"minutes\"}}}`\n"
+"            - Pemicu setiap hari Senin: `{\"trigger\": {\"type\": "
+"\"on_schedule\", \"date_offset_or_interval\": {\"amount\": 7, \"unit\": "
+"\"day\", \"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (jika hari Senin "
+"berikutnya adalah 24-08-2026)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -88,6 +134,22 @@ msgid ""
 "instead, that leaves the user without the Run button.\n"
 "        "
 msgstr ""
+"\n"
+"            Menjalankan otomatisasi berbasis waktu sekarang juga, persis "
+"seperti jadwalnya: membuat duplikat agen yang menjalankan instruksi tindakan "
+"dalam eksekusi headless, dan menampilkan hasilnya di chat.\n"
+"            Gunakan alat ini saat user meminta untuk menjalankan, menguji, "
+"atau mencoba otomatisasi sekarang, alih-alih mengeksekusi sendiri langkah-"
+"langkah otomatisasi dalam percakapan. Hanya otomatisasi berbasis waktu "
+"(tindakan terjadwal dan aturan waktu) yang dapat dijalankan sesuai "
+"permintaan; aturan berbasis peristiwa diuji dengan membuat atau memperbarui "
+"record yang cocok dengan pemicunya.\n"
+"            Setelah membuat otomatisasi berbasis waktu, tawarkan kepada user "
+"untuk menjalankannya sekali dengan MEMANGGIL alat ini segera: kartu "
+"konfirmasinya (\"Jalankan\" / \"Tidak sekarang\") adalah penawarannya. "
+"Jangan pernah bertanya \"haruskah saya menjalankannya?\" di teks pesan Anda, "
+"karena hal itu membuat user tidak memiliki tombol Jalankan.\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.module.module,description:base.module_ai_agentic
@@ -99,6 +161,12 @@ msgid ""
 "* Enhance customer service with AI-powered responses\n"
 "* Automate routine tasks with intelligent workflows\n"
 msgstr ""
+"\n"
+"* Buat dan kelola agen AI untuk beragam tugas-tugas bisnis\n"
+"* Integrasikan model-model dan layanan AI yang populer\n"
+"* Proses dokumen dan ekstrak informasi secara otomatis\n"
+"* Tingkatkan customer service dengan tanggapan bertenaga AI\n"
+"* Otomatiskan tugas-tugas rutin dengan alur kerja yang cerdas\n"
 
 #. module: ai_agentic
 #. odoo-python
@@ -106,27 +174,31 @@ msgstr ""
 msgid ""
 "\"%s\" ran. The full transcript is in its own chat, under the Automation tab."
 msgstr ""
+"\"%s\" dijalankan. Transkrip lengkap ada di obrolannya sendiri, di tab "
+"Otomatisasi."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/base_automation.py:0
 msgid "%(agent)s: %(automation)s"
-msgstr ""
+msgstr "%(agent)s: %(automation)s"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archive"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Arsipkan"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Delete"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Hapus"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Unarchive"
 msgstr ""
+"<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Batalkan "
+"pengarsipan"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -145,6 +217,8 @@ msgid ""
 "A powerful suite of AI tools and agents integrated directly into your Odoo "
 "environment"
 msgstr ""
+"Rangkaian alat dan agen AI yang kuat serta terintegrasi langsung ke "
+"environment Odoo Anda"
 
 #. module: ai_agentic
 #: model:ir.module.module,shortdesc:base.module_ai_agentic
@@ -156,82 +230,82 @@ msgstr "AI"
 #: model:ir.model,name:ai_agentic.model_ai_agent
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "Agen AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_agent_source
 msgid "AI Agent Source"
-msgstr ""
+msgstr "Sumber Agen AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_automation_trigger
 msgid "AI Automation Trigger"
-msgstr ""
+msgstr "Pemicu Otomatisasi AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_automation_trigger_ids
 msgid "AI Automation Triggers"
-msgstr ""
+msgstr "Pemicu Otomatisasi AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "Sesi AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_tool
 msgid "AI Tool"
-msgstr ""
+msgstr "Alat AI"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "AI Tool: Create or Update Automation"
-msgstr ""
+msgstr "Alat AI: Buat atau Perbarui Otomatisasi"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_run_automation
 msgid "AI Tool: Run Automation"
-msgstr ""
+msgstr "Alat AI: Jalankan Otomatisasi"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "AI Tools"
-msgstr ""
+msgstr "Alat AI"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ir_actions_server_view_form
 msgid "Actions"
-msgstr ""
+msgstr "Tindakan"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_list.xml:0
 msgid "Add"
-msgstr ""
+msgstr "Tambahkan"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Links"
-msgstr ""
+msgstr "Tambahkan Link"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Sources"
-msgstr ""
+msgstr "Tambahkan Sumber"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Add a Link"
-msgstr ""
+msgstr "Tambahkan Link"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.js:0
 msgid "Add skills to expand what your agent can do."
-msgstr ""
+msgstr "Tambahkan keahlian untuk memperluas kemampuan agen Anda."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -239,12 +313,16 @@ msgstr ""
 msgid ""
 "Add sources to give your agent the information it needs to answer accurately."
 msgstr ""
+"Tambahkan sumber untuk memberikan informasi yang dibutuhkan agen Anda agar "
+"dapat menjawab dengan akurat."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add sources to your AI Agent to get answers based on specific content."
 msgstr ""
+"Tambahkan sumber ke Agen AI untuk mendapatkan jawaban berdasarkan konten "
+"tertentu."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -253,24 +331,26 @@ msgid ""
 "Add triggers to let your agent run automatically on a schedule or when key "
 "events happen."
 msgstr ""
+"Tambahkan pemicu agar agen dapat berjalan otomatis sesuai jadwal atau saat "
+"peristiwa penting terjadi."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Adding sources..."
-msgstr ""
+msgstr "Menambahkan sumber..."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Creation"
-msgstr ""
+msgstr "Setelah Pembuatan"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Update"
-msgstr ""
+msgstr "Setelah Pembaruan"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -282,19 +362,19 @@ msgstr "Agen"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Name"
-msgstr ""
+msgstr "Nama Agen"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Subtitle"
-msgstr ""
+msgstr "Subjudul Agen"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/thread_actions_patch.js:0
 msgid "Agent configuration"
-msgstr ""
+msgstr "Konfigurasi agen"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_base_automation__ai_agent_id
@@ -302,6 +382,9 @@ msgid ""
 "Agent that runs the AI actions of this automation rule. Its tool calls are "
 "auto-confirmed and each run is kept in a chat for inspection."
 msgstr ""
+"Agen yang menjalankan tindakan AI dari aturan otomatisasi ini. Panggilan "
+"alatnya dikonfirmasi secara otomatis dan setiap eksekusi disimpan dalam "
+"obrolan untuk diperiksa."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -320,12 +403,12 @@ msgstr "Agen-Agen membantu Anda mengelola dan mengatur operasi AI Anda."
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_action_prompt
 msgid "Ai Action Prompt"
-msgstr ""
+msgstr "Prompt Tindakan AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_next_trigger_date
 msgid "Ai Next Trigger Date"
-msgstr ""
+msgstr "Tanggal Pemicu AI Berikutnya"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -336,19 +419,19 @@ msgstr "Semua Model"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.js:0
 msgid "Allow this Agent to ask for help to other Agents"
-msgstr ""
+msgstr "Izinkan Agen ini untuk meminta bantuan kepada Agen lain"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__architect
 msgid "Architect"
-msgstr ""
+msgstr "Arsitek"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Archive"
-msgstr ""
+msgstr "Arsip"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -360,18 +443,18 @@ msgstr "Diarsipkan"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to archive this agent?"
-msgstr ""
+msgstr "Yakin ingin mengarsipkan agen ini?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to delete this agent?"
-msgstr ""
+msgstr "Yakin ingin menghapus agen ini?"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__artist
 msgid "Artist"
-msgstr ""
+msgstr "Seniman"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -380,40 +463,40 @@ msgstr ""
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__automation_id
 msgid "Automation"
-msgstr ""
+msgstr "Otomatisasi"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_base_automation
 msgid "Automation Rule"
-msgstr ""
+msgstr "Peraturan Otomatisasi"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Automation Rule %(name)s"
-msgstr ""
+msgstr "Aturan Otomatisasi %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__automation_ids
 msgid "Automation rules that run this agent by themselves."
-msgstr ""
+msgstr "Aturan otomatisasi yang menjalankan agen ini secara mandiri."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.js:0
 msgid "Automation triggered!"
-msgstr ""
+msgstr "Otomatisasi dipicu!"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__avatar_role
 msgid "Avatar Role"
-msgstr ""
+msgstr "Peran Avatar"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Based on a Date Field"
-msgstr ""
+msgstr "Berdasarkan field Tanggal"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -428,14 +511,14 @@ msgstr "Panggil Agen"
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "Channel opened by an automation rule or scheduled action."
-msgstr ""
+msgstr "Saluran dibuka oleh aturan otomatisasi atau tindakan terjadwal."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
 #. module: ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_config_menu
@@ -445,7 +528,7 @@ msgstr "Konfigurasi"
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ai_agent_action_create
 msgid "Create Agent"
-msgstr ""
+msgstr "Buat Agen"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_skill
@@ -453,6 +536,8 @@ msgid ""
 "Create a skill that leverages instructions and tools to direct Odoo AI in "
 "assisting the user with their tasks."
 msgstr ""
+"Buat keterampilan yang memanfaatkan instruksi dan alat untuk mengarahkan "
+"Odoo AI membantu user menyelesaikan tugas."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_agent_action
@@ -468,17 +553,17 @@ msgstr "Buat keterampilan pertama Anda!"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Created a Trigger"
-msgstr ""
+msgstr "Pemicu Dibuat"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Dibuat oleh"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Dibuat pada"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -488,7 +573,7 @@ msgstr "Aturan Kustom"
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Custom Skills"
-msgstr ""
+msgstr "Keterampilan Kustom"
 
 #. module: ai_agentic
 #: model:ir.actions.act_window,name:ai_agentic.ai_composer_action
@@ -506,35 +591,39 @@ msgid ""
 "- What can it do?\n"
 "- How should it work?"
 msgstr ""
+"Tentukan kerangka kerja operasional agen Anda:\n"
+"- Peran apa yang harus diambilnya?\n"
+"- Apa yang dapat dilakukannya?\n"
+"- Bagaimana cara kerjanya?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Hapus"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__detective
 msgid "Detective"
-msgstr ""
+msgstr "Detektif"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Disable"
-msgstr ""
+msgstr "Nonaktifkan"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "Buang"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Saluran Diskusi"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__display_name
@@ -547,26 +636,26 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__display_name
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nama Tampilan"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Dropdown menu"
-msgstr ""
+msgstr "Menu dropdown"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "Edi"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Enable"
-msgstr ""
+msgstr "Aktifkan"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
@@ -577,22 +666,22 @@ msgstr "Jelaskan ke Agen apa yang mereka harus lakukan..."
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "File"
-msgstr ""
+msgstr "File"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "From AI Automation"
-msgstr ""
+msgstr "Dari Otomatisasi AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__headset
 msgid "Headset"
-msgstr ""
+msgstr "Headset"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__hoodie
 msgid "Hoodie"
-msgstr ""
+msgstr "Hoodie"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -722,7 +811,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "No valid URLs found to process."
-msgstr ""
+msgstr "Tidak ada URL valid yang ditemukan untuk diproses."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -758,7 +847,7 @@ msgstr "Pada Model"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Paste your links, one per line"
-msgstr ""
+msgstr "Tempel link Anda, satu per baris"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
@@ -1027,7 +1116,7 @@ msgstr "Penggunaan dalam AI telah ditetapkan"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "When should your agent be triggered?"
-msgstr ""
+msgstr "Kapan agen Anda harus dipicu?"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form

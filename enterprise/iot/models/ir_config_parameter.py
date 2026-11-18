@@ -11,7 +11,7 @@ class IrConfigParameter(models.Model):
         if key == 'web.base.url' and value and not value.startswith('http://localhost'):
             iot_box_identifiers = self.env['iot.box'].search([]).mapped('identifier')
             for identifier in iot_box_identifiers:
-                self.env['iot.channel'].send_message({
+                self.env['iot.channel'].sudo().send_message({
                     'iot_identifier': identifier,
                     'server_url': value,
                 }, 'server_update')

@@ -43,3 +43,4 @@ from . import test_payroll_config_settings
 from . import test_payroll_worked_days_count
 from . import test_time_rule_payslip
 from . import test_time_type_data
+from . import test_salary_benefit

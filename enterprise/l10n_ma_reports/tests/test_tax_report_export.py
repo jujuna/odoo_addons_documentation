@@ -1,4 +1,5 @@
 from odoo import Command, fields
+from odoo.exceptions import UserError
 from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests import tagged
@@ -94,7 +95,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
                         <rd>
                             <ordre>1</ordre>
                             <num>BILL/2019/01/0001</num>
-                            <des>BILL/2019/01/0001</des>
+                            <des>Product A</des>
                             <mht>500.0</mht>
                             <tva>100.0</tva>
                             <ttc>600.0</ttc>
@@ -177,7 +178,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
                             <rd>
                                 <ordre>1</ordre>
                                 <num>BILL/2019/01/0002</num>
-                                <des>BILL/2019/01/0002</des>
+                                <des>Product A</des>
                                 <mht>500.0</mht>
                                 <tva>100.0</tva>
                                 <ttc>600.0</ttc>
@@ -282,7 +283,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
                         <rd>
                             <ordre>1</ordre>
                             <num>BILL/2019/01/0001</num>
-                            <des>BILL/2019/01/0001</des>
+                            <des>Product A</des>
                             <mht>500.0</mht>
                             <tva>100.0</tva>
                             <ttc>600.0</ttc>
@@ -294,6 +295,70 @@ class TestAccountMaExport(TestAccountReportsCommon):
                             <tx>20.0</tx>
                             <mp>
                                 <id>7</id>
+                            </mp>
+                            <dpai>2019-01-01</dpai>
+                            <dfac>2019-01-01</dfac>
+                        </rd>
+                    </releveDeductions>
+                </DeclarationReleveDeduction>
+            """,
+        )
+
+    def test_export_tax_report_with_dgi_mapping(self):
+        """ <num> should use the supplier reference, <des> the aggregated invoice line
+        labels, and <mp><id> the payment method registered on the payment, instead of
+        always falling back to the invoice number / code 7. """
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
+
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'ref': 'SUPPLIER-INV-0042',
+            'date': '2019-01-01',
+            'invoice_date': '2019-01-01',
+            'partner_id': self.partner_ma.id,
+            'currency_id': self.other_currency.id,
+            'invoice_line_ids': [Command.create({
+                'name': 'Purchase of raw materials',
+                'product_id': self.product_a.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set(self.company_data['default_tax_purchase'].ids)],
+            })],
+        })
+
+        bill.action_post()
+        self._register_payment(
+            bill,
+            journal_id=self.company_data['default_journal_bank'].id,
+            l10n_ma_reports_payment_method='4',
+            payment_date='2019-01-01',
+        )
+
+        self.env.flush_all()
+
+        self._report_compare_with_test_file(
+            self.report.dispatch_report_action(self._generate_options(self.report, '2019-01-01', '2019-01-31'), 'l10n_ma_reports_export_vat_to_xml'),
+            test_xml="""
+                <DeclarationReleveDeduction>
+                    <idf>22233411</idf>
+                    <annee>2019</annee>
+                    <periode>1</periode>
+                    <regime>1</regime>
+                    <releveDeductions>
+                        <rd>
+                            <ordre>1</ordre>
+                            <num>SUPPLIER-INV-0042</num>
+                            <des>Purchase of raw materials</des>
+                            <mht>500.0</mht>
+                            <tva>100.0</tva>
+                            <ttc>600.0</ttc>
+                            <refF>
+                                <if>22233412</if>
+                                <nom>Ma customer</nom>
+                                <ice>001561191000066</ice>
+                            </refF>
+                            <tx>20.0</tx>
+                            <mp>
+                                <id>4</id>
                             </mp>
                             <dpai>2019-01-01</dpai>
                             <dfac>2019-01-01</dfac>
@@ -356,3 +421,175 @@ class TestAccountMaExport(TestAccountReportsCommon):
                 </DeclarationReleveDeduction>
             """,
         )
+
+    def test_export_tax_report_payment_method_per_period(self):
+        """ A bill paid in two periods with two different payment methods should report,
+        in each period, the method of the payment that made the VAT deductible in that period. """
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
+
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'date': '2019-01-01',
+            'invoice_date': '2019-01-01',
+            'partner_id': self.partner_ma.id,
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set(self.company_data['default_tax_purchase'].ids)],
+            })],
+        })
+
+        bill.action_post()
+        for payment_date, payment_method in (('2019-01-15', '2'), ('2019-02-15', '4')):
+            self._register_payment(
+                bill,
+                journal_id=self.company_data['default_journal_bank'].id,
+                amount=600.0,
+                l10n_ma_reports_payment_method=payment_method,
+                payment_date=payment_date,
+            )
+
+        self.env.flush_all()
+
+        for date_from, date_to, month, payment_method, payment_date in (
+            ('2019-01-01', '2019-01-31', '1', '2', '2019-01-15'),
+            ('2019-02-01', '2019-02-28', '2', '4', '2019-02-15'),
+        ):
+            with self.subTest(month=month):
+                self._report_compare_with_test_file(
+                    self.report.dispatch_report_action(self._generate_options(self.report, date_from, date_to), 'l10n_ma_reports_export_vat_to_xml'),
+                    test_xml=f"""
+                        <DeclarationReleveDeduction>
+                            <idf>22233411</idf>
+                            <annee>2019</annee>
+                            <periode>{month}</periode>
+                            <regime>1</regime>
+                            <releveDeductions>
+                                <rd>
+                                    <ordre>1</ordre>
+                                    <num>BILL/2019/01/0001</num>
+                                    <des>Product A</des>
+                                    <mht>500.0</mht>
+                                    <tva>100.0</tva>
+                                    <ttc>600.0</ttc>
+                                    <refF>
+                                        <if>22233412</if>
+                                        <nom>Ma customer</nom>
+                                        <ice>001561191000066</ice>
+                                    </refF>
+                                    <tx>20.0</tx>
+                                    <mp>
+                                        <id>{payment_method}</id>
+                                    </mp>
+                                    <dpai>{payment_date}</dpai>
+                                    <dfac>2019-01-01</dfac>
+                                </rd>
+                            </releveDeductions>
+                        </DeclarationReleveDeduction>
+                    """,
+                )
+
+    def test_export_tax_report_payment_method_from_bill(self):
+        """ When the bill is not paid through a payment (e.g. reconciled with a bank statement line),
+        the payment method set on the bill should be used. """
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
+
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'date': '2019-01-01',
+            'invoice_date': '2019-01-01',
+            'partner_id': self.partner_ma.id,
+            'l10n_ma_reports_payment_method': '3',
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set(self.company_data['default_tax_purchase'].ids)],
+            })],
+        })
+
+        bill.action_post()
+        self.pay_with_statement_line(bill, self.company_data['default_journal_bank'].id, '2019-01-01', -1200)
+
+        self.env.flush_all()
+
+        bills_values = self.env['l10n_ma.tax.report.handler']._l10n_ma_prepare_vat_report_values(
+            self._generate_options(self.report, '2019-01-01', '2019-01-31'),
+        )['bills']
+        self.assertEqual([bill_values['payment_method'] for bill_values in bills_values], ['3'])
+
+    def test_export_tax_report_designation_per_tax(self):
+        """ Each row of the declaration is a (bill, tax) pair: its designation should only
+        contain the labels of the bill lines having that tax. """
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
+        tax_10 = self.env['account.chart.template'].ref('vat_in_10_150')
+
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'date': '2019-01-01',
+            'invoice_date': '2019-01-01',
+            'partner_id': self.partner_ma.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Laptop',
+                    'product_id': self.product_a.id,
+                    'price_unit': 1000.0,
+                    'tax_ids': [Command.set(self.company_data['default_tax_purchase'].ids)],
+                }),
+                Command.create({
+                    'name': 'Books',
+                    'product_id': self.product_a.id,
+                    'price_unit': 1000.0,
+                    'tax_ids': [Command.set(tax_10.ids)],
+                }),
+            ],
+        })
+
+        bill.action_post()
+        self.pay_with_statement_line(bill, self.company_data['default_journal_bank'].id, '2019-01-01', -2300)
+
+        self.env.flush_all()
+
+        bills_values = self.env['l10n_ma.tax.report.handler']._l10n_ma_prepare_vat_report_values(
+            self._generate_options(self.report, '2019-01-01', '2019-01-31'),
+        )['bills']
+        self.assertEqual(
+            sorted((bill_values['tax_rate'], bill_values['designation']) for bill_values in bills_values),
+            [(10.0, 'Books'), (20.0, 'Laptop')],
+        )
+
+    def test_lock_return_attaches_xml(self):
+        """ Locking the return should attach the XML even with non-blocking errors (partner
+        without ICE), and raise a UserError with blocking ones (company without VAT). """
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'date': '2019-01-01',
+            'invoice_date': '2019-01-01',
+            'partner_id': self.partner_ma.id,
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set(self.company_data['default_tax_purchase'].ids)],
+            })],
+        })
+
+        bill.action_post()
+        self.pay_with_statement_line(bill, self.company_data['default_journal_bank'].id, '2019-01-01', -1200)
+
+        self.env.flush_all()
+
+        tax_return = self.env['account.return'].create({
+            'name': 'VAT January 2019',
+            'date_from': '2019-01-01',
+            'date_to': '2019-01-31',
+            'type_id': self.env.ref('l10n_ma_reports.ma_tax_return_type').id,
+            'company_id': self.env.company.id,
+        })
+        options = {**tax_return._get_closing_report_options(), 'export_mode': 'file'}
+
+        with self.allow_pdf_render():
+            tax_return._generate_locking_attachments(options)
+        self.assertTrue(any(name.endswith('.xml') for name in tax_return.attachment_ids.mapped('name')))
+
+        self.env.company.vat = False
+        with self.allow_pdf_render(), self.assertRaises(UserError):
+            tax_return._generate_locking_attachments(options)

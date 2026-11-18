@@ -66,6 +66,38 @@ class TestDataReset(TransactionCase):
         self.assertFalse(self.rule.modified_by_user)
         self.assertTrue(self.rule.bold)
 
+    def test_reset_rule_only_resets_that_rule(self):
+        """
+        Resetting a rule restores it from the data files, without touching the other rules,
+        whether they were modified on a critical field or not.
+        """
+        gross_rule = self.env.ref('l10n_us_hr_payroll.l10n_us_hr_payroll_structure_us_employee_salary_gross_salary_rule')
+        attachment_rule = self.env.ref('l10n_us_hr_payroll.l10n_us_hr_payroll_structure_us_employee_salary_attachment_of_salary_rule')
+
+        self.rule.with_user(self.payroll_manager).write({'amount_python_compute': 'result = 1', 'active': False})
+        gross_rule.with_user(self.payroll_manager).amount_python_compute = 'result = 2'
+        attachment_rule.with_user(self.payroll_manager).name = 'Custom Attachment'
+        self.assertTrue(self.rule.modified_by_user)
+        self.assertTrue(gross_rule.modified_by_user)
+        self.assertFalse(attachment_rule.modified_by_user)
+
+        self.rule.with_user(self.payroll_manager).action_reset_rule()
+
+        self.assertFalse(self.rule.modified_by_user)
+        self.assertTrue(self.rule.active)
+        self.assertEqual(self.rule.amount_python_compute.strip(), "result = categories['BASIC']")
+        self.assertTrue(gross_rule.modified_by_user)
+        self.assertEqual(gross_rule.amount_python_compute, 'result = 2')
+        self.assertEqual(attachment_rule.name, 'Custom Attachment')
+
+    def test_reset_rule_not_in_data(self):
+        """
+        A rule created by a user is not defined in the data files and cannot be reset.
+        """
+        user_rule = self.rule.with_user(self.payroll_manager).copy()
+        with self.assertRaises(UserError):
+            user_rule.with_user(self.payroll_manager).action_reset_rule()
+
     def test_system_rule_deleted_by_payroll_manager(self):
         """
         The payroll manager should not be able to delete a rule created by the system.

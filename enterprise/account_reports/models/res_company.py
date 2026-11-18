@@ -169,7 +169,7 @@ class ResCompany(models.Model):
             self.env['account.return.type']._generate_or_refresh_all_returns(roots_to_recompute)
 
         if any(lock_date_field in vals for lock_date_field in ('fiscalyear_lock_date', 'hard_lock_date', 'tax_lock_date')):
-            self.env.ref('account_reports.ir_cron_garbage_collect_snapshots')._trigger()
+            self._garbage_collect_report_snapshots_after_lock_date_change()
 
         # Skip returns whose deadline is determined by the return type's 'deadline_days_delay',
         # because changes to the company's 'account_return_reminder_day' do not affect their computed deadline.
@@ -193,6 +193,31 @@ class ResCompany(models.Model):
                     account_returns._compute_deadline()
 
         return res
+
+    def _garbage_collect_report_snapshots_after_lock_date_change(self):
+        self.env['account.report.snapshot']._acquire_snapshot_lock()
+
+        generic_tax_report = self.env.ref('account.generic_tax_report')
+
+        impacted_companies = self.env['res.company'].sudo().search([('id', 'child_of', self.ids)])
+        snapshot_deletion_domains = []
+        for company in impacted_companies.with_context(ignore_exceptions=True):
+            fy_hard_lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
+
+            snapshot_deletion_domains.append([
+                *([('date', '>', fy_hard_lock_date)] if fy_hard_lock_date != datetime.date.min else []),
+                ('company_id', '=', company.id),
+                ('report_id.root_report_id', '!=', generic_tax_report.id),
+            ])
+
+            snapshot_deletion_domains.append([
+                *([('date', '>', company.user_tax_lock_date)] if company.user_tax_lock_date != datetime.date.min else []),
+                ('company_id', '=', company.id),
+                ('report_id.root_report_id', '=', generic_tax_report.id),
+            ])
+
+        self.env['account.report.snapshot'].sudo().search(Domain.OR(snapshot_deletion_domains)).unlink()
+        self.env.ref('account_reports.ir_cron_create_snapshots')._trigger()
 
     def _get_available_tax_units(self, report, limit=None):
         """

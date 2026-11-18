@@ -99,9 +99,18 @@
         <field name="company_id" ref="base.demo_company_iq"/>
     </record>
 
+    <record id="iq_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_iq"/>
+    </record>
+    <record id="iq_hr_job_consultant" model="hr.job">
+        <field name="name">Consultant</field>
+        <field name="company_id" ref="base.demo_company_iq"/>
+    </record>
+
     <record id="iq_hr_employee_rasheed" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_iq_hr_payroll.iq_res_partner_rasheed')).name"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_iq_hr_payroll.iq_hr_job_developer"/>
         <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.webp"/>
         <field name="work_phone">99 123 0987</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_iq_hr_payroll.iq_res_partner_rasheed')).name.replace(' ', '.').lower() + '@example.com'"/>
@@ -142,7 +151,7 @@
 
     <record id="iq_hr_employee_raghad" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_iq_hr_payroll.iq_res_partner_raghad')).name"/>
-        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="job_id" ref="l10n_iq_hr_payroll.iq_hr_job_consultant"/>
         <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.webp"/>
         <field name="work_phone">99 329 1469</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_iq_hr_payroll.iq_res_partner_raghad')).name.replace(' ', '.').lower() + '@example.com'"/>

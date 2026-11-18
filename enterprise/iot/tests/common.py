@@ -64,7 +64,7 @@ class IotCommonTest(HttpCase):
             self.iot_websocket_messages.append({message_type: message})
             if message_type == "iot_action":
                 return original_send_message(
-                    iot_channel_record,
+                    iot_channel_record.sudo(),
                     {
                         'session_id': message['session_id'],
                         'iot_box_identifier': message['iot_identifier'],

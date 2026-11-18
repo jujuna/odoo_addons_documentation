@@ -70,61 +70,69 @@ class StockPickingType(models.Model):
         locations_enabled = self.env.user.has_group('stock.group_stock_multi_locations')
         package_enabled = self.env.user.has_group('stock.group_tracking_lot')
         tracking_enabled = self.env.user.has_group('stock.group_production_lot')
-        can_scan_source_location = locations_enabled and self.code in ('outgoing', 'internal')
+        can_scan_source_location = self._can_scan_source_location() and locations_enabled
         must_scan_source_location = can_scan_source_location and self.restrict_scan_source_location == 'mandatory'
         # About source location scan.
         if must_scan_source_location:
             steps.append({
-                'title': _("Scan the source location")
+                'title': self.env._("Scan the source location"),
             })
         # About product scan.
         text = ""
         if package_enabled and not self.restrict_scan_product:
-            text += _("Scan an existing package to move")
+            text += self.env._("Scan an existing package to move")
         if can_scan_source_location:
             text += Markup("<br/>") if text else ""
-            text += _("Scan a source location")
+            text += self.env._("Scan a source location")
         steps.append({
-            'title': _("Scan a product"),
             'optional': not self.restrict_scan_product,
+            'title': self._get_step_title('scan_product'),
             'alternative_text': text,
         })
         # About lot/serial number scan.
         if tracking_enabled:
             steps.append({
-                'title': _("Scan a lot/serial number if product is tracked")
+                'title': self._get_step_title('scan_lot'),
+                'optional': self.restrict_scan_tracking_number == 'optional',
             })
             text = False
-            if package_enabled and self.restrict_put_in_pack == 'optional':
-                text = _("Scan a package or put in pack if desired")
+            if package_enabled and self.restrict_put_in_pack == 'optional' and self.code in ('incoming', 'outgoing', 'internal'):
+                text = self.env._("Scan a package or put in pack if desired")
             steps.append({
-                'title': _("Scan more lot/serial numbers"),
+                'title': self.env._("Scan more lot/serial numbers"),
                 'optional': True,
                 'alternative_text': text,
             })
         # About Put in Pack.
         if package_enabled and self.restrict_put_in_pack == 'mandatory':
             steps.append({
-                'title': _("Scan a package or put in pack"),
+                'title': self.env._("Scan a package or put in pack"),
             })
         # About destination location.
         if locations_enabled and self.restrict_scan_dest_location != 'no':
             steps.append({
-                'title': _("Scan the destination location"),
+                'title': self.env._("Scan the destination location"),
                 'optional': self.restrict_scan_dest_location == 'optional',
             })
         # About validation.
         steps.append({
-            'title': _("Validate or scan another product"),
-            'alternative_text': must_scan_source_location and _("Scan another source location"),
+            'title': self._get_step_title('validate_or_scan_another_product'),
+            'alternative_text': must_scan_source_location and self.env._("Scan another source location"),
         })
         return steps
 
-    @api.depends('code', 'restrict_put_in_pack', 'restrict_scan_product', 'restrict_scan_dest_location', 'restrict_scan_source_location')
+    @api.depends(
+            'code',
+            'restrict_put_in_pack',
+            'restrict_scan_product',
+            'restrict_scan_dest_location',
+            'restrict_scan_source_location',
+            'restrict_scan_tracking_number',
+    )
     def _compute_instructions_preview(self):
         self.instructions_preview = False
         for picking_type in self:
-            if picking_type.code not in ['incoming', 'outgoing', 'internal']:
+            if not picking_type.is_barcode_picking_type:
                 continue
             steps = picking_type._compute_instructions_steps()
             if steps:
@@ -171,6 +179,20 @@ class StockPickingType(models.Model):
     def action_picking_batch_barcode_kanban(self):
         action = self._get_action('stock_barcode.stock_barcode_batch_picking_action_kanban')
         return action
+
+    def _get_step_title(self, step):
+        match step:
+            case 'scan_product':
+                return self.env._("Scan a product")
+            case 'validate_or_scan_another_product':
+                return self.env._("Validate or scan another product")
+            case 'scan_lot':
+                return self.env._("Scan a lot/serial number if product is tracked")
+            case _:
+                return False
+
+    def _can_scan_source_location(self):
+        return self.code in ('outgoing', 'internal')
 
     def get_action_picking_tree_ready_kanban(self):
         return self._get_action('stock_barcode.stock_picking_action_kanban')

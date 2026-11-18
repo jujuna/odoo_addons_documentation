@@ -290,6 +290,23 @@ class TestTaskGanttView(TestProjectCommon):
         self.assertEqual(len(projects), 1)
         self.assertEqual(len(milestones), 1)
 
+    @freeze_time('2026-07-12')
+    def test_get_all_deadlines_task_domain_filter(self):
+        (self.project_pigs + self.project_goats).allow_milestones = True
+        self.project_pigs.write({'date_start': '2026-07-05', 'date': '2026-08-10'})
+        self.project_goats.write({'date_start': '2026-07-01', 'date': '2026-07-15'})
+        milestone_pigs = self.env['project.milestone'].create({'name': 'Milestone Pigs', 'project_id': self.project_pigs.id, 'deadline': '2026-07-10'})
+
+        results_filtered = self.env['project.task'].with_context(gantt_task_domain=[('id', '=', self.task_1.id)]).get_all_deadlines('2026-07-01', '2026-07-31')
+        self.assertEqual(len(results_filtered['project_id']), 1, "Should return only the filtered project")
+        self.assertEqual(results_filtered['project_id'][0]['id'], self.project_pigs.id, "Should return the Pigs project")
+        self.assertEqual(len(results_filtered['milestone_id']), 1, "Should return only the filtered milestone")
+        self.assertEqual(results_filtered['milestone_id'][0]['id'], milestone_pigs.id, "Should return the Pigs milestone")
+
+        results_empty = self.env['project.task'].with_context(gantt_task_domain=[(0, '=', 1)]).get_all_deadlines('2026-07-05', '2026-08-10')
+        self.assertEqual(len(results_empty['project_id']), 0, "Should return no projects when no tasks match")
+        self.assertEqual(len(results_empty['milestone_id']), 0, "Should return no milestones when no tasks match")
+
     def test_plan_tasks_no_assignee_allocated_hours(self):
         self.tasks.write({
             'planned_date_begin': '2024-03-07 00:00:00',
@@ -457,6 +474,14 @@ class TestTaskGanttView(TestProjectCommon):
         })
         start = Datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         stop = start + relativedelta(days=30)
+        # The public holidays are unavailabilities of the flexible employees too: remove the ones
+        # generated in the database (e.g. Veterans Day for a US company in November)
+        self.env['resource.calendar.leaves'].search([
+            ('resource_id', '=', False),
+            ('company_id', 'in', [False, self.env.company.id]),
+            ('date_from', '<', stop),
+            ('date_to', '>', start),
+        ]).unlink()
         result = self.env['project.task']._gantt_unavailability(
             'user_ids', [self.user_gantt_test_1.id], start, stop, 'month'
         )

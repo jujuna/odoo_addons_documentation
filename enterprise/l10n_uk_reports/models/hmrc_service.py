@@ -40,55 +40,41 @@ class HmrcService(models.AbstractModel):
         Raise when something unexpected happens (enterprise contract not valid e.g.)
         :return: False when no login through hmrc needed by the user, otherwise the url action
         """
-        user = self.env.user
-        if user_token := user.l10n_uk_user_token:
-            if not user.l10n_uk_hmrc_vat_token or user.l10n_uk_hmrc_vat_token_expiration_time < datetime.now() + timedelta(minutes=1):
-                try:
-                    url = self._get_proxy_server() + '/onlinesync/l10n_uk/get_tokens'
-                    dbuuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
-                    data = json.dumps({'params': {'user_token': user_token, 'dbuuid': dbuuid}})
-                    resp = requests.request('GET', url, data=data,
-                                            headers={'content-type': "application/json"}, timeout=TIMEOUT) #json-rpc
-                    resp.raise_for_status()
-                    response = resp.json()
-                    response = response.get('result', {})
-                    self._write_tokens(user, response)
-                except:
-                    # If it is a connection error, don't delete credentials and re-raise
-                    raise
-                else: #In case no error was thrown, but an error is indicated
-                    if response.get('error'):
-                        self._clean_tokens(user)
-                        self.env.cr.commit()  # Even with the raise, we want to commit the cleaning of the tokens in the db
-                        raise UserError(self.env._(
-                            'There was a problem refreshing the tokens.  Please log in again. %(error)s',
-                            error=response.get('message'),
-                        ))
-                    else:
-                        # Let the user know they established the connection and can submit the report.
-                        self.env.user._bus_send('simple_notification', {
-                            'type': 'success',
-                            'message': self.env._("You are successfully connected to HMRC. You can now send the VAT report."),
-                        })
-        else:
-            # if no user_token, ask for one
-            url = self._get_proxy_server() + '/onlinesync/l10n_uk/get_user'
-            dbuuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
-            data = json.dumps({'params': {'dbuuid': dbuuid}})
-            resp = requests.request('POST', url, data=data, headers={'content-type': 'application/json', 'Accept': 'text/plain'})
+        def proxy_request(method, endpoint, **params):
+            params['dbuuid'] = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+            resp = requests.request(method, self._get_proxy_server() + endpoint, json={'params': params}, timeout=TIMEOUT)
             resp.raise_for_status()
-            contents = resp.json()
-            contents = contents.get('result')
-            if contents.get('error'):
-                raise UserError(contents.get('message'))
-            user.sudo().write({'l10n_uk_user_token': contents.get('user_token')})
-            # login
-            url = self.env['hmrc.service']._get_oauth_url(user.l10n_uk_user_token)
+            return resp.json().get('result', {})
+
+        company_sudo = self._get_hmrc_company().sudo()
+
+        if company_sudo.l10n_uk_user_token and (
+            not company_sudo.l10n_uk_hmrc_vat_token
+            or company_sudo.l10n_uk_hmrc_vat_token_expiration_time < datetime.now() + timedelta(minutes=1)
+        ):
+            response = proxy_request('GET', '/onlinesync/l10n_uk/get_tokens', user_token=company_sudo.l10n_uk_user_token)
+            if response.get('error'):
+                # The user token is no longer valid, start a new login below
+                self._clean_tokens(company_sudo)
+            else:
+                self._write_tokens(company_sudo, response)
+                self.env.user._bus_send('simple_notification', {
+                    'type': 'success',
+                    'message': self.env._("You are successfully connected to HMRC. You can now submit the VAT return."),
+                })
+
+        if not company_sudo.l10n_uk_user_token:
+            # if no user_token, ask for one
+            response = proxy_request('POST', '/onlinesync/l10n_uk/get_user')
+            if response.get('error'):
+                raise UserError(response.get('message'))
+            company_sudo.write({'l10n_uk_user_token': response.get('user_token')})
             return {
                 'type': 'ir.actions.act_url',
-                'url': url,
+                'url': self._get_oauth_url(company_sudo.l10n_uk_user_token),
                 'target': 'self',
             }
+
         return False
 
     @api.model
@@ -182,15 +168,15 @@ class HmrcService(models.AbstractModel):
             raise UserError(self.env._("Invalid HMRC fraud prevention headers"))
 
     @api.model
-    def _write_tokens(self, user, tokens):
-        user.sudo().write({
+    def _write_tokens(self, record, tokens):
+        record.sudo().write({
             'l10n_uk_hmrc_vat_token_expiration_time': tokens.get('expiration_time'),
             'l10n_uk_hmrc_vat_token': tokens.get('access_token'),
         })
 
     @api.model
-    def _clean_tokens(self, user):
-        user.sudo().write({
+    def _clean_tokens(self, record):
+        record.sudo().write({
             'l10n_uk_user_token': '',
             'l10n_uk_hmrc_vat_token_expiration_time': False,
             'l10n_uk_hmrc_vat_token': '',
@@ -205,10 +191,15 @@ class HmrcService(models.AbstractModel):
     def _get_state(self, userlogin):
         # Search your own host
         url = request.httprequest.scheme + '://' + request.httprequest.host
+        if self.env.context.get('hmrc_redirect_to_settings'):
+            action = self.env.ref('l10n_uk_reports.action_hmrc_settings_redirect')
+        else:
+            action = self.env.ref('l10n_uk_reports.action_hmrc_redirect')
+
         return json.dumps({
             'url': url,
             'user': userlogin,
-            'action': self.env.ref('l10n_uk_reports.action_hmrc_redirect').id,
+            'action': action.id,
             'return_id': self.env.context.get('return_id'),
         })
 
@@ -243,3 +234,9 @@ class HmrcService(models.AbstractModel):
         mode = self.env['ir.config_parameter'].sudo().get_str('l10n_uk_reports.hmrc_mode') or 'production'
         hmrc_client_id = 'GqJgi8Hal1hsEwbG6rY6i9Ag1qUa' if mode == 'production' else 'dTdANDSeX4fiw63DicmUaAVQDSMa'
         return hmrc_client_id
+
+    @api.model
+    def _get_hmrc_company(self):
+        if return_id := self.env.context.get('return_id'):
+            return self.env['account.return'].browse(return_id).company_id
+        return self.env.company

@@ -21,7 +21,7 @@ const { topbarMenuRegistry } = spreadsheet.registries;
 test("new template menu", async function () {
     mockService("action", {
         doAction({ params, tag }) {
-            if (tag === "action_open_template" && params.spreadsheet_id[0] === newTemplateId) {
+            if (tag === "action_open_template" && params.spreadsheet_id === newTemplateId) {
                 expect.step("redirect");
             }
             return super.doAction(...arguments);

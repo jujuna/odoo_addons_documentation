@@ -177,3 +177,34 @@ class TestAvalaraBrInvoiceFiscalReform(TestAvalaraBrCommon):
         products.l10n_br_taxable_is = False
         for line in get_lines():
             self.assertFalse(line['goods']['notSubjectToIsTax'])
+
+    def test_service_split_street_address(self):
+        invoice, _ = self._create_invoice_01_and_expected_response()
+        invoice.company_id.l10n_br_is_icbs = True
+        invoice.partner_id.write({
+            'street_name': 'Avenida das Araucárias',
+            'street_number': '1325',
+            'street_number2': 'Sala 204',
+            'city_id': self.env.ref('l10n_br.city_br_002').id,
+        })
+        invoice.invoice_line_ids.mapped('product_id').write({
+            'type': 'service',
+            'l10n_br_property_service_code_origin_id': self.env['l10n_br.service.code'].create({
+                'code': '123',
+                'city_id': invoice.partner_id.city_id.id,
+            }).id,
+        })
+        invoice.l10n_latam_document_type_id = self.env.ref('l10n_br.dt_SE')
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        self.assertDictEqual(payload['header']['locations']['rendered']['address'], {
+            'number': '1325',
+            'complement': 'Sala 204',
+            'street': 'Avenida das Araucárias',
+            'neighborhood': 'Cristo Rei',
+            'zipcode': '93022-718',
+            'cityName': 'São Leopoldo',
+            'state': 'RS',
+            'country': 'BRA',
+            'countryCode': '1058',
+        })

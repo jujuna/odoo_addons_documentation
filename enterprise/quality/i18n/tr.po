@@ -21,18 +21,19 @@
 # Umur Akın <umura@projetgrup.com>, 2022
 # abc Def <hdogan1974@gmail.com>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 23:00+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
-"quality/tr/>\n"
+"PO-Revision-Date: 2026-11-09 12:59+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/quality/"
+"tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,6 +54,15 @@ msgid ""
 "tolerance\n"
 "* Define your stages for the quality alerts\n"
 msgstr ""
+"\n"
+"Kalite Temeli\n"
+"===============\n"
+"* Üretim emirlerinde veya iş emirlerinde kalite kontrolleri oluşturacak "
+"kalite noktalarını tanımlayın (quality_mrp)\n"
+"* Kalite uyarıları bağımsız olarak veya kalite kontrolleriyle ilgili "
+"oluşturulabilir\n"
+"* Min / maks tolerans ile kalite kontrolüne ölçüm ekleme imkanı\n"
+"* Kalite uyarıları için aşamalarınızı tanımlayın\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -77,7 +87,7 @@ msgstr ""
 #. module: quality
 #: model:ir.model,name:quality.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Erişim Grupları"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -113,7 +123,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_plans_ids
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_state
@@ -205,17 +215,17 @@ msgstr "Rumuzlanan Model"
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Categories"
-msgstr ""
+msgstr "Tüm Kategoriler"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Products"
-msgstr ""
+msgstr "Tüm Ürünler"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
 msgid "Apply to"
-msgstr ""
+msgstr "Uygula"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -233,23 +243,23 @@ msgstr "Ek Sayısı"
 #. module: quality
 #: model:ir.module.module,summary:base.module_quality
 msgid "Basic Feature for Quality"
-msgstr ""
+msgstr "Kalite için Temel Özellik"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Toplu Transfer"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_check__batch_id
 msgid "Batch associated to this transfer"
-msgstr ""
+msgstr "Bu transfer ile ilişkili toplu transfer"
 
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Categories"
-msgstr ""
+msgstr "Kategoriler"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -601,7 +611,7 @@ msgstr "Düşük"
 #: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
 #: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -678,7 +688,7 @@ msgstr "Sonraki Aktivitie Türü"
 #. module: quality
 #: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: quality
 #. odoo-python
@@ -879,7 +889,7 @@ msgstr "Kalite Ekipleri"
 #. module: quality
 #: model:ir.module.module,shortdesc:base.module_quality
 msgid "Quality Base"
-msgstr ""
+msgstr "Quality Base"
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -1052,6 +1062,8 @@ msgid ""
 "Technical field holding the tracking method. False on a storable product "
 "means it's tracked by quantity only."
 msgstr ""
+"Takip yöntemini içeren teknik alan. Depolanabilir bir üründe \"false\" "
+"değeri, ürünün yalnızca miktar bazında takip edildiği anlamına gelir."
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
@@ -1115,7 +1127,7 @@ msgstr "Bugünkü Aktiviteler"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
 msgid "Tracking Method"
-msgstr ""
+msgstr "Takip Yöntemi"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -1167,12 +1179,12 @@ msgstr "etkin"
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "e.g. Check Dimensions"
-msgstr ""
+msgstr "örn. Boyutları Kontrol Et"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "e.g. Quarantine, Second Inspection"
-msgstr ""
+msgstr "örn. Karantina, İkinci Denetim"
 
 #~ msgid "Lot"
 #~ msgstr "Lot"

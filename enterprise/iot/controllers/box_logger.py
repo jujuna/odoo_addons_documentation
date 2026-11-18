@@ -21,6 +21,7 @@ class IotLoggerController(http.Controller):
     def receive_iot_log(self):
         # Authenticate the IoT Box using the Bearer token
         auth_header = request.httprequest.headers.get('Authorization')
+        data = request.httprequest.get_data()
         if not auth_header or not auth_header.startswith('Bearer '):
             return Response(status=401)
 
@@ -29,7 +30,7 @@ class IotLoggerController(http.Controller):
             return Response(status=401)
 
         # Parse and log the received logs batch
-        logs_batch = _sanitize_log_batch(request.httprequest.get_data())
+        logs_batch = _sanitize_log_batch(data)
         if len(logs_batch) < 2:
             return Response(status=200)
 

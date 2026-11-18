@@ -1,3 +1,11 @@
+export function clickBookingButton() {
+    return {
+        content: "Click on the Booking button",
+        trigger: ".pos-leftheader button:contains('Booking')",
+        run: "click",
+    };
+}
+
 export function isKanbanViewShown() {
     return {
         content: "Check that the booking kanban view is shown",
@@ -49,4 +57,40 @@ export function checkGanttPillInfo(eventName, startTime) {
             run: "click",
         },
     ];
+}
+
+export function clickNewGanttBooking() {
+    return {
+        content: "Create a booking with the New button",
+        trigger: ".o_gantt_button_add",
+        run: "click",
+    };
+}
+
+export function openGanttPopover(bookingName) {
+    return {
+        content: `Open the popover of ${bookingName}`,
+        trigger: `.o_gantt_pill:contains("${bookingName}"):eq(0)`,
+        run: "click",
+    };
+}
+
+export function openKanbanPopover(bookingName) {
+    return {
+        content: `Open the popover of ${bookingName}`,
+        trigger: `.o_kanban_record:contains("${bookingName}")`,
+        run: "click",
+    };
+}
+
+export function dragKanbanBookingToColumn(bookingName, columnName) {
+    return {
+        content: `Drag ${bookingName} to the ${columnName} column`,
+        trigger: `.o_kanban_record:contains("${bookingName}")`,
+        async run(helpers) {
+            await helpers.drag_and_drop(
+                `.o_kanban_group:has(.o_column_title:contains("${columnName}"))`
+            );
+        },
+    };
 }

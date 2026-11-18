@@ -17,7 +17,7 @@ from odoo.addons.mail.tests.common import MailCommon, mail_new_test_user
 from odoo.addons.mail.tools.discuss import Store
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests import HttpCase, users
-from odoo.tools import BinaryBytes, html_escape, mute_logger
+from odoo.tools import BinaryBytes, convert_file, html_escape, mute_logger
 
 
 class TestChannelInternals(MailCommon, HttpCase):
@@ -100,6 +100,14 @@ class TestChannelInternals(MailCommon, HttpCase):
         channel.write({"active": False})
         self.assertFalse(channel.active)
 
+    def test_builtin_channel_recreated_on_upgrade(self):
+        """A deleted built-in channel recreated on upgrade should get its default name."""
+        self.env.ref("mail.channel_admin").unlink()
+        convert_file(self.env, "mail", "data/discuss_channel_data.xml", idref={}, mode="update")
+        channel_admin = self.env.ref("mail.channel_admin")
+        self.assertEqual(channel_admin.name, "Administrators")
+        self.assertEqual(channel_admin.description, "General channel for administrators.")
+
     @users('employee')
     @freeze_time("2020-03-22 10:42:06")
     def test_channel_members(self):
@@ -140,6 +148,7 @@ class TestChannelInternals(MailCommon, HttpCase):
                                     "id": message.id,
                                     "incoming_email_cc": False,
                                     "incoming_email_to": False,
+                                    "linkedSubChannel": False,
                                     "message_link_preview_ids": [],
                                     "message_type": "notification",
                                     "model": "discuss.channel",
@@ -794,6 +803,28 @@ class TestChannelInternals(MailCommon, HttpCase):
         self.assertEqual(self.test_channel.channel_partner_ids, self.user_employee.partner_id | test_partner)
         self.assertEqual(private_group.channel_partner_ids, self.user_employee.partner_id | test_partner)
 
+    def test_channel_subscribe_auto_sends_member_create_date(self):
+        group = self.env["res.groups"].create({"name": "Group", "user_ids": self.test_user.ids})
+        self._reset_bus()
+        self.test_channel.group_ids = group
+        member = self.test_channel.channel_member_ids.filtered(
+            lambda m: m.partner_id == self.test_partner,
+        )
+        self.assertTrue(member)
+        self.env.cr.precommit.run()
+        notification = self.env["bus.bus"].sudo().search(
+            [("channel", "=", json_dump((self.cr.dbname, "res.users", self.test_user.id)))],
+        )
+        self.assertEqual(len(notification), 1)
+        message = json.loads(notification.message)
+        self.assertEqual(message["type"], "mail.record/insert")
+        member_data = message["payload"]["discuss.channel.member"]
+        self.assertEqual([data["id"] for data in member_data], member.ids)
+        self.assertEqual(
+            member_data[0]["create_date"],
+            fields.Datetime.to_string(member.create_date),
+        )
+
     @users('employee')
     @mute_logger('odoo.models.unlink')
     def test_channel_private_unfollow(self):
@@ -971,6 +1002,14 @@ class TestChannelInternals(MailCommon, HttpCase):
             ),
         ):
             channel.image_128 = BinaryBytes(b"<svg/>")
+
+    def test_group_write_empty_name(self):
+        group = self.env["discuss.channel"]._create_group(
+            users_to=self.user_employee,
+            name="Group",
+        )
+        group.write({"name": False})
+        self.assertEqual(group.name, "")
 
     @freeze_time("2025-04-08 10:00:00")
     def test_channel_notification(self):

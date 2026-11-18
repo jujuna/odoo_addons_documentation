@@ -348,6 +348,27 @@ class TestDeliveryEnvia(TransactionCase):
 
             picking._action_done()
 
+    def test_validate_delivery_with_long_product_name_without_category(self):
+        shipping_product = self.env['product.product'].create({
+            'name': 'Premium Wireless Noise Cancelling Headphones',
+            'type': 'consu',
+            'weight': 10.0,
+            'qty_available': 100,
+        })
+        delivery = self.env['stock.picking'].create({
+            'picking_type_id': self.ref('stock.picking_type_out'),
+            'partner_id': self.br_partner.id,
+            'carrier_id': self.envia.id,
+            'move_ids': [(0, 0, {
+                'product_id': shipping_product.id,
+                'product_uom_qty': 10.00,
+            })],
+        })
+        with _mock_envia_call():
+            delivery.button_validate()
+            self.assertEqual(delivery.state, 'done')
+            self.assertTrue(delivery.carrier_tracking_url)
+
 
 @tagged('post_install', '-at_install')
 class TestDeliveryEnviaWithLocalisations(TestDeliveryEnvia):

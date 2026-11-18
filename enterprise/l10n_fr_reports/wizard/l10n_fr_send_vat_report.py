@@ -140,7 +140,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
     )
     bank_partner_id = fields.Many2one(
         comodel_name='res.partner.bank',
-        domain="[('partner_id', '=', company_partner_id), ('partner_id.country_code', '=', 'FR')]",
+        domain="[('partner_id', '=', company_partner_id)]",
     )
     has_wrongly_configured_account = fields.Boolean(compute='_compute_has_wrongly_configured_account')
     date_from = fields.Date(required=True)
@@ -182,6 +182,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
     show_express_mention = fields.Boolean()
     express_mention_reason = fields.Text()
     report_async_document_ids = fields.Many2many(comodel_name='account.report.async.document', relation='report_document_fr_send_vat_report_rel')
+    is_accounting_firm_foreign = fields.Boolean(compute='_compute_is_accounting_firm_foreign')
 
     @api.depends('report_id', 'date_from', 'date_to')
     def _compute_vat_amount(self):
@@ -239,6 +240,16 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
         # Take the whole and apply modulo 97, it should be 1
         return int(replaced_iban) % 97 == 1
 
+    def _compute_is_accounting_firm_foreign(self):
+        for wizard in self:
+            wizard.is_accounting_firm_foreign = False
+            if not wizard.date_from or not wizard.date_to or not wizard.report_id:
+                continue
+            options = wizard.report_id.get_options({'date': {'date_from': wizard.date_from, 'date_to': wizard.date_to}})
+            sender_company = wizard.report_id._get_sender_company_for_export(options)
+            representative = sender_company.account_representative_id
+            wizard.is_accounting_firm_foreign = representative and wizard._get_writer(sender_company) != representative
+
     def _get_address_dict(self, company):
         return {
             'street': company.street[:30],
@@ -255,6 +266,13 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
                 error_list.append(_("%(field)s is required on %(model)s", field=model._fields[field].string, model=model.display_name))
         if error_list:
             raise ValidationError(", ".join(error_list))
+
+    @api.model
+    def _get_writer(self, sender_company):
+        representative = sender_company.account_representative_id
+        if representative and (representative.l10n_fr_is_french or not representative.country_id):
+            return representative
+        return sender_company
 
     def _check_siret(self, company):
         if not siret.is_valid(company.l10n_fr_siret):
@@ -274,7 +292,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
         # Check constraints
         sender_company = self.report_id._get_sender_company_for_export(options)
         # Assume Emitor = Writer -> omit the emitor
-        writer = sender_company.account_representative_id or sender_company
+        writer = self._get_writer(sender_company)
         self._check_constraints(writer, ['l10n_fr_siret', 'street', 'zip', 'city', 'country_id'])
         self._check_siret(writer)
         # Debtor
@@ -344,7 +362,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
         return [
             {
                 'id': 'BA',
-                'ftx_1': self.express_mention_reason,
+                'ftx_1': self.express_mention_reason[:512],
             },
             {
                 'id': 'BC',
@@ -355,7 +373,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
     def _get_common_edi_vals(self, options):
         sender_company = self.report_id._get_sender_company_for_export(options)
         # Assume Emitor = Writer -> omit the emitor
-        writer = sender_company.account_representative_id or sender_company
+        writer = self._get_writer(sender_company)
         debtor = sender_company
         writer_vals = {
             'siret': writer.l10n_fr_siret.replace(" ", ""),
@@ -635,7 +653,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
                 'value': self.reimbursement_date.strftime("%Y%m%d"),
             })
         if self.is_reimbursement_comment and self.reimbursement_comment:
-            zones.append({'id': 'FJ', 'ftx_1': self.reimbursement_comment})
+            zones.append({'id': 'FJ', 'ftx_1': self.reimbursement_comment[:512]})
 
         declarations = {
             'type': 'RBT',

@@ -1,0 +1,1 @@
+from . import test_l10n_it_pos_fiskaly_sale

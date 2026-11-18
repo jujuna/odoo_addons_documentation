@@ -22,6 +22,12 @@ class HrContractSalaryResume(models.Model):
     _order = 'sequence'
 
     def _get_available_fields(self):
+        """Return the selection of ``code``: the ``hr.version`` fields and the main payslip line codes.
+
+        :return: ``[(code, label)]``, with the ``BASIC``, ``SALARY``, ``GROSS`` and ``NET``
+            payslip line codes after the fields
+        :rtype: list[tuple[str, str]]
+        """
         return [(field, description['string']) for field, description in self.env['hr.version'].fields_get().items()] + [('BASIC', 'Basic'), ('SALARY', 'Salary'), ('GROSS', 'Taxable Salary'), ('NET', 'Net')]
 
     name = fields.Char(translate=True)
@@ -31,8 +37,7 @@ class HrContractSalaryResume(models.Model):
         ('version', 'Employee Record Value'),
         ('sum', 'Sum of Benefits Values'),
         ('monthly_total', 'Monthly Total'),
-        ('payslip', 'Payslip Value'),
-        ('sum', 'Sum')], required=True, default='fixed',
+        ('payslip', 'Payslip Value')], required=True, default='fixed',
         help='Pick how the value of the information is computed:\n'
              'Fixed value: Set a determined value static for all links\n'
              'Employee Record value: Get the value from a field on the Employee Record\n'

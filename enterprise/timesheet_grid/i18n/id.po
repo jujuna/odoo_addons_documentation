@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 01:03+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-11-05 05:37+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "timesheet_grid/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -33,18 +33,21 @@ msgid ""
 "* Timesheet submission and validation\n"
 "* Activate grid view for timesheets\n"
 msgstr ""
+"\n"
+"* Penyerahan dan validasi timesheet\n"
+"* Aktifkan tampilan grid untuk timesheet\n"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid " from %(people)s"
-msgstr ""
+msgstr " dari %(people)s"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid " to %(people)s"
-msgstr ""
+msgstr " ke %(people)s"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -74,7 +77,7 @@ msgstr "%(minutes)sm"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "%(person1)s, %(person2)s, and %(count)s more"
-msgstr ""
+msgstr "%(person1)s, %(person2)s, dan %(count)s lainnya"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -86,13 +89,13 @@ msgstr "'Instal ActivityWatch'"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "(Step"
-msgstr ""
+msgstr "(Langkah"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "(example)"
-msgstr ""
+msgstr "(contoh)"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -115,7 +118,31 @@ msgstr "/ Tidak Ada Tugas"
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "07m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "12m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "1h 21m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "2h 22m"
+msgstr "2j 22m"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "42m"
 msgstr ""
 
 #. module: timesheet_grid
@@ -123,10 +150,8 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
 msgid ""
 "<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "
-"\"Metting with the customer.\"</i>"
+"\"Meeting with the customer.\"</i>"
 msgstr ""
-"<b>Tambahkan deskripsi</b> <br/> <i> Buat rangkuman singkat tentang "
-"aktivitas Anda, misalnya, \"Bertemu dengan pelanggan.\"</i>"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -169,9 +194,18 @@ msgstr ""
 "dimulai dari sini.</i>"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
+msgid ""
+"<b>Start your session</b> <br/> <i>A session must be running to log a "
+"timesheet.</i>"
+msgstr ""
+
+#. module: timesheet_grid
 #: model_terms:digest.tip,tip_description:timesheet_grid.digest_tip_timesheet_grid_0
 msgid "<b>Tip: Let the Timesheets Assistant do the hard work</b>"
 msgstr ""
+"<b>Tips: Biarkan Asisten Timesheet yang melakukan pekerjaan beratnya</b>"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -207,18 +241,18 @@ msgstr ""
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder_user
 msgid ""
 "<t>\n"
-"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
-"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"></t>\n"
+"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"></t>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to log your hours for the following period: <t t-"
 "out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" data-"
-"icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
+"icon=\"east\"></i> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
 "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged <t "
 "t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != "
 "0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> hours on "
 "the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours % 1 !"
 "= 0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> requested."
-"<br/>\n"
+"<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}};; padding: 8px 16px "
@@ -226,9 +260,9 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Fill in your timesheet</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
@@ -238,10 +272,10 @@ msgstr ""
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder
 msgid ""
 "<t>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to approve your team's timesheets for the "
 "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - "
-"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
@@ -249,65 +283,47 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Validate the Timesheets</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
 msgstr ""
-"<t>\n"
-"Halo <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
-"Sekadar pengingat untuk menyetujui timesheet tim Anda untuk periode berikut: "
-"<t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - <t t-"
-"out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
-"<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
-"    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\">Validasi Timesheet</a>\n"
-"</div>\n"
-"<br/>Terima kasih,<br/>\n"
-"<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
-"</t>\n"
-"            </t>"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A document being written, scrolling"
-msgstr ""
+msgstr "Dokumen yang sedang ditulis, bergulir"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A terminal with code scrolling by"
-msgstr ""
+msgstr "Terminal dengan kode yang bergulir"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "A video call with a participant on screen"
-msgstr ""
+msgstr "Panggilan video dengan peserta di layar"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Grup Akses"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__active
 msgid "Active"
-msgstr ""
+msgstr "Aktif"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "ActivityWatch"
-msgstr ""
+msgstr "ActivityWatch"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_aw_rule
@@ -318,7 +334,7 @@ msgstr "ActivityWatch Peraturan URL Browser"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "ActivityWatch is installed, but needs configuration."
-msgstr ""
+msgstr "ActivityWatch sudah terinstal, tetapi memerlukan konfigurasi."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -328,9 +344,15 @@ msgid "Add"
 msgstr "Tambah"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/hooks/use_aw_suggestions_draggable.js:0
+msgid "Add %s suggestions"
+msgstr ""
+
+#. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "Advanced"
-msgstr ""
+msgstr "Lanjutan"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -366,6 +388,8 @@ msgid ""
 "Already installed? Make sure ActivityWatch is running, and enable “Apps on "
 "Device” in your browser settings."
 msgstr ""
+"Sudah terinstal? Pastikan ActivityWatch berjalan, dan aktifkan \"Aplikasi di "
+"Perangkat\" di pengaturan browser Anda."
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__always_active
@@ -381,7 +405,7 @@ msgstr "Jumlah"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "An inbox, with a message opening"
-msgstr ""
+msgstr "Kotak masuk, dengan pesan yang terbuka"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_account_analytic_line
@@ -399,13 +423,13 @@ msgstr ""
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "Applicability"
-msgstr ""
+msgstr "Penerapan"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__applies_to
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_search
 msgid "Applies To"
-msgstr ""
+msgstr "Diterapkan ke"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_res_config_settings__reminder_allow
@@ -420,12 +444,12 @@ msgstr "Frekuensi Pengingat Penyetuju"
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_search
 msgid "Archived"
-msgstr ""
+msgstr "Diarsipkan"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "Assignment"
-msgstr ""
+msgstr "Penugasan"
 
 #. module: timesheet_grid
 #: model:ir.ui.menu,name:timesheet_grid.menu_activitywatch_sync
@@ -457,6 +481,8 @@ msgid ""
 "Automatically track your device activity and convert it into timesheets — "
 "while keeping your data private."
 msgstr ""
+"Lacak aktivitas perangkat secara otomatis dan konversikan menjadi timesheet. "
+"Tenang! Privasi data Anda tetap terjaga."
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.res_config_settings_view_form
@@ -481,13 +507,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Away"
-msgstr ""
+msgstr "Tidak di Tempat"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Bill 22% more of your time"
-msgstr ""
+msgstr "Tagihkan tambahan 22% dari waktu Anda"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -505,7 +531,7 @@ msgstr "Kegiatan browser"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Browser activity:"
-msgstr ""
+msgstr "Aktivitas browser:"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -517,13 +543,13 @@ msgstr "Berdasarkan Project"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "CORS Origins"
-msgstr ""
+msgstr "Asal CORS"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "CORS Regex"
-msgstr ""
+msgstr "Regex CORS"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -534,13 +560,19 @@ msgstr "Pengaturan CORS di ActivityWatch"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__call
 msgid "Call"
-msgstr ""
+msgstr "Telepon"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Call Marc"
+msgstr "Hubungi Marc"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Captured today"
-msgstr ""
+msgstr "Terekam hari ini"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -576,6 +608,12 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Chronological"
 msgstr "Kronologis"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Clear search"
+msgstr "Hapus pencarian"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -631,19 +669,19 @@ msgstr "Selesaikan Pengaturan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Composing email $1"
-msgstr ""
+msgstr "Menulis email $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Composing email to $1"
-msgstr ""
+msgstr "Menyusun email ke $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Composing email%(people)s%(subject)s"
-msgstr ""
+msgstr "Menulis email%(people)s%(subject)s"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_config_settings
@@ -677,6 +715,8 @@ msgid ""
 "Connected failed. Make sure ActivityWatch is running, and enable “Apps on "
 "Device” in your browser settings"
 msgstr ""
+"Koneksi gagal. Pastikan ActivityWatch berjalan, dan aktifkan “Aplikasi di "
+"Perangkat” di pengaturan browser Anda"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -688,7 +728,7 @@ msgstr "Koneksi Berhasil"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Connection successful! The assistant is tracking your activity."
-msgstr ""
+msgstr "Koneksi berhasil! Asisten sedang melacak aktivitas Anda."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -763,13 +803,13 @@ msgstr "Hapus"
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_hr_department
 msgid "Department"
-msgstr ""
+msgstr "Departemen"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__department_ids
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__applies_to__departments
 msgid "Departments"
-msgstr ""
+msgstr "Departemen"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_merge_wizard_view_form
@@ -801,7 +841,7 @@ msgstr "Pengembangan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Development Activity"
-msgstr ""
+msgstr "Aktivitas Pengembangan"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -888,7 +928,7 @@ msgstr "Apakah Anda ingin menyimpan perubahan Anda?"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__document
 msgid "Document"
-msgstr ""
+msgstr "Dokumen"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -914,7 +954,7 @@ msgstr "Draft"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__email
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_hr_employee
@@ -954,25 +994,31 @@ msgstr "Aktifkan Izin ‘Aplikasi di Perangkat’"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "End Session"
-msgstr ""
+msgstr "Akhiri Sesi"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__applies_to__everyone
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_search
 msgid "Everyone"
+msgstr "Semua Orang"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Feature XyZ"
 msgstr ""
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Find the ActivityWatch extension and copy its"
-msgstr ""
+msgstr "Temukan ekstensi ActivityWatch dan salin"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Firefox extension (only if used)"
-msgstr ""
+msgstr "Ekstensi Firefox (hanya jika digunakan)"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -988,7 +1034,7 @@ msgstr "Frekuensi"
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "General Information"
-msgstr ""
+msgstr "Informasi Umum"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1095,6 +1141,8 @@ msgid ""
 "If you use the ActivityWatch Firefox extension, follow these steps to allow "
 "it to connect and track your activity."
 msgstr ""
+"Jika Anda menggunakan ekstensi Firefox ActivityWatch, ikuti langkah-langkah "
+"ini agar ekstensi tersebut dapat terhubung dan melacak aktivitas Anda."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1121,7 +1169,7 @@ msgstr "Instal Asisten Timesheet"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Install our activity tracker to automate your timesheet suggestions."
-msgstr ""
+msgstr "Instal pelacak aktivitas kami untuk mengotomatiskan saran timesheet."
 
 #. module: timesheet_grid
 #. odoo-python
@@ -1132,7 +1180,7 @@ msgstr "Regex tidak valid: %(regex)s"
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__is_my_department_rule
 msgid "Is My Department Rule"
-msgstr ""
+msgstr "Adalah Aturan Departemen Saya"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1187,13 +1235,13 @@ msgstr "Pastikan ActivityWatch sudah terpasang."
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Manifest URL"
-msgstr ""
+msgstr "URL Manifes"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Matched to the right project, ready to confirm"
-msgstr ""
+msgstr "Dicocokkan dengan project yang tepat, siap untuk dikonfirmasi"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__meeting
@@ -1226,7 +1274,7 @@ msgstr "Gabung Timesheet-Timesheet"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__messaging
 msgid "Messaging"
-msgstr ""
+msgstr "Perpesanan"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_res_config_settings__timesheet_min_duration
@@ -1236,7 +1284,7 @@ msgstr "Durasi Minimal"
 #. module: timesheet_grid
 #: model:ir.model.fields,help:timesheet_grid.field_aw_rule__threshold
 msgid "Minimum duration required for an activity to appear in suggestions"
-msgstr ""
+msgstr "Durasi minimum yang diperlukan agar aktivitas muncul dalam saran"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_ir_module_module
@@ -1254,7 +1302,7 @@ msgstr "Bulan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "More information"
-msgstr ""
+msgstr "Informasi selengkapnya"
 
 #. module: timesheet_grid
 #. odoo-python
@@ -1271,12 +1319,12 @@ msgstr ""
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_search
 msgid "My Departments"
-msgstr ""
+msgstr "Departemen Saya"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_search
 msgid "My Rules"
-msgstr ""
+msgstr "Aturan Saya"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_view_search
@@ -1315,7 +1363,7 @@ msgstr "Butuh bantuan? Lihat dokumentasi kami"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Never lose track of your time again"
-msgstr ""
+msgstr "Jangan sampai lupa mencatat waktu"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1359,7 +1407,7 @@ msgstr "Peraturan asisten tidak ditemukan. Ayo buat!"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "No data detected from the extension."
-msgstr ""
+msgstr "Tidak ada data yang terdeteksi dari ekstensi."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1384,6 +1432,12 @@ msgstr "Tidak ada saran untuk %(boldStart)s%(day)s%(boldEnd)s."
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
 msgid "No suggestions for %(boldStart)sToday%(boldEnd)s."
 msgstr "Tidak ada saran untuk %(boldStart)sHari Ini%(boldEnd)s."
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "No suggestions match \""
+msgstr "Tidak ada saran yang cocok dengan \""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1440,7 +1494,7 @@ msgstr "Ikon Odoo Systray"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Odoo database URL"
-msgstr ""
+msgstr "URL database Odoo"
 
 #. module: timesheet_grid
 #. odoo-python
@@ -1479,13 +1533,13 @@ msgstr "Buka Timesheets Systray"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Open the ActivityWatch settings and paste the Manifest URL into the"
-msgstr ""
+msgstr "Buka pengaturan ActivityWatch dan tempel URL Manifest ke"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Open the Firefox extensions page:"
-msgstr ""
+msgstr "Buka halaman ekstensi Firefox:"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,help:timesheet_grid.field_aw_rule__description
@@ -1503,7 +1557,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__other
 msgid "Other"
-msgstr ""
+msgstr "Lainnya"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1526,12 +1580,12 @@ msgstr "Toggle Izin - Ilustrasi Animasi"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__planning
 msgid "Planning"
-msgstr ""
+msgstr "Perencanaan"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__presentation
 msgid "Presentation"
-msgstr ""
+msgstr "Presentasi"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1549,12 +1603,12 @@ msgstr "Hari Sebelumnya"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Privacy-friendly"
-msgstr ""
+msgstr "Ramah Privasi"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__applies_to__private
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1574,39 +1628,39 @@ msgid "Public Employee"
 msgstr "Karyawan Publik"
 
 #. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "Pycharm - %(folder)s - %(branch)s"
-msgstr "Pycharm - %(folder)s - %(branch)s"
-
-#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_timesheet_merge_wizard__unit_amount
 msgid "Quantity"
 msgstr "Kuantitas"
 
 #. module: timesheet_grid
 #. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Read Agreement"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Reading Inbox"
-msgstr ""
+msgstr "Membaca Kotak Masuk"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Reading email $1"
-msgstr ""
+msgstr "Membaca email $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Reading email from $1"
-msgstr ""
+msgstr "Membaca email dari $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Reading email%(people)s%(subject)s"
-msgstr ""
+msgstr "Membaca email%(people)s%(subject)s"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__regex
@@ -1635,7 +1689,7 @@ msgstr "Hapus"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Remove /manifest.json from the URL so it looks like this:"
-msgstr ""
+msgstr "Hapus /manifest.json dari URL agar tampilannya menjadi seperti ini:"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1674,6 +1728,12 @@ msgid "Restart the Server"
 msgstr "Restart Server"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Review Specification"
+msgstr ""
+
+#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_res_config_settings__timesheet_rounding
 msgid "Round up"
 msgstr "Bulatkan keatas"
@@ -1693,9 +1753,15 @@ msgid "Save"
 msgstr "Simpan"
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Search suggestions..."
+msgstr "Saran pencarian..."
+
+#. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_list
 msgid "Select a department"
-msgstr ""
+msgstr "Pilih departemen"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,help:timesheet_grid.field_hr_employee__timesheet_manager_id
@@ -1717,7 +1783,7 @@ msgstr "Urutan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1811,19 +1877,19 @@ msgstr "Pengaturan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Show Away Time"
-msgstr ""
+msgstr "Tampilkan Waktu Tidak di Tempat"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__side_activity
 msgid "Side Activity"
-msgstr ""
+msgstr "Aktivitas Sampingan"
 
 #. module: timesheet_grid
 #. odoo-python
 #: code:addons/timesheet_grid/models/account_analytic_line.py:0
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__spreadsheet
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Spreadsheet"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1835,13 +1901,13 @@ msgstr "Mulai Sekarang"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Start Session"
-msgstr ""
+msgstr "Mulai Sesi"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Start new timer"
-msgstr ""
+msgstr "Mulai timer baru"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1889,7 +1955,7 @@ msgstr "Asisten siap melacak aktivitas Anda. 🎉"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "The Timesheets Assistant isn't available on mobile yet"
-msgstr ""
+msgstr "Asisten Timesheet belum tersedia di perangkat mobile"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.res_config_settings_view_form
@@ -1973,6 +2039,9 @@ msgid ""
 "Example pattern: Meet - (.*)\\|https://meet.google.com captures each Google "
 "Meet meeting.\n"
 "\n"
+"For code editors, the pattern is matched against \"<repository>|<branch>\", "
+"e.g. odoo-dev/enterprise|master-1234-dev.\n"
+"\n"
 "Tip: The parts in parentheses (…) are captured automatically and can be used "
 "in the Template or in the Description.\n"
 "\n"
@@ -1981,23 +2050,26 @@ msgid ""
 "Search for info about Customer A → counted as part of the same event\n"
 "Open Customer B Meeting → a new event starts."
 msgstr ""
-"Ini memberitahu Odoo aktivitas mana yang harus dilacak dari ActivityWatch. "
-"Setiap aktivitas yang sesuai dengan pola ini akan membuat acara baru, dan "
-"semua tindakan terkait berikutnya dihitung sebagai bagian darinya hingga "
-"aktivitas lain dimulai. Hanya aktivitas yang berdurasi lebih dari 1 menit "
-"yang dilacak.\n"
+"Hal ini memberi tahu Odoo aktivitas mana yang akan dilacak dari "
+"ActivityWatch. Setiap aktivitas yang cocok dengan pola ini akan membuat "
+"acara baru, dan semua tindakan terkait berikutnya dihitung sebagai bagian "
+"darinya sampai aktivitas yang berbeda dimulai. Hanya aktivitas yang lebih "
+"lama dari 1 menit yang dilacak.\n"
 "\n"
-"Contoh pola: Meet - (.*)\\|https://meet.google.com mencatat setiap pertemuan "
+"Contoh pola: Meet - (.*)\\|https://meet.google.com menangkap setiap meeting "
 "Google Meet.\n"
 "\n"
-"Tips: Bagian di dalam tanda kurung (…) dicatat secara otomatis dan dapat "
-"digunakan di Template atau Deskripsi.\n"
+"Untuk editor kode, pola dicocokkan dengan \"<repository>|<branch>\", contoh: "
+"odoo-dev/enterprise|master-1234-dev.\n"
 "\n"
-"Contoh acara baru:\n"
-"Buka Pertemuan Pelanggan A → acara baru dibuat\n"
-"Cari informasi tentang Pelanggan A → dihitung sebagai bagian dari acara yang "
-"sama\n"
-"Buka Pertemuan Pelanggan B → acara baru dimulai."
+"Tips: Bagian dalam tanda kurung (…) ditangkap secara otomatis dan dapat "
+"digunakan dalam Template atau dalam Deskripsi.\n"
+"\n"
+"Contoh peristiwa baru:\n"
+"Buka Meeting Pelanggan A → peristiwa baru dibuat\n"
+"Mencari info tentang Pelanggan A → dihitung sebagai bagian dari peristiwa "
+"yang sama\n"
+"Buka Meetng Pelanggan B → peristiwa baru dimulai."
 
 #. module: timesheet_grid
 #. odoo-python
@@ -2012,7 +2084,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__threshold
 msgid "Threshold"
-msgstr ""
+msgstr "Ambang Batas"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2032,6 +2104,18 @@ msgstr "Pembulatan Waktu"
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_view_grid_by_project
 msgid "Time Spent"
 msgstr "Waktu yang digunakan"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time added"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time removed"
+msgstr ""
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_employee_public__timesheet_manager_id
@@ -2140,7 +2224,7 @@ msgstr "Timesheet: Pengingat Karyawan"
 #. module: timesheet_grid
 #: model:digest.tip,name:timesheet_grid.digest_tip_timesheet_grid_0
 msgid "Tip: Let the Timesheets Assistant do the hard work"
-msgstr ""
+msgstr "Tips: Biarkan Asisten Timesheet yang melakukan pekerjaan berat"
 
 #. module: timesheet_grid
 #: model:ir.ui.menu,name:timesheet_grid.menu_timesheet_grid_validate
@@ -2164,6 +2248,8 @@ msgid ""
 "To help the Assistant automatically suggest your timesheet entries, your "
 "browser needs to be able to communicate with your local"
 msgstr ""
+"Untuk membantu Asisten menyarankan entri timesheet secara otomatis, browser "
+"harus dapat berkomunikasi dengan lokal Anda"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2215,12 +2301,12 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.module.module,summary:base.module_timesheet_grid
 msgid "Track employee time on tasks"
-msgstr ""
+msgstr "Lacak waktu karyawan pada tugas"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "Tracking Behavior"
-msgstr ""
+msgstr "Perilaku Pelacakan"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2271,9 +2357,15 @@ msgstr "Di bawah"
 
 #. module: timesheet_grid
 #. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Undo"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Unknown Activity"
-msgstr ""
+msgstr "Aktivitas Tidak Diketahui"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2322,7 +2414,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_users
 msgid "User"
-msgstr "Pengguna"
+msgstr "User"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_account_analytic_line__user_can_validate
@@ -2338,12 +2430,6 @@ msgstr "Frekuensi Pengingat User"
 #: model:ir.model.fields,help:timesheet_grid.field_hr_employee_public__timesheet_manager_id
 msgid "User responsible of timesheet validation. Should be Timesheet Manager."
 msgstr "User penanggungjawab validasi timesheet. Harusnya Manajer Timesheet."
-
-#. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "VS Code - %(folder)s"
-msgstr "Kode VS - %(folder)s"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2387,7 +2473,7 @@ msgstr "Lihat Data ActivityWatch"
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_list
 msgid "Visible to all"
-msgstr ""
+msgstr "Terlihat untuk semua"
 
 #. module: timesheet_grid
 #. odoo-python
@@ -2412,6 +2498,8 @@ msgid ""
 "We recommend installing our browser extension for more accurate suggestions. "
 "If you've already installed it, please make sure it is enabled."
 msgstr ""
+"Sebaiknya instal ekstensi browser kami agar saran lebih akuran. Jika Anda "
+"sudah menginstalnya, pastikan ekstensi tersebut diaktifkan."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2434,19 +2522,19 @@ msgstr "Pekan"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Welcome back"
-msgstr ""
+msgstr "Selamat datang kembali"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Welcome,"
-msgstr ""
+msgstr "Selamat datang,"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/services/static_timesheet_timer_service.js:0
 msgid "What did you work on?"
-msgstr ""
+msgstr "Apa saja yang Anda kerjakan?"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,help:timesheet_grid.field_aw_rule__side_activity
@@ -2456,6 +2544,10 @@ msgid ""
 "interruptions (like checking messages or notifications) without affecting "
 "your ongoing timeline tracking."
 msgstr ""
+"Jika diaktifkan, saran yang dihasilkan oleh aturan ini tidak akan mengubah "
+"project atau tugas aktif untuk aktivitas Anda berikutnya, memungkinkan Anda "
+"untuk menangani gangguan cepat (seperti memeriksa pesan atau notifikasi) "
+"tanpa memengaruhi pelacakan lini masa yang sedang berjalan."
 
 #. module: timesheet_grid
 #: model:ir.model.fields,help:timesheet_grid.field_account_analytic_line__user_can_validate
@@ -2476,19 +2568,19 @@ msgstr "Jendela"
 #: code:addons/timesheet_grid/models/account_analytic_line.py:0
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Working on $1"
-msgstr ""
+msgstr "Mengerjakan $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Working on %(target)s"
-msgstr ""
+msgstr "Mengerjakan %(target)s"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "Working on %s"
-msgstr ""
+msgstr "Mengerjakan %s"
 
 #. module: timesheet_grid
 #. odoo-python
@@ -2573,6 +2665,7 @@ msgstr ""
 #: code:addons/timesheet_grid/models/aw_rule.py:0
 msgid "You can’t make a rule created by another user private."
 msgstr ""
+"Anda tidak dapat mengubah aturan yang dibuat oleh user lain menjadi pribadi."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2590,7 +2683,7 @@ msgstr "Timesheet Anda"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Your activity, tracked locally"
-msgstr ""
+msgstr "Aktivitas Anda, dilacak secara lokal"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2599,6 +2692,8 @@ msgid ""
 "Your browser can't connect to the tracker. Please follow these steps to "
 "configure the CORS settings."
 msgstr ""
+"Browser Anda tidak dapat terhubung dengan pelacak. Ikuti langkah-langkah "
+"berikut untuk mengonfigurasi pengaturan CORS."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2607,6 +2702,8 @@ msgid ""
 "Your browser can’t connect to the tracker. Please configure the CORS "
 "settings."
 msgstr ""
+"Browser Anda tidak dapat terhubung dengan pelacak. Konfigurasi pengaturan "
+"CORS."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2615,6 +2712,8 @@ msgid ""
 "Your browser is blocked from connecting to the tracker. Don’t worry — here’s "
 "how to fix it."
 msgstr ""
+"Browser Anda tidak dapat terhubung dengan pelacak. Jangan khawatir, berikut "
+"cara mengatasinya."
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2660,13 +2759,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Zero effort"
-msgstr ""
+msgstr "Tanpa usaha"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "about:debugging#/runtime/this-firefox"
-msgstr ""
+msgstr "about:debugging#/runtime/this-firefox"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__res_company__timesheet_mail_employee_interval__months
@@ -2684,12 +2783,24 @@ msgstr "setelah akhir minggu"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "below to open the"
-msgstr ""
+msgstr "di bawah untuk membuka"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "below to open the ActivityWatch website."
+msgstr "di bawah ini untuk membuka website ActivityWatch."
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info py-3"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info rounded py-3"
 msgstr ""
 
 #. module: timesheet_grid
@@ -2701,31 +2812,31 @@ msgstr "hari"
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_list
 msgid "e.g. Email"
-msgstr ""
+msgstr "cth: Email"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_list
 msgid "e.g. Working on $1"
-msgstr ""
+msgstr "Cth: Mengerjakan $1"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "field."
-msgstr ""
+msgstr "field."
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "from %(person)s: \"%(subject)s\""
-msgstr ""
+msgstr "dari %(person)s: \"%(subject)s\""
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "h"
-msgstr ""
+msgstr "j"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2737,31 +2848,31 @@ msgstr "http://localhost:5600"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "http://localhost:5600/#/timeline"
-msgstr ""
+msgstr "http://localhost:5600/#/timeline"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "in the"
-msgstr ""
+msgstr "di"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "moz-extension://abcd1234"
-msgstr ""
+msgstr "moz-extension://abcd1234"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "moz-extension://abcd1234/manifest.json"
-msgstr ""
+msgstr "moz-extension://abcd1234/manifest.json"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "of"
-msgstr ""
+msgstr "dari"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2781,14 +2892,14 @@ msgstr "ikon info halaman di kolom alamat browser Anda"
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/by_project/by_project.xml:0
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/timeline/timeline.xml:0
 msgid "px-0 w-auto align-items-stretch"
-msgstr ""
+msgstr "px-0 w-auto align-items-stretch"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/by_project/by_project.xml:0
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/timeline/timeline.xml:0
 msgid "px-3 py-2 w-100 justify-content-end gap-2"
-msgstr ""
+msgstr "px-3 py-2 w-100 justify-content-end gap-2"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2800,19 +2911,19 @@ msgstr "dipilih"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "server."
-msgstr ""
+msgstr "server."
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "settings, enter your"
-msgstr ""
+msgstr "pengaturan, masukkan"
 
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
 msgid "to %(person)s: \"%(subject)s\""
-msgstr ""
+msgstr "untuk %(person)s: \"%(subject)s\""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2824,13 +2935,158 @@ msgstr "untuk memverifikasi bahwa semuanya berfungsi dengan baik."
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "website."
-msgstr ""
+msgstr "website."
+
+#~ msgid ""
+#~ "<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "
+#~ "\"Metting with the customer.\"</i>"
+#~ msgstr ""
+#~ "<b>Tambahkan deskripsi</b> <br/> <i> Buat rangkuman singkat tentang "
+#~ "aktivitas Anda, misalnya, \"Bertemu dengan pelanggan.\"</i>"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to log your hours for the following period: "
+#~ "<t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" "
+#~ "data-icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</"
+#~ "t>.\n"
+#~ "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged "
+#~ "<t t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % "
+#~ "1 != 0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> "
+#~ "hours on the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-"
+#~ "if=\"working_hours % 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 "
+#~ "* 60))\">:30</t> requested.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Fill in your timesheet</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Halo, <t t-out=\"object.name or ''\">Abigail Peterson</t>.<br/><br/>\n"
+#~ "Ini adalah pengingat untuk mencatat jam kerja Anda selama periode "
+#~ "berikut: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i "
+#~ "class=\"oi\" data-icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or "
+#~ "''\">05/06/2021</t>.\n"
+#~ "Untuk sementara, Anda <t t-if=\"timesheet_hours != 0\">baru</t> mencatat "
+#~ "<t t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % "
+#~ "1 != 0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> "
+#~ "jam dari <t t-out=\"'%d' %int(working_hours)\">8</t><t t-"
+#~ "if=\"working_hours % 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 "
+#~ "* 60))\">:30</t> yang diminta.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Isi timesheet Anda</a>\n"
+#~ "</div>\n"
+#~ "<br/>Terima kasih,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to approve your team's timesheets for the "
+#~ "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> "
+#~ "- <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Validate the Timesheets</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "Halo <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "Sekadar pengingat untuk menyetujui timesheet tim Anda untuk periode "
+#~ "berikut: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - <t t-"
+#~ "out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Validasi Timesheet</a>\n"
+#~ "</div>\n"
+#~ "<br/>Terima kasih,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+
+#~ msgid "Pycharm - %(folder)s - %(branch)s"
+#~ msgstr "Pycharm - %(folder)s - %(branch)s"
+
+#~ msgid ""
+#~ "This tells Odoo which activity to track from ActivityWatch. Each activity "
+#~ "that matches this pattern will create a new event, and all following "
+#~ "related actions are counted as part of it until a different activity "
+#~ "starts. Only activities longer than 1 minute are tracked.\n"
+#~ "\n"
+#~ "Example pattern: Meet - (.*)\\|https://meet.google.com captures each "
+#~ "Google Meet meeting.\n"
+#~ "\n"
+#~ "Tip: The parts in parentheses (…) are captured automatically and can be "
+#~ "used in the Template or in the Description.\n"
+#~ "\n"
+#~ "Example of a new event:\n"
+#~ "Open Customer A Meeting → a new event is created\n"
+#~ "Search for info about Customer A → counted as part of the same event\n"
+#~ "Open Customer B Meeting → a new event starts."
+#~ msgstr ""
+#~ "Ini memberitahu Odoo aktivitas mana yang harus dilacak dari "
+#~ "ActivityWatch. Setiap aktivitas yang sesuai dengan pola ini akan membuat "
+#~ "acara baru, dan semua tindakan terkait berikutnya dihitung sebagai bagian "
+#~ "darinya hingga aktivitas lain dimulai. Hanya aktivitas yang berdurasi "
+#~ "lebih dari 1 menit yang dilacak.\n"
+#~ "\n"
+#~ "Contoh pola: Meet - (.*)\\|https://meet.google.com mencatat setiap "
+#~ "pertemuan Google Meet.\n"
+#~ "\n"
+#~ "Tips: Bagian di dalam tanda kurung (…) dicatat secara otomatis dan dapat "
+#~ "digunakan di Template atau Deskripsi.\n"
+#~ "\n"
+#~ "Contoh acara baru:\n"
+#~ "Buka Pertemuan Pelanggan A → acara baru dibuat\n"
+#~ "Cari informasi tentang Pelanggan A → dihitung sebagai bagian dari acara "
+#~ "yang sama\n"
+#~ "Buka Pertemuan Pelanggan B → acara baru dimulai."
+
+#~ msgid "VS Code - %(folder)s"
+#~ msgstr "Kode VS - %(folder)s"
 
 #~ msgid "Automatic timesheets, zero effort."
 #~ msgstr "Timesheet otomatis, tak perlu repot."
-
-#~ msgid "Call Marc"
-#~ msgstr "Hubungi Marc"
 
 #~ msgid "Coding PR#23"
 #~ msgstr "Coding PR#23"

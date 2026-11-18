@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from unittest.mock import patch
 from dateutil.relativedelta import relativedelta
 
 from odoo.tests import tagged
@@ -429,3 +430,39 @@ class TestPayrollWithholdingTaxesWithChildAllowances(TestPayrollCommon):
             msg="Disabled spouse should add a disabled_dependent_deduction under Scale II."
         )
         self.assertEqual(withholding_tax_amount, 0, msg="Withholding tax should be 0 for an employee with a 2500 euro salary and a disabled spouse under Scale II.")
+
+    def test_double_holiday_withholding_taxes_child_exemption(self):
+        """
+        Annexe III n° 54: when the yearly normal pay is below the limit of the number of children, the exceptional
+        allowance is exempted up to the difference between that limit and the yearly normal pay. The rate and the
+        reduction of n° 55 come from the yearly normal pay itself.
+        """
+        employee = self.create_employee({
+            'name': 'Two children',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'children': 2,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Double holiday pay 2026',
+            'employee_id': employee.id,
+            'date_from': date(2026, 6, 1),
+            'date_to': date(2026, 6, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+        })
+        yearly_revenue = 20000
+        monthly_wage = yearly_revenue / 12 / (1 - 0.1307)
+        rates = payslip._rule_parameter('holiday_pay_pp_rates')
+        limit = payslip._rule_parameter('holiday_pay_pp_exoneration')[2]
+        reduction = payslip._rule_parameter('holiday_pay_pp_rate_reduction')[2]
+        self.assertGreater(limit, yearly_revenue)
+        self.assertLessEqual(yearly_revenue, reduction[1])
+        rate = payslip._l10n_be_find_withholding_tax_rates(yearly_revenue, rates)
+        version_class = self.registry['hr.version']
+        with patch.object(version_class, '_l10n_be_get_monthly_wage', lambda self, year: monthly_wage):
+            # the whole allowance is exempted
+            self.assertAlmostEqual(payslip._get_withholding_taxes_after_child_allowances(rates, limit - yearly_revenue - 30), 0, 2)
+            # the part above the exempted amount is taxed at the rate of the yearly normal pay, then reduced
+            self.assertAlmostEqual(
+                payslip._get_withholding_taxes_after_child_allowances(rates, limit - yearly_revenue + 530),
+                -530 * rate * (1 - reduction[0] / 100), 2)

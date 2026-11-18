@@ -67,7 +67,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="manual_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'bus_transport_employee_kilometer')])"/>
         <field name="display_type">manual</field>
-        <field name="uom" eval="False"/>
+        <field name="uom">length_metric_system</field>
         <field name="description">Enter the number of kilometers you ride by bus to go to work. The approximative amount reimbursed by the employer is calculated accordingly.</field>
     </record>
 
@@ -113,7 +113,7 @@
         <field name="name">Tram Kilometer</field>
         <field name="show_name">False</field>
         <field name="sequence">20</field>
-        <field name="uom" eval="False"/>
+        <field name="uom">length_metric_system</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'tram_transport_employee_kilometer')])"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="manual_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'tram_transport_employee_kilometer')])"/>
@@ -164,7 +164,7 @@
         <field name="name">Metro Kilometer</field>
         <field name="show_name">False</field>
         <field name="sequence">23</field>
-        <field name="uom" eval="False"/>
+        <field name="uom">length_metric_system</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'metro_transport_employee_kilometer')])"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="manual_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'metro_transport_employee_kilometer')])"/>
@@ -176,7 +176,7 @@
         <field name="is_configurable_benefit" eval="True"/>
         <field name="manual_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'train_transport_employee_kilometer')])"/>
         <field name="display_type">manual</field>
-        <field name="uom" eval="False"/>
+        <field name="uom">length_metric_system</field>
     </record>
 
     <record id="l10n_be_transport_public_train_periodicity" model="hr.contract.salary.benefit">
@@ -298,6 +298,7 @@
         <field name="description">In addition to your legal leaves, you can choose to have extra days off (up to +15 days). The amount of annual time off (legal leaves) allocated to you depends on your working hours from the previous year. For example, if you worked full-time for 12 months under a Belgian contract, you are entitled to 20 days off.</field>
         <field name="slider_min">0</field>
         <field name="slider_max">15</field>
+        <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_contract_salary.hr_employee_view_form_inherit_be_payroll')])]"/>
     </record>
 
     <record id="l10n_be_hr_payroll.l10n_be_intellectual_property" model="hr.contract.salary.benefit">

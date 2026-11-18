@@ -14,17 +14,18 @@
 # Ediz Duman <neps1192@gmail.com>, 2022
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"PO-Revision-Date: 2026-11-09 14:37+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/mrp_mps/"
 "tr/>\n"
 "Language: tr\n"
@@ -58,6 +59,23 @@ msgid ""
 "will\n"
 "procure.\n"
 msgstr ""
+"\n"
+"Ana Üretim Programı\n"
+"==========================\n"
+"\n"
+"Bazen daha sonra oluşturulacak üretim siparişlerinin bileşenler için\n"
+"satın alma siparişleri oluşturmanız gerekir.  Veya sadece daha sonra satış "
+"siparişlerini alacağınız\n"
+"üretim siparişleri için.  Çözüm tahmin etmektir\n"
+"Satış tahminlerinize dayanarak zaten bazı üretim siparişleri\n"
+"veya satın alma emirleri oluşturacaksınız.\n"
+"\n"
+"Rapora eklemek istediğiniz ürünleri seçmeniz gerekir.  rapor için dönem: "
+"gün, hafta, ay, ...\n"
+"seçebilirsiniz.   Ayrıca güvenlik stoğunu, minimum tedarik miktarını "
+"tanımlayabilir.\n"
+"Tedarik edeceğiniz miktarı manuel olarak\n"
+"geçersiz kılabilirsiniz.\n"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_bom_form_view_inherit_mps
@@ -128,7 +146,7 @@ msgstr "Ürün Ekle"
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/mps_selection.js:0
 msgid "All Periods"
-msgstr ""
+msgstr "Tüm Dönemler"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__allowed_route_ids
@@ -147,6 +165,8 @@ msgid ""
 "Are you sure you want to remove these products from your schedule?\n"
 "All forecasts will be gone for good."
 msgstr ""
+"Bu ürünleri programınızdan kaldırmak istediğinizden emin misiniz?\n"
+"Tüm tahminler kalıcı olarak silinecektir."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -155,6 +175,8 @@ msgid ""
 "Are you sure you want to remove this product from your schedule?\n"
 "All forecasts will be gone for good."
 msgstr ""
+"Bu ürünü programınızdan kaldırmak istediğinizden emin misiniz?\n"
+"Tüm tahminler kalıcı olarak silinecektir."
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_trigger__automated
@@ -338,7 +360,7 @@ msgstr "İkmal İçin Göster"
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
 msgid "Don't Import"
-msgstr ""
+msgstr "İçe Aktarma"
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__route_id
@@ -346,6 +368,8 @@ msgid ""
 "Either the route specified directly or the one computed to be used for "
 "replenishing this product."
 msgstr ""
+"Doğrudan belirtilen rota veya bu ürünün yenilenmesi için kullanılmak üzere "
+"hesaplanan rota."
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__excessive_replenishment
@@ -385,6 +409,8 @@ msgid ""
 "Forecast Quantity for <span class=\"fw-bold\">selected products</span> based "
 "on historical date or actual demand."
 msgstr ""
+"Geçmiş verilere veya gerçek talebe dayalı olarak <span class=\"fw-bold\">"
+"seçilen ürünler</span> için Tahmin Miktarı."
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__low_forecast
@@ -499,7 +525,7 @@ msgstr "Son Güncelleme"
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_mps_forecast_suggestion__based_on__last_year
 msgid "Last Year"
-msgstr ""
+msgstr "Geçen Yıl"
 
 #. module: mrp_mps
 #: model:ir.ui.menu,name:mrp_mps.mrp_mps_menu_planning
@@ -816,13 +842,13 @@ msgstr "Alımlar"
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
 msgid "Remove Product Lines"
-msgstr ""
+msgstr "Ürün Satırlarını Kaldır"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
 msgid "Remove lines"
-msgstr ""
+msgstr "Satırları kaldır"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -843,7 +869,7 @@ msgstr "Replenish_qty manuel olarak güncellendi"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id
 msgid "Replenishment Route"
-msgstr ""
+msgstr "Yenileme Rotası"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
@@ -892,12 +918,12 @@ msgstr "Rota"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id_placeholder
 msgid "Route Id Placeholder"
-msgstr ""
+msgstr "Rota Kimliği Yer Tutucu"
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__specified_route_id
 msgid "Route for replenishing this product."
-msgstr ""
+msgstr "Bu ürünün yenilenmesi için rota."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -951,7 +977,7 @@ msgstr "Tedarikçiyi Göster"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__specified_route_id
 msgid "Specified Route"
-msgstr ""
+msgstr "Belirtilen Rota"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -981,7 +1007,7 @@ msgstr "Yeniden tedarik durumuna göre filtrelemeyi destekleyen teknik alan"
 #. odoo-python
 #: code:addons/mrp_mps/models/mrp_mps.py:0
 msgid "Template for Master Production Schedule"
-msgstr ""
+msgstr "Ana Üretim Programı Şablonu"
 
 #. module: mrp_mps
 #: model:ir.model.constraint,message:mrp_mps.constraint_mrp_production_schedule_warehouse_product_ref_uniq
@@ -1104,7 +1130,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.js:0
 msgid "Update forecast"
-msgstr ""
+msgstr "Tahmini güncelle"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__supplier_id
@@ -1169,4 +1195,4 @@ msgstr "birimler x"
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
 msgid "x"
-msgstr ""
+msgstr "x"

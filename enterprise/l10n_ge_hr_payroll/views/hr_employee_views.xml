@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.inherit.l10n_ge_hr_payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <group name="payroll_group" position="inside">
+                <group string="Georgia Payroll" name="l10n_ge_payroll" invisible="company_country_code != 'GE'">
+                    <field name="l10n_ge_tax_privilege" class="o_hr_narrow_field"/>
+                    <field name="l10n_ge_privilege_used" invisible="l10n_ge_tax_privilege == 'none'"/>
+                    <field name="l10n_ge_pension_status" class="o_hr_narrow_field"/>
+                    <field name="l10n_ge_net_salary" string="Net Salary Basis"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

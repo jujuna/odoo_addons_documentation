@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command, fields
+from odoo.exceptions import AccessError
 from odoo.tests import Form, freeze_time
 
 from .common import TestPlanningFieldServiceCommon
@@ -550,3 +551,7 @@ class TestPlanningFieldServiceFlow(TestPlanningFieldServiceCommon):
             self.env.ref("planning_field_service.mt_shift_unassigned"), slot._mail_get_message_subtypes(),
             "The 'Shift Unassigned' subtype should stay visible, otherwise it cannot be unfollowed.",
         )
+
+    def test_intervention_report_access(self):
+        with self.assertRaises(AccessError):
+            self.env['ir.actions.report'].with_user(self.portal_user)._render_qweb_html('planning_field_service.worksheet_custom', self.intervention.ids)

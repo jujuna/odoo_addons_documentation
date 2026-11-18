@@ -46,6 +46,8 @@ class HrPayslip(models.Model):
             start_date = (
                 payslip.employee_id._get_first_contract_date(payslip.date_from)
                 or payslip.employee_id._get_first_contract_date()
+                or payslip.version_id.contract_date_start
+                or payslip.date_from
             )
             payslip.l10n_mx_years_worked = payslip.date_to.year - start_date.year
             if start_date <= payslip.date_to + relativedelta(year=start_date.year):
@@ -153,6 +155,8 @@ class HrPayslip(models.Model):
         effective_date_to = min(self.date_to, v_date_end)
         effective_days_in_period = (effective_date_to - effective_date_from).days + 1
         days_without_disabilities = effective_days_in_period - disability_days
+        min_wage_period_days = self.version_id._l10n_mx_get_min_wage_period_days(self.date_to) if self.version_id else 0
+        is_minimum_wage = bool(self.version_id) and self.version_id._l10n_mx_is_minimum_wage(self.date_to)
 
         res.update({
             'days_in_period': days_in_period,
@@ -164,6 +168,8 @@ class HrPayslip(models.Model):
             'accrued_days_in_period': accrued_days_in_period,
             'effective_days_in_period': effective_days_in_period,
             'days_in_month_ratio': days_in_month_ratio,
+            'min_wage_period_days': min_wage_period_days,
+            'is_minimum_wage': is_minimum_wage,
         })
         return res
 

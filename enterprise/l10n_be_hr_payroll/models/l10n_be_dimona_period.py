@@ -18,7 +18,7 @@ class L10nBeDimonaPeriod(models.Model):
 
     name = fields.Char('Period ID', required=True, readonly=True, index=True)
     company_id = fields.Many2one('res.company', required=True, readonly=True, index=True)
-    relation_id = fields.Many2one('l10n.be.dimona.relation', 'relation_id', compute='_compute_period_info', store=True, readonly=True, index='btree_not_null')
+    relation_id = fields.Many2one('l10n.be.dimona.relation', 'Relation', compute='_compute_period_info', store=True, readonly=True, index='btree_not_null')
     declaration_ids = fields.One2many('l10n.be.dimona.declaration', 'period_id')
     employee_id = fields.Many2one('hr.employee', compute='_compute_period_info', store=True, readonly=True)
     date_start = fields.Date(compute='_compute_period_info', store=True, readonly=True)
@@ -48,9 +48,10 @@ class L10nBeDimonaPeriod(models.Model):
                 (year, month, day) = period.content['endDate'].split('-')
                 period.date_end = date(int(year), int(month), int(day))
 
+            # The Dimona of the employer are for the employees of all its branches
             period.employee_id = self.env['hr.employee'].with_context(active_test=False).search([
                 ('niss', '=', period.content['worker']['ssin']),
-                ('company_id', '=', period.company_id.id),
+                ('company_id', 'child_of', period.company_id.id),
             ], order="active DESC", limit=1)
 
             period.relation_id = self.env['l10n.be.dimona.relation'].search([

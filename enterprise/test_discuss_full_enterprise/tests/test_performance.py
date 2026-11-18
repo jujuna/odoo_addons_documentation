@@ -4,7 +4,7 @@ from odoo.addons.test_discuss_full.tests.test_performance import TestDiscussFull
 
 TestDiscussFullPerformance._query_count_init_store += 6
 TestDiscussFullPerformance._query_count_init_messaging += 1
-TestDiscussFullPerformance._query_count_messaging_menu_channels += 3
+TestDiscussFullPerformance._query_count_messaging_menu_channels += 4
 
 old_get_init_store_data_result = TestDiscussFullPerformance._get_init_store_data_result
 

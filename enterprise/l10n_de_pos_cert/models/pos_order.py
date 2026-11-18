@@ -117,10 +117,12 @@ class PosOrder(models.Model):
         """, [self.id])
         datas = self.env.cr.dictfetchall()
 
+        # Refund lines are stored with a positive subtotal (qty * sign)
+        refund_sign = -1 if self.is_refund else 1
         result = []
         for data in datas:
             vat_export_id = self.env["account.tax"].browse(data["tax_id"]).l10n_de_vat_definition_export_identifier if data["tax_id"] else 5  # no tax -> considered as non taxable
-            result.append(self.session_id._get_vat_details(vat_export_id, data["incl_vat"], data["excl_vat"]))
+            result.append(self.session_id._get_vat_details(vat_export_id, data["incl_vat"] * refund_sign, data["excl_vat"] * refund_sign))
         return result
 
     def refund(self):

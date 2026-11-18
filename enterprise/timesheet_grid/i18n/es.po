@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:49+0000\n"
-"PO-Revision-Date: 2026-10-06 08:33+0000\n"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-11-10 15:32+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/"
 "timesheet_grid/es/>\n"
@@ -35,6 +35,9 @@ msgid ""
 "* Timesheet submission and validation\n"
 "* Activate grid view for timesheets\n"
 msgstr ""
+"\n"
+"* Envío y validación de partes de horas\n"
+"* Active la vista de cuadrícula para partes de horas\n"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -117,7 +120,31 @@ msgstr ""
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "07m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "12m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "1h 21m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "2h 22m"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "42m"
 msgstr ""
 
 #. module: timesheet_grid
@@ -125,7 +152,7 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
 msgid ""
 "<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "
-"\"Metting with the customer.\"</i>"
+"\"Meeting with the customer.\"</i>"
 msgstr ""
 
 #. module: timesheet_grid
@@ -161,6 +188,14 @@ msgid ""
 msgstr ""
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/js/tours/timesheet_grid.js:0
+msgid ""
+"<b>Start your session</b> <br/> <i>A session must be running to log a "
+"timesheet.</i>"
+msgstr ""
+
+#. module: timesheet_grid
 #: model_terms:digest.tip,tip_description:timesheet_grid.digest_tip_timesheet_grid_0
 msgid "<b>Tip: Let the Timesheets Assistant do the hard work</b>"
 msgstr ""
@@ -192,18 +227,18 @@ msgstr ""
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder_user
 msgid ""
 "<t>\n"
-"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
-"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"></t>\n"
+"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"></t>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to log your hours for the following period: <t t-"
 "out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" data-"
-"icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
+"icon=\"east\"></i> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</t>.\n"
 "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged <t "
 "t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != "
 "0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> hours on "
 "the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours % 1 !"
 "= 0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> requested."
-"<br/>\n"
+"<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}};; padding: 8px 16px "
@@ -211,49 +246,22 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Fill in your timesheet</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
 msgstr ""
-"<t>\n"
-"<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
-"<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
-"Hola, <t t-out=\"object.name or ''\">Abigail Peterson</t>:<br/><br/>\n"
-"Este es un recordatorio para que rellene los partes de horas "
-"correspondientes al siguiente período: <t t-out=\"ctx.get('date_start') or "
-"''\">05/05/2021</t> <i class=\"oi\" data-icon=\"east\"/> <t t-"
-"out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.\n"
-"De momento, <t t-if=\"timesheet_hours != 0\">solo</t> ha registrado <t t-"
-"out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != 0\" "
-"t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> horas de las "
-"<t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours % 1 != "
-"0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> h "
-"obligatorias.<br/>\n"
-"<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
-"    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}};; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\">Completar partes de horas</a>\n"
-"</div>\n"
-"<br/>Gracias,<br/>\n"
-"<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
-"</t>\n"
-"            </t>"
 
 #. module: timesheet_grid
 #: model:mail.template,body_html:timesheet_grid.mail_template_timesheet_reminder
 msgid ""
 "<t>\n"
-"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+"Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br><br>\n"
 "This is a friendly reminder to approve your team's timesheets for the "
 "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> - "
-"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+"<t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br>\n"
 "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
 "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
@@ -261,32 +269,13 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\">Validate the Timesheets</a>\n"
 "</div>\n"
-"<br/>Thank you,<br/>\n"
+"<br>Thank you,<br>\n"
 "<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "            </t>"
 msgstr ""
-"<t>\n"
-"Hola, <t t-out=\"object.name or ''\">Abigail Peterson</t>:<br/><br/>\n"
-"Este es un recordatorio para que apruebe los partes de horas de su equipo "
-"correspondientes al siguiente período: <t t-out=\"ctx.get('date_start') or "
-"''\">05/05/2021</t> - <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>."
-"<br/>\n"
-"<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;\">\n"
-"    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\">Validar partes de horas</a>\n"
-"</div>\n"
-"<br/>Gracias,<br/>\n"
-"<t t-if=\"user.signature\">\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
-"</t>\n"
-"            </t>"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -309,7 +298,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Grupos de acceso"
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_aw_rule__active
@@ -338,6 +327,12 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/by_project/by_project.xml:0
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/timeline/timeline.xml:0
 msgid "Add"
+msgstr "Añadir"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/hooks/use_aw_suggestions_draggable.js:0
+msgid "Add %s suggestions"
 msgstr ""
 
 #. module: timesheet_grid
@@ -544,6 +539,12 @@ msgstr ""
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Call Marc"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
 msgid "Captured today"
 msgstr ""
 
@@ -581,6 +582,12 @@ msgstr ""
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Clear search"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Click"
 msgstr ""
 
@@ -610,7 +617,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_res_company
@@ -650,7 +657,7 @@ msgstr "Ajustes de configuración"
 #. module: timesheet_grid
 #: model:ir.ui.menu,name:timesheet_grid.hr_timesheet_enterprise_menu_configuration
 msgid "Configuration"
-msgstr ""
+msgstr "Configuración"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -698,7 +705,7 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #. module: timesheet_grid
 #: model:ir.model,website_form_label:timesheet_grid.model_project_task
@@ -870,7 +877,7 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:timesheet_grid.field_timesheet_grid_mixin__display_name
 #: model:ir.model.fields,field_description:timesheet_grid.field_timesheets_analysis_report__display_name
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -907,7 +914,7 @@ msgstr "Borrador"
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__email
 msgid "Email"
-msgstr ""
+msgstr "Correo electrónico"
 
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_hr_employee
@@ -951,6 +958,12 @@ msgstr ""
 
 #. module: timesheet_grid
 #. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Feature XyZ"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Find the ActivityWatch extension and copy its"
 msgstr ""
@@ -975,7 +988,7 @@ msgstr "Frecuencia"
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
 msgid "General Information"
-msgstr ""
+msgstr "Información general"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1018,7 +1031,7 @@ msgstr "No se puede agrupar por fecha"
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
+msgstr "Enrutamiento HTTP"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1181,7 +1194,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model,name:timesheet_grid.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menú"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_merge_wizard_view_form
@@ -1366,6 +1379,12 @@ msgstr ""
 #. module: timesheet_grid
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "No suggestions match \""
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "No time recorded."
 msgstr ""
 
@@ -1477,7 +1496,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__other
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1500,7 +1519,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__planning
 msgid "Planning"
-msgstr ""
+msgstr "Planificación"
 
 #. module: timesheet_grid
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__presentation
@@ -1548,15 +1567,15 @@ msgid "Public Employee"
 msgstr "Empleado público"
 
 #. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "Pycharm - %(folder)s - %(branch)s"
-msgstr ""
-
-#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_timesheet_merge_wizard__unit_amount
 msgid "Quantity"
 msgstr "Cantidad"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Read Agreement"
+msgstr ""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1603,7 +1622,7 @@ msgstr "Recordatorio para validar los partes de horas de su equipo"
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/by_project/by_project.xml:0
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/timeline/timeline.xml:0
 msgid "Remove"
-msgstr ""
+msgstr "Eliminar"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1648,6 +1667,12 @@ msgid "Restart the Server"
 msgstr ""
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/no_content_animation/no_content_animation.xml:0
+msgid "Review Specification"
+msgstr ""
+
+#. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_res_config_settings__timesheet_rounding
 msgid "Round up"
 msgstr "Redondear"
@@ -1665,6 +1690,12 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/timesheet_inline_form/timesheet_inline_form.xml:0
 #: code:addons/timesheet_grid/static/src/components/timesheet_systray_menu/timesheet_systray.xml:0
 msgid "Save"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Search suggestions..."
 msgstr ""
 
 #. module: timesheet_grid
@@ -1694,7 +1725,7 @@ msgstr "Secuencia"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Server"
-msgstr ""
+msgstr "Servidor"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1779,7 +1810,7 @@ msgstr ""
 #: code:addons/timesheet_grid/models/account_analytic_line.py:0
 #: model:ir.model.fields.selection,name:timesheet_grid.selection__aw_rule__type__spreadsheet
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Hoja de cálculo"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1833,7 +1864,7 @@ msgstr "Plantilla"
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Test Connection"
-msgstr ""
+msgstr "Probar conexión"
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -1929,6 +1960,9 @@ msgid ""
 "Example pattern: Meet - (.*)\\|https://meet.google.com captures each Google "
 "Meet meeting.\n"
 "\n"
+"For code editors, the pattern is matched against \"<repository>|<branch>\", "
+"e.g. odoo-dev/enterprise|master-1234-dev.\n"
+"\n"
 "Tip: The parts in parentheses (…) are captured automatically and can be used "
 "in the Template or in the Description.\n"
 "\n"
@@ -1971,6 +2005,18 @@ msgstr "Redondeo del tiempo"
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.timesheet_view_grid_by_project
 msgid "Time Spent"
 msgstr "Tiempo dedicado"
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time added"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Time removed"
+msgstr ""
 
 #. module: timesheet_grid
 #: model:ir.model.fields,field_description:timesheet_grid.field_hr_employee_public__timesheet_manager_id
@@ -2149,7 +2195,7 @@ msgstr ""
 #. module: timesheet_grid
 #: model:ir.module.module,summary:base.module_timesheet_grid
 msgid "Track employee time on tasks"
-msgstr ""
+msgstr "Seguimiento del tiempo de empleados en las tareas"
 
 #. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.aw_rule_form
@@ -2201,6 +2247,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "Under"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.js:0
+msgid "Undo"
 msgstr ""
 
 #. module: timesheet_grid
@@ -2274,12 +2326,6 @@ msgid "User responsible of timesheet validation. Should be Timesheet Manager."
 msgstr ""
 "Usuario responsable de la validación del parte de horas. Debería ser un "
 "gerente de partes de horas."
-
-#. module: timesheet_grid
-#. odoo-javascript
-#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet_model.js:0
-msgid "VS Code - %(folder)s"
-msgstr ""
 
 #. module: timesheet_grid
 #. odoo-javascript
@@ -2616,6 +2662,18 @@ msgid "below to open the ActivityWatch website."
 msgstr ""
 
 #. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info py-3"
+msgstr ""
+
+#. module: timesheet_grid
+#. odoo-javascript
+#: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "border border-info rounded py-3"
+msgstr ""
+
+#. module: timesheet_grid
 #: model_terms:ir.ui.view,arch_db:timesheet_grid.res_config_settings_view_form
 msgid "days"
 msgstr "días"
@@ -2748,6 +2806,107 @@ msgstr ""
 #: code:addons/timesheet_grid/static/src/components/aw_timesheet/aw_timesheet.xml:0
 msgid "website."
 msgstr ""
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to log your hours for the following period: "
+#~ "<t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> <i class=\"oi\" "
+#~ "data-icon=\"east\"/> <t t-out=\"ctx.get('date_stop') or ''\">05/06/2021</"
+#~ "t>.\n"
+#~ "For the time being, you <t t-if=\"timesheet_hours != 0\">only</t> logged "
+#~ "<t t-out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % "
+#~ "1 != 0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> "
+#~ "hours on the <t t-out=\"'%d' %int(working_hours)\">8</t><t t-"
+#~ "if=\"working_hours % 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 "
+#~ "* 60))\">:30</t> requested.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Fill in your timesheet</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"timesheet_hours\" t-value=\"ctx.get('timesheet_hours', 0)\"/>\n"
+#~ "<t t-set=\"working_hours\" t-value=\"ctx.get('working_hours', 0)\"/>\n"
+#~ "Hola, <t t-out=\"object.name or ''\">Abigail Peterson</t>:<br/><br/>\n"
+#~ "Este es un recordatorio para que rellene los partes de horas "
+#~ "correspondientes al siguiente período: <t t-out=\"ctx.get('date_start') "
+#~ "or ''\">05/05/2021</t> <i class=\"oi\" data-icon=\"east\"/> <t t-"
+#~ "out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.\n"
+#~ "De momento, <t t-if=\"timesheet_hours != 0\">solo</t> ha registrado <t t-"
+#~ "out=\"'%d' %int(timesheet_hours)\">2</t><t t-if=\"timesheet_hours % 1 != "
+#~ "0\" t-out=\"':%02d' % (round(timesheet_hours % 1 * 60))\">:30</t> horas "
+#~ "de las <t t-out=\"'%d' %int(working_hours)\">8</t><t t-if=\"working_hours "
+#~ "% 1 != 0\" t-out=\"':%02d' % (round(working_hours % 1 * 60))\">:30</t> h "
+#~ "obligatorias.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}};; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Completar partes de horas</a>\n"
+#~ "</div>\n"
+#~ "<br/>Gracias,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "Hello <t t-out=\"object.name or ''\">Abigail Peterson</t>,<br/><br/>\n"
+#~ "This is a friendly reminder to approve your team's timesheets for the "
+#~ "following period: <t t-out=\"ctx.get('date_start') or ''\">05/05/2021</t> "
+#~ "- <t t-out=\"ctx.get('date_stop') or ''\">06/05/2021</t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Validate the Timesheets</a>\n"
+#~ "</div>\n"
+#~ "<br/>Thank you,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "Hola, <t t-out=\"object.name or ''\">Abigail Peterson</t>:<br/><br/>\n"
+#~ "Este es un recordatorio para que apruebe los partes de horas de su equipo "
+#~ "correspondientes al siguiente período: <t t-out=\"ctx.get('date_start') "
+#~ "or ''\">05/05/2021</t> - <t t-out=\"ctx.get('date_stop') or "
+#~ "''\">06/05/2021</t>.<br/>\n"
+#~ "<div t-if=\"ctx.get('action_url')\" style=\"margin: 16px 0px 16px 0px;"
+#~ "\">\n"
+#~ "    <a t-att-href=\"ctx.get('action_url')\" t-attf-style=\"background-"
+#~ "color: {{object.company_id.email_secondary_color or '#875A7B'}}; padding: "
+#~ "8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
+#~ "5px; font-size: 13px;\">Validar partes de horas</a>\n"
+#~ "</div>\n"
+#~ "<br/>Gracias,<br/>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "            </t>"
 
 #~ msgid "My Department"
 #~ msgstr "Mi departamento"

@@ -19,20 +19,30 @@
             <field name="evaluation_type">salary_rule</field>
             <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_ip_deduction')])]"/>
         </record>
+        <record id="l10n_be_281_mapping_273s_ip_onss" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">273s_ip_onss</field>
+            <field name="declaration_code">273S</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_ip_part_onss')])]"/>
+        </record>
         <record id="l10n_be_281_mapping_274_18_taxable" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
             <field name="tag">274_18_taxable</field>
             <field name="declaration_code">274.18</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue')])]"/>
+            <!-- The amounts of the category of the nature, added up per payslip by the 274 -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = sum(nature_values['TAXABLE_18'][p.id] for p in payslips)</field>
         </record>
         <record id="l10n_be_281_mapping_274_18_withholding" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
             <field name="tag">274_18_withholding</field>
             <field name="declaration_code">274.18</field>
+            <!-- The amounts of the category of the nature, added up per payslip by the 274 -->
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = -mapped_total['REPLACEMENT_REVENUE.P.P']</field>
+            <field name="evaluation_value">result = -sum(nature_values['WITHHOLDING_TAX_274_18'][p.id] for p in payslips)</field>
         </record>
 
         <!-- ==================================== -->
@@ -40,24 +50,30 @@
         <!-- ==================================== -->
         <record id="l10n_be_281_mapping_274_10_taxable" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- The presence tokens of the employees are out of the withholding tax base, as the pay of the days of
+                 the Horeca occasional workers taxed at the flat rate (its own base, declared in box 10a of the
+                 281.10). The private
+                 car commuting allowance is in the withholding tax base, but declared apart from the remunerations
+                 (box 14 of the 281.10): it is not part of the taxable amount, as the social secretariats declare it -->
             <field name="tag">274_10_taxable</field>
             <field name="declaration_code">274.10</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
-result = sum(taxable_values[p.id] for p in payslips)
+result = sum(taxable_values[p.id] + nature_values['OCCASIONAL_WITHHOLDING_BASE'][p.id] for p in payslips) \
+    + mapped_total['PRESENCE_TOKEN'] - mapped_total['CAR.PRIV']
             </field>
         </record>
         <record id="l10n_be_281_mapping_274_10_withholding" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">274_10_withholding</field>
             <field name="declaration_code">274.10</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
-                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
-            ])]"/>
+            <!-- The amounts of the categories of the natures, added up per payslip by the 274. The withholding taxes of
+                 the presence tokens (274.30 category) of the employees and directors declared here are included. -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = -sum(nature_values['WITHHOLDING_TAX_274_10_20'][p.id] + nature_values['WITHHOLDING_TAX_274_30'][p.id] for p in payslips)
+            </field>
         </record>
 
         <!-- ==================================== -->
@@ -65,24 +81,26 @@ result = sum(taxable_values[p.id] for p in payslips)
         <!-- ==================================== -->
         <record id="l10n_be_281_mapping_274_20_taxable" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- The presence tokens of the directors are director remunerations, out of the withholding tax base. The
+                 private car commuting allowance is not part of the taxable amount, as on the 274.10 -->
             <field name="tag">274_20_taxable</field>
             <field name="declaration_code">274.20</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
-result = sum(taxable_values[p.id] for p in payslips)
+result = sum(taxable_values[p.id] for p in payslips) + mapped_total['PRESENCE_TOKEN'] - mapped_total['CAR.PRIV']
             </field>
         </record>
         <record id="l10n_be_281_mapping_274_20_withholding" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">274_20_withholding</field>
             <field name="declaration_code">274.20</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
-                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
-            ])]"/>
+            <!-- The amounts of the categories of the natures, added up per payslip by the 274. The withholding taxes of
+                 the presence tokens (274.30 category) of the employees and directors declared here are included. -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = -sum(nature_values['WITHHOLDING_TAX_274_10_20'][p.id] + nature_values['WITHHOLDING_TAX_274_30'][p.id] for p in payslips)
+            </field>
         </record>
 
         <!-- ======================================================= -->
@@ -110,7 +128,9 @@ result = sum(taxable_values[p.id] for p in payslips)
             <field name="tag">f10_2036_inwonersdeenfr</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <!-- 1: French cross-border worker. The seasonal ones (2) and the days out of the border zone (2090) are not
+                 known: to be completed manually. -->
+            <field name="evaluation_value">result = 1 if mapped_total['cross_border'] else 0</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2037" model="l10n.be.281.mapping">
@@ -197,9 +217,7 @@ result = mapped_total['departure_date']
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
             <field name="evaluation_value">
-result = mapped_total['total_gross'] + mapped_total['cct90_payslip_exemption'] - mapped_total['cct90_exempted'] \
-    - mapped_total['termination_gross'] - mapped_total['arrear_gross'] - mapped_total['warrant_gross'] - mapped_total['holiday_gross'] \
-    - mapped_total['atn_total'] - mapped_total['private_transport_reimbursement']
+result = mapped_total['ordinary_remuneration']
             </field>
         </record>
 
@@ -209,7 +227,7 @@ result = mapped_total['total_gross'] + mapped_total['cct90_payslip_exemption'] -
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount_300']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2063" model="l10n.be.281.mapping">
@@ -258,7 +276,8 @@ result = mapped_total['termination_gross']
             <field name="tag">f10_2067_rechtvermindering66_81</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_base_6681']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2068" model="l10n.be.281.mapping">
@@ -320,7 +339,7 @@ result = -mapped_total['M.ONSS']
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
             <field name="evaluation_value">
-result = max(sum(mapped_total[atn_code] for atn_code in atn_mapping) - mapped_total.get('company_car_exemption', 0), 0)
+result = mapped_total['benefits_in_kind']
             </field>
         </record>
 
@@ -336,7 +355,9 @@ result = max(sum(mapped_total[atn_code] for atn_code in atn_mapping) - mapped_to
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2079" model="l10n.be.281.mapping">
+            <!-- The overtime of the relaunch worked in 2023 can be declared until the income of 2025 (carry over of 2 years) -->
             <field name="date_from">2020-01-01</field>
+            <field name="date_to">2025-12-31</field>
             <field name="tag">f10_2079_covidovertimeremuneration2023</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -452,7 +473,9 @@ result = mapped_total['other_transport_mean']
             <field name="tag">f10_2095_aantaluren</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <!-- hours with 2 decimals, as the other hours of box 18 -->
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_hours_6681']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2096" model="l10n.be.281.mapping">
@@ -469,7 +492,7 @@ result = mapped_total['other_transport_mean']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['overtime_hours'] + mapped_total['overtime_hours_360']</field>
+            <field name="evaluation_value">result = mapped_total['overtime_rate_hours']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2098" model="l10n.be.281.mapping">
@@ -481,15 +504,23 @@ result = mapped_total['other_transport_mean']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2099" model="l10n.be.281.mapping">
+            <!-- The nature of the benefits in kind declared in 6b: nothing without benefits in kind, the company car
+                 only for its part above the commuting exemption declared in 14c, nothing for the benefits in kind of the
+                 arrears declared in 7b -->
             <field name="date_from">2020-01-01</field>
             <field name="tag">f10_2099_aard</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
 result = ''
-for atn_code, report_code in atn_mapping.items():
-    if mapped_total.get(atn_code, 0) and report_code not in result:
-        result += report_code
+if round(mapped_total['benefits_in_kind'], 2):
+    for atn_code, report_code in atn_mapping.items():
+        amount = mapped_total['atn_amounts'][atn_code]
+        if report_code == 'F':
+            amount = mapped_total['atn_amounts']['ATN.CAR'] + mapped_total['atn_amounts']['ATNCARREGUL'] - mapped_total['company_car_exemption']
+        if round(amount, 2) > 0 and report_code not in result:
+            result += report_code
+    result = result or 'Z'
             </field>
         </record>
 
@@ -542,7 +573,7 @@ result = '00,00' if round(mapped_total['warrant_gross'], 2) else ''
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount_300']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2113" model="l10n.be.281.mapping">
@@ -659,7 +690,8 @@ result = '00,00' if round(mapped_total['warrant_gross'], 2) else ''
             <field name="tag">f10_2127_nonrecurrentadvantagesoutdated</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['cct90_arrear_exempted']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2128" model="l10n.be.281.mapping">
@@ -687,31 +719,32 @@ result = '00,00' if round(mapped_total['warrant_gross'], 2) else ''
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2131" model="l10n.be.281.mapping">
-            <!-- The replacement revenues, the economic unemployment complements and the presence tokens are declared with their withholding taxes on the 281.18, 281.13 and 281.30.
+            <!-- The replacement revenues and the economic unemployment complements are declared with their withholding taxes on the 281.18 and 281.13.
+                 The presence tokens of the employees flagged for the 281.30 are declared there, the other ones here.
                  The tax on the profit sharing bonus is a withholding tax on movable income, declared on the 273S. -->
             <field name="date_from">2020-01-01</field>
             <field name="tag">f10_2131_bedrijfsvoorheffingvanwerkgever</field>
             <field name="declaration_code">281.10</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
-                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_low_PP'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_high_PP'),
-            ])]"/>
+            <!-- PPTOTAL is the total of the withholding taxes before the fiscal voluntarism, the ones of the presence
+                 tokens included; the other rules are negative lines -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['PPTOTAL'] + mapped_total['REPLACEMENT_REVENUE.P.P'] + mapped_total['ECONOMIC_UNEMPLOYMENT.P.P'] \
+    + mapped_total['PROFITSHARINGLOW.PP'] + mapped_total['PROFITSHARINGHIGH.PP'] \
+    - mapped_total['FISC_VOL_10'] - mapped_total['FISC_VOL_20'] - mapped_total['FISC_VOL_30']
+            </field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2132" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">f10_2132_horeca</field>
             <field name="declaration_code">281.10</field>
-            <field name="evaluation_type">salary_rule</field>
+            <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_taxable'),
-            ])]"/>
+            <field name="salary_rule_ids" eval="[(5, 0, 0)]"/>
+            <!-- the pay of the days taxed at the flat rate and the holiday pay for these days -->
+            <field name="evaluation_value">result = mapped_total['HORECA_OCC_TAXABLE'] + mapped_total['horeca_occasional_holiday_pay']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2133" model="l10n.be.281.mapping">
@@ -751,7 +784,9 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2138" model="l10n.be.281.mapping">
+            <!-- The overtime of the relaunch worked in 2023 can be declared until the income of 2025 (carry over of 2 years) -->
             <field name="date_from">2020-01-01</field>
+            <field name="date_to">2025-12-31</field>
             <field name="tag">f10_2138_covidovertimehours2023</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -775,7 +810,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount'] if mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount_360']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2165" model="l10n.be.281.mapping">
@@ -784,7 +819,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount'] if mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount_360']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2166" model="l10n.be.281.mapping">
@@ -793,7 +828,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['flexi_exemption'] if mapped_total['is_flexi_pensioner'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['flexi_exemption_pensioner']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2167" model="l10n.be.281.mapping">
@@ -802,7 +837,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours_300']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2168" model="l10n.be.281.mapping">
@@ -811,7 +846,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours_300']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2169" model="l10n.be.281.mapping">
@@ -820,7 +855,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours'] if mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours_360']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2170" model="l10n.be.281.mapping">
@@ -829,7 +864,7 @@ result = mapped_total['mobility_budget']
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours'] if mapped_total['horeca_white_cash_register'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours_360']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2176" model="l10n.be.281.mapping">
@@ -958,7 +993,7 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2195" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2195_relanceovertimeremuneration</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -967,7 +1002,7 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2196" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2196_relanceovertimehours</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -976,12 +1011,12 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2198" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2198_flexijobnotpension</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['flexi_exemption'] if not mapped_total['is_flexi_pensioner'] else 0</field>
+            <field name="evaluation_value">result = mapped_total['flexi_exemption'] - mapped_total['flexi_exemption_pensioner']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2200" model="l10n.be.281.mapping">
@@ -1041,26 +1076,26 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2207" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2207_travelbicycleorspeedpedelec</field>
             <field name="declaration_code">281.10</field>
-            <field name="evaluation_type">salary_rule</field>
+            <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation')
-            ])]"/>
+            <field name="salary_rule_ids" eval="[(5, 0, 0)]"/>
+            <field name="evaluation_value">result = mapped_total['CYCLE'] + mapped_total['commute_bike_allowance']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2208" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2208_benefitprovisionbicycleorspeedpedelec</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['BIKE_BENEFIT']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2209" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2209_overtimehours</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -1068,7 +1103,7 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2210" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f10_2210_workbonus5254</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">salary_rule</field>
@@ -1079,17 +1114,19 @@ result = mapped_total['mobility_budget']
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2226" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <!-- The kilometers of the bike reimbursement (box 14d): the bike part of the commute, back and forth, and the
+                 kilometers of the lump sum bike commute allowance -->
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f10_2226_kmzone2207</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
-result = int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_home_work * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total']))
+result = int(round(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.bike_transport_employee_kilometer * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total']) + mapped_total['commute_bike_kilometers']))
             </field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2227" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f10_2227_relanceovertimeremuneration2025</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -1098,7 +1135,7 @@ result = int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_ho
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2228" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f10_2228_relanceovertimehours2025</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
@@ -1108,13 +1145,13 @@ result = int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_ho
 
         <record id="l10n_be_281_mapping_281_10_2257" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- The personal contributions of the employee to the group insurance, his own (not the total of the
+                 company) -->
             <field name="tag">f10_2257_employeecontribution</field>
             <field name="declaration_code">281.10</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">
-result = mapped_total['total_employee_contribution']
-            </field>
+            <field name="evaluation_value">result = mapped_total['GI.EMP.CONT']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_10_2062" model="l10n.be.281.mapping">
@@ -1233,7 +1270,11 @@ result = mapped_total['total_employee_contribution']
             <field name="tag">f20_2055_datumvanindienstt</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <!-- Box 2: only for a director under an employment contract (avis aux debiteurs 281.20), the entry date if
+                 the director started during the year, as the departure date of 2056 -->
+            <field name="evaluation_value">
+result = mapped_total['entry_date'] if mapped_total.get('director_under_employment_contract') else ''
+            </field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2056" model="l10n.be.281.mapping">
@@ -1242,7 +1283,7 @@ result = mapped_total['total_employee_contribution']
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
-result = mapped_total['departure_date']
+result = mapped_total['departure_date'] if mapped_total.get('director_under_employment_contract') else ''
             </field>
         </record>
 
@@ -1253,7 +1294,7 @@ result = mapped_total['departure_date']
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['GROSS'] - sum(mapped_total[atn_code] for atn_code in atn_mapping) - mapped_total['ATN_RENT']</field>
+            <field name="evaluation_value">result = mapped_total['periodic_remuneration']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2061" model="l10n.be.281.mapping">
@@ -1266,29 +1307,32 @@ result = mapped_total['departure_date']
 
         <record id="l10n_be_281_mapping_281_20_2062" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- The presence tokens are non periodic remunerations of the director -->
             <field name="tag">f20_2062_anderebezoldiginge</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">salary_rule</field>
+            <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_employee_yearly_salary_gross_salary_rule')])]"
-            />
+            <field name="salary_rule_ids" eval="[(5, 0, 0)]"/>
+            <field name="evaluation_value">result = mapped_total['other_remuneration']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2064" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- Box 8a (code 402): the early holiday pay of a director under an employment contract -->
             <field name="tag">f20_2064_vervroegdvakantieg</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['early_holiday_pay']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2065" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2065_opzeggingsreclasseringsverg</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_termination_fees_gross')])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2067" model="l10n.be.281.mapping">
@@ -1296,7 +1340,9 @@ result = mapped_total['departure_date']
             <field name="tag">f20_2067_bijzonderbijdrage</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <!-- Code 409: the special social security contribution of a director under an employment contract -->
+            <field name="evaluation_value">result = -mapped_total['M.ONSS']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2068" model="l10n.be.281.mapping">
@@ -1314,8 +1360,11 @@ result = sum(mapped_total[atn_code] for atn_code in atn_mapping)
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2069_compensationamountwithoutstandards</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_representation_fees_volatile'),
+            ])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2071" model="l10n.be.281.mapping">
@@ -1355,9 +1404,8 @@ result = sum(mapped_total[atn_code] for atn_code in atn_mapping)
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">
-result = sum(all_line_values['BONUS_GROSS'][p.id]['total'] for p in payslips if p.struct_id.code == 'BECCT90')
-            </field>
+            <!-- Up to the yearly limit, the excess is declared in box 6b (2062) -->
+            <field name="evaluation_value">result = mapped_total['cct90_exempted']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2078" model="l10n.be.281.mapping">
@@ -1392,7 +1440,9 @@ result = sum(all_line_values['WARRANT_GROSS'][p.id]['total'] for p in payslips i
             <field name="tag">f20_2081_bezoldigingen</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <!-- Code 411: the remunerations of codes 400 and 401 of a director under an employment contract -->
+            <field name="evaluation_value">result = mapped_total['director_contract_remuneration']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2082" model="l10n.be.281.mapping">
@@ -1407,24 +1457,34 @@ result = sum(all_line_values['WARRANT_GROSS'][p.id]['total'] for p in payslips i
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2083_bonus</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <!-- Code 419: the work bonus of a director under an employment contract, as on the 281.10 (2115) -->
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_employment_bonus_volet_A')
+            ])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2084" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2084_bonus5254</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <!-- Code 430: the work bonus of a director under an employment contract, as on the 281.10 (2210) -->
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_employment_bonus_volet_B')
+            ])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2087" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2087_code420</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <!-- Code 420: the bicycle allowances of code 432 of a director under an employment contract -->
+            <field name="evaluation_value">result = mapped_total['director_contract_bicycle']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2088" model="l10n.be.281.mapping">
@@ -1525,13 +1585,17 @@ for atn_code, report_code in atn_mapping.items():
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2131_bedrijfsvoorheffingvanwerkgever</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
-                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
-                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
-            ])]"/>
+            <!-- All the withholding taxes of the remunerations, the ones of the presence tokens of the directors
+                 included, without the ones of the replacement revenues, of the economic unemployment and of the profit
+                 sharing bonus, declared on their own forms. PPTOTAL is the total of the withholding taxes before the
+                 fiscal voluntarism, the other rules are negative lines -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['PPTOTAL'] + mapped_total['REPLACEMENT_REVENUE.P.P'] + mapped_total['ECONOMIC_UNEMPLOYMENT.P.P'] \
+    + mapped_total['PROFITSHARINGLOW.PP'] + mapped_total['PROFITSHARINGHIGH.PP'] \
+    - mapped_total['FISC_VOL_10'] - mapped_total['FISC_VOL_20'] - mapped_total['FISC_VOL_30']
+            </field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2133" model="l10n.be.281.mapping">
@@ -1547,7 +1611,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="tag">f20_2134_totaalbedragmobiliteitsbudget</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['mobility_budget']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2138" model="l10n.be.281.mapping">
@@ -1623,7 +1688,7 @@ for atn_code, report_code in atn_mapping.items():
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2195" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2195_relanceovertimeremuneration</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
@@ -1631,7 +1696,7 @@ for atn_code, report_code in atn_mapping.items():
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2196" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2196_relanceovertimehours</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
@@ -1639,19 +1704,28 @@ for atn_code, report_code in atn_mapping.items():
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2200" model="l10n.be.281.mapping">
+            <!-- Box 19 a): the expenses of the company reimbursed to the director, as on the 281.10 -->
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2200_compensationwithstandards</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_representation_fees'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_homeworking_fees'),
+            ])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2201" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">f20_2201_compensationwithdocuments</field>
             <field name="declaration_code">281.20</field>
-            <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_expense_reimbursement_manual'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_expense_refund'),
+            ])]"/>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2202" model="l10n.be.281.mapping">
@@ -1695,7 +1769,7 @@ for atn_code, report_code in atn_mapping.items():
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2207" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2207_travelbicycleorspeedpedelec</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">salary_rule</field>
@@ -1706,25 +1780,27 @@ for atn_code, report_code in atn_mapping.items():
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2208" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2208_benefitprovisionbicycleorspeedpedelec</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['BIKE_BENEFIT']</field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2226" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <!-- The kilometers of the bike reimbursement (box 19 c)): the bike part of the commute, back and forth -->
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f20_2226_kmzone2207</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">
-result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_home_work * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total'])))
+result = str(int(round(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.bike_transport_employee_kilometer * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total']))))
             </field>
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2227" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f20_2227_relanceovertimeremuneration2025</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
@@ -1732,7 +1808,7 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2228" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2025-01-01</field>
             <field name="tag">f20_2228_relanceovertimehours2025</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">python</field>
@@ -1766,7 +1842,7 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
         </record>
 
         <record id="l10n_be_281_mapping_281_20_2209" model="l10n.be.281.mapping">
-            <field name="date_from">2020-01-01</field>
+            <field name="date_from">2024-01-01</field>
             <field name="tag">f20_2209_totalcontributiontravelexpenses</field>
             <field name="declaration_code">281.20</field>
             <field name="evaluation_type">control</field>
@@ -1827,16 +1903,25 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
             <field name="date_from">2020-01-01</field>
             <field name="tag">274_30_taxable</field>
             <field name="declaration_code">274.30</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.l10n_be_presence_token_salary_rule')])]"/>
+            <!-- The presence tokens and the taxable salary of the beneficiaries of a 281.30 (box 2064), added up per
+                 payslip by the 274 -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = sum(nature_values['TAXABLE_30'][p.id] + taxable_values[p.id] for p in payslips)
+            </field>
         </record>
         <record id="l10n_be_281_mapping_274_30_withholding" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">274_30_withholding</field>
             <field name="declaration_code">274.30</field>
-            <field name="evaluation_type">salary_rule</field>
-            <!-- All the withholding taxes of the employee, as on the 281.30 (box 2063): the 274.10 leaves them out -->
-            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')])]"/>
+            <!-- The withholding taxes of the presence tokens and of the salary of the beneficiaries of a 281.30, as on
+                 the 281.30 (box 2063), added up per payslip by the 274 -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = -sum(nature_values['WITHHOLDING_TAX_274_10_20'][p.id] + nature_values['WITHHOLDING_TAX_274_30'][p.id] for p in payslips)
+            </field>
         </record>
 
         <!-- ==================================== -->
@@ -1885,19 +1970,23 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
             <field name="date_from">2020-01-01</field>
             <field name="tag">f30_2063_bedrijfsvoorheffing</field>
             <field name="declaration_code">281.30</field>
-            <field name="evaluation_type">salary_rule</field>
+            <!-- The withholding taxes of the employee, but those of the replacement revenues, of the economic unemployment and of the profit sharing bonus, declared on the 281.18, 281.13 and 273S. PPTOTAL is the total of the withholding taxes before the fiscal voluntarism, the other rules are negative lines -->
+            <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')
-            ])]"/>
+            <field name="evaluation_value">
+result = mapped_total['PPTOTAL'] + mapped_total['REPLACEMENT_REVENUE.P.P'] + mapped_total['ECONOMIC_UNEMPLOYMENT.P.P'] \
+    + mapped_total['PROFITSHARINGLOW.PP'] + mapped_total['PROFITSHARINGHIGH.PP'] - mapped_total['FISC_VOL_30']
+            </field>
         </record>
         <record id="l10n_be_281_mapping_281_30_2064" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">f30_2064_presentiegelden</field>
             <field name="declaration_code">281.30</field>
+            <!-- The presence tokens with the whole taxable remuneration (benefits in kind included) and the reimbursed
+                 expenses of the beneficiary, by the residence of the version of each payslip -->
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['PRESENCE_TOKEN'] if employee.l10n_be_resident_situation == 'resident' else 0</field>
+            <field name="evaluation_value">result = mapped_total['resident_income']</field>
         </record>
         <record id="l10n_be_281_mapping_281_30_2065" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
@@ -2031,9 +2120,11 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
             <field name="date_from">2020-01-01</field>
             <field name="tag">f30_2081_retributies</field>
             <field name="declaration_code">281.30</field>
+            <!-- The presence tokens with the whole taxable remuneration (benefits in kind included) and the reimbursed
+                 expenses of the beneficiary, by the residence of the version of each payslip -->
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['PRESENCE_TOKEN'] if employee.l10n_be_resident_situation != 'resident' else 0</field>
+            <field name="evaluation_value">result = mapped_total['non_resident_income']</field>
         </record>
         <record id="l10n_be_281_mapping_281_30_2082" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
@@ -2069,13 +2160,12 @@ result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.k
         </record>
         <record id="l10n_be_281_mapping_281_30_2086" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
+            <!-- Box 9: the reimbursed expenses included in the taxable income (boxes 6a / 7f) -->
             <field name="tag">f30_2086_bedrag</field>
             <field name="declaration_code">281.30</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">
-result = sum(mapped_total[code] for code in atn_mapping)
-            </field>
+            <field name="evaluation_value">result = mapped_total['reimbursed_expenses']</field>
         </record>
         <record id="l10n_be_281_mapping_281_30_2087" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
@@ -2128,12 +2218,7 @@ result = sum(mapped_total[code] for code in atn_mapping)
             <field name="tag">f30_2099_aard</field>
             <field name="declaration_code">281.30</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">
-result = ''
-for atn_code, report_code in atn_mapping.items():
-    if mapped_total[atn_code] and report_code not in result:
-        result += report_code
-            </field>
+            <field name="evaluation_value">result = mapped_total['reimbursed_expenses_nature']</field>
         </record>
         <record id="l10n_be_281_mapping_281_30_2109" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
@@ -2329,7 +2414,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="tag">f18_2035_verantwoordingsstukken</field>
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <!-- 1: the indemnities are exempted of withholding tax by a tax treaty (cross-border workers) -->
+            <field name="evaluation_value">result = 1 if any(payslip.version_id.no_withholding_taxes for payslip in payslips) else 0</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2060" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2364,19 +2450,26 @@ for atn_code, report_code in atn_mapping.items():
             <field name="evaluation_value">result = 0</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2064" model="l10n.be.281.mapping">
+            <!-- The arrears are declared in 2067 (code 272), the complements of a work accident in 2065 (code 270) -->
             <field name="date_from">1990-01-01</field>
             <field name="tag">f18_2064_ziekteofinvaliditeit</field>
             <field name="declaration_code">281.18</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue')])]"/>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['REPLACEMENT_REVENUE'] - mapped_total['arrears']['REPLACEMENT_REVENUE'] \
+    - (mapped_total['WORK_ACCIDENT_COMPLEMENT'] - mapped_total['arrears']['WORK_ACCIDENT_COMPLEMENT'])
+            </field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2065" model="l10n.be.281.mapping">
+            <!-- The extra-legal complements from the 31st day of a work accident or an occupational disease. The
+                 guaranteed salary of the days 8 to 30 is declared on the 281.10 -->
             <field name="date_from">1990-01-01</field>
             <field name="tag">f18_2065_beroepsziekte</field>
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['WORK_ACCIDENT_COMPLEMENT'] - mapped_total['arrears']['WORK_ACCIDENT_COMPLEMENT']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2066" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2392,7 +2485,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['arrears']['REPLACEMENT_REVENUE']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2068" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2400,7 +2493,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['transferred_281_10']['group_insurance']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2069" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2408,7 +2501,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['transferred_281_10']['individual_continuation']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2070" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2416,7 +2509,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = -mapped_total['REPLACEMENT_REVENUE.P.P']</field>
+            <field name="evaluation_value">result = -mapped_total['REPLACEMENT_REVENUE.P.P'] - mapped_total['FISC_VOL_18']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2071" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2424,7 +2517,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['transferred_281_10']['special_contribution']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2072" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2505,13 +2598,20 @@ for atn_code, report_code in atn_mapping.items():
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
             <field name="evaluation_value">result = 0</field>
+            <!-- Belcotax only accepts 598.81 in this zone, the zone is left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_18_2090" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
             <field name="tag">f18_2090_dagen</field>
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = round(sum(worked_days[code] for code in ('082.00', '072.00', '072.01')))</field>
+            <!-- The days of the year: not the ones of the arrears. A half day is rounded up.
+                 The days are the working days of the work entries paid with the indemnities of zone 2064 (082.00,
+                 072.00, 072.01), not the calendar days the "avis aux débiteurs" counts from the 8th (31st) calendar
+                 day of incapacity: a choice kept on purpose, the days and the amount come from the same work entries
+                 and the calendar days of an incapacity are not known from the payslips. -->
+            <field name="evaluation_value">result = int(float_round(sum(wd.number_of_days for wd in payslips.worked_days_line_ids if wd.code in ('082.00', '072.00', '072.01') and not wd.payslip_id.l10n_be_arrear_salary), precision_digits=0, rounding_method='HALF-UP'))</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2091" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2526,6 +2626,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_18_2103" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2533,6 +2635,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_18_2109" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2540,6 +2644,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_18_2128" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2547,7 +2653,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.18</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = 0</field>
+            <field name="evaluation_value">result = mapped_total['transferred_281_10']['free_pension']</field>
         </record>
         <record id="l10n_be_281_mapping_281_18_2059" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2587,20 +2693,19 @@ for atn_code, report_code in atn_mapping.items():
             <field name="date_from">1990-01-01</field>
             <field name="tag">274_13_taxable</field>
             <field name="declaration_code">274.13</field>
-            <field name="evaluation_type">salary_rule</field>
-            <field name="salary_rule_ids" eval="[(6, 0, [
-                ref('l10n_be_hr_payroll.l10n_be_economic_unemployment_compensation'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_compensation'),
-                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_bonus'),
-            ])]"/>
+            <!-- The amounts of the category of the nature, added up per payslip by the 274 -->
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = sum(nature_values['TAXABLE_13'][p.id] for p in payslips)</field>
         </record>
         <record id="l10n_be_281_mapping_274_13_withholding" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
             <field name="tag">274_13_withholding</field>
             <field name="declaration_code">274.13</field>
+            <!-- The amounts of the category of the nature, added up per payslip by the 274 -->
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = -mapped_total['ECONOMIC_UNEMPLOYMENT.P.P']</field>
+            <field name="evaluation_value">result = -sum(nature_values['WITHHOLDING_TAX_274_13'][p.id] for p in payslips)</field>
         </record>
 
         <!-- ==================================== -->
@@ -2618,7 +2723,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="tag">f13_2035_verantwoordingsstukken</field>
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = 0</field>
+            <!-- 1: the complements are exempted of withholding tax by a tax treaty (cross-border workers) -->
+            <field name="evaluation_value">result = 1 if any(payslip.version_id.no_withholding_taxes for payslip in payslips) else 0</field>
         </record>
         <record id="l10n_be_281_mapping_281_13_2060" model="l10n.be.281.mapping">
             <!-- Box 10: the complements, the arrears are declared in box 11 -->
@@ -2627,7 +2733,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = sum(mapped_total[code] - mapped_total['arrears'][code] for code in ('EUC', 'EUC_CP200', 'EUB'))</field>
+            <field name="evaluation_value">result = mapped_total['taxable_13'] - mapped_total['arrears']['taxable_13']</field>
         </record>
         <record id="l10n_be_281_mapping_281_13_2061" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2660,7 +2766,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = sum(mapped_total['arrears'][code] for code in ('EUC', 'EUC_CP200', 'EUB'))</field>
+            <field name="evaluation_value">result = mapped_total['arrears']['taxable_13']</field>
         </record>
         <record id="l10n_be_281_mapping_281_13_2067" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2734,7 +2840,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = -mapped_total['ECONOMIC_UNEMPLOYMENT.P.P']</field>
+            <field name="evaluation_value">result = -mapped_total['ECONOMIC_UNEMPLOYMENT.P.P'] - mapped_total['FISC_VOL_13']</field>
         </record>
         <record id="l10n_be_281_mapping_281_13_2079" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2785,7 +2891,7 @@ for atn_code, report_code in atn_mapping.items():
             <field name="tag">f13_2089_werkloosheidzonder</field>
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
-            <field name="evaluation_value">result = round(sum(wd.number_of_days for wd in payslips.worked_days_line_ids if wd.work_entry_type_id.l10n_be_economic_unemployment))</field>
+            <field name="evaluation_value">result = mapped_total['unemployment_days']</field>
         </record>
         <record id="l10n_be_281_mapping_281_13_2091" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2800,6 +2906,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_13_2102" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2807,6 +2915,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_13_2103" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2814,6 +2924,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_13_2109" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>
@@ -2821,6 +2933,8 @@ for atn_code, report_code in atn_mapping.items():
             <field name="declaration_code">281.13</field>
             <field name="evaluation_type">python</field>
             <field name="evaluation_value">result = ''</field>
+            <!-- Optional zone, left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
         </record>
         <record id="l10n_be_281_mapping_281_13_2128" model="l10n.be.281.mapping">
             <field name="date_from">1990-01-01</field>

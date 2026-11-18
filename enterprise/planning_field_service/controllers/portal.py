@@ -68,7 +68,7 @@ class PlanningFieldServiceCustomerPortal(CustomerPortal):
             'user': request.env.user,
         }
         values.update(self._get_additional_intervention_data(intervention_sudo))
-        values = self._get_page_view_values(intervention_sudo, None, values, 'my_field_service_history', False)
+        values = self._get_page_view_values(intervention_sudo, access_token, values, 'my_field_service_history', False)
         return request.render('planning_field_service.portal_my_field_service_report_form', values)
 
     @http.route(['/my/field-service/<int:intervention_id>/sign'], type='jsonrpc', auth='public', website=True)

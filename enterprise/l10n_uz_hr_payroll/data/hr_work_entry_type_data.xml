@@ -10,26 +10,32 @@
 
     <record id="hr_work_entry.uz_hr_work_entry_type_out_of_contract" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">HALF-UP</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_leave" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_compensatory" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_home_working" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_unpaid_leave" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_sick_leave" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <record id="hr_work_entry.uz_work_entry_type_public_holiday" model="hr.work.entry.type">
@@ -39,6 +45,7 @@
     <!-- Annual Labor Leave -->
     <record id="hr_work_entry.l10n_uz_work_entry_type_annual_labor_leave" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+        <field name="round_days_type">DOWN</field>
     </record>
 
     <!-- Annual Labor Leave - Sunday -->

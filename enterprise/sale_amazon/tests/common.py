@@ -90,6 +90,16 @@ GET_ORDER_MOCK = {
     "salesChannel": {"marketplaceId": "ATVPDKIKX0DER"},
     "recipient": {"deliveryAddress": ORDER_ADDRESS_MOCK},
     "orderItems": [ORDER_ITEM_MOCK],
+    "tax": {
+        "taxRegistrations": [
+            {
+                "entityType": "BUYER",
+                "legalName": "Gederic Frilson",
+                "taxRegistrationType": "VAT",
+                "taxRegistrationNumber": "1234567890",
+            }
+        ]
+    }
 }
 
 SEARCH_ORDERS_RESPONSE_MOCK = {

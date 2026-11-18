@@ -19,17 +19,18 @@
 # Enes Dayanç, 2022
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 03:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-09 16:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "approvals/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -52,6 +53,17 @@ msgid ""
 "According to the approval type configuration, a request\n"
 "creates next activities for the related approvers.\n"
 msgstr ""
+"\n"
+"Bu modül, onay iş akışını yönetir\n"
+"======================================\n"
+"\n"
+"Bu modül; iş seyahatleri, ofis dışı durumlar, \n"
+"fazla mesai, ekipman ödünç alma, genel onaylar, tedarikler, sözleşme onayı "
+"vb. onay taleplerini \n"
+"yönetir.\n"
+"\n"
+"Onay türü yapılandırmasına göre, bir talep ilgili onaylayıcılar için\n"
+"bir sonraki faaliyetleri oluşturur.\n"
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -116,7 +128,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -335,7 +347,7 @@ msgstr "Ekler"
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
 msgid "Automated Sequence"
-msgstr ""
+msgstr "Otomatik Sıralama"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -435,7 +447,7 @@ msgstr "Sözleşme Onayı"
 #. module: approvals
 #: model:ir.module.module,summary:base.module_approvals
 msgid "Create and validate approvals requests"
-msgstr ""
+msgstr "Onay istekleri oluşturma ve doğrulama"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -508,7 +520,7 @@ msgstr "Açıklama"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Description:"
-msgstr ""
+msgstr "Açıklama:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__display_name
@@ -582,7 +594,7 @@ msgstr "Kuvvet Onayı"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Future Activities"
-msgstr ""
+msgstr "Sonraki Aktiviteler"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_general_approval
@@ -662,6 +674,11 @@ msgid ""
 "request, along with the selected users\n"
 "    "
 msgstr ""
+"Çalışan yöneticisinin bu onay türüyle nasıl etkileşime girdiği.\n"
+"\n"
+"        eğer seçiliyse, çalışan yöneticisi, seçili kullanıcılarla birlikte "
+"talebin zorunlu bir onaylayıcısıdır\n"
+"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -703,6 +720,8 @@ msgid ""
 "If enabled, the approval request subject will be generated automatically "
 "using the given prefix code."
 msgstr ""
+"Etkinleştirilirse, onay talebi konusu verilen önek kodu kullanılarak "
+"otomatik olarak oluşturulur."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -751,7 +770,7 @@ msgstr "Son Güncelleme"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Late Activities"
-msgstr ""
+msgstr "Geciken Aktiviteler"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
@@ -798,7 +817,7 @@ msgstr "Marc Demo"
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
@@ -820,7 +839,7 @@ msgstr "Minimum Onay"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Minimum Approval must be at least 1."
-msgstr ""
+msgstr "Minimum Onay en az 1 olmalıdır."
 
 #. module: approvals
 #. odoo-python
@@ -905,7 +924,7 @@ msgstr "Sonraki Aktivitie Türü"
 #. module: approvals
 #: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1024,7 +1043,7 @@ msgstr "Dönem:"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
 msgid "Prefix Code"
-msgstr ""
+msgstr "Önek Kodu"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1232,7 +1251,7 @@ msgstr "Gönderildi"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Submitted Date"
-msgstr ""
+msgstr "Gönderim Tarihi"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1351,7 +1370,7 @@ msgstr "Gönderilecek"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Bugünkü Aktiviteler"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
@@ -1411,7 +1430,7 @@ msgstr "Onaylanmış bir talebi silemezsiniz. Bunun yerine arşivleyin."
 #. odoo-python
 #: code:addons/approvals/models/approval_approver.py:0
 msgid "You cannot change approval request."
-msgstr ""
+msgstr "Onay talebini değiştiremezsiniz."
 
 #. module: approvals
 #. odoo-python

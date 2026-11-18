@@ -35,3 +35,17 @@ class TestHrEmployee(TransactionCase):
         })
 
         self.assertEqual(employee.company_id, self.company_ch)
+
+    def test_certificate_default_only_for_swiss_companies(self):
+        """The Swiss certificate levels only exist for the Swiss companies: the default must not be given
+        to the employees of the other companies."""
+        company_be = self.env['res.company'].create({
+            'name': 'Belgian Company',
+            'country_id': self.env.ref('base.be').id,
+        })
+        swiss_employee, belgian_employee = (
+            self.env['hr.employee'].with_company(company).create({'name': 'Employee', 'company_id': company.id})
+            for company in (self.company_ch, company_be)
+        )
+        self.assertEqual(swiss_employee.certificate, 'mandatorySchoolOnly')
+        self.assertFalse(belgian_employee.certificate)

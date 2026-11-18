@@ -13,7 +13,7 @@
                             </div>
                             <div class="row border">
                                 <div class="col-4 border-end">
-                                    <strong>1. Nr.</strong> <span t-out="employee.id"/>
+                                    <strong>1. Nr.</strong> <span t-out="report_data['f2009_volgnummer']"/>
                                 </div>
                                 <div class="col-8">
                                     <strong>2. Date of entry: </strong> <span t-out="report_data['f10_2055_datumvanindienstt']"/>
@@ -521,12 +521,12 @@
                                     <div class="row border-top">
                                         <div class="col-7 fw-bold offset-2">1) Remuneration</div>
                                         <div class="col-1 text-end">381</div>
-                                        <div class="col-2 text-end"><span t-out="report_data['f10_2079_covidovertimeremuneration2023']"/></div>
+                                        <div class="col-2 text-end"><span t-out="report_data.get('f10_2079_covidovertimeremuneration2023', '')"/></div>
                                     </div>
                                     <div class="row border-top">
                                         <div class="col-7 fw-bold offset-2">2) Overtime hours worked and paid between 01.07.2023 and 31.12.2023 included and paid in 2025</div>
                                         <div class="col-1 text-end">382</div>
-                                        <div class="col-2 text-end"><span t-out="report_data['f10_2138_covidovertimehours2023']"/></div>
+                                        <div class="col-2 text-end"><span t-out="report_data.get('f10_2138_covidovertimehours2023', '')"/></div>
                                     </div>
                                 </div>
                             </div>

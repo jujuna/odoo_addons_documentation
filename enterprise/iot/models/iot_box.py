@@ -34,7 +34,7 @@ class IotBox(models.Model):
     @api.ondelete(at_uninstall=True)
     def _unlink_iot_box(self):
         for identifier in self.mapped('identifier'):
-            self.env['iot.channel'].send_message({
+            self.env['iot.channel'].sudo().send_message({
                 "iot_identifier": identifier
             }, 'server_clear')
 

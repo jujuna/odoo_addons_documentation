@@ -48,6 +48,7 @@ export function useSticky(ref, { root } = {}) {
             const onScroll = () => {
                 state.isSticky = containerEl.scrollTop > 0;
             };
+            onScroll();
             containerEl.addEventListener("scroll", onScroll);
             return () => {
                 containerEl.removeEventListener("scroll", onScroll);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="l10n_be_hr_payroll.DmfaPreview">
+        <div class="o_action o_l10n_be_dmfa_preview h-100">
+            <Layout display="{ controlPanel: {} }">
+                <t t-set-slot="control-panel-buttons">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" t-att-disabled="this.state.loading or this.state.printing" t-on-click="this.onPrint">
+                            Print
+                        </button>
+                        <select t-if="this.state.companies.length > 1" class="form-select w-auto" t-on-change="this.onCompanyChange">
+                            <t t-foreach="this.state.companies" t-as="company" t-key="company.id">
+                                <option t-att-value="company.id" t-att-selected="company.id === this.state.companyId" t-out="company.name"/>
+                            </t>
+                        </select>
+                    </div>
+                </t>
+                <div t-if="this.state.loading" class="p-4 text-muted">
+                    <i class="oi oi-spin me-2" data-icon="progress_activity"/>Loading...
+                </div>
+                <iframe t-else="" class="w-100 h-100 border-0 bg-white" t-att-srcdoc="this.state.html"/>
+            </Layout>
+        </div>
+    </t>
+</templates>

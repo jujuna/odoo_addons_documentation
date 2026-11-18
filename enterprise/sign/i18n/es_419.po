@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:50+0000\n"
-"PO-Revision-Date: 2026-10-08 11:34+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-13 20:33+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
 "odoo-20/sign/es_419/>\n"
 "Language: es_419\n"
@@ -364,6 +364,15 @@ msgstr "<small class=\"text-muted\">Remitente</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Signatarios</small>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"<small>SMS Verification: The signatory has confirmed their control of the "
+"phone number using a unique code sent by SMS</small>"
+msgstr ""
+"<small>Verificación por SMS: El signatario confirmó que controla el número "
+"de teléfono con un código único que recibió por SMS</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -874,6 +883,11 @@ msgid ""
 "                A qualified signature carries the legal weight of a "
 "handwritten one across the European Union."
 msgstr ""
+"Pídele a los firmantes del documento en Firma electrónica de Odoo que firmen "
+"con su propia firma electrónica calificada, emitida por un proveedor de "
+"servicios de confianza. \n"
+"                Una firma calificada tiene el mismo valor legal que una "
+"manuscrita en toda la Unión Europea."
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__assign_to
@@ -2011,6 +2025,20 @@ msgid "Email Subject"
 msgstr "Asunto del correo"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Email Verification"
+msgstr "Verificación de correo electrónico"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"Email Verification: The signatory has confirmed control of their email inbox "
+"by clicking on a unique link"
+msgstr ""
+"Verificación por correo electrónico: Quien firma confirmó que controla su "
+"bandeja de entrada con un enlace único"
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2446,18 +2474,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
 "If you do not want to receive these notifications anymore, you can disable "
-"the extra-authentication step in the\n"
-"                        <code>\n"
-"                            Sign &gt; Configuration &gt; Roles\n"
-"                        </code>\n"
-"                        menu."
+"the extra-authentication step\n"
+"                        in the signer settings of your sign templates."
 msgstr ""
-"Si ya no desea recibir estas notificaciones, puede deshabilitar el paso "
-"adicional de autenticación en el menú de\n"
-"                        <code>\n"
-"                            Firma electrónica &gt; Configuración &gt; "
-"Funciones.\n"
-"                        </code>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -3714,6 +3733,11 @@ msgid "SMS Token"
 msgstr "Token del SMS"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "SMS Verification"
+msgstr "Verificación por SMS"
+
+#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Ventas"
@@ -3799,11 +3823,6 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Buscar <span class=\"nolabel\"> (en documento)</span>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Secure Link"
-msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4305,6 +4324,7 @@ msgstr "Hash del signatario:"
 #: model:ir.model.fields.selection,name:sign.selection__mail_activity_type__category__sign_request
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__signature
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__sign
+#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model:mail.activity.type,summary:sign.mail_activity_data_signature_request
 #: model:sign.item.type,name:sign.sign_item_type_signature
 #: model:sign.item.type,placeholder:sign.sign_item_type_signature
@@ -4386,7 +4406,6 @@ msgstr "Se rechazó la firma"
 #: model:ir.model,name:sign.model_sign_request
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__sign_request_id
-#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Signature Request"
 msgstr "Solicitud de firma"
@@ -4790,11 +4809,6 @@ msgstr "Tachar el área resaltada"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__subject
 msgid "Subject"
 msgstr "Asunto"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "System Account"
-msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
@@ -5475,14 +5489,8 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Código único por SMS"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Unique Link via Email"
-msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5642,11 +5650,6 @@ msgstr "Valor"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "¡El valor ya existe!"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Verification method"
-msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6310,24 +6313,19 @@ msgid "{{0}} Summary"
 msgstr "{{0}} Resumen"
 
 #~ msgid ""
-#~ "<small>SMS Verification: The signatory has confirmed their control of the "
-#~ "phone number using a unique code sent by SMS</small>"
+#~ "If you do not want to receive these notifications anymore, you can "
+#~ "disable the extra-authentication step in the\n"
+#~ "                        <code>\n"
+#~ "                            Sign &gt; Configuration &gt; Roles\n"
+#~ "                        </code>\n"
+#~ "                        menu."
 #~ msgstr ""
-#~ "<small>Verificación por SMS: El signatario confirmó que controla el "
-#~ "número de teléfono con un código único que recibió por SMS</small>"
-
-#~ msgid "Email Verification"
-#~ msgstr "Verificación de correo electrónico"
-
-#~ msgid ""
-#~ "Email Verification: The signatory has confirmed control of their email "
-#~ "inbox by clicking on a unique link"
-#~ msgstr ""
-#~ "Verificación por correo electrónico: Quien firma confirmó que controla su "
-#~ "bandeja de entrada con un enlace único"
-
-#~ msgid "SMS Verification"
-#~ msgstr "Verificación por SMS"
+#~ "Si ya no desea recibir estas notificaciones, puede deshabilitar el paso "
+#~ "adicional de autenticación en el menú de\n"
+#~ "                        <code>\n"
+#~ "                            Firma electrónica &gt; Configuración &gt; "
+#~ "Funciones.\n"
+#~ "                        </code>"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Permitir que los signatarios se identifiquen mediante itsme®."

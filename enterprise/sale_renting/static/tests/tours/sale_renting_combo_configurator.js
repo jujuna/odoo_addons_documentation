@@ -8,11 +8,7 @@ registry
     .add('sale_renting_combo_configurator', {
         steps: () => [
             ...stepUtils.goToAppSteps('sale_renting.rental_menu_root', "Open the rental app"),
-            {
-                content: "Create a new SO",
-                trigger: '.o_list_button_add',
-                run: 'click',
-            },
+            ...tourUtils.createNewSalesOrder(),
             ...tourUtils.selectCustomer("Test Partner"),
             ...tourUtils.addProduct("Combo product"),
             // Assert that the rental price and duration are correct.

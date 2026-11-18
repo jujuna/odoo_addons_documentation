@@ -765,8 +765,9 @@ class AccountBankReconciliationReportHandler(models.AbstractModel):
             :param params:      The action params containing at least 'st_line_ids' and 'name'.
             :return:            A dictionary representing an ir.actions.act_window.
         """
+        journal = self.env['account.journal'].browse(options.get('bank_reconciliation_report_journal_id'))
         return self.env['account.bank.statement.line']._action_open_bank_reconciliation_widget(
-            default_context={'create': False},
+            default_context={'create': False, 'default_journal_id': journal.id},
             extra_domain=[('id', 'in', params.get('st_line_ids'))],
             name=params.get('name'),
         )

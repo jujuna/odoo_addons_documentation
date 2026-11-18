@@ -15,6 +15,7 @@ class AppointmentType(models.Model):
     def _load_pos_data_domain(self, data):
         return [('id', '=', data['pos.config'].appointment_type_id.id)]
 
+    # TODO: Remove in master
     def get_available_appointment_resources(self):
         self.ensure_one()
         start_date = self.env.context.get('start_date')

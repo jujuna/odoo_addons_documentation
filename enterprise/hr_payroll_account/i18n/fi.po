@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 17:49+0000\n"
-"PO-Revision-Date: 2026-10-15 13:35+0000\n"
+"PO-Revision-Date: 2026-11-10 12:12+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll_account/fi/>\n"
@@ -40,6 +40,13 @@ msgid ""
 "    * Payment Encoding\n"
 "    * Company Contribution Management\n"
 msgstr ""
+"\n"
+"Yleinen palkanlaskentajärjestelmä, joka on integroitu kirjanpitoon.\n"
+"==================================================\n"
+"\n"
+"    * Kulujen kirjaaminen\n"
+"    * Maksujen kirjaaminen\n"
+"    * Yritysmaksujen hallinta\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -86,6 +93,9 @@ msgid ""
 "                            Journal Entry <br/> (Preview)\n"
 "                        </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                            Päiväkirjan kirjaus <br/> (Esikatselu)\n"
+"                        </span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -96,11 +106,13 @@ msgstr "<span class=\"o_stat_text\">Palkkalaskelma</span>"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "<span invisible=\"reference\">No payrun id passed in context.</span>"
 msgstr ""
+"<span invisible=\"reference\">Pakanmaksuerän tunnusta ei välitetty "
+"kontekstissa.</span>"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__account
 msgid "Account"
-msgstr ""
+msgstr "Tili"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_chart_template
@@ -116,7 +128,7 @@ msgstr "Kirjanpito"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__accounting_date
 msgid "Accounting Date"
-msgstr ""
+msgstr "Kirjauspäivä"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__move_id
@@ -146,7 +158,7 @@ msgstr "Laskennallinen tarkkuus"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
 msgid "Anonymize Journal Entries"
-msgstr ""
+msgstr "Anonymisoi päiväkirjan kirjaukset"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -156,7 +168,7 @@ msgstr "Haluatko varmasti jatkaa?"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
 msgid "Batch Payroll Journal Items"
-msgstr ""
+msgstr "Palkanlaskennan kirjausrivit erissä"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__batch_payroll_move_lines
@@ -169,12 +181,12 @@ msgstr "Palkanlaskentasiirtorivien eräkäsittely"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Yritys"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__company_currency_id
 msgid "Company Currency"
-msgstr ""
+msgstr "Yrityksen valuutta"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_config_settings
@@ -196,7 +208,7 @@ msgstr "Luotu"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__credit
 msgid "Credit"
-msgstr ""
+msgstr "Kredit"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_credit
@@ -213,7 +225,7 @@ msgstr "Veroruudukot credit"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__debit
 msgid "Debit"
-msgstr ""
+msgstr "Debet"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
@@ -231,7 +243,7 @@ msgstr "Veroruudukot debit"
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__account_debit
 msgid "Default account defined on the journal of the pay structure."
-msgstr ""
+msgstr "Palkkarakenteen päiväkirjassa määritetty oletustili."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_chart_template__display_name
@@ -283,6 +295,9 @@ msgid ""
 "into a single journal item. This will anonymize the accounting entries but "
 "also disable single payment generations."
 msgstr ""
+"Ota käyttöön yhdistääksesi kaikki saman ajanjakson kirjanpidon kirjaukset "
+"yhdeksi kirjausriviksi. Tämä anonymisoi kirjaukset, mutta estää myös "
+"yksittäisten maksujen luomisen."
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
@@ -291,6 +306,10 @@ msgid ""
 "individual employee amount are not distinguishable in accounting. This also "
 "disables the pay button on individual payslips."
 msgstr ""
+"Ota käyttöön yhdistääksesi päiväkirjan kirjaukset palkanlaskentaa "
+"käsiteltäessä, jotta yksittäisten työntekijöiden summat eivät ole "
+"erotettavissa kirjanpidossa. Tämä poistaa myös käytöstä yksittäisten "
+"palkkalaskelmien maksupainikkeen."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__employee_move_line
@@ -307,6 +326,9 @@ msgid ""
 "the payslip line name. It could be useful for deduction/reimbursement or "
 "payslip adjustments for instance."
 msgstr ""
+"Ota käyttöön jakaaksesi tämän säännön kirjanpidon kirjaukset palkkalaskelman "
+"rivin nimen perusteella. Se voi olla hyödyllistä esimerkiksi vähennysten/"
+"hyvitysten tai palkkalaskelman oikaisujen yhteydessä."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -316,7 +338,7 @@ msgstr "Ei sisälly nettoon"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Generate Draft Journal Entries"
-msgstr ""
+msgstr "Luo päiväkirjan luonnoskirjauksia"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -371,6 +393,8 @@ msgid ""
 "Invalid IBAN for the following Beneficiaries:\n"
 "%s"
 msgstr ""
+"Virheellinen IBAN seuraaville edunsaajille:\n"
+"%s"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -409,7 +433,7 @@ msgstr "Kirjausrivi"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Journal Items"
-msgstr ""
+msgstr "Kirjausrivit"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
@@ -420,7 +444,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
 msgid "Label"
-msgstr ""
+msgstr "Nimike"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
@@ -437,12 +461,12 @@ msgstr "Viimeksi päivitetty"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
 msgid "Line"
-msgstr ""
+msgstr "Rivi"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
 msgid "Mock version of an account move line used for simulations"
-msgstr ""
+msgstr "Simulaatioissa käytettävä testiversio tilin kirjauksen rivistä"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -457,13 +481,13 @@ msgstr "Siirron tila"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "No Journal"
-msgstr ""
+msgstr "Ei päiväkirjaa"
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payroll_warning.py:0
 msgid "No Journal on Structure"
-msgstr ""
+msgstr "Ei päiväkirjaa rakenteessa"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_salary_rule_view_form
@@ -473,7 +497,7 @@ msgstr "Tyhjä"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__partner
 msgid "Partner"
-msgstr ""
+msgstr "Kumppani"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -493,7 +517,7 @@ msgstr "Palkkalaskelma"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "Maksu"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -504,12 +528,12 @@ msgstr "Maksu suoritettu %s"
 #. module: hr_payroll_account
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_account
 msgid "Payroll Accounting"
-msgstr ""
+msgstr "Palkanlaskennan kirjanpito"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_warning
 msgid "Payroll Warning"
-msgstr ""
+msgstr "Palkanlaskennan varoitus"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_line
@@ -519,7 +543,7 @@ msgstr "Palkkalaskelman rivi"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,description:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Payslip has no journal defined"
-msgstr ""
+msgstr "Palkkalaskelmalle ei ole määritetty päiväkirjaa"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_ids
@@ -530,17 +554,17 @@ msgstr "Palkkalaskelmat"
 #. module: hr_payroll_account
 #: model:ir.actions.act_window,name:hr_payroll_account.action_open_payrun_move_preview
 msgid "Preview of Journal Entry"
-msgstr ""
+msgstr "Päiväkirjan kirjauksen esikatselu"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__reference
 msgid "Reference"
-msgstr ""
+msgstr "Viite"
 
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Review Records"
-msgstr ""
+msgstr "Tarkista tietueet"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -613,7 +637,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__tax_tag_ids
 msgid "Tax Grids"
-msgstr ""
+msgstr "Verotaulukot"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -630,16 +654,19 @@ msgid ""
 "with accounting rights can cancel them:\n"
 "%s"
 msgstr ""
+"Seuraavat palkkalaskelmat on linkitetty päiväkirjan kirjaukselle. Vain "
+"käyttäjä kirjanpidon käyttöoikeuksilla voi peruuttaa ne:\n"
+"%s"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Credit"
-msgstr ""
+msgstr "Kredit yhteensä"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Debit"
-msgstr ""
+msgstr "Debet yhteensä"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -649,7 +676,7 @@ msgstr "Vahvista"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
 msgid "Wizard to show previews of account moves related to pay runs."
-msgstr ""
+msgstr "Ohjattu toiminto palkanmaksuun liittyvien tilitapahtumien esikatseluun."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -661,7 +688,7 @@ msgstr "Et voi luoda kirjanpitotapahtumaa maksetulle palkkalaskelmalle."
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Pay Structure"
-msgstr ""
+msgstr "Et voi poistaa palkkarakenteeseen linkitettyä päiväkirjaa"
 
 #~ msgid "Account Payslip Houserental"
 #~ msgstr "Tilin palkkalaskelman vuokra-asunto"

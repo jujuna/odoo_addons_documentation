@@ -2,6 +2,7 @@
 
 from . import common
 from . import test_cp302_thirteen_month
+from . import test_payslip_counters
 from . import test_payroll_allocating_paid_time_off
 from . import test_payroll_bik
 from . import test_payroll_bik_housing
@@ -9,7 +10,6 @@ from . import test_payroll_fuel_card_private_use
 from . import test_payroll_credit_time_wizard
 from . import test_payroll_departure_notice
 from . import test_hr_dmfa_mobility_budget
-from . import test_payroll_impulsion
 from . import test_payroll_right_to_legal_leaves
 from . import test_payroll_sickness_relapse
 from . import test_payroll_eco_vouchers
@@ -50,6 +50,7 @@ from . import test_variable_schedule
 from . import test_fleet_vehicle
 from . import test_elderly_reduction
 from . import test_l10n_be_273_xx
+from . import test_273s
 from . import test_payroll_profit_sharing_bonus
 from . import test_dmfa_unexperienced_reduction
 from . import test_payroll_holiday_attest
@@ -58,6 +59,7 @@ from . import test_payroll_transport_exemption
 from . import test_public_transport
 from . import test_payrun
 from . import test_payroll_config_settings
+from . import test_res_config_settings
 from . import test_payslip_multi_validation
 from . import test_termination_documents_payrun
 from . import test_cp200_annual_bonus
@@ -66,6 +68,7 @@ from . import test_hr_dmfa_first_hire_reductions
 from . import test_cafeteria_plan
 from . import test_payroll_salary_sacrifice
 from . import test_l10n_be_281_10
+from . import test_l10n_be_281_errors
 from . import test_l10n_be_281_13
 from . import test_l10n_be_281_mapping
 from . import test_payroll_fiscal_period
@@ -74,9 +77,16 @@ from . import test_be_time_rules
 from . import test_payroll_starterjob
 from . import test_payroll_economic_unemployment
 from . import test_payroll_training_time_off
+from . import test_payroll_sectoral_compensatory_rest
 from . import test_seniority_lost_period
 from . import test_payroll_salary_attachment
 from . import test_mobility_budget
 from . import test_l10n_be_281_18
 from . import test_l10n_be_281_20
+from . import test_l10n_be_281_30
 from . import test_l10n_be_274_281_consistency
+from . import test_payroll_social_security_certificate
+from . import test_payroll_config_branches
+from . import test_salary_increase_wizard
+from . import test_worked_days_amount
+from . import test_payslip_missing_information

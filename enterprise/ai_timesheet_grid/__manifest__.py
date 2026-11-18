@@ -12,6 +12,9 @@
         "web.assets_backend": [
             "ai_timesheet_grid/static/src/**/*",
         ],
+        "web.assets_unit_tests": [
+            "ai_timesheet_grid/static/tests/**/*",
+        ],
     },
     "author": "Odoo S.A.",
     "license": "OEEL-1",

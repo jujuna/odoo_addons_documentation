@@ -18,6 +18,13 @@ export const stepUtils = {
             { trigger: `${target}:checked` },
         ];
     },
+    removeWorkcenterFromDisplay(workcenterName) {
+        const target = `.o_mrp_workcenter_dialog div.o_workcenter_button:contains("${workcenterName}") input`;
+        return [
+            { trigger: `${target}:checked`, run: "click" },
+            { trigger: `${target}:not(:checked)` },
+        ];
+    },
     confirmWorkcentersSelection() {
         return [
             {

@@ -170,21 +170,19 @@ class AccountMoveSend(models.AbstractModel):
             }
 
         exemption_702 = self.env['account.chart.template'].ref('l10n_tr_nilvera_einvoice.account_tax_code_702')
-        # Warning alert if a line has no product and is missing CTSP Number
         tr_export_moves = tr_nilvera_moves.filtered(
             lambda m: m.l10n_tr_is_export_invoice or m.l10n_tr_exemption_code_id == exemption_702,
         )
         if non_eligible_tr_lines := tr_export_moves.invoice_line_ids.filtered(
-            lambda line: line.display_type == 'product' and not (line.product_id or line.l10n_tr_ctsp_number),
+            lambda line: line.display_type == 'product' and not line.l10n_tr_ctsp_number,
         ):
             alerts['l10n_tr_non_eligible_products'] = {
                 'message': self.env._(
-                    "The following products are missing a CTSP Number:\n%(products)s\n",
-                    products="\n".join(f"- {line.display_name}" for line in non_eligible_tr_lines),
+                    "Cannot send the invoice because the required CTSP Number is missing.",
                 ),
-                'level': 'warning',
+                'level': 'danger',
                 'action_text': self.env._("View Product(s)"),
-                'action': non_eligible_tr_lines._get_records_action(
+                'action': non_eligible_tr_lines.product_id._get_records_action(
                     name=self.env._("Check Products"),
                 ),
             }

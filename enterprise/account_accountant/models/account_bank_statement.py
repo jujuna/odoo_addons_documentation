@@ -714,8 +714,8 @@ class AccountBankStatementLine(models.Model):
             to_process[st_line_id, matching_word] = [(aml_id, aml_amount_residual)]
             for word in st_lines_refs.get(st_line_id, []):
                 if word.lower() in matching_word.lower() or matching_word.lower() in word.lower():
-                    del to_process[st_line_id, matching_word]
-                    del to_process[st_line_id, word]
+                    to_process.pop((st_line_id, matching_word), None)
+                    to_process.pop((st_line_id, word), None)
             if st_line_id not in st_lines_refs:
                 st_lines_refs[st_line_id] = []
             st_lines_refs[st_line_id].append(matching_word)
@@ -1767,6 +1767,7 @@ class AccountBankStatementLine(models.Model):
         new_lines = []
         has_exchange_diff = False
         highest_exchange_diff_line = {}
+        highest_foreign_line = {}
         stop_reco_at_first_partial = self.env.context.get('stop_reco_at_first_partial')
         partial_applied = False
         for move_line in move_lines:
@@ -1816,18 +1817,29 @@ class AccountBankStatementLine(models.Model):
                 open_balance -= total_amount + current_balance
                 open_amount_currency += current_amount_currency - total_amount_currency
 
-            new_lines.extend(lines_with_epd or new_lines_to_add)
+            reconciled_lines = lines_with_epd or new_lines_to_add
+            new_lines.extend(reconciled_lines)
+            if (
+                move_line.currency_id != company_currency
+                and abs(reconciled_lines[0]['balance']) > abs(highest_foreign_line.get('balance', 0))
+            ):
+                highest_foreign_line = reconciled_lines[0]
             if stop_reco_at_first_partial and (partial_applied or company_currency.is_zero(open_balance)):
                 break
 
             # Individual currency conversions can leave a company currency rounding difference.
             # Apply it to the highest line with an exchange difference instead of suspense.
+            # Without any exchange difference, apply it to the highest foreign currency line:
+            # the reconciliation then books it as an exchange difference.
+            rounding_line = highest_exchange_diff_line or highest_foreign_line
             if (
-                highest_exchange_diff_line
+                rounding_line
                 and transaction_currency.is_zero(open_amount_currency)
                 and not company_currency.is_zero(open_balance)
             ):
-                highest_exchange_diff_line['balance'] -= open_balance
+                rounding_line['balance'] -= open_balance
+                open_balance = 0.0
+                has_exchange_diff = True
 
         self.with_context(
             no_exchange_difference_no_recursive=not has_exchange_diff,
@@ -1841,6 +1853,13 @@ class AccountBankStatementLine(models.Model):
                 and currency.compare_amounts(current_amount, 0) > 0
                 and currency.compare_amounts(current_amount, open_amount) > 0
             )
+
+        payments = move_line.move_id.payment_ids
+        # If a payment comes from a provider or is an iso/sepa payment, we don't want to allow a partial reconciliation on it
+        for payment in payments:
+            if ('payment_transaction_id' in payments._fields and payment.payment_transaction_id) or re.match(r"^iso20022.*|^sepa_ct$", payment.payment_method_code):
+                return None
+
         transaction_amount, transaction_currency, _journal_amount, _journal_currency, company_amount, company_currency = self._get_accounting_amounts_and_currencies()
         has_enough_comp_debit = has_enough(company_currency, open_balance, current_balance)
         has_enough_comp_credit = has_enough(company_currency, -open_balance, -current_balance)
@@ -2022,7 +2041,7 @@ class AccountBankStatementLine(models.Model):
         # linked to the move_line_to_edit, but this will raise an error during the _check_amls_exigibility_for_reconciliation.
         # We need to filter this line out as it has been reverted and reconciled, so it shouldn't interfere with the line we're trying to reconcile.
         exchange_line = self.env['account.move.line']
-        if (exchange_move := move_line_to_edit._get_matched_move_ids().exchange_move_id) and any(record_data.get(key) for key in ['balance', 'amount_currency']):
+        if exchange_move := move_line_to_edit._get_matched_move_ids().exchange_move_id:
             exchange_line |= exchange_move.line_ids.filtered(lambda line: line in move_line_to_edit.reconciled_lines_ids)
 
         liquidity_lines, _suspense_lines, other_lines = self._seek_for_lines()

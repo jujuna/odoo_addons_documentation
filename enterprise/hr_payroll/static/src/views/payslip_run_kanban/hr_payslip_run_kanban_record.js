@@ -1,5 +1,6 @@
 import { PayRunButtonBox } from "../../components/payrun_card/button_box/payrun_button_box";
 import { usePlugin } from "@odoo/owl";
+import { UIPlugin } from "@web/core/ui/ui_plugin";
 import { KanbanRecord } from "@web/views/kanban/kanban_record";
 import { PayRunChatterService } from "@hr_payroll/js/payrun_chatter_service";
 
@@ -14,6 +15,7 @@ export class PayrunKanbanRecord extends KanbanRecord {
     setup() {
         super.setup();
         this.payRunChatter = usePlugin(PayRunChatterService);
+        this.ui = usePlugin(UIPlugin);
     }
 
     get isChatterOpen() {
@@ -56,7 +58,11 @@ export class PayrunKanbanRecord extends KanbanRecord {
     }
 
     getCardClasses() {
-        return `${super.getCardClasses()} o_payrun_card_root opacity-trigger-hover d-flex flex-row align-items-center`;
+        let classes = `${super.getCardClasses()} o_payrun_card_root opacity-trigger-hover d-flex flex-row align-items-center`;
+        if (this.isChatterOpen && this.isSelected && !this.ui.isSmall()) {
+            classes += " o_payrun_kanban_record_selected";
+        }
+        return classes;
     }
 }
 

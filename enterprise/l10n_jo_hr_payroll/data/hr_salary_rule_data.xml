@@ -190,7 +190,8 @@ if overtime_rate:
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
         <field name="code">EOSPROV</field>
         <field name="sequence">55</field>
-        <field name="condition_select">none</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = employee.l10n_jo_is_eligible_for_eos</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 salary = payslip._l10n_jo_get_gross_wage()

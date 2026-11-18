@@ -104,10 +104,10 @@ class SocialAccount(models.Model):
                 )
 
             statistics_360d_total_interactions = [
-                int(response and sum(
+                int(sum(
                     v.get('total_value', {}).get('value', 0)
-                    for v in response.get('data', ()))
-                )
+                    for v in (response or {}).get('data', ())
+                ))
                 for __, response in zip(range(12), responses)
             ]
 

@@ -118,6 +118,14 @@ class AccountMove(models.Model):
             digital_signature_sudo.last_token = False
             return None
         response_parsed = analyze_response['result']
+        if response_parsed.tag == 'SCRIPT':
+            # RTC answers an expired token with an authentication error page, DTEUpload with STATUS 5
+            digital_signature_sudo.last_token = False
+            if retry_send:
+                _logger.info('The SII could not authenticate the request. Retrying send AEC to SII with a new token.')
+                return self.l10n_cl_send_dte_to_sii(retry_send=False)
+            self.message_post(body=_('The SII could not authenticate the request. Please try sending again.'))
+            return None
         self.l10n_cl_sii_send_ident = response_parsed.findtext('TRACKID')
         sii_response_status = response_parsed.findtext('STATUS')
         if sii_response_status == '5':

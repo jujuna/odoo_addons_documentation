@@ -305,6 +305,32 @@ class TestHrAppraisal(TransactionCase):
             "The unselected employee should not get an appraisal",
         )
 
+    def test_appraisal_campaign_department_and_job(self):
+        department = self.env['hr.department'].create({'name': 'Campaign Department'})
+        job = self.env['hr.job'].create({'name': 'Campaign Job'})
+        manager = self.env['hr.employee'].create({'name': 'Campaign Manager'})
+        employee = self.env['hr.employee'].create({
+            'name': 'Campaign Employee',
+            'parent_id': manager.id,
+            'department_id': department.id,
+            'job_id': job.id,
+        })
+        appraisal_template = self.env['hr.appraisal.template'].create({'description': 'Test appraisal template'})
+        campaign = self.env['hr.appraisal.campaign.wizard'].create({
+            'employee_ids': [(6, 0, employee.ids)],
+            'appraisal_template_id': appraisal_template.id,
+        })
+        appraisal = self.env['hr.appraisal'].search(campaign.action_generate_appraisals()['domain'])
+        self.assertEqual(appraisal.state, '2_pending')
+        self.assertEqual(appraisal.department_id, department)
+        self.assertEqual(appraisal.job_id, job)
+
+    def test_appraisal_campaign_default_shared_template(self):
+        # Only shared templates, as the default ones
+        self.env['hr.appraisal.template'].search([]).company_id = False
+        campaign = self.env['hr.appraisal.campaign.wizard'].new({})
+        self.assertTrue(campaign.appraisal_template_id)
+
     def test_create_appraisal_campaign_for_all_employees(self):
         user_without_hr_right = self.env['res.users'].create({
             'name': 'Test without hr right',

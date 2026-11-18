@@ -847,12 +847,12 @@ class AccountAssetVariant(models.Model):
         self.write({'state': 'paused'})
 
     def open_asset(self, view_mode):
-        if len(self) == 1:
-            view_mode = ['form']
-        views = [v for v in [(False, 'list'), (False, 'form')] if v[1] in view_mode]
         ctx = dict(self.env.context)
         ctx.pop('default_move_type', None)
-        ctx['variant_id'] = self.id
+        if len(self) == 1:
+            view_mode = ['form']
+            ctx['variant_id'] = self.id
+        views = [v for v in [(False, 'list'), (False, 'form')] if v[1] in view_mode]
         action = {
             'name': self.env._('Asset'),
             'view_mode': ','.join(view_mode),

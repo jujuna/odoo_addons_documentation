@@ -17,18 +17,20 @@
 # Ediz Duman <neps1192@gmail.com>, 2022
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 00:55+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-09 14:35+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "social_push_notifications/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +59,7 @@ msgstr "İzin Ver"
 #. module: social_push_notifications
 #: model:ir.model.constraint,message:social_push_notifications.constraint_website_visitor_push_subscription_unique_endpoint
 msgid "An endpoint cannot be assigned multiple times."
-msgstr ""
+msgstr "Bir uç nokta birden fazla kez atanamaz."
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
@@ -67,12 +69,12 @@ msgstr "Gövde"
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__endpoint
 msgid "Browser endpoint"
-msgstr ""
+msgstr "Tarayıcı uç noktası"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__keys
 msgid "Browser keys"
-msgstr ""
+msgstr "Tarayıcı anahtarları"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_res_config_settings
@@ -143,7 +145,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/social_push_notifications/static/src/interactions/push_notification_request_interaction.js:0
 msgid "Failed to enable push notifications"
-msgstr ""
+msgstr "Anlık bildirimler etkinleştirilemedi"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.push_notifications_preview
@@ -191,7 +193,7 @@ msgstr "Icon Image"
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
 msgid "Immediately"
-msgstr ""
+msgstr "Acil Olarak"
 
 #. module: social_push_notifications
 #. odoo-javascript
@@ -200,6 +202,9 @@ msgid ""
 "It looks like notifications are blocked by your browser. To stay updated, "
 "please enable them in your browser settings!"
 msgstr ""
+"Bildirimler tarayıcınız tarafından engellenmiş gibi görünüyor. "
+"Güncellemelerden haberdar olmak için lütfen tarayıcı ayarlarınızdan bunları "
+"etkinleştirin!"
 
 #. module: social_push_notifications
 #. odoo-javascript
@@ -208,6 +213,9 @@ msgid ""
 "It looks like notifications aren't enabled in your browser. To stay updated, "
 "please enable them in your browser settings!"
 msgstr ""
+"Bildirimler tarayıcınızda etkinleştirilmemiş gibi görünüyor. "
+"Güncellemelerden haberdar olmak için lütfen tarayıcı ayarlarınızdan bunları "
+"etkinleştirin!"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_website_visitor_push_subscription__keys
@@ -219,11 +227,17 @@ msgid ""
 "- auth: The auth value should be treated as a secret and not shared outside "
 "of Odoo"
 msgstr ""
+"Bildirimde kullanılan tarayıcı anahtarlarını ifade eder: \n"
+"- p256dh: Tarayıcı tarafından oluşturulan abonelik genel anahtarıdır. "
+"Tarayıcı, özel anahtarı gizli tutar ve  \n"
+"          yükün şifresini çözmek için kullanır\n"
+"- auth: Kimlik doğrulama değeri gizli tutulmalı ve Odoo dışında "
+"paylaşılmamalıdır"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_live_post__last_push_subscription_id
 msgid "Last Push Subscription"
-msgstr ""
+msgstr "Son Anlık Bildirim Aboneliği"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_media__media_type
@@ -245,7 +259,7 @@ msgstr "Yeni Mesaj"
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.utm_campaign_view_form
 msgid "New Push"
-msgstr ""
+msgstr "Yeni Anlık Bildirim"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__notification_request_delay
@@ -303,13 +317,13 @@ msgstr "Lütfen bir bildirim esajı belirtin."
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
 msgid "Post On"
-msgstr ""
+msgstr "Gönderim Tarihi"
 
 #. module: social_push_notifications
 #. odoo-javascript
 #: code:addons/social_push_notifications/static/src/views/widgets/push_notification_request_preview/push_notification_request_preview_button.xml:0
 msgid "Preview"
-msgstr ""
+msgstr "Önizle"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.website_visitor_view_kanban
@@ -380,7 +394,7 @@ msgstr "Anlık Bildirimler Önizlemesi"
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post__push_notifications_scheduled_date
 msgid "Push Notifications Scheduled for"
-msgstr ""
+msgstr "Anlık Bildirimler şu zaman için planlandı:"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_website_visitor_push_subscription
@@ -414,7 +428,7 @@ msgstr "Anlık Bildirim Gönder"
 #: model:ir.module.module,description:base.module_social_push_notifications
 #: model:ir.module.module,summary:base.module_social_push_notifications
 msgid "Send push notifications to your web visitors"
-msgstr ""
+msgstr "Web ziyaretçilerinize anlık bildirimler gönderin"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_social_account
@@ -444,7 +458,7 @@ msgstr "Sosyal Gönderi Şablonu"
 #. module: social_push_notifications
 #: model:ir.module.module,shortdesc:base.module_social_push_notifications
 msgid "Social Push Notifications"
-msgstr ""
+msgstr "Sosyal Push Bildirimleri"
 
 #. module: social_push_notifications
 #. odoo-python
@@ -455,7 +469,7 @@ msgstr "Seçilen bazı ziyaretçilerin anlık bildirimlerine izin vermez."
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_ir_config_parameter
 msgid "System Parameter"
-msgstr ""
+msgstr "Sistem Parametresi"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_template_view_form
@@ -470,7 +484,7 @@ msgstr "Bu web sitesi için zaten bir yapılandırma var."
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_account__website_id
 msgid "This configuration will only be used for the specified website"
-msgstr ""
+msgstr "Bu yapılandırma yalnızca belirtilen websitesi için kullanılacaktır"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_live_post__push_notification_image
@@ -492,7 +506,7 @@ msgstr "UTM Kampanyası"
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_utm_mixin
 msgid "UTM Mixin"
-msgstr ""
+msgstr "UTM Karışımı"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_media__media_type

@@ -56,11 +56,6 @@
                 <field name="is_barcode_picking_type" invisible="1"/>
                 <page name="barcode_app" string="Barcode App" invisible="not is_barcode_picking_type">
                     <group>
-                        <label for="show_reserved_sns" string="Show reserved lots/SN" invisible="code not in ['incoming', 'outgoing', 'internal']" groups="stock.group_production_lot"/>
-                        <field name="show_reserved_sns" groups="stock.group_production_lot" nolabel="1"/>
-                        <field name="show_entire_packs" groups="stock.group_tracking_lot"/>
-                    </group>
-                    <group>
                         <group name="restrict_scan_settings" string="Mandatory Scan">
                             <field name="restrict_scan_source_location" string="Source Location"
                                    groups="stock.group_stock_multi_locations"
@@ -82,6 +77,9 @@
                             <field name="group_lines_by_product"
                                    groups="stock.group_stock_picking_batch"
                                    invisible="code not in ['incoming', 'outgoing', 'internal']"/>
+                            <label for="show_reserved_sns" string="Show reserved lots/SN" invisible="code not in ['incoming', 'outgoing', 'internal']" groups="stock.group_production_lot"/>
+                            <field name="show_reserved_sns" groups="stock.group_production_lot" nolabel="1"/>
+                            <field name="show_entire_packs" groups="stock.group_tracking_lot"/>
                         </group>
                     </group>
                     <field name="show_barcode_validation" invisible="1"/>

@@ -1,16 +1,17 @@
-import { describe, expect, test } from "@odoo/hoot";
+import { animationFrame, describe, expect, test } from "@odoo/hoot";
 import { waitFor, waitForNone } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
 import {
     MockServer,
     contains,
     defineModels,
+    editSearch,
     getService,
     mockService,
     onRpc,
     patchWithCleanup,
     selectFieldDropdownItem,
     serverState,
+    validateSearch,
 } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
 
@@ -21,7 +22,8 @@ import {
 } from "./helpers/data";
 import { makeDocumentsMockEnv } from "./helpers/model";
 import { embeddedActionsServerData } from "./helpers/test_server_data";
-import { mountDocumentsListView } from "./helpers/views/list";
+import { basicDocumentsListArch, mountDocumentsListView } from "./helpers/views/list";
+import { getEnrichedSearchArch } from "./helpers/views/search";
 
 describe.current.tags("desktop");
 
@@ -355,7 +357,7 @@ test("edit mode is preserved when interacting with modals or control panel", asy
     expect(".o_data_row_selected").toHaveCount(1);
     await contains('.o_data_row:nth-child(1) td.o_list_many2one[name="partner_id"]').click();
     await selectFieldDropdownItem("partner_id", "Search more...");
-    
+
     // Clicks inside the modal do not exit edit mode
     await contains(`.modal-title:contains("Search: Contact")`).click();
     await animationFrame();
@@ -365,9 +367,9 @@ test("edit mode is preserved when interacting with modals or control panel", asy
 
     // Clicks inside the row do not exit edit mode (e.g. deleting a tag)
     await contains('.o_data_row:nth-child(1) td[name="tag_ids"]').click();
-    await expect('.o_data_row:nth-child(1) .o_field_many2many_tags .o_tag').toHaveCount(2);
-    await contains('.o_data_row:nth-child(1) .o_field_many2many_tags .o_delete:eq(0)').click();
-    await expect('.o_data_row:nth-child(1) .o_field_many2many_tags .o_tag').toHaveCount(1);
+    await expect(".o_data_row:nth-child(1) .o_field_many2many_tags .o_tag").toHaveCount(2);
+    await contains(".o_data_row:nth-child(1) .o_field_many2many_tags .o_delete:eq(0)").click();
+    await expect(".o_data_row:nth-child(1) .o_field_many2many_tags .o_tag").toHaveCount(1);
 
     // Clicks near searchbar exit edit mode
     await contains(".o_control_panel_breadcrumbs").click();
@@ -377,4 +379,59 @@ test("edit mode is preserved when interacting with modals or control panel", asy
     // Click below the list panel unselects the row
     await contains("div.o_list_renderer.o_documents_view.o_renderer").click();
     expect(".o_data_row_selected").toHaveCount(0);
+});
+
+test("column sort order persists across folder/search but is reset on root changes", async function () {
+    onRpc("/documents/touch/<access_token>", () => ({}));
+
+    let lastOrder;
+    onRpc("web_search_read", ({ kwargs }) => {
+        lastOrder = kwargs.order;
+    });
+    const serverData = getDocumentsTestServerModelsData([
+        makeDocumentRecordData(2, "Folder 1b", { type: "folder", user_folder_id: "SHARED" }),
+        makeDocumentRecordData(3, "Folder 2", { type: "folder", user_folder_id: "SHARED" }),
+        makeDocumentRecordData(4, "b.txt", { folder_id: 2 }),
+        makeDocumentRecordData(5, "a.txt", { folder_id: 2 }),
+    ]);
+    await makeDocumentsMockEnv({ serverData });
+
+    const listViewDefaultOrder = "is_folder ASC, create_date DESC, id DESC";
+    await mountDocumentsListView({
+        arch: basicDocumentsListArch.replace(
+            `<list js_class="documents_list" multi_edit="1">`,
+            `<list js_class="documents_list" multi_edit="1" default_order="${listViewDefaultOrder}">`
+        ),
+        searchViewArch: getEnrichedSearchArch(`<search><field name="name"/></search>`),
+    });
+
+    await contains(`.o_search_panel_label[data-tooltip="Shared with me"] .o_toggle_fold`).click();
+    await contains(`.o_search_panel_label_title:contains("Folder 2")`).click();
+    // Set a specific order by clicking the "Name" column header.
+    await contains("thead th[data-name='name']").click();
+    await animationFrame();
+    const sortedOrder = lastOrder;
+    expect(sortedOrder.startsWith("name ASC")).toBe(true);
+
+    // Switching to a real folder under the same root keeps the chosen order.
+    await contains(`.o_search_panel_label_title:contains("Folder 1b")`).click();
+    await animationFrame();
+    expect(lastOrder).toBe(sortedOrder);
+
+    // Entering a search in the search bar keeps the chosen order.
+    await editSearch("a.txt");
+    await validateSearch();
+    await animationFrame();
+    expect(lastOrder).toBe(sortedOrder);
+
+    // Switching to Recent and unfolding a group switches to order defined for "Recent".
+    await contains("span.o_search_panel_label_title:contains('Recent')").click();
+    await contains(".o_group_header:contains('Today')").click();
+    await animationFrame();
+    expect(lastOrder).toBe("is_folder ASC, last_access_date_group DESC, write_date DESC");
+
+    // Coming back to a real folder from Recent resets the order to the root default
+    await contains(`.o_search_panel_label_title:contains("Folder 1b")`).click();
+    await animationFrame();
+    expect(lastOrder).toBe(listViewDefaultOrder);
 });

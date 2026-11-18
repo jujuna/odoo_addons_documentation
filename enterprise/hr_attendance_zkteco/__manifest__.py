@@ -1,7 +1,7 @@
 {
     "name": "Attendances ZKTeco BioTime",
     "category": "Human Resources",
-    "summary": "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API",
+    "summary": "Integrate ZKTeco BioPro with attendances app via BioTime 8.5 & 9.0 API",
     "depends": [
         "hr_attendance",
         "mail",

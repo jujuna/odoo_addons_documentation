@@ -14,6 +14,8 @@ class HrRuleParameterValue(models.Model):
     _description = 'Salary Rule Parameter Value'
     _inherit = ['mail.track.mixin']
     _order = 'date_from desc'
+    _clear_cache_name = 'default'
+    _clear_cache_on_fields = {'rule_parameter_id', 'date_from', 'parameter_value'}
 
     rule_parameter_id = fields.Many2one('hr.rule.parameter', required=True, index=True, ondelete='cascade', default=lambda self: self.env.context.get('active_id'))
     rule_parameter_name = fields.Char(related="rule_parameter_id.name", readonly=True)
@@ -38,6 +40,12 @@ class HrRuleParameterValue(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """
+        Create parameter values. An existing value of the same parameter at the same
+        ``date_from`` is replaced. Invalidate the cache of
+        ``hr.rule.parameter._get_parameter_from_code`` and, for users, log the creation in the
+        chatter of the parameter.
+        """
         existing_values_domain = Domain.OR([[
             ('rule_parameter_id', '=', vals['rule_parameter_id']),
             ('date_from', '=', vals['date_from'])
@@ -45,7 +53,6 @@ class HrRuleParameterValue(models.Model):
         existing_values = self.search(existing_values_domain)
         if existing_values:
             existing_values.unlink()
-        self.env.transaction.invalidate_ormcache()
         for vals in vals_list:
             vals['modified_by_user'] = self.env.uid != SUPERUSER_ID
         parameter_values = super().create(vals_list)
@@ -64,6 +71,11 @@ class HrRuleParameterValue(models.Model):
         return parameter_values
 
     def write(self, vals):
+        """
+        Write on the values. When ``date_from`` or ``parameter_value`` change, log the change in
+        the chatter of the parameter and invalidate the cache of
+        ``hr.rule.parameter._get_parameter_from_code``.
+        """
         tracked_fnames = self._track_get_fields() & set(vals.keys())
         if tracked_fnames:
             for value in self:
@@ -74,7 +86,6 @@ class HrRuleParameterValue(models.Model):
                         date_label=self.env._("Modifying value for %s.", format_date(self.env, value.date_from)),
                     ),
                 )
-            self.env.transaction.invalidate_ormcache()
         return super().write(vals)
 
     @api.ondelete(at_uninstall=False)

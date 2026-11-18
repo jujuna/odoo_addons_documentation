@@ -187,6 +187,24 @@ class TestDianPosUbl(TestL10nCoEdiPosCommon):
             self.get_xml_tree_from_string(expected_invoice_xml),
         )
 
+    @freeze_time('2025-03-01 01:10:00')  # 2025-02-28 20:10 in Bogota
+    def test_51_pos_order_refund_billing_reference_date(self):
+        order = self._create_and_send_order(
+            pos_order_ui_data={
+                'pos_order_lines_ui_args': [(self.product_a, 2)],
+                'payments': [(self.default_pos_payment_method, 2380.0)],
+            },
+            response_file_name='SendTestSetAsync.xml',
+        )
+
+        with self._pos_session():
+            refund_order = order._refund()
+            refund_xml = self.env['pos.edi.xml.ubl_dian']._export_pos_order(refund_order)[0]
+
+        tree = self.get_xml_tree_from_string(refund_xml)
+        self.assertEqual(tree.xpath("./*[local-name()='IssueDate']/text()"), ['2025-02-28'])
+        self.assertEqual(tree.xpath("//*[local-name()='BillingReference']//*[local-name()='IssueDate']/text()"), ['2025-02-28'])
+
     @freeze_time('2025-03-01')
     def test_60_multiple_payments_change(self):
         """

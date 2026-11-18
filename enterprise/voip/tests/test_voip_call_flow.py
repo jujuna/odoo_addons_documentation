@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from odoo import Command
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
 
 from odoo.addons.voip.models.phone_service_api import PhoneServiceAPI
@@ -1109,3 +1109,188 @@ class TestVoipCallFlowValidation(VoipPhoneServiceCase):
                 if route.endswith("/delete_schedule")
             ],
         )
+
+
+@tagged("post_install", "-at_install")
+class TestVoipCallFlowAudioMessage(VoipPhoneServiceCase):
+    def _create_audio_message(self, name="Welcome"):
+        sound = self.env["voip.sound"].with_context(voip_skip_pbx_sync=True).create({
+            "name": name,
+            **tts_sound_values(f"{name}, please hold."),
+        })
+        audio_message = self.env["voip.ivr"].browse(
+            self.env["voip.ivr"].get_or_create_audio_message_wrapper(sound.id)
+        )
+        # The PBX mock echoes ids back rather than allocating them.
+        audio_message.with_context(voip_skip_pbx_sync=True).pbx_ivr_id = 200 + audio_message.id
+        return audio_message
+
+    def _graph(self, *nodes, connections=None):
+        return {
+            "nodes": [_start_node(), *nodes],
+            "connections": connections or (
+                [_connection("start", "next", nodes[0]["id"])] if nodes else []
+            ),
+        }
+
+    def _age(self, records):
+        records.flush_recordset()
+        self.env.cr.execute(
+            "UPDATE voip_ivr SET create_date = now() - interval '2 days' WHERE id IN %s",
+            [tuple(records.ids)],
+        )
+        records.invalidate_recordset(["create_date"])
+
+    def test_removing_node_deletes_its_audio_message_but_keeps_its_sound(self):
+        audio_message = self._create_audio_message()
+        sound = audio_message.menu_sound_id
+        call_flow = self.env["voip.call.flow"].create({
+            "graph_data": self._graph(_record_node("audio", "audio_message", audio_message)),
+        })
+        pbx_ivr_id = audio_message.pbx_ivr_id
+        self.assertEqual(audio_message.callflow_id, call_flow)
+        self.assertTrue(pbx_ivr_id)
+
+        calls, patcher = _capture_pbx_calls()
+        with patcher:
+            call_flow.graph_data = self._graph()
+            self.env.cr.postcommit.run()
+
+        self.assertFalse(audio_message.exists())
+        self.assertTrue(sound.exists())
+        self.assertTrue(any(
+            route.endswith("/delete_ivr") and params.get("ivr_id") == pbx_ivr_id
+            for route, params in calls
+        ))
+
+    def test_archived_call_flow_keeps_its_audio_messages_until_their_node_is_removed(self):
+        """Also one picked through "Open a Menu", which older versions
+        allowed: what makes it part of its node is the record, not the node
+        type."""
+        for node_type in ("audio_message", "ivr"):
+            with self.subTest(node_type=node_type):
+                audio_message = self._create_audio_message(node_type)
+                audio_node = (
+                    _record_node("audio", "audio_message", audio_message)
+                    if node_type == "audio_message"
+                    else _ivr_node("audio", audio_message)
+                )
+                menu = self.env["voip.ivr"].with_context(voip_skip_pbx_sync=True).create({
+                    "name": f"{node_type} Menu",
+                    "pbx_ivr_id": 106,
+                    **tts_sound_values("Press one for sales."),
+                })
+                call_flow = self.env["voip.call.flow"].create({
+                    "graph_data": self._graph(audio_node, _ivr_node("menu", menu)),
+                })
+
+                call_flow.active = False
+                # Its other records are released so they can be used
+                # elsewhere, but a "Play Audio" node's Menu is part of it.
+                self.assertFalse(menu.callflow_id)
+                self.assertEqual(audio_message.callflow_id, call_flow)
+
+                call_flow.active = True
+                self.assertEqual((menu | audio_message).callflow_id, call_flow)
+
+                call_flow.active = False
+                call_flow.graph_data = self._graph(_ivr_node("menu", menu))
+                self.assertFalse(audio_message.exists())
+
+    def test_audio_message_routed_from_outside_a_call_flow_cannot_be_deleted(self):
+        for model_name, field_name, values in (
+            ("voip.call.group", "no_answer_destination_ref", {"name": "Support"}),
+            # Checked before the DID routes to a deleted record are cleared.
+            ("voip.did.number", "destination_ref", {
+                "did_number": "+3287000123",
+                "did_number_type": "local",
+                "state": "active",
+            }),
+        ):
+            with self.subTest(model_name):
+                audio_message = self._create_audio_message(model_name)
+                graph_data = self._graph(_record_node("audio", "audio_message", audio_message))
+                call_flow = self.env["voip.call.flow"].create({"graph_data": graph_data})
+                route = self.env[model_name].with_context(voip_skip_pbx_sync=True).create({
+                    **values,
+                    field_name: f"voip.ivr,{audio_message.id}",
+                })
+
+                with self.assertRaisesRegex(UserError, "still used"):
+                    call_flow.graph_data = self._graph()
+                with self.assertRaisesRegex(UserError, "still used"):
+                    call_flow.unlink()
+
+                self.assertTrue(audio_message.exists())
+                self.assertEqual(audio_message.callflow_id, call_flow)
+                self.assertEqual(route[field_name], audio_message)
+                self.assertEqual(call_flow.graph_data, graph_data)
+
+    def test_call_flow_records_routing_to_an_audio_message_do_not_prevent_its_removal(self):
+        """Their destinations are rewritten from the graph, right after the
+        removed nodes' records are released."""
+        audio_message = self._create_audio_message()
+        call_group = self.env["voip.call.group"].with_context(voip_skip_pbx_sync=True).create({
+            "name": "Support",
+        })
+        call_flow = self.env["voip.call.flow"].create({
+            "graph_data": self._graph(
+                _call_group_node("group", call_group),
+                _record_node("audio", "audio_message", audio_message),
+                connections=[
+                    _connection("start", "next", "group"),
+                    _connection("group", "no_answer", "audio"),
+                ],
+            ),
+        })
+        self.assertEqual(call_group.no_answer_destination_ref, audio_message)
+
+        call_flow.graph_data = self._graph(_call_group_node("group", call_group))
+
+        self.assertFalse(audio_message.exists())
+        self.assertFalse(call_group.no_answer_destination_ref)
+
+    def test_unsaved_audio_messages_are_cleaned_up_unless_still_used(self):
+        recent, unused, routed, archived, archived_menu = (
+            self._create_audio_message(name)
+            for name in ("Recent", "Unused", "Routed", "Archived", "Archived Menu")
+        )
+        self.env["voip.call.group"].with_context(voip_skip_pbx_sync=True).create({
+            "name": "Support",
+            "no_answer_destination_ref": f"voip.ivr,{routed.id}",
+        })
+        # A Call Flow archived before its "Play Audio" Menus were kept
+        # attached to it: those are only referenced by its graph.
+        for audio_message, node_type in ((archived, "audio_message"), (archived_menu, "ivr")):
+            call_flow = self.env["voip.call.flow"].create({
+                "graph_data": self._graph(_record_node("audio", node_type, audio_message)),
+                "active": False,
+            })
+            audio_message.with_context(voip_call_flow_sync=True).callflow_id = False
+            self.assertFalse(call_flow.active)
+        self._age(unused | routed | archived | archived_menu)
+        unused_sound = unused.menu_sound_id
+
+        self.env["voip.ivr"]._gc_orphan_audio_messages()
+
+        self.assertEqual(
+            (recent | unused | routed | archived | archived_menu).exists(),
+            recent | routed | archived | archived_menu,
+        )
+        self.assertTrue(unused_sound.exists())
+        for audio_message in archived | archived_menu:
+            with self.subTest(audio_message=audio_message), self.assertRaisesRegex(UserError, "archived Call Flow"):
+                audio_message.menu_sound_id.unlink()
+
+    def test_deleting_sound_deletes_its_unsaved_audio_message_unless_still_used(self):
+        unused, routed = self._create_audio_message("Unused"), self._create_audio_message("Routed")
+        self.env["voip.call.group"].with_context(voip_skip_pbx_sync=True).create({
+            "name": "Support",
+            "no_answer_destination_ref": f"voip.ivr,{routed.id}",
+        })
+
+        unused.menu_sound_id.unlink()
+        with self.assertRaisesRegex(UserError, "still used as a destination"):
+            routed.menu_sound_id.unlink()
+
+        self.assertEqual((unused | routed).exists(), routed)

@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
-"PO-Revision-Date: 2026-10-15 10:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-10 15:34+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/voip/es/"
 ">\n"
@@ -246,16 +246,16 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> has requested a phone "
-"number.\n"
-"                    <br/><br/>\n"
+"                    Dear <t t-out=\"ctx.get('recipient_name')\"></t>,\n"
+"                    <br><br>\n"
+"                    <strong t-out=\"user.name\"></strong> has requested a "
+"phone number.\n"
+"                    <br><br>\n"
 "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
 "                        <span>They added the following comment:</span>\n"
 "                        <div style=\"border-left: 4px solid #dee2e6; "
 "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
+"                            <t t-out=\"object.body_html\"></t>\n"
 "                        </div>\n"
 "                    </t>\n"
 "                    <a t-attf-style=\"background-color: "
@@ -269,52 +269,28 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Estimado <t t-out=\"ctx.get('recipient_name')\"/>:\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> ha solicitado un número de "
-"teléfono.\n"
-"                    <br/><br/>\n"
-"                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
-"                        <span>Han añadido el siguiente comentario:</span>\n"
-"                        <div style=\"border-left: 4px solid #dee2e6; "
-"padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
-"                        </div>\n"
-"                    </t>\n"
-"                    <a t-attf-style=\"background-color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px; "
-"text-decoration: none; color: {{user.company_id.email_primary_color or "
-"'#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
-"voip.action_voip_did_number\">\n"
-"                        Comprar número\n"
-"                    </a>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: voip
 #: model:mail.template,body_html:voip.mail_template_voicemail_message
 msgid ""
 "<div>\n"
 "                <p>A new mailbox message was left in <t t-"
-"out=\"object.voicemail_id.name\"/>.</p>\n"
+"out=\"object.voicemail_id.name\"></t>.</p>\n"
 "                <ul>\n"
 "                    <li>\n"
 "                        <strong>Caller:</strong>\n"
 "                        <t t-if=\"object.caller_id_name or "
 "object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
+"object.caller_id_num\"></t>\n"
 "                        <t t-else=\"\">Unknown caller</t>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.caller_id_name and "
 "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
+"out=\"object.caller_id_num\"></t></li>\n"
 "                    <li><strong>Received on:</strong> <t t-"
-"out=\"format_datetime(object.occurred_at)\"/></li>\n"
+"out=\"format_datetime(object.occurred_at)\"></t></li>\n"
 "                    <li><strong>Duration:</strong> <t t-"
-"out=\"format_duration(object.duration / 3600)\"/></li>\n"
+"out=\"format_duration(object.duration / 3600)\"></t></li>\n"
 "                </ul>\n"
 "                <p>The recording is attached to this email.</p>\n"
 "            </div>\n"
@@ -592,6 +568,15 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/voip_ivr.py:0
+msgid ""
+"A \"Play Audio\" node is still used as a destination:\n"
+"%(references)s\n"
+"Reassign those destinations first."
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "A Call Flow connection uses a saturated port."
 msgstr ""
@@ -705,6 +690,15 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid ""
+"A sound used by a Menu cannot be deleted. Delete the Menu first, or remove "
+"the node from its Call Flow. It is used by:\n"
+"%(usages)s"
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/pbx_service.py:0
 msgid "A tenant migration cannot reuse an identifier with a different mapping."
 msgstr ""
@@ -773,7 +767,7 @@ msgstr "Aceptar la llamada"
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__action
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__action_first_name
@@ -932,7 +926,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__address
 msgid "Address"
-msgstr ""
+msgstr "Dirección"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_is_filled
@@ -956,6 +950,8 @@ msgid ""
 "Adds a softphone and helpers to make phone calls directly from within your "
 "Odoo database."
 msgstr ""
+"Añade un softphone y ayudantes para hacer llamadas telefónicas directamente "
+"desde su base de datos de Odoo."
 
 #. module: voip
 #: model:res.groups,name:voip.group_voip_admin
@@ -966,7 +962,7 @@ msgstr "Administrador"
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "After"
-msgstr ""
+msgstr "Después de"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__resolved_agent_count
@@ -1013,7 +1009,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__allowed_call_group_ids
 msgid "Allowed Groups"
-msgstr ""
+msgstr "Grupos permitidos"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__allowed_user_ids
@@ -1100,7 +1096,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_configuration_dialog.js:0
 msgid "Apply"
-msgstr ""
+msgstr "Aplicar"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__requirement_review_state__approved
@@ -1732,7 +1728,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_city
 msgid "City"
-msgstr ""
+msgstr "Ciudad"
 
 #. module: voip
 #. odoo-javascript
@@ -2091,7 +2087,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/action_list.xml:0
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #. module: voip
 #. odoo-javascript
@@ -2431,6 +2427,7 @@ msgid "Disconnected Internal Destination"
 msgstr ""
 
 #. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_http__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__display_name
@@ -2475,7 +2472,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail__display_name
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__display_name
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: voip
 #. odoo-javascript
@@ -2548,7 +2545,7 @@ msgstr "Hecho"
 #: code:addons/voip/static/src/widgets/audio_binary/audio_binary_field.xml:0
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "Download"
-msgstr ""
+msgstr "Descargar"
 
 #. module: voip
 #. odoo-javascript
@@ -2850,7 +2847,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_search_view
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_view
 msgid "Failed"
-msgstr ""
+msgstr "Fallido"
 
 #. module: voip
 #. odoo-python
@@ -2922,7 +2919,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_sound__data
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_list
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #. module: voip
 #. odoo-javascript
@@ -3061,12 +3058,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Friday"
-msgstr ""
+msgstr "Viernes"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
 msgid "From"
-msgstr ""
+msgstr "Desde"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__is_fulfilled
@@ -3160,7 +3157,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_call_group
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_form
 msgid "Group"
-msgstr ""
+msgstr "Grupo"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_call_group
@@ -3168,7 +3165,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_list
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 msgid "Groups"
-msgstr ""
+msgstr "Grupos"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_call_group
@@ -3182,7 +3179,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
+msgstr "Enrutamiento HTTP"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_search
@@ -3302,7 +3299,7 @@ msgstr "¡Tenga paciencia!"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__hours_display
 msgid "Hours"
-msgstr ""
+msgstr "Horas"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__hours_end
@@ -3325,6 +3322,12 @@ msgid "I have updated the proof of address with a more recent bill..."
 msgstr ""
 
 #. module: voip
+#: model:ir.model,name:voip.model_iap_account
+msgid "IAP Account"
+msgstr ""
+
+#. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__id
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:voip.field_ir_http__id
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__id
@@ -3384,7 +3387,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Icono"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number__activity_exception_icon
@@ -3737,7 +3740,7 @@ msgstr "Teclado"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_voice_selection/tts_voice_selection_field.js:0
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_search
@@ -3940,7 +3943,7 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/history.xml:0
 #: code:addons/voip/static/src/softphone/in_call_view.xml:0
 msgid "Log"
-msgstr ""
+msgstr "Registrar"
 
 #. module: voip
 #. odoo-python
@@ -4021,7 +4024,7 @@ msgstr ""
 #. module: voip
 #: model:ir.module.module,summary:base.module_voip
 msgid "Make and receive phone calls from within Odoo."
-msgstr ""
+msgstr "Relice y reciba llamadas desde Odoo"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_config_settings_view_form
@@ -4115,7 +4118,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_ivr
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Menu"
-msgstr ""
+msgstr "Menú"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__menu_sound_id
@@ -4127,7 +4130,7 @@ msgstr ""
 #: model:ir.ui.menu,name:voip.voip_ivr_menu
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_list
 msgid "Menus"
-msgstr ""
+msgstr "Menús"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_ivr
@@ -4215,7 +4218,7 @@ msgstr "Llamada perdida de %(phone_number)s"
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__did_number_type__mobile
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__did_number_type__mobile
 msgid "Mobile"
-msgstr ""
+msgstr "Móvil"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__mode
@@ -4226,7 +4229,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Monday"
-msgstr ""
+msgstr "Lunes"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__month_days
@@ -4241,7 +4244,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__months
 msgid "Months"
-msgstr ""
+msgstr "Meses"
 
 #. module: voip
 #. odoo-python
@@ -4596,7 +4599,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 #. module: voip
 #. odoo-python
@@ -4978,7 +4981,7 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/time_condition.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition_period__mode__open
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__open_destination_ref
@@ -5021,7 +5024,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__ordered
@@ -5669,7 +5672,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_ir_qweb
 msgid "Qweb"
-msgstr ""
+msgstr "Qweb"
 
 #. module: voip
 #. odoo-javascript
@@ -5898,7 +5901,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_mail_activity_schedule__res_model_selection
 msgid "Related Model"
-msgstr ""
+msgstr "Modelo relacionado"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -5981,7 +5984,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__review_status__required
 msgid "Required"
-msgstr ""
+msgstr "Requerido"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__requirement_group_id
@@ -6135,7 +6138,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__role
 msgid "Role"
-msgstr ""
+msgstr "Rol"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__rrmemory
@@ -6211,7 +6214,7 @@ msgstr "Error de envío del SMS"
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Saturday"
-msgstr ""
+msgstr "Sábado"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_config_settings_view_form
@@ -6222,7 +6225,7 @@ msgstr "Programe y realice llamadas desde su base de datos"
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__step__search
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 msgid "Search"
-msgstr ""
+msgstr "Buscar"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__search_error
@@ -6574,7 +6577,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/linphone_provisioning_qr_code/linphone_provisioning_qr_code_field.js:0
 msgid "Size"
-msgstr ""
+msgstr "Tamaño"
 
 #. module: voip
 #. odoo-javascript
@@ -6612,7 +6615,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_music_on_hold__sort
 msgid "Sort"
-msgstr ""
+msgstr "Ordenar"
 
 #. module: voip
 #. odoo-javascript
@@ -6734,7 +6737,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__step
 msgid "Step"
-msgstr ""
+msgstr "Paso"
 
 #. module: voip
 #. odoo-javascript
@@ -6781,7 +6784,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Sunday"
-msgstr ""
+msgstr "Domingo"
 
 #. module: voip
 #. odoo-javascript
@@ -6830,7 +6833,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_ir_config_parameter
 msgid "System Parameter"
-msgstr ""
+msgstr "Parámetro del sistema"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
@@ -6884,7 +6887,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_sound__tts_text
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__textual
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__text_value
@@ -7725,7 +7728,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Thursday"
-msgstr ""
+msgstr "Jueves"
 
 #. module: voip
 #. odoo-javascript
@@ -7770,12 +7773,12 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__timezone
 msgid "Timezone"
-msgstr ""
+msgstr "Zona horaria"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
 msgid "To"
-msgstr ""
+msgstr "Hasta"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_view_form
@@ -7884,7 +7887,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Tuesday"
-msgstr ""
+msgstr "Martes"
 
 #. module: voip
 #. odoo-javascript
@@ -7940,7 +7943,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "United Kingdom"
-msgstr ""
+msgstr "Reino Unido"
 
 #. module: voip
 #. odoo-javascript
@@ -7966,7 +7969,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_group_submit_form
 msgid "Update"
-msgstr ""
+msgstr "Actualizar"
 
 #. module: voip
 #. odoo-python
@@ -8148,7 +8151,7 @@ msgstr "Nombre de usuario"
 #: model:ir.model.fields,field_description:voip.field_voip_call_group__user_ids
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 msgid "Users"
-msgstr ""
+msgstr "Usuarios"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__uses_odoo_provider
@@ -8524,7 +8527,7 @@ msgstr "WebSocket"
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Wednesday"
-msgstr ""
+msgstr "Miércoles"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__week_days
@@ -8566,7 +8569,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_result_line__wizard_id
 msgid "Wizard"
-msgstr ""
+msgstr "Asistente"
 
 #. module: voip
 #. odoo-python
@@ -8857,6 +8860,18 @@ msgid "Zoom out"
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of an archived Call Flow"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of the Call Flow \"%(call_flow)s\""
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "add_shopping_cart"
@@ -9017,6 +9032,66 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
 msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "the Menu \"%(menu)s\""
+msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> has requested a phone "
+#~ "number.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>They added the following comment:</span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        Buy Number\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    Estimado <t t-out=\"ctx.get('recipient_name')\"/>:\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> ha solicitado un número "
+#~ "de teléfono.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>Han añadido el siguiente comentario:</"
+#~ "span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        Comprar número\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "VoIP"
 #~ msgstr "VoIP"

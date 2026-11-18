@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 04:03+0000\n"
+"PO-Revision-Date: 2026-11-03 08:22+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "sale_purchase_inter_company_rules/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -101,6 +101,9 @@ msgid ""
 "Order will be created with the chosen warehouse based on the contact address "
 "for the delivery of goods."
 msgstr ""
+"Als een ander bedrijf een Inkooporder bij dit bedrijf bevestigt, wordt er "
+"een Verkooporder aangemaakt met het gekozen magazijn op basis van het "
+"contactadres voor de levering van goederen."
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_purchase_orders
@@ -111,26 +114,29 @@ msgid ""
 "Order will be created with the chosen warehouse based on the contact address "
 "for the receipt of goods."
 msgstr ""
+"Als een ander bedrijf een Verkooporder bij dit bedrijf bevestigt, wordt er "
+"een Inkooporder aangemaakt met het gekozen magazijn op basis van het "
+"contactadres voor de ontvangst van goederen."
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.module.module,shortdesc:base.module_sale_purchase_inter_company_rules
 msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
-msgstr ""
+msgstr "Intercompany-module voor verkoop- en inkooporders en facturen"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__auto_purchase_order_line_id
 msgid "Intercompany Purchase Order Line"
-msgstr ""
+msgstr "Intercompany-inkooporderregel"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.module.module,summary:base.module_sale_purchase_inter_company_rules
 msgid "Intercompany SO/PO/INV rules"
-msgstr ""
+msgstr "Intercompany-regels voor Verkoop/Inkoop/Facturatie"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__auto_sale_order_line_id
 msgid "Intercompany Sale Order Line"
-msgstr ""
+msgstr "Intercompany-verkooporderregel"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_account_move
@@ -147,11 +153,17 @@ msgid ""
 "\n"
 "   Supported documents are SO, PO.\n"
 msgstr ""
+"Module voor de synchronisatie van documenten tussen verschillende bedrijven. "
+"Hiermee kun je bijvoorbeeld automatisch een verkooporder aanmaken wanneer "
+"een inkooporder wordt bevestigd met een ander bedrijf in het systeem als "
+"leverancier, en omgekeerd.\n"
+"\n"
+"   Ondersteunde documenten zijn verkooporders en inkooporders.\n"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
 msgid "Note"
-msgstr ""
+msgstr "Notitie"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order
@@ -161,7 +173,7 @@ msgstr "Inkooporder"
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order_line
 msgid "Purchase Order Line"
-msgstr ""
+msgstr "Inkooporderregel"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order
@@ -171,12 +183,12 @@ msgstr "Verkooporder"
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order_line
 msgid "Sales Order Line"
-msgstr ""
+msgstr "Verkooporderregel"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
 msgid "Section"
-msgstr ""
+msgstr "Sectie"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__auto_purchase_order_id
@@ -191,38 +203,42 @@ msgstr "Bron verkooporder"
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
 msgid "Subsection"
-msgstr ""
+msgstr "Subsectie"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
 msgid "The following value(s) have been added from the linked Purchase Order:"
 msgstr ""
+"De volgende waarde(n) is/zijn toegevoegd vanuit de gekoppelde inkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
 msgid "The following value(s) have been added from the linked Sales Order:"
 msgstr ""
+"De volgende waarde(n) is/zijn toegevoegd vanuit de gekoppelde verkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
 msgid ""
 "The following value(s) have been updated from the linked Purchase Order:"
 msgstr ""
+"De volgende waarde(n) is/zijn bijgewerkt vanuit de gekoppelde Inkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
 msgid "The following value(s) have been updated from the linked Sales Order:"
 msgstr ""
+"De volgende waarde(n) is/zijn bijgewerkt vanuit de gekoppelde verkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
 msgid "The related purchase order:"
-msgstr ""
+msgstr "De gerelateerde inkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
 msgid "The related sale order:"
-msgstr ""
+msgstr "De gerelateerde verkooporder:"
 
 #. module: sale_purchase_inter_company_rules
 #. odoo-python
@@ -247,7 +263,7 @@ msgstr ""
 #. module: sale_purchase_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
 msgid "has been cancelled."
-msgstr ""
+msgstr "is geannuleerd."
 
 #~ msgid "Generate Purchases Orders"
 #~ msgstr "Genereer inkooporders"

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-10-12 12:38+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-10-30 10:33+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "hr_contract_salary/fi/>\n"
@@ -44,8 +44,8 @@ msgid ""
 " If checked, any change on this information will trigger a new computation "
 "of the gross-->net salary."
 msgstr ""
-" Jos valittu, kaikki näiden tietojen muutokset käynnistävät uuden brutto->"
-"nettopalkan laskennan."
+" Jos valittu, kaikki näiden tietojen muutokset käynnistävät uuden brutto-"
+">nettopalkan laskennan."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_employee__signatures_count
@@ -125,10 +125,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -145,44 +145,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>Onneksi olkoon!</h2>\n"
-"                Voit määrittää palkkasi ja työsuhde-etusi klikkaamalla alla "
-"olevaa linkkiä.<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    Linkin viimeinen voimassaolopäivä: <t t-out=\"ctx.get"
-"('validity_end')\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        Määritä pakettisi\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -201,7 +179,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -1607,6 +1585,11 @@ msgid "Job Title"
 msgstr "Tehtävänimike"
 
 #. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
 msgid "Languages"
 msgstr "Kielet"
@@ -1927,14 +1910,15 @@ msgid ""
 "No signature template defined on the version. Please contact the HR "
 "responsible."
 msgstr ""
-"Versiossa ei ole määritetty allekirjoituspohjaa. Ota yhteyttä "
-"henkilöstö­vastaavaan."
+"Versiossa ei ole määritetty allekirjoituspohjaa. Ota yhteyttä henkilöstö­"
+"vastaavaan."
 
 #. module: hr_contract_salary
 #. odoo-python
 #: code:addons/hr_contract_salary/models/hr_version.py:0
 msgid "No templates are configured yet. Do you want to set up first one?"
-msgstr "Yhtään mallipohjaa ei ole vielä määritetty. Haluatko luoda ensimmäisen?"
+msgstr ""
+"Yhtään mallipohjaa ei ole vielä määritetty. Haluatko luoda ensimmäisen?"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit_value__selector_highlight__none
@@ -2711,7 +2695,7 @@ msgstr "Allekirjoituksen luontityyppi"
 #. module: hr_contract_salary
 #: model:ir.module.module,summary:base.module_hr_contract_salary
 msgid "Sign Employment Contracts"
-msgstr ""
+msgstr "Allekirjoita työsopimukset"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_signatory__order
@@ -2845,7 +2829,7 @@ msgstr "Rakennetyyppi"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
+msgid "Sum of Benefits Values"
 msgstr ""
 
 #. module: hr_contract_salary
@@ -2875,6 +2859,12 @@ msgstr "Mallipohjat"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "Teksti"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -3261,6 +3251,11 @@ msgid "id"
 msgstr "tunnus"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3278,14 +3273,63 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: Työtarjous - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: Työtarjous - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
 "{{ object.company_id.name }}: Työtarjous - {{ object.employee_id.name }}"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Onneksi olkoon!</h2>\n"
+#~ "                Voit määrittää palkkasi ja työsuhde-etusi klikkaamalla "
+#~ "alla olevaa linkkiä.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    Linkin viimeinen voimassaolopäivä: <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Määritä pakettisi\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

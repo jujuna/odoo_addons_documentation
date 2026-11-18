@@ -58,7 +58,7 @@ export class PlanningFieldServiceLiveMapModel extends PlanningFieldServiceMapMod
                 );
                 r.address = this._formatAddress(address);
                 data.locatedResources.push(r);
-                this._notifyFetchedCoordinate(data);
+                this.notify();
             })
         );
     }
@@ -111,7 +111,8 @@ export class PlanningFieldServiceLiveMapModel extends PlanningFieldServiceMapMod
             });
             groups[id].records = shift ? [shift] : [];
         }
-        data.records = Object.values(groups).flatMap((g) => g.records);
+        // A shift assigned to several resources belongs to each of their groups.
+        data.records = [...new Set(Object.values(groups).flatMap((g) => g.records))];
         return groups;
     }
 

@@ -40,7 +40,7 @@ class AccountBatchPayment(models.Model):
         for batch in sepa_batches:
             invalid_partners = self.env['res.partner']
             for partner in batch.payment_ids.commercial_partner_id:
-                addresses = partner._get_all_addr()
+                addresses = partner.sudo()._get_all_addr()
                 has_valid_address = any(
                     addr.get('city') and addr.get('country')
                     for addr in addresses

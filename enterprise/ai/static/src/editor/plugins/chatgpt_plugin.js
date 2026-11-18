@@ -69,7 +69,7 @@ export class ChatGPTPlugin extends Plugin {
         const isEmpty = !selection.toString().replace(/\s+/g, "");
         const cannotReplace = this.dependencies.selection
             .getTargetedNodes()
-            .find((el) => this.dependencies.split.isUnsplittable(el) || !isContentEditable(el));
+            .find((el) => this.dependencies.delete.isUnremovable(el) || !isContentEditable(el));
         return cannotReplace || isEmpty;
     }
 

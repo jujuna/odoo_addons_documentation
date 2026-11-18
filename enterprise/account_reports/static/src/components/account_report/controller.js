@@ -2,6 +2,7 @@
 
 import { _t } from "@web/core/l10n/translation";
 
+import { browser } from "@web/core/browser/browser";
 import { user } from "@web/core/user";
 import { range } from "@web/core/utils/numbers";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -29,6 +30,7 @@ import {
     untrack,
 } from "@odoo/owl";
 
+const COMPANY_RELOAD_STORAGE_KEY = "account_reports_company_reload_action";
 
 /** Create a copy of a given object and check every property to transform them:
  * - if they are objects themselves, we recursively create virtual objects for them
@@ -144,8 +146,9 @@ const VirtualGridType = t.object({
 
 
 export class AccountReportController extends Plugin {
-    action = useConfig("action", t.object());
+    action = JSON.parse(browser.sessionStorage.getItem(COMPANY_RELOAD_STORAGE_KEY)) || useConfig("action", t.object());
 
+    env = useEnv();
     orm = usePlugin(ORM);
     actionPlugin = usePlugin(ActionPlugin);
     dialog = usePlugin(DialogPlugin);
@@ -213,7 +216,7 @@ export class AccountReportController extends Plugin {
         },
     };
     accountStatusModel = new RelationalModel(
-        useEnv(),
+        this.env,
         {
             config: {
                 resModel: 'account.audit.account.status',
@@ -231,6 +234,7 @@ export class AccountReportController extends Plugin {
 
     cachedFilterOptions = signal(null);  // the options used for the header.
     options = signal(null);
+    searchBarInput = "";
     data = signal(null);
 
     reportOptionsMap = {};
@@ -256,6 +260,23 @@ export class AccountReportController extends Plugin {
 
     setup() {
         super.setup();
+
+        browser.sessionStorage.removeItem(COMPANY_RELOAD_STORAGE_KEY);
+
+        // Force the proper companies into the selector and reload the page if needed. This is done for consistency and usability.
+        // If companies asked by the options don't match the active ones exactly (including the main one), reload
+        let actionCompanyIds = this.action?.context?.allowed_company_ids;
+        if ( actionCompanyIds && actionCompanyIds.join() !== user.activeCompanies.map((c) => c.id).join()) {
+            // We are still in onWillStart: the report action is not committed to the URL yet, so the
+            // reload triggered by activateCompanies would land back on the previous action.
+            this.env.pushStateBeforeReload();
+
+            // When reloading, the action will be reused automatically if it was declared as an object in data.
+            // However, it won't be if it was just an action dict built in Python. If it was an action dict built and modified from a data action,
+            // that action will be used in its original state. When hence need to save the action that was actually used to restore it properly.
+            browser.sessionStorage.setItem(COMPANY_RELOAD_STORAGE_KEY, JSON.stringify(this.action));
+            user.activateCompanies(actionCompanyIds, {includeChildCompanies: false, reload: true});
+        }
 
         useEffect(() => {
             const invalidateVisibleLines = this._invalidateVisibleLines();
@@ -332,6 +353,7 @@ export class AccountReportController extends Plugin {
         this.refreshVisibleAnnotations(reportInformation.lines, reportInformation.annotations);
 
         this.data.set(proxy({ ...reportInformation, line: markRaw(reportInformation.lines) }));
+        this.setLineSearchMatch();
         this._invalidateVisibleLines.set(true);  // So the useEffect know to reset the lineHeights and the fake line columns width
 
         // HACK: when changing report, the content gets emptied. So the browserequestAnimationFramer bring the window at the top. However,
@@ -351,6 +373,9 @@ export class AccountReportController extends Plugin {
         // Wait for 200 ms at least to prevent the loading animation from flickering if the report loads quickly.
         const waitingTime = longWaitBeforeLoadAnimation ? 500 : 200;
         await new Promise((resolve) => setTimeout(resolve, waitingTime));
+
+        // The report may have been closed while waiting, its scope can't be used anymore.
+        if (this.destroyed) return;
 
         if (this.loadingData) {
             // Only invalidate the lines here, as if the report load quickly enough (thanks to the cache for example),
@@ -589,6 +614,7 @@ export class AccountReportController extends Plugin {
     set lines(value) {
         this.data().lines = value;
         this.setLineVisibility(this.lines);
+        this.setLineSearchMatch();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -738,6 +764,7 @@ export class AccountReportController extends Plugin {
 
     insertLines(lineIndex, deleteCount, newLines) {
         this.lines.splice(lineIndex, deleteCount, ...newLines);
+        this.setLineSearchMatch();
         this.invalidateVisibleLines();
     }
 
@@ -1416,6 +1443,52 @@ export class AccountReportController extends Plugin {
         }
     }
 
+    setLineSearchMatch() {
+        if (!this.options().search_bar) return;
+        const query = this.searchBarInput.toLowerCase();
+
+        if (query.length) {
+            const parentLines = [];
+            let parentLineId = undefined;
+            for (const line of this.lines) {
+                while (parentLines.length && parentLines.at(-1).level >= line.level) {
+                    parentLines.pop();
+                }
+
+                if (parentLineId && !line.id.startsWith(`${parentLineId}|`)) {
+                    parentLineId = undefined;
+                }
+
+                line.search_match = false;
+                if (line.name) {
+                    const lineName = line.name.trim().toLowerCase();
+                    const match = (lineName.indexOf(query) !== -1);
+
+                    if (match) {
+                        line.search_match = true;
+                        // update parent lines to be visible if a child line matches the search
+                        for (let i = parentLines.length - 1; i >= 0; i--) {
+                            parentLines[i].search_match = true;
+                        }
+                        if (!parentLineId || !line.id.startsWith(`${parentLineId}|`)) {
+                            parentLineId = line.id;
+                        }
+                    }
+                }
+
+                if (parentLineId && line.id.startsWith(`${parentLineId}|`)) {
+                    line.search_match = true;
+                }
+
+                parentLines.push(line);
+            }
+        } else {
+            for (const line of this.lines) {
+                line.search_match = true;
+            }
+        }
+    }
+
     /**
      * Defines whether the line should be visible depending on its value and the ones of its children.
      * For parent lines, it's visible if there is at least one child with a value different from zero
@@ -1475,7 +1548,7 @@ export class AccountReportController extends Plugin {
                     allUnfoldedLines.push(...sectionOptions.unfolded_lines);
             }
 
-            actionOptions = {...this.cachedFilterOptions(), unfolded_lines: allUnfoldedLines};
+            actionOptions = {...this.cachedFilterOptions(), unfolded_lines: allUnfoldedLines, filter_search_bar: this.searchBarInput};
         }
 
         if (confirmationDialog) {

@@ -108,6 +108,7 @@ class AccountPayment(models.Model):
                 line_amount = payment._get_aml_amount_in_payment_currency(line)
                 current_amount = get_current_amount(payment, line_amount, remaining)
                 exchange_diff_balance = st_line._lines_get_account_balance_exchange_diff(line.currency_id, line.amount_residual, line.amount_residual_currency)
+                has_exchange_diff = has_exchange_diff or not line.currency_id.is_zero(exchange_diff_balance)
                 amls_to_add = [line._get_aml_values(
                     name=line.name,
                     balance=payment.currency_id._convert(from_amount=-current_amount, to_currency=company_currency, date=st_line.date),

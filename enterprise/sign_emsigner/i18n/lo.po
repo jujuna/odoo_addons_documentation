@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sign_emsigner
+# * sign_emsigner
 #
+# Bone NI <bounkirdni@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.3a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:56+0000\n"
-"PO-Revision-Date: 2026-09-18 02:43+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Lao <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-30 17:55+0000\n"
+"PO-Revision-Date: 2026-11-08 05:33+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
 "sign_emsigner/lo/>\n"
 "Language: lo\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,8 @@ msgid ""
 "<br/>\n"
 "                        Reference Number:"
 msgstr ""
+"<br/>\n"
+"                        ເລກອ້າງອີງ:"
 
 #. module: sign_emsigner
 #: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
@@ -31,6 +34,14 @@ msgid ""
 "<br/>\n"
 "                        Transaction Number:"
 msgstr ""
+"<br/>\n"
+"                        ເລກທຸລະກຳ:"
+
+#. module: sign_emsigner
+#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
+msgid ""
+"<small>The signatory has provided this identity through emSigner</small>"
+msgstr "<small>ຜູ້ລົງລາຍເຊັນໄດ້ຢັ້ງຢືນຕົວຕົນນີ້ຜ່ານ emSigner ແລ້ວ</small>"
 
 #. module: sign_emsigner
 #. odoo-python
@@ -39,6 +50,7 @@ msgid ""
 "A signer using Aadhaar cannot be part of a request that is signed with a "
 "qualified signature."
 msgstr ""
+"ຜູ້ລົງລາຍເຊັນທີ່ໃຊ້ Aadhaar ບໍ່ສາມາດຢູ່ໃນຄຳຮ້ອງຂໍທີ່ມີການລົງລາຍເຊັນແບບມີຄຸນສົມບັດຮັບຮອງໄດ້."
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -47,18 +59,22 @@ msgid ""
 "Aadhaar Sign works only with a single signer and document. Adding more will "
 "switch to the standard eSignature."
 msgstr ""
+"Aadhaar Sign ສາມາດໃຊ້ໄດ້ກັບຜູ້ລົງລາຍເຊັນດຽວ ແລະ ເອກະສານດຽວເທົ່ານັ້ນ. ຖ້າເພີ່ມຕື່ມ ລະບົບຈະປ່ຽນໄປ"
+"ເປັນ eSignature ມາດຕະຖານ."
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/models/sign_item_role.py:0
 msgid "Aadhaar sign authentication is available only for companies in India."
 msgstr ""
+"ການຢັ້ງຢືນຕົວຕົນຜ່ານ Aadhaar Sign ແມ່ນໃຊ້ໄດ້ສະເພາະບໍລິສັດໃນປະເທດອິນເດຍເທົ່ານັ້ນ."
 
 #. module: sign_emsigner
 #: model:ir.module.module,description:base.module_sign_emsigner
 msgid ""
 "Add support for emSigner identification when signing documents (Indian only)"
 msgstr ""
+"ເພີ່ມການຮອງຮັບການຢັ້ງຢືນຕົວຕົນດ້ວຍ emSigner ເມື່ອລົງລາຍເຊັນເອກະສານ (ສະເພາະປະເທດອິນເດຍ)"
 
 #. module: sign_emsigner
 #: model:iap.service,description:sign_emsigner.iap_service_emsigner_proxy
@@ -69,22 +85,31 @@ msgid ""
 "their identity through the emSigner platform using aadhaar card number. "
 "Available in India."
 msgstr ""
+"ຮ້ອງຂໍໃຫ້ຜູ້ລົງລາຍເຊັນເອກະສານໃນ Odoo Sign ຢັ້ງຢືນຕົວຕົນໂດຍໃຊ້ emSigner aadhaar esign. ໂດຍກ"
+"ານຮວມ Odoo Sign ເຂົ້າກັບ emSigner, ທ່ານສາມາດເພີ່ມຂັ້ນຕອນການຢັ້ງຢືນຕົວຕົນໃນຂັ້ນຕອນການລົງລາຍເຊັ"
+"ນ ແລະ ຮ້ອງຂໍໃຫ້ຜູ້ລົງລາຍເຊັນລະບຸຕົວຕົນຜ່ານແພລດຟອມ emSigner ໂດຍໃຊ້ເລກບັດ Aadhaar. ໃຊ້ໄດ້ໃນປະເ"
+"ທດອິນເດຍ."
+
+#. module: sign_emsigner
+#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
+msgid "Authenticated with emSigner"
+msgstr "ຢັ້ງຢືນຕົວຕົນຜ່ານ emSigner ແລ້ວ"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__auth_method
 msgid "Authentication"
-msgstr ""
+msgstr "ການຢັ້ງຢືນຕົວຕົນ"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Continue"
-msgstr ""
+msgstr "ສືບຕໍ່"
 
 #. module: sign_emsigner
 #: model:iap.service,unit_name:sign_emsigner.iap_service_emsigner_proxy
 msgid "Credits"
-msgstr ""
+msgstr "ເຄຣດິດ"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__display_name
@@ -93,19 +118,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_send_request__display_name
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_template__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "ຊື່ສະແດງ"
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "ERROR: Invalid PDF file! %s"
-msgstr ""
+msgstr "ຜິດພາດ: ໄຟລ໌ PDF ບໍ່ຖືກຕ້ອງ! %s"
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "Emsigner only supports signing a single document at a time."
-msgstr ""
+msgstr "Emsigner ຮອງຮັບການລົງລາຍເຊັນເທື່ອລະໜຶ່ງເອກະສານເທົ່ານັ້ນ."
 
 #. module: sign_emsigner
 #. odoo-python
@@ -113,6 +138,8 @@ msgstr ""
 msgid ""
 "Emsigner role cannot be signed first. Please keep emsigner as last signer."
 msgstr ""
+"ບົດບາດ Emsigner ບໍ່ສາມາດລົງລາຍເຊັນກ່ອນໝູ່ໄດ້. ກະລຸນາຈັດໃຫ້ emsigner ເປັນຜູ້ລົງລາຍເຊັນລຳດັບສຸດທ້າ"
+"ຍ."
 
 #. module: sign_emsigner
 #. odoo-python
@@ -121,17 +148,18 @@ msgid ""
 "Emsigner role cannot be used for signing directly. Please send the request "
 "instead."
 msgstr ""
+"ບົດບາດ Emsigner ບໍ່ສາມາດໃຊ້ເພື່ອລົງລາຍເຊັນໂດຍກົງໄດ້. ກະລຸນາສົ່ງເປັນຄຳຮ້ອງຂໍແທນ."
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/components/document_signable.js:0
 msgid "Error"
-msgstr ""
+msgstr "ຜິດພາດ"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,help:sign_emsigner.field_sign_item_role__auth_method
 msgid "Force the signatory to identify using a second authentication method"
-msgstr ""
+msgstr "ບັງຄັບໃຫ້ຜູ້ລົງລາຍເຊັນຢັ້ງຢືນຕົວຕົນໂດຍໃຊ້ວິທີການຢັ້ງຢືນຂັ້ນທີສອງ"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__id
@@ -140,77 +168,77 @@ msgstr ""
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_send_request__id
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_template__id
 msgid "ID"
-msgstr ""
+msgstr "ໄອດີ"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/backend_components/sign_template_action.js:0
 msgid "Ok"
-msgstr ""
+msgstr "ຕົກລົງ"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Proceed to eSign"
-msgstr ""
+msgstr "ດຳເນີນການລົງລາຍເຊັນ eSign"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Redirecting to complete the Aadhaar eSign process."
-msgstr ""
+msgstr "ກຳລັງປ່ຽນເສັ້ນທາງເພື່ອເຮັດສຳເລັດຂັ້ນຕອນ Aadhaar eSign."
 
 #. module: sign_emsigner
 #: model:ir.module.module,summary:base.module_sign_emsigner
 msgid "Sign documents with emSigner"
-msgstr ""
+msgstr "ລົງລາຍເຊັນເອກະສານດ້ວຍ emSigner"
 
 #. module: sign_emsigner
 #: model:ir.module.module,shortdesc:base.module_sign_emsigner
 msgid "Sign emSigner"
-msgstr ""
+msgstr "ເຊັນ emSigner"
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/models/sign_request_item.py:0
 msgid "Sign request item is not validated yet."
-msgstr ""
+msgstr "ລາຍການຄຳຮ້ອງຂໍລົງລາຍເຊັນຍັງບໍ່ທັນໄດ້ຮັບການກວດສອບເທື່ອ."
 
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_send_request
 msgid "Sign send request"
-msgstr ""
+msgstr "ສົ່ງຄຳຮ້ອງຂໍລົງລາຍເຊັນ"
 
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_item_role
 msgid "Signature Item Role"
-msgstr ""
+msgstr "ບົດບາດຂອງລາຍການລາຍເຊັນ"
 
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_request
 msgid "Signature Request"
-msgstr ""
+msgstr "ຄຳຮ້ອງຂໍລາຍເຊັນ"
 
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_request_item
 msgid "Signature Request Item"
-msgstr ""
+msgstr "ລາຍການຄຳຮ້ອງຂໍລາຍເຊັນ"
 
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_template
 msgid "Signature Template"
-msgstr ""
+msgstr "ແມ່ແບບລາຍເຊັນ"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/backend_components/sign_template_action.js:0
 msgid "Signer Edition"
-msgstr ""
+msgstr "ການແກ້ໄຂຜູ້ລົງລາຍເຊັນ"
 
 #. module: sign_emsigner
 #: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
 msgid "Status:"
-msgstr ""
+msgstr "ສະຖານະ:"
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -219,45 +247,46 @@ msgid ""
 "The emSigner identification data could not be forwarded to Odoo, the "
 "signature could not be saved."
 msgstr ""
+"ບໍ່ສາມາດສົ່ງຕໍ່ຂໍ້ມູນການຢັ້ງຢືນຕົວຕົນຂອງ emSigner ໄປຫາ Odoo ໄດ້, ບໍ່ສາມາດບັນທຶກລາຍເຊັນໄດ້."
 
 #. module: sign_emsigner
 #: model:ir.model.fields.selection,name:sign_emsigner.selection__sign_item_role__auth_method__emsigner
 msgid "Via Aadhar eSign"
-msgstr ""
+msgstr "ຜ່ານ Aadhar eSign"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/backend_components/sign_template_action.js:0
 msgid "Warning"
-msgstr ""
+msgstr "ຄຳເຕືອນ"
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "emSigner IAP service could not be found."
-msgstr ""
+msgstr "ບໍ່ພົບບໍລິການ emSigner IAP."
 
 #. module: sign_emsigner
 #: model:iap.service,name:sign_emsigner.iap_service_emsigner_proxy
 msgid "emSigner Proxy"
-msgstr ""
+msgstr "emSigner ພຣັອກຊີ"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_reference_number
 msgid "emSigner Reference Number"
-msgstr ""
+msgstr "ເລກອ້າງອີງ emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_status
 msgid "emSigner Status"
-msgstr ""
+msgstr "ສະຖານະ emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_transaction_number
 msgid "emSigner Transaction Number"
-msgstr ""
+msgstr "ເລກທຸລະກຳ emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_return_value
 msgid "emSigner Values"
-msgstr ""
+msgstr "ຄ່າ emSigner"

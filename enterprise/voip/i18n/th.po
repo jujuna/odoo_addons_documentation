@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
-"PO-Revision-Date: 2026-10-20 08:48+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-05 09:33+0000\n"
 "Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/voip/th/>\n"
 "Language: th\n"
@@ -245,16 +245,16 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> has requested a phone "
-"number.\n"
-"                    <br/><br/>\n"
+"                    Dear <t t-out=\"ctx.get('recipient_name')\"></t>,\n"
+"                    <br><br>\n"
+"                    <strong t-out=\"user.name\"></strong> has requested a "
+"phone number.\n"
+"                    <br><br>\n"
 "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
 "                        <span>They added the following comment:</span>\n"
 "                        <div style=\"border-left: 4px solid #dee2e6; "
 "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
+"                            <t t-out=\"object.body_html\"></t>\n"
 "                        </div>\n"
 "                    </t>\n"
 "                    <a t-attf-style=\"background-color: "
@@ -274,22 +274,22 @@ msgstr ""
 msgid ""
 "<div>\n"
 "                <p>A new mailbox message was left in <t t-"
-"out=\"object.voicemail_id.name\"/>.</p>\n"
+"out=\"object.voicemail_id.name\"></t>.</p>\n"
 "                <ul>\n"
 "                    <li>\n"
 "                        <strong>Caller:</strong>\n"
 "                        <t t-if=\"object.caller_id_name or "
 "object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
+"object.caller_id_num\"></t>\n"
 "                        <t t-else=\"\">Unknown caller</t>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.caller_id_name and "
 "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
+"out=\"object.caller_id_num\"></t></li>\n"
 "                    <li><strong>Received on:</strong> <t t-"
-"out=\"format_datetime(object.occurred_at)\"/></li>\n"
+"out=\"format_datetime(object.occurred_at)\"></t></li>\n"
 "                    <li><strong>Duration:</strong> <t t-"
-"out=\"format_duration(object.duration / 3600)\"/></li>\n"
+"out=\"format_duration(object.duration / 3600)\"></t></li>\n"
 "                </ul>\n"
 "                <p>The recording is attached to this email.</p>\n"
 "            </div>\n"
@@ -567,6 +567,15 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/voip_ivr.py:0
+msgid ""
+"A \"Play Audio\" node is still used as a destination:\n"
+"%(references)s\n"
+"Reassign those destinations first."
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "A Call Flow connection uses a saturated port."
 msgstr ""
@@ -680,6 +689,15 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid ""
+"A sound used by a Menu cannot be deleted. Delete the Menu first, or remove "
+"the node from its Call Flow. It is used by:\n"
+"%(usages)s"
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/pbx_service.py:0
 msgid "A tenant migration cannot reuse an identifier with a different mapping."
 msgstr ""
@@ -709,7 +727,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Abort"
-msgstr ""
+msgstr "ยกเลิก"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__abort_destination_ref
@@ -801,7 +819,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__state__active
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_view
 msgid "Active"
-msgstr ""
+msgstr "เปิดใช้งาน"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_extension__active_did_number_id
@@ -907,7 +925,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__address
 msgid "Address"
-msgstr ""
+msgstr "ที่อยู่"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_is_filled
@@ -967,7 +985,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_ids
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_list
 msgid "Agents"
-msgstr ""
+msgstr "ตัวแทน"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__all_day
@@ -1099,7 +1117,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_extended
 msgid "Apt/Suite/Floor"
-msgstr ""
+msgstr "เลขที่ห้อง/ชุด/พื้นที่"
 
 #. module: voip
 #. odoo-javascript
@@ -2304,7 +2322,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_list
 msgid "Destination"
-msgstr ""
+msgstr "ปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_extension__destination_type
@@ -2342,7 +2360,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr_option__digit
 msgid "Digit"
-msgstr ""
+msgstr "ตัวเลข"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__direction
@@ -2359,12 +2377,12 @@ msgstr "Disabled"
 #: code:addons/voip/static/src/flow_editor/flow_node_configuration_dialog.js:0
 #: model_terms:ir.ui.view,arch_db:voip.voip_activity_schedule_form_view
 msgid "Discard"
-msgstr ""
+msgstr "ละทิ้ง"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Disconnect"
-msgstr ""
+msgstr "ยกเลิกการเชื่อมต่อ"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_disconnect_code
@@ -2377,7 +2395,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_queue_status__disconnected
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__logged_out
 msgid "Disconnected"
-msgstr ""
+msgstr "ตัดการเชื่อมต่อ"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_destination_type
@@ -2400,6 +2418,7 @@ msgid "Disconnected Internal Destination"
 msgstr ""
 
 #. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_http__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__display_name
@@ -2697,7 +2716,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_phone_service_event__event_id
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__event_id
 msgid "Event"
-msgstr ""
+msgstr "อีเวนต์"
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_cost_line_check_unique_event_id
@@ -2724,7 +2743,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__example
 msgid "Example"
-msgstr ""
+msgstr "ตัวอย่าง"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_call_flow_window
@@ -2734,7 +2753,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__status__expired
 msgid "Expired"
-msgstr ""
+msgstr "หมดอายุแล้ว"
 
 #. module: voip
 #. odoo-javascript
@@ -3022,13 +3041,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Forward"
-msgstr ""
+msgstr "ส่งต่อ"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Friday"
-msgstr ""
+msgstr "วันศุกร์"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
@@ -3038,7 +3057,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__is_fulfilled
 msgid "Fulfilled"
-msgstr ""
+msgstr "สำเร็จแล้ว"
 
 #. module: voip
 #. odoo-javascript
@@ -3068,7 +3087,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_generate/tts_generate_field.js:0
 msgid "Generating..."
-msgstr ""
+msgstr "กำลังสร้าง..."
 
 #. module: voip
 #. odoo-javascript
@@ -3292,6 +3311,12 @@ msgid "I have updated the proof of address with a more recent bill..."
 msgstr ""
 
 #. module: voip
+#: model:ir.model,name:voip.model_iap_account
+msgid "IAP Account"
+msgstr ""
+
+#. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__id
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:voip.field_ir_http__id
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__id
@@ -3464,7 +3489,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_list
 msgid "Inputs"
-msgstr ""
+msgstr "อินพุต"
 
 #. module: voip
 #. odoo-python
@@ -3559,7 +3584,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Invalid"
-msgstr ""
+msgstr "ไม่ถูกต้อง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__invalid_destination_ref
@@ -3651,37 +3676,37 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr_option__ivr_id
 msgid "Ivr"
-msgstr ""
+msgstr "ระบบตอบรับอัตโนมัติทางโทรศัพท์"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "January"
-msgstr ""
+msgstr "มกราคม"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "John"
-msgstr ""
+msgstr "จอห์น"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_kanban
 msgid "Join"
-msgstr ""
+msgstr "เข้าร่วม"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "July"
-msgstr ""
+msgstr "กรกฎาคม"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "June"
-msgstr ""
+msgstr "มิถุนายน"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_linphone_provisioning_key_hashes
@@ -3702,7 +3727,7 @@ msgstr "แป้นพิมพ์"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_voice_selection/tts_voice_selection_field.js:0
 msgid "Language"
-msgstr ""
+msgstr "ภาษา"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_search
@@ -3805,13 +3830,13 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_kanban
 msgid "Leave"
-msgstr ""
+msgstr "ลา"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__leg_ids
 #: model:ir.model.fields,field_description:voip.field_voip_conversation__leg_ids
 msgid "Leg"
-msgstr ""
+msgstr "ช่วงของการเชื่อมต่อ"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_provider__recording_policy__user
@@ -3831,7 +3856,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__linear
 msgid "Linear"
-msgstr ""
+msgstr "เชิงเส้น"
 
 #. module: voip
 #. odoo-javascript
@@ -3943,7 +3968,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "London"
-msgstr ""
+msgstr "ลอนดอน"
 
 #. module: voip
 #. odoo-javascript
@@ -3961,7 +3986,7 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/dialer.js:0
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__voicemail_id
 msgid "Mailbox"
-msgstr ""
+msgstr "กล่องจดหมาย"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_provider__voicemail_code
@@ -4005,7 +4030,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "March"
-msgstr ""
+msgstr "มีนาคม"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_activity_schedule_form_view
@@ -4050,7 +4075,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "May"
-msgstr ""
+msgstr "พฤษภาคม"
 
 #. module: voip
 #. odoo-javascript
@@ -4080,7 +4105,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_ivr
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Menu"
-msgstr ""
+msgstr "เมนู"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__menu_sound_id
@@ -4298,7 +4323,7 @@ msgstr "ชื่อ"
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__did_number_type__national
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__did_number_type__national
 msgid "National"
-msgstr ""
+msgstr "ระดับชาติ"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__needs_credits
@@ -4603,7 +4628,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "November"
-msgstr ""
+msgstr "พฤศจิกายน"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_result_line__phone_number
@@ -4763,7 +4788,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "October"
-msgstr ""
+msgstr "ตุลาคม"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users_settings__how_to_call_on_mobile__voip
@@ -4941,7 +4966,7 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/time_condition.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition_period__mode__open
 msgid "Open"
-msgstr ""
+msgstr "เปิด"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__open_destination_ref
@@ -5602,7 +5627,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_queue
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Queue"
-msgstr ""
+msgstr "คิว"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_queue_status
@@ -5622,7 +5647,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_list
 msgid "Queues"
-msgstr ""
+msgstr "คิว"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_queue
@@ -5632,7 +5657,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_ir_qweb
 msgid "Qweb"
-msgstr ""
+msgstr "Qweb"
 
 #. module: voip
 #. odoo-javascript
@@ -5644,7 +5669,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_music_on_hold__sort__random
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__random
 msgid "Random"
-msgstr ""
+msgstr "สุ่ม"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_music_on_hold__sort__random_start
@@ -5871,7 +5896,7 @@ msgstr ""
 #: code:addons/voip/models/voip_did_number.py:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__state__released
 msgid "Released"
-msgstr ""
+msgstr "เผยแพร่แล้ว"
 
 #. module: voip
 #. odoo-javascript
@@ -5972,7 +5997,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_requirement_group__requirement_ids
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_group_submit_form
 msgid "Requirements"
-msgstr ""
+msgstr "ข้อกำหนด"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement_group__filtered_requirement_ids
@@ -6091,12 +6116,12 @@ msgstr "กำลังดัง…"
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Ringtone"
-msgstr ""
+msgstr "เสียงเรียกเข้า"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__role
 msgid "Role"
-msgstr ""
+msgstr "บทบาท"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__rrmemory
@@ -6154,7 +6179,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call_leg__role__routing
 msgid "Routing"
-msgstr ""
+msgstr "การกำหนดเส้นทาง"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call_leg__sip_call_id
@@ -6172,7 +6197,7 @@ msgstr "ข้อผิดพลาดในการส่ง SMS"
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Saturday"
-msgstr ""
+msgstr "วันเสาร์"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_config_settings_view_form
@@ -6183,7 +6208,7 @@ msgstr "กำหนดเวลาและโทรจากฐานข้อ
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__step__search
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 msgid "Search"
-msgstr ""
+msgstr "ค้นหา"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__search_error
@@ -6240,7 +6265,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/search_bar.js:0
 msgid "Search…"
-msgstr ""
+msgstr "ค้นหา…"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
@@ -6612,12 +6637,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_list
 msgid "Sounds"
-msgstr ""
+msgstr "เสียง"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call_leg__role__source
 msgid "Source"
-msgstr ""
+msgstr "แหล่งที่มา"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__source_type
@@ -6742,7 +6767,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Sunday"
-msgstr ""
+msgstr "วันอาทิตย์"
 
 #. module: voip
 #. odoo-javascript
@@ -7764,7 +7789,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__did_number_type__toll_free
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__did_number_type__toll_free
 msgid "Toll-free"
-msgstr ""
+msgstr "หมายเลขโทรฟรี"
 
 #. module: voip
 #. odoo-python
@@ -7783,7 +7808,7 @@ msgstr "ระยะเวลารวม"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_music_on_hold__track_ids
 msgid "Tracks"
-msgstr ""
+msgstr "แทร็ก"
 
 #. module: voip
 #. odoo-javascript
@@ -7856,7 +7881,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
 msgid "Type"
-msgstr ""
+msgstr "ประเภท"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number__activity_exception_decoration
@@ -7911,7 +7936,7 @@ msgstr "ไม่ทราบ"
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_pip_window.js:0
 msgid "Unmute"
-msgstr ""
+msgstr "ยกเลิกการปิดเสียง"
 
 #. module: voip
 #. odoo-javascript
@@ -7922,7 +7947,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_group_submit_form
 msgid "Update"
-msgstr ""
+msgstr "อัปเดต"
 
 #. module: voip
 #. odoo-python
@@ -7935,7 +7960,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/audio_binary/audio_binary_field.xml:0
 msgid "Upload"
-msgstr ""
+msgstr "อัปโหลด"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_sound__source_type__upload
@@ -8104,7 +8129,7 @@ msgstr "ชื่อผู้ใช้"
 #: model:ir.model.fields,field_description:voip.field_voip_call_group__user_ids
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 msgid "Users"
-msgstr ""
+msgstr "ผู้ใช้"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__uses_odoo_provider
@@ -8120,7 +8145,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/in_call_view.xml:0
 msgid "Via"
-msgstr ""
+msgstr "ผ่าน"
 
 #. module: voip
 #. odoo-python
@@ -8469,7 +8494,7 @@ msgstr "ชื่อผู้ใช้ Voip"
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_queue_status__waiting
 msgid "Waiting"
-msgstr ""
+msgstr "กำลังรอ"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_provider__ws_server
@@ -8498,8 +8523,8 @@ msgid ""
 "Whether the call happened in a production environment. True for all calls "
 "created before this tracking was implemented."
 msgstr ""
-"ระบุว่าการโทรเกิดขึ้นในสภาพแวดล้อมจริงหรือไม่ โดยจะมีค่าเป็น True สำหรับทุกสายที่สร้างขึ้นก่อนเริ่ม"
-"ใช้งานระบบติดตามนี้"
+"ระบุว่าการโทรเกิดขึ้นในสภาพแวดล้อมจริงหรือไม่ โดยจะมีค่าเป็น True "
+"สำหรับทุกสายที่สร้างขึ้นก่อนเริ่มใช้งานระบบติดตามนี้"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__needs_credits
@@ -8814,6 +8839,18 @@ msgid "Zoom out"
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of an archived Call Flow"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of the Call Flow \"%(call_flow)s\""
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "add_shopping_cart"
@@ -8973,6 +9010,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "the Menu \"%(menu)s\""
 msgstr ""
 
 #~ msgid "VoIP"

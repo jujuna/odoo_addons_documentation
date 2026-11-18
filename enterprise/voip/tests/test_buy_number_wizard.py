@@ -12,7 +12,6 @@ from odoo.tools.safe_eval import expr_eval
 from odoo.addons.iap.models.iap_account import IapAccount
 from odoo.addons.voip.models.pbx_service import PBXService
 from odoo.addons.voip.models.phone_service_api import (
-    PHONE_SERVICE_NAME,
     PhoneServiceError,
     PhoneServiceAPI,
 )
@@ -1017,7 +1016,17 @@ class TestBuyNumberWizardWithRequirements(TestBuyNumberWizardBase):
                 "meta": {"total_results": 1},
             }
         if route.endswith("/create_requirement_group"):
-            return {"success": True, "data": {"id": "test_rg_001"}}
+            return {
+                "success": True,
+                "data": {
+                    "id": "test_rg_001",
+                    "regulatory_requirements": [
+                        {"requirement_id": "test_req_textual", "field_type": "textual"},
+                        {"requirement_id": "test_req_document", "field_type": "document"},
+                        {"requirement_id": "test_req_action", "field_type": "action"},
+                    ],
+                },
+            }
         return {"success": True, "data": {}}
 
     def _search_select_and_proceed(self, wizard):
@@ -1387,7 +1396,15 @@ class TestBuyNumberWizardActionRequirement(TestBuyNumberWizardBase):
                     "meta": {"total_results": 1},
                 }
             if route.endswith("/create_requirement_group"):
-                return {"success": True, "data": {"id": "rg_action_test"}}
+                return {
+                    "success": True,
+                    "data": {
+                        "id": "rg_action_test",
+                        "regulatory_requirements": [
+                            {"requirement_id": "req_action_test", "field_type": "action"},
+                        ],
+                    },
+                }
             return {"success": True, "data": {}}
 
         with patch.object(PhoneServiceAPI, "_call_phone_service", side_effect=mock_group_and_reqs):
@@ -1683,6 +1700,76 @@ class TestVoipRequirementValidation(TestBuyNumberWizardBase):
         with patch.object(PhoneServiceAPI, "_call_phone_service", side_effect=divergent):
             _data, requirements = api.create_requirement_group("BE", "local")
         self.assertEqual(requirements, {})
+
+
+@tagged("voip")
+class TestCreateRequirementGroup(common.TransactionCase):
+    """The requirement set comes from the created group, end_user_type from the listing."""
+
+    def _create(self, country_code, listed, group_requirement_ids):
+        calls = []
+
+        def route(route, params, retry_registration=True):
+            calls.append((route, params))
+            if "/get_requirements" in route:
+                return {"success": True, "data": listed, "meta": {"total_results": len(listed)}}
+            if route.endswith("/create_requirement_group"):
+                return {"success": True, "data": {
+                    "id": "rg_test",
+                    "regulatory_requirements": [
+                        {"requirement_id": req_id, "field_type": "textual"}
+                        for req_id in group_requirement_ids
+                    ],
+                }}
+            return {"success": True, "data": {}}
+
+        with patch.object(PhoneServiceAPI, "_call_phone_service", side_effect=route):
+            data, requirements = PhoneServiceAPI(self.env).create_requirement_group(country_code, "local")
+        payload = next(params for r, params in calls if r.endswith("/create_requirement_group"))["payload"]
+        return data, payload, [req["id"] for req in requirements.get("requirement_types", [])]
+
+    def _entry(self, end_user_type, *req_ids):
+        return {
+            "end_user_type": end_user_type,
+            "requirement_types": [
+                {"id": req_id, "name": f"Name {req_id}", "type": "textual"} for req_id in req_ids
+            ],
+        }
+
+    def test_company_end_user_type_sent_when_listed(self):
+        """India lists individual, company and a stale entry without end user type."""
+        listed = [
+            self._entry("individual", "full_name", "company_link"),
+            self._entry("company", "full_name", "gst", "pan"),
+            self._entry(None, "contact", "address"),
+        ]
+        data, payload, req_ids = self._create("IN", listed, ["full_name", "gst", "pan"])
+        self.assertEqual(data["id"], "rg_test")
+        self.assertEqual(payload["end_user_type"], "company")
+        self.assertEqual(req_ids, ["full_name", "gst", "pan"])
+
+    def test_only_end_user_type_listed_is_sent(self):
+        """A country listing a single end user type other than company gets that one."""
+        listed = [self._entry("individual", "full_name")]
+        _data, payload, _req_ids = self._create("XX", listed, ["full_name"])
+        self.assertEqual(payload["end_user_type"], "individual")
+
+    def test_no_end_user_type_when_none_listed(self):
+        listed = [self._entry(None, "contact", "address")]
+        _data, payload, req_ids = self._create("BE", listed, ["contact", "address"])
+        self.assertNotIn("end_user_type", payload)
+        self.assertEqual(req_ids, ["contact", "address"])
+
+    def test_group_requirements_pick_among_several_sets(self):
+        """Ireland lists two unrelated sets; only the group tells which one applies."""
+        listed = [self._entry(None, "a1", "a2"), self._entry(None, "b1", "b2", "b3")]
+        _data, _payload, req_ids = self._create("IE", listed, ["b1", "b2", "b3"])
+        self.assertEqual(req_ids, ["b1", "b2", "b3"])
+
+    def test_requirement_missing_from_listing_kept(self):
+        listed = [self._entry(None, "contact")]
+        _data, _payload, req_ids = self._create("BE", listed, ["contact", "unlisted"])
+        self.assertEqual(req_ids, ["contact", "unlisted"])
 
 
 @tagged("voip")
@@ -1991,7 +2078,7 @@ class TestBuyNumberWizardCreditGate(TestBuyNumberWizardBase):
         action = self._create_wizard().action_buy_credits()
         self.assertEqual(action["type"], "ir.actions.act_url")
         self.assertEqual(action["target"], "new")
-        self.assertIn(f"service_name={PHONE_SERVICE_NAME}", action["url"])
+        self.assertEqual(action["url"], "test_url")
 
     def test_refresh_balance_repolls_and_keeps_wizard_open(self):
         wizard = self._create_wizard()

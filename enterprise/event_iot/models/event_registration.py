@@ -14,5 +14,6 @@ class EventRegistration(models.Model):
             "identifier": printer.identifier,
             "iotIdentifier": printer.iot_id.identifier,
             "ip": printer.iot_id.ip,
+            "iotBoxId": printer.iot_id.id,
         })
         return result

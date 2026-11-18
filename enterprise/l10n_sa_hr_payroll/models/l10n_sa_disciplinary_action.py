@@ -165,7 +165,7 @@ class L10nSaDisciplinaryAction(models.Model):
                 elif self.daily_wage_based_on == 'working_days':
                     res_cal = employee.version_id.resource_calendar_id
                     month_start = self.date.replace(day=1)
-                    next_month = self.date.replace(day=1, month=self.date.month + 1)
+                    next_month = month_start + relativedelta(months=1)
                     start_dt = fields.Datetime.to_datetime(month_start)
                     end_dt = fields.Datetime.to_datetime(next_month) - relativedelta(seconds=1)
                     days = float(res_cal.get_work_duration_data(start_dt, end_dt)['days'])

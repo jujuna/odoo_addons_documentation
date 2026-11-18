@@ -342,7 +342,7 @@ class AccountIntrastatReportHandler(models.AbstractModel):
                     %(weight_rounding)s
                 )) AS weight,
                 CASE WHEN code.supplementary_unit IS NOT NULL and SUM(prod.intrastat_supplementary_unit_amount) != 0
-                    THEN CAST(SUM(prod.intrastat_supplementary_unit_amount * account_move_line.quantity * inv_line_uom.factor / prod_uom.factor) AS numeric)
+                    THEN ROUND(CAST(SUM(prod.intrastat_supplementary_unit_amount * account_move_line.quantity * inv_line_uom.factor / prod_uom.factor) AS numeric), 2)
                     ELSE NULL END AS supplementary_units,
                 code.supplementary_unit AS supplementary_units_code,
                 -- We double sign the balance to make sure that we keep consistency between invoice/bill and the intrastat report

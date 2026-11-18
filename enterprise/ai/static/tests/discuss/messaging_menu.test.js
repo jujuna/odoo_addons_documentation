@@ -7,7 +7,7 @@ import {
     start,
     startServer,
 } from "@mail/../tests/mail_test_helpers";
-import { test } from "@odoo/hoot";
+import { test, waitFor } from "@odoo/hoot";
 import { Command, serverState } from "@web/../tests/web_test_helpers";
 import { defineAIModels } from "../ai_test_helpers";
 
@@ -18,6 +18,16 @@ test("Can open a new AI chat from the messaging menu AI tab", async () => {
     await openMessagingMenu(MENU_ACTIVE_IDS.AI_CHAT);
     await click("button:has([data-icon='add']):text('Chat')");
     await contains(".o-mail-ChatWindow-displayName:text('Test AI Agent')");
+});
+
+test("light user's messaging menu only has the discuss tabs", async () => {
+    serverState.isRegularUser = false;
+    await start();
+    await openMessagingMenu();
+    await waitFor(".o-mail-MessagingMenu-tab:count(3)");
+    await waitFor(".o-mail-MessagingMenu-tab[data-id='chat']");
+    await waitFor(".o-mail-MessagingMenu-tab[data-id='channel']");
+    await waitFor(".o-mail-MessagingMenu-tab[data-id='meeting']");
 });
 
 test("AI tab has an unread filter", async () => {

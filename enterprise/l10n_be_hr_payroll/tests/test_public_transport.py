@@ -24,7 +24,7 @@ class TestPublicTransport(TestPayrollCommon):
             'bus_transport_employee_kilometer': kilometer,
         })
         # the employer intervention table of 1 February 2026
-        return version.with_context(payslip_date=date(2026, 3, 1))._get_public_transport_reimbursed_amount('bus')
+        return version._get_public_transport_reimbursed_amount('bus', ref_date=date(2026, 3, 1))
 
     def test_cp302_bus(self):
         # 80% of the price paid, at most the table amount for 16 km (67 a month, 674 a year), without minimum amount
@@ -46,6 +46,34 @@ class TestPublicTransport(TestPayrollCommon):
             (50, 'fixed', 0, 35.9),
             (100, 'monthly', 5, 40.0),
             (40, 'monthly', 5, 30.0),
+            # price by distance without the distance: nothing (no fallback on the 1 km bracket)
+            (100, 'monthly', 0, 0.0),
+            (1000, 'yearly', 0, 0.0),
         ):
             self.assertAlmostEqual(self._bus_reimbursement('200', amount, periodicity, kilometer), expected, places=2,
                                    msg=f"{amount} {periodicity} {kilometer} km")
+
+    def test_missing_distance_warning(self):
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_public_transport_missing_distance')
+
+        def get_dashboard_employees():
+            return self.env['hr.employee'].union(
+                warning_data['records'] for warning_data in warning._get_applicable_payroll_warnings(self.env.company)
+            )
+
+        self.assertNotIn(self.employee, get_dashboard_employees())
+        # Only where the reimbursement depends on the distance: CP 200 subscription priced by distance
+        for joint_committee, periodicity, kilometer, warned in (
+            ('200', 'monthly', 0, True),
+            ('200', 'yearly', 0, True),
+            ('200', 'monthly', 5, False),
+            ('200', 'fixed', 0, False),
+            ('302', 'monthly', 0, False),
+        ):
+            with self.subTest(joint_committee=joint_committee, periodicity=periodicity, kilometer=kilometer):
+                self._bus_reimbursement(joint_committee, 100, periodicity, kilometer)
+                if warned:
+                    self.assertIn(self.employee, get_dashboard_employees())
+                else:
+                    self.assertNotIn(self.employee, get_dashboard_employees())
+        self.assertFalse(warning.block_payslips)

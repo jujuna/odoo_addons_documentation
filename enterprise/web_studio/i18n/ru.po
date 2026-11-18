@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:44+0000\n"
-"PO-Revision-Date: 2026-09-18 00:26+0000\n"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-10-28 14:33+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-20/"
 "web_studio/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -80,6 +80,20 @@ msgid ""
 "\n"
 "Note: Only the admin user is allowed to make those customizations.\n"
 msgstr ""
+"\n"
+"Студия - Настройка Odoo\n"
+"=======================\n"
+"\n"
+"Этот аддон позволяет пользователю настраивать большинство элементов "
+"пользовательского интерфейса в\n"
+"простым и графическим способом. Он имеет две основные функции:\n"
+"\n"
+"* создание нового приложения (добавление модуля, пункта меню верхнего уровня "
+"и действия по умолчанию)\n"
+"* настройка существующего приложения (редактирование меню, действий, "
+"представлений, переводов, ...)\n"
+"\n"
+"Примечание: только пользователь admin имеет право выполнять эти настройки.\n"
 
 #. module: web_studio
 #. odoo-python
@@ -209,6 +223,7 @@ msgstr "<b>Отличная работа!</b> Вы прошли все этап�
 #: code:addons/web_studio/models/studio_approval.py:0
 msgid "A child rule must operates on the same model as its main rule"
 msgstr ""
+"Дочернее правило должно работать с той же моделью, что и его основное правило"
 
 #. module: web_studio
 #. odoo-javascript
@@ -650,6 +665,8 @@ msgid ""
 "Are you sure you want to remove the %(node)s %(field)s from the view?\n"
 "If you need it back, add it from the list of existing fields."
 msgstr ""
+"Вы уверены, что хотите удалить %(node)s %(field)s из представления?\n"
+"Если он вам понадобится снова, добавьте его из списка существующих полей."
 
 #. module: web_studio
 #. odoo-javascript
@@ -661,7 +678,7 @@ msgstr "Вы уверены, что хотите удалить значения
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
 msgid "Are you sure you want to remove this %(node)s from the view?"
-msgstr ""
+msgstr "Вы действительно хотите удалить %(node)s из представления?"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2424,6 +2441,12 @@ msgid "Invalid studio_approval %s in button"
 msgstr "Недопустимое значение studio_approval %s в кнопке"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
+msgid "Invisible"
+msgstr ""
+
+#. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__is_delegation
 msgid "Is Delegation"
 msgstr "Делегирование"
@@ -3263,6 +3286,12 @@ msgid "Ratings"
 msgstr "Рейтинги"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
+msgid "Readonly"
+msgstr ""
+
+#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 msgid "Ready"
@@ -3416,6 +3445,12 @@ msgstr "Отчеты"
 #: code:addons/web_studio/controllers/main.py:0
 msgid "Reports for %(model_name)s (%(model)s)"
 msgstr "Отчеты для %(model_name)s (%(model)s)"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
+msgid "Required"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__res_id
@@ -3631,7 +3666,7 @@ msgstr "выбрать поле"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
 msgid "Select a M2O field from another model pointing to the current model"
-msgstr ""
+msgstr "Выберите поле M2O из другой модели, ссылающееся на текущую модель"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view_quick_create
@@ -3675,6 +3710,9 @@ msgid ""
 "predefined order\\n- Optimized: Reorders stops to minimize travel time and "
 "distance"
 msgstr ""
+"Выберите предпочтительный вариант маршрутизации Mapbox:\\n- Упорядоченный: "
+"сохраняет остановки в предварительно заданном порядке\\n- Оптимизированный: "
+"переупорядочивает остановки для минимизации времени и расстояния в пути"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3740,6 +3778,9 @@ msgid ""
 "range (e.g. [100, 200]). If not set, the width is automatically computed to "
 "fit optimally."
 msgstr ""
+"Установите фиксированную ширину (например, 100), минимальную ширину "
+"(например, [100]) или диапазон ширины (например, [100, 200]). Если не "
+"установлено, ширина вычисляется автоматически для оптимального размещения."
 
 #. module: web_studio
 #. odoo-javascript
@@ -3808,6 +3849,8 @@ msgid ""
 "Some records were skipped because approvals were missing "
 "to                                    proceed with your request:"
 msgstr ""
+"Некоторые записи были пропущены, так как отсутствовали согласования, "
+"необходимые для                                    выполнения вашего запроса:"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4214,6 +4257,10 @@ msgid ""
 "some view inherits from another but targets a node that doesn't exist. It "
 "might be due to the mutations of the base views during the upgrade process."
 msgstr ""
+"Отчет не удалось загрузить, так как произошла какая-то ошибка. Обычно это "
+"означает, что какое-то представление наследуется от другого, но нацелено на "
+"несуществующий узел. Это может быть связано с мутациями базовых "
+"представлений в процессе обновления."
 
 #. module: web_studio
 #. odoo-javascript
@@ -4268,6 +4315,8 @@ msgid ""
 "There are %s records that use the values you are trying to remove.\n"
 "Are you sure you want to get rid of them?"
 msgstr ""
+"Эти значения используются в %s записях.\n"
+"Вы действительно хотите их удалить?"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4278,6 +4327,10 @@ msgid ""
 "To create a one2many field on the current model, you must first create its "
 "many2one counterpart on the model you want to relate to.\n"
 msgstr ""
+"В текущей модели нет полей many2one, связанных с ней.\n"
+"\n"
+"Чтобы создать поле one2many в текущей модели, необходимо сначала создать его "
+"аналог many2one в модели, к которой вы хотите привязаться.\n"
 
 #. module: web_studio
 #. odoo-python

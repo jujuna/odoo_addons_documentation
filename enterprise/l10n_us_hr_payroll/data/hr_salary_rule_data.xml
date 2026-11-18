@@ -1123,6 +1123,7 @@ tax_to_be_withheld = (gross - bracket) * rate / 100 if gross >= bracket else 0
 
 if version.schedule_pay in ['semi-annually', 'quarterly', 'bi-monthly']:
     tax_to_be_withheld /= version._get_salary_costs_factor()[version.schedule_pay]
+tax_to_be_withheld = ceil(tax_to_be_withheld)
 
 result = -(tax_to_be_withheld + employee.l10n_us_state_extra_withholding)
         </field>
@@ -1351,6 +1352,7 @@ result_rate = payslip._rule_parameter('l10n_us_co_famli_rate')
     <record id="l10n_us_employee_co_opt_aurora" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [ref('l10n_us_hr_payroll.hr_payroll_taxes')])]"/>
         <field name="name">CO OPT Aurora</field>
+        <field name="active" eval="False"/>
         <field name="code">COOPTAURORA</field>
         <field name="sequence">166</field>
         <field name="condition_select">python</field>
@@ -1483,6 +1485,20 @@ result_qty = payslip.sum_worked_hours
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 gross = categories['TAXABLE'] - result_rules['401K']['total']
+year_payslips = version.env['hr.payslip'].search([
+    ('employee_id', '=', employee.id),
+    ('state', 'in', ['validated', 'paid']),
+    ('date_from', '&gt;=', payslip.date_from + relativedelta(day=1, month=1)),
+    ('date_to', '&lt;=', payslip.date_from + relativedelta(days=-1)),
+    ('company_id', '=', version.company_id.id),
+])
+line_values = year_payslips._get_line_values(['TAXABLE', '401K'], vals_list=['amount'], compute_sum=True)
+previous_amounts = line_values['TAXABLE']['sum']['amount'] - line_values['401K']['sum']['amount']
+cap = payslip._rule_parameter('l10n_us_OASDI_cap')
+if previous_amounts &gt; cap:
+    gross = 0
+else:
+    gross = min(cap - previous_amounts, gross)
 rate = payslip._rule_parameter('l10n_us_or_fmli_employee_portion') / 100
 result = gross * rate
 result_rate = - payslip._rule_parameter('l10n_us_or_fmli_rate')
@@ -1868,8 +1884,21 @@ result_rate = payslip._rule_parameter('l10n_us_dc_pfl_rate')
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 taxable = categories['TAXABLE']
+year_payslips = version.env['hr.payslip'].search([
+    ('employee_id', '=', employee.id),
+    ('state', 'in', ['validated', 'paid']),
+    ('date_from', '&gt;=', payslip.date_from + relativedelta(day=1, month=1)),
+    ('date_to', '&lt;=', payslip.date_from + relativedelta(days=-1)),
+    ('company_id', '=', version.company_id.id),
+])
+line_values = year_payslips._get_line_values(['TAXABLE'], vals_list=['amount'], compute_sum=True)
+previous_amounts = line_values['TAXABLE']['sum']['amount']
 rate, cap = payslip._rule_parameter('l10n_us_dc_administrative_funding_tax')
-result = min(taxable * rate / 100, cap)
+if previous_amounts &gt; cap:
+    result = 0
+else:
+    result = min(cap - previous_amounts, taxable)
+result_rate = rate
         </field>
         <field name="appears_on_payslip" eval="False"/>
         <field name="partner_id" ref="res_partner_pfl_dc"/>
@@ -1906,6 +1935,20 @@ result_qty = payslip.sum_worked_hours
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 gross = categories['TAXABLE'] - result_rules['401K']['total']
+year_payslips = version.env['hr.payslip'].search([
+    ('employee_id', '=', employee.id),
+    ('state', 'in', ['validated', 'paid']),
+    ('date_from', '&gt;=', payslip.date_from + relativedelta(day=1, month=1)),
+    ('date_to', '&lt;=', payslip.date_from + relativedelta(days=-1)),
+    ('company_id', '=', version.company_id.id),
+])
+line_values = year_payslips._get_line_values(['TAXABLE', '401K'], vals_list=['amount'], compute_sum=True)
+previous_amounts = line_values['TAXABLE']['sum']['amount'] - line_values['401K']['sum']['amount']
+cap = payslip._rule_parameter('l10n_us_OASDI_cap')
+if previous_amounts &gt; cap:
+    gross = 0
+else:
+    gross = min(cap - previous_amounts, gross)
 rate = 1 - payslip._rule_parameter('l10n_us_or_fmli_employee_portion') / 100
 result = gross * rate
 result_rate = payslip._rule_parameter('l10n_us_or_fmli_rate')
@@ -2003,6 +2046,7 @@ result_rate = -payslip._rule_parameter('l10n_us_co_famli_rate')
     <record id="l10n_us_employee_salary_company_co_opt_aurora" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [ref('l10n_us_hr_payroll.hr_payroll_employer_deductions')])]"/>
         <field name="name">Employer Taxes: CO OPT Aurora</field>
+        <field name="active" eval="False"/>
         <field name="code">COMPANYCOOPTAURORA</field>
         <field name="sequence">176</field>
         <field name="condition_select">python</field>

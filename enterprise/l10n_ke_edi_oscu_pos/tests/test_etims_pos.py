@@ -1,10 +1,12 @@
+from unittest.mock import patch
+
 from odoo import Command
 from odoo.addons.l10n_ke_edi_oscu_pos.tests.common import CommonPosKeEdiTest
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
 from odoo.addons.l10n_ke_edi_oscu.tests.common import TestKeEdiCommon
 from odoo.addons.l10n_ke_edi_oscu.tests.test_live import TestKeEdi
-from odoo.exceptions import UserError
-from odoo.tests import tagged
+from odoo.exceptions import LockError, UserError
+from odoo.tests import new_test_user, tagged
 
 from freezegun import freeze_time
 
@@ -112,6 +114,151 @@ class TestEtimsPos(TestKeEdiCommon, CommonPosKeEdiTest):
         self.assertEqual(order.l10n_ke_oscu_internal_data, order.account_move.l10n_ke_oscu_internal_data)
         self.assertEqual(order.l10n_ke_oscu_signature, order.account_move.l10n_ke_oscu_signature)
         self.assertEqual(order.l10n_ke_oscu_receipt_number, order.account_move.l10n_ke_oscu_receipt_number)
+
+    def test_invoice_stamped_before_stock_moves_commit(self):
+        """ Sending the stock moves commits, so the invoice must carry the eTIMS values by then:
+        a failure after that commit would otherwise leave a sent order with an unstamped invoice. """
+        order, _ = self.create_backend_pos_order({
+            'order_data': {
+                'partner_id': self.partner_moda.id,
+                'to_invoice': True,
+            },
+            'line_data': [
+                {'product_id': self.twenty_dollars_with_10_incl.product_variant_id.id}
+            ],
+            'payment_data': [
+                {'payment_method_id': self.bank_payment_method.id}
+            ]
+        })
+
+        invoice_signatures = []
+        with patch.object(
+            self.env.registry['stock.move'], '_l10n_ke_oscu_process_moves', autospec=True,
+            side_effect=lambda moves: invoice_signatures.append(order.account_move.l10n_ke_oscu_signature),
+        ):
+            order.action_post_order()
+
+        self.assertEqual(invoice_signatures, ['123456789ODOOGR3'])
+
+    def test_rejected_order_does_not_keep_etims_number(self):
+        """ The number of a rejected order goes back to the sequence and is taken by the next
+        order, so the rejected order must not claim it (and its receipt) on its next attempt. """
+        order_data = {
+            'order_data': {
+                'partner_id': self.partner_moda.id,
+            },
+            'line_data': [
+                {'product_id': self.twenty_dollars_with_10_incl.product_variant_id.id}
+            ],
+            'payment_data': [
+                {'payment_method_id': self.bank_payment_method.id}
+            ]
+        }
+        rejected_order, _ = self.create_backend_pos_order(order_data)
+        next_order, _ = self.create_backend_pos_order(order_data)
+
+        with patch.object(
+            self.env.registry['res.company'], '_l10n_ke_call_etims', autospec=True,
+            return_value=({'code': '910', 'message': 'Invalid request'}, {}, None),
+        ):
+            rejected_order.post_order_to_etims()
+        next_order.action_post_order()
+        rejected_order.action_post_order()
+
+        self.assertNotEqual(rejected_order.l10n_ke_oscu_order_number, next_order.l10n_ke_oscu_order_number)
+
+    def _create_paid_order(self):
+        order, _ = self.create_backend_pos_order({
+            'order_data': {
+                'partner_id': self.partner_moda.id,
+            },
+            'line_data': [
+                {'product_id': self.twenty_dollars_with_10_incl.product_variant_id.id}
+            ],
+            'payment_data': [
+                {'payment_method_id': self.bank_payment_method.id}
+            ]
+        })
+        return order
+
+    def _patch_etims(self, save_sale=None, on_call=None):
+        """ Answer saveTrnsSalesOsdc with `save_sale` when given, every other endpoint as in demo mode. """
+        call_etims = self.env.registry['res.company']._l10n_ke_call_etims
+
+        def _call_etims(company, endpoint, content):
+            if on_call:
+                on_call(endpoint, content)
+            if save_sale and endpoint == 'saveTrnsSalesOsdc':
+                return save_sale
+            return call_etims(company, endpoint, content)
+
+        return patch.object(self.env.registry['res.company'], '_l10n_ke_call_etims', autospec=True, side_effect=_call_etims)
+
+    def test_sent_order_not_filed_again(self):
+        """ A request retried after the order was accepted must not send the sale to eTIMS again. """
+        order = self._create_paid_order()
+        order.action_post_order()
+        number = order.l10n_ke_oscu_order_number
+
+        endpoints = []
+        with self._patch_etims(on_call=lambda endpoint, content: endpoints.append(endpoint)):
+            order.post_order_to_etims()
+
+        self.assertEqual(endpoints, [])
+        self.assertEqual(order.l10n_ke_oscu_order_number, number)
+
+    def test_order_being_sent_elsewhere_not_sent(self):
+        """ The order is locked while it is sent, so a concurrent write cannot roll back the
+        transaction after eTIMS accepted the sale; a second send is refused. """
+        order = self._create_paid_order()
+
+        endpoints = []
+        with (
+            patch.object(self.env.registry['pos.order'], 'lock_for_update', side_effect=LockError("locked")),
+            self._patch_etims(on_call=lambda endpoint, content: endpoints.append(endpoint)),
+            self.assertRaises(UserError),
+        ):
+            order.post_order_to_etims()
+
+        self.assertEqual(endpoints, [])
+
+    def test_cashier_duplicate_number_does_not_block_next_sales(self):
+        """ eTIMS answering 924 to a cashier must not end in an access error on the sequence,
+        and the number it already holds must not be handed to the next sale. """
+        cashier = new_test_user(self.env, 'ke_cashier', groups='base.group_user,point_of_sale.group_pos_user,account.group_account_invoice', company_id=self.company.id)
+        order = self._create_paid_order().with_user(cashier)
+
+        sent = []
+        with self._patch_etims(
+            save_sale=({'code': '924', 'message': 'Invoice number already exists'}, {}, None),
+            on_call=lambda endpoint, content: endpoint == 'saveTrnsSalesOsdc' and sent.append(content['invcNo']),
+        ):
+            response = order.post_order_to_etims()
+
+        next_order = self._create_paid_order().with_user(cashier)
+        with self._patch_etims(
+            save_sale=({'code': '910', 'message': 'Invalid request'}, {}, None),
+            on_call=lambda endpoint, content: endpoint == 'saveTrnsSalesOsdc' and sent.append(content['invcNo']),
+        ):
+            next_order.post_order_to_etims()
+
+        self.assertEqual(response['error']['code'], '924')
+        self.assertFalse(order.l10n_ke_order_json['invcNo'])
+        self.assertEqual(len(sent), 2)
+        self.assertNotEqual(sent[1], sent[0])
+
+    def test_pending_number_recovered(self):
+        """ eTIMS holds the sale this order sent before (e.g. after a timeout): recover its
+        receipt, don't resend. """
+        order = self._create_paid_order()
+        order.l10n_ke_order_json = {'invcNo': 2}
+
+        endpoints = []
+        with self._patch_etims(on_call=lambda endpoint, content: endpoints.append(endpoint)):
+            order.action_post_order()
+
+        self.assertEqual(order.l10n_ke_oscu_order_number, 2)
+        self.assertNotIn('saveTrnsSalesOsdc', endpoints)
 
     def test_cant_send_order_with_product_out_of_stock(self):
         order, _ = self.create_backend_pos_order({

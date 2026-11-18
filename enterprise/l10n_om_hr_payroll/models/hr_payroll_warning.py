@@ -6,6 +6,8 @@ class HrPayrollWarning(models.Model):
 
     def _get_payroll_translation(self, text, **kwargs):
         # Please order alphabetically to easily spot duplicates
+        if text == "Company Bank Account":
+            return self.env._("Company Bank Account")
         if text == "Employee":
             return self.env._("Employee")
         if text == "Kindly configure the company's MOL registration number":

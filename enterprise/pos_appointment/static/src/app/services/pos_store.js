@@ -2,9 +2,31 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { POSAppointmentQuickCreate } from "@pos_appointment/app/form_extend/form_view_dialog";
 import { PosStore } from "@point_of_sale/app/services/pos_store";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 patch(PosStore.prototype, {
+    verifyBooking() {
+        if (this.config.raw.appointment_type_id) {
+            return true;
+        }
+        this.dialog.add(AlertDialog, {
+            title: _t("Booking Unavailable"),
+            body: _t("Please set an appointment type in the PoS Configuration."),
+        });
+
+        if (this.router.currentScreenParams().actionName === "manage-booking") {
+            const { page, params } = this.defaultPage;
+            this.navigate(
+                page,
+                page === "ProductScreen" ? { orderUuid: this.getEmptyOrder().uuid } : params
+            );
+        }
+        return false;
+    },
     async manageBookings(viewMode = "") {
+        if (!this.verifyBooking()) {
+            return;
+        }
         this.orderToTransferUuid = null;
         this.navigate("ActionScreen", { actionName: "manage-booking", viewMode: viewMode });
     },
@@ -14,7 +36,7 @@ patch(PosStore.prototype, {
         }
 
         return this.dialog.add(POSAppointmentQuickCreate, {
-            title: _t("Edit"),
+            title: _t("Edit Booking"),
             resModel: "calendar.event",
             resId: appointmentId,
             size: "md",
@@ -43,7 +65,7 @@ patch(PosStore.prototype, {
             context = { ...context, ...opt.context };
         }
         return this.dialog.add(POSAppointmentQuickCreate, {
-            title: _t("Create"),
+            title: _t("Create Booking"),
             resModel: "calendar.event",
             size: "md",
             context: context,

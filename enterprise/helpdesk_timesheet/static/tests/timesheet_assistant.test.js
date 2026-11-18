@@ -6,6 +6,7 @@ import {
     onRpc,
     selectFieldDropdownItem,
 } from "@web/../tests/web_test_helpers";
+import { advanceTime } from "@odoo/hoot-dom";
 import { WebClient } from "@web/webclient/webclient";
 import { setupTimesheetEnvironment } from "@timesheet_grid/../tests/timesheet_timer_helpers";
 
@@ -172,4 +173,91 @@ test("Timesheet Assistant: should automatically link helpdesk ticket and fill fo
     expect(`${form} .o_field_widget[name='helpdesk_ticket_id'] input`).toHaveValue("Ticket #101");
 
     expect(`${form} .o_field_widget[name='task_id']`).toHaveCount(0);
+});
+
+test("Timesheet Assistant search filters suggestions by helpdesk ticket", async () => {
+    const today = luxon.DateTime.now().startOf("day").plus({ hours: 10 });
+    localStorage.setItem("aw_suggestion_pref", "timeline");
+
+    const [firstProject, secondProject] = pyEnv["project.project"].create([
+        { name: "Support", allow_timesheets: true, has_helpdesk_team: true },
+        { name: "VIP team", allow_timesheets: true, has_helpdesk_team: true },
+    ]);
+    const [firstTicket, secondTicket] = pyEnv["helpdesk.ticket"].create([
+        { name: "Printer offline", project_id: firstProject },
+        { name: "Very persuasive ticket", project_id: secondProject },
+    ]);
+
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 15, rounding: 15 },
+        odoo_models_data: [
+            {
+                model: "helpdesk.ticket",
+                label: "Ticket",
+                template: "Working on $1",
+                url_regex: `${window.location.origin}/odoo/helpdesk/(?:\\d+)/tickets/(\\d+)`,
+                type: "odoo",
+            },
+        ],
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () =>
+        [firstTicket, secondTicket].map((ticketId, index) => ({
+            timestamp: today.plus({ minutes: index * 10 }).toISO(),
+            duration: 600,
+            data: {
+                title: ticketId === firstTicket ? "Printer offline" : "Very persuasive ticket",
+                url: `${window.location.origin}/odoo/helpdesk/1/tickets/${ticketId}`,
+            },
+        }))
+    );
+
+    onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
+        "helpdesk.ticket": {
+            [firstTicket]: {
+                project_id: firstProject,
+                project_name: "Support",
+                source_record_name: "Printer offline",
+                task_id: false,
+            },
+            [secondTicket]: {
+                project_id: secondProject,
+                project_name: "VIP team",
+                source_record_name: "Very persuasive ticket",
+                task_id: false,
+            },
+        },
+    }));
+
+    await openAssistant();
+    expect(".o_suggestions_suggestion").toHaveCount(2);
+
+    await contains(".o_aw_search_input").edit("persuasive");
+    await advanceTime(250);
+    expect(".o_suggestions_suggestion").toHaveCount(1);
+    expect(".o_suggestions_suggestion_description").toHaveText("Working on Very persuasive ticket");
+    expect(".o_suggestions_suggestion_description .o-mail-Message-searchHighlight").toHaveText(
+        "persuasive"
+    );
+
+    await contains("button[name='action_groupby_project']").click();
+    expect(".o_suggestions_suggestion").toHaveCount(1);
+    expect(".o_suggestions_suggestion_description .o-mail-Message-searchHighlight").toHaveText(
+        "persuasive"
+    );
+
+    await contains(".o_aw_search_input").edit("Unknown ticket");
+    await advanceTime(250);
+    expect(".o_suggestions_suggestion").toHaveCount(0);
+    expect(".o_suggestions_content p[title='Unknown ticket']").toHaveText(
+        'No suggestions match "Unknown ticket".'
+    );
+
+    await contains("button[title='Clear search']").click();
+    expect(".o_aw_search_input").toHaveValue("");
+    expect(".o_suggestions_suggestion").toHaveCount(2);
+    expect(".o_suggestions_content .o-mail-Message-searchHighlight").toHaveCount(0);
 });

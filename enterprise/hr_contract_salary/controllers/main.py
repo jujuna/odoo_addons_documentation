@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import hashlib
+import re
 
 from collections import defaultdict, OrderedDict
 from odoo import fields, http, models, Command, _
@@ -50,6 +51,19 @@ class SignContract(Sign):
         return result
 
     def _update_version_on_signature(self, request_item, version, offer):
+        """Update the version, the employee and the offer when the contract is signed.
+
+        When the employee (first signer) has signed, the offer becomes ``half_signed`` (or
+        ``full_signed`` if nobody else must sign). When all signers have signed, the offer is
+        ``full_signed``, the new version is activated (replacing the current version if it does
+        not start before it, its payslips being moved to the new version), the employee and its
+        work contact are activated and the applicant moves to the *Hired* stage. The benefit
+        activities and signature requests are created at each step.
+
+        :param request_item: signed ``sign.request.item`` record
+        :param version: ``hr.version`` record created by the offer (archived until fully signed)
+        :param offer: ``hr.contract.salary.offer`` record
+        """
         # Only the applicant/employee has signed
         if request_item.sign_request_id.nb_closed == 1:
             version.hash_token = False
@@ -98,6 +112,15 @@ class SignContract(Sign):
             self._send_benefit_sign_request(version)
 
     def _create_activity_benefit(self, version, contract_states):
+        """Schedule on ``version`` the activities of its chosen benefits.
+
+        For the benefits of the structure type with an activity type and an ``activity_creation``
+        in ``contract_states``: when the benefit is set (``always``) or when its value differs from
+        the origin version (``onchange``).
+
+        :param version: ``hr.version`` record
+        :param contract_states: ``activity_creation`` values (``running``, ``countersigned``)
+        """
         benefits = request.env['hr.contract.salary.benefit'].sudo().search([
             ('structure_type_id', '=', version.structure_type_id.id),
             ('activity_type_id', '!=', False),
@@ -114,6 +137,13 @@ class SignContract(Sign):
                     user_id=benefit.activity_responsible_id.id)
 
     def _send_benefit_sign_request(self, version):
+        """Create the signature requests of the documents of the chosen benefits (``sign_template_id``).
+
+        Same conditions as :meth:`_create_activity_benefit`, one request per sign template, signed
+        by the employee and/or the HR responsible depending on the template roles.
+
+        :param version: ``hr.version`` record
+        """
         benefits = request.env['hr.contract.salary.benefit'].sudo().search([
             ('structure_type_id', '=', version.structure_type_id.id),
             ('sign_template_id', '!=', False)])
@@ -161,6 +191,14 @@ class HrContractSalary(http.Controller):
         return payslip._get_payslip_lines()
 
     def _get_default_template_values(self, version, offer):
+        """Return the values rendered in the ``hr_contract_salary.salary_package`` template.
+
+        :meth:`_get_salary_package_values` completed with the offer values (job, department,
+        ``final_yearly_costs``...) and the page options (``redirect_to_job``, ``whitelist``,
+        ``part_time``), overridden by :meth:`_compute_salary_package`.
+
+        :rtype: dict
+        """
         values = self._get_salary_package_values(version, offer)
         values.update({
             'redirect_to_job': False,
@@ -184,14 +222,27 @@ class HrContractSalary(http.Controller):
             'status_message': self.env._('This offer is outdated, please request an updated link...')})
 
     def _can_submit_offer(self, values):
+        """Return whether the package can be submitted: not a simulation offer, nor a job page.
+
+        :param dict values: values of :meth:`_get_default_template_values`
+        :rtype: bool
+        """
         return not values['redirect_to_job'] and not values.get('is_simulation_offer', False)
 
     def check_access_to_salary_configurator(self, request_token, offer, version):
-        """
-        Methods of access:
-        1 - User access (inside 'group_hr_manager')
-        2 - User access (the user of the offered employee, if exists)
-        3 - Token
+        """Check that the current user can open the configurator of the offer.
+
+        The offer must exist, not be expired nor refused, and the user must be an HR manager,
+        give the offer access token, or, if the employee of the offer has a user, be that user or
+        be able to read the version.
+
+        :param str request_token: token given in the request
+        :param offer: ``hr.contract.salary.offer`` record
+        :param version: ``hr.version`` record of the offer (``hr.contract.salary.offer._get_version()``)
+        :return: ``(True, None)``, or ``(False, error page response)``
+        :rtype: tuple
+        :raise NotFound: if the offer has no token and the user no access.
+        :raise AccessError: if the user cannot read the version of another user.
         """
         if not offer.exists() or offer.state in ['expired', 'refused']:
             return False, request.render('http_routing.http_error', {
@@ -233,6 +284,17 @@ class HrContractSalary(http.Controller):
             'status_message': error_msg})
 
     def _compute_salary_package(self, version, offer, **kw):
+        """Render the configurator page of the offer.
+
+        The wage of ``version`` is set from the yearly cost of the offer (which public offers
+        can override with the ``final_yearly_costs`` URL parameter), then the page is rendered
+        with :meth:`_get_default_template_values`.
+
+        :param version: ``hr.version`` record of the offer, in the simulation savepoint
+        :param offer: ``hr.contract.salary.offer`` record
+        :param kw: URL parameters (``token``, ``final_yearly_costs``, ``job_id``, ``allow``, ``part``)
+        :rtype: odoo.http.Response
+        """
         if offer.applicant_id:
             version = version.with_context(is_applicant=True)
 
@@ -297,6 +359,7 @@ class HrContractSalary(http.Controller):
         return response
 
     def _compute_salary_package_thank_you(self, version, offer, **kw):
+        """Render the page displayed after the employee signed, with the HR responsible contact."""
         response = request.render("hr_contract_salary.salary_package_thank_you", {
             'responsible_name': version.hr_responsible_id.partner_id.name or version.job_id.recruiter_id.name,
             'responsible_email': version.hr_responsible_id.work_email or version.job_id.recruiter_id.work_email,
@@ -314,18 +377,52 @@ class HrContractSalary(http.Controller):
         return response
 
     def _get_personal_infos_countries(self, version, personal_info):
+        """Return the countries proposed by a ``country`` dropdown personal info.
+
+        :rtype: res.country
+        """
         return request.env['res.country'].search([])
 
     def _get_personal_infos_states(self, version, personal_info):
+        """Return the states proposed by a ``state`` dropdown personal info.
+
+        :rtype: res.country.state
+        """
         return request.env['res.country.state'].search([])
 
     def _get_personal_infos_langs(self, version, personal_info):
+        """Return the languages proposed by a ``lang`` dropdown personal info.
+
+        :rtype: res.lang
+        """
         return request.env['res.lang'].search([])
 
     def _should_add_personal_info(self, personal_info, version):
+        """Return whether the personal info is asked in the configurator of ``version``.
+
+        Hook to hide generic personal infos per country.
+
+        :param personal_info: ``hr.contract.salary.personal.info`` record
+        :param version: ``hr.version`` record
+        :rtype: bool
+        """
         return True
 
     def _get_personal_infos(self, version, offer):
+        """Return the personal infos to display in the configurator and their initial values.
+
+        The personal infos are the generic ones and those of the structure type of ``version``
+        accepted by :meth:`_should_add_personal_info`; for simulation offers, only those which
+        ``impacts_net_salary``. Initial values are read on the employee, its bank account, or its
+        last created version; documents are data URIs.
+
+        :param version: ``hr.version`` record
+        :param offer: ``hr.contract.salary.offer`` record
+        :return: ``(personal infos by info type name, dropdown options by field,
+            initial values by field)``; dropdown options are lists of ``(value, label)``
+            (``(id, name, country id)`` for states)
+        :rtype: tuple[dict, dict, dict]
+        """
         initial_values = {}
         dropdown_options = {}
         targets = {
@@ -400,11 +497,37 @@ class HrContractSalary(http.Controller):
         return new_mapped_personal_infos, new_dropdown_options, new_initial_values
 
     def _get_benefits(self, version_vals, offer):
+        """Return the configurable benefits of the structure type.
+
+        :param dict version_vals: version values (``hr.version._get_values_dict()``)
+        :param offer: ``hr.contract.salary.offer`` record
+        :rtype: hr.contract.salary.benefit
+        """
         return request.env['hr.contract.salary.benefit'].sudo().search([
             ('structure_type_id', '=', version_vals.get('structure_type_id')),
              ('is_configurable_benefit', '=', True)])
 
     def _get_benefits_values(self, version, offer):
+        """Return the benefits to display in the configurator and their initial values.
+
+        Initial values are read on ``version`` and are keyed by the benefit field, with the
+        ``fold_<field>``, ``<field>_radio``, ``<field>_manual``, ``<field>_text`` and
+        ``select_<field>`` variants depending on the display type.
+
+        :param version: ``hr.version`` record
+        :param offer: ``hr.contract.salary.offer`` record
+        :return: an 8-tuple:
+
+            * the benefits by ``hr.contract.salary.benefit.type``;
+            * the input names of the benefits depending on each benefit (space separated);
+            * the input names of the mandatory benefits of each benefit (space separated);
+            * the names of each benefit and of its mandatory benefits (``;`` separated);
+            * the benefit types, sorted;
+            * the dropdown options by field: ``[(value, value)]``;
+            * the dropdown group options by field: ``{section: [(value, value)]}``;
+            * the initial values by input name.
+        :rtype: tuple
+        """
         initial_values = {}
         dropdown_options = {}
         dropdown_group_options = {}
@@ -486,6 +609,14 @@ class HrContractSalary(http.Controller):
         return mapped_benefits, mapped_dependent_benefits, mapped_mandatory_benefits, mapped_mandatory_benefits_names, benefit_types, dropdown_options, dropdown_group_options, initial_values
 
     def _get_salary_package_values(self, version, offer):
+        """Return the benefits and personal infos values of the configurator page.
+
+        Merge :meth:`_get_personal_infos` and :meth:`_get_benefits_values` (floats rounded to 5
+        digits) under the ``benefits``, ``mapped_personal_infos``, ``dropdown_options``,
+        ``initial_values``... keys.
+
+        :rtype: dict
+        """
         mapped_personal_infos, dropdown_options_1, initial_values_1 = self._get_personal_infos(version, offer)
         mapped_benefits, mapped_dependent_benefits, mandatory_benefits, mandatory_benefits_names, benefit_types, dropdown_options_2, dropdown_group_options, initial_values_2 = self._get_benefits_values(version, offer)
         all_initial_values = {**initial_values_1, **initial_values_2}
@@ -507,6 +638,20 @@ class HrContractSalary(http.Controller):
         }
 
     def _get_new_version_values(self, version_vals, employee, benefits, offer):
+        """Return the values of the version created from the configured package.
+
+        The version is archived, starts at the offer ``contract_start_date`` (keeping the
+        contract dates for an amendment) and gets the wage, yearly cost and benefit values
+        chosen in the configurator. For a benefit field, the
+        ``hr.version._get_benefit_values_<field>(version_vals, benefits)`` method, if any,
+        returns the values to write instead. ``x_`` fields of the offer are copied as well.
+
+        :param dict version_vals: values of the current version (``hr.version._get_values_dict()``)
+        :param employee: ``hr.employee`` record
+        :param dict benefits: configurator inputs of the ``version`` section, by input name
+        :param offer: ``hr.contract.salary.offer`` record
+        :rtype: dict
+        """
         version_benefits = self._get_benefits(version_vals, offer)
         company = self.env['res.company'].browse(version_vals.get('company_id'))
         # During simulation, the offer temporarily becomes an amendment. After rollback and cache invalidation, compute isn't triggered automatically!
@@ -514,6 +659,8 @@ class HrContractSalary(http.Controller):
         effective_date = offer.contract_start_date or fields.Date.today().replace(day=1)
         contract_date_start = offer.employee_version_id.contract_date_start if offer.is_contract_amendment else effective_date
         contract_date_end = offer.employee_version_id.contract_date_end if offer.is_contract_amendment else offer.contract_end_date
+        # The job location is the work address of the hired applicants, the employees keep theirs
+        address = offer.applicant_id and offer.employee_job_id.address_id or employee.address_id
         new_version_vals = {
             'active': False,
             'name': version_vals.get('name') or self.env._("Package Simulation"),
@@ -535,7 +682,7 @@ class HrContractSalary(http.Controller):
             'contract_date_end': contract_date_end,
             'employee_type_id': version_vals.get('employee_type_id'),
             'originated_offer_id': offer.id,
-            'address_id': employee.address_id.id,
+            'address_id': address.id,
             'work_location_id': employee.work_location_id.id,
         }
         if 'attendance_based' in version_vals:
@@ -563,7 +710,33 @@ class HrContractSalary(http.Controller):
                 new_version_vals[field] = offer[field]
         return new_version_vals
 
+    def _get_iban_error(self, account_number):
+        """Return an error message when the account number is not a valid IBAN, or False.
+
+        A wrong bank account blocks the salary payment, so the candidate has to fix it before submitting.
+        Only the account numbers starting with a country code are IBANs: the others are not checked.
+        """
+        # The IBAN validation is added by account, which the salary configurator does not depend on
+        if not account_number or 'account.account' not in request.env:
+            return False
+        if not re.sub(r'[\W_]', '', account_number)[:2].isalpha():
+            return False
+        if request.env['res.partner.bank'].retrieve_account_type(account_number) != 'iban':
+            return _("The IBAN %s is not valid, please verify it.", account_number)
+        return False
+
     def _update_personal_info(self, employee, version, personal_infos_values, no_name_write=False):
+        """Write the personal infos entered in the configurator.
+
+        On the employee, the version and the bank account (found or created for the work
+        contact); the work contact is created (archived) if needed.
+
+        :param employee: ``hr.employee`` record
+        :param version: ``hr.version`` record
+        :param dict personal_infos_values: inputs by section (``employee``, ``version_personal``,
+            ``bank_account``)
+        :param bool no_name_write: do not overwrite the employee and contact names
+        """
         def resolve_value(field_name, values):
             targets = {
                 'version_personal': request.env['hr.version'],
@@ -649,9 +822,6 @@ class HrContractSalary(http.Controller):
 
         employee_vals['work_contact_id'] = partner.id
 
-        if job.address_id:
-            employee_vals['address_id'] = job.address_id.id
-
         if not no_name_write:
             employee_vals['name'] = employee_vals['legal_name'] = employee_infos.get('name', '')
         # unclear why, but was done due to 'selection field issue', to check at some point
@@ -662,6 +832,22 @@ class HrContractSalary(http.Controller):
             request.env['ir.attachment'].sudo().create(attachment_create_vals)
 
     def create_new_version(self, version_vals, offer, benefits, no_write=False, **kw):
+        """Create the version (archived) and the employee of the configured package.
+
+        The employee is the one of the offer or of the applicant, or a new archived employee.
+        The version is created from :meth:`_get_new_version_values`, the personal infos are
+        written (:meth:`_update_personal_info`) and the payroll properties are set from the
+        ``rule`` benefits (:meth:`_update_version_payroll_properties`).
+
+        :param dict version_vals: values of the current version (``hr.version._get_values_dict()``)
+        :param offer: ``hr.contract.salary.offer`` record
+        :param dict benefits: configurator inputs by section (``version``, ``version_personal``,
+            ``employee``, ``address``, ``bank_account``)
+        :param bool no_write: compute the differences with the current values
+        :return: ``(new version, [(field label, old value, new value)])``; overrides may return
+            ``{'error': True, 'error_msg': message}`` instead, which :meth:`submit` returns as is
+        :rtype: tuple
+        """
         # Generate a new version with the current modifications
         version_diff = []
         benefits_values = benefits['version']
@@ -778,6 +964,16 @@ class HrContractSalary(http.Controller):
         return new_version, version_diff
 
     def _compute_update_salary(self, version, offer, benefits, **kw):
+        """Simulate the configured package and return the values displayed by the configurator.
+
+        :param version: ``hr.version`` record of the offer
+        :param offer: ``hr.contract.salary.offer`` record
+        :param dict benefits: configurator inputs by section
+        :param kw: ``simulation_working_schedule`` (see
+            ``hr.version._generate_salary_simulation_payslip()``)
+        :return: :meth:`_get_compute_results` and ``new_gross``, the wage of the new version
+        :rtype: dict
+        """
         result = {}
         version_vals = version._get_values_dict()
         new_version = self.create_new_version(version_vals, offer, benefits, no_write=True)[0]
@@ -807,6 +1003,23 @@ class HrContractSalary(http.Controller):
         return result
 
     def _get_compute_results(self, new_version):
+        """Return the package summary of a simulated version, displayed by the configurator.
+
+        The resume lines (generic or of the structure type) give their value from a fixed value,
+        a version field, a sum of benefits, or a line of the simulated payslip; the
+        ``monthly_total`` lines add up the lines that ``impacts_monthly_total``.
+
+        :param new_version: ``hr.version`` record, in the simulation savepoint
+        :return: a dict with:
+
+            * ``wage``: the wage of ``new_version``;
+            * ``resume_categories``: the category names, sorted;
+            * ``resume_lines_mapped``: ``{category name: {code: (name, value, uom symbol,
+              explanation, currency position, uom)}}``;
+            * ``payslip_lines``: ``[(name, total, code, 'total' or the sign of the total,
+              currency position, currency symbol)]`` for the lines shown on payslips.
+        :rtype: dict
+        """
         schedule_pay_label = dict(request.env['hr.version']._fields['schedule_pay']._description_selection(request.env))
 
         def _get_period_name(category_id, version):
@@ -875,13 +1088,17 @@ class HrContractSalary(http.Controller):
         payslip_lines = payslip._get_payslip_lines()
 
         salary_rules = request.env['hr.salary.rule'].sudo().browse([line['salary_rule_id'] for line in payslip_lines])
-        appears_on_payslip_mapped = {rule.id: rule.appears_on_payslip for rule in salary_rules}
+        # As on the PDF, the lines of the extra info section are not part of the payslip lines
+        appears_on_payslip_mapped = {
+            rule.id: 'never' if rule.display_in_pdf_extra_info else rule.appears_on_payslip
+            for rule in salary_rules
+        }
 
         result['payslip_lines'] = [(
             line['name'],
             f'{line['total']:.2f}',
             line['code'],
-            'total' if line['code'] in ['BASIC', 'SALARY', 'GROSS', 'NET', 'GROSSIP'] else float_compare(line['total'], 0, precision_digits=2),
+            'total' if line['code'] in ['BASIC', 'SALARY', 'GROSS', 'TAXABLE_SALARY_TOTAL', 'NET', 'GROSSIP'] else float_compare(line['total'], 0, precision_digits=2),
             new_version.company_id.currency_id.position,
             new_version.company_id.currency_id.symbol
         ) for line in payslip_lines if (appears_on_payslip_mapped[line['salary_rule_id']] == 'always'
@@ -929,6 +1146,11 @@ class HrContractSalary(http.Controller):
         return result
 
     def _update_version_payroll_properties(self, version, benefits):
+        """Set the payroll properties of the ``rule`` benefits from the configurator inputs.
+
+        :param version: ``hr.version`` record
+        :param dict benefits: configurator inputs of the ``version`` section
+        """
         version_benefits = request.env['hr.contract.salary.benefit'].sudo().search([
             ('structure_type_id', '=', version.structure_type_id.id),
             ('source', '=', 'rule')])
@@ -944,6 +1166,20 @@ class HrContractSalary(http.Controller):
             version._set_property_input_value(benefit.salary_rule_id.code, float(value))
 
     def _compute_onchange_benefit(self, version, benefit_field, new_value, offer, benefits, **kw):
+        """Return the new configuration of a benefit modified in the configurator.
+
+        The description is ``hr.version._get_description_<field>(new_value)`` if it exists, else
+        the benefit description. Override to adapt the value or other inputs.
+
+        :param version: ``hr.version`` record of the offer
+        :param str benefit_field: input name of the benefit
+        :param new_value: new input value
+        :param offer: ``hr.contract.salary.offer`` record
+        :param dict benefits: configurator inputs by section
+        :return: ``{'new_value': value, 'description': html or False, 'extra_values': False or
+            [(input name, value)]}``
+        :rtype: dict
+        """
         benefit = request.env['hr.contract.salary.benefit'].sudo().search([
             ('structure_type_id', '=', version.structure_type_id.id),
             ('field', '=', benefit_field)], limit=1)
@@ -985,6 +1221,11 @@ class HrContractSalary(http.Controller):
         return {'hide_children': not bool(value), 'field': field}
 
     def _get_email_info(self, version, **kw):
+        """Return the package summary sent by email when the package is submitted.
+
+        :return: ``{'mapped_data': {section: {sub section: [(label, value)]}}}``
+        :rtype: dict
+        """
         field_names = {
             model: {
                 field.name: field.field_description for field in request.env['ir.model.fields'].sudo().search([('model', '=', model)])
@@ -1046,6 +1287,10 @@ class HrContractSalary(http.Controller):
         return {'mapped_data': result}
 
     def _append_additional_benefit_info(self, benefit_info, version, field_names, field_name):
+        """Hook to add lines after a benefit in :meth:`_get_email_info`.
+
+        :param list benefit_info: ``[(label, value)]`` of the benefit type, to complete
+        """
         return
 
     def _send_mail_message(self, offer, template, kw, values, new_version_id=None):
@@ -1058,6 +1303,10 @@ class HrContractSalary(http.Controller):
         )
 
     def send_email(self, offer, version, **kw):
+        """Post the package summary (:meth:`_get_email_info`) on the offer.
+
+        :return: ``version`` id
+        """
         self._send_mail_message(
             offer,
             'hr_contract_salary.hr_contract_salary_email_template',
@@ -1066,6 +1315,10 @@ class HrContractSalary(http.Controller):
         return version.id
 
     def send_diff_email(self, offer, differences, new_version_id, **kw):
+        """Post on the new version the differences with the current one.
+
+        :param list differences: ``[(field label, old value, new value)]``
+        """
         self._send_mail_message(
             offer,
             'hr_contract_salary.hr_contract_salary_diff_email_template',
@@ -1074,12 +1327,26 @@ class HrContractSalary(http.Controller):
             new_version_id)
 
     def _compute_submit(self, version, offer, benefits, **kw):
+        """Return the values of the current version used to create the new one on submission.
+
+        :rtype: dict
+        """
         if version.employee_id.user_id == request.env.user:
             kw['employee'] = version.employee_id
         return version._get_values_dict()
 
     @http.route(['/salary_package/submit'], type='jsonrpc', auth='public')
     def submit(self, offer_id=None, benefits=None, **kw):
+        """Create the archived version of the configured package and its signature request.
+
+        The version is created by :meth:`create_new_version` (outside the simulation savepoint),
+        the summary and the differences are posted, and a signature request of the offer sign
+        template is created for the offer signatories.
+
+        :return: ``{'job_id', 'request_id', 'token', 'error': 0, 'new_version_id'}``, the token
+            being the one of the employee sign request item; or ``{'error': 1, 'error_msg'}``
+        :rtype: dict
+        """
         with hr_version_context(request, invalidate=True):
             offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
             if offer.is_simulation_offer:
@@ -1092,6 +1359,10 @@ class HrContractSalary(http.Controller):
             if not has_access:
                 return error_page
             version_vals = self._compute_submit(version, offer, benefits, **kw)
+
+        iban_error = self._get_iban_error(benefits['bank_account'].get('account_number'))
+        if iban_error:
+            return {'error': 1, 'error_msg': iban_error}
 
         kw['package_submit'] = True
         new_version = self.create_new_version(version_vals, offer, benefits, no_write=True, **kw)
@@ -1203,6 +1474,10 @@ class HrContractSalary(http.Controller):
         }
 
     def _compute_refuse(self, version, offer, feedback, token):
+        """Check that the offer can be refused.
+
+        :raise UserError: without version and valid token.
+        """
         if not version and (not token or not consteq(offer.access_token, token)):
             raise UserError(self.env._('This link is invalid. Please contact the HR Responsible to get a new one...'))
 

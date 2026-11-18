@@ -13,14 +13,14 @@ patch(FrequencyViewer.prototype, {
     get idToModel() {
         return {
             ...super.idToModel,
-            heldepsk_ticket_id: "helpdesk.ticket",
+            helpdesk_ticket_id: "helpdesk.ticket",
         };
     },
 
     getRecordData(parsed, names) {
         return {
             ...super.getRecordData(parsed, names),
-            ticket: names.heldepsk_ticket_id?.[parsed.heldepsk_ticket_id],
+            ticket: names.helpdesk_ticket_id?.[parsed.helpdesk_ticket_id],
         };
     },
 });

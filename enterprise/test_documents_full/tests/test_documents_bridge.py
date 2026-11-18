@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import RecordCapturer
 from odoo.tests.common import tagged
 
@@ -83,3 +83,22 @@ class TestDocumentsBridge(TestDocumentsBridgeCommon):
         self.env.company.documents_bridge_settings = False
         self.env.company.documents_bridge_folder_id.action_archive()
         self.env.company.documents_bridge_folder_id.unlink()
+
+    def test_bridge_folder_cannot_link_to_record(self):
+        """It should not be possible for a bridge folder to be linked to a record."""
+        bridge_folder = self.env.company.documents_bridge_folder_id
+        self.assertTrue(bridge_folder, "The company should have a default folder")
+        TestModel = self.env["documents.mixin.test.folder.per.instance"]
+
+        with self.assertRaises(ValidationError):
+            TestModel.create({"name": "Record", "record_folder_id": bridge_folder.id})
+
+    def test_different_company_bridge_folder_cannot_link_to_record(self):
+        """It should not be possible for another company's bridge folder to be linked to a record."""
+        shared_folder = self.env["documents.document"].create({"name": "Shared Folder", "type": "folder", "company_id": False})
+        self.company_2.documents_bridge_folder_id = shared_folder.id
+        self.company_2.documents_bridge_settings = True
+        TestModel = self.env["documents.mixin.test.folder.per.instance"]
+
+        with self.assertRaises(ValidationError):
+            TestModel.create({"name": "Record", "record_folder_id": shared_folder.id})

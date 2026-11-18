@@ -114,11 +114,37 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    def _inter_company_prepare_invoice_line_data(self):
-        ''' Get values to create the invoice line.
-        We prioritize the analytic distribution in the following order:
+    def _inter_company_get_analytic_distribution(self, source_distribution, source_account_ids, product_id, product_categ_id, partner, company, account_prefix=None):
+        ''' Retrieve the merged analytic distribution for an inter-company document line.
+            Prioritize the analytic distribution in the following order:
             - Default Analytic Distribution model specific to Company B
             - Analytic Distribution set for the line in Company A's document if available to Company B
+        '''
+        distribution_model_vals = {
+            'product_id': product_id,
+            'product_categ_id': product_categ_id,
+            'partner_id': partner.id,
+            'partner_category_id': partner.category_id.ids,
+            'company_id': company.id,
+        }
+        if account_prefix:
+            distribution_model_vals['account_prefix'] = account_prefix
+        company_b_default = self.env['account.analytic.distribution.model']._get_distribution(distribution_model_vals) or {}
+        analytic_distribution = {}
+        if source_distribution:
+            accounts_with_company = source_account_ids.filtered('company_id')
+            for key, val in source_distribution.items():
+                is_company_account = False
+                for account_id in key.split(','):
+                    if int(account_id) in accounts_with_company.ids:
+                        is_company_account = True
+                        break
+                if not is_company_account:
+                    analytic_distribution[key] = val
+        return dict(company_b_default, **analytic_distribution)
+
+    def _inter_company_prepare_invoice_line_data(self):
+        ''' Get values to create the invoice line.
         :return: Python dictionary of values.
         '''
         self.ensure_one()
@@ -141,29 +167,16 @@ class AccountMoveLine(models.Model):
 
         company_b = self.env['res.company']._find_company_from_partner(self.move_id.partner_id.id)
         company_a_partner = self.company_id.partner_id
-        company_b_default_distribution = self.env['account.analytic.distribution.model']._get_distribution({
-            "product_id": self.product_id.id,
-            "product_categ_id": self.product_id.categ_id.id,
-            "partner_id": company_a_partner.id,
-            "partner_category_id": company_a_partner.category_id.ids,
-            "account_prefix": self.account_id.code,
-            "company_id": company_b.id,
-        })
-
-        analytic_distribution = {}
-        if self.analytic_distribution:
-            accounts_with_company = self.distribution_analytic_account_ids.filtered('company_id')
-
-            for key, val in self.analytic_distribution.items():
-                is_company_account = False
-                for account_id in key.split(','):
-                    if int(account_id) in accounts_with_company.ids:
-                        is_company_account = True
-                        break
-                if not is_company_account:
-                    analytic_distribution[key] = val
-
-        if company_b_default_distribution or analytic_distribution:
-            vals['analytic_distribution'] = dict(company_b_default_distribution, **analytic_distribution)
+        analytic = self._inter_company_get_analytic_distribution(
+            self.analytic_distribution,
+            self.distribution_analytic_account_ids,
+            self.product_id.id,
+            self.product_id.categ_id.id,
+            company_a_partner,
+            company_b,
+            account_prefix=self.account_id.code,
+        )
+        if analytic:
+            vals['analytic_distribution'] = analytic
 
         return vals

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="attachment_ai_agent_source_1" model="ir.attachment">
+        <field name="name">Odoo Enterprise Agreement.pdf</field>
+        <field name="raw" type="bytes" file="ai_agentic/static/demo/odoo_enterprise_agreement.pdf"/>
+        <field name="mimetype">application/pdf</field>
+        <field name="res_model">ai.agent</field>
+    </record>
+
+    <record id="ai_agent_source_1" model="ai.agent.source">
+        <field name="name">Odoo Enterprise Agreement</field>
+        <field name="attachment_id" ref="attachment_ai_agent_source_1"/>
+        <field name="type">binary</field>
+        <field name="agent_id" ref="ai.ai_agent_1"/>
+    </record>
+</odoo>

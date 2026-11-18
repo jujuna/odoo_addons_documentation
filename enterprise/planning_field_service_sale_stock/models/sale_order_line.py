@@ -26,7 +26,9 @@ class SaleOrderLine(models.Model):
                 if move.state in ('done', 'cancel'):
                     continue
                 if move.product_uom_qty:
-                    if not move.move_line_ids:
+                    if sol_to_treat.product_id.tracking == 'none':
+                        move.quantity = move.product_uom_qty
+                    elif not move.move_line_ids:
                         ml_vals = move._prepare_move_line_vals(quantity=0)
                         ml_vals['quantity'] = move.product_uom_qty
                         ml_vals['lot_id'] = sol_to_treat.fsm_lot_id.id

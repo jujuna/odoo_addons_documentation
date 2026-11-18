@@ -23,6 +23,7 @@ Indian Payroll Salary Rules.
     - Yearly Salary by Employee Report
     """,
     'data': [
+        'data/hr_work_entry_type_data.xml',
         'data/report_paperformat.xml',
         'data/mail_template_data.xml',
         'data/res_country_state_data.xml',

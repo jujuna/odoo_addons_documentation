@@ -85,8 +85,55 @@
 
     <!-- Withholding Taxes -->
     <record id="WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 / 274.20 (Periodic)</field>
         <field name="code">WITHHOLDING_BASE</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Taxable amount by nature of the withholding tax declarations, see the
+         withholding tax categories below. -->
+    <record id="TAXABLE_SALARY" model="hr.salary.rule.category">
+        <field name="name">Taxable Salary (274)</field>
+        <field name="code">TAXABLE_SALARY</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Set on the rules summing the withholding tax bases of the natures 10/20 (GROSS, DH_GROSS, ...), which are only
+         on the structures taxing them: a rule belonging to two bases is counted once. Also on the rules feeding a base
+         after it is summed (PP_EXEMP), or without such rule (HORECA_OCC_TAXABLE). -->
+    <record id="TAXABLE_10_20" model="hr.salary.rule.category">
+        <field name="name">Taxable 274.10 / 274.20</field>
+        <field name="code">TAXABLE_10_20</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.TAXABLE_SALARY"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="ECONOMIC_UNEMPLOYMENT_BASE" model="hr.salary.rule.category">
+        <field name="name">Taxable 274.13 (Economic Unemployment)</field>
+        <field name="code">TAXABLE_13</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.TAXABLE_SALARY"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Set on the rule summing the replacement revenues of the work entries (REPLACEMENT_REVENUE_BASE) -->
+    <record id="TAXABLE_18" model="hr.salary.rule.category">
+        <field name="name">Taxable 274.18 (Replacement Revenues)</field>
+        <field name="code">TAXABLE_18</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.TAXABLE_SALARY"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="TAXABLE_30" model="hr.salary.rule.category">
+        <field name="name">Taxable 274.30 (Presence Tokens)</field>
+        <field name="code">TAXABLE_30</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.TAXABLE_SALARY"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Intellectual property, declared in the 273S -->
+    <record id="IP_WT" model="hr.salary.rule.category">
+        <field name="name">Taxable 273S</field>
+        <field name="code">TAXABLE_273S</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -97,7 +144,7 @@
     </record>
 
     <record id="YEARLY_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Yearly Withholding Tax Base</field>
+        <field name="name">Taxable 274.20 (Non-periodic)</field>
         <field name="code">YEARLY_WITHHOLDING_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
@@ -105,34 +152,34 @@
     <!-- the pay of the days a Horeca occasional worker spends in its contingent, taxed at a flat rate apart from the
          scale and its reductions -->
     <record id="OCCASIONAL_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Occasional Workers Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 (Occasional)</field>
         <field name="code">OCCASIONAL_WITHHOLDING_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
     <record id="BONUS_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Bonus Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 (Bonus)</field>
         <field name="code">BONUS_WITHHOLDING_BASE</field>
         <field name="parent_id" ref="l10n_be_hr_payroll.IPA_REDUCTION_BASE"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
     <record id="WARRANT_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Warrant Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 / 274.20 (Warrant &amp; SOP)</field>
         <field name="code">WARRANT_WITHHOLDING_BASE</field>
         <field name="parent_id" ref="l10n_be_hr_payroll.IPA_REDUCTION_BASE"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
     <record id="DH_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Double Holiday Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 (Holiday Pay)</field>
         <field name="code">DH_WITHHOLDING_BASE</field>
         <field name="parent_id" ref="l10n_be_hr_payroll.IPA_REDUCTION_BASE"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
     <record id="TERMINATION_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Termination Fees Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 (Termination fees)</field>
         <field name="code">TERMINATION_WITHHOLDING_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
@@ -150,7 +197,7 @@
     </record>
 
     <record id="TERMINATION_HOLIDAY_WITHHOLDING_BASE" model="hr.salary.rule.category">
-        <field name="name">Termination Holidays Withholding Tax Base</field>
+        <field name="name">Taxable 274.10 (Termination Holiday Pay)</field>
         <field name="code">TERMINATION_HOLIDAY_WITHHOLDING_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
@@ -158,6 +205,47 @@
     <record id="PP" model="hr.salary.rule.category">
         <field name="name">Withholding Tax</field>
         <field name="code">PP</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WITHHOLDING_TAX_274_10_20" model="hr.salary.rule.category">
+        <field name="name">Withholding Tax 274.10 / 274.20</field>
+        <field name="code">WITHHOLDING_TAX_274_10_20</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.PP"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WITHHOLDING_TAX_274_13" model="hr.salary.rule.category">
+        <field name="name">Withholding Tax 274.13</field>
+        <field name="code">WITHHOLDING_TAX_274_13</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.PP"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WITHHOLDING_TAX_274_18" model="hr.salary.rule.category">
+        <field name="name">Withholding Tax 274.18</field>
+        <field name="code">WITHHOLDING_TAX_274_18</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.PP"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WITHHOLDING_TAX_274_30" model="hr.salary.rule.category">
+        <field name="name">Withholding Tax 274.30</field>
+        <field name="code">WITHHOLDING_TAX_274_30</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.PP"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WITHHOLDING_TAX_273S" model="hr.salary.rule.category">
+        <field name="name">Withholding Tax 273S</field>
+        <field name="code">WITHHOLDING_TAX_273S</field>
+        <field name="parent_id" ref="l10n_be_hr_payroll.PP"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="FISCAL_VOLUNTARISM" model="hr.salary.rule.category">
+        <field name="name">Fiscal Voluntarism</field>
+        <field name="code">FISCAL_VOLUNTARISM</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -238,12 +326,6 @@
         <field name="name">Seized Amount</field>
         <field name="code">SEIZED_AMOUNT</field>
         <field name="parent_id" ref="l10n_be_hr_payroll.REMUNERATION_BASE"/>
-        <field name="country_id" ref="base.be"/>
-    </record>
-
-    <record id="ECONOMIC_UNEMPLOYMENT_BASE" model="hr.salary.rule.category">
-        <field name="name">Economic Unemployment Base</field>
-        <field name="code">ECONOMIC_UNEMPLOYMENT_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -465,6 +547,14 @@
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- The variable revenues (commissions and what replaces them), averaged for the loss on commission and the
+         holiday pay on the variable salary -->
+    <record id="VARIABLE_REVENUES" model="hr.salary.rule.category">
+        <field name="name">Variable Revenues</field>
+        <field name="code">VARIABLE_REVENUES</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <record id="VARIABLE_SALARY_LOSS" model="hr.salary.rule.category">
         <field name="name">Variable Salary Loss</field>
         <field name="code">VARIABLE_SALARY_LOSS</field>
@@ -475,13 +565,6 @@
     <record id="ONSS_NO_WT" model="hr.salary.rule.category">
         <field name="name">Remuneration Subject to ONSS, Exempt from Withholding Tax</field>
         <field name="code">ONSS_NO_WT</field>
-        <field name="country_id" ref="base.be"/>
-    </record>
-
-    <!-- Intellectual property subject to the IP withholding tax -->
-    <record id="IP_WT" model="hr.salary.rule.category">
-        <field name="name">Intellectual Property Subject to Withholding Tax</field>
-        <field name="code">IP_WT</field>
         <field name="country_id" ref="base.be"/>
     </record>
 

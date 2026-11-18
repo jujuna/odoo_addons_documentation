@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 18:27+0000\n"
-"PO-Revision-Date: 2026-09-18 05:05+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 18:28+0000\n"
+"PO-Revision-Date: 2026-11-10 15:35+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "l10n_nl_reports/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,15 @@ msgid ""
 "Accounting reports for Netherlands\n"
 "Submit your Tax Reports to the Dutch tax authorities\n"
 msgstr ""
+"\n"
+"Boekhoudrapporten voor Nederland\n"
+"Dien je belastingaangiften in bij de Nederlandse belastingdienst\n"
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/models/l10n_nl_reports_sbr_status_service.py:0
 msgid "%(attachment_name)s (detached).%(attachment_extension)s"
-msgstr ""
+msgstr "%(attachment_name)s (losgekoppeld).%(attachment_extension)s"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -46,6 +49,7 @@ msgstr "Ophalen van de status van %(report_name)s mislukt"
 msgid ""
 "%(report_name)s status retrieval requires the submission certificate (%(id)s)"
 msgstr ""
+"%(report_name)s status opvragen vereist het indieningscertificaat (%(id)s)"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -96,14 +100,15 @@ msgid ""
 "return of <t t-out=\"object.company_id.name or ''\">NL Company</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"></"
+"t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -112,22 +117,21 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p>\n"
 "                    Beste <t t-out=\"object.company_id.name or ''\">NL "
-"Bedrijf</t>,\n"
+"Company</t>,\n"
 "                </p>\n"
 "                <p>\n"
-"                     Op basis van de ontvangen documenten en informatie is "
-"de btw-aangifte van <t t-out=\"object.company_id.name or ''\">NL Bedrijf</"
-"t>\n"
-"                    voor de periode <t t-"
-"out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> ingediend.\n"
+"                    Op basis van de ontvangen documenten en informatie is de "
+"btw-aangifte van <t t-out=\"object.company_id.name or ''\">NL Company</t>\n"
+"                    voor periode <t t-out=\"object.type_id._get_period_name"
+"(object.company_id, object.date_from, object.date_to)\"></t> ingediend.\n"
 "                </p>\n"
 "                <p>\n"
-"                    Vastgesteld is dat een bedrag van <t t-"
+"                    Er is vastgesteld dat een bedrag van <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> verschuldigd blijft.\n"
+"object.amount_to_pay_currency_id)\"></t> nog moet worden betaald.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"></t>"
+"\n"
 "                <p>Met vriendelijke groet,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -139,6 +143,8 @@ msgid ""
 "<span class=\"text-muted ms-2\">Use your own certificate instead of Odoo's.</"
 "span>"
 msgstr ""
+"<span class=\"text-muted ms-2\">Gebruik je eigen certificaat in plaats van "
+"dat van Odoo.</span>"
 
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.vat_payment_details_table
@@ -153,7 +159,7 @@ msgstr "Geaccepteerd"
 #. module: l10n_nl_reports
 #: model:ir.model,name:l10n_nl_reports.model_account_chart_template
 msgid "Account Chart Template"
-msgstr ""
+msgstr "Grootboekschema sjabloon"
 
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.vat_payment_details_table
@@ -206,12 +212,15 @@ msgid ""
 "An internal error occurred on the IAP Odoo server. Please contact Odoo "
 "support."
 msgstr ""
+"Er is een interne fout opgetreden op de IAP-Odoo-server. Neem contact op met "
+"Odoo support."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "An unexpected error occurred while sending your report."
 msgstr ""
+"Er is een onverwachte fout opgetreden bij het verzenden van je rapport."
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,help:l10n_nl_reports.field_l10n_nl_reports_sbr_icp_wizard__contact_type
@@ -333,7 +342,7 @@ msgstr "Aangemaakt op"
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Digipoort"
-msgstr ""
+msgstr "Digipoort"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_res_company__l10n_nl_reports_sbr_cert_id
@@ -346,21 +355,21 @@ msgstr "Digipoort-certificaat"
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Digipoort pre-production"
-msgstr ""
+msgstr "Digipoort preproductie"
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Discussion ID unavailable."
-msgstr ""
+msgstr "Discussie-ID niet beschikbaar."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Discussion ID: %(id)s"
-msgstr ""
+msgstr "Discussie-ID: %(id)s"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_account_chart_template__display_name
@@ -452,7 +461,7 @@ msgstr "Ga naar Boekhoudinstellingen"
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_l10n_nl_reports_sbr_status_service__access_token
 msgid "IAP Access Token"
-msgstr ""
+msgstr "IAP toegangstoken"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_l10n_nl_reports_vat_pay_wizard__account_number
@@ -595,7 +604,7 @@ msgstr "Naam van het ingediende rapport"
 #. module: l10n_nl_reports
 #: model:ir.module.module,shortdesc:base.module_l10n_nl_reports
 msgid "Netherlands - Accounting Reports"
-msgstr ""
+msgstr "Nederland - Boekhoudrapporten"
 
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_reports_sbr_icp_wizard_form
@@ -613,17 +622,20 @@ msgstr "Odoo"
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "Only Enterprise databases can submit Dutch SBR reports through Odoo."
 msgstr ""
+"Enkel Enterprise-databases kunnen Nederlandse SBR-rapporten verzenden via "
+"Odoo."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "Only production databases can submit Dutch SBR reports through Odoo."
 msgstr ""
+"Alleen productiedatabases kunnen Nederlandse SBR-rapporten via Odoo indienen."
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_res_config_settings__l10n_nl_reports_sbr_use_own_certificate
 msgid "Own Certificate"
-msgstr ""
+msgstr "Eigen certificaat"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_l10n_nl_reports_vat_pay_wizard__partner_id
@@ -751,7 +763,7 @@ msgstr "Je rapport wordt verzonden"
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.res_config_settings_view_form_l10n_nl
 msgid "Setup Digipoort SBR certificate settings"
-msgstr ""
+msgstr "Digipoort SBR-certificaat instellen"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_l10n_nl_reports_vat_pay_wizard__show_vat_balance
@@ -761,7 +773,7 @@ msgstr "Btw-saldo weergeven"
 #. module: l10n_nl_reports
 #: model:ir.model.fields,field_description:l10n_nl_reports.field_l10n_nl_reports_vat_pay_wizard__show_warning_missing_vat_number
 msgid "Show Warning Missing Vat Number"
-msgstr ""
+msgstr "Waarschuwing ontbrekend btw-nummer tonen"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -815,6 +827,8 @@ msgstr "Dienst voor het controleren van de status van Digipoort-indiening"
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Status polling is unavailable because no discussion ID was returned."
 msgstr ""
+"Status opvragen is niet beschikbaar omdat er geen discussie-ID werd "
+"geretourneerd."
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,help:l10n_nl_reports.field_res_company__l10n_nl_reports_sbr_icp_last_sent_date_to
@@ -867,7 +881,7 @@ msgstr "Belastingplichtige (BPL)"
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "The"
-msgstr ""
+msgstr "De"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -875,12 +889,13 @@ msgstr ""
 msgid ""
 "The Digipoort server is not accessible at the moment. Please try again later."
 msgstr ""
+"De Digipoort-server is momenteel niet beschikbaar. Probeer het later opnieuw."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "The Digipoort server returned the following error:\n"
-msgstr ""
+msgstr "De Digipoort-server geeft de volgende fout:\n"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -889,6 +904,8 @@ msgid ""
 "The IAP Odoo server could not identify your database. Please contact Odoo "
 "support."
 msgstr ""
+"De IAP-Odoo-server kon je database niet identificeren. Neem contact op met "
+"Odoo support."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -897,12 +914,14 @@ msgid ""
 "The IAP Odoo server could not verify your subscription. Please try again "
 "later."
 msgstr ""
+"De IAP-Odoo-server kon je abonnement niet verifiëren. Probeer het later "
+"opnieuw."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/models/l10n_nl_reports_sbr_status_service.py:0
 msgid "The IAP authentication information is unavailable."
-msgstr ""
+msgstr "De informatie over de IAP-authenticatie is niet beschikbaar."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -911,6 +930,8 @@ msgid ""
 "The ICP report from %(date_from)s to %(date_to)s was sent to %(environment)s."
 "%(newline)s%(status_message)s%(newline)s%(discussion_id)s"
 msgstr ""
+"Het ICP-rapport van %(date_from)s tot en met %(date_to)s is verzonden naar %"
+"(environment)s.%(newline)s%(status_message)s%(newline)s%(discussion_id)s"
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,help:l10n_nl_reports.field_res_company__l10n_nl_reports_sbr_server_root_cert_id
@@ -927,6 +948,15 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "The VAT balance is"
 msgstr "Het btw-saldo is"
+
+#. module: l10n_nl_reports
+#. odoo-python
+#: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
+msgid ""
+"The VAT return for a period before 2026 can no longer be filed "
+"electronically. Since September 1st 2026, older periods are no longer "
+"accepted in Digipoort."
+msgstr ""
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -965,6 +995,11 @@ msgid ""
 "that was used to submit this report. Restore it and click Refresh to try "
 "again. The report has already been submitted; do not submit it again."
 msgstr ""
+"De status kon niet worden opgehaald vanwege de volgende certificaatfout: %"
+"(error)s Het ophalen van de status vereist hetzelfde persoonlijke "
+"certificaat dat is gebruikt om dit rapport in te dienen. Herstel het en klik "
+"op Vernieuwen om het opnieuw te proberen. Het rapport is al ingediend; dien "
+"het niet opnieuw in."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -974,6 +1009,9 @@ msgid ""
 "could not be retrieved because of the following error: %(error)s Correct the "
 "configuration and submit the report again."
 msgstr ""
+"De status van de %(report_name)s-inzending met discussie-ID '%(id)s' kon "
+"niet worden opgehaald vanwege de volgende fout: %(error)s Corrigeer de "
+"configuratie en dien het rapport opnieuw in."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1027,6 +1065,9 @@ msgid ""
 "The tax report from %(date_from)s to %(date_to)s was sent to %(environment)s."
 "%(newline)s%(status_message)s%(newline)s%(discussion_id)s"
 msgstr ""
+"Het belastingrapport van %(date_from)s tot en met %(date_to)s is verzonden "
+"naar %(environment)s.%(newline)s%(status_message)s%(newline)s%"
+"(discussion_id)s"
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1054,6 +1095,8 @@ msgstr ""
 msgid ""
 "Too many requests were sent to the IAP Odoo server. Please try again later."
 msgstr ""
+"Er zijn te veel verzoeken verzonden naar de IAP-Odoo-server. Probeer het "
+"later opnieuw."
 
 #. module: l10n_nl_reports
 #: model:ir.model.fields,help:l10n_nl_reports.field_account_return__l10n_nl_sbr_status
@@ -1087,6 +1130,7 @@ msgstr "BTW-betaling"
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "VAT number is missing; no payment communication can be created."
 msgstr ""
+"Btw-nummer ontbreekt. Er kan geen betalingscommunicatie worden aangemaakt."
 
 #. module: l10n_nl_reports
 #: model:mail.template,name:l10n_nl_reports.email_template_vat_payment_instructions
@@ -1119,7 +1163,7 @@ msgstr ""
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "We will post its processing status in this chatter once received."
-msgstr ""
+msgstr "We plaatsen de verwerkingsstatus in deze chatter na ontvangst."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1131,7 +1175,7 @@ msgstr "XBRL"
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Your ICP report has been sent to Digipoort."
-msgstr ""
+msgstr "Je ICP-rapport is verzonden naar Digipoort."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1160,6 +1204,8 @@ msgid ""
 "Your certificate was not accepted by the server. Please verify the "
 "certificate you uploaded and try again."
 msgstr ""
+"Je certificaat werd niet aanvaard door de server. Verifieer het certificaat "
+"dat je hebt geüpload en probeer het opnieuw."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1178,12 +1224,14 @@ msgid ""
 "Your database is not active on the IAP Odoo server. Please contact Odoo "
 "support."
 msgstr ""
+"Je database is niet actief op de IAP-Odoo-server. Neem contact op met Odoo "
+"support."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "Your tax report has been sent to Digipoort."
-msgstr ""
+msgstr "Je belastingaangifte is verzonden naar Digipoort."
 
 #. module: l10n_nl_reports
 #. odoo-python
@@ -1199,18 +1247,20 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_sbr_icp_wizard.py:0
 msgid "Your test ICP report has been sent to Digipoort pre-production."
-msgstr ""
+msgstr "Je test-ICP-rapport is verzonden naar Digipoort preproductie."
 
 #. module: l10n_nl_reports
 #. odoo-python
 #: code:addons/l10n_nl_reports/wizard/l10n_nl_reports_sbr_tax_report_wizard.py:0
 msgid "Your test tax report has been sent to Digipoort pre-production."
 msgstr ""
+"Je test-belastingaangifte is verzonden naar de pre-productieomgeving van "
+"Digipoort."
 
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "company"
-msgstr ""
+msgstr "bedrijf"
 
 #. module: l10n_nl_reports
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
@@ -1238,6 +1288,56 @@ msgstr "QR-code voor betaling"
 #: model_terms:ir.ui.view,arch_db:l10n_nl_reports.l10n_nl_vat_pay_wizard_form
 msgid "to pay this amount."
 msgstr "om dit bedrag te betalen."
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name or ''\">NL "
+#~ "Company</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "VAT return of <t t-out=\"object.company_id.name or ''\">NL Company</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Beste <t t-out=\"object.company_id.name or ''\">NL "
+#~ "Bedrijf</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                     Op basis van de ontvangen documenten en informatie "
+#~ "is de btw-aangifte van <t t-out=\"object.company_id.name or ''\">NL "
+#~ "Bedrijf</t>\n"
+#~ "                    voor de periode <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> ingediend.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Vastgesteld is dat een bedrag van <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> verschuldigd blijft.\n"
+#~ "                </p>\n"
+#~ "                <t t-call=\"l10n_nl_reports.vat_payment_details_table\"/"
+#~ ">\n"
+#~ "                <p>Met vriendelijke groet,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid ""
 #~ "An error occured while using your certificate. Please verify the "

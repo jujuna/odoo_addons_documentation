@@ -42,6 +42,11 @@ class SaleOrderLine(models.Model):
     def _get_location_final(self):
         partner_company = self.env['res.company']._find_company_from_partner(self.order_id.partner_id.id)
         if partner_company and partner_company != self.company_id and self.order_id.partner_id != self.order_id.partner_shipping_id:
+            location_final = super()._get_location_final()
+            inter_comp_location = self.env.ref('stock.stock_location_inter_company')
+            # Keep a sublocation of the inter-company transit set up like it (transit, no company)
+            if location_final.usage == 'transit' and not location_final.company_id and location_final._child_of(inter_comp_location):
+                return location_final
             # Means that's we're in inter-company transaction -> Must sent to inter-company transit.
             return self.order_id.partner_id.property_stock_customer
         return super()._get_location_final()

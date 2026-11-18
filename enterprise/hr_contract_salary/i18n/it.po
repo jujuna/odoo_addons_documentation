@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-10-22 14:17+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-12 10:38+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "hr_contract_salary/it/>\n"
@@ -113,10 +113,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -135,21 +135,21 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulazioni!</h2>\n"
-"                Puoi configurare il tuo pacchetto retributivo facendo clic "
-"sul link in basso.<br/>\n"
+"                Puoi configurare il tuo pacchetto salariale facendo clic sul "
+"link in basso.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    Il link scadrà il <t t-out=\"ctx.get('validity_end')\"/>"
-".\n"
+"                    Il link scade tra <t t-out=\"ctx.get('validity_end')\"></"
+"t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
+"% "
+"(                             ctx.get('offer_id'),                             "
+"('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+"''                         )\" target=\"_blank\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+"decoration: none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
 "                        Configura il tuo pacchetto\n"
 "                    </a>\n"
 "                </div>\n"
@@ -161,16 +161,16 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -189,11 +189,46 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <h2>Congratulazioni, <t t-"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
+"                siamo lieti di offrirti di unirti a <t t-"
+"out=\"object.company_id.name\"></t>.<br>\n"
+"                Siamo rimasti molto colpiti dal tuo profilo e non vediamo "
+"l'ora di darti il benvenuto nel team.<br><br>\n"
+"                Il prossimo passo è personalizzare le componenti della "
+"retribuzione, i benefit extra-legali e le opzioni di mobilità tramite il "
+"nostro portale interattivo:\n"
+"                <t t-if=\"ctx.get('validity_end')\">\n"
+"                    Il link scade il <t t-out=\"ctx.get('validity_end')\"></"
+"t>.\n"
+"                </t>\n"
+"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+"                    <a t-attf-href=\"/salary_package/simulation/offer/"
+"{{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" "
+"target=\"_blank\" t-attf-style=\"background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
+"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
+"padding: 8px 16px 8px 16px; border-radius: 5px;\">Configura il tuo "
+"pacchetto</a>\n"
+"                </div>\n"
+"                Cosa aspettarsi:\n"
+"                <ul>\n"
+"                    <li>Personalizza le preferenze del tuo pacchetto nel "
+"simulatore</li>\n"
+"                    <li>Rivedi il riepilogo dell'offerta generato</li>\n"
+"                    <li>Firma digitalmente il contratto di assunzione</li>\n"
+"                </ul>\n"
+"                Se hai domande riguardanti la tua offerta o il pacchetto "
+"retributivo, non esitare a chiedere.<br><br>\n"
+"                Cordiali saluti,\n"
+"            </div>\n"
+"        "
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_thank_you
@@ -205,6 +240,7 @@ msgstr "<i class=\"oi mr8\" data-icon=\"check_circle\"/>Congratulazioni"
 msgid ""
 "<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"A\"/>"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_next_step_button
@@ -422,6 +458,7 @@ msgstr "Indirizzo"
 #: code:addons/hr_contract_salary/models/hr_contract_salary_benefit.py:0
 msgid "All benefit values must be valid floats."
 msgstr ""
+"Tutti i valori dei benefit devono essere numeri in virgola mobile validi."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__display_type__always
@@ -554,7 +591,7 @@ msgstr "Beneficio"
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit_value__benefit_display_type
 msgid "Benefit Display Type"
-msgstr "Tipo visualizzazione vantaggio"
+msgstr "Tipo visualizzazione benefit"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -665,7 +702,7 @@ msgstr "Impostazioni di configurazione"
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit__is_configurable_benefit
 msgid "Configurable Benefit"
-msgstr "Vantaggio configurabile"
+msgstr "Benefit configurabile"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
@@ -770,6 +807,7 @@ msgstr "Resoconto analisi contratto e assunzione"
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__manual_res_field_id
 msgid "Contract field used to manually encode a benefit value."
 msgstr ""
+"Campo contratto utilizzato per inserire manualmente un valore di benefit."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__activity_creation__countersigned
@@ -972,7 +1010,7 @@ msgstr "Ufficio"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "Depends On"
-msgstr ""
+msgstr "Dipende da"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit__description
@@ -1560,7 +1598,7 @@ msgstr "Intero"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_search
 msgid "Is Configurable"
-msgstr ""
+msgstr "È configurabile"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__is_contract_amendment
@@ -1575,7 +1613,7 @@ msgstr "Sta seguendo"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_search
 msgid "Is Not Configurable"
-msgstr ""
+msgstr "Non è configurabile"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_personal_info__is_required
@@ -1613,6 +1651,11 @@ msgstr "Posizione lavorativa"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__job_title
 msgid "Job Title"
 msgstr "Figura professionale"
+
+#. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
@@ -1691,7 +1734,7 @@ msgstr "Nome campo manuale"
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit__manual_res_field_id
 msgid "Manual Field in Contract"
-msgstr ""
+msgstr "Campo manuale nel contratto"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__display_type__manual
@@ -1732,7 +1775,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_contract_salary/models/hr_contract_salary_offer.py:0
 msgid "Missing required fields: %s"
-msgstr ""
+msgstr "Campi obbligatori mancanti: %s"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume_category__periodicity__monthly
@@ -1882,7 +1925,7 @@ msgstr ""
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No activity type"
-msgstr ""
+msgstr "Nessun tipo di attività"
 
 #. module: hr_contract_salary
 #: model_terms:ir.actions.act_window,help:hr_contract_salary.contract_recruitment_report_action
@@ -1892,22 +1935,22 @@ msgstr "Nessun dato da visualizzare"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No dependency"
-msgstr ""
+msgstr "Nessuna dipendenza"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No description"
-msgstr ""
+msgstr "Nessuna descrizione"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No field"
-msgstr ""
+msgstr "Nessun campo"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No icon"
-msgstr ""
+msgstr "Nessuna icona"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -1923,12 +1966,12 @@ msgstr "Nessun'offerta selezionata"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No requested document"
-msgstr ""
+msgstr "Nessun documento richiesto"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "No signature requested"
-msgstr ""
+msgstr "Nessuna firma richiesta"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -1965,7 +2008,7 @@ msgstr "Non è un input valido nel campo integer"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "Not sending copy"
-msgstr ""
+msgstr "Copia non inviata"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__message_needaction_counter
@@ -2591,12 +2634,12 @@ msgstr "Seleziona un modello di contatto per caricare i valori predefiniti"
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "Select a display type"
-msgstr ""
+msgstr "Seleziona un tipo di visualizzazione"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_benefit_view_form
 msgid "Select a responsible person"
-msgstr ""
+msgstr "Seleziona un responsabile"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2664,7 +2707,7 @@ msgstr "Invia per e-mail"
 #. odoo-python
 #: code:addons/hr_contract_salary/models/hr_contract_salary_offer.py:0
 msgid "Send Offer"
-msgstr ""
+msgstr "Invia offerta"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_benefit__sign_copy_partner_id
@@ -2864,8 +2907,8 @@ msgstr "Tipo struttura"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
-msgstr "Somma"
+msgid "Sum of Benefits Values"
+msgstr "Somma dei valori dei benefit"
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.resume,name:hr_contract_salary.hr_contract_salary_payroll_resume_gross_worker
@@ -2894,6 +2937,12 @@ msgstr "Modelli"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "Testo"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -2942,8 +2991,8 @@ msgid ""
 "The display type of a benefit linked to a salary rule must be one of the "
 "following: %s"
 msgstr ""
-"Il tipo di visualizzazione di un vantaggio collegato a una regola "
-"retributiva deve essere uno dei seguenti: %s"
+"Il tipo di visualizzazione di un benefit collegato a una regola retributiva "
+"deve essere uno dei seguenti: %s"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__fold_res_field_id
@@ -3180,7 +3229,7 @@ msgstr "In attesa di me"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__activity_creation_type__onchange
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__sign_frenquency__always
 msgid "When the benefit is modified"
-msgstr "Quando il vantaggio è modificato"
+msgstr "Quando il benefit è modificato"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__activity_creation_type__always
@@ -3301,6 +3350,11 @@ msgid "id"
 msgstr "id"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3318,15 +3372,141 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: Offerta di lavoro - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: Offerta di lavoro - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
-"{{ object.company_id.name }}: offerta di lavoro - {{ "
-"object.employee_id.name }}"
+"{{ object.company_id.name }}: offerta di lavoro - "
+"{{ object.employee_id.name }}"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulazioni!</h2>\n"
+#~ "                Puoi configurare il tuo pacchetto retributivo facendo "
+#~ "clic sul link in basso.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    Il link scadrà il <t t-out=\"ctx.get('validity_end')"
+#~ "\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configura il tuo pacchetto\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations, <t t-"
+#~ "out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+#~ "                We are delighted to extend an offer for you to join <t t-"
+#~ "out=\"object.company_id.name\"/>.<br/>\n"
+#~ "                We were thoroughly impressed with your background and "
+#~ "can't wait to welcome you to the team.<br/><br/>\n"
+#~ "                The next step is to customize your remuneration "
+#~ "components, extra-legal benefits, and mobility choices through our "
+#~ "interactive portal:\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-attf-href=\"/salary_package/simulation/offer/"
+#~ "{{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" "
+#~ "target=\"_blank\" t-attf-style=\"background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration: none; color: {{object.company_id.email_primary_color or "
+#~ "'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;\">Configure "
+#~ "your package</a>\n"
+#~ "                </div>\n"
+#~ "                What to expect next:\n"
+#~ "                <ul>\n"
+#~ "                    <li>Tailor your package preferences in the simulator</"
+#~ "li>\n"
+#~ "                    <li>Review your generated offer summary</li>\n"
+#~ "                    <li>Digitally sign your employment contract</li>\n"
+#~ "                </ul>\n"
+#~ "                If you have any questions regarding your offer or salary "
+#~ "package, don't hesitate to ask us.<br/><br/>\n"
+#~ "                Best regards,\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulazioni, <t t-"
+#~ "out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+#~ "                siamo lieti di farti un'offerta per unirti a <t t-"
+#~ "out=\"object.company_id.name\"/>.<br/>\n"
+#~ "                Siamo rimasti molto colpiti dalla tua esperienza e non "
+#~ "vediamo l'ora di darti il benvenuto nel team.<br/><br/>\n"
+#~ "                Il prossimo passo consiste nel personalizzare le "
+#~ "componenti del pacchetto retributivo, i benefit extra-legali e le opzioni "
+#~ "di mobilità tramite il nostro portale interattivo:\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    Il link scadrà il <t t-out=\"ctx.get('validity_end')"
+#~ "\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-attf-href=\"/salary_package/simulation/offer/"
+#~ "{{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" "
+#~ "target=\"_blank\" t-attf-style=\"background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration: none; color: {{object.company_id.email_primary_color or "
+#~ "'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;\">Configura "
+#~ "il tuo pacchetto</a>\n"
+#~ "                </div>\n"
+#~ "                Cosa aspettarsi:\n"
+#~ "                <ul>\n"
+#~ "                    <li>personalizza le tue preferenze nel simulatore;</"
+#~ "li>\n"
+#~ "                    <li>rivedi il riepilogo dell'offerta generato;</li>\n"
+#~ "                    <li>firma digitalmente il tuo contratto di lavoro.</"
+#~ "li>\n"
+#~ "                </ul>\n"
+#~ "                In caso di domande sull'offerta o sul pacchetto "
+#~ "retributivo, non esitare a contattarci.<br/><br/>\n"
+#~ "                Cordiali saluti,\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid "Sum"
+#~ msgstr "Somma"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

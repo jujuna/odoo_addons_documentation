@@ -963,7 +963,10 @@ class VoipCall(models.Model):
             domain = [("phone_mobile_search", "=", f"+{number}")]
         else:
             domain = [("phone_mobile_search", "=", number)]
-        partner = self.env["res.partner"].search(domain, limit=1)
+        # No limit: given one, PostgreSQL walks all contacts in name order
+        # instead of using the phone indexes, which takes minutes on databases
+        # with millions of contacts.
+        partner = self.env["res.partner"].search(domain)[:1]
         if not partner:
             partner = self.env["res.users.settings"]._get_user_from_voip_username(
                 number, provider=self.user_id.voip_provider_id,
@@ -981,6 +984,27 @@ class VoipCall(models.Model):
         self.check_access("read")
         self.sudo().partner_id = partner
         return self._get_store_data()
+
+    def update_phone_number(self, phone_number):
+        """Rebind an ongoing call to the party the PBX now connects it to.
+
+        Only the user receiving the call may rebind it, and only while it is
+        ongoing: a late re-INVITE must not rewrite a call that already ended.
+        The same party in another format is not a new interlocutor, as in
+        ``_handle_call_updated``.
+        """
+        self.ensure_one()
+        self.check_access("read")
+        number = self._resolve_incoming_caller_number(phone_number)
+        if (
+            self.user_id == self.env.user
+            and self.state == "ongoing"
+            and number
+            and not same_number(number, self.phone_number)
+        ):
+            self.sudo().write({"phone_number": number, "partner_id": False})
+            self.get_contact_info()
+        return self._get_result()
 
     def update_activity_message(self):
         self.check_access("read")

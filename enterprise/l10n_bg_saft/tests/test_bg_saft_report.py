@@ -31,8 +31,8 @@ class TestBgSaftReportEmptyNoBank(TestSaftReport):
             'email': 'john_the_bossman@big-company.com',
         })
 
-    def _generate_xml(self):
-        options = self._generate_options(fields.Date.from_string('2021-01-01'), fields.Date.from_string('2021-12-31'))
+    def _generate_saft_xml(self, date_from='2021-06-01', date_to='2021-06-30'):
+        options = self._generate_options(fields.Date.from_string(date_from), fields.Date.from_string(date_to))
         return self.report_handler.l10n_bg_export_saft_to_xml(options)['file_content']
 
 
@@ -40,7 +40,7 @@ class TestBgSaftReportEmptyNoBank(TestSaftReport):
 class TestBgSaftReportEmptyNoBankValues(TestBgSaftReportEmptyNoBank):
     def test_l10n_bg_saft_errors_bank_accounts(self):
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'company_bank_account_missing',
         })
@@ -55,7 +55,7 @@ class TestBgSaftReportEmptyNoBankValues(TestBgSaftReportEmptyNoBank):
         self.company_data['company'].write({
             'bank_ids': self.partner_bank_bg_iban,
         })
-        self._generate_xml()
+        self._generate_saft_xml()
 
 
 class TestBgSaftReportEmpty(TestBgSaftReportEmptyNoBank):
@@ -77,18 +77,14 @@ class TestBgSaftReportEmpty(TestBgSaftReportEmptyNoBank):
             ],
         })
 
-    def _generate_xml(self):
-        options = self._generate_options(fields.Date.from_string('2021-01-01'), fields.Date.from_string('2021-12-31'))
-        return self.report_handler.l10n_bg_export_saft_to_xml(options)['file_content']
-
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestBgSaftReportEmptyValues(TestBgSaftReportEmpty):
-    @freeze_time('2022-01-01')
+    @freeze_time('2021-07-01')
     def test_l10n_bg_saft_values(self):
         with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report_empty.xml", "rb") as expected_xml:
             self.assertXmlTreeEqual(
-                self.get_xml_tree_from_string(self._generate_xml()),
+                self.get_xml_tree_from_string(self._generate_saft_xml()),
                 self.get_xml_tree_from_string(expected_xml.read()),
             )
 
@@ -216,8 +212,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
 
         invoices = cls.env['account.move'].create([{
                 'move_type': 'out_invoice',
-                'invoice_date': '2021-01-01',
-                'date': '2021-01-01',
+                'invoice_date': '2021-06-01',
+                'date': '2021-06-01',
                 'partner_id': cls.partner_a.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -230,8 +226,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'out_invoice',
-                'invoice_date': '2021-03-01',
-                'date': '2021-03-01',
+                'invoice_date': '2021-06-05',
+                'date': '2021-06-05',
                 'partner_id': cls.company_data['company'].partner_id.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -244,8 +240,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'out_refund',
-                'invoice_date': '2021-03-01',
-                'date': '2021-03-01',
+                'invoice_date': '2021-06-10',
+                'date': '2021-06-10',
                 'partner_id': cls.partner_a.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -258,8 +254,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'in_invoice',
-                'invoice_date': '2021-06-30',
-                'date': '2021-06-30',
+                'invoice_date': '2021-06-29',
+                'date': '2021-06-29',
                 'partner_id': cls.partner_b.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -288,8 +284,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'out_invoice',
-                'invoice_date': '2021-06-15',
-                'date': '2021-06-15',
+                'invoice_date': '2021-06-25',
+                'date': '2021-06-25',
                 'partner_id': cls.company_related_partner.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -303,8 +299,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'in_invoice',
-                'invoice_date': '2021-03-15',
-                'date': '2021-03-15',
+                'invoice_date': '2021-06-15',
+                'date': '2021-06-15',
                 'partner_id': cls.partner_c.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -318,8 +314,8 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {
                 'move_type': 'out_invoice',
-                'invoice_date': '2021-03-17',
-                'date': '2021-03-17',
+                'invoice_date': '2021-06-17',
+                'date': '2021-06-17',
                 'partner_id': cls.partner_c.id,
                 'invoice_line_ids': [
                     Command.create({
@@ -333,11 +329,11 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             },
             {  # self bill
                 'move_type': 'in_invoice',
-                'invoice_date': '2021-03-18',
-                'date': '2021-03-18',
+                'invoice_date': '2021-06-18',
+                'date': '2021-06-18',
                 'partner_id': cls.partner_c.id,
                 'journal_id': cls.self_billing_journal_id.id,
-                'name': 'SELFB/2021/03/0001',  # Prevent the self billing journal from prepending a client id for sequencing
+                'name': 'SELFB/2021/06/0001',  # Prevent the self billing journal from prepending a client id for sequencing
                 'invoice_line_ids': [
                     Command.create({
                         'product_id': cls.product_a.id,
@@ -356,7 +352,7 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
             'name': 'test_statement',
             'line_ids': [
                 Command.create({
-                    'date': '2021-03-01',
+                    'date': '2021-06-08',
                     'payment_ref': 'Payment Ref',
                     'partner_id': cls.partner_a.id,
                     'journal_id': cls.company_data['default_journal_bank'].id,
@@ -370,11 +366,11 @@ class TestBgSaftReportCommon(TestBgSaftReportEmpty):
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestBgSaftReport(TestBgSaftReportCommon):
-    @freeze_time('2022-01-01')
+    @freeze_time('2021-07-01')
     def test_l10n_bg_saft_values(self):
         with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report.xml", "rb") as expected_xml:
             self.assertXmlTreeEqual(
-                self.get_xml_tree_from_string(self._generate_xml()),
+                self.get_xml_tree_from_string(self._generate_saft_xml()),
                 self.get_xml_tree_from_string(expected_xml.read()),
             )
 
@@ -430,7 +426,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'vat': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'settings_accounting_basis_missing',
             'settings_ownership_structure_missing',
@@ -450,7 +446,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'l10n_bg_saft_ultimate_owner_ids': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'ultimate_owners_missing',
         })
@@ -461,7 +457,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'country_id': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'ultimate_owners_not_company',
             'ultimate_owners_missing_country',
@@ -473,7 +469,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'vat': False,  # proxy for is_company: False
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'bg_ultimate_owners_missing_cyrillic_name',
             'bg_ultimate_owners_missing_vat',
@@ -486,7 +482,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'vat': 'BG1234567892',  # proxy for is_company: True
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'beneficial_owners_missing_country',
             'beneficial_owners_not_person',
@@ -498,7 +494,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'additional_identifiers': {},
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'bg_beneficial_owners_missing_cyrillic_name',
             'bg_beneficial_owners_missing_egn',
@@ -509,7 +505,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'name': 'Бил действителният собственик',
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'foreign_beneficial_owners_missing_latin_name',
         })
@@ -519,7 +515,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'bank_name': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'bank_account_with_missing_bank_name',
         })
@@ -529,7 +525,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'l10n_bg_saft_registration_number': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'bank_account_with_missing_registration_number',
         })
@@ -539,7 +535,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'country_id': False,
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'bank_account_with_missing_country',
         })
@@ -552,7 +548,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
             'name': "fullnamewithnospace",
         })
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'missing_partner_phone_number',
             'missing_partner_function',
@@ -638,7 +634,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         invoice.action_post()
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'uom_with_missing_saft_code',
             'uom_with_missing_saft_description',
@@ -690,7 +686,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         invoice.action_post()
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'product_internal_reference_duplicated',
         })
@@ -717,7 +713,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         self._remove_account_code()
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'accounts_missing_saft_code',
         })
@@ -731,7 +727,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         self.env['account.chart.template'].try_loading(company.chart_template, company=company)
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'accounts_missing_saft_code',
         })
@@ -745,7 +741,7 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         self._remove_tax_code()
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'taxes_missing_saft_code',
         })
@@ -760,7 +756,144 @@ class TestBgSaftReport(TestBgSaftReportCommon):
         self.env['account.chart.template'].try_loading(company.chart_template, company=company)
 
         with self.assertRaises(self.ReportException) as cm:
-            self._generate_xml()
+            self._generate_saft_xml()
         self.assertEqual(set(cm.exception.errors), {
             'taxes_missing_saft_code',
         })
+
+    @freeze_time('2021-07-01')
+    def test_l10n_bg_saft_tax_return_attachments(self):
+        """ Tests that a SAFT is correctly generated when the return is validated.
+         Tests that the other tax documents are added to the attachements as well"""
+
+        date_from = '2021-06-01'
+        date_to = '2021-06-30'
+
+        self.tax_return_type = self.env.ref('l10n_bg_reports.bg_tax_return_type')
+
+        tax_return = self.env['account.return'].create({
+            'name': 'l10n_bg test return',
+            'company_id': self.env.company.id,
+            'type_id': self.tax_return_type.id,
+            'date_from': date_from,
+            'date_to': date_to,
+        })
+
+        self.assertEqual(tax_return.attachment_ids.ids, [])
+
+        with self.allow_pdf_render():
+            tax_return.action_validate()
+
+        if not self.env['ir.config_parameter'].sudo().get_bool("l10n_bg_saft.create_on_validate"):
+            self.assertEqual(tax_return.attachment_ids.ids, [])
+
+            with self.allow_pdf_render():
+                tax_return.action_submit()
+
+            self.assertEqual(
+                tax_return.attachment_ids.mapped('name'),
+                [
+                    'tax_report_jun_2021_company_1_data.pdf',
+                    'PRODAGBI.txt',
+                    'POKUPKI.txt',
+                    'general_ledger_jun_2021.xml',
+                ],
+            )
+            with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report_with_return.xml", "rb") as expected_xml:
+                self.assertXmlTreeEqual(
+                    self.get_xml_tree_from_string(tax_return.attachment_ids[3].raw.content),
+                    self.get_xml_tree_from_string(expected_xml.read()),
+                )
+        else:
+            self.assertEqual(
+                tax_return.attachment_ids.mapped('name'),
+                [
+                    'PRODAGBI.txt',
+                    'POKUPKI.txt',
+                    'general_ledger_jun_2021.xml',
+                ],
+            )
+            with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report.xml", "rb") as expected_xml:
+                self.assertXmlTreeEqual(
+                    self.get_xml_tree_from_string(tax_return.attachment_ids[2].raw.content),
+                    self.get_xml_tree_from_string(expected_xml.read()),
+                )
+
+    @freeze_time('2021-07-01')
+    def test_l10n_bg_saft_tax_return_attachments_error_wizard(self):
+        """ Tests that the wizard is triggered when an error with a 'warning'
+        level is present.
+        Tests that a SAFT is correctly generated if the user decide to proceed
+        anyway.
+        Tests that the other tax documents are added to the attachements as well"""
+
+        date_from = '2021-06-01'
+        date_to = '2021-06-30'
+
+        # Missing country on a beneficial owner will trigger an errors with a
+        # 'warning' level. It will start up the wizard but not block the validation
+        self.company_beneficial_owner_bg.write({
+            'country_id': False,
+        })
+
+        self.tax_return_type = self.env.ref('l10n_bg_reports.bg_tax_return_type')
+
+        tax_return = self.env['account.return'].create({
+            'name': 'l10n_bg test return',
+            'company_id': self.env.company.id,
+            'type_id': self.tax_return_type.id,
+            'date_from': date_from,
+            'date_to': date_to,
+        })
+
+        self.assertEqual(tax_return.attachment_ids.ids, [])
+
+        with self.allow_pdf_render():
+            attachment_error_wizard = tax_return.action_validate()
+
+        if not self.env['ir.config_parameter'].sudo().get_bool("l10n_bg_saft.create_on_validate"):
+            self.assertEqual(tax_return.attachment_ids.ids, [])
+            with self.allow_pdf_render():
+                attachment_error_wizard = tax_return.action_submit()
+
+        self.assertEqual(tax_return.attachment_ids.ids, [])
+
+        self.assertEqual(attachment_error_wizard.get('name'), 'Bulgarian SAF-T file errors')
+        self.assertEqual(attachment_error_wizard.get('type'), 'ir.actions.act_window')
+        self.assertEqual(attachment_error_wizard.get('res_model'), 'l10n_bg_saft.file.attachment.error.wizard')
+
+        wizard_id = self.env['l10n_bg_saft.file.attachment.error.wizard'].browse([
+            attachment_error_wizard.get('res_id'),
+        ])
+        with self.allow_pdf_render():
+            wizard_id.button_proceed_with_errors()
+
+        if self.env['ir.config_parameter'].sudo().get_bool("l10n_bg_saft.create_on_validate"):
+            self.assertEqual(
+                tax_return.attachment_ids.mapped('name'),
+                [
+                    'PRODAGBI.txt',
+                    'POKUPKI.txt',
+                    'general_ledger_jun_2021.xml',
+                ],
+            )
+            with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report_owner_missing_country.xml", "rb") as expected_xml:
+                self.assertXmlTreeEqual(
+                    self.get_xml_tree_from_string(tax_return.attachment_ids[2].raw.content),
+                    self.get_xml_tree_from_string(expected_xml.read()),
+                )
+        else:
+            self.assertEqual(
+                tax_return.attachment_ids.mapped('name'),
+                [
+                    'tax_report_jun_2021_company_1_data.pdf',
+                    'PRODAGBI.txt',
+                    'POKUPKI.txt',
+                    'general_ledger_jun_2021.xml',
+                ],
+            )
+            with tools.file_open("l10n_bg_saft/tests/expected_xmls/saft_report_with_return_owner_missing_country.xml", "rb") as expected_xml:
+                self.assertXmlTreeEqual(
+                    self.get_xml_tree_from_string(tax_return.attachment_ids[3].raw.content),
+                    self.get_xml_tree_from_string(expected_xml.read()),
+                )

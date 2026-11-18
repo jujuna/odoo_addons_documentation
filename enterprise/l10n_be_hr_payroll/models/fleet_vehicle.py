@@ -32,6 +32,19 @@ class FleetVehicle(models.Model):
         help="Last date a field impacting the DMFA declaration was changed on this car."
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        # The default fuel type prevents its computation from the model: apply it when the
+        # vehicle is not created from the form (import, RPC, ...), where the onchange does it.
+        models = self.env['fleet.vehicle.model'].browse(
+            {vals['model_id'] for vals in vals_list if vals.get('model_id') and 'fuel_type' not in vals})
+        models_by_id = {model.id: model for model in models}
+        for vals in vals_list:
+            model = models_by_id.get(vals.get('model_id')) if 'fuel_type' not in vals else None
+            if model and model.default_fuel_type:
+                vals['fuel_type'] = model.default_fuel_type
+        return super().create(vals_list)
+
     def _from_be(self):
         if self:
             return self.company_id.country_id.code == "BE"
@@ -132,7 +145,10 @@ class FleetVehicle(models.Model):
         }.get(fuel_type, fuel_type)
         if formula_fuel in ['gasoline', 'diesel', 'lpg']:
             fuel_coefficient = self.env['hr.rule.parameter']._get_parameter_from_code('fuel_coefficient', fee_date)
-            if co2_emission_unit == 'g/mi':
+            if not co2:
+                # no CO2 emission known: 165 g/km for the diesel engines, 182 g/km for the others
+                co2 = 165 if formula_fuel == 'diesel' else 182
+            elif co2_emission_unit == 'g/mi':
                 co2 *= MI_TO_KM_FACTOR
             co2_fee = (((co2 * 9.0) - fuel_coefficient.get(formula_fuel)) / 12.0) * indexation_ratio * greening_factor
         return max(co2_fee, co2_fee_min)
@@ -196,11 +212,16 @@ class FleetVehicle(models.Model):
 
         date = date or Date.context_today(self)
         if acquisition_date:
-            car_age = relativedelta(date, acquisition_date).years
+            # a started month counts as a full month: the age runs from the 1st of the registration month, so the
+            # new coefficient applies to the whole month of the anniversary
+            car_age = relativedelta(date, acquisition_date.replace(day=1)).years
             value_loss_per_year = 0.06  # 6% of car value lost each year
             age_coefficient = 1.00 - car_age * value_loss_per_year
             age_coefficient = max(age_coefficient, 0.70)
-            if co2_emission_unit == 'g/mi':
+            if not co2 and fuel_type not in ['electric', 'hydrogen']:
+                # no CO2 emission known: 195 g/km for the diesel engines, 205 g/km for the others
+                co2 = 195 if fuel_type in ['diesel', 'plug_in_hybrid_diesel'] else 205
+            elif co2_emission_unit == 'g/mi':
                 co2 *= MI_TO_KM_FACTOR
 
             min_co2_prc = self.env['hr.rule.parameter']._get_parameter_from_code('min_co2_prc', date, raise_if_not_found=False) or 0.04
@@ -275,7 +296,8 @@ class FleetVehicle(models.Model):
             return False
 
         payslips_with_wrong_vehicle_dmfa = self.env['l10n_be.dmfa'].search_count([
-            ('company_id', '=', version.company_id.id),
+            # declared by the root company, for all its branches
+            ('company_id', '=', version.company_id.root_id.id),
             ('state', 'not in', ['draft', 'ready']),
             ('quarter_start', '<=', max(payslips_with_wrong_vehicle.mapped('date_to'))),
             ('quarter_end', '>=', min(payslips_with_wrong_vehicle.mapped('date_to'))),
@@ -293,7 +315,8 @@ class FleetVehicle(models.Model):
         # Only the declaration covering today can be impacted by a change made now.
         dmfa_declarations = self.env['l10n_be.dmfa'].search(
             domain=[
-                ('company_id', 'in', self.company_id.ids),
+                # declared by the root company, for all its branches
+                ('company_id', 'in', self.company_id.root_id.ids),
                 ('state', 'not in', ['draft', 'ready']),
                 ('quarter_start', '<=', today),
                 ('quarter_end', '>=', today),

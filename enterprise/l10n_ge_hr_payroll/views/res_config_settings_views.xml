@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.l10n_ge_hr_payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_payroll.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='hr_payroll_settings']" position="after">
+                <block title="Georgia Payroll" id="l10n_ge_payroll_settings" invisible="company_country_code != 'GE'">
+                    <setting string="Income Tax Regime" help="Status of the company deciding the rate of the income tax withheld on the salaries.">
+                        <field name="l10n_ge_tax_regime" class="w-100"/>
+                    </setting>
+                    <setting string="Annual Leave Time-off Type" help="Time-off type of the annual leave: the days allocated and not taken nor expired are paid on the departure.">
+                        <field name="l10n_ge_annual_leave_type_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

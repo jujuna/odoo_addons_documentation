@@ -22,25 +22,25 @@ patch(OrderPaymentValidation.prototype, {
                 });
                 return false;
             }
-            const mandatoryFacturaFields = [
-                "l10n_cl_dte_email",
-                "l10n_cl_activity_description",
-                "street",
-                "l10n_cl_sii_taxpayer_type",
-                "vat",
-            ];
+            const mandatoryFacturaFields = {
+                l10n_cl_dte_email: _t("DTE Email"),
+                l10n_cl_activity_description: _t("Activity Description"),
+                street: _t("Street"),
+                l10n_cl_sii_taxpayer_type: _t("Taxpayer Type"),
+                vat: _t("Tax ID"),
+            };
             const missingFields = [];
             const partner = this.order.getPartner();
             if (this.order.invoice_type == "factura" || this.order.isRefund) {
-                for (const field of mandatoryFacturaFields) {
+                for (const [field, label] of Object.entries(mandatoryFacturaFields)) {
                     if (!partner[field]) {
-                        missingFields.push(field);
+                        missingFields.push(label);
                     }
                 }
             }
             if (missingFields.length > 0) {
                 this.pos.notification.add(
-                    _t("Please fill out missing fields to proceed: " + missingFields.join(", "))
+                    _t("Please fill out missing fields to proceed: %s", missingFields.join(", "))
                 );
                 this.pos.editPartner(partner);
                 return false;

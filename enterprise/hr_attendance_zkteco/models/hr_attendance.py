@@ -9,9 +9,9 @@ class HrAttendance(models.Model):
     zkteco_checkin_transaction_id = fields.Many2one("zkteco.transactions", readonly=True)
     zkteco_checkout_transaction_id = fields.Many2one("zkteco.transactions", readonly=True)
 
-    in_mode = fields.Selection(selection_add=[("biotime", "Biotime")])
-    out_mode = fields.Selection(selection_add=[("biotime", "Biotime")])
-    terminal_id = fields.Many2one("zkteco.terminal", help="The Biotime terminal in which the record is created from")
+    in_mode = fields.Selection(selection_add=[("biotime", "BioTime")])
+    out_mode = fields.Selection(selection_add=[("biotime", "BioTime")])
+    terminal_id = fields.Many2one("zkteco.terminal", help="The BioTime terminal in which the record is created from")
 
     @api.ondelete(at_uninstall=True)
     def _unlink_reset_linked_zkteco_transactions(self):

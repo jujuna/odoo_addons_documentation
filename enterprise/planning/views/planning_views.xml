@@ -181,7 +181,7 @@
                             <div class="o_row">
                                 <field name="allocated_hours" readonly="not can_edit" widget="float_time" class="oe_inline" required="not employee_public_ids" options="{'show_seconds': False}"/>
                             </div>
-                            <field name="role_id" readonly="not can_edit" context="{'search_default_resource_ids': resource_ids}" placeholder="e.g. Bartender" groups="planning.group_planning_manager"/>
+                            <field name="role_id" readonly="not can_edit" context="{'search_default_resource_ids': resource_ids if resource_ids and resource_roles else False}" placeholder="e.g. Bartender" groups="planning.group_planning_manager"/>
                             <t groups="base.group_multi_company">
                                 <field name="company_id" readonly="not can_edit" options="{'no_create': True}"/>
                             </t>
@@ -258,7 +258,7 @@
         <field name="name">planning.slot.kanban</field>
         <field name="model">planning.slot</field>
         <field name="arch" type="xml">
-            <kanban highlight_color="color" group_create="false" sample="1" default_group_by="start_datetime:day" js_class="planning_kanban" card_id="%(planning.planning_view_card)d"/>
+            <kanban highlight_color="color" group_create="false" quick_create="false" sample="1" default_group_by="start_datetime:day" js_class="planning_kanban" card_id="%(planning.planning_view_card)d"/>
         </field>
     </record>
 

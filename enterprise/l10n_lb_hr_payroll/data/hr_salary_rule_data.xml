@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="l10n_lb_salary_rule_section_contractual" model="hr.salary.rule.section">
+        <field name="name">Contractual Allowances</field>
+        <field name="sequence">1</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_lb_salary_rule_section_allowances" model="hr.salary.rule.section">
+        <field name="name">Other Allowances and Benefits</field>
+        <field name="sequence">2</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_lb_salary_rule_section_payments" model="hr.salary.rule.section">
+        <field name="name">Bonuses and Other Payments</field>
+        <field name="sequence">3</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_lb_salary_rule_section_termination" model="hr.salary.rule.section">
+        <field name="name">Termination Payments</field>
+        <field name="sequence">4</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_lb_salary_rule_section_nssf" model="hr.salary.rule.section">
+        <field name="name">National Social Security Fund</field>
+        <field name="sequence">5</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_lb_salary_rule_section_deductions" model="hr.salary.rule.section">
+        <field name="name">Deductions</field>
+        <field name="sequence">6</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary'))]"/>
+    </record>
+
+    <!-- Basic salary: the paid time types feed the remuneration, the NSSF earnings and the taxable income, the rule only
+         displays the remuneration base before any other rule. The overtime is paid by its time types at their rate
+         (+50% on the normal days, an extra day's pay on the public holidays), detailed in the worked days. -->
+    <record id="l10n_lb_rule_basic" model="hr.salary.rule">
+        <field name="name">Basic Salary</field>
+        <field name="code">BASIC</field>
+        <field name="sequence">1</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['LB_REMUNERATION_BASE']
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Increases and allowances added to the basic wage: part of the wage of the end-of-service indemnity -->
+    <record id="l10n_lb_rule_cost_of_living" model="hr.salary.rule">
+        <field name="name">Cost-of-Living Increase</field>
+        <field name="code">COL_ALW</field>
+        <field name="sequence">10</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_STATUTORY_ALW'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_contractual"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Cost-of-living increases granted by decree and acquired in the wage: LBP 1,325,000 from 1 April 2022 on the wages up to LBP 4,000,000 (Decree No. 9129 of 2022, part of the NSSF earnings by its art. 3) and LBP 6,400,000 from 29 May 2023 (Decree No. 11343 of 2023). Counted in the minimum wage and the wage of the indemnities (Labour Code, art. 57).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_regular_allowance" model="hr.salary.rule">
+        <field name="name">Regular Allowance</field>
+        <field name="code">REGULAR_ALW</field>
+        <field name="sequence">11</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_STATUTORY_ALW'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_contractual"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Fixed allowance of the contract paid every month (seniority, responsibility, function): part of the wage of the indemnities (Labour Code, art. 57), of the NSSF earnings and of the taxable income.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_commission" model="hr.salary.rule">
+        <field name="name">Commission</field>
+        <field name="code">COMMISSION</field>
+        <field name="sequence">12</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_contractual"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Commissions: NSSF earnings and taxable income. For the indemnities, the average of the commissions of the last 12 months is added to the wage (Labour Code, art. 57).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Statutory transport allowance: outside the NSSF earnings and the taxable income -->
+    <record id="l10n_lb_rule_transport_allowance" model="hr.salary.rule">
+        <field name="name">Transport Allowance</field>
+        <field name="code">TRANSPORT_ALW</field>
+        <field name="sequence">20</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Transport allowance of the decrees: LBP 450,000 for each day of actual attendance at the workplace from 15 February 2024 (Law No. 217 of 2012; Decree No. 12966 of 2024), not due for the leaves, the holidays and the remote work, nor when the employer provides the transport or the lodging. Not part of the NSSF earnings (Law No. 217, §4) nor of the taxable income (Income Tax Law, art. 50(2)). Enter the amount of the month; the transport paid above the statutory amount goes to the additional transport allowance.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_transport_extra" model="hr.salary.rule">
+        <field name="name">Additional Transport Allowance</field>
+        <field name="code">TRANSPORT_EXTRA</field>
+        <field name="sequence">21</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Transport paid above the statutory daily amount: outside the exclusions of the NSSF earnings and of the taxable income.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_housing_allowance" model="hr.salary.rule">
+        <field name="name">Housing Allowance</field>
+        <field name="code">HOUSING_ALW</field>
+        <field name="sequence">23</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Housing allowance paid in cash: NSSF earnings for its full amount (Regulation No. 11, art. 2) and taxable income.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_other_allowance" model="hr.salary.rule">
+        <field name="name">Other Allowance</field>
+        <field name="code">OTHER_ALW</field>
+        <field name="sequence">24</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Meal, phone or other cash allowance: NSSF earnings and taxable income.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_benefit_in_kind" model="hr.salary.rule">
+        <field name="name">Benefit in Kind</field>
+        <field name="code">BENEFIT_IN_KIND</field>
+        <field name="sequence">25</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Value of the benefits provided by the employer (housing, car, meals): NSSF earnings, the housing on the site at 20% of the minimum wage (Regulation No. 11, art. 2), and taxable income (Income Tax Law, art. 49), not paid in cash.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_education_grant" model="hr.salary.rule">
+        <field name="name">Education Grant</field>
+        <field name="code">EDUCATION_GRANT</field>
+        <field name="sequence">27</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Education grant of the children set by decree (Decree No. 13225 of 2024 for the school year 2023-2024) or by a permanent scheme of the company: not part of the wage, of the NSSF earnings nor of the end-of-service indemnity (art. 3 §6), excluded from the taxable income within the limits of the State Employees' Cooperative (Income Tax Law, art. 50(4)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_reimbursement" model="hr.salary.rule">
+        <field name="name">Expense Reimbursement</field>
+        <field name="code">REIMBURSEMENT</field>
+        <field name="sequence">28</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Refund of the expenses incurred for the employer on receipts: neither NSSF earnings (Regulation No. 11, art. 1) nor taxable income (Income Tax Law, art. 50(2)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- NSSF family allowance paid with the salary for the Fund and offset in the contribution schedule -->
+    <record id="l10n_lb_rule_family_allowance" model="hr.salary.rule">
+        <field name="name">NSSF Family Allowance</field>
+        <field name="code">FAMILY_ALW</field>
+        <field name="sequence">30</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE')])]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._l10n_lb_compute_family_allowance()
+        </field>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Paid monthly by the employer for the Fund and offset in the contribution schedule (Social Security Code, art. 48): LBP 2,100,000 for the spouse without paid work and LBP 1,155,000 for each dependent child up to 5 from 1 May 2026 (Decree No. 2923 of 2026). Neither NSSF earnings nor taxable income (Social Security Code, art. 67 §3; Income Tax Law, art. 47(10)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Tax borne by the employer: income tax grossed up, iterated in hr.payslip._get_payslip_lines() -->
+    <record id="l10n_lb_rule_gross_up" model="hr.salary.rule">
+        <field name="name">Tax Borne by the Employer</field>
+        <field name="code">GROSS_UP</field>
+        <field name="sequence">50</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.l10n_lb_net_salary</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = l10n_lb_gross_up
+        </field>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Income tax paid by the employer for the employee: a cash benefit itself (Income Tax Law, art. 49), grossed up.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Bonuses: taxed with the cumulative income of the month of payment -->
+    <record id="l10n_lb_rule_bonus" model="hr.salary.rule">
+        <field name="name">Bonus</field>
+        <field name="code">BONUS</field>
+        <field name="sequence">60</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'BONUS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['BONUS'].amount
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_payments"/>
+        <field name="note">Bonus or incentive: no statutory bonus exists. NSSF earnings of the month of payment, subject to the annual regularisation of the ceilings (Regulation No. 11, art. 4), and taxable income of the month, in the marginal bands of the cumulative computation.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_leave_in_lieu" model="hr.salary.rule">
+        <field name="name">Untaken Leave Paid</field>
+        <field name="code">LEAVE_IN_LIEU</field>
+        <field name="sequence">71</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('l10n_lb_hr_payroll.LB_NSSF_BASE'),
+            ref('l10n_lb_hr_payroll.LB_TAX_BASE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'LEAVE_IN_LIEU' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['LEAVE_IN_LIEU'].amount
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_termination"/>
+        <field name="note">Annual leave not taken, paid at the termination: taxable, NSSF earnings but not part of the end-of-service wage (Regulation No. 11, art. 1(II)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- End-of-service indemnity: computed on the last payslip of the foreign employees outside the end-of-service
+         branch of the NSSF, entered for the other employees. Neither NSSF earnings nor taxable income. -->
+    <record id="l10n_lb_rule_end_of_service" model="hr.salary.rule">
+        <field name="name">End-of-Service Indemnity</field>
+        <field name="code">END_OF_SERVICE</field>
+        <field name="sequence">72</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'END_OF_SERVICE' in inputs or payslip._l10n_lb_is_end_of_service_computed()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+if 'END_OF_SERVICE' in inputs:
+    result = inputs['END_OF_SERVICE'].amount
+else:
+    result = payslip._l10n_lb_compute_end_of_service(categories['LB_STATUTORY_ALW'])
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_termination"/>
+        <field name="note">Lebanese employees, and foreign employees covered by the end-of-service branch of the NSSF: the indemnity is liquidated by the NSSF (Social Security Code, art. 51); enter the amount paid by the employer, if any. Foreign employees outside the branch (art. 9 §3): computed on the last payslip, half a month of wage below one year of service, a month of wage for each year of service from one year (Labour Code, art. 54), a year begun counting for its months and a month begun as a whole month, as the NSSF does for its indemnity (Social Security Code, art. 51); the wage is the basic salary with the cost-of-living increases and the regular allowances (art. 57). An amount entered replaces the computation. Exempt from the income tax (Income Tax Law, art. 47), not NSSF earnings.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Gross income: everything paid to the employee so far, the deductions come after -->
+    <record id="l10n_lb_rule_gross" model="hr.salary.rule">
+        <field name="name">Gross Income</field>
+        <field name="code">GROSS</field>
+        <field name="sequence">80</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['LB_REMUNERATION_BASE']
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- National Social Security Fund: sickness and maternity and family allowances within their ceilings, end-of-service
+         uncapped -->
+    <record id="l10n_lb_rule_nssf_base" model="hr.salary.rule">
+        <field name="name">NSSF Earnings</field>
+        <field name="code">NSSF_BASE</field>
+        <field name="sequence">85</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['LB_NSSF_BASE']
+        </field>
+        <field name="display_in_pdf_extra_info" eval="True"/>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_nssf_sm_employee" model="hr.salary.rule">
+        <field name="name">NSSF Sickness and Maternity (Employee)</field>
+        <field name="code">NSSF_SM_EMP</field>
+        <field name="sequence">90</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.l10n_lb_nssf_coverage in ('full', 'no_eos')</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = min(result_rules['NSSF_BASE']['total'], payslip._l10n_lb_from_lbp(payslip._rule_parameter('l10n_lb_nssf_sm_ceiling')))
+result_rate = -payslip._rule_parameter('l10n_lb_nssf_rates')['sm_employee']
+        </field>
+        <field name="note">3% of the NSSF earnings within the monthly ceiling of LBP 120,000,000 from 1 August 2025 (Decree No. 887 of 2025), deducted from the wage (Social Security Code, art. 68 and 73; Regulation No. 22): 2% of the normal rate and 1% of the retirees' scheme (Law No. 27 of 2017). The salaries in foreign currency are declared in LBP at the official rate. Not deducted from the taxable income.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_nssf_sm_employer" model="hr.salary.rule">
+        <field name="name">NSSF Sickness and Maternity (Employer)</field>
+        <field name="code">NSSF_SM_EMPLR</field>
+        <field name="sequence">91</field>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.l10n_lb_nssf_coverage in ('full', 'no_eos')</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = min(result_rules['NSSF_BASE']['total'], payslip._l10n_lb_from_lbp(payslip._rule_parameter('l10n_lb_nssf_sm_ceiling')))
+result_rate = payslip._rule_parameter('l10n_lb_nssf_rates')['sm_employer']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">8% of the NSSF earnings within the sickness and maternity ceiling: 7% of the normal rate and 1% of the retirees' scheme. Paid with the employee share by the end of the following month (10 insured employees or more) or of the following quarter.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_nssf_fa_employer" model="hr.salary.rule">
+        <field name="name">NSSF Family Allowances (Employer)</field>
+        <field name="code">NSSF_FA_EMPLR</field>
+        <field name="sequence">92</field>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.l10n_lb_nssf_coverage in ('full', 'no_eos')</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = min(result_rules['NSSF_BASE']['total'], payslip._l10n_lb_from_lbp(payslip._rule_parameter('l10n_lb_nssf_fa_ceiling')))
+result_rate = payslip._rule_parameter('l10n_lb_nssf_rates')['fa_employer']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">6% of the NSSF earnings within the monthly ceiling of LBP 28,000,000 from 1 May 2026 (Decree No. 2923 of 2026), borne by the employer (Social Security Code, art. 73). The family allowances paid with the salaries are offset in the contribution schedule.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_nssf_eos_employer" model="hr.salary.rule">
+        <field name="name">NSSF End-of-Service (Employer)</field>
+        <field name="code">NSSF_EOS_EMPLR</field>
+        <field name="sequence">93</field>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_lb_is_eos_due()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = result_rules['NSSF_BASE']['total']
+result_rate = payslip._rule_parameter('l10n_lb_nssf_rates')['eos_employer']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">8.5% of the NSSF earnings without ceiling (Social Security Code, art. 68 §3 and 73), until the employee reaches 64. Not due for a foreign employee without reciprocity. The pension system of Law No. 319 of 2023 will replace it one year after its implementing decree, not issued yet.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_eos_settlement" model="hr.salary.rule">
+        <field name="name">NSSF End-of-Service Settlement</field>
+        <field name="code">EOS_SETTLEMENT</field>
+        <field name="sequence">94</field>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'EOS_SETTLEMENT' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['EOS_SETTLEMENT'].amount
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_nssf"/>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">Difference between the end-of-service indemnity computed by the NSSF and the contributions of the employer with their interest, notified by the Fund on the liquidation and paid within one month in fresh funds (Social Security Code, art. 54 §4; NSSF memo 770).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Income tax on salaries and wages, withheld on the cumulative income of the calendar year in LBP -->
+    <record id="l10n_lb_rule_taxable_income" model="hr.salary.rule">
+        <field name="name">Taxable Income</field>
+        <field name="code">TAXABLE</field>
+        <field name="sequence">110</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['LB_TAX_BASE']
+        </field>
+        <field name="display_in_pdf_extra_info" eval="True"/>
+        <field name="note">Salaries, wages and benefits of the month (Income Tax Law, art. 49), less the transport, the expenses, the end-of-service indemnity and the family allowances (art. 47 and 50). The NSSF employee contribution is not deducted.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_income_tax" model="hr.salary.rule">
+        <field name="name">Income Tax</field>
+        <field name="code">ITS</field>
+        <field name="sequence">120</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -payslip._l10n_lb_from_lbp(payslip._l10n_lb_compute_income_tax(result_rules['TAXABLE']['total']))
+        </field>
+        <field name="note">Tax on salaries and wages withheld on the cumulative income of the calendar year (MoF Decision 620/1 of 2019): family deduction of LBP 450,000,000, 225,000,000 for the spouse and 45,000,000 for each child up to 5 (Law No. 324 of 2024, art. 49), bands of 2% to 25% (art. 47), both split by the days of work, rounded up to LBP 10,000. The taxable income of a salary in foreign currency is converted at the rate of the Lebanese pound at the end of each month (Decree No. 56 of 2025, art. 17). Remitted quarterly by the 15th of the following month with the R10 statement (Income Tax Law, art. 63).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <!-- Deductions, within the net pay left -->
+    <record id="l10n_lb_rule_advance_recovery" model="hr.salary.rule">
+        <field name="name">Salary Advance Recovery</field>
+        <field name="code">ADVANCE_RECOVERY</field>
+        <field name="sequence">150</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'ADVANCE_RECOVERY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -min(inputs['ADVANCE_RECOVERY'].amount, max(categories['LB_REMUNERATION_BASE'], 0))
+result_name = inputs['ADVANCE_RECOVERY'].name
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_deductions"/>
+        <field name="note">Advance of salary paid during the month, e.g. the advances of the workers paid twice a month (Labour Code, art. 47).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_loan_recovery" model="hr.salary.rule">
+        <field name="name">Loan Recovery</field>
+        <field name="code">LOAN_RECOVERY</field>
+        <field name="sequence">151</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'LOAN_RECOVERY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -min(inputs['LOAN_RECOVERY'].amount, max(categories['LB_REMUNERATION_BASE'], 0))
+result_name = inputs['LOAN_RECOVERY'].name
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_deductions"/>
+        <field name="note">Instalment of a loan granted by the employer.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_deduction" model="hr.salary.rule">
+        <field name="name">Other Deduction</field>
+        <field name="code">DEDUCTION</field>
+        <field name="sequence">160</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_lb_hr_payroll.LB_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'DEDUCTION' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -min(inputs['DEDUCTION'].amount, max(categories['LB_REMUNERATION_BASE'], 0))
+result_name = inputs['DEDUCTION'].name
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lb_hr_payroll.l10n_lb_salary_rule_section_deductions"/>
+        <field name="note">Other deduction agreed with the employee.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    <record id="l10n_lb_rule_net" model="hr.salary.rule">
+        <field name="name">Net Salary</field>
+        <field name="code">NET</field>
+        <field name="sequence">200</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['LB_REMUNERATION_BASE']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">Paid at least once a month to the employees and twice a month to the workers, on a working day (Labour Code, art. 47).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_lb_hr_payroll.hr_payroll_structure_lb_employee_salary')])]"/>
+        <field name="country_id" ref="base.lb"/>
+    </record>
+
+    </data>
+</odoo>

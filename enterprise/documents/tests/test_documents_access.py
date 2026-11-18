@@ -13,6 +13,47 @@ from odoo.tests.common import RecordCapturer
 
 class TestDocumentsAccess(TransactionCaseDocuments, MailCase):
 
+    def test_batched_access_updates_preserve_previous_values_and_propagation(self):
+        parents = self.env['documents.document'].create([{
+            'name': f'Batch root {index}', 'type': 'folder',
+            'owner_id': self.doc_user.id,
+            'access_internal': 'none', 'access_via_link': 'edit',
+            'is_access_via_link_hidden': False,
+        } for index in range(2)])
+        children = self.env['documents.document'].create([{
+            'name': f'Batch child {parent.id}', 'type': 'url',
+            'url': 'https://example.com', 'folder_id': parent.id,
+            'owner_id': self.doc_user.id,
+            'access_internal': 'none', 'access_via_link': 'edit',
+            'is_access_via_link_hidden': False,
+        } for parent in parents])
+        with patch('odoo.addons.documents.models.documents_document.ACCESS_UPDATE_BATCH_SIZE', 1):
+            changes = parents.with_user(self.doc_user)._action_update_access(
+                'view', 'none', True, no_propagation=True)
+        self.assertEqual(changes, {parent.id: {
+            'access_internal': 'none', 'access_via_link': 'edit',
+            'is_access_via_link_hidden': False,
+        } for parent in parents})
+        self.assertEqual(set(parents.mapped('access_internal')), {'view'})
+        self.assertEqual(set(parents.mapped('access_via_link')), {'none'})
+        self.assertTrue(all(parents.mapped('is_access_via_link_hidden')))
+        self.assertEqual(set(children.mapped('access_internal')), {'none'})
+        self.assertEqual(set(children.mapped('access_via_link')), {'edit'})
+        self.assertFalse(any(children.mapped('is_access_via_link_hidden')))
+
+        with patch('odoo.addons.documents.models.documents_document.ACCESS_UPDATE_BATCH_SIZE', 1):
+            changes = parents.with_user(self.doc_user)._action_update_access('edit', 'view', False)
+        self.assertEqual(changes, {
+            **{parent.id: {
+                'access_internal': 'view', 'access_via_link': 'none',
+                'is_access_via_link_hidden': True,
+            } for parent in parents},
+            **{child.id: {'access_internal': 'none', 'access_via_link': 'edit'} for child in children},
+        })
+        self.assertEqual(set((parents | children).mapped('access_internal')), {'edit'})
+        self.assertEqual(set((parents | children).mapped('access_via_link')), {'view'})
+        self.assertFalse(any((parents | children).mapped('is_access_via_link_hidden')))
+
     @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_access')
     def test_access_type_internal(self):
         """Check that the 'internal' access_type_role works as expected."""

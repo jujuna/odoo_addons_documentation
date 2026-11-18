@@ -19,7 +19,7 @@ registry.category("web_tour.tours").add("timesheet_tour", {
         },
         {
             trigger:
-                ".o_grid_view .o_grid_row:not(.o_grid_section).o_grid_cell_today, .o_grid_component_timesheet_uom",
+                ".o_grid_view .o_grid_row.o_grid_column_cell.o_grid_highlightable.text-900.o_grid_cell_today.bg-info-subtle div span, .o_grid_component_timesheet_uom",
             content: markup(
                 _t(
                     "<b>Add time in the Grid view</b> <br/> <i>Click a cell to enter hours. Press Tab or Enter to navigate easily.</i>"
@@ -40,26 +40,50 @@ registry.category("web_tour.tours").add("timesheet_tour", {
             run: "click",
         },
         {
+            isActive: ["div.o_menu_systray button.o-dropdown > i.oi.oi-filled.text-danger"],
+            trigger: "div.o_wrap_btn_sign_out button.btn-primary",
+            content: markup(
+                _t("<b>Start your session</b> <br/> <i>A session must be running to log a timesheet.</i>")
+            ),
+            tooltipPosition: "bottom",
+            run: "click",
+        },
+        {
             trigger: "div[name=description_field]",
             content: markup(
                 _t(
-                    '<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "Metting with the customer."</i>'
+                    '<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "Meeting with the customer."</i>'
                 )
             ),
             tooltipPosition: "bottom",
-            run: "edit My Activity",
+            run: "click",
         },
         {
-            trigger: "div[name=project_field]",
+            trigger: "div[name=project_field] div[name=project_id] input.o_input",
             content: markup(
                 _t(
                     "<b>Select a project</b> <br/> <i>Choose the relevant project, such as a customer or team project.</i>"
                 )
             ),
             tooltipPosition: "right",
+            run: "edit Internal",
+        },
+        {
+            isActive: ["auto"],
+            trigger: "div[name=project_field] div[name=project_id] .o-autocomplete--dropdown-item a:contains('Internal')",
             run: "click",
         },
         {
+            isActive: ["auto"],
+            trigger: "button[name=save_btn]",
+            run: "press ctrl+Enter",
+        },
+        {
+            isActive: ["auto"],
+            trigger: ".list-group-item:has(p.fw-medium:contains('/')):has(p.small:contains('Internal'))",
+        },
+        {
+            isActive: ["manual"],
             trigger: "button[name=save_btn]",
             content: markup(
                 _t(

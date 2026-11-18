@@ -8,7 +8,7 @@ class HrExpense(models.Model):
     _inherit = "hr.expense"
 
     payment_mode = fields.Selection(
-        selection_add=[('payslip_account', 'Employee (Through a Payslip)')],
+        selection_add=[('payslip_account', 'Employee (Payslip)')],
         ondelete={'payslip_account': 'cascade'},
     )
     refund_in_payslip = fields.Boolean(string="Reimburse In Next Payslip")
@@ -24,7 +24,7 @@ class HrExpense(models.Model):
     @api.depends('payslip_id.state')
     def _compute_state(self):
         # EXTENDS hr_expense
-        to_update = self.filtered(lambda exp: exp.payment_mode == 'payslip_account' and exp.existing_bill_id and exp.account_move_id)
+        to_update = self.filtered(lambda exp: exp.payment_mode == 'payslip_account' and exp.has_existing_bill and exp.account_move_id)
         for expense in to_update:
             move = expense.account_move_id
             if move.state == 'cancel':
@@ -168,13 +168,6 @@ class HrExpense(models.Model):
             'res_id': self.payslip_id.id,
         }
 
-    def action_open_account_move(self):
-        # EXTENDS hr_expense
-        self.ensure_one()
-        if not (self.payment_mode == 'payslip_account' and self.existing_bill_id):
-            return super().action_open_account_move()
-        return self.account_move_id._get_records_action()
-
     def _post_without_wizard_payslip_mode(self):
         """ Post a payslip without any direct call for the wizard """
         # When a move has been deleted
@@ -204,12 +197,10 @@ class HrExpense(models.Model):
     def _prepare_linked_bill_paid_in_salary_payment_vals(self):
         expenses = self.filtered(
             lambda expense: expense.payment_mode == 'payslip_account'
-                and expense.existing_bill_id
+                and expense.has_existing_bill
+                and not expense.account_move_id
                 and not any(expense.existing_bill_id.line_ids.mapped('reconciled'))
         )
-        if not expenses:
-            return
-
         payment_vals = []
         for expense in expenses:
             salary_rules = expense.product_id.salary_rule_ids.filtered(lambda sr: sr.account_debit and sr.account_debit.account_type == 'liability_payable')

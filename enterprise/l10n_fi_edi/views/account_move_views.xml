@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_move_form_inherit_l10n_fi_edi" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.l10n_fi_edi</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@id='other_tab']//group[@name='sale_info_group']" position="before">
+                    <group string="Finvoice" name="finvoice_fields" invisible="country_code != 'FI'">
+                        <field name="l10n_fi_edi_invoice_type_code"/>
+                        <field name="l10n_fi_edi_epi_charge"/>
+                        <field name="l10n_fi_edi_origin_code"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

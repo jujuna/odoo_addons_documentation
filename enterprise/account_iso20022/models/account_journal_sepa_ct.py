@@ -43,6 +43,10 @@ class AccountJournal(models.Model):
             return CdtrAgt
         return CdtrAgt
 
+    def _get_ClrSysMmbId(self, bank_account, payment_method_code):
+        if payment_method_code != 'sepa_ct' or not bank_account.bank_bic:
+            return super()._get_ClrSysMmbId(bank_account, payment_method_code)
+
     def _get_ChrgBr(self, payment_method_code, forced_value):
         if payment_method_code == 'sepa_ct':
             ChrgBr = etree.Element("ChrgBr")
@@ -128,11 +132,9 @@ class AccountJournal(models.Model):
         return super()._get_RmtInf(payment_method_code, payment)
 
     def _get_bic_tag(self, payment_method_line, effective_payment_method_code=None):
-        payment_method_code = effective_payment_method_code or payment_method_line.code
-        use_pain_09 = payment_method_code == 'iso20022_se' and payment_method_line.sepa_pain_version == "pain.001.001.09"
-        if use_pain_09 or self._should_use_pain_09(payment_method_line, effective_payment_method_code):
+        if self._should_use_pain_09(payment_method_line, effective_payment_method_code):
             return 'BICFI'
-        return super()._get_bic_tag(payment_method_code)
+        return super()._get_bic_tag(payment_method_line, effective_payment_method_code)
 
     def _get_regex_for_bic_code(self, payment_method_line, effective_payment_method_code=None):
         if self._should_use_pain_09(payment_method_line, effective_payment_method_code):

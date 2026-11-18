@@ -22,7 +22,7 @@ class WorksheetTemplate(models.Model):
     worksheet_count = fields.Integer(compute='_compute_worksheet_count')
 
     # field needed to enable the monetary field of properties
-    currency_id = fields.Many2one('res.currency', 'Currency', compute='_compute_currency_id', compute_sql='_compute_currency_id', compute_sudo=True)
+    currency_id = fields.Many2one('res.currency', 'Currency', compute='_compute_currency_id', compute_sql='_compute_sql_currency_id', compute_sudo=True)
 
     @api.depends_context('company')
     @api.depends('company_id')

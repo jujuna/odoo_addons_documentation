@@ -266,6 +266,26 @@ class TestDecemberRegularization(TestPayrollCommon):
             total = sum(departure_payslip_n1.line_ids.filtered(lambda l: l.code == code).mapped('total'))
             self.assertAlmostEqual(total, 0.0, places=0, msg=f"Departure in December: {code} amount mismatch")
 
+    def test_01b_december_regularization_other_joint_committee(self):
+        """ The December settlement of the holiday pay concerns the employees of all the joint committees """
+        (self.version_2024_empl_1 | self.version_2025_empl_1).l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_220')
+        self._create_and_validate_payslip(
+            self.employee_1,
+            self.version_2025_empl_1,
+            date_from=date(2025, 11, 1),
+            date_to=date(2025, 11, 30)
+        )
+        december_2025_payslip = self._create_and_validate_payslip(
+            self.employee_1,
+            self.version_2025_empl_1,
+            date_from=date(2025, 12, 1),
+            date_to=date(2025, 12, 31)
+        )
+        simple_december_line = december_2025_payslip.line_ids.filtered(lambda l: l.code == 'SIMPLE_DECEMBER')
+        double_december_basic_line = december_2025_payslip.line_ids.filtered(lambda l: l.code == 'DOUBLE_DECEMBER_BASIC')
+        self.assertAlmostEqual(simple_december_line.total, 1838.12, places=0)
+        self.assertAlmostEqual(double_december_basic_line.total, 921.2, places=0)
+
     @freeze_time("2025-11-01")
     def test_02_departure_holiday_attest_n1_after_switch_from_full_time_to_half_time(self):
         """ Scenario 1: check regularization in the holiday attest by departure """
@@ -295,6 +315,23 @@ class TestDecemberRegularization(TestPayrollCommon):
                                msg="Departure: Double Holiday Regularization amount mismatch")
         self.assertAlmostEqual(double_december_complementary_line.total, 70.09, places=0,
                                msg="Departure: Double Complementary Holiday Regularization amount mismatch")
+
+        # The holiday certificate handed to the next employer prints the double holiday pay amounts
+        departure_payslip_n = self.env['hr.payslip'].search([
+            ('employee_id', '=', self.employee_1.id),
+            ('struct_id', '=', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays').id),
+        ])
+        for payslip, report in (
+            (departure_payslip_n, 'l10n_be_hr_payroll.action_report_termination_holidays_n'),
+            (departure_payslip_n1, 'l10n_be_hr_payroll.action_report_termination_holidays_n1'),
+        ):
+            html = str(self.env['ir.actions.report']._render_qweb_html(report, payslip.ids)[0])
+            for code in ['PAY_DOUBLE', 'PAY_DOUBLE_COMPLEMENTARY']:
+                total = payslip.line_ids.filtered(lambda l: l.code == code).total
+                self.assertTrue(total)
+                amount = f"{total:,.2f}"
+                self.assertTrue(amount in html or amount.translate(str.maketrans(',.', '.,')) in html,
+                                f"{report}: the certificate should print {code} ({amount})")
 
     @freeze_time("2025-12-20")
     def test_03_december_regularization_after_salary_raise(self):
@@ -426,18 +463,55 @@ class TestDecemberRegularization(TestPayrollCommon):
         self.assertAlmostEqual(fictitious_remuneration, expected_fictitious_remuneration, places=2,
                                 msg="Fictitious remuneration did not evaluate the wages period-by-period.")
 
+    def test_05b_fictitious_remuneration_four_days_week(self):
+        """
+        The fictitious remuneration of an assimilated day is the daily wage of the employee's own week: a fourth of
+        the weekly wage on a 4-day week, not a fifth.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Test Employee (4/5)',
+            'company_id': self.belgian_company.id,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+        })
+        version = employee.create_version({
+            'date_version': date(2024, 1, 1),
+            'contract_date_start': date(2024, 1, 1),
+            'wage': 2400,
+            'resource_calendar_id': self.env['resource.calendar'].create({
+                'name': '4 days a week',
+                'company_id': self.belgian_company.id,
+                'attendance_ids': [(0, 0, {
+                    'dayofweek': str(day), 'hour_from': 8, 'hour_to': 15.6,
+                }) for day in range(4)],
+            }).id,
+        })
+        unpaid_leave_type = self.env['hr.work.entry.type'].search([('code', '=', '122.00')], limit=1)
+        self.env['hr.leave'].create({
+            'work_entry_type_id': unpaid_leave_type.id,
+            'request_date_from': date(2024, 7, 1),
+            'request_date_to': date(2024, 7, 11),
+            'employee_id': employee.id,
+        }).action_approve()
+        payslip = self._create_and_validate_payslip(employee, version, date(2024, 7, 1), date(2024, 7, 31))
+        days = sum(payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '122.00').mapped('number_of_days'))
+        self.assertEqual(days, 8)
+
+        fictitious_remuneration = employee._get_fictitious_remuneration_previous_year(date(2025, 6, 1))
+        self.assertAlmostEqual(fictitious_remuneration, days * 2400 * 3 / 13 / 4, places=2)
+
     @freeze_time("2025-12-20")
     def test_06_compute_input_line_ids_does_not_duplicate_on_recompute(self):
         """
         Calling _compute_input_line_ids() a second time must not duplicate its input lines.
         This proves the method body itself is idempotent, not the full ORM recompute path.
         """
-        december_2025_payslip = self._create_and_validate_payslip(
-            self.employee_1,
-            self.version_2025_empl_1,
-            date_from=date(2025, 12, 1),
-            date_to=date(2025, 12, 31)
-        )
+        december_2025_payslip = self.env['hr.payslip'].create({
+            'name': "Payslip 2025-12",
+            'employee_id': self.employee_1.id,
+            'version_id': self.version_2025_empl_1.id,
+            'date_from': date(2025, 12, 1),
+            'date_to': date(2025, 12, 31),
+        })
 
         december_2025_payslip._compute_input_line_ids()
 
@@ -448,6 +522,23 @@ class TestDecemberRegularization(TestPayrollCommon):
                           "SIMPLE_DECEMBER input line should not be duplicated on recompute.")
         self.assertEqual(len(double_december_basic_inputs), 1,
                           "DOUBLE_DECEMBER_BASIC input line should not be duplicated on recompute.")
+        for december_input in simple_december_inputs + double_december_basic_inputs:
+            self.assertEqual(december_input.amount, round(december_input.amount, 2),
+                             "The December regularization inputs should be rounded to the currency.")
+
+    @freeze_time("2025-12-20")
+    def test_06b_december_regularization_student_without_double_holiday_pay(self):
+        """ A student earns no double holiday pay: no double holiday pay balance in December """
+        self.version_2025_empl_1.l10n_be_dimona_category = 'stu'
+        december_2025_payslip = self._create_and_validate_payslip(
+            self.employee_1,
+            self.version_2025_empl_1,
+            date_from=date(2025, 12, 1),
+            date_to=date(2025, 12, 31)
+        )
+        input_codes = december_2025_payslip.input_line_ids.mapped('code')
+        self.assertIn('SIMPLE_DECEMBER', input_codes)
+        self.assertNotIn('DOUBLE_DECEMBER_BASIC', input_codes)
 
     def test_07_departure_n1_simple_holiday_pay_from_gross_reference(self):
         """

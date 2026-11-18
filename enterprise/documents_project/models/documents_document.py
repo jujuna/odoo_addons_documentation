@@ -4,6 +4,7 @@ from odoo import fields, models, _
 from odoo import api
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
+from odoo.tools.sql import SQL
 
 
 class DocumentsDocument(models.Model):
@@ -47,6 +48,13 @@ class DocumentsDocument(models.Model):
         project_base_folder = self.env.ref('documents_project.document_project_folder', raise_if_not_found=False)
         if project_base_folder and project_base_folder in self and not project_base_folder.active:
             raise ValidationError(_("You cannot archive the project base folder (%s).", project_base_folder.name))
+
+    @api.model
+    def _get_no_unlink_domain(self):
+        # Avoid deleting (even inaccessible) projects' folders.
+        ProjectSudo = self.env['project.project'].sudo().with_context(active_test=False)
+        folder_ids = ProjectSudo._search([('documents_folder_id', '!=', False)]).subselect(SQL('documents_folder_id'))
+        return super()._get_no_unlink_domain() | Domain('id', 'in', folder_ids)
 
     @api.constrains('company_id')
     def _check_company_fits_projects_and_settings(self):

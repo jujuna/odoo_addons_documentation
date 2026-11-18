@@ -151,7 +151,13 @@ class TestHrSignRequest(TestHrCommon, SignRequestCommon):
         the employee signatory role has been removed.
         """
         employee = self.env['hr.employee'].create({'name': 'Employee Without Role'})
-        self.env.ref('hr_sign.sign_item_role_employee_signatory').unlink()
+        # Only the external ID is removed: the role itself can't be deleted as soon as
+        # some sign items use it (e.g. the hr_contract_salary demo templates).
+        self.env['ir.model.data'].search([
+            ('module', '=', 'hr_sign'),
+            ('name', '=', 'sign_item_role_employee_signatory'),
+        ]).unlink()
+        self.assertFalse(self.env.ref('hr_sign.sign_item_role_employee_signatory', raise_if_not_found=False))
 
         self.assertEqual(employee.sign_request_count, 0)
         action = employee.open_employee_sign_requests()

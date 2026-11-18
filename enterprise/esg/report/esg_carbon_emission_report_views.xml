@@ -9,6 +9,7 @@
                     <div class="d-flex align-items-center">
                         <div class="w-75">
                             <h1>
+                                <field name="product_id" class="d-block" readonly="1" invisible="not product_id" options="{'no_open': True}"/>
                                 <field name="name" widget="text" class="o_text_overflow" options="{'line_breaks': False}" readonly="id &lt; 0"/>
                             </h1>
                         </div>
@@ -62,7 +63,10 @@
                     <button name="action_create_other_emission" type="object" string="New" display="always" class="btn btn-primary"/>
                 </header>
                 <field name="date" widget="esg_list_daterange" width="200px" options="{'end_date_field': 'date_end'}" readonly="id &lt; 0"/>
-                <field name="name" readonly="id &lt; 0"/>
+                <column string="Name">
+                    <field name="product_id" readonly="1" invisible="not product_id" options="{'no_open': True}"/>
+                    <field name="name" readonly="id &lt; 0" invisible="not name and product_id" required="id > 0"/>
+                </column>
                 <field name="product_category_id" optional="hide" readonly="1" options="{'no_open': True}"/>
                 <field name="partner_id" optional="show" readonly="1" options="{'no_open': True}"/>
                 <field name="esg_emission_factor_id" options="{'no_open': True, 'no_create': True}" groups="!esg.esg_group_manager" context="{'search_default_my_country_filter': True, 'search_default_group_by_country': True}"/>
@@ -97,7 +101,10 @@
                 <templates>
                     <t t-name="card">
                         <div class="d-flex mb-1">
-                            <field name="name" class="fw-bold fs-5 text-truncate"/>
+                            <div class="d-flex flex-column min-w-0 fw-bold fs-5">
+                                <field name="product_id" class="text-truncate" invisible="not product_id"/>
+                                <field name="name" class="text-truncate" invisible="not name and product_id"/>
+                            </div>
                             <div class="flex-shrink-0 ms-auto">
                                 <field name="esg_emissions_value"/>
                                 <span class="ms-1">kgCO₂e</span>
@@ -118,7 +125,7 @@
         <field name="model">esg.carbon.emission.report</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
+                <field name="display_name" string="Name"/>
                 <field name="partner_id"/>
                 <field name="esg_emission_factor_id"/>
                 <field name="move_id" groups="account.group_account_invoice"/>

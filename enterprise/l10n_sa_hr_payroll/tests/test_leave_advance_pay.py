@@ -491,3 +491,53 @@ class TestLeaveAdvancePay(TestSACommon):
         }
         payslip_mar.compute_sheet()
         self._validate_payslip(payslip_mar, payslip_mar_results, skip_lines=True)
+
+    def test_leave_advance_overlapping_year_end(self):
+        """Leave from 20/Dec/2026 to 10/Jan/2027: the advance counts the 6 working days of Jan 2027."""
+        paid_leave = self.env["hr.leave"].create(
+            {
+                "name": "Paid Time Off Dec -> Jan",
+                "employee_id": self.saudi_employee.id,
+                "work_entry_type_id": self.paid_time_off_type.id,
+                "request_date_from": date(2026, 12, 20),
+                "request_date_to": date(2027, 1, 10),
+            }
+        )
+        leave_advance_pay_wizard = (
+            self.env["hr.leave.advance.pay"]
+            .with_context(hr_leave_id=paid_leave.id)
+            .create(
+                {
+                    "struct_id": self.sa_employee_struct_id.id,
+                }
+            )
+        )
+        act_dict = leave_advance_pay_wizard.action_populate_payslip()
+        payslip_dec = self.env["hr.payslip"].browse(act_dict["res_id"])
+        self.assertEqual(payslip_dec.date_from, date(2026, 12, 1))
+        self.assertEqual(payslip_dec._get_input_line_amount("LEAVEADVPAY"), 6)
+
+    def test_leave_advance_overlapping_november_december(self):
+        """Leave from 20/Nov/2026 to 10/Dec/2026: the advance counts the 8 working days of Dec 2026."""
+        paid_leave = self.env["hr.leave"].create(
+            {
+                "name": "Paid Time Off Nov -> Dec",
+                "employee_id": self.saudi_employee.id,
+                "work_entry_type_id": self.paid_time_off_type.id,
+                "request_date_from": date(2026, 11, 20),
+                "request_date_to": date(2026, 12, 10),
+            }
+        )
+        leave_advance_pay_wizard = (
+            self.env["hr.leave.advance.pay"]
+            .with_context(hr_leave_id=paid_leave.id)
+            .create(
+                {
+                    "struct_id": self.sa_employee_struct_id.id,
+                }
+            )
+        )
+        act_dict = leave_advance_pay_wizard.action_populate_payslip()
+        payslip_nov = self.env["hr.payslip"].browse(act_dict["res_id"])
+        self.assertEqual(payslip_nov.date_from, date(2026, 11, 1))
+        self.assertEqual(payslip_nov._get_input_line_amount("LEAVEADVPAY"), 8)

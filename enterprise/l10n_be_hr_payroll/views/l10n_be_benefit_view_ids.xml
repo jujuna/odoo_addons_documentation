@@ -672,8 +672,8 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <label for="fiscal_voluntarism_amount"/>
-                <div class="d-flex align-items-center">
+                <label for="fiscal_voluntarism_amount" invisible="l10n_be_egov3_code == '999'"/>
+                <div class="d-flex align-items-center" invisible="l10n_be_egov3_code == '999'">
                     <field name="fiscal_voluntarism_percentage" class="flex-grow-1" widget="percentage" invisible="fiscal_voluntarism_type in ['fixed', 'total_amount']" options="{'no_symbol': True}"/>
                     <field name="fiscal_voluntarism_amount" class="flex-grow-1" invisible="fiscal_voluntarism_type == 'percentage'"/>
                     <field name="fiscal_voluntarism_type" nolabel="1" class="w-auto me-0"/>
@@ -691,7 +691,7 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <field name="restructuring_reduction_date_start" placeholder="No Reduction"/>
+                <field name="restructuring_reduction_date_start" placeholder="No Reduction" invisible="l10n_be_egov3_code == '999'"/>
             </group>
         </field>
     </record>
@@ -705,7 +705,7 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <field name="l10n_be_impulsion_plan" placeholder="Not applicable" invisible="l10n_be_working_region != 'wa'"/>
+                <field name="l10n_be_impulsion_plan" placeholder="Not applicable" invisible="l10n_be_egov3_code == '999'"/>
             </group>
         </field>
     </record>
@@ -719,8 +719,8 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <label for="rd_percentage"/>
-                <div class="o_row">
+                <label for="rd_percentage" invisible="l10n_be_egov3_code == '999'"/>
+                <div class="o_row" invisible="l10n_be_egov3_code == '999'">
                     <field name="rd_percentage" class="o_hr_narrow_field" widget="percentage"/>
                 </div>
             </group>
@@ -752,7 +752,7 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <field name="l10n_be_onss_reduction_unexperienced_employees_flander"/>
+                <field name="l10n_be_onss_reduction_unexperienced_employees_flander" invisible="l10n_be_egov3_code == '999'"/>
             </group>
         </field>
     </record>
@@ -784,7 +784,7 @@
                 <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="taxes_reduction_group" position="inside">
-                <field name="l10n_be_is_aid_zone"/>
+                <field name="l10n_be_is_aid_zone" invisible="l10n_be_egov3_code == '999'"/>
             </group>
         </field>
     </record>
@@ -811,7 +811,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_homeworking_amount" string="Homeworking"/>
@@ -829,7 +829,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_homeworking_amount" string="Homeworking"/>
@@ -847,7 +847,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_office_fees_amount" string="Office Fees"/>
@@ -865,7 +865,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_office_fees_amount" string="Office Fees"/>
@@ -883,7 +883,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_office_fees_2022_amount" string="Office Fees (2022)"/>
@@ -901,7 +901,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_office_fees_2022_amount" string="Office Fees (2022)"/>
@@ -919,7 +919,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_phone_amount" string="Phone"/>
@@ -937,7 +937,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_phone_amount" string="Phone"/>
@@ -955,7 +955,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_internet_amount" string="Internet"/>
@@ -973,7 +973,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_internet_amount" string="Internet"/>
@@ -991,7 +991,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_pc_amount" string="Private Computer Allowance"/>
@@ -1009,7 +1009,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_pc_amount" string="Private Computer Allowance"/>
@@ -1027,7 +1027,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_second_screen_amount" string="Second Screen Allowance"/>
@@ -1045,7 +1045,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_second_screen_amount" string="Second Screen Allowance"/>
@@ -1063,7 +1063,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_scanner_amount" string="Scanner Allowance"/>
@@ -1081,7 +1081,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_scanner_amount" string="Scanner Allowance"/>
@@ -1099,7 +1099,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_garage_amount" string="Car Management (Garage)"/>
@@ -1117,7 +1117,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_garage_amount" string="Car Management (Garage)"/>
@@ -1135,7 +1135,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_parking_amount" string="Car Management (Parking)"/>
@@ -1153,7 +1153,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_parking_amount" string="Car Management (Parking)"/>
@@ -1171,7 +1171,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_wash_amount" string="Car Management (Wash)"/>
@@ -1189,7 +1189,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_management_wash_amount" string="Car Management (Wash)"/>
@@ -1207,7 +1207,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_loc_amount" string="Daily Misc. Allowance (Itinerant Worker)"/>
@@ -1225,7 +1225,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_loc_amount" string="Daily Misc. Allowance (Itinerant Worker)"/>
@@ -1243,7 +1243,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_meal_amount" string="Daily Meal Allowance (Itinerant Worker)"/>
@@ -1261,7 +1261,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_meal_amount" string="Daily Meal Allowance (Itinerant Worker)"/>
@@ -1279,7 +1279,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_living_amount" string="Daily Housing Allowance (Itinerant Worker)"/>
@@ -1297,7 +1297,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_travel_cost_living_amount" string="Daily Housing Allowance (Itinerant Worker)"/>
@@ -1315,7 +1315,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_service_travel_abroad_amount" string="Service Travel Abroad"/>
@@ -1333,7 +1333,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_service_travel_abroad_amount" string="Service Travel Abroad"/>
@@ -1351,7 +1351,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_working_tools_amount" string="Working Tools Allowance"/>
@@ -1369,7 +1369,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_working_tools_amount" string="Working Tools Allowance"/>
@@ -1387,7 +1387,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_buying_work_clothes_amount" string="Daily Workwear Allowance"/>
@@ -1405,7 +1405,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_buying_work_clothes_amount" string="Daily Workwear Allowance"/>
@@ -1423,7 +1423,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_work_clothes_maintenance_amount" string="Workwear Maintenance"/>
@@ -1441,7 +1441,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_work_clothes_maintenance_amount" string="Workwear Maintenance"/>
@@ -1459,7 +1459,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_personal_work_clothes_maintenance_amount" string="Personal Workwear Maintenance"/>
@@ -1477,7 +1477,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_personal_work_clothes_maintenance_amount" string="Personal Workwear Maintenance"/>
@@ -1495,7 +1495,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_travel_amount" string="Commute Allowance (Car)"/>
@@ -1513,7 +1513,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_car_travel_amount" string="Commute Allowance (Car)"/>
@@ -1531,7 +1531,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_bike_travel_amount" string="Commute Allowance (Bike)"/>
@@ -1549,7 +1549,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_bike_travel_amount" string="Commute Allowance (Bike)"/>
@@ -1567,7 +1567,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_bike_professional_travel_amount" string="Business Trip Allowance (Bike)"/>
@@ -1585,7 +1585,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_bike_professional_travel_amount" string="Business Trip Allowance (Bike)"/>
@@ -1603,7 +1603,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_daily_misc_base_amount" string="Daily Misc. Serious Base"/>
@@ -1621,7 +1621,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_daily_misc_base_amount" string="Daily Misc. Serious Base"/>
@@ -1639,7 +1639,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_misc_base_amount" string="Monthly Misc. Serious Base"/>
@@ -1657,7 +1657,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_misc_base_amount" string="Monthly Misc. Serious Base"/>
@@ -1675,7 +1675,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_daily_misc_other_amount" string="Daily Misc. Other Criterias"/>
@@ -1693,7 +1693,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_daily_misc_other_amount" string="Daily Misc. Other Criterias"/>
@@ -1711,7 +1711,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_misc_other_amount" string="Monthly Misc. Other Criterias"/>
@@ -1729,7 +1729,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_misc_other_amount" string="Monthly Misc. Other Criterias"/>
@@ -1747,7 +1747,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_pro_base_amount" string="Monthly Prorated Serious Base"/>
@@ -1765,7 +1765,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_pro_base_amount" string="Monthly Prorated Serious Base"/>
@@ -1783,7 +1783,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_pro_other_amount" string="Monthly Prorated Other Criterias"/>
@@ -1801,7 +1801,7 @@
         <field name="inherit_id" ref="l10n_be_hr_payroll.hr_contract_template_view_form"/>
         <field name="arch" type="xml">
             <group name="representation_fees" position="attributes">
-                <attribute name="invisible">0</attribute>
+                <attribute name="invisible">country_code != 'BE'</attribute>
             </group>
             <group name="representation_fees" position="inside">
                 <label for="l10n_be_lsa_monthly_pro_other_amount" string="Monthly Prorated Other Criterias"/>

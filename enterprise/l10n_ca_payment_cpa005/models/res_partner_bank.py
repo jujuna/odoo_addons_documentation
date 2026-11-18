@@ -2,8 +2,9 @@
 import re
 
 from odoo import models, fields, api
-from odoo.addons.base.models.res_partner_bank import sanitize_account_number
+
 from odoo.exceptions import ValidationError
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 
 
 def cpa005_sanitize_account_number(account_number):
@@ -24,6 +25,7 @@ def cpa005_sanitize_financial_institution_nr(fin_inst_nr):
 class ResPartnerBank(models.Model):
     _inherit = "res.partner.bank"
 
+    # !!! Do not use for new features/customizations, will be removed in 20.1. Rely on generic clearing_number instead.
     l10n_ca_financial_institution_number = fields.Char(
         "Financial Institution ID Number",
         size=9,
@@ -47,12 +49,18 @@ class ResPartnerBank(models.Model):
                     )
                 )
 
-    @api.depends('l10n_ca_financial_institution_number')
+    @api.depends('l10n_ca_financial_institution_number', 'clearing_label_id', 'clearing_number')
     def _compute_l10n_ca_cpa005_fi_number_parts(self):
         for bank in self:
-            if fin_inst_nr := cpa005_sanitize_financial_institution_nr(bank.l10n_ca_financial_institution_number):
+            if fin_inst_nr := bank._l10n_ca_cpa005_get_financial_institution_number():
                 bank.l10n_ca_cpa005_institution_number = fin_inst_nr[1:4]
                 bank.l10n_ca_cpa005_transit_number = fin_inst_nr[4:9]
             else:
                 bank.l10n_ca_cpa005_institution_number = False
                 bank.l10n_ca_cpa005_transit_number = False
+
+    def _l10n_ca_cpa005_get_financial_institution_number(self):
+        """We have twice the same information in Odoo, this is a fix for stable. """
+        return cpa005_sanitize_financial_institution_nr(
+            self.l10n_ca_financial_institution_number or self._get_clearing_number('CA')
+        )

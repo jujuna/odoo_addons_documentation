@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-11 12:35+0000\n"
-"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
+"POT-Creation-Date: 2026-11-13 17:50+0000\n"
+"PO-Revision-Date: 2026-11-05 07:33+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
 "projects/odoo-20/account_reports/zh_Hans/>\n"
 "Language: zh_CN\n"
@@ -189,45 +189,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the list of your open invoices.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != object.commercial_partner_id.id\">"
-"亲爱的 <t t-out=\"object.name or ''\"/> (<t t-"
-"out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">亲爱的 <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    请查收附件中的未结清发票清单。\n"
-"                    <br/>\n"
-"                    如果您有任何疑问，请随时与我们联系。\n"
-"                    <br/>\n"
-"                    祝好，\n"
-"                    <br/>\n"
-"                    <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_customer_statement
@@ -235,45 +215,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the statement of your account.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != object.commercial_partner_id.id\">"
-"亲爱的 <t t-out=\"object.name or ''\"/>（<t t-"
-"out=\"object.commercial_partner_id.name or ''\"/>），</t>\n"
-"                    <t t-else=\"\">亲爱的 <t t-out=\"object.name or ''\"/>，"
-"</t>\n"
-"                    <br/>\n"
-"                    随函附上您的账户对账单。\n"
-"                    <br/>\n"
-"                    如有任何疑问，请随时联系我们。\n"
-"                    <br/>\n"
-"                    诚挚问候，\n"
-"                    <br/>\n"
-"\t                <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_tax_return_deadline
@@ -281,35 +241,22 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    Hi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    The deadline to submit <strong t-out=\"object.name\"/> "
-"is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    The deadline to submit <strong t-out=\"object.name\"></"
+"strong> is <strong t-out=\"format_date(object.date_deadline)\"></strong>."
+"<br>\n"
 "                    To avoid any potential fine, please ensure all remaining "
-"documents are sent over as soon as possible.<br/>\n"
+"documents are sent over as soon as possible.<br>\n"
 "                    If you've already submitted everything but still "
 "received this email, it's likely the tax return hasn't been marked as "
-"submitted in Odoo.<br/>\n"
+"submitted in Odoo.<br>\n"
 "                    Should you have any question or need assistance, feel "
-"free to get in touch.<br/><br/>\n"
-"                    Best regards,<br/>\n"
+"free to get in touch.<br><br>\n"
+"                    Best regards,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    您好 <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>，<br/><br/>\n"
-"                    提交 <strong t-out=\"object.name\"/> 的截止日期为 "
-"<strong t-out=\"format_date(object.date_deadline)\"/>。<br/>\n"
-"                    为避免可能的罚款，请确保尽快发送所有剩余文件。<br/>\n"
-"                    如果您已提交全部文件但仍收到此邮件，很可能是该纳税申报表"
-"尚未在 Odoo 中标记为已提交。<br/>\n"
-"                    如有任何疑问或需要协助，欢迎随时联系我们。<br/><br/>\n"
-"                    此致敬礼，<br/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_generic_tax_instructions
@@ -324,12 +271,12 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -337,12 +284,12 @@ msgid ""
 "                        <td>Amount to Pay</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
 "                        <td>Due By</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Kind regards,</p>\n"
@@ -350,41 +297,6 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p>\n"
-"                    亲爱的 <t t-out=\"object.company_id.name\">YourCompany</"
-"t>，\n"
-"                </p>\n"
-"                <p>\n"
-"                    根据已收到的文件及信息，<t t-"
-"out=\"object.company_id.name\">YourCompany</t>\n"
-"                    期间 <t t-"
-"out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> 的纳税申报表已提交。\n"
-"                </p>\n"
-"                <p>\n"
-"                    经核定，仍需缴纳金额为 <t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/>。\n"
-"                </p>\n"
-"                <table style=\"border:1px solid black; padding:20px; text-"
-"align:left; border-spacing: 16px;\">\n"
-"                    <tr>\n"
-"                        <td>应缴金额</td>\n"
-"                        <td><t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
-"                    </tr>\n"
-"                    <tr>\n"
-"                        <td>缴纳截止日期</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
-"                    </tr>\n"
-"                </table>\n"
-"                <p>此致，</p>\n"
-"                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -871,7 +783,7 @@ msgstr "调整分录"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
 msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
-msgstr ""
+msgstr "将净利润/（亏损）调节至净现金流量的调整项目："
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
@@ -2726,7 +2638,7 @@ msgstr "删除"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
 msgid "Depreciation and amortisation"
-msgstr ""
+msgstr "折旧与摊销"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3616,12 +3528,12 @@ msgstr "未来活动"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
 msgid "Gain (-)/Loss (+) on sale of financial instruments"
-msgstr ""
+msgstr "金融工具销售收益(-)/损失(+)"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
 msgid "Gain (-)/Loss (+) on sale of intangible assets"
-msgstr ""
+msgstr "无形资产销售收益(-)/损失(+)"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
@@ -4101,7 +4013,7 @@ msgstr "%s的收入准备金"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
 msgid "Income tax paid (-)/received (+)"
-msgstr ""
+msgstr "已付 (-)/已收 (+) 所得税"
 
 #. module: account_reports
 #. odoo-python
@@ -4193,17 +4105,17 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
 msgid "Interest paid"
-msgstr ""
+msgstr "已付利息"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
 msgid "Interest received"
-msgstr ""
+msgstr "已收利息"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
 msgid "Interests/Dividends paid"
-msgstr ""
+msgstr "已付利息/股利"
 
 #. module: account_reports
 #. odoo-javascript
@@ -4347,6 +4259,11 @@ msgstr "是否可抵扣"
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_report_set
 msgid "Is Report Set"
 msgstr "报告是否设置"
+
+#. module: account_reports
+#: model:ir.model.fields,field_description:account_reports.field_account_journal__is_tax_return_journal
+msgid "Is Tax Return Journal"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_tax_return
@@ -4923,7 +4840,7 @@ msgstr "净资产"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
 msgid "Net financial result : income (-)/cost (+)"
-msgstr ""
+msgstr "净财务结果：收入 (-)/成本 (+)"
 
 #. module: account_reports
 #. odoo-python
@@ -5123,7 +5040,7 @@ msgstr "无法计算所有聚合表达式。这可能是由于其公式中存在
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
 msgid "Not reconciled yet"
-msgstr ""
+msgstr "尚未对账"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__notes
@@ -5224,6 +5141,12 @@ msgstr "选择格式之一不能在DMS导出"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_search_view
 msgid "Ongoing"
 msgstr "正在进行"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/res_partner.py:0
+msgid "Only a partner with a Tax ID can be set as main."
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -5357,12 +5280,12 @@ msgstr "其他收入"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
 msgid "Other payables"
-msgstr ""
+msgstr "其他应付款"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
 msgid "Other receivables"
-msgstr ""
+msgstr "其他应收款"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
@@ -6193,6 +6116,11 @@ msgid "Return Name"
 msgstr "申报名称"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Return Reminders"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__return_state
 msgid "Return State"
 msgstr "申报状态"
@@ -6511,6 +6439,11 @@ msgid "Send And Print Values"
 msgstr "发送和打印数值"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Send Copy To"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_customer_statement.py:0
 msgid "Send Customer Statements"
@@ -6566,6 +6499,8 @@ msgid "Service Sales to North-Irish Customers"
 msgstr "面向北爱尔兰客户的服务销售"
 
 #. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/widgets/set_as_main_partner/set_as_main_partner.xml:0
 #: model_terms:ir.ui.view,arch_db:account_reports.duplicate_vat_partner_tree_view
 msgid "Set as main"
 msgstr "设置为主要"
@@ -7488,12 +7423,12 @@ msgstr "贸易应付账款分析审核"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
 msgid "Trade payables"
-msgstr ""
+msgstr "应付账款"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
 msgid "Trade receivables"
-msgstr ""
+msgstr "应收账款"
 
 #. module: account_reports
 #. odoo-python
@@ -7662,7 +7597,7 @@ msgstr "未实现的币别收益/损失"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_forex
 msgid "Unrealized FX Gain (-)/Loss (+)"
-msgstr ""
+msgstr "Unrealized FX Gain (-)/Loss (+)"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7939,7 +7874,7 @@ msgstr "工作档案"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
 msgid "Working capital adjustments"
-msgstr ""
+msgstr "营运资金调整"
 
 #. module: account_reports
 #. odoo-python
@@ -8063,6 +7998,12 @@ msgstr "由于另一个申报已在更晚日期锁定，因此无法将此申报
 #: code:addons/account_reports/models/account_report.py:0
 msgid "You cannot update this value as it's locked by: %s"
 msgstr "无法更新此值，因为它已被锁定：%s"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "You do not have permission to refresh returns."
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -8345,6 +8286,201 @@ msgstr "⇒重置为Odoo汇率"
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr "≤ 12 个月"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the list of your open invoices.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">亲爱的 <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">亲爱的 <t t-out=\"object.name or ''\"/"
+#~ ">,</t>\n"
+#~ "                    <br/>\n"
+#~ "                    请查收附件中的未结清发票清单。\n"
+#~ "                    <br/>\n"
+#~ "                    如果您有任何疑问，请随时与我们联系。\n"
+#~ "                    <br/>\n"
+#~ "                    祝好，\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the statement of your account.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">亲爱的 <t t-out=\"object.name or ''\"/>"
+#~ "（<t t-out=\"object.commercial_partner_id.name or ''\"/>），</t>\n"
+#~ "                    <t t-else=\"\">亲爱的 <t t-out=\"object.name or ''\"/"
+#~ ">，</t>\n"
+#~ "                    <br/>\n"
+#~ "                    随函附上您的账户对账单。\n"
+#~ "                    <br/>\n"
+#~ "                    如有任何疑问，请随时联系我们。\n"
+#~ "                    <br/>\n"
+#~ "                    诚挚问候，\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hi <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    The deadline to submit <strong t-out=\"object.name\"/"
+#~ "> is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    To avoid any potential fine, please ensure all "
+#~ "remaining documents are sent over as soon as possible.<br/>\n"
+#~ "                    If you've already submitted everything but still "
+#~ "received this email, it's likely the tax return hasn't been marked as "
+#~ "submitted in Odoo.<br/>\n"
+#~ "                    Should you have any question or need assistance, feel "
+#~ "free to get in touch.<br/><br/>\n"
+#~ "                    Best regards,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    您好 <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>，<br/><br/>\n"
+#~ "                    提交 <strong t-out=\"object.name\"/> 的截止日期为 "
+#~ "<strong t-out=\"format_date(object.date_deadline)\"/>。<br/>\n"
+#~ "                    为避免可能的罚款，请确保尽快发送所有剩余文件。<br/>\n"
+#~ "                    如果您已提交全部文件但仍收到此邮件，很可能是该纳税申报"
+#~ "表尚未在 Odoo 中标记为已提交。<br/>\n"
+#~ "                    如有任何疑问或需要协助，欢迎随时联系我们。<br/><br/>\n"
+#~ "                    此致敬礼，<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">YourCompany</"
+#~ "t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "tax return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Amount to Pay</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Due By</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    亲爱的 <t t-"
+#~ "out=\"object.company_id.name\">YourCompany</t>，\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    根据已收到的文件及信息，<t t-"
+#~ "out=\"object.company_id.name\">YourCompany</t>\n"
+#~ "                    期间 <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> 的纳税申报表已提交。\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    经核定，仍需缴纳金额为 <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/>。\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>应缴金额</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>缴纳截止日期</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>此致，</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "银行对账单行"

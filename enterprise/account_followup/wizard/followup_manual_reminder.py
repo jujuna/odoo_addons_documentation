@@ -25,8 +25,12 @@ class Account_FollowupManual_Reminder(models.TransientModel):
                 continue
 
             partner = wizard.move_ids[:1].partner_id or self.env.user.partner_id
-            amount_due = sum(wizard.move_ids.filtered(lambda m: m.partner_id == partner).mapped('amount_residual'))
-            values = wizard.template_id.with_context(amount_due=amount_due)._generate_template(
+            partner_moves = wizard.move_ids.filtered(lambda m: m.partner_id == partner)
+            # we account for possibility that the invoices are in a different currency from company's or there's invoices with differing currencies
+            overdue_currency = partner.currency_id if len(partner_moves.currency_id) > 1 else wizard.move_ids[0].currency_id
+            amount_property = 'amount_residual_signed' if len(partner_moves.currency_id) > 1 else 'amount_residual'
+            amount_due = sum(partner_moves.mapped(amount_property))
+            values = wizard.template_id.with_context(amount_due=amount_due, overdue_currency=overdue_currency)._generate_template(
                 [partner.id],
                 ['subject', 'body_html'],
             )[partner.id]
@@ -55,14 +59,18 @@ class Account_FollowupManual_Reminder(models.TransientModel):
 
         partner_data = self.env['account.move']._read_group(
             domain=[('id', 'in', self.move_ids.ids)],
-            aggregates=['amount_residual:sum', 'id:recordset'],
+            aggregates=['amount_residual:sum', 'amount_residual_signed:sum', 'id:recordset'],
             groupby=['partner_id'],
         )
 
-        for partner, amount_residual, moves in partner_data:
+        for partner, amount_residual, amount_residual_signed, moves in partner_data:
+            overdue_currency = partner.currency_id if len(moves.currency_id) > 1 else moves[0].currency_id
+            amount_due = amount_residual_signed if len(moves.currency_id) > 1 else amount_residual
+
             # Render template per partner with their specific context
             template_ctx = self.template_id.with_context(
-                amount_due=amount_residual,
+                amount_due=amount_due,
+                overdue_currency=overdue_currency
             )
             body = template_ctx._render_field('body_html', [partner.id])[partner.id]
 

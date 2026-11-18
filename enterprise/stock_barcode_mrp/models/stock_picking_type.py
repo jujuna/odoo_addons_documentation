@@ -31,6 +31,23 @@ class StockPickingType(models.Model):
             else:
                 super(StockPickingType, picking_type)._compute_is_barcode_picking_type()
 
+    def _get_step_title(self, step):
+        if self.code != 'mrp_operation':
+            return super()._get_step_title(step)
+
+        match step:
+            case 'scan_product':
+                return self.env._("Scan a component")
+            case 'validate_or_scan_another_product':
+                return self.env._("Produce or scan another component")
+            case 'scan_lot':
+                return self.env._("Scan a lot/serial number if component is tracked")
+            case _:
+                return False
+
+    def _can_scan_source_location(self):
+        return super()._can_scan_source_location() or self.code == 'mrp_operation'
+
     def get_action_picking_tree_ready_kanban(self):
         if self.code == 'mrp_operation':
             res = self._get_action('stock_barcode_mrp.mrp_action_kanban')

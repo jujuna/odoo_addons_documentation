@@ -70,8 +70,11 @@ class TestMarketingCampaign(MarketingAutomationCommon):
 
     @users('user_marketing_automation')
     def test_duplicate_campaign(self):
-        """ Test duplicating a campaign: should not duplicate traces
-        and consider mailings as already sent through duplicates """
+        """ Test duplicating a campaign:
+        - should not duplicate traces and consider mailings as already sent through duplicates.
+        - should also duplicate the mailings, set their state to `done`, and link them to the new
+        campaign.
+        """
         original_campaign = self.campaign.with_user(self.env.user)
 
         # Add server activity to campaign
@@ -96,6 +99,14 @@ class TestMarketingCampaign(MarketingAutomationCommon):
                             'records': self.test_contacts,
                             'trace_status': 'sent',
                         }], activity)
+
+        original_mailing = original_campaign.marketing_activity_ids.mass_mailing_id
+        duplicated_mailing = duplicated_campaign.marketing_activity_ids.mass_mailing_id
+        self.assertNotEqual(duplicated_mailing, original_mailing)
+        self.assertRecordValues(duplicated_mailing, [{
+            'state': 'done',
+            'campaign_id': duplicated_campaign.utm_campaign_id.id,
+        }])
 
     @users('user_marketing_automation')
     def test_model_update(self):

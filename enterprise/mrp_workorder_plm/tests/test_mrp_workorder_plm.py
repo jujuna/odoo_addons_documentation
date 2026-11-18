@@ -125,6 +125,13 @@ class TestMrpWorkorderPlm(TestPlmCommon):
         self.assertEqual(eco1.routing_change_ids[2].change_type, 'update', "Wrong type on operation change line.")
         self.assertTrue(eco1.routing_change_ids[2].quality_point_id and not eco1.routing_change_ids[2].old_quality_point_id)
 
+        # rename quality_point_test1: it no longer matches its original step
+        eco1.new_bom_id.operation_ids[0].quality_point_ids[0].title = 'QP1 renamed'
+        routing_changes = eco1.routing_change_ids
+        self.assertEqual(routing_changes.mapped('change_type'), ['update'] * 4)
+        self.assertEqual(len(routing_changes.filtered(lambda c: c.quality_point_id and not c.old_quality_point_id)), 2)
+        self.assertEqual(len(routing_changes.filtered(lambda c: not c.quality_point_id and c.old_quality_point_id)), 2)
+
     def test_add_new_step_to_wo_aside_bom(self):
         """
         Test that adding a step to WO that isn't in the BoM
@@ -237,3 +244,49 @@ class TestMrpWorkorderPlm(TestPlmCommon):
         action = wo.action_add_step()
         add_step_form = Form(self.env[action['res_model']].with_context(action['context']), view=action['views'][0][0])
         add_step_form.save().add_check_in_chain()
+
+    def test_update_step_from_shop_floor(self):
+        """ Updating a step suggested from the shop floor should update both the
+            title and the instruction of the corresponding step in the ECO.
+            Updating an existing step should only update the instruction, so that
+            the step can still be matched by the following suggestions. """
+        self.quality_point_test1.title = "Existing Step"
+        mo = self.env['mrp.production'].create({
+            'product_id': self.table.id,
+            'bom_id': self.bom_table.id,
+            'product_qty': 1,
+        })
+        mo.action_confirm()
+        wo = mo.workorder_ids[0]
+
+        def _update_step(check, title, note):
+            action = wo.action_propose_change(change_type="update_step", check_id=check.id)
+            update_form = Form.from_action(self.env, action)
+            update_form.title = title
+            update_form.note = note
+            update_form.save().process()
+
+        action = wo.action_add_step()
+        add_step_form = Form.from_action(self.env, action)
+        add_step_form.title = "Old Title"
+        add_step_form.note = "Old Instruction"
+        new_step = add_step_form.save()
+        new_step.add_check_in_chain()
+        eco_step = new_step.point_id
+        eco = self.env['mrp.eco'].search([('bom_id', '=', self.bom_table.id)])
+        self.assertEqual(eco_step.operation_id.bom_id, eco.new_bom_id)
+        self.assertEqual(eco_step.title, "New Step Suggestion: Old Title")
+
+        _update_step(new_step, "New Title", "New Instruction")
+        self.assertRecordValues(eco_step, [{'title': "New Title", 'note': "<p>New Instruction</p>"}])
+        self.assertEqual(new_step.title, "New Title")
+
+        existing_step = wo.check_ids.filtered(lambda c: c.point_id == self.quality_point_test1)
+        existing_eco_step = eco.new_bom_id.operation_ids.quality_point_ids.filtered(lambda p: p.title == "Existing Step")
+        self.assertEqual(len(existing_eco_step), 1)
+        _update_step(existing_step, "Renamed Step", "First Instruction")
+        self.assertRecordValues(existing_eco_step, [{'title': "Existing Step", 'note': "<p>First Instruction</p>"}])
+        # The step is still found in the ECO after its title has been changed in the shop floor
+        _update_step(existing_step, "Renamed Step Again", "Second Instruction")
+        self.assertRecordValues(existing_eco_step, [{'title': "Existing Step", 'note': "<p>Second Instruction</p>"}])
+        self.assertEqual(existing_step.title, "Renamed Step Again")

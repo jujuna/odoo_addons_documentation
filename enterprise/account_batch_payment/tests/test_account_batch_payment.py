@@ -1,3 +1,4 @@
+import ast
 import time
 from unittest.mock import patch
 
@@ -24,6 +25,9 @@ class TestAccountBatchPayment(TestBankRecWidgetCommon):
         cls.journal = cls.company_data['default_journal_bank']
         cls.batch_deposit_method = cls.env.ref('account_batch_payment.account_payment_method_batch_deposit')
         cls.batch_deposit = cls.journal.inbound_payment_method_line_ids.filtered(lambda l: l.code == 'batch_payment')
+        cls.batch_deposit_out_method = cls.batch_deposit_method.sudo().copy({'payment_type': 'outbound'})
+        cls.batch_deposit_out = cls.batch_deposit.copy({'payment_method_id': cls.batch_deposit_out_method.id, 'payment_type': 'outbound'})
+        cls.journal.write({'outbound_payment_method_line_ids': [Command.link(cls.batch_deposit_out.id)]})
 
         cls.partner_bank_account = cls.env['res.partner.bank'].create({
             'account_number': 'BE32707171912447',
@@ -1153,7 +1157,7 @@ class TestAccountBatchPaymentAccountingOnly(TestAccountBatchPayment):
         ).create({
             'amount': 2000,
             'payment_date': '2019-01-01',
-            'payment_method_line_id': self.batch_deposit.id,
+            'payment_method_line_id': self.batch_deposit_out.id,
             'group_payment': True,
         })._create_payments()
         payments.create_batch_payment()
@@ -1367,3 +1371,122 @@ class TestAccountBatchPaymentAccountingOnly(TestAccountBatchPayment):
         self.assertFalse(st_line.is_reconciled)
         for payment in payments:
             self.assertEqual(payment.state, 'paid')
+
+    def test_bank_rec_widget_batch_with_exch_diff_without_entries(self):
+        """
+            Tests to reconcile a batch payment without entry with to a statement line with an exchange diff
+        """
+        chf_currency = self.setup_other_currency('CHF', rates=[('2016-01-01', 2.0), ('2019-01-03', 4.0)])
+        st_line = self._create_st_line(100.0, date='2019-01-05', foreign_currency_id=chf_currency.id)
+        invoice_line_with_exch_diff = self._create_invoice_one_line(
+            move_type='out_invoice',
+            invoice_date='2019-01-01',
+            price_unit=100.0,
+            currency_id=chf_currency.id,
+            post=True,
+        ).line_ids.filtered(lambda l: l.account_id.account_type in ('asset_receivable', 'liability_payable'))
+        payment = self.env['account.payment.register'].with_context(
+            active_model='account.move',
+            active_ids=(invoice_line_with_exch_diff).move_id.ids,
+        ).create({
+            'amount': 100,
+            'payment_date': '2019-01-04',
+            'payment_method_line_id': self.batch_deposit.id,
+        })._create_payments()
+        self.assertFalse(payment.move_id)
+
+        batch = self.env['account.batch.payment'].create({
+                'batch_type': payment.payment_type,
+                'journal_id': self.journal.id,
+                'payment_ids': [Command.set(payment.ids)],
+                'payment_method_id': self.batch_deposit_method.id,
+            })
+        batch.validate_batch()
+        self.assertEqual(batch.amount, 25.0)
+
+        st_line.set_batch_payment_bank_statement_line(payment.batch_payment_id.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id,    'amount_currency':  100.0,  'balance': 100.0,  'reconciled': False},
+            {'account_id': invoice_line_with_exch_diff.account_id.id,   'amount_currency': -100.0,  'balance': -25.0,  'reconciled': True},
+            {'account_id': st_line.journal_id.suspense_account_id.id,   'amount_currency': -300.0,  'balance': -75.0,  'reconciled': False},
+        ])
+        self.assertEqual(payment.state, 'reconciled')
+        self.assertEqual(batch.state, 'reconciled')
+        self.assertRecordValues(invoice_line_with_exch_diff._all_reconciled_lines(), [
+            {'amount_currency':  100.0,   'balance':  50.0,  'name': 'INV/2019/00001'},
+            {'amount_currency': -100.0,   'balance': -25.0,  'name': 'INV/2019/00001'},
+            {'amount_currency':    0.0,   'balance': -25.0,  'name': 'Currency exchange rate difference'},
+        ])
+
+    def test_create_batch_with_refund(self):
+        payment = self.env['account.payment'].create({
+            'amount': 100.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'destination_account_id': self.partner_a.property_account_receivable_id.id,
+            'currency_id': self.env.company.currency_id.id,
+            'partner_bank_id': self.partner_bank_account.id,
+            'date': '2024-05-14',
+        })
+        payment.action_post()
+        refund = self.env['account.payment'].create({
+            'amount': 50.0,
+            'payment_type': 'outbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'destination_account_id': self.partner_a.property_account_receivable_id.id,
+            'currency_id': self.env.company.currency_id.id,
+            'partner_bank_id': self.partner_bank_account.id,
+            'date': '2024-05-15',
+        })
+        # Payments created from refund transactions have the payment method of the initial transaction
+        refund.write({'payment_method_id': payment.payment_method_id.id})
+        refund.action_post()
+
+        # Create new batch from payment and refund
+        batch_payment_action = (refund + payment).create_batch_payment()
+        batch_payment = self.env['account.batch.payment'].browse(batch_payment_action.get('res_id'))
+        self.assertEqual(batch_payment.batch_type, 'inbound')
+        self.assertTrue(refund in batch_payment.payment_ids)
+
+    def test_add_refund_to_existing_batch(self):
+        payments = self.env['account.payment'].create([{
+            'amount': 100.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'destination_account_id': self.partner_a.property_account_receivable_id.id,
+            'currency_id': self.env.company.currency_id.id,
+            'partner_bank_id': self.partner_bank_account.id,
+            'date': '2024-05-14',
+        }, {
+            'amount': 200.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'destination_account_id': self.partner_a.property_account_receivable_id.id,
+            'currency_id': self.env.company.currency_id.id,
+            'partner_bank_id': self.partner_bank_account.id,
+            'date': '2024-05-14',
+        }])
+        payments.action_post()
+        # Create new batch from payments
+        batch_payment_action = payments.create_batch_payment()
+        batch_payment = self.env['account.batch.payment'].browse(batch_payment_action.get('res_id'))
+
+        refund = self.env['account.payment'].create({
+            'amount': 100.0,
+            'payment_type': 'outbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'destination_account_id': self.partner_a.property_account_receivable_id.id,
+            'currency_id': self.env.company.currency_id.id,
+            'partner_bank_id': self.partner_bank_account.id,
+            'date': '2024-05-15',
+        })
+        # Payments created from refund transactions have the payment method of the initial transaction
+        refund.write({'payment_method_id': payments[0].payment_method_id.id})
+        refund.action_post()
+        # Check that refund can be added to existing batch
+        self.assertTrue(refund.filtered_domain(ast.literal_eval(batch_payment.payment_ids_domain)))

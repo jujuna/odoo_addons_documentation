@@ -3,7 +3,7 @@
 
 import odoo.tests
 from odoo.addons.pos_restaurant.tests.test_frontend import TestFrontend
-from odoo import fields
+from odoo import Command, fields
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 from unittest import skip
@@ -87,3 +87,42 @@ class TestUi(TestFrontend):
         self.pos_config.with_user(self.pos_admin).open_ui()
         self.start_pos_tour("test_table_without_ressources", login="pos_admin")
         self.assertEqual(len(self.pos_config.floor_ids.table_ids.appointment_resource_id.ids), 5)
+
+    @freeze_time('2025-08-27 12:18:56')
+    def test_booking_available_seats_and_check_in(self):
+        appointment_type = self.env['appointment.type'].create({
+            'appointment_tz': 'US/Eastern',
+            'event_videocall_source': False,
+            'is_auto_assign': True,
+            'name': 'Seats Booking Test',
+            'manage_capacity': True,
+            'schedule_based_on': 'resources',
+        })
+        self.pos_config.appointment_type_id = appointment_type
+        # A group of four linked 2-seat tables, a 4-seat table linked to a 2-seat table
+        # and a standalone 4-seat table: 18 seats in total.
+        resources = self.env['appointment.resource'].create([{
+            'name': f'Booking Table {name}',
+            'capacity': capacity,
+            'sequence': sequence,
+            'appointment_type_ids': [Command.set(appointment_type.ids)],
+        } for sequence, (name, capacity) in enumerate([
+            ('A', 2), ('B', 2), ('C', 2), ('D', 2), ('E', 4), ('F', 2), ('G', 4),
+        ], start=1)])
+        table_a, table_b, table_c, table_d, table_e, table_f, _table_g = resources
+        table_a.linked_resource_ids = table_b | table_c | table_d
+        table_b.linked_resource_ids = table_a | table_c | table_d
+        table_c.linked_resource_ids = table_a | table_b | table_d
+        table_e.linked_resource_ids = table_f
+
+        self.pos_config.with_user(self.pos_admin).open_ui()
+        self.start_pos_tour('test_booking_available_seats_and_check_in', login="pos_admin")
+
+        bookings = self.env['calendar.event'].search([('appointment_type_id', '=', appointment_type.id)])
+        booking_one, booking_two, booking_three = (
+            bookings.filtered(lambda b: b.name == name) for name in ('Booking One', 'Booking Two', 'Booking Three')
+        )
+        self.assertEqual(booking_one.resource_ids, table_a)
+        self.assertEqual(booking_two.resource_ids, table_b)
+        self.assertFalse(booking_three.resource_ids)
+        self.assertEqual(set(bookings.mapped('appointment_status')), {'attended'})

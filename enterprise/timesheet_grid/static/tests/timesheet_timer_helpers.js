@@ -67,7 +67,7 @@ export function setupTimesheetEnvironment() {
         env.sessionData.timesheet_timer_fields =
             env.pyEnv["account.analytic.line"].fields_get(fieldNames);
 
-        onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => {
+        onRpc("/timesheet_grid/timesheet_systray_user_data", async () => {
             const spec =
                 env.pyEnv["account.analytic.line"]._get_aw_timesheet_fields_specification();
             const domain = [["date", "=", luxon.DateTime.now().toFormat("yyyy-MM-dd")]];

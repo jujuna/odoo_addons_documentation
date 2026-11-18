@@ -368,6 +368,29 @@ class TestIncomingDirect(PhoneServiceEventCase):
             "partner_id": transferee.id,
         }])
 
+    def test_transfer_target_follows_its_leg_into_the_customer_conversation(self):
+        # Captured 2026-10-22: once the transferor completes, Wazo reports the
+        # target's leg in the customer's conversation, Call-ID unchanged, while
+        # the target's call was built in the consultation conversation.
+        consultation = self.direct_ring(conversation_id="conv-consultation")
+        consultation.leg("bernard").created()
+        consultation.leg("bernard").answers()
+        call = self.call_of("bernard")
+        consultation.leg("bernard").updated(
+            status="Up", conversation_id=CONVERSATION, peer_caller_id_number=self.partner_phone)
+
+        self.assertRecordValues(call, [{
+            "state": "ongoing",
+            "phone_number": self.partner_phone,
+            "partner_id": self.partner_be.id,
+        }])
+
+        consultation.wait(30)
+        consultation.leg("bernard").ends(answered=True, conversation_id=CONVERSATION)
+
+        self.assertEqual(self.call_of("bernard"), call)
+        self.assertEqual(call.state, "terminated")
+
     def test_trunk_connected_line_never_moves_the_interlocutor(self):
         # The trunk's connected line transits through Asterisk placeholders
         # while a transfer completes; only the user leg is trusted.

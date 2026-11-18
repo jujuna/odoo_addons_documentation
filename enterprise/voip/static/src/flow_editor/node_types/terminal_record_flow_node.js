@@ -68,7 +68,10 @@ export const RECORD_CONFIGS = {
             voip_call_flow_audio_creation: true,
             voip_call_flow_node_configuration: true,
         },
-        domain: [["callflow_id", "=", false]],
+        domain: [
+            ["callflow_id", "=", false],
+            ["is_audio_message", "=", false],
+        ],
         icon: "format_list_numbered",
         label: _t("Open a Menu"),
         resModel: "voip.ivr",

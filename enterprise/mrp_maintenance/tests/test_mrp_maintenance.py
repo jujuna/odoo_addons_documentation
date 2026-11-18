@@ -491,3 +491,45 @@ class TestMrpMaintenance(common.TransactionCase):
         # Confirm that the next MR is scheduled after the MO has finished
         self.assertEqual(next_mr.schedule_date, wo_finished_date,
             "Next preventive maintenance should be scheduled after the MO's end.")
+
+    @freeze_time("2026-07-07")
+    def test_block_workcenter_wo_planning(self):
+        """This test make sure that maintenance that block workcenter are correctly taken into account in the workorder planning."""
+
+        self.workcenter_id.write({
+            'maintenance_team_id': self.maintenance_team_id.id,
+            'technician_user_id': self.technician_user_id.id,
+            'expected_mtbf': 0,
+            'effective_date': '2026-04-13',
+        })
+
+        maintenance_request_1 = self._create_workcenter_request(name='Some keys are not working', schedule_date=datetime(2026, 8, 12, 8), workcenter_id=self.workcenter_id, maintenance_type="corrective")
+        maintenance_request_1.write({"block_workcenter": True, "schedule_end": datetime(2026, 8, 12, 17)})
+        # the work center is blocked for the whole working day of 2026-08-12 (8-12, 13-17)
+
+        product = self.env['product.product'].create({
+            'name': 'Test Product',
+            'type': 'consu',
+        })
+
+        workorder = self.env['mrp.workorder'].create({
+            'name': 'Test Workorder',
+            'workcenter_id': self.workcenter_id.id,
+            'duration_expected': 60 * 10,  # 2 days
+            'date_start': datetime(2026, 8, 10, 8),
+            'product_id': product.id,
+            'production_id': self.env['mrp.production'].create({
+                'product_id': product.id,
+                'product_qty': 1,
+                'uom_id': product.uom_id.id,
+            }).id,
+        })
+        workorder._set_dates()
+        # This workorder is not blocked by the maintenance request, so it is scheduled normally (10 hours) 8 hours on 2026-08-10 and 2 hours on 2026-08-11
+        self.assertEqual(workorder.date_start, datetime(2026, 8, 10, 8))
+        self.assertEqual(workorder.date_finished, datetime(2026, 8, 11, 10))
+
+        # This workorder is blocked by the maintenance request: 8 hours on 2026-08-11, then
+        # nothing on 2026-08-12 (fully blocked by the maintenance) and the last 2 hours on 2026-08-13
+        date_finished = workorder._calculate_date_finished(date_start=datetime(2026, 8, 11, 8))
+        self.assertEqual(date_finished, datetime(2026, 8, 13, 10))

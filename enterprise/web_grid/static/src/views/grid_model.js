@@ -902,7 +902,7 @@ export class GridModel extends Model {
                 items: [],
             },
             record: {
-                context: {},
+                context: { ...metaData.searchParams.context },
                 resModel: this.resModel,
                 resIds: [],
             },

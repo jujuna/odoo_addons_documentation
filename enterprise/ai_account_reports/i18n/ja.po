@@ -1,0 +1,570 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * ai_account_reports
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-11-02 03:19+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
+"ai_account_reports/ja/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid ""
+"\n"
+"Builds reusable configuration from action_report_id returned by\n"
+"accounting_report_list, using the companies currently selected in Odoo.\n"
+"A matching current browser report supplies its native options and source\n"
+"action; otherwise native defaults apply.\n"
+"\n"
+"Returns report_config, currencies, available_option_overrides, a paginated\n"
+"line_catalog and report_config_ref. report_config contains action_report_id\n"
+"and options. options.companies lists the companies included by native reporting,\n"
+"which may be fewer than the current selection.\n"
+"Its options retain native settings and choices, including report_id and\n"
+"columns. report_config.options.columns contains all native column definitions\n"
+"in order; expression_label can repeat across groups. Match report_id to\n"
+"available_variants or sections for the selected report name. Currency details\n"
+"are listed separately by ID.\n"
+"Returned options are a subset of the saved settings. aging_based_on is\n"
+"base_on_invoice_date for invoice dates or base_on_maturity_date for due dates.\n"
+"\n"
+"Use native names in option_overrides. journals and account_type accept\n"
+"{id, selected} objects. In resolved native options, no selected entries means\n"
+"all listed entries apply. Use accounting_report_select to change identity or\n"
+"options. If the user changes the company selection, describe the report again\n"
+"to obtain a new reference.\n"
+"        "
+msgstr ""
+"\n"
+"Odooで現在選択されている会社を使用して、accounting_report_listから返される\n"
+"action_report_idから再利用可能な構成を構築します。\n"
+"一致する現在のブラウザレポートがそのネイティブオプションとソースアクションを"
+"提供します。\n"
+"そうでない場合は、ネイティブのデフォルトが適用されます。\n"
+"\n"
+"report_config、currencies、available_option_overrides、ページ分割された"
+"line_catalog、および\n"
+"report_config_refを返します。report_configにはaction_report_idとoptionsが含ま"
+"れます。\n"
+"options.companiesはネイティブのレポート機能に含まれる会社をリストしますが、\n"
+"これは現在の選択より少ない場合があります。\n"
+"そのoptionsは、report_idや列を含むネイティブの設定と選択を保持します。\n"
+"report_config.options.columnsには、順序通りにすべてのネイティブの列定義が含ま"
+"れます。\n"
+"expression_labelはグループ間で繰り返される可能性があります。選択したレポート"
+"名のavailable_variants\n"
+"またはセクションとreport_idを照合してください。通貨の詳細は\n"
+"IDごとに個別にリストされます。\n"
+"返されるoptionsは保存された設定のサブセットです。aging_based_onは、\n"
+"請求書日付の場合はbase_on_invoice_date、支払期日の場合はbase_on_maturity_date"
+"となります。\n"
+"\n"
+"option_overridesではネイティブ名を使用してください。journalsおよび"
+"account_typeは{id, selected}オブジェクトを受け入れます。\n"
+"解決されたネイティブオプションにおいて、選択されたエントリがない場合は、"
+"リストされたすべてのエントリが適用されます。\n"
+"IDまたはオプションを変更するには、accounting_report_selectを使用してください"
+"。ユーザーが会社選択を変更した場合は、\n"
+"新しい参照を取得するためにレポートを再度説明してください。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid ""
+"\n"
+"Computes native report values from report_config_ref returned by describe or\n"
+"select. Returns report_config, currencies, column_groups, paginated lines,\n"
+"native warnings and the same report_config_ref.\n"
+"An empty warnings object means the report returned no warnings. It does not\n"
+"establish that the accounts are correct, reconciled or compliant. Consider any\n"
+"line-level warning_text as well.\n"
+"report_config.options.columns keeps all native column definitions. Provide at\n"
+"least one expression_label in columns. These labels select row cells across all\n"
+"periods and groups without changing the config. Pagination limits rows,\n"
+"regardless of the number of columns.\n"
+"Each line contains native columns: expression_label, column_group_index,\n"
+"no_format (raw value) and name (formatted value). column_group_index indexes\n"
+"column_groups; forced_options.date identifies that group's period when present,\n"
+"otherwise use report_config.options.date. A configured date range does not mean\n"
+"every value is activity within that range: General Ledger account debit and\n"
+"credit totals include opening amounts. line_ref permits expansion.\n"
+"row_type distinguishes data, totals and load_more summaries. Lines retain\n"
+"native warning_text when present.\n"
+"        "
+msgstr ""
+"\n"
+"describe またはselectによって返されたreport_config_refからネイティブ\n"
+"のレポート値を計算します。report_config、currencies、column_groups、ページ\n"
+"ネーションされた lines、ネイティブの warnings、および同じ report_config_ref\n"
+"を返します。\n"
+"空のwarningsオブジェクトは、レポートが警告を返さなかったことを意味します。\n"
+"これは、勘定科目が正しいこと、消込済であること、またはコンプライアンスに\n"
+"準拠していることを証明するものではありません。行レベルのwarning_textも同様\n"
+"に考慮してください。\n"
+"report_config.options.columnsは、すべてのネイティブ列定義を保持します。\n"
+"columnsに少なくとも1つの expression_labelを指定してください。これらのラ\n"
+"ベルは、設定を変更することなく、すべての期間およびグループにわたって行セル"
+"を\n"
+"選択します。ページネーションは、列数に関係なく行を制限します。\n"
+"各行には、ネイティブ列が含まれます: expression_label、column_group_index、\n"
+"no_format(生の値)、および name(フォーマット済みの値)。column_group_index\n"
+"はcolumn_groupsをインデックス付けします。forced_options.dateが存在する\n"
+"場合はそのグループの期間を特定し、存在しない場合は "
+"report_config.options.date\n"
+"を使用します。設定された日付範囲は、すべての値がその範囲内のアクティビティ"
+"で\n"
+"あることを意味するわけではありません。総勘定元帳の勘定科目借方・貸方合計に"
+"は\n"
+"期首残高が含まれます。line_refにより展開が可能です。\n"
+"row_type は、data、totals、およびload_moreの集計を区別します。行は、存在\n"
+"する場合、ネイティブのwarning_textを保持します。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid ""
+"\n"
+"Create a native audit working file for the currently selected company and\n"
+"exact dates, using the native local audit type and configured cycles. Select\n"
+"one company in Odoo before calling this tool. Requires confirmation. For branch\n"
+"structures, ask the user to create the file manually in the Accounting\n"
+"application and provide its ID. Returns the file scope, URL and native check\n"
+"progress.\n"
+"        "
+msgstr ""
+"\n"
+"現在選択されている会社および正確な日付に対して、ネイティブのローカル監査"
+"タイプ\n"
+"と設定されたサイクルを使用して、ネイティブの監査調書ファイルを作成します。こ"
+"の\n"
+"ツールを呼び出す前に、Odoo で会社を1社選択してください。確認が必要です。支"
+"社\n"
+"構造の場合は、ユーザーに対して会計アプリケーション内で手動でファイルを作成し"
+"、\n"
+"そのIDを提供するよう求めてください。ファイルの対象範囲、URL、および"
+"ネイティブ\n"
+"のチェック進捗状況を返します。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid ""
+"\n"
+"Expands a line_ref issued by get_values or expand_line using its exact saved\n"
+"configuration and column selection. Returns the same report_config, currencies,\n"
+"lines, column_groups and pagination as get_values. Follow returned line_ref\n"
+"values for deeper detail. A load_more reference reloads its parent branch and\n"
+"may repeat earlier lines; do not double-count them.\n"
+"Rows represent report lines, not necessarily accounting records. Initial Balance\n"
+"is an opening summary. Row names are display descriptions; do not infer\n"
+"dimensions absent from the returned data. Lines retain native warning_text\n"
+"when present.\n"
+"        "
+msgstr ""
+"\n"
+"get_valuesまたはexpand_lineによって発行されたline_refを、保存された\n"
+"正確な設定と列の選択を使用して展開します。get_valuesと同じreport_config、\n"
+"currencies、lines、column_groups、およびページネーションを返します。より深"
+"い\n"
+"詳細については、返されたline_refの値に従ってください。load_moreの参照は\n"
+"親ブランチを再読み込みするため、前の行が重複する場合があります。二重に"
+"カウント\n"
+"しないでください。\n"
+"行はレポートの行を表し、必ずしも会計レコードとは限りません。期首残高\n"
+"は期首の要約です。行名は表示用の説明です。返されたデータに存在しない\n"
+"ディメンションを推測しないでください。行は、存在する場合、ネイティブの\n"
+"warning_textを保持します。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_list
+msgid ""
+"\n"
+"Lists accessible report entry points from account_report client actions.\n"
+"Use action_report_id to describe an entry; report.report_id identifies its\n"
+"native default selection. Returns report names, default variant/section IDs,\n"
+"filter_date_range and pagination. An empty list means no matching entries.\n"
+"        "
+msgstr ""
+"\n"
+"account_reportクライアントアクションからアクセス可能な"
+"レポートエントリポイントを一覧表示します。\n"
+"エントリを指定するにはaction_report_idを使用します。report.report_idはその\n"
+"ネイティブデフォルト選択を識別します。レポート名、デフォルトのバリアント/"
+"セクションID、\n"
+"filter_date_range、およびページネーションを返します。空のリストは一致する"
+"エントリがないことを意味します。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_open
+msgid ""
+"\n"
+"Opens the exact saved report_config_ref using its source action and full\n"
+"native options. Returns opened, report_config, currencies and the reference.\n"
+"If that exact configuration is already displayed, opened is false and reason\n"
+"explains why. Otherwise a client action opens it. Call this tool alone and wait\n"
+"for its result before answering.\n"
+"        "
+msgstr ""
+"\n"
+"そのソースアクションと完全なネイティブオプションを使用して、保存された正確"
+"な\n"
+"report_config_refを開きます。opened、report_config、currencies、および参照"
+"を\n"
+"返します。その正確な設定がすでに表示されている場合、openedはfalseとなり、"
+"reason\n"
+"にその理由が示されます。それ以外の場合はクライアントアクションが開きます。こ"
+"のツール\n"
+"を単独で呼び出し、結果を待ってから回答してください。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid ""
+"\n"
+"Preview and save a validated batch of findings for one assigned cycle, under\n"
+"native access and review rules. Only non-file checks may be updated. Use\n"
+"reviewed for supported clearance, anomaly for evidenced exceptions, and todo for\n"
+"incomplete or blocked checks. Never formally completes or supervises the\n"
+"working file. Requires confirmation. After saving, returns the updated check\n"
+"codes, native check progress and working-file URL.\n"
+"\n"
+"For each saved audit note, write a short, plain-language conclusion, normally\n"
+"two or three sentences. State what is established, what is wrong, or what\n"
+"remains unresolved. Include only the decisive facts or amounts and any\n"
+"necessary next action.\n"
+"\n"
+"Do not repeat the check description, company, period or procedures unless\n"
+"needed to understand the conclusion. Avoid headings such as Scope, Procedures\n"
+"and Evidence. Preserve limitations that change what can be concluded. Use\n"
+"neutral language without mentioning agents.\n"
+"        "
+msgstr ""
+"\n"
+"割り当てられた1つのサイクルについて、ネイティブaccessおよびreview規則に従い"
+"、\n"
+"検出事項(finding)の検証済みバッチをプレビューして保存します。更新できるのは"
+"ファイル以外のチェックのみです。\n"
+"supported clearanceにはreviewed、根拠のある例外にはanomaly、未完了または阻害"
+"されているチェックにはtodoを使用してください。\n"
+"作業ファイル(working file)を正式に完了(complete)または監督(supervise)すること"
+"は決して行いません。確認(confirmation)が必要です。保存後、\n"
+"更新後のチェックコード、ネイティブcheck進捗および作業ファイルURLを返します"
+"。\n"
+"\n"
+"保存される各監査ノート(audit note)について、短く平易な結論を記述してください"
+"(通常2〜3文)。\n"
+"確定した事項、誤りである点、または未解決の点を述べます。記載するのは、\n"
+"決定的な事実または金額と、必要な次の対応のみとします。\n"
+"\n"
+"理解に必要な場合を除き、チェックの説明、会社、期間または手続を繰り返さないで"
+"ください。Scope、Procedures\n"
+"およびEvidenceなどの見出しは避けてください。結論の範囲に影響する制約・限界は"
+"保持してください。\n"
+"主体(担当者等)に言及せず、中立的な表現を用いてください。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid ""
+"\n"
+"Read the native working file, complete check instructions and notes, company and\n"
+"dates, live cycle progress, and paginated checks. Pass cycle to read the\n"
+"assigned cycle, or omit it to discover all cycles. File checks require manual\n"
+"evidence. Native record count is only a capped hint; it is not a complete\n"
+"evidence count. Progress summarizes native statuses and refresh flags, not a\n"
+"record of agent investigations.\n"
+"        "
+msgstr ""
+"\n"
+"ネイティブ作業ファイル、完全なチェック手順およびノート、会社および\n"
+"日付、リアルタイムのサイクル進捗、ならびにページネーションされたチェックを読"
+"み取ります。割り当てられた\n"
+"サイクルを読み取るにはcycleを渡し、すべてのサイクルを検出するには省略します。"
+"ファイルチェックには手動の\n"
+"証拠が必要です。ネイティブのレコード数は上限付きの目安にすぎず、完全な\n"
+"証拠数ではありません。進捗状況はネイティブのステータスと更新フラグを要約した"
+"ものであり、\n"
+"エージェントの調査記録ではありません。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid ""
+"\n"
+"Return a check's native action in action_detail as an investigation hint, with\n"
+"search and main view XML for record actions. Interpret its domain, active search\n"
+"defaults and search-panel selections using the XML, including filter grouping.\n"
+"Group-by defaults suggest grouping rather than record restrictions. Choose\n"
+"fields and explicit domains for search/read-group, or use accounting-report\n"
+"tools for report actions. Native report IDs and options remain in the action.\n"
+"\n"
+"No records or report_config_ref are returned. Action context is metadata for\n"
+"interpreting the action; it does not configure subsequent tools.\n"
+"If no action is available, investigate from the check instructions and attached\n"
+"documents. Other executable actions are returned without being run.\n"
+"        "
+msgstr ""
+"\n"
+"調査のヒントとして、action_detail内にチェックのネイティブアクションを返し、\n"
+"レコードアクション用の検索およびメインビューXMLを含めます。フィルタのグループ"
+"化を含め、\n"
+"XMLを使用してそのドメイン、アクティブな検索デフォルト、および検索パネルの選択"
+"を解釈します。\n"
+"グループ化のデフォルトはレコードの制限ではなくグループ化を示唆します。\n"
+"search/read-group用にフィールドと明示的なドメインを選択するか、"
+"レポートアクション用には\n"
+"会計レポートツールを使用します。ネイティブのレポートIDおよびオプションは"
+"アクション内に残ります。\n"
+"\n"
+"レコードまたはreport_config_refは返されません。アクションコンテキストは\n"
+"アクションを解釈するためのメタデータであり、後続のツールを設定するものではあ"
+"りません。\n"
+"アクションが利用できない場合は、チェック手順および添付ドキュメントから調査し"
+"てください。\n"
+"その他の実行可能なアクションは、実行されずに返されます。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_select
+msgid ""
+"\n"
+"Selects a variant or section from an exact report_config_ref.\n"
+"Use choice={kind: \"variant\", id: ...} with an ID from\n"
+"report_config.options.available_variants, or kind: \"section\" with an ID from\n"
+"report_config.options.sections. These lists belong to the supplied\n"
+"configuration. A report can serve different roles in different lists; use the\n"
+"matching kind. Returns the same description as describe.\n"
+"Optional option_overrides uses native option names and selection objects.\n"
+"Checks reference ownership, selected companies and report access.\n"
+"        "
+msgstr ""
+"\n"
+"正確なreport_config_refからバリアントまたはセクションを選択します。\n"
+"report_config.options.available_variantsのIDを指定してchoice={kind: "
+"\"variant\", id: ...}を使用するか、\n"
+"またはreport_config.options.sectionsのIDを指定してkind: \"section\"を使用しま"
+"す。これらのリストは提供された\n"
+"設定に属します。レポートは異なるリストにおいて異なる役割を果たすことができま"
+"す。一致する\n"
+"kindを使用してください。describeと同じ説明を返します。\n"
+"オプションのoption_overridesはネイティブのオプション名と選択オブジェクトを使"
+"用します。\n"
+"参照の所有権、選択された会社、およびレポートアクセスを確認します。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid ""
+"\n"
+"Set the working audit file for this session's context-dependent accounting\n"
+"fields, or pass null to clear it. Select the assigned file before querying audit\n"
+"fields with search/read-group. Wait for the setter result before issuing those\n"
+"queries. Clear it before unrelated work or select the new file when the\n"
+"assignment changes. Parent and child sessions keep separate working-file\n"
+"selections. The file's companies and main company must match Odoo's company\n"
+"selector.\n"
+"\n"
+"Returns the active file, company and period, or audit_context=null when cleared.\n"
+"This does not add company/date domains to ordinary searches, select report\n"
+"options or modify the working file's findings.\n"
+"        "
+msgstr ""
+"\n"
+"このセッションのコンテキストに依存する会計フィールドに対して作業監査ファイル"
+"を設定するか、\n"
+"またはクリアするためにnullを渡します。search/read-groupで監査フィールドを\n"
+"クエリする前に、割り当てられたファイルを選択してください。それらのクエリを発"
+"行する前に\n"
+"セッターの結果を待ってください。無関係な作業を行う前にクリアするか、割り当て"
+"が\n"
+"変更されたときに新しいファイルを選択してください。親セッションと子セッション"
+"は別々の\n"
+"作業ファイル選択を保持します。ファイルの会社および主会社はOdooの会社\n"
+"セレクタと一致している必要があります。\n"
+"\n"
+"アクティブなファイル、会社、および期間を返します。クリアされた場合は"
+"audit_context=nullを\n"
+"返します。これは通常の検索に会社/日付のドメインを追加したり、"
+"レポートオプションを\n"
+"選択したり、作業ファイルの指摘事項を変更したりするものではありません。\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.module.module,shortdesc:base.module_ai_account_reports
+msgid "AI Accounting Reports"
+msgstr "AI会計レポート"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_session
+msgid "AI Session"
+msgstr "AIセッション"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_tool
+msgid "AI Tool"
+msgstr "AIツール"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "AI Tool: Create Audit Working File"
+msgstr "AIツール: 監査作業ファイルを作成"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "AI Tool: Describe Accounting Report"
+msgstr "AIツール: 会計レポートを説明"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "AI Tool: Expand Accounting Report Line"
+msgstr "AIツール: 会計レポート明細行を展開"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "AI Tool: Get Accounting Report Values"
+msgstr "AIツール: 会計レポートの値を取得"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "AI Tool: Get Audit Check Action Detail"
+msgstr "AIツール: 監査チェックアクションの詳細を取得"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "AI Tool: List Accounting Reports"
+msgstr "AIツール: 会計レポートを一覧表示"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "AI Tool: Open Accounting Report"
+msgstr "AIツール: 会計レポートを開く"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "AI Tool: Read Audit Checks"
+msgstr "AIツール: 監査検査を読み取る"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "AI Tool: Save Audit Cycle Findings"
+msgstr "AIツール: 監査サイクルの検討結果を保存"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "AI Tool: Select Accounting Report Identity"
+msgstr "AIツール: 会計レポートの識別子を選択"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "AI Tool: Set Working Audit File"
+msgstr "AIツール: 作業監査ファイルを指定"
+
+#. module: ai_account_reports
+#: model:ir.module.module,summary:base.module_ai_account_reports
+msgid "AI-assisted accounting report analysis and audit review"
+msgstr "AI支援による会計レポート分析および監査レビュー"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "Computing selected accounting figures"
+msgstr "選択された会計数値を計算中"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "Create Audit Working File"
+msgstr "監査作業ファイルの作成"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__display_name
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__display_name
+msgid "Display Name"
+msgstr "表示名"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "Drilling into the accounting report"
+msgstr "会計レポートをドリルダウンしています"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "Finding accessible accounting reports"
+msgstr "アクセス可能な会計レポートを検索中"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__id
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__id
+msgid "ID"
+msgstr "ID"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "Inspecting the accounting report"
+msgstr "会計レポートを検査中"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "Inspecting the audit check action"
+msgstr "監査チェックアクションを検査中"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Invalid or inaccessible partner_categories."
+msgstr "無効な、またはアクセスできないpartner_categoriesです。"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "Opening the supporting accounting report"
+msgstr "サポート会計レポートを開いています"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "Read Audit Checks"
+msgstr "監査チェックを読み取る"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "Save Audit Cycle Findings"
+msgstr "監査サイクルの調査結果を保存"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "Selecting the accounting report"
+msgstr "会計レポートを選択中"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "Setting Working Audit File"
+msgstr "監査作業ファイルを設定"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "The report engine returned an invalid company scope."
+msgstr "レポートエンジンが不正な会社適用範囲を返しました。"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Unavailable report."
+msgstr "利用できないレポート。"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "You must be an accountant to access accounting reports."
+msgstr "会計レポートにアクセスするには、会計士である必要があります。"

@@ -2083,3 +2083,111 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         ])
         # Total = 10000 + 1111 - 510.4 + 100000 - 40000 - 11101 + 5750.6 - 100000 + 60000 = 25250.2
         # The total of the list view is now the same as from the cell (25 250.2 = inv1 + inv3.1 + inv4 + inv5)
+
+    def test_deferred_reports_deferred_lines_without_deferral_entry_warning(self):
+        """
+        Tests that posting invoice lines not associated with a deferred entry into
+        a default deferred account triggers a warning in the deferred expense/revenue
+        report. Tests that the warning references the correct accounts and items.
+        """
+
+        self.env.cr.cache.pop('report_deferred_lines', None)
+
+        self.company.generate_deferred_expense_entries_method = 'on_validation'
+        self.company.generate_deferred_revenue_entries_method = 'on_validation'
+
+        # normal expense
+        non_deferred_expense_account = self.expense_accounts[0]
+        self._create_invoice_deferred(
+            [[non_deferred_expense_account, 1000, False, False]],
+            invoice_date='2023-03-15',
+            move_type='in_invoice',
+        )
+
+        # normal deferred expense
+        self._create_invoice_deferred(
+            [[non_deferred_expense_account, 1000, '2023-01-01', '2023-04-30']],
+            invoice_date='2023-03-15',
+            move_type='in_invoice',
+        )
+
+        # normal revenue
+        non_deferred_revenue_account = self.revenue_accounts[0]
+        self._create_invoice_deferred(
+            [[non_deferred_revenue_account, 1000, False, False]],
+            invoice_date='2023-03-15',
+            move_type='out_invoice',
+        )
+
+        # normal deferred revenue
+        self._create_invoice_deferred(
+            [[non_deferred_revenue_account, 1000, '2023-01-01', '2023-04-30']],
+            invoice_date='2023-03-15',
+            move_type='out_invoice',
+        )
+
+        def test_deferred_report_warning(report, default_deferred_account, move_type):
+            options = self._generate_options(
+                report=report,
+                date_from='2023-03-01',
+                date_to='2023-03-31',
+
+                # The warning is only displayed in mono-company
+                default_options={'forced_companies': [self.env.company.id]},
+            )
+
+            warnings = {}
+            report._get_lines(options, warnings=warnings)
+            self.assertFalse(warnings.get('account_reports.deferred_lines_without_deferral_entry_warning'))
+
+            deferred_lines_posted_directly_to_deferred_account = self._create_invoice_deferred(
+                [[default_deferred_account, 1000, '2023-01-01', '2023-04-30']],
+                invoice_date='2023-03-15',
+                move_type=move_type,
+            ).invoice_line_ids
+
+            warnings = {}
+            report._get_lines(options, warnings=warnings)
+            self.assertEqual(
+                warnings['account_reports.deferred_lines_without_deferral_entry_warning'],
+                {'account_ids': [default_deferred_account.id]},
+            )
+
+            non_deferred_lines_posted_directly_to_deferred_account = self._create_invoice_deferred(
+                [[default_deferred_account, 1000, False, False]],
+                invoice_date='2023-03-15',
+                move_type=move_type,
+            ).invoice_line_ids
+
+            warnings = {}
+            report._get_lines(options, warnings=warnings)
+            self.assertEqual(
+                warnings['account_reports.deferred_lines_without_deferral_entry_warning'],
+                {'account_ids': [default_deferred_account.id]},
+            )
+
+            move_line_ids_without_deferral_entry = self.env['account.move.line'].search(
+                report._get_move_line_ids_without_deferral_entry_domain(
+                    options,
+                    warnings['account_reports.deferred_lines_without_deferral_entry_warning']['account_ids'],
+            ))
+            self.assertEqual(
+                move_line_ids_without_deferral_entry.ids,
+                (non_deferred_lines_posted_directly_to_deferred_account
+                   + deferred_lines_posted_directly_to_deferred_account).ids,
+            )
+
+            # Tests that no warning is displayed in multi-company
+            options = self._generate_options(
+                report=report,
+                date_from='2023-03-01',
+                date_to='2023-03-31',
+            )
+            self.assertTrue(len(options['companies']) > 1)
+
+            warnings = {}
+            report._get_lines(options, warnings=warnings)
+            self.assertFalse(warnings.get('account_reports.deferred_lines_without_deferral_entry_warning'))
+
+        test_deferred_report_warning(self.deferred_expense_report, self.company.deferred_expense_account_id, 'in_invoice')
+        test_deferred_report_warning(self.deferred_revenue_report, self.company.deferred_revenue_account_id, 'out_invoice')

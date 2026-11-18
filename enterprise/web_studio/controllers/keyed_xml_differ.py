@@ -240,6 +240,11 @@ def _leaves_repr(leaves: list[Leaf]):
             case TextLeaf(element=element):
                 if element:
                     texts.append(element)
+            case CommentLeaf(element=element):
+                if texts:
+                    yield (None, _texts_concat(texts))
+                    texts = []
+                yield ("comment", element)
     if texts:
         yield (None, _texts_concat(texts))
 

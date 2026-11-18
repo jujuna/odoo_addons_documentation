@@ -19,7 +19,7 @@ ONVA_ASSIMILATED_DAY_THRESHOLDS = (
 
 class L10nBeHolidayAttest(models.Model):
     _name = "l10n.be.holiday.attest"
-    _description = "CP200: Holiday Attestation"
+    _description = "Holiday Attestation"
     _rec_name = "display_name"
 
     # Employee data
@@ -349,7 +349,7 @@ class L10nBeHolidayAttest(models.Model):
     def _compute_issues(self):
         for attestation in self:
             issues = {}
-            if attestation.date_from > attestation.date_to:
+            if attestation.date_from and attestation.date_to and attestation.date_from > attestation.date_to:
                 issues[0] = {
                     "message": self.env._("The start date must be before or equal to the end date."),
                     "level": "danger",
@@ -463,10 +463,11 @@ class L10nBeHolidayAttest(models.Model):
             if not hours_per_day:
                 attestation.days_to_allocate = 0
                 continue
+            # the days are rounded up to the unit, as the days of the legal holidays
             attestation.days_to_allocate = float_round(
-                attestation.hours_to_allocate / hours_per_day,
-                precision_rounding=0.5,
-                rounding_method="DOWN",
+                float_round(attestation.hours_to_allocate / hours_per_day, precision_digits=4),
+                precision_rounding=1,
+                rounding_method="UP",
             )
 
     @api.depends("attest_type", "days_to_allocate", "hours_to_allocate", "prev_days_earned", "version_id", "year")
@@ -502,7 +503,7 @@ class L10nBeHolidayAttest(models.Model):
             employee_type: self._get_work_entry_type_for_allocation(employee_type)
             for employee_type in {a.version_id for a in valid_attestations}
         }
-        all_work_entry_types = self.env["hr.work.entry.type"].union(*work_entry_type_by_employee_type.values())
+        all_work_entry_types = self.env["hr.work.entry.type"].union(work_entry_type_by_employee_type.values())
 
         allocations = self.env["hr.leave.allocation"].search([
             ("employee_id", "in", employees.ids),
@@ -577,7 +578,7 @@ class L10nBeHolidayAttest(models.Model):
             line_values = employee_payslips._get_line_values(["HolPayRec", "HolPayReg"], compute_sum=True)
             sum_payslip_shp_recovery = line_values["HolPayRec"]["sum"]["total"]
             sum_payslip_shp_regularization = line_values["HolPayReg"]["sum"]["total"]
-            total_recovered = sum_payslip_shp_regularization - sum_payslip_shp_recovery
+            total_recovered = -(sum_payslip_shp_recovery + sum_payslip_shp_regularization)
 
             attestation.simple_holiday_pay_amount_recovered = max(
                 0,
@@ -620,7 +621,7 @@ class L10nBeHolidayAttest(models.Model):
             )
             sum_prior_double_holiday_cap = sum(prior_employee_attestations.mapped("double_holiday_pay_cap"))
             line_values = employee_payslips._get_line_values(["DOUBLERECOVERY"], compute_sum=True)
-            total_recovered = line_values["DOUBLERECOVERY"]["sum"]["total"]
+            total_recovered = -line_values["DOUBLERECOVERY"]["sum"]["total"]
 
             attestation.double_holiday_pay_amount_recovered = max(
                 0,
@@ -647,6 +648,7 @@ class L10nBeHolidayAttest(models.Model):
         "version_id",
         "version_id.resource_calendar_id.calendar_type",
         "version_id.reference_calendar_id",
+        "version_id.company_id.resource_calendar_id",
     )
     def _compute_attestation_warning(self):
         for attestation in self:
@@ -654,7 +656,7 @@ class L10nBeHolidayAttest(models.Model):
                 attestation.attestation_warning_message = self.env._(
                     "Please save the employee record before adding a holiday attestation.",
                 )
-            elif attestation.version_id.sudo()._is_flexible() and not attestation.version_id.reference_calendar_id:
+            elif attestation.version_id.sudo()._is_flexible() and not attestation.version_id.sudo()._get_reference_calendar():
                 attestation.attestation_warning_message = self.env._(
                     "The employee's contract has no working schedule configured. Please set a working schedule on the contract before adding an attestation.",
                 )
@@ -678,7 +680,7 @@ class L10nBeHolidayAttest(models.Model):
     @api.constrains("date_from", "date_to")
     def _check_dates(self):
         for attestation in self:
-            if attestation.date_from > attestation.date_to:
+            if attestation.date_from and attestation.date_to and attestation.date_from > attestation.date_to:
                 raise ValidationError(self.env._("The start date must be before or equal to the end date."))
 
             if attestation.date_from.year != attestation.date_to.year:
@@ -769,6 +771,7 @@ class L10nBeHolidayAttest(models.Model):
             "res_model": "hr.leave.allocation",
             "res_id": self.leave_allocation_id.id,
             "view_mode": "form",
+            "views": [(False, "form")],
             "target": "new",
         }
 

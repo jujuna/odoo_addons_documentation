@@ -114,6 +114,20 @@ class StockMove(models.Model):
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
+    def action_apply_from_shop_floor(self):
+        for line in self:
+            move = line.move_id
+            if move.has_tracking != 'none' and move.picking_type_prefill_shop_floor_lots and move.raw_material_production_id:
+                move.picked = True
+            else:
+                line.picked = True
+
+    def action_remove_from_shop_floor(self):
+        """Pick the move so finishing the work order preserves the remaining consumption, including zero."""
+        move = self.move_id
+        self.unlink()
+        move.picked = True
+
     def _takes_from_quant(self, quant):
         self.ensure_one()
         fields_to_match = ('location_id', 'product_id', 'owner_id', 'package_id', 'lot_id')

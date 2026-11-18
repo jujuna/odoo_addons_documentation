@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import date, datetime, time
+from datetime import UTC, date, datetime, time
+from zoneinfo import ZoneInfo
 import math
 
 from dateutil import rrule
@@ -9,6 +10,15 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
+from odoo.tools import format_date
+
+# departures ending the contract at once, without any notice: force majeure, serious misconduct (of either party),
+# death, end of a fixed term or of a specific work
+NO_NOTICE_REASON_CODES = (352, 355, 356, 357, 360, 361)
+# dismissals with notice by the employer, including the dismissal in view of the RCC (353)
+EMPLOYER_NOTICE_REASON_CODES = (342, 353, 358, 359)
+# resignations, whose notice indemnity is owed by the employee to the employer, not paid as termination fees
+RESIGNATION_REASON_CODES = (340, 343, 354)
 
 
 class HrEmployeeDeparture(models.Model):
@@ -45,6 +55,16 @@ class HrEmployeeDeparture(models.Model):
         string='Notice Period Start',
         compute='_compute_notice_period_start', store=True,
         help='First monday from the departure date (or the following open day if it is a public holiday).')
+    l10n_be_is_economic_unemployment = fields.Boolean(
+        string='Departure While On Economic Unemployment',
+        compute='_compute_l10n_be_is_economic_unemployment',
+        help="The notification date falls in a period of economic unemployment (suspension or reduced work regime, "
+             "law of 3 July 1978, art. 51 for workers and art. 77/4 for employees): the working schedule of the "
+             "employee contains economic unemployment attendances, or an approved economic unemployment time off "
+             "covers that date. The employee can then resign without notice, and the notice given by the employer "
+             "starts after the planned economic unemployment.\n"
+             "Time off approved after the departure is recorded does not update the notice period: change the "
+             "notification date and set it back to recompute it.")
 
     l10n_be_notice_respect = fields.Selection([
         ('with', 'Works fully'),
@@ -91,6 +111,7 @@ class HrEmployeeDeparture(models.Model):
         'Gross reference remuneration current year', compute='_compute_gross_reference_remuneration_n')
     l10n_be_gross_reference_remuneration_n1 = fields.Monetary(
         'Gross reference remuneration previous year', compute='_compute_gross_reference_remuneration_n1')
+    l10n_be_holiday_attest_blocked_reason = fields.Char(compute="_compute_l10n_be_holiday_attest_blocked_reason")
 
     l10n_be_time_off_line_ids = fields.One2many('l10n.be.employee.departure.holiday.attest.line', 'departure_id',
         string="Time Off", compute='_compute_time_off_line_ids', store=True, index='btree_not_null')
@@ -107,10 +128,12 @@ class HrEmployeeDeparture(models.Model):
     l10n_be_work_time_rate = fields.Float(compute='_compute_version_data')
     l10n_be_company_sector = fields.Selection(related="employee_id.version_id.payroll_config_id.l10n_be_sector")
 
-    @api.depends('l10n_be_notice_duration_week_after_2014', 'employee_id.birthday', 'departure_date', 'l10n_be_first_contract_date', 'l10n_be_work_time_rate', 'l10n_be_company_sector')
+    @api.depends('l10n_be_notice_duration_week_after_2014', 'employee_id.birthday', 'departure_date', 'l10n_be_first_contract_date', 'l10n_be_work_time_rate', 'l10n_be_company_sector', 'l10n_be_reason_code')
     def _compute_professional_reclassification(self):
         for departure in self:
-            if departure.country_code != 'BE' or not departure.employee_id:
+            # the outplacement is offered to the workers dismissed by their employer (with notice or an indemnity)
+            if departure.country_code != 'BE' or not departure.employee_id \
+                    or departure.l10n_be_reason_code not in EMPLOYER_NOTICE_REASON_CODES:
                 departure.l10n_be_professional_reclassification = False
                 continue
             if departure.l10n_be_notice_duration_week_after_2014 >= 30:
@@ -190,12 +213,19 @@ class HrEmployeeDeparture(models.Model):
         for notice in self:
             difference = relativedelta(notice.departure_date, notice.l10n_be_first_contract_date)
             difference += relativedelta(years=notice.employee_id.l10n_be_scale_seniority, months=notice.employee_id.l10n_be_scale_seniority_months)
-            if difference.years == 0:
-                notice.l10n_be_seniority_description = self.env._('%(months)s months', months=difference.months)
+            if difference.months == 1:
+                months = self.env._('1 month')
             else:
+                months = self.env._('%(months)s months', months=difference.months)
+            if difference.years == 0:
+                notice.l10n_be_seniority_description = months
+            else:
+                if difference.years == 1:
+                    years = self.env._('1 year')
+                else:
+                    years = self.env._('%(years)s years', years=difference.years)
                 notice.l10n_be_seniority_description = self.env._(
-                    '%(years)s years and %(months)s months',
-                    months=difference.months, years=difference.years)
+                    '%(years)s and %(months)s', years=years, months=months)
 
     @api.depends('country_code', 'l10n_be_egov3_code', 'l10n_be_reason_code', 'l10n_be_first_contract_date', 'departure_date')
     def _compute_l10n_be_thirteen_month_eligible(self):
@@ -211,8 +241,11 @@ class HrEmployeeDeparture(models.Model):
             or not self.departure_date
         ):
             return False
-        # fired, fired: serious misconduct, retired, fired/resigned: early retirement
-        if self.l10n_be_reason_code in (342, 355, 340, 353, 354, 358, 359):
+        # CP 200: the employees fired for a serious misconduct are excluded from the year-end bonus
+        if self.l10n_be_reason_code == 355:
+            return False
+        # fired, retired, fired/resigned: early retirement
+        if self.l10n_be_reason_code in (342, 340, 353, 354, 358, 359):
             required_seniority = self.env['hr.rule.parameter']._get_parameter_from_code(
                 'cp200_thirteen_month_six_months_required_seniority', self.departure_date)
         else:
@@ -221,7 +254,8 @@ class HrEmployeeDeparture(models.Model):
         return self.departure_date >= self.l10n_be_first_contract_date + relativedelta(**required_seniority)
 
     @api.depends('l10n_be_first_contract_id', 'departure_reason_id', 'l10n_be_salary_december_2013', 'dismissal_date',
-        'l10n_be_notice_period_start', 'employee_id.l10n_be_scale_seniority', 'employee_id.l10n_be_scale_seniority_months')
+        'l10n_be_notice_period_start', 'employee_id.l10n_be_scale_seniority', 'employee_id.l10n_be_scale_seniority_months',
+        'l10n_be_is_economic_unemployment')
     def _compute_notice_duration(self):
         self.l10n_be_salary_visibility = False
         self.l10n_be_notice_duration_month_before_2014 = 0
@@ -231,28 +265,31 @@ class HrEmployeeDeparture(models.Model):
                 continue
             departure_code = departure.l10n_be_reason_code
             first_contract_date = departure.l10n_be_first_contract_date
-            first_contract_date += relativedelta(
-                years=-(departure.employee_id.l10n_be_scale_seniority or 0),
-                months=-(departure.employee_id.l10n_be_scale_seniority_months or 0)
-            )
+            scale_seniority_months = 12 * (departure.employee_id.l10n_be_scale_seniority or 0) \
+                + (departure.employee_id.l10n_be_scale_seniority_months or 0)
+            # The Part I only exists for the contracts started before 2014: the seniority recognized at hiring
+            # of a later contract is counted with the unified table of the Part II
+            seniority_after_2014_months = 0
+            if first_contract_date < date(2014, 1, 1):
+                first_contract_date -= relativedelta(months=scale_seniority_months)
+            else:
+                seniority_after_2014_months = scale_seniority_months
             years_delta = relativedelta(date(2013, 12, 31), first_contract_date)
             difference_in_years = years_delta.years + years_delta.months / 12 + years_delta.days / 365
             # Part I
-            if departure_code in (342, 358, 359) and difference_in_years > 0:  # fired
+            if departure_code in EMPLOYER_NOTICE_REASON_CODES and difference_in_years > 0:  # fired
                 departure.l10n_be_salary_visibility = True
                 if departure.l10n_be_salary_december_2013 == 'inferior':
                     departure.l10n_be_notice_duration_month_before_2014 = math.ceil(difference_in_years / 5.0) * 3.0
                 else:
                     departure.l10n_be_notice_duration_month_before_2014 = max(math.ceil(difference_in_years), 3)
             # Part II
-            if departure_code in (340, 342, 343, 358, 359):  # retired, fired or resigned
+            if departure_code in (340, 343, *EMPLOYER_NOTICE_REASON_CODES):  # retired, fired or resigned
                 first_day_since_2014 = max(date(2014, 1, 1), first_contract_date)
                 period_since_2014 = relativedelta(departure.l10n_be_notice_period_start, first_day_since_2014)
-                period_in_month = period_since_2014.months + period_since_2014.years * 12
+                period_in_month = period_since_2014.months + period_since_2014.years * 12 + seniority_after_2014_months
 
-                dismissal_version = departure.employee_id._get_version(departure.dismissal_date)
-                on_economic_unemployment = bool(dismissal_version.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
-                if on_economic_unemployment and departure_code == 343:
+                if departure.l10n_be_is_economic_unemployment and departure_code == 343:
                     departure.l10n_be_notice_duration_week_after_2014 = 0
                     continue
                 duration_parameter = 'l10n_be_duration_notice_resigned' if departure_code in [343, 340] else 'l10n_be_duration_notice_fired'
@@ -283,7 +320,8 @@ class HrEmployeeDeparture(models.Model):
                     until=datetime.combine(departure.departure_date, time.max))
                 departure.l10n_be_notice_duration = weeks.count()
 
-    @api.depends('dismissal_date', 'l10n_be_notice_respect', 'l10n_be_reason_code', 'l10n_be_first_contract_id')
+    @api.depends('dismissal_date', 'l10n_be_notice_respect', 'l10n_be_reason_code', 'l10n_be_first_contract_id',
+        'l10n_be_is_economic_unemployment')
     def _compute_notice_period_start(self):
         def next_monday(initial_date):
             return initial_date + relativedelta(days=7 - initial_date.weekday())
@@ -294,21 +332,22 @@ class HrEmployeeDeparture(models.Model):
                 continue
             remaining_economic_unemployment_days = 0
             dismissal_version = departure.employee_id._get_version(departure.dismissal_date) if departure.employee_id else self.env['hr.version']
-            on_economic_unemployment = bool(dismissal_version.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
-            contract_end_date = dismissal_version.contract_date_end
-            if not contract_end_date or contract_end_date < departure.dismissal_date:
-                contract_end_date = departure.dismissal_date
-            if on_economic_unemployment:
-                remaining_economic_unemployment_days = (contract_end_date - departure.dismissal_date).days
+            if departure.l10n_be_is_economic_unemployment:
+                # the notice given by the employer starts after the planned economic unemployment
+                economic_unemployment_end = departure._get_l10n_be_economic_unemployment_end_date()
+                remaining_economic_unemployment_days = (economic_unemployment_end - departure.dismissal_date).days
             if departure.country_code != 'BE' or not departure.l10n_be_first_contract_id or\
-                    departure.l10n_be_notice_respect == 'without' or departure.l10n_be_reason_code in (350, 351):
+                    departure.l10n_be_notice_respect == 'without' or departure.l10n_be_reason_code in (350, 351) or\
+                    departure.l10n_be_reason_code in NO_NOTICE_REASON_CODES:
                 departure.l10n_be_notice_period_start = departure.dismissal_date
-            elif departure.l10n_be_reason_code in (342, 358, 359):
+            elif departure.l10n_be_reason_code in EMPLOYER_NOTICE_REASON_CODES:
                 # We can only take the next monday that has at least 3 calendar days (Monday to Saturday except public
                 # holidays) between the departure date and the start of the notice period
                 public_leaves = dismissal_version.resource_calendar_id.global_leave_ids.filtered(
                     lambda leave: leave.work_entry_type_id == public_holiday_type)
-                public_holidays_dates = (d.date() for d in public_leaves.mapped('date_from'))
+                # the public holidays are stored in UTC: a whole day starts the day before in UTC
+                tz = ZoneInfo(departure.employee_id._get_tz())
+                public_holidays_dates = {d.replace(tzinfo=UTC).astimezone(tz).date() for d in public_leaves.mapped('date_from')}
                 calendar_days = 0
                 current_date = departure.dismissal_date + relativedelta(days=1 + remaining_economic_unemployment_days)
                 while calendar_days < 3:
@@ -318,6 +357,57 @@ class HrEmployeeDeparture(models.Model):
                 departure.l10n_be_notice_period_start = next_monday(current_date)
             else:
                 departure.l10n_be_notice_period_start = next_monday(departure.dismissal_date)
+
+    @api.depends('dismissal_date', 'employee_id', 'country_code')
+    def _compute_l10n_be_is_economic_unemployment(self):
+        # Time off is not in the dependencies on purpose: the stored notice fields depend on this field, and
+        # recomputing them (and the departure date) on every time off change would overwrite the encoded departures.
+        for departure in self:
+            departure.l10n_be_is_economic_unemployment = bool(departure._get_l10n_be_economic_unemployment_end_date())
+
+    def _get_l10n_be_economic_unemployment_end_date(self):
+        """Return the last day of the economic unemployment period containing the notification date.
+
+        The economic unemployment comes either from the working schedule of the employee on the notification date
+        (attendances of an economic unemployment work entry type, planned until the end of the contract) or from
+        approved time off of an economic unemployment work entry type. For the time off, the first one must cover
+        the notification date, and the following ones extend the period as long as they are consecutive: a time off
+        starting at the latest on the first working day (a weekday of the working schedule) after the end of the
+        previous one, so that the weekends and the days off of a part-time schedule do not break the period.
+
+        :return: the last day of the period, or False when the notification date is not in such a period (or
+            the company is not Belgian)
+        :rtype: datetime.date | bool
+        """
+        self.ensure_one()
+        if self.country_code != 'BE' or not self.dismissal_date or not self.employee_id:
+            return False
+        version = self.employee_id._get_version(self.dismissal_date)
+        calendar = version.resource_calendar_id
+        if calendar.attendance_ids.work_entry_type_id.filtered('l10n_be_economic_unemployment'):
+            contract_end_date = version.contract_date_end
+            if not contract_end_date or contract_end_date < self.dismissal_date:
+                return self.dismissal_date
+            return contract_end_date
+        # sudo: the departure can be managed by users who can't read the time off of the other employees
+        leaves = self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'validate'),
+            ('work_entry_type_id.l10n_be_economic_unemployment', '=', True),
+            ('request_date_to', '>=', self.dismissal_date),
+        ], order='request_date_from, request_date_to')
+        if not leaves or leaves[0].request_date_from > self.dismissal_date:
+            return False
+        working_weekdays = {int(day) for day in calendar.attendance_ids.mapped('dayofweek')}
+        end_date = leaves[0].request_date_to
+        for leave in leaves[1:]:
+            next_working_day = end_date + relativedelta(days=1)
+            while working_weekdays and next_working_day.weekday() not in working_weekdays:
+                next_working_day += relativedelta(days=1)
+            if leave.request_date_from > next_working_day:
+                break
+            end_date = max(end_date, leave.request_date_to)
+        return end_date
 
     @api.depends(
         "country_code", "l10n_be_reason_code", "l10n_be_first_contract_id",
@@ -332,13 +422,16 @@ class HrEmployeeDeparture(models.Model):
                 or not departure.l10n_be_first_contract_id
                 or not departure.l10n_be_notice_period_start
                 or departure.l10n_be_reason_code in (350, 351)
+                or departure.l10n_be_reason_code in NO_NOTICE_REASON_CODES
             ):
                 continue
-            # the notice period computation is different for prestated time before vs after 2014
-            weeks_before_2014 = departure.l10n_be_notice_duration_month_before_2014 / 12 * 52
-            notice_period_weeks = weeks_before_2014 + departure.l10n_be_notice_duration_week_after_2014
+            # the notice period computation is different for prestated time before vs after 2014: the Part I is in
+            # calendar months, the Part II in weeks
             # when the employee leaves if the notice period was fully prestated
-            departure.l10n_be_notice_period_theoretical_end += relativedelta(weeks=notice_period_weeks, days=-1)
+            departure.l10n_be_notice_period_theoretical_end += relativedelta(
+                months=departure.l10n_be_notice_duration_month_before_2014,
+                weeks=departure.l10n_be_notice_duration_week_after_2014,
+                days=-1)
 
     @api.depends(
         "country_code", "l10n_be_reason_code", "l10n_be_first_contract_id",
@@ -366,7 +459,7 @@ class HrEmployeeDeparture(models.Model):
                 # meant to be manually changed if notice_respect == 'partial'
                 departure.departure_date = departure.l10n_be_notice_period_theoretical_end
 
-    @api.depends('employee_id', 'country_code', 'departure_date', 'employee_id.slip_ids.state')
+    @api.depends('employee_id', 'country_code', 'departure_date', 'employee_id.slip_ids.state', 'l10n_be_first_contract_id')
     def _compute_payslip_history(self):
         struct_codes = ['BETHIRTEEN', 'BEMONTHLY']
         for departure in self:
@@ -376,12 +469,16 @@ class HrEmployeeDeparture(models.Model):
                     'l10n_be_payslip_n1_ids': [(5, 0, 0)],
                 })
                 continue
-            departure.l10n_be_payslip_n_ids = [(4, p.id) for p in departure.employee_id._get_payslips_for_year(
-                departure.departure_date.year, struct_codes
-            )]
-            departure.l10n_be_payslip_n1_ids = [(4, p.id) for p in departure.employee_id._get_payslips_for_year(
-                departure.departure_date.year - 1, struct_codes
-            )]
+            # The exit holiday pay of an earlier contract was paid at its end: only the payslips of the current
+            # chain of contracts count
+            contract_start = departure.l10n_be_first_contract_id.contract_date_start
+            payslips_n = departure.employee_id._get_payslips_for_year(departure.departure_date.year, struct_codes)
+            payslips_n1 = departure.employee_id._get_payslips_for_year(departure.departure_date.year - 1, struct_codes)
+            if contract_start:
+                payslips_n = payslips_n.filtered(lambda p: p.date_to >= contract_start)
+                payslips_n1 = payslips_n1.filtered(lambda p: p.date_to >= contract_start)
+            departure.l10n_be_payslip_n_ids = [(4, p.id) for p in payslips_n]
+            departure.l10n_be_payslip_n1_ids = [(4, p.id) for p in payslips_n1]
 
     @api.depends('l10n_be_payslip_n_ids', 'l10n_be_payslip_n1_ids')
     def _compute_payslips_description(self):
@@ -492,11 +589,100 @@ class HrEmployeeDeparture(models.Model):
         for departure in self:
             departure.l10n_be_gross_reference_remuneration_n1 = departure.l10n_be_net_n1 + departure.l10n_be_fictitious_remuneration_n1
 
+    @api.depends(
+        "country_code",
+        "departure_date",
+        "employee_id.slip_ids.date_from",
+        "employee_id.slip_ids.date_to",
+        "employee_id.slip_ids.state",
+        "employee_id.slip_ids.struct_id",
+        "l10n_be_termination_documents_generated",
+    )
+    def _compute_l10n_be_holiday_attest_blocked_reason(self):
+        """
+        Warning when the departure month's worked days are not yet on a validated monthly payslip. Once the
+        termination documents are generated (from a pay run, or a departure older than the database), the
+        departure is handled and no longer flagged.
+        """
+        self.l10n_be_holiday_attest_blocked_reason = False
+        departures = self.filtered(
+            lambda d: d.country_code == "BE" and d.employee_id and d.departure_date
+            and not d.l10n_be_termination_documents_generated,
+        )
+        if not departures:
+            return
+        month_starts = {departure: departure.departure_date + relativedelta(day=1) for departure in departures}
+        payslips_by_employee = self.env["hr.payslip"].search([
+            ("employee_id", "in", departures.employee_id.ids),
+            ("struct_id.code", "=", "BEMONTHLY"),
+            ("state", "in", ["validated", "paid"]),
+            ("date_from", "<=", max(departures.mapped("departure_date"))),
+            ("date_to", ">=", min(month_starts.values())),
+        ]).grouped("employee_id")
+        for departure, month_start in month_starts.items():
+            if any(
+                payslip.date_from <= departure.departure_date and payslip.date_to >= month_start
+                for payslip in payslips_by_employee.get(departure.employee_id, [])
+            ):
+                continue
+            departure.l10n_be_holiday_attest_blocked_reason = self.env._(
+                "A period of work (%(start)s - %(end)s) is not covered by a validated payslip. Generate and validate the Last Payslip before the Holiday Attest.",
+                start=format_date(self.env, month_start),
+                end=format_date(self.env, departure.departure_date),
+            )
+
     def action_register(self):
         self._process_fixed_term_departure()
         res = super().action_register()
         self.filtered(lambda departure: departure.country_code == 'BE')._compute_net()
         return res
+
+    def action_generate_termination_last_payslip(self):
+        self.ensure_one()
+        payslip = self._generate_termination_last_payslip()
+        return {
+            'name': self.env._('Last Payslip'),
+            'view_mode': 'form',
+            'res_model': 'hr.payslip',
+            'res_id': payslip.id,
+            'type': 'ir.actions.act_window',
+            'views': [[False, 'form']],
+        }
+
+    def _generate_termination_last_payslip(self):
+        """
+        Create the departure-month regular payslip like the normal pay run does for a mid-month leaver
+        """
+        self.ensure_one()
+        struct_id = self.env.ref("l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary")
+        date_from = self.departure_date + relativedelta(day=1)
+        if date_from > fields.Date.context_today(self) + relativedelta(day=1):
+            raise UserError(self.env._(
+                "The last payslip of %(employee)s can't be generated before the month of the departure (%(date)s).",
+                employee=self.employee_id.name,
+                date=format_date(self.env, self.departure_date),
+            ))
+        existing_payslip = self.env["hr.payslip"].search(
+            [
+                ("employee_id", "=", self.employee_id.id),
+                ("struct_id", "=", struct_id.id),
+                ("date_from", "=", date_from),
+                ("state", "!=", "cancel"),
+            ],
+            limit=1,
+        )
+
+        if existing_payslip:
+            return existing_payslip
+
+        last_payslip = self.env["hr.payslip"].create({
+            "employee_id": self.employee_id.id,
+            "date_from": date_from,
+            "date_to": date_from + relativedelta(day=31),
+            "struct_id": struct_id.id,
+        })
+        last_payslip.compute_sheet()
+        return last_payslip
 
     def action_generate_termination_payslip(self):
         self.ensure_one()
@@ -532,10 +718,13 @@ class HrEmployeeDeparture(models.Model):
         version = self._get_termination_version()
         is_worker = version.is_worker()
         struct_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees')
+        # the indemnity is due at the end of the contract: after the worked part of the notice when it is partial
+        payslip_date = self.departure_date if self.l10n_be_notice_respect == 'partial' and self.departure_date \
+            else self.l10n_be_notice_period_start
         existing_payslip = self.env['hr.payslip'].search([
             ('employee_id', '=', self.employee_id.id),
             ('struct_id', '=', struct_id.id),
-            ('date_from', '=', self.l10n_be_notice_period_start),
+            ('date_from', '=', payslip_date),
             ('state', '!=', 'cancel')
         ], limit=1)
 
@@ -544,8 +733,8 @@ class HrEmployeeDeparture(models.Model):
 
         termination_payslip = self.env['hr.payslip'].create({
             'employee_id': self.employee_id.id,
-            'date_from': self.l10n_be_notice_period_start,
-            'date_to': self.l10n_be_notice_period_start,
+            'date_from': payslip_date,
+            'date_to': payslip_date,
             'struct_id': struct_id.id,
         })
         termination_payslip.worked_days_line_ids = [(5, 0, 0)]
@@ -553,13 +742,11 @@ class HrEmployeeDeparture(models.Model):
         version = termination_payslip.version_id
 
         weeks = self.l10n_be_notice_duration_week_after_2014
-        if self.l10n_be_notice_respect == 'partial':
-            weeks -= self.l10n_be_notice_duration
-
         remaining_days = 0
-        if is_worker and self.l10n_be_notice_period_start and self.departure_date:
-            total_days = (self.departure_date - self.l10n_be_notice_period_start).days
-            remaining_days = total_days % 7
+        if self.l10n_be_notice_respect == 'partial' and self.l10n_be_notice_period_start and self.departure_date:
+            # the indemnity covers the part of the notice remaining after the last day worked, to the day
+            worked_days = (self.departure_date - self.l10n_be_notice_period_start).days + 1
+            weeks, remaining_days = divmod(max(weeks * 7 - worked_days, 0), 7)
 
         termination_payslip._set_input_values({
             'ND_MONTH': 0 if is_worker else self.l10n_be_notice_duration_month_before_2014,
@@ -619,6 +806,17 @@ class HrEmployeeDeparture(models.Model):
 
     def _get_termination_year_end_bonus(self, version, is_worker):
         self.ensure_one()
+        # The year-end bonus of some joint committees is paid by a fund (e.g. the fidelity stamps of the
+        # construction): not by the employer, it isn't part of the remuneration of the termination fees
+        fund_joint_committee_codes = self.env['hr.rule.parameter']._get_parameter_from_code(
+            'l10n_be_year_end_bonus_paid_by_fund_joint_committees',
+            self.departure_date or fields.Date.today(), raise_if_not_found=False) or []
+        joint_committee = version.l10n_be_joint_committee_id
+        if joint_committee and fund_joint_committee_codes:
+            fund_joint_committees = self.env['l10n.be.joint.committee'].with_context(active_test=False).search([
+                ('egov3_code', 'in', fund_joint_committee_codes)])
+            if joint_committee.is_descendant_of(fund_joint_committees):
+                return 0
         if not is_worker:
             return version._get_contract_wage()
         if not self.departure_date:
@@ -627,6 +825,8 @@ class HrEmployeeDeparture(models.Model):
 
     def action_generate_termination_holidays(self):
         self.ensure_one()
+        if message := self.l10n_be_holiday_attest_blocked_reason:
+            raise UserError(message)
         payslips = self._generate_termination_holidays()
         return {
             'name': self.env._('Holiday Attests Payslips'),
@@ -944,6 +1144,13 @@ class HrEmployeeDeparture(models.Model):
         if self.country_code == 'BE':
             return True
         return super()._check_refuse_future_leaves_condition()
+
+    @api.onchange('departure_date')
+    def _onchange_departure_date(self):
+        """ Belgian employees are only archived on an explicit date: keep "Don't archive" by default. """
+        if self.country_code == 'BE':
+            return
+        super()._onchange_departure_date()
 
     def _get_departures_to_archive(self):
         """ Exclude Belgian departures without an archive date from automatic archival. """

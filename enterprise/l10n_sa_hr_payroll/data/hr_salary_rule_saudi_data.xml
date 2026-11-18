@@ -326,7 +326,10 @@ for lines in worked_days.values():
             <field name="code">EOSP</field>
             <field name="appears_on_payslip">non_zero</field>
             <field name="sequence">45</field>
-            <field name="condition_select">none</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">
+result = not employee.departure_date or employee.departure_date &gt; payslip.date_to
+            </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 paid_days = total_number_of_days
@@ -355,7 +358,7 @@ else:
             <field name="sequence">50</field>
             <field name="condition_select">python</field>
             <field name="condition_python">
-result = version.l10n_sa_number_of_days
+result = not employee.departure_date or employee.departure_date &gt; payslip.date_to
             </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
@@ -393,7 +396,7 @@ result = annual_leave_days * daily_wage
             <field name="sequence">55</field>
             <field name="condition_select">python</field>
             <field name="condition_python">
-result = employee.departure_reason_id and employee.l10n_sa_remaining_annual_leave_balance &gt; 0
+result = employee.departure_reason_id and employee.l10n_sa_remaining_annual_leave_balance &gt; 0 and employee.departure_date and employee.departure_date &lt;= payslip.date_to and employee.departure_date &gt;= payslip.date_from
             </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
@@ -412,7 +415,7 @@ result = daily_wage
             <field name="code">EOSB</field>
             <field name="sequence">60</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = employee.departure_date and employee.departure_reason_id</field>
+            <field name="condition_python">result = employee.departure_reason_id and employee.departure_date and employee.departure_date &lt;= payslip.date_to and employee.departure_date &gt;= payslip.date_from</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 result = 0

@@ -49,38 +49,47 @@
     <record id="hr_job_senior_project_manager" model="hr.job">
         <field name="name">Senior Project Manager</field>
         <field name="department_id" ref="au_hr_department_it"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_people_culture_manager" model="hr.job">
         <field name="name">People and Culture Manager</field>
         <field name="department_id" ref="au_hr_department_hr"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_junior_hr_assistant" model="hr.job">
         <field name="name">Junior HR Assistant</field>
         <field name="department_id" ref="au_hr_department_hr"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_senior_developer" model="hr.job">
         <field name="name">Senior Developer</field>
         <field name="department_id" ref="au_hr_department_it"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_cfo" model="hr.job">
         <field name="name">CFO</field>
         <field name="department_id" ref="au_hr_department_finance"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_marketing_manager" model="hr.job">
         <field name="name">Marketing Manager</field>
         <field name="department_id" ref="au_hr_department_marketing"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_marketing_consultant" model="hr.job">
         <field name="name">Marketing Consultant</field>
         <field name="department_id" ref="au_hr_department_marketing"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_casual_admin_officer" model="hr.job">
         <field name="name">Casual Admin Officer</field>
         <field name="department_id" ref="au_hr_department_hr"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
     <record id="hr_job_senior_developer_au" model="hr.job">
         <field name="name">Senior Developer AU</field>
         <field name="department_id" ref="au_hr_department_rd"/>
+        <field name="company_id" ref="base.demo_company_au"/>
     </record>
 
     <record id="res_partner_category_child_support" model="res.partner.category">
@@ -737,6 +746,15 @@
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
+    <record id="au_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_au"/>
+    </record>
+    <record id="au_hr_job_consultant" model="hr.job">
+        <field name="name">Consultant</field>
+        <field name="company_id" ref="base.demo_company_au"/>
+    </record>
+
     <record id="hr_employee_dennis" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_au_hr_payroll.res_partner_dennis')).name"/>
         <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.webp"/>
@@ -771,7 +789,7 @@
         <field name="l10n_au_tfn">999999846</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_au_hr_payroll.res_partner_bank_account_dennis'))]"/>
         <field name="department_id" ref="l10n_au_hr_payroll.au_hr_department_rd"/>
-        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="job_id" ref="l10n_au_hr_payroll.au_hr_job_consultant"/>
         <field name="structure_type_id" ref="l10n_au_hr_payroll.structure_type_schedule_1"/>
         <field name="wage">4940</field>
         <field name="wage_type">hourly</field>

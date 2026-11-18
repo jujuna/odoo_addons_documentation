@@ -9,9 +9,4 @@ This module allows adding suggestions for calendar events in the Timesheets Assi
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'timesheet_grid_calendar/static/src/**',
-        ],
-    },
 }

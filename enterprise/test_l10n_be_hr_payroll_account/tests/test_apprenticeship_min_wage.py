@@ -3,14 +3,14 @@
 from datetime import date
 
 from freezegun import freeze_time
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestPayslipNoAccountingCommon
 from odoo.tests import tagged
 from odoo.tools import float_round
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install', 'apprenticeship')
-class TestApprenticeshipMinWage(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestApprenticeshipMinWage(TestPayslipNoAccountingCommon, TestBelgiumCommon):
     """
     Test minimum wage calculations for all apprenticeship contract types
     as defined in Section 9 - FORMATIONS PERMANENTES DES CLASSES MOYENNES
@@ -18,7 +18,6 @@ class TestApprenticeshipMinWage(TestPayslipValidationCommon, TestBelgiumCommon):
     """
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
 

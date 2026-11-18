@@ -71,6 +71,12 @@ def lock_pdf_interactive_forms(pdf_bytes):
         output_pdf = PdfFileWriter()
         output_pdf.append_pages_from_reader(pdf_reader)
 
+        # Only the pages are copied, we need to keep the document's form, needed to display the widgets
+        acro_form = pdf_reader.trailer["/Root"].get("/AcroForm")
+        if acro_form:
+            # pypdf >= 3 no longer imports the objects of another document on write, they must be cloned
+            output_pdf._root_object[NameObject("/AcroForm")] = acro_form.clone(output_pdf) if hasattr(acro_form, "clone") else acro_form
+
         for page in output_pdf.pages:
             annots = page.get("/Annots")
             # Skip malformed annotation data (e.g. /Annots pointing to a stream instead of an array)

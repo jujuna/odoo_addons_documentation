@@ -66,12 +66,19 @@ class AccountAnalyticLine(models.Model):
     def _is_updatable_timesheet(self):
         return super()._is_updatable_timesheet() and not self.validated
 
-    def _timesheet_get_portal_domain(self):
-        domain = super()._timesheet_get_portal_domain()
+    @api.model
+    def _get_invoiced_timesheet_domain(self):
+        domain = Domain.TRUE
         param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET
         if param_invoiced_timesheet == 'approved':
-            domain = Domain.AND([domain, [('validated', '=', True)]])
+            domain = Domain('validated', '=', True)
         return domain
+
+    def _timesheet_get_portal_domain(self):
+        return Domain.AND([
+            super()._timesheet_get_portal_domain(),
+            self._get_invoiced_timesheet_domain(),
+        ])
 
     def _compute_can_validate(self):
         # Prevent `user_can_validate` from being true if the line is validated and the SO aswell

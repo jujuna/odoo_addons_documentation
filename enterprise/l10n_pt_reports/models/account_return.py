@@ -38,7 +38,9 @@ class AccountReturn(models.Model):
         months_per_period = return_type._get_periodicity_months_delay(company)
 
         if return_type_external_id == 'l10n_pt_reports.pt_tax_return_type' and not return_type.with_company(company).deadline_days_delay:
-            return date_to + relativedelta(days=10 if months_per_period == 1 else 20) + relativedelta(months=1)
+            if date_to.month == 6:
+                return date_to.replace(month=9, day=20)
+            return date_to + relativedelta(days=20) + relativedelta(months=1)
         if return_type_external_id == 'l10n_pt_reports.pt_ec_sales_list_return_type' and months_per_period in (1, 3):
             return date_to + relativedelta(days=20)
 

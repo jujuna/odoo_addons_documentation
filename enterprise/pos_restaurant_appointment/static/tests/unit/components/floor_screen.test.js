@@ -81,4 +81,10 @@ describe("pos_restaurant_appointment floor_plan.js", () => {
         appointment.appointment_status = "attended";
         expect(table.firstAppointment).toBe(false);
     });
+
+    test("Total Available Capacity is 0 if appointment_type_id is not set", async () => {
+        const store = await setupPosEnv();
+        store.config.appointment_type_id = undefined;
+        expect(store.getTotalAvailableCapacity()).toEqual(0);
+    });
 });

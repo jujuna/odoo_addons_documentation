@@ -31,7 +31,7 @@ class L10n_UkVatObligation(models.Model):
     period_key = fields.Char('Period Key', readonly=True)
     date_received = fields.Date('Received Submission date', readonly=True)
     company_id = fields.Many2one('res.company', 'Company', required=True,
-        default=lambda self: self.env.company)
+        default=lambda self: self.env['hmrc.service']._get_hmrc_company())
 
     @api.depends('date_due', 'date_start', 'date_end')
     def _compute_display_name(self):
@@ -62,8 +62,8 @@ class L10n_UkVatObligation(models.Model):
         if not match(r'^[0-9]{9}$', vat or ''):
             raise UserError(_("VAT numbers of UK companies should have exactly 9 figures or 11 with the GB or XI prefix. Please check the settings of the current company."))
 
-        user = self.env.user
-        bearer = user.l10n_uk_hmrc_vat_token
+        company = self.env['hmrc.service']._get_hmrc_company()
+        bearer = company.sudo().l10n_uk_hmrc_vat_token
         headers = self._get_auth_headers(bearer, self.env.context.get('client_data'))
         self.env['hmrc.service']._validate_fraud_prevention_headers(headers)
 
@@ -92,8 +92,7 @@ class L10n_UkVatObligation(models.Model):
         elif error_code == 'NOT_FOUND':
             error_message = _('No open obligations were found for the moment.')
         elif error_code == 'CLIENT_OR_AGENT_NOT_AUTHORISED':
-            # In case one user needs to submit the report for two companies, they will need to re-login.
-            self.env['hmrc.service']._clean_tokens(user)
+            self.env['hmrc.service']._clean_tokens(company)
             return []
         else:
             error_message = response.get('message', error_code)
@@ -102,19 +101,20 @@ class L10n_UkVatObligation(models.Model):
     def _get_vat(self, return_id=None):
         # Use company's VAT if company is British, otherwise try to look for a UK fiscal position.
         vat = ""
+        company = self.env['hmrc.service']._get_hmrc_company()
         return_record = self.env['account.return'].browse(return_id)
         if return_record and return_record.tax_unit_id and return_record.tax_unit_id.vat:
             vat = return_record.tax_unit_id.vat
         if not vat:
             foreign_vat = False
-            if self.env.company.country_id.code != 'GB':
-                foreign_vat = self.env.company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
-            vat = foreign_vat or self.env.company.vat
+            if company.country_id.code != 'GB':
+                foreign_vat = company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
+            vat = foreign_vat or company.vat
 
         if not vat:
             raise RedirectWarning(
-                self.env._("No VAT number associated with %(company_name)s. Please define one", company_name=self.env.company.name),
-                self.env.company._get_records_action(),
+                self.env._("No VAT number associated with %(company_name)s. Please define one", company_name=company.name),
+                company._get_records_action(),
                 self.env._("Company Settings")
             )
 
@@ -136,9 +136,10 @@ class L10n_UkVatObligation(models.Model):
             (today + relativedelta(months=-6)).strftime('%Y-%m-%d'),
             (today + relativedelta(months=6, leapdays=-1)).strftime('%Y-%m-%d')
         )
+        company = self.env['hmrc.service']._get_hmrc_company()
         for new_obligation in obligations:
             obligation = self.env['l10n_uk.vat.obligation'].search([('period_key', '=', new_obligation.get('periodKey')),
-                                                                 ('company_id', '=', self.env.company.id)])
+                                                                 ('company_id', '=', company.id)])
             status = 'open' if new_obligation['status'] == 'O' else 'fulfilled'
             if not obligation:
                 self.sudo().create({'date_start': new_obligation['start'],
@@ -147,7 +148,7 @@ class L10n_UkVatObligation(models.Model):
                                     'date_due': new_obligation['due'],
                                     'status': status,
                                     'period_key': new_obligation['periodKey'],
-                                    'company_id': self.env.company.id,
+                                    'company_id': company.id,
                                     })
             elif obligation.status != status or obligation.date_received != new_obligation.get('received'):
                 obligation.sudo().write({'status': status,
@@ -207,7 +208,7 @@ class L10n_UkVatObligation(models.Model):
         res = self.env['hmrc.service']._login()
         if res: # If you can not login, return url for re-login
             return res
-        headers = self._get_auth_headers(self.env.user.l10n_uk_hmrc_vat_token, data)
+        headers = self._get_auth_headers(self.env['hmrc.service']._get_hmrc_company().sudo().l10n_uk_hmrc_vat_token, data)
         self.env['hmrc.service']._validate_fraud_prevention_headers(headers)
 
         url = self.env['hmrc.service']._get_endpoint_url('/organisations/vat/%s/returns' % vat)

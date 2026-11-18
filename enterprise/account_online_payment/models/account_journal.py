@@ -1,4 +1,5 @@
 from odoo import models
+from odoo.addons.account_online_synchronization.models.account_online import OdooFinRedirectException
 
 
 class AccountJournal(models.Model):
@@ -6,7 +7,10 @@ class AccountJournal(models.Model):
 
     def action_start_compliance_procedure(self):
         self.ensure_one()
-        response = self.account_online_link_id._update_connection_status()
+        try:
+            response = self.account_online_link_id._update_connection_status()
+        except OdooFinRedirectException as e:
+            return self.account_online_link_id._handle_odoofin_redirect_exception(mode=e.mode)
 
         if audit_uuids := response.get('alert_uuids'):
             return {

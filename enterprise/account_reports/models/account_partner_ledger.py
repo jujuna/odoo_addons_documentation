@@ -331,7 +331,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             ],
         }
 
-    @snapshotable_engine(result_aggregators={'init_balance': sum, 'has_sublines': max}, sub_engine_of='_report_engine_partner_ledger_initial_balance')
+    @snapshotable_engine(result_aggregators={'init_balance': sum, 'has_sublines': max}, sub_engine_of='_report_engine_partner_ledger_initial_balance', version=2)
     def _report_engine_partner_ledger_initial_balance_subengine(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Summable part of the partner ledger's initial balance: plain sums grouped on the move lines' own partner_id """
         report = self.env['account.report'].browse(options['report_id'])
@@ -433,7 +433,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                         ELSE NULL
                     END
                 """,
-                date_field=self._get_expr('invoice_date', query),
+                date_field=self._get_expr('date', query),
                 date_from=date_from,
                 expr=expr,
             )
@@ -503,7 +503,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                         ELSE NULL
                     END
                 """,
-                date_field=self._get_expr('invoice_date', query),
+                date_field=self._get_expr('date', query),
                 date_from=date_from,
                 expr=self._get_expr('id', query),
             )

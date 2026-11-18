@@ -16,15 +16,16 @@
                     <field name="country_id" options="{'no_create': True, 'no_open': True}"/>
                     <field name="optional_on_work_entry_type_ids" widget="many2many_tags" placeholder="Not usable on time entries"/>
                     <field name="parent_is_premium_pay" invisible="1"/>
+                    <field name="premium_currency_id" invisible="1"/>
                     <label for="premium_amount_per_hour" string="Premium Pay" invisible="not parent_is_premium_pay"/>
                     <div name="premium_amounts" invisible="not parent_is_premium_pay">
                         <div class="o_row">
-                            <field name="premium_amount_per_hour" class="o_hr_narrow_field"/>
-                            <span>€ / Hour</span>
+                            <field name="premium_amount_per_hour" class="o_hr_narrow_field" widget="monetary" options="{'currency_field': 'premium_currency_id'}"/>
+                            <span>/ Hour</span>
                         </div>
                         <div class="o_row">
-                            <field name="premium_amount_per_day" class="o_hr_narrow_field"/>
-                            <span>€ / Day</span>
+                            <field name="premium_amount_per_day" class="o_hr_narrow_field" widget="monetary" options="{'currency_field': 'premium_currency_id'}"/>
+                            <span>/ Day</span>
                         </div>
                         <div class="o_row">
                             <field name="premium_percentage_hourly_rate" class="o_hr_narrow_field"/>

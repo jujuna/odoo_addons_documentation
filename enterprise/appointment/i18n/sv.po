@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-23 14:33+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-12 15:29+0000\n"
 "Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
 "Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/"
 "appointment/sv/>\n"
@@ -166,17 +166,17 @@ msgstr ""
 msgid ""
 "<div style=\"font-size: 13px; color: #374151;  background-color: white;\">\n"
 "    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
-"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
 "    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
-"ctx.get('mail_tz')\"/>\n"
+"ctx.get('mail_tz')\"></t>\n"
 "    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
-"object.find_partner_customer() or object.partner_id\"/>\n"
+"object.find_partner_customer() or object.partner_id\"></t>\n"
 "    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
 "bottom: 28px;\">\n"
 "        Appointment canceled\n"
 "        <img src=\"/calendar/static/src/img/times-circle.png\" "
 "style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
-"decoration:none; vertical-align: bottom;\"/>\n"
+"decoration:none; vertical-align: bottom;\">\n"
 "    </h1>\n"
 "    <p style=\"margin: 0;\">\n"
 "        <t t-if=\"customer\">\n"
@@ -185,7 +185,7 @@ msgid ""
 "        <t t-else=\"\">\n"
 "            Hello,\n"
 "        </t>\n"
-"        <br/>\n"
+"        <br>\n"
 "        <span style=\"display: block; margin-top: 8px;\">Your appointment "
 "for <t t-out=\"object.appointment_type_id.name or ''\">Technical Demo</t> <t "
 "t-if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
@@ -255,7 +255,7 @@ msgid ""
 "        </table>\n"
 "    </div>\n"
 "    <div style=\"margin: 32px 0 0;\">\n"
-"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"></t>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Attendees</h2>\n"
@@ -263,7 +263,7 @@ msgid ""
 "as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
 "            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
 "img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
-"15px; vertical-align: text-bottom;\"/>\n"
+"15px; vertical-align: text-bottom;\">\n"
 "            <t t-if=\"attendee.common_name\">\n"
 "                <span style=\"margin-left: 5px\" t-"
 "out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
@@ -293,8 +293,8 @@ msgstr ""
 #: model:mail.template,body_html:appointment.appointment_feedback_mail_template
 msgid ""
 "<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
-">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()"
+"\"></t>\n"
 "    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
 "size: 13px; color: #374151; width: 100%;\">\n"
 "        <tr>\n"
@@ -305,7 +305,7 @@ msgid ""
 "        </tr>\n"
 "        <tr>\n"
 "            <td style=\"padding-bottom: 16px;\">\n"
-"                Thank you for booking with us.<br/>\n"
+"                Thank you for booking with us.<br>\n"
 "            </td>\n"
 "        </tr>\n"
 "        <tr>\n"
@@ -339,7 +339,7 @@ msgid ""
 "middle; width: 25px;\">\n"
 "                            <img src=\"/rating/static/src/img/rating_5.png\" "
 "alt=\"Satisfied\" style=\"width: 20px; height: 20px; border: 0; vertical-"
-"align: middle; text-decoration: none;\"/>\n"
+"align: middle; text-decoration: none;\">\n"
 "                        </td>\n"
 "                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
 "vertical-align: middle;\">\n"
@@ -354,7 +354,7 @@ msgid ""
 "middle; width: 25px;\">\n"
 "                            <img src=\"/rating/static/src/img/rating_3.png\" "
 "alt=\"Okay\" style=\"width: 20px; height: 20px; border: 0; vertical-align: "
-"middle; text-decoration: none;\"/>\n"
+"middle; text-decoration: none;\">\n"
 "                        </td>\n"
 "                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
 "vertical-align: middle;\">\n"
@@ -369,7 +369,7 @@ msgid ""
 "middle; width: 25px;\">\n"
 "                            <img src=\"/rating/static/src/img/rating_1.png\" "
 "alt=\"Dissatisfied\" style=\"width: 20px; height: 20px; border: 0; vertical-"
-"align: middle; text-decoration: none;\"/>\n"
+"align: middle; text-decoration: none;\">\n"
 "                        </td>\n"
 "                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
 "vertical-align: middle;\">\n"
@@ -397,13 +397,13 @@ msgstr ""
 msgid ""
 "<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
 "    <t t-set=\"customer\" t-value=\" object.event_id.find_partner_customer()"
-"\"/>\n"
+"\"></t>\n"
 "    <t t-set=\"target_responsible\" t-value=\"object.partner_id == "
-"object.event_id.partner_id\"/>\n"
-"    <t t-set=\"target_customer\" t-value=\"object.partner_id == customer\"/"
-">\n"
+"object.event_id.partner_id\"></t>\n"
+"    <t t-set=\"target_customer\" t-value=\"object.partner_id == customer\"></"
+"t>\n"
 "    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
-"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
 "\n"
 "    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
 "bottom: 28px;\">\n"
@@ -432,7 +432,7 @@ msgid ""
 "strong><t t-if=\"object.event_id.appointment_type_id.category not in "
 "['custom', 'anytime'] and "
 "object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t "
-"t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t>.<br/>\n"
+"t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t>.<br>\n"
 "                    We'll let you know once it's confirmed.\n"
 "                </t>\n"
 "            </t>\n"
@@ -593,7 +593,7 @@ msgid ""
 "        </table>\n"
 "    </div>\n"
 "    <div style=\"margin: 32px 0 0;\">\n"
-"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"></t>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Attendees</h2>\n"
@@ -601,7 +601,7 @@ msgid ""
 "\" t-as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
 "            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
 "img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
-"15px; vertical-align: text-bottom;\"/>\n"
+"15px; vertical-align: text-bottom;\">\n"
 "            <t t-if=\"attendee != object\">\n"
 "                <span style=\"margin-left: 5px\" t-"
 "out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
@@ -634,7 +634,7 @@ msgid ""
 "    </div>\n"
 "    <t t-set=\"upcoming_appointments\" t-"
 "value=\"(object.event_id.appointment_booker_id.upcoming_appointment_ids - "
-"object.event_id).sorted('start')\"/>\n"
+"object.event_id).sorted('start')\"></t>\n"
 "    <div t-if=\"upcoming_appointments\" style=\"margin: 32px 0 0;\">\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
@@ -673,11 +673,11 @@ msgstr ""
 msgid ""
 "<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
 "    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
-"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
 "    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
-"ctx.get('mail_tz')\"/>\n"
+"ctx.get('mail_tz')\"></t>\n"
 "    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
-"object.find_partner_customer() or object.partner_id\"/>\n"
+"object.find_partner_customer() or object.partner_id\"></t>\n"
 "    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151;\">\n"
 "        <t t-if=\"not object.appointment_type_id.is_always_confirm and "
 "object.appointment_status == 'request'\">Appointment requested</t>\n"
@@ -685,7 +685,7 @@ msgid ""
 "            Booking confirmed\n"
 "            <img src=\"/calendar/static/src/img/check-circle.png\" "
 "style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
-"decoration:none; vertical-align: bottom;\"/>\n"
+"decoration:none; vertical-align: bottom;\">\n"
 "        </t>\n"
 "    </h1>\n"
 "    <p style=\"margin: 0;\">\n"
@@ -817,7 +817,7 @@ msgid ""
 "        </table>\n"
 "    </div>\n"
 "    <div style=\"margin: 32px 0 0;\">\n"
-"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"></t>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Attendees</h2>\n"
@@ -825,7 +825,7 @@ msgid ""
 "as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
 "            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
 "img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
-"15px; vertical-align: text-bottom;\"/>\n"
+"15px; vertical-align: text-bottom;\">\n"
 "            <t t-if=\"attendee.common_name\">\n"
 "                <span style=\"margin-left: 5px\" t-"
 "out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
@@ -849,10 +849,10 @@ msgid ""
 "    </div>\n"
 "    <t t-set=\"upcoming_appointments\" t-"
 "value=\"(object.appointment_booker_id.upcoming_appointment_ids - "
-"object).sorted('start')\"/>\n"
+"object).sorted('start')\"></t>\n"
 "    <div t-if=\"upcoming_appointments\" style=\"margin: 32px 0 0;\">\n"
 "        <t t-set=\"appointment_booker_id\" t-"
-"value=\"object.appointment_booker_id.id\"/>\n"
+"value=\"object.appointment_booker_id.id\"></t>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Your Other Upcoming Appointment(s)</h2>\n"
@@ -881,7 +881,7 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
 msgid "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Duration\"/>"
-msgstr ""
+msgstr "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Tid\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -956,6 +956,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Preview</span>"
 msgstr ""
+"<i class=\"oi o_appointment_kanban_button_icon d-none\" data-icon=\"public\"/"
+">\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Förhandsvisa</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -965,6 +969,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Configure</span>"
 msgstr ""
+"<i class=\"oi oi-filled o_appointment_kanban_button_icon d-none\" data-"
+"icon=\"settings\"/>\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Konfigurera</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1193,6 +1201,8 @@ msgid ""
 "<span class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Upcoming\"/"
 ">"
 msgstr ""
+"<span class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Kommande\"/"
+">"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -1387,7 +1397,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__allow_guests
 msgid "Allow guests"
-msgstr ""
+msgstr "Tillåt gäster"
 
 #. module: appointment
 #: model:ir.module.module,summary:base.module_appointment
@@ -1723,7 +1733,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_slot
 msgid "Appointment: Time Slot"
-msgstr "Tidsbeställning: Tidsperiod"
+msgstr "Tidsbokning: tid"
 
 #. module: appointment
 #. odoo-python
@@ -1807,7 +1817,7 @@ msgstr "Deltagare"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__auto_confirm
 msgid "Auto Confirm"
-msgstr ""
+msgstr "Bekräfta automatiskt"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__assignment_method__auto
@@ -1995,7 +2005,7 @@ msgstr "Bokningslinjer"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Booking Pages"
-msgstr ""
+msgstr "Bokningssidor"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__event_start
@@ -2246,7 +2256,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Closing Days"
-msgstr ""
+msgstr "Stängda dagar"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_leave
@@ -2392,7 +2402,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Copy invite url to clipboard"
-msgstr ""
+msgstr "Kopiera inbjudningslänken"
 
 #. module: appointment
 #. odoo-javascript
@@ -2579,7 +2589,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.js:0
 msgid "Delete"
-msgstr ""
+msgstr "Radera"
 
 #. module: appointment
 #: model:appointment.type,name:appointment.appointment_type_dental_care
@@ -2651,7 +2661,7 @@ msgstr "Visningsnamn"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__show_avatars
 msgid "Display pictures"
-msgstr ""
+msgstr "Visa bilder"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__show_avatars
@@ -2699,7 +2709,7 @@ msgstr "Rullgardinsmeny (ett svar)"
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_duration
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Duration"
-msgstr "Tidsperiod"
+msgstr "Tid"
 
 #. module: appointment
 #. odoo-python
@@ -2732,7 +2742,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Edit Appointment"
-msgstr ""
+msgstr "Redigera tidsbokning"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -2814,7 +2824,7 @@ msgstr "Extra information ges när tiden är bokad."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__feedback_mail_template_id
 msgid "Feedback Email"
-msgstr ""
+msgstr "Feedback via e-post"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
@@ -2944,7 +2954,7 @@ msgstr "Har meddelande"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__hide_duration
 msgid "Hide Duration"
-msgstr "Dölj Varaktighet"
+msgstr "Dölj tid"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__hide_timezone
@@ -3484,7 +3494,7 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
 msgid "My Calendar Link"
-msgstr ""
+msgstr "Länk till min kalender"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_search
@@ -3538,7 +3548,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr "Nästa kalenderhändelse"
+msgstr "Nästa aktivitetshändelse i kalendern"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_date_deadline
@@ -3644,7 +3654,7 @@ msgstr "Antal fel"
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "Antal meddelanden som kräver åtgärd"
+msgstr "Antal meddelanden som kräver en åtgärd"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__message_has_error_counter
@@ -4182,13 +4192,13 @@ msgstr "Välj användare..."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__is_date_first
 msgid "Select date and time first"
-msgstr ""
+msgstr "Välj datum och tid först"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Select this appointment type"
-msgstr ""
+msgstr "Välj den här tidsbokningstypen"
 
 #. module: appointment
 #. odoo-javascript
@@ -4393,7 +4403,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_schedule_staff_appointment
 msgid "Staff"
-msgstr ""
+msgstr "Personal"
 
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.calendar_event_action_view_bookings_users
@@ -4988,7 +4998,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__user_capacity
 msgid "User Capacity"
-msgstr ""
+msgstr "Användarkapacitet"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_leave__user_domain
@@ -5197,7 +5207,7 @@ msgstr "tidsbokningar"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "days,"
-msgstr ""
+msgstr "dagar,"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_form
@@ -5276,7 +5286,7 @@ msgstr "t.ex. john.smith@example.com"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "guests"
-msgstr ""
+msgstr "deltagare"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5319,7 +5329,7 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "on"
-msgstr ""
+msgstr "den"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated

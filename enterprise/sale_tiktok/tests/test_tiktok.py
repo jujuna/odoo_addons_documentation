@@ -6,6 +6,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 
 from odoo import Command, _, fields
+from odoo.exceptions import UserError
 from odoo.tests.common import tagged
 from odoo.tools import mute_logger
 
@@ -46,6 +47,33 @@ class TestTikTokShop(common.TestTikTokShopCommon):
         self.assertEqual(order.pricelist_id.name, f"TikTok {currency.name}")
         product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
         self.assertEqual(product_line.discount, 0.0)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_order_packing_ref_with_empty_packages(self):
+        """An order received with an empty list of packages is created without a packing ref."""
+        order_data = {**common.ORDER_MOCK["orders"][0], "packages": []}
+        order = self.shop._create_order_from_data(order_data)
+        self.assertTrue(order)
+        self.assertFalse(order.tiktok_packing_ref)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_order_packing_ref_with_packages(self):
+        """The packing ref is taken from the first package of the order."""
+        order_data = {**common.ORDER_MOCK["orders"][0], "packages": [{"id": "1234567890"}]}
+        order = self.shop._create_order_from_data(order_data)
+        self.assertEqual(order.tiktok_packing_ref, "1234567890")
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_order_packing_ref_set_on_update(self):
+        """The packing ref of an order created without package is set once TikTok creates it."""
+        order_data = common.ORDER_MOCK["orders"][0]
+        order = self.shop._create_order_from_data({**order_data, "packages": []})
+
+        self.shop._update_order_from_data(order, order_data)
+        self.assertEqual(order.tiktok_packing_ref, common.PACKAGE_ID_MOCK)
+
+        self.shop._update_order_from_data(order, {**order_data, "packages": [{"id": "other"}]})
+        self.assertEqual(order.tiktok_packing_ref, common.PACKAGE_ID_MOCK)
 
     @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
     def test_sync_orders_full(self):
@@ -450,6 +478,53 @@ class TestTikTokShop(common.TestTikTokShopCommon):
             messages = picking.message_ids.filtered(lambda m: m.subject == "TikTok Shop Label")
             self.assertEqual(len(messages), 1)
 
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_sync_pickings_without_packing_ref(self):
+        """Pickings of orders without package can neither be shipped nor get a label."""
+        order_data_mock = {"orders": [{**common.ORDER_MOCK["orders"][0], "packages": []}]}
+        called_operations = []
+
+        def get_tiktok_api_response_mock(_shop, operation_, *_args, **_kwargs):
+            called_operations.append(operation_)
+            if operation_ in ("get_order_list", "get_order_detail"):
+                return order_data_mock
+            return common.OPERATIONS_RESPONSES_MAP[operation_]
+
+        with patch(
+            "odoo.addons.sale_tiktok.utils.make_tiktok_api_request",
+            new=get_tiktok_api_response_mock,
+        ):
+            self.shop._sync_orders(auto_commit=False)
+            order = self.env["sale.order"].search([("tiktok_order_ref", "=", common.ORDER_ID_MOCK)])
+            picking = self.env["stock.picking"].search([("sale_id", "=", order.id)])
+
+            order.tiktok_delivery_status = "draft"
+            with self.assertRaisesRegex(UserError, "This order has no TikTok package yet"):
+                picking.action_tiktok_ship_order()
+
+            picking._action_done()
+            self.env["stock.picking"]._sync_tiktok_pickings()
+            self.assertEqual(order.tiktok_delivery_status, "confirmed")
+            self.assertNotIn("get_package_label", called_operations)
+            self.assertFalse(picking.carrier_tracking_ref)
+            self.assertFalse(picking.tiktok_label_attachment_id)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_ship_order_fetches_missing_packing_ref(self):
+        """Shipping an order without package fetches it from TikTok Shop if available."""
+        order_data = {**common.ORDER_MOCK["orders"][0], "status": "AWAITING_SHIPMENT"}
+        order = self.shop._create_order_from_data({**order_data, "packages": []})
+        order.tiktok_delivery_status = "draft"
+
+        with patch(
+            "odoo.addons.sale_tiktok.utils.make_tiktok_api_request",
+            return_value={"orders": [order_data]},
+        ):
+            action = order.picking_ids.action_tiktok_ship_order()
+
+        self.assertEqual(order.tiktok_packing_ref, common.PACKAGE_ID_MOCK)
+        self.assertEqual(action["res_model"], "tiktok.picking.ship.wizard")
+
     #  Product
     def test_find_matching_product_search(self):
         """Test the product search based on the internal reference.
@@ -720,3 +795,463 @@ class TestTikTokShop(common.TestTikTokShopCommon):
         self.assertEqual(item.product_id.default_code, self.product.default_code)
         msg = "The correct product should now be assigned to the item."
         self.assertNotEqual(item.product_id, default_product, msg)
+
+    # --- Test Tax Handling --- #
+
+    def _create_taxed_order(self, order_id, item_tax, quantity=1, currency="USD"):
+        """Import an order of `quantity` units at 100.00, each charged `item_tax` by TikTok Shop."""
+        items = [
+            dict(
+                common.ORDER_ITEM_MOCK,
+                original_price="100.00",
+                sale_price="100.00",
+                item_tax=[{
+                    "tax_type": "SALES_TAX",
+                    "tax_amount": f"{item_tax:.2f}",
+                    "tax_rate": f"{item_tax / 100:.2f}",
+                }],
+            )
+        ] * quantity
+        order_data = common.build_order_mock(
+            order_id=order_id, items=items, shipping_fee=0, currency=currency
+        )["orders"][0]
+        return self.shop._create_order_from_data(order_data)
+
+    def test_compute_subtotal_price_include_tax(self):
+        """A price-included tax reads the unit price as gross, so the subtotal is the paid total."""
+        currency = self.env.ref("base.USD")
+        subtotal = self.shop._compute_subtotal(10.0, self.tax_price_include_7, currency)
+
+        self.assertEqual(subtotal, 10.0)
+
+    def test_compute_subtotal_price_exclude_tax(self):
+        """A price-excluded tax is backed out, so the line total still equals the paid total."""
+        currency = self.env.ref("base.USD")
+        subtotal = self.shop._compute_subtotal(10.0, self.tax_price_exclude_7, currency)
+
+        # The subtotal is left unrounded (10 / 1.07 = 9.345794...) for Odoo to reconcile exactly.
+        self.assertAlmostEqual(subtotal, 10.0 / 1.07)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_item_tax_is_added_to_the_line_paid_total(self):
+        """The tax TikTok Shop charged on an item is priced into the line, not the residue.
+
+        100.00 plus 7% excluded is exact, and the rounded split is still frozen on the line.
+        """
+        self.product.taxes_id = self.tax_price_exclude_7
+
+        order = self._create_taxed_order("ITEM_TAX_001", item_tax=7.0)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(product_line, [{
+            "price_unit": 100.0,
+            "price_total": 107.0,
+            "extra_tax_data": {
+                "manual_total_excluded_currency": 100.0,
+                "manual_total_excluded": 100.0,
+                "manual_tax_amounts": {
+                    str(self.tax_price_exclude_7.id): {
+                        "tax_amount_currency": 7.0,
+                        "tax_amount": 7.0,
+                        "base_amount_currency": 100.0,
+                        "base_amount": 100.0,
+                    },
+                },
+                "currency_id": order.currency_id.id,
+                "price_unit": 100.0,
+                "discount": 0.0,
+                "quantity": 1,
+                "rate": 1.0,
+            },
+        }])
+        self.assertEqual(order.amount_total, 107.0)
+        self.assertFalse(self._adjustment_lines(order))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_misconfigured_tax_keeps_the_line_total(self):
+        """A price-included tax where TikTok charged a price-excluded one still totals correctly.
+
+        The rate only shifts the split between base and tax; the buyer-paid line total, and so the
+        order total, are unaffected and need no adjustment line.
+        """
+        self.product.taxes_id = self.tax_price_include_7
+
+        order = self._create_taxed_order("TAX_CONFIG_001", item_tax=7.0)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{"price_unit": 107.0, "price_total": 107.0}],
+        )
+        self.assertEqual(order.amount_total, 107.0)
+        self.assertFalse(self._adjustment_lines(order))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_mixed_included_and_excluded_taxes_keep_the_line_total(self):
+        """A price-included tax and a price-excluded tax on one line still match the paid total.
+
+        The included tax stays inside the unit price and the excluded tax is added on top. Their
+        rates only change the split; the buyer-paid line total does not move onto an adjustment.
+
+        Both taxes are 7%. Rounding each of them and the base separately misses 110.00 by one cent
+        when the unit price is the raw inverse, so the rounded split is frozen on the line with
+        the base absorbing that cent.
+        """
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        taxes = self.tax_price_include_7 | self.tax_price_exclude_7
+        self.product.taxes_id = taxes
+
+        order = self._create_taxed_order("TAX_MIXED_001", item_tax=10.0)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{
+                "tax_ids": taxes.ids,
+                "price_subtotal": 96.5,
+                "price_total": 110.0,
+            }],
+        )
+        self.assertTrue(product_line.extra_tax_data)
+        self.assertEqual(order.amount_total, 110.0)
+        self.assertFalse(self._adjustment_lines(order))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_excluded_taxes_with_include_base_amount_keep_the_line_total(self):
+        """Two price-excluded taxes still match the paid total when the first affects the base.
+
+        The first tax is included in the base of the second (`include_base_amount`). Backing that
+        compound tax out must still leave a line total equal to what the buyer paid.
+
+        10% on the base followed by the shared 7% excluded tax rounds to 110.01 when the unit
+        price is the raw inverse, so the rounded split is frozen on the line with the base
+        absorbing that cent.
+        """
+        self.tax_price_exclude_7.sequence = 2
+        tax_base = self.env["account.tax"].create({
+            "name": "TikTok Test Tax 10% Excluded Base",
+            "amount": 10.0,
+            "price_include_override": "tax_excluded",
+            "include_base_amount": True,
+            "sequence": 1,
+            "tax_group_id": self.tax_price_exclude_7.tax_group_id.id,
+        })
+        self.product.taxes_id = tax_base | self.tax_price_exclude_7
+
+        order = self._create_taxed_order("TAX_BASE_001", item_tax=10.0)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{
+                "tax_ids": (tax_base | self.tax_price_exclude_7).ids,
+                "price_subtotal": 93.45,
+                "price_total": 110.0,
+            }],
+        )
+        self.assertTrue(product_line.extra_tax_data)
+        self.assertEqual(order.amount_total, 110.0)
+        self.assertFalse(self._adjustment_lines(order))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_fixed_tax_with_mixed_taxes_keep_the_line_total(self):
+        """A per-unit fixed tax is backed out of every unit and the line still matches the paid total.
+
+        Each of the 3 units carries the 1.00 fixed tax, so the line holds 3.00 of it on top of
+        the two 7% taxes.
+        """
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        self.product.taxes_id = (
+            self.tax_fixed_1 | self.tax_price_include_7 | self.tax_price_exclude_7
+        )
+
+        order = self._create_taxed_order("TAX_FIXED_QTY_001", item_tax=11.0, quantity=3)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{"product_uom_qty": 3, "price_subtotal": 289.48, "price_total": 333.0}],
+        )
+        self.assertTrue(product_line.extra_tax_data)
+        self.assertFalse(self._adjustment_lines(order))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_reconciled_line_in_foreign_currency_keeps_the_line_total(self):
+        """A reconciled line in a foreign currency still matches the paid total."""
+        currency = self.setup_other_currency("EUR", rates=[("2020-01-01", 0.913537)])
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        self.product.taxes_id = self.tax_price_include_7 | self.tax_price_exclude_7
+
+        order = self._create_taxed_order("TAX_CURRENCY_001", item_tax=10.0, currency="EUR")
+
+        self.assertRecordValues(
+            order.order_line.filtered(lambda line: line.product_id == self.product),
+            [{"currency_id": currency.id, "price_subtotal": 96.5, "price_total": 110.0}],
+        )
+        self.assertFalse(self._adjustment_lines(order))
+
+    # --- Test Reconciled Tax Split --- #
+
+    def test_reconciled_extra_tax_data_with_fixed_and_mixed_taxes(self):
+        """The base absorbs the rounding cent while every tax, the fixed one included, keeps its
+        rounded amount."""
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        taxes = self.tax_fixed_1 | self.tax_price_include_7 | self.tax_price_exclude_7
+        currency = self.env.ref("base.USD")
+        [(quantity, price_unit)] = self.shop._compute_reconciled_line_specs(
+            3, 333.0, taxes, currency
+        )
+
+        extra_tax_data = self.shop._prepare_reconciled_extra_tax_data(
+            quantity, price_unit, 333.0, taxes, currency, 1.0, self.product
+        )
+
+        self.assertEqual(extra_tax_data["quantity"], 3)
+        self.assertAlmostEqual(extra_tax_data["price_unit"], price_unit)
+        self.assertAlmostEqual(extra_tax_data["manual_total_excluded_currency"], 289.48)
+        self.assertEqual(
+            [
+                round(extra_tax_data["manual_tax_amounts"][str(tax.id)]["tax_amount_currency"], 2)
+                for tax in taxes
+            ],
+            [3.0, 20.26, 20.26],
+        )
+
+    def test_reconciled_extra_tax_data_in_foreign_currency(self):
+        """The company-currency amounts are frozen next to the order-currency ones.
+
+        110.00 EUR / 0.913537 = 120.41 USD, split as 105.63 + 7.39 + 7.39.
+        """
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        taxes = self.tax_price_include_7 | self.tax_price_exclude_7
+        currency = self.env.ref("base.EUR")
+        [(quantity, price_unit)] = self.shop._compute_reconciled_line_specs(
+            1, 110.0, taxes, currency
+        )
+
+        extra_tax_data = self.shop._prepare_reconciled_extra_tax_data(
+            quantity, price_unit, 110.0, taxes, currency, 0.913537, self.product
+        )
+
+        self.assertEqual(extra_tax_data["currency_id"], currency.id)
+        self.assertAlmostEqual(extra_tax_data["manual_total_excluded_currency"], 96.5)
+        self.assertAlmostEqual(extra_tax_data["manual_total_excluded"], 105.63)
+        for tax in taxes:
+            amounts = extra_tax_data["manual_tax_amounts"][str(tax.id)]
+            self.assertAlmostEqual(amounts["tax_amount_currency"], 6.75)
+            self.assertAlmostEqual(amounts["tax_amount"], 7.39)
+
+    # --- Test Invoicing --- #
+
+    def _assert_invoice_keeps_the_frozen_split(self, order):
+        """
+        Verify Invoice `order` and check the invoice reuses the product line's frozen tax split.
+        """
+        extra_tax_data = order.order_line.filtered(
+            lambda line: line.product_id == self.product
+        ).extra_tax_data
+        company_currency = order.company_id.currency_id
+
+        invoice = order._create_invoices()
+        invoice.action_post()
+
+        self.assertRecordValues(invoice, [{
+            "amount_untaxed": order.amount_untaxed,
+            "amount_total": order.amount_total,
+            "amount_untaxed_signed": company_currency.round(
+                extra_tax_data["manual_total_excluded"]
+            ),
+        }])
+        self.assertEqual(
+            {
+                str(line.tax_line_id.id): (-line.amount_currency, -line.balance)
+                for line in invoice.line_ids.filtered("tax_line_id")
+            },
+            {
+                tax_id: (
+                    order.currency_id.round(amounts["tax_amount_currency"]),
+                    company_currency.round(amounts["tax_amount"]),
+                )
+                for tax_id, amounts in extra_tax_data["manual_tax_amounts"].items()
+            },
+        )
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_reconciled_split_is_kept_on_the_invoice(self):
+        """The invoice reuses the frozen split instead of recomputing the taxes."""
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        self.product.taxes_id = (
+            self.tax_fixed_1 | self.tax_price_include_7 | self.tax_price_exclude_7
+        )
+        order = self._create_taxed_order("INVOICE_SPLIT_001", item_tax=11.0, quantity=3)
+
+        self._assert_invoice_keeps_the_frozen_split(order)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_reconciled_split_is_kept_on_the_invoice_in_foreign_currency(self):
+        """The invoice also reuses the frozen company-currency amounts."""
+        self.setup_other_currency("EUR", rates=[("2020-01-01", 0.913537)])
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        self.product.taxes_id = self.tax_price_include_7 | self.tax_price_exclude_7
+        order = self._create_taxed_order("INVOICE_SPLIT_002", item_tax=10.0, currency="EUR")
+
+        self._assert_invoice_keeps_the_frozen_split(order)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_reconciled_split_is_dropped_when_the_quantity_changes(self):
+        """Editing the quantity recomputes the taxes instead of reusing the frozen split."""
+        self.tax_price_include_7.sequence = 1
+        self.tax_price_exclude_7.sequence = 2
+        self.product.taxes_id = self.tax_price_include_7 | self.tax_price_exclude_7
+        order = self._create_taxed_order("SPLIT_RESET_001", item_tax=10.0)
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+
+        # Keep the unit price, which a quantity change would otherwise reset from the pricelist.
+        product_line.write({"product_uom_qty": 2, "price_unit": product_line.price_unit})
+
+        # Raw rounding of 2 x 103.245614...: base 192.98, not the frozen 96.50 scaled up.
+        self.assertEqual(product_line.price_subtotal, 192.98)
+
+    # --- Test Adjustment Lines --- #
+
+    def _adjustment_lines(self, order):
+        adjustment_product = self.env.ref("sale_tiktok.default_adjustment_product")
+        return order.order_line.filtered(lambda line: line.product_id == adjustment_product)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_no_adjustment_line_for_tax_exclusive_unit_rounding(self):
+        """Tax-exclusive non-divisible unit prices do not emit a rounding adjustment line."""
+        self.product.taxes_id = self.tax_price_exclude_7
+        # Three units at 10.00 back out to 9.345794... each; keeping the unrounded tax-exclusive
+        # subtotal on the line lets Odoo reconcile exactly.
+        items = [
+            dict(common.ORDER_ITEM_MOCK, original_price="10.00", sale_price="10.00")
+            for _index in range(3)
+        ]
+        order_data = common.build_order_mock(
+            order_id="ADJ_RESIDUE_001", items=items, shipping_fee=0, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        self.assertFalse(self._adjustment_lines(order))
+        self.assertEqual(order.amount_total, float(order_data["payment"]["total_amount"]))
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_no_adjustment_line_for_half_cent_tax(self):
+        """A tax-exclusive subtotal landing on a half-cent tax does not emit an adjustment line.
+
+        A 10.00 shipping fee under a 15% price-excluded tax backs out to 8.695652...; rounding
+        that subtotal to 8.70 would tax it 1.305, rounded up to 1.31, and total 10.01 against the
+        10.00 the buyer paid. Keeping it unrounded lets `round_globally` tax it 1.30.
+        """
+        self.env.company.tax_calculation_rounding_method = "round_globally"
+        tax_price_exclude_15 = self.env["account.tax"].create({
+            "name": "TikTok Test Tax 15% Excluded",
+            "amount": 15.0,
+            "price_include_override": "tax_excluded",
+        })
+        shipping_product = self.env.ref("sale_tiktok.default_shipping_product")
+        shipping_product.taxes_id = tax_price_exclude_15
+        order_data = common.build_order_mock(
+            order_id="ADJ_HALF_CENT_001", shipping_fee=10, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        shipping_line = order.order_line.filtered(
+            lambda line: line.product_id == shipping_product
+        )
+        self.assertAlmostEqual(shipping_line.price_unit, 10.0 / 1.15)
+        self.assertEqual(shipping_line.price_total, 10.0)
+        self.assertFalse(self._adjustment_lines(order))
+        self.assertEqual(order.amount_total, float(order_data["payment"]["total_amount"]))
+
+    # --- Test Shipping Lines --- #
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_free_shipping_omits_shipping_line(self):
+        """A zero buyer-paid shipping fee produces no shipping line."""
+        order_data = common.build_order_mock(
+            order_id="FREE_SHIP_001", shipping_fee=0, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        # Only one line for the one item — no shipping line.
+        self.assertEqual(len(order.order_line), 1)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_shipping_line_with_tax(self):
+        """The shipping line prices the buyer-paid fee and carries the mapped taxes."""
+        shipping_product = self.env.ref("sale_tiktok.default_shipping_product")
+        shipping_product.taxes_id = self.tax_price_exclude_7
+        order_data = common.build_order_mock(
+            order_id="SHIP_TAX_001", shipping_fee=10, shipping_fee_tax=0.70, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        shipping_line = order.order_line.filtered(
+            lambda line: line.product_id == shipping_product
+        )
+        self.assertRecordValues(
+            shipping_line,
+            [{"tax_ids": self.tax_price_exclude_7.ids, "price_unit": 10.0}],
+        )
+        self.assertEqual(order.amount_total, float(order_data["payment"]["total_amount"]))
+
+    # --- Test Order Line Values --- #
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_prepare_order_lines_values(self):
+        """Line items sharing a product collapse into one line priced at the buyer-paid unit."""
+        items = [
+            dict(common.ORDER_ITEM_MOCK, original_price="12.00", sale_price="10.00")
+            for _index in range(2)
+        ]
+        order_data = common.build_order_mock(
+            order_id="LINES_001", items=items, shipping_fee=0, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{"price_unit": 10.0, "product_uom_qty": 2.0, "discount": 0.0}],
+        )
+        self.assertEqual(order.amount_total, 20.0)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_cart_level_promotion_is_carried_by_the_item_price(self):
+        """TikTok Shop allocates cart-level promotions to the line items, so no discount line.
+
+        Mirrors a real sandbox order: three units of a 50000 item under a 15% and a
+        buy-3-get-30% promotion arrive at `sale_price` 29750 each, already summing to
+        `sub_total`.
+        """
+        items = [
+            dict(common.ORDER_ITEM_MOCK, original_price="50000", sale_price="29750")
+            for _index in range(3)
+        ]
+        order_data = common.build_order_mock(
+            order_id="CART_PROMO_001", items=items, shipping_fee=15, currency="USD"
+        )["orders"][0]
+
+        order = self.shop._create_order_from_data(order_data)
+
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertRecordValues(
+            product_line,
+            [{"price_unit": 29750.0, "product_uom_qty": 3.0, "discount": 0.0}],
+        )
+        self.assertEqual(len(order.order_line), 2)  # item line + shipping, nothing else
+        self.assertEqual(order.amount_total, float(order_data["payment"]["total_amount"]))

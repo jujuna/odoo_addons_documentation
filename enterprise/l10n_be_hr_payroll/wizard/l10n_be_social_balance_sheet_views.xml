@@ -8,7 +8,7 @@
                 <group class="w-50">
                     <label for="date_from" string="Period"/>
                     <div>
-                        <field name="date_from" class="oe_inline o_hr_narrow_field"/> - <field name="date_to" class="oe_inline o_hr_narrow_field"/>
+                        <field name="date_from" class="oe_inline o_hr_narrow_field" required="1"/> - <field name="date_to" class="oe_inline o_hr_narrow_field" required="1"/>
                     </div>
                     <field name="company_id"/>
                     <field name="state" invisible="1"/>
@@ -23,6 +23,8 @@
                 <footer>
                     <button name="print_report" string="Export to PDF" type="object" class="btn-primary" invisible="state != 'draft'" data-hotkey="q"/>
                     <button name="print_report" string="Export to PDF" type="object" invisible="state != 'done'" data-hotkey="w"/>
+                    <button name="export_report_xlsx" string="Export to XLSX" type="object" data-hotkey="e"/>
+                    <button name="action_validate" string="Validate" type="object" class="btn-primary" data-hotkey="v"/>
                     <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>

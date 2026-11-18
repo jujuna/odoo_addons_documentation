@@ -13,7 +13,7 @@ from lxml import html
 from typing import Self
 
 from odoo import _, api, fields, models, modules, tools
-from odoo.exceptions import AccessError, MissingError
+from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.fields import Domain
 from odoo.tools import clean_context, groupby, SQL
 from odoo.tools.constants import IN_MAX
@@ -407,10 +407,11 @@ class MailMessage(models.Model):
     @api.depends_context("uid")
     def _compute_is_bookmarked(self):
         """ Compute if the message is bookmarked by the current user. """
-        # TDE FIXME: use SQL
+        partner = self.env.user.partner_id
         bookmarked = (
             self.sudo()
-            .filtered(lambda msg: self.env.user.partner_id in msg.bookmarked_partner_ids)
+            .with_context(active_test=False)
+            .filtered(lambda msg: partner in msg.bookmarked_partner_ids and partner.active)
             .sudo(False)
         )
         for message in self:
@@ -645,7 +646,10 @@ class MailMessage(models.Model):
             for values in self.env.cr.dictfetchall()
         }
         if len(messages_to_check) == MAX_SEARCH_LIMIT:  # avoid out of memory
-            raise ValueError(self.env._("Cannot search, too many messages"))
+            raise UserError(self.env._(
+                "Too many messages to be processed.\n"
+                "Please apply additional filters to reduce the number of potential messages."
+            ))
         accessible = self.browse(messages_to_check)
         if not messages_to_check:
             return accessible
@@ -1013,9 +1017,14 @@ class MailMessage(models.Model):
         if search_term:
             # we replace every space by a % to avoid hard spacing matching
             search_term = search_term.replace(" ", "%")
+            attachment_domain = Domain("name", "ilike", search_term)
+            if thread:
+                attachment_domain &= (
+                    Domain("res_model", "=", thread._name) & Domain("res_id", "=", thread.id)
+                ) | Domain("res_model", "=", "mail.message")
             message_domain = Domain.OR([
-                # sudo: access to attachment is allowed if you have access to the parent model
-                [("attachment_ids", "in", self.env["ir.attachment"].sudo()._search([("name", "ilike", search_term)]))],
+                # any!: access to attachment is allowed if you have access to the parent model
+                Domain("attachment_ids", "any!", attachment_domain),
                 # sudo: res.partner - allow searching by author name
                 [("author_id", "in", self.env["res.partner"].sudo()._search([("name", "ilike", search_term)]))],
                 # sudo: mail.guest - allow searching by guest name
@@ -1025,8 +1034,6 @@ class MailMessage(models.Model):
                 [("subtype_id.description", "ilike", search_term)],
             ])
             domain &= message_domain
-        if search_term or is_filtered:
-            res["count"] = self.search_count(domain)
         if around is not None:
             messages_before = self.search(domain & Domain('id', '<=', around), limit=limit // 2, order="id DESC")
             messages_after = self.search(domain & Domain('id', '>', around), limit=limit // 2, order='id ASC')

@@ -1,15 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import math
 import random
 import string
 from ast import literal_eval
 from collections import defaultdict
+from contextlib import closing
 from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 from odoo.addons.l10n_be_hr_payroll.models.utils import MU_SERVICE_CODES, WAGE_SERVICE_CODES, format_amount, round_eurocent
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import BinaryBytes, config, date_utils, float_round
+from odoo.tools import BinaryBytes, config, date_utils, float_is_zero, float_round
 
 from odoo import _, api, fields, models, modules
 
@@ -46,15 +48,27 @@ ECONOMIC_UNEMPLOYMENT = 800
 NON_RECURRENT_BENEFITS = 888
 REDUCED_ACTIVATION = 261
 
+# The hours a part-time worker performs beyond its contractual schedule (not recovered): plain, at +50%, at +100%
+ADDITIONAL_HOURS_TYPES = (
+    'hr_work_entry.be_work_entry_type_additional_hours',
+    'hr_work_entry.be_work_entry_type_additional_hours_50',
+    'hr_work_entry.be_work_entry_type_additional_hours_100',
+)
+
 FIRST_HIRE_FIELDS = ['first_hire', 'second_hire', 'third_hire', 'fourth_hire', 'fifth_hire', 'sixth_hire']
 
 
-def get_flemish_training_worked_days(worked_days):
-    flemish_training_types = (
-        worked_days.env.ref('hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off', raise_if_not_found=False),
-        worked_days.env.ref('hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off_with_meal_voucher', raise_if_not_found=False),
-    )
-    return worked_days.filtered(lambda wd: wd.work_entry_type_id in flemish_training_types)
+# The average days a week of a variable schedule close to a whole number of days are that number, as a social
+# secretariat declares them: (lowest, highest average, days a week); 7 above 6.92
+VARIABLE_DAYS_PER_WEEK_TOLERANCES = (
+    (0.98, 1.02, 1), (1.97, 2.03, 2), (2.96, 3.04, 3), (3.95, 4.04, 4), (4.94, 5.06, 5), (5.93, 6.07, 6))
+
+
+# the joint committees of the construction sector, whose workers declare the gross remuneration paid for an illness
+# (zone 01011): construction, brick industry
+ILLNESS_REMUNERATION_JOINT_COMMITTEES = ('124', '114')
+# from 2020/2 to 2024/1, the workers and the employees of all the sectors declared it
+ILLNESS_REMUNERATION_ALL_SECTORS = (date(2020, 4, 1), date(2024, 3, 31))
 
 
 class DMFANode:
@@ -119,9 +133,11 @@ class DMFANaturalPerson(DMFANode):
             return
         student_payslips = payslips.filtered(lambda p: p.version_id.is_student())
         regular_payslips = payslips - student_payslips
-        # A worker record per worker code (e.g. a blue collar becoming a white collar in the quarter)
-        workers_payslips = ([student_payslips] if student_payslips else []) + list(
-            regular_payslips.grouped(lambda p: p.version_id.l10n_be_worker_code_id.dmfa_code).values())
+        # A worker record per employer category and worker code (e.g. a blue collar becoming a white collar in the
+        # quarter, or a Horeca occasional worker declared under 317 becoming a regular worker declared under 017)
+        workers_payslips = ([student_payslips] if student_payslips else []) + list(regular_payslips.grouped(
+            lambda p: (p._l10n_be_get_employer_category_dmfa_code(), p.version_id.l10n_be_worker_code_id.dmfa_code),
+        ).values())
         if not workers_payslips:
             raise UserError(self.env._('No valid payslips found for employee %s', employee.name))
         self.worker_records = []
@@ -152,6 +168,7 @@ class DMFAWorker(DMFANode):
 
         self.frontier_worker = 0
         self.activity_with_risk = self.payslips.version_id[0].l10n_be_risk_class
+        self.employer_class = self.payslips[0]._l10n_be_get_employer_category_dmfa_code()
 
         self.student_payslips = payslips.filtered(lambda p: p.version_id.is_student())
         payslips = payslips - self.student_payslips
@@ -160,6 +177,11 @@ class DMFAWorker(DMFANode):
             self.worker_code = self.student_payslips.version_id[0].l10n_be_worker_code_id.dmfa_code
         else:
             self.worker_code = payslips.version_id[0].l10n_be_worker_code_id.dmfa_code
+        # The key of the worker record in the natural person state: its worker code, prefixed by its employer
+        # category when it isn't the one of the payroll configuration (e.g. 317 for a Horeca occasional worker
+        # under a 017 configuration), not to mix it with a regular worker record of the same worker code
+        self.state_key = self.env['l10n_be.dmfa.natural_person.state']._get_worker_record_key(
+            self.employer_class, self.worker_code, self.payslips.payroll_config_id[:1].l10n_be_employer_category_id.dmfa_code)
 
         self.local_unit_id = -1 # Deprecated since 2014
 
@@ -281,16 +303,16 @@ class DMFAWorker(DMFANode):
 
         if natural_person_state and is_new_state:
             # Another worker record of the natural person, created with this declaration
-            natural_person_state.worker_record_data = {**natural_person_state.worker_record_data, self.worker_code: current_state_data}
+            natural_person_state.worker_record_data = {**natural_person_state.worker_record_data, self.state_key: current_state_data}
         elif natural_person_state:
-            natural_person_state.validate_changes(current_state_data, self.worker_code)
+            natural_person_state.validate_changes(current_state_data, self.state_key)
         else:
             natural_person_state = self.env['l10n_be.dmfa.natural_person.state'].create({
                 'employee_id': self.payslips[0].employee_id.id,
                 'niss': self.payslips[0].employee_id.niss,
                 'quarter_start': self.quarter_start,
                 'quarter_end': self.quarter_end,
-                'worker_record_data': {self.worker_code: current_state_data},
+                'worker_record_data': {self.state_key: current_state_data},
             })
 
         self.state = natural_person_state
@@ -307,7 +329,11 @@ class DMFAWorker(DMFANode):
 
     def _prepare_student_contributions(self):
         payslips = self.student_payslips
-        basis = round(payslips._get_line_values(['BASIC'], compute_sum=True)['BASIC']['sum']['total'], 2)
+        # The remuneration the solidarity contribution is computed on, as the ordinary contributions of the other
+        # workers (_prepare_contributions): the salary, the paid benefits included, not only the basic pay
+        salary_codes = self.env['hr.payslip']._get_salary_wage_line_codes() - {'DH_SALARY'}
+        line_values = payslips._get_line_values(salary_codes, compute_sum=True)
+        basis = round(sum(line_values[code]['sum']['total'] for code in salary_codes), 2)
         basis *= payslips[0]._l10n_be_get_onss_basis_uplift()
         contributions = [
             DMFAStudentContribution(self.student_payslips, basis)
@@ -324,7 +350,8 @@ class DMFAWorker(DMFANode):
         # Exclude payslips without remuneration to avoid having a sum of 27€ (ATNs)
         # On a full sick quarter that actually has no presence
         regular_payslips = contribution_payslips.filtered(lambda p: p.struct_id.code == 'BEMONTHLY')
-        regular_payslips_no_remun = regular_payslips.filtered(lambda p: not p._get_total_basic_wage_without_double_holiday())
+        regular_payslips_no_remun = regular_payslips.filtered(
+            lambda p: not self.env['l10n_be.dmfa']._has_remuneration(p))
         no_remun = regular_payslips == regular_payslips_no_remun
         if no_remun:
             contribution_payslips -= regular_payslips
@@ -337,8 +364,8 @@ class DMFAWorker(DMFANode):
         for p in contribution_payslips:
             payslip_basis = sum(line_values[code][p.id]['total'] for code in salary_codes)
             if p.struct_id.code == 'BECCT90':
-                # Only the CCT 90 bonus above the ceiling is subject to the ordinary contributions
-                payslip_basis = max(0, payslip_basis - p._rule_parameter('cct90_employer_onss_threshold'))
+                # Only the CCT 90 bonus above the yearly ceiling is subject to the ordinary contributions
+                payslip_basis = max(0, payslip_basis - p._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold'))
             payslip_bases[p] = payslip_basis
         basis = round(sum(payslip_bases.values()), 2)
         # The activation contribution isn't due on a termination indemnity
@@ -405,8 +432,10 @@ class DMFAWorker(DMFANode):
         has_non_recurrent_benefits = contribution_payslips._get_line_values(['ONSSEMPLOYER_888'], compute_sum=True)['ONSSEMPLOYER_888']['sum']['total'] > 0
         # Quarterly annual holidays contribution of the manual workers
         has_holidays = contribution_payslips._get_line_values(['ONSSEMPLOYER_253'], compute_sum=True)['ONSSEMPLOYER_253']['sum']['total'] > 0
-        # Manual workers only have ONSS rates under the contribution type 1.
-        contribution_type = '1' if contribution_payslips[0].version_id.is_worker() else '0'
+        # Manual workers only have ONSS rates under the contribution type 1, but a flexi-job's (050 or 450) are under
+        # the type 0, a manual worker's as the others' (a refused flexi-job is an ordinary worker)
+        version = contribution_payslips[0].version_id
+        contribution_type = '1' if version.is_worker() and not version.is_flexi() else '0'
 
         return ([
             DMFAWorkerContribution(contribution_payslips, basis, self.quarter_start, ASBESTOS),  # quarters due: see the payslip rule
@@ -552,8 +581,11 @@ class DMFAWorker(DMFANode):
                 #   <RemunAmount>00000400546</RemunAmount>
                 # </Remun>
                 employee = termination_payslips.employee_id
-                # The indemnity covers the period from the day after the last day of the contract
-                termination_start = employee.departure_date + relativedelta(days=1)
+                # The indemnity covers the period from the day after the last day of the contract (the end of the
+                # contract of the occupation when the employee has no departure date anymore, e.g. rehired since)
+                last_day = employee.departure_date or max(filter(None, occupation_contracts.mapped('date_end')), default=None) \
+                    or min(termination_payslips.mapped('date_from')) - relativedelta(days=1)
+                termination_start = last_day + relativedelta(days=1)
                 termination_periods = _split_termination_period(
                     termination_start, max(employee.l10n_be_notice_period_theoretical_end or termination_start, termination_start))
                 termination_values = termination_payslips._get_line_values(['TERM_BASIC'])
@@ -646,7 +678,56 @@ class DMFAWorker(DMFANode):
                     # Archived versions aren't in the occupations: their worked days stay with the payslip
                     worked_days_index = occupation_by_version.get(worked_days.version_id, index)
                     worked_days_by_occupation[worked_days_index] |= worked_days
-                    paid_amounts[worked_days_index] += worked_days.amount if worked_days.is_paid else 0
+                    # The Horeca overtime without contributions (080) isn't paid in the gross salary: its pay is declared
+                    # under its own remuneration code (013) on the line of its days, not shared with the gross salary
+                    paid_amounts[worked_days_index] += worked_days.amount \
+                        if worked_days.is_paid and worked_days.work_entry_type_id.dmfa_code != '80' else 0
+                if payslip._l10n_be_is_horeca_occasional() and all(occupations[i][2] == occupations[i][3] for i in paid_amounts):
+                    # The remuneration of a Horeca occasional worker is the flat wage of its days, per started hour
+                    # (6 hours a day at most): a line of one day gets the flat wage of its own hours, not a share of
+                    # the pay (whose premiums or hourly wage can differ between the days); a day beyond the worker's
+                    # yearly contingent is paid as an ordinary one
+                    flat_days = payslip._l10n_be_get_horeca_occasional_flat_days()
+                    hourly_flat = payslip._rule_parameter('horeca_occasional_hourly_wage')
+                    working_hours = defaultdict(float)
+                    for worked_days in payslip.worked_days_line_ids:
+                        if self.env['l10n_be.dmfa']._is_working_service(worked_days):
+                            working_hours[occupation_by_version.get(worked_days.version_id, index)] += worked_days.number_of_hours
+                    paid_amounts = {
+                        i: min(math.ceil(round(working_hours[i], 4)), 6) * hourly_flat if occupations[i][2] in flat_days else amount
+                        for i, amount in paid_amounts.items() if working_hours[i] or amount}
+                # A premium pay (e.g. a worked public holiday) is pay of the worked days carrying it: their line gets it
+                # whole, the rest of the gross salary is shared pro rata to the pay of the worked days
+                premium_hours = defaultdict(lambda: defaultdict(float))
+                premium_split = False
+                for worked_days in payslip.worked_days_line_ids:
+                    worked_days_index = occupation_by_version.get(worked_days.version_id, index)
+                    for code in worked_days.category_options_ids._get_codes_with_ancestors():
+                        premium_hours[code][worked_days_index] += worked_days.number_of_hours
+                if len(paid_amounts) > 1 and premium_hours and sum(paid_amounts.values()):
+                    premiums = defaultdict(float)
+                    for line in self._get_payslip_lines(payslip):
+                        hours = next((
+                            premium_hours[category.code] for category in line.salary_rule_id.category_ids
+                            if sum(premium_hours.get(category.code, {}).values())), None)
+                        if hours and line.total:
+                            for i, h in hours.items():
+                                premiums[i] += line.total * h / sum(hours.values())
+                    gross = sum(line.total for line in self._get_payslip_lines(payslip) if line.code == 'SALARY')
+                    premium = sum(premiums.values())
+                    if premium and gross > premium and payslip.version_id.is_flexi() and any(
+                            line.code == 'FLEXI_PECULE' and line.total for line in self._get_payslip_lines(payslip)):
+                        # A flexi-job's premium of a day is pay of that day: its line gets it with the pay of its
+                        # worked days, the flexi rule below sharing the rest of the gross salary and the flexi holiday
+                        # pay on the hours of the lines (a social secretariat's DmfA)
+                        paid_amounts = {
+                            i: paid_amounts.get(i, 0) + premiums.get(i, 0) for i in paid_amounts.keys() | premiums.keys()}
+                    elif premium and gross > premium:
+                        premium_split = True
+                        pay = sum(paid_amounts.values())
+                        paid_amounts = {
+                            i: (gross - premium) * paid_amounts.get(i, 0) / pay + premiums.get(i, 0)
+                            for i in paid_amounts.keys() | premiums.keys()}
                 total_paid_amount = sum(paid_amounts.values())
                 if not total_paid_amount:
                     rates = {index: 1}
@@ -655,11 +736,40 @@ class DMFAWorker(DMFANode):
                 for i in paid_amounts.keys() | rates.keys():
                     payslip_rates_by_occupation[i][payslip.id] = rates.get(i, 0)
                 if len(rates) > 1:
+                    payslip_lines = self._get_payslip_lines(payslip)
+                    # A flexi-job's days: each line gets a share of the flexi holiday pay pro rata to its hours,
+                    # truncated to the cent, the rest on the last line (a social secretariat's DmfA)
+                    pecule = sum(line.total for line in payslip_lines if line.code == 'FLEXI_PECULE')
+                    service_hours = defaultdict(float)
+                    for worked_days in payslip.worked_days_line_ids:
+                        if self.env['l10n_be.dmfa']._is_working_service(worked_days):
+                            service_hours[occupation_by_version.get(worked_days.version_id, index)] += worked_days.number_of_hours
+                    service_hours = {i: float_round(service_hours.get(i, 0), 2) for i in rates}
+                    total_hours = sum(service_hours.values())
+                    pecule_shares = {}
+                    # (not when the gross salary is already shared with its premiums on the days carrying them)
+                    if pecule and total_hours and not premium_split and payslip.version_id.is_flexi():
+                        last = max(rates, key=lambda i: (occupations[i][2], i))
+                        pecule_shares = {
+                            i: float_round(pecule * hours / total_hours, 2, rounding_method='DOWN')
+                            for i, hours in service_hours.items() if i != last}
                     # Each line rounded to the cent, the rest on the largest share: same total
                     largest = max(rates, key=rates.get)
-                    for line in self._get_payslip_lines(payslip):
-                        amounts = {i: round_eurocent(line.total * rate) for i, rate in rates.items() if i != largest}
-                        amounts[largest] = line.total - sum(amounts.values())
+                    for line in payslip_lines:
+                        if pecule_shares and line.code in ('FLEXI_PECULE', 'SALARY'):
+                            # the gross salary: the pay of the line's worked days, a share of the rest of the gross
+                            # salary (e.g. a monthly additional gross) pro rata to the hours of the line, truncated to
+                            # the cent as the flexi holiday pay, and the line's share of the flexi holiday pay
+                            other_pay = line.total - pecule - total_paid_amount if line.code == 'SALARY' else 0
+                            amounts = {
+                                i: (round_eurocent(paid_amounts.get(i, 0)) + float_round(
+                                    other_pay * service_hours[i] / total_hours, 2, rounding_method='DOWN')
+                                    if line.code == 'SALARY' else 0) + share
+                                for i, share in pecule_shares.items()}
+                            amounts[last] = line.total - sum(amounts.values())
+                        else:
+                            amounts = {i: round_eurocent(line.total * rate) for i, rate in rates.items() if i != largest}
+                            amounts[largest] = line.total - sum(amounts.values())
                         for i, amount in amounts.items():
                             line_amounts_by_occupation[i][line.id] = amount
         return {
@@ -679,6 +789,9 @@ class DMFAWorker(DMFANode):
             lines = self._get_payslip_lines(self.payslips).filtered(lambda line: line.code == line_code)
             if lines:
                 if line_code == 'ONSSRESTRUCTURING' and not any(line.amount > 0 for line in lines):
+                    continue
+                # no deduction block without an amount (an employment bonus of 0 on every payslip of the quarter)
+                if float_is_zero(sum(lines.mapped('total')), precision_digits=2):
                     continue
                 deduction = DMFAWorkerDeduction(lines, code=dmfa_code)
                 if line_code == 'ONSSRESTRUCTURING':
@@ -767,22 +880,39 @@ class DMFAWorker(DMFANode):
         )
         if not reduction.code or not reduction.reduction_cap:
             return
-        occupations = [o for o in self.occupations if not o.is_termination and o.services]
+        # a flexi-job gets no reduction (see _prepare_occupation_deductions)
+        occupations = [o for o in self.occupations if not o.is_termination and o.services and not o.contract.is_flexi()]
         if not occupations:
             return
-        occupation = max(occupations, key=lambda o: L10n_BeDmfa._get_l10n_be_mu(o.payslips[:1].version_id, services=o.services))
+        occupation = max(occupations, key=lambda o: o.target_group_values['mu'])
+        amount = self.env['hr.payslip']._l10n_be_target_group_occupation_amount(
+            {'code': reduction.code, 'g': reduction.reduction_cap, 'p_max': reduction.potential_reduction},
+            occupation.target_group_values, self.mu_global)
         deduction = DMFAOccupationTargetGroup(
-            occupation.payslips, occupation.services, occupation.mean_working_hours, self.mu_global,
-            reduction.code, reduction.reduction_cap, p_max=reduction.potential_reduction, starting_date=reduction.starting_date)
+            occupation.payslips, reduction.code, amount, starting_date=reduction.starting_date)
         deduction.reduction_cap = reduction.reduction_cap
         if int(deduction.deduction_amount) > 0:
             occupation.occupation_deductions = (occupation.occupation_deductions or []) + [deduction]
             self.first_hire_reduction = deduction
 
     def _prepare_occupation_deductions(self, occupations):
-        mu_global = 0
+        # A flexi-job gets no reduction of contributions and its hours stay out of μ (a refused one is an ordinary worker)
+        # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/socialsecuritycontributions/calculationbase/flexi/flexi_and_overtime_horeca.html
         for occupation in occupations:
-            mu_global += L10n_BeDmfa._get_l10n_be_mu(occupation.payslips[:1].version_id, services=occupation.services)
+            if occupation.contract.is_flexi():
+                occupation.occupation_deductions = DMFAOccupationStructuralDeduction.init_multi([])
+        occupations = [occupation for occupation in occupations if not occupation.contract.is_flexi()]
+        # The occupation lines as the reductions see them, built the same way as
+        # on the payslips, see hr.payslip._get_l10n_be_target_group_occupations
+        for occupation in occupations:
+            version = occupation.payslips[:1].version_id
+            occupation.target_group_values = self.env['hr.payslip']._l10n_be_target_group_occupation(
+                occupation.payslips,
+                mu=self.env['l10n_be.dmfa']._get_l10n_be_mu(version, services=occupation.services),
+                hours_per_week=int(occupation.mean_working_hours) / 100,
+                reference_wage=self.env['l10n_be.dmfa']._get_l10n_be_reference_wage(version, occupation=occupation),
+            )
+        mu_global = sum(occupation.target_group_values['mu'] for occupation in occupations)
         self.mu_global = mu_global
 
         # Structural deduction
@@ -790,39 +920,27 @@ class DMFAWorker(DMFANode):
             if not sum(int(s.nbr_hours) / 100 for s in occupation.services if int(s.code) in WAGE_SERVICE_CODES):
                 occupation.occupation_deductions = DMFAOccupationStructuralDeduction.init_multi([])
             else:
-                amount = L10n_BeDmfa._get_l10n_be_structural_deduction_3000(occupation.payslips, mu_global=mu_global)
-                occupation.occupation_deductions = DMFAOccupationStructuralDeduction.init_multi([(occupation.payslips, amount)])
+                amount = self.env['l10n_be.dmfa']._get_l10n_be_structural_deduction_3000(
+                    occupation.payslips, mu_global=mu_global, occupation=occupation)
+                # no deduction block without an amount
+                occupation.occupation_deductions = DMFAOccupationStructuralDeduction.init_multi(
+                    [(occupation.payslips, amount)] if float_round(amount, 2) > 0 else [])
 
         # Target-group deductions
         payslip = self.payslips[:1]
         if not payslip:
             return
         employee = payslip.employee_id
-        # Quarterly reference wage ss (same definition as the structural reduction).
-        ww_quarter = sum(
-            int(r.amount) / 100
-            for occupation in occupations
-            for r in occupation.remunerations
-            if int(r.code) in [1, 2, 4, 5, 12]
-        )
-        hh_quarter = sum(
-            int(s.nbr_hours) / 100
-            for occupation in occupations
-            for s in occupation.services
-            if int(s.code) in WAGE_SERVICE_CODES
-        )
-        uu = payslip.version_id._get_reference_calendar().full_time_required_hours
-        ss_quarter = round_eurocent(ww_quarter * round_eurocent(13.0 * uu / hh_quarter)) if hh_quarter else 0
-        aggregates = {'mu_global': mu_global, 'ss_quarter': ss_quarter, 'versions': self.payslips.mapped('version_id')}
         for reduction in payslip._l10n_be_target_group_reductions():
-            if hasattr(payslip, '_l10n_be_target_group_reduction_%s' % reduction):
-                for spec in getattr(payslip, '_l10n_be_target_group_reduction_%s' % reduction)(employee, self.quarter_start, aggregates):
-                    for occupation in occupations:
-                        occupation.occupation_deductions = (occupation.occupation_deductions or []) + DMFAOccupationTargetGroup.init_multi([(
-                            occupation.payslips,
-                            occupation.services, occupation.mean_working_hours,
-                            mu_global, spec['code'], spec['g'], spec.get('p_max'), spec.get('starting_date'),
-                        )])
+            for spec in payslip._l10n_be_target_group_specs(reduction, employee, self.quarter_start):
+                for occupation in occupations:
+                    if not payslip._l10n_be_target_group_occupation_qualifies(reduction, spec, occupation.target_group_values):
+                        continue
+                    occupation.occupation_deductions = (occupation.occupation_deductions or []) + DMFAOccupationTargetGroup.init_multi([(
+                        occupation.payslips, spec['code'],
+                        payslip._l10n_be_target_group_occupation_amount(spec, occupation.target_group_values, mu_global),
+                        spec.get('starting_date'),
+                    )])
 
 
 class DMFAActivationInformation(DMFANode):
@@ -856,7 +974,9 @@ class DMFAStudentContribution(DMFANode):
         rate = payslips[0]._get_onss_global_rates()['total_rate'] / 100
         self.student_contribution_amount = format_amount(round(basis * rate, 2), width=9)
         self.student_nbr_days = -1
-        self.student_hours_nbr = round(payslips._get_worked_days_line_values(['002.00'], ['number_of_hours'], True)['002.00']['sum']['number_of_hours'])
+        # Only the hours actually worked, in whole hours rounded up, while the remuneration is all the pay subject
+        # to the solidarity contribution
+        self.student_hours_nbr = payslips._l10n_be_get_student_worked_hours()
 
 
 class DMFAWorkerContribution(DMFANode):
@@ -876,13 +996,13 @@ class DMFAWorkerContribution(DMFANode):
             yearly_salary = payslips[0]._l10n_be_get_termination_yearly_salary()
             contribution_type = payslips[0]._get_termination_fees_contribution_type(yearly_salary)
         elif worker_code == WORKER_SUBSISTENCE:
-            contribution_type = 2 if payslips[0].employee_id._get_age() < 25 else 0
+            contribution_type = payslips[0]._get_fse_flat_contribution_type()
         elif worker_code in (WORKER_PENSION, EMPLOYEE_PENSION):
             contribution_type, _ = payslips[0]._get_pension_fund_contribution_type()
-        elif worker_code == FFE_NON_COMMERCIAL:
-            contribution_type = '0' if payslips[0]._with_salary_moderation() else '2'
+        elif worker_code in (SPECIAL_FFE, FFE_NON_COMMERCIAL):
+            contribution_type = payslips[0]._get_ffe_without_headcount_contribution_type()
         elif worker_code in (WORKER_SUBSISTENCE_PERCENTAGE, EMPLOYEE_SUBSISTENCE_PERCENTAGE):
-            contribution_type = '0' if payslips[0].payroll_config_id.onss_importance_code in ['1', '2', '3', '4'] else '5'
+            contribution_type = payslips[0]._get_fse_percentage_contribution_type()
         elif worker_code == WORKER_RETIREMENT_FUND:
             contribution_type = payslips[0].payroll_config_id.l10n_be_worker_retirement_fund
         elif worker_code == EMPLOYEE_RETIREMENT_FUND:
@@ -899,18 +1019,21 @@ class DMFAWorkerContribution(DMFANode):
             basis = line_values['MOBILITY_PAYMENT']['sum']['total'] + line_values['MOBILITY_PAYMENT_PREV_YEAR']['sum']['total']
             basis *= payslips[0]._l10n_be_get_onss_basis_uplift()
         elif worker_code == TRAFFIC_FINES:
-            # The contribution is due on the traffic fines paid back by the employer
-            basis = -payslips._get_line_values(['TRAFFIC_FINES'], compute_sum=True)['TRAFFIC_FINES']['sum']['total']
+            # The basis of the payslips: the traffic fines the employer pays, the light ones above their exemption
+            basis = payslips._get_line_values(['ONSSEMPLOYER_889'], vals_list=['amount'], compute_sum=True)['ONSSEMPLOYER_889']['sum']['amount']
         elif worker_code == NON_RECURRENT_BENEFITS:
             # The bonus up to the ceiling, the part above being remuneration
             line_values = payslips._get_line_values(['BONUS_SALARY'])
             basis = round(sum(
-                min(line_values['BONUS_SALARY'][p.id]['total'], p._rule_parameter('cct90_employer_onss_threshold'))
+                min(line_values['BONUS_SALARY'][p.id]['total'], p._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold'))
                 for p in payslips), 2)
         elif worker_code == TERMINATION_FEES:
             line_values = payslips._get_line_values(['TERM_BASIC'], compute_sum=True)
             base_amount = line_values['TERM_BASIC']['sum']['total']
             basis = payslips[0]._get_termination_fees_contribution_basis(base_amount)
+        # The contribution is the declared calculation basis (to the cent, e.g. a worker's gross salary at 108%) at
+        # the rate of the contribution, as the ONSS computes it
+        basis = round_eurocent(basis)
         self.calculation_basis = format_amount(basis)
 
         rates = payslips[0]._get_onss_rates(worker_code, contribution_type)
@@ -953,9 +1076,9 @@ class DMFAWorkerContribution(DMFANode):
             self.calculation_basis = -1
         elif worker_code in (ACTIVATION, REDUCED_ACTIVATION):
             # With a quarterly minimum
-            self.amount = format_amount(max(activation_minimum, round(basis * rate / 100, 2)))
+            self.amount = format_amount(max(activation_minimum, round_eurocent(basis * rate / 100)))
         else:
-            self.amount = format_amount(round(basis * rate / 100, 2))
+            self.amount = format_amount(round_eurocent(basis * rate / 100))
         self.first_hiring_date = -1
         if worker_code == WORKER_SUBSISTENCE and contribution_type == 2:
             # Mandatory for the reduced flat rate of the young workers: the first hiring by the employer
@@ -984,6 +1107,7 @@ class DMFAOccupation(DMFANode):
         payslip_rates = payslip_rates or {}
         # The payslips whose remuneration is (partly) declared on this occupation
         self.remunerated_payslips = payslips.filtered(lambda p: payslip_rates.get(p.id, 1))
+        self.payslip_rates = payslip_rates
         self.line_amounts = line_amounts or {}
 
         contract = contracts.sorted(key='date_start', reverse=True)[0]
@@ -1033,33 +1157,126 @@ class DMFAOccupation(DMFANode):
         self.TenthOrTwelfth = -1
         self.ActivityCode = -1  # Facultative
         self.days_justification = -1 # YTI: Will be useful for payroll based on attendances
+        self.additional_days = 0
 
         if contract.l10n_be_time_credit and any(t.code == '122.04' for t in time_credit_type_ids):
-            days_per_week = 5.0
-            mean_working_hours = 38.0
+            # A partial resumption of work after an illness (reorganisation measure 5) declares the days a week and
+            # the hours a week of the reference worker (a full time), not 5 days of 38 hours
+            # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/hours_a_week.html
+            days_per_week = contract._get_reference_calendar().days_per_week or 5.0
+            mean_working_hours = hours_per_week
         else:
             # The days a week of the worker's schedule (4 hours a day for 5 days a week is 5 days), the days of a
             # time credit aren't working days
             days_per_week = calendar.days_per_week
             if not days_per_week and calendar.calendar_type != 'fixed':
-                reference_calendar = contract.reference_calendar_id or contract.company_id.resource_calendar_id
+                reference_calendar = contract._get_reference_calendar()
                 days_per_week = calendar._get_days_per_week_for_period(
                     quarter_start, quarter_end, reference_calendar.hours_per_day * 3 / 4)
             mean_working_hours = contract.resource_calendar_id.hours_per_week
 
+        # The average weekly hours derived from the services of the occupation (no contractual number of hours a week):
+        # a full time when they reach the ones of the reference worker
+        derived_hours = False
+        # A Horeca occasional worker (an extra) has an occupation line per day of work: as for any short occupation,
+        # its hours a week are the ones it would have worked over a longer occupation, its hours a day on each day of
+        # the reference worker's week (at most the reference hours), and its days a week the reference worker's ones
+        # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/hours_a_week.html
+        # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/days_a_week.html
+        self.is_horeca_occasional = contract.l10n_be_dimona_category == 'ext' and \
+            contract._l10n_be_get_employer_category_dmfa_code() == '317'
+        if self.is_horeca_occasional:
+            reference_days = contract._get_reference_calendar().days_per_week or 5
+            service_lines = self.worked_days.filtered(self.env['l10n_be.dmfa']._is_working_service)
+            worked_hours = sum(service_lines.mapped('number_of_hours'))
+            worked_days = sum(service_lines.mapped('number_of_days'))
+            if worked_days:
+                days_per_week = reference_days
+                mean_working_hours = min(float_round(worked_hours / worked_days * reference_days, 2), hours_per_week)
+                derived_hours = True
+                # The function number of the flat wage the contributions of its days are computed on: daily (94) for a
+                # day of 6 hours or more, by the hour (95) for a shorter one; none for the days beyond the worker's
+                # yearly contingent, paid and declared as ordinary ones
+                # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/sector_specific_characteristics/function_number.html
+                flat_days = set().union(*(
+                    p._l10n_be_get_horeca_occasional_flat_days()
+                    for p in self.remunerated_payslips if p._l10n_be_is_horeca_occasional()))
+                line_days = {self.date_start + relativedelta(days=n) for n in range(
+                    ((self.date_stop or quarter_end) - self.date_start).days + 1)}
+                if line_days & flat_days:
+                    self.position_code = 94 if float_round(worked_hours / worked_days, 2) >= 6 else 95
+
+        if not mean_working_hours and not contract.l10n_be_time_credit:
+            derived_hours = True
+            # Without a number of hours a week (a schedule of the hours worked only, e.g. a flexi-job), the average
+            # weekly hours and days of the services of the occupation line over its weeks: 72 hours on 9 days in the
+            # 30 days of April are 16.80 hours and 2.10 days a week
+            date_start = max(self.date_start, quarter_start)
+            date_stop = min(filter(None, [self.date_stop or quarter_end, contract.date_end]))
+            weeks = self.env['l10n_be.dmfa']._get_weeks(date_start, date_stop)
+            service_hours, service_days = self.env['l10n_be.dmfa']._l10n_be_get_flexible_hours_and_days(
+                self.worked_days)
+            if weeks >= 1:
+                mean_working_hours = float_round(service_hours / weeks, 2)
+                days_per_week = self.env['l10n_be.dmfa']._get_variable_days_per_week(service_days, weeks)
+            else:
+                # A line of less than a week: the hours of a longer occupation, its hours a day on each day a week of
+                # its schedule, and these days a week (40 hours on 5 days with a schedule of 6 days a week are 48
+                # hours a week; 4.5 hours on a day are 27 hours a week)
+                # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/hours_a_week.html
+                days_per_week = calendar.days_per_week or contract._get_reference_calendar().days_per_week or 5
+                mean_working_hours = float_round(
+                    service_hours / service_days * days_per_week, 2) if service_days else 0.0
+            # at most the hours of the reference worker (a full time)
+            mean_working_hours = min(mean_working_hours, hours_per_week)
         self.days_per_week = format_amount(days_per_week, width=3)
         self.mean_working_hours = ('%.2f' % mean_working_hours).replace('.', '').zfill(4)
 
         self.is_parttime = 1 if (not calendar.is_fulltime and not contract.l10n_be_time_credit) else 0
+        if derived_hours and mean_working_hours >= hours_per_week:
+            # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/contract_type.html
+            self.is_parttime = 0
+        self.derived_hours = derived_hours
 
         self.commission = contract.l10n_be_joint_committee_id.egov3_code
+        # A time credit (reduction of the working time, reorganisation measure 4) planned day by day too: the ONSS
+        # makes no exception; not a full suspension (3, no services) nor a partial resumption after an illness (5,
+        # the days a week of the reference worker)
+        self.is_variable_without_cycle = calendar.calendar_type == 'variable' \
+            and not any(calendar.attendance_ids.mapped('recurrency')) and not derived_hours \
+            and (not contract.l10n_be_time_credit or self.reorganisation_measure == 4)
+        if self.is_parttime:
+            self.additional_days = self._get_additional_days()
         self.services, self.skip_remun = self._prepare_services()
+        if self.is_variable_without_cycle:
+            # A variable schedule without cycle (days planned one by one, no recurring week), a flexi-job's too: its
+            # days a week are the days declared over the weeks of the quarter, so its occupation line starts again
+            # each quarter
+            # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/days_a_week.html
+            self.date_start = max(self.date_start, quarter_start)
+            if not self.date_stop or self.date_stop > quarter_end:
+                self.date_stop = quarter_end
+            weeks = self.env['l10n_be.dmfa']._get_weeks(self.date_start, self.date_stop)
+            if weeks >= 1:
+                # a line of less than a week (a short contract) keeps the days a week of its schedule: the days it
+                # would have worked over a longer occupation
+                # nor the days of additional hours only, which a part-time worker isn't supposed to work
+                declared_days = sum(
+                    int(service.nbr_days) for service in self.services if service.code != '080') / 100 - self.additional_days
+                self.days_per_week = format_amount(
+                    self.env['l10n_be.dmfa']._get_variable_days_per_week(declared_days, weeks), width=3)
+                # the days of the services balanced on the hours a day of these average days a week (same total)
+                self.services = self._prepare_services()[0]
         if not mean_working_hours and self.reorganisation_measure != 3 and not any(
                 wd.work_entry_type_id.count_as == 'working_time' and wd.number_of_hours > 0
                 for wd in self.worked_days):
             # 0 hours per week are only allowed for a complete career interruption (reorganisation
             # measure 3) or for a worker with no services to perform during the period
             self.days_justification = 7
+        elif self.additional_days:
+            # A part-time worker who works, beyond its contractual services, days it doesn't recover in the quarter
+            # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/dmfa_fillinrules/servicedatadeclaration/declarationmethod_workerservices.html
+            self.days_justification = 5
         if not self.skip_remun:
             self.remunerations = self._prepare_remunerations()
         else:
@@ -1077,11 +1294,103 @@ class DMFAOccupation(DMFANode):
         for wd in self.worked_days:
             # Don't declare out of contract + credit time
             if wd.work_entry_type_id.dmfa_code != '-1' and wd.work_entry_type_id.code not in ['000.00', '147.00', '147.05', '147.07', '147.04', '147.08', '147.13']:
-                services_by_dmfa_code[wd.work_entry_type_id.dmfa_code] |= wd
+                services_by_dmfa_code[self.env['l10n_be.dmfa']._get_service_code(wd, self.quarter_start)] |= wd
         skip_remun = all(dmfa_code in ['30', '50', '52'] for dmfa_code in services_by_dmfa_code.keys())
         # Do not skip remun if there is some remunerations not linked to worked days (PFA, etc)
         skip_remun = skip_remun and not any(p._get_total_basic_wage_without_double_holiday() and p.struct_id.code in ['BETERM', 'BEHOLN', 'BEHOLN1', 'BETHIRTEEN', 'BEWARRANT'] for p in self.remunerated_payslips)
-        return (DMFAService.init_multi([(wds,) for wds in services_by_dmfa_code.values()]), skip_remun)
+        # Nor on a quarter of absences or without any service (a full illness, a full career break) when a remuneration
+        # is paid (e.g. a bonus): its contributions are due
+        skip_remun = skip_remun and not any(
+            p.struct_id.code == 'BEMONTHLY' and self.env['l10n_be.dmfa']._has_remuneration(p)
+            for p in self.remunerated_payslips)
+        days_by_code = self._get_services_days(services_by_dmfa_code)
+        return (DMFAService.init_multi([
+            (wds, code, days_by_code.get(code)) for code, wds in services_by_dmfa_code.items()
+            if days_by_code.get(code) != 0]), skip_remun)
+
+    def _get_additional_days(self):
+        """ The days a part-time worker worked additional hours only on (e.g. a Saturday off its schedule), not
+        recovered: each of them is a day of the code 1 on top of the days of its schedule, whatever its hours. The
+        additional hours worked on a day of normal services add no day, the day being declared already.
+        https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/dmfa_fillinrules/servicedatadeclaration/declarationmethod_workerservices.html
+
+        :return: the number of these days in the occupation line
+        """
+        additional_types = self.env['hr.work.entry.type'].browse(
+            self.env['ir.model.data']._xmlid_to_res_id(xmlid, raise_if_not_found=False) for xmlid in ADDITIONAL_HOURS_TYPES
+        ).exists()
+        additional_lines = self.worked_days.filtered(
+            lambda wd: wd.work_entry_type_id in additional_types and wd.number_of_hours)
+        if not additional_lines:
+            return 0
+        quarter_end = self.quarter_start + relativedelta(months=3, days=-1)
+        date_from = max(self.date_start, self.quarter_start)
+        date_to = min(self.date_stop or quarter_end, quarter_end)
+        versions = self.worked_days.version_id
+        types_by_date = defaultdict(set)
+        for payslip in additional_lines.payslip_id:
+            period_from, period_to = max(date_from, payslip.date_from), min(date_to, payslip.date_to)
+            if period_from > period_to:
+                continue
+            for vals in versions.generate_work_entries(period_from, period_to):
+                if vals['version_id'] in versions and period_from <= vals['date'] <= period_to and vals['duration']:
+                    types_by_date[vals['date']].add(vals['work_entry_type_id'])
+        return sum(1 for types in types_by_date.values() if all(t in additional_types for t in types))
+
+    def _get_services_days(self, services_by_dmfa_code):
+        """ The days of each service code of the occupation line, balanced as the ONSS converts hours to days: a half
+        day is the hours a day of the occupation (its weekly hours over its days a week, the average ones for a
+        variable schedule without cycle; without hours a week, the hours of its services over their days) divided by
+        2. Each service code but the most frequent one gets its hours in half days, rounded half up (2.25 days are 2.5
+        days, 2.75 days 3 days); the most frequent code gets the other days of the line, so that the line keeps the
+        days of its services. A code of less than a quarter of a day gets no day and is left out, its time being in
+        the days of the other codes. The extra hours (e.g. the Horeca overtime without contributions, service code
+        080) are worked on days declared under other codes: neither balanced nor counted, except the days of a
+        part-time worker's additional hours only (see _get_additional_days), days of the code 1 of their own.
+        https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/dmfa_fillinrules/servicedatadeclaration/declarationmethod_workerservices.html
+
+        :param services_by_dmfa_code: {service code: worked days}
+        :return: {service code: days (0 for a code left out)}, the codes absent keeping the days of their worked days
+        """
+        def half_up(days):
+            return float_round(days * 2, 0, rounding_method='HALF-UP') / 2
+
+        day_lines = {
+            code: wds.filtered(lambda wd: not wd.work_entry_type_id.is_extra_hours)
+            for code, wds in services_by_dmfa_code.items() if code != '80'}
+        day_lines = {code: wds for code, wds in day_lines.items() if wds}
+        hours = {code: sum(wds.mapped('number_of_hours')) for code, wds in day_lines.items()}
+        days = {code: sum(wds.mapped('number_of_days')) for code, wds in day_lines.items()}
+        if self.derived_hours:
+            hours_a_day = sum(hours.values()) / sum(days.values()) if sum(days.values()) else 0
+        else:
+            days_per_week = int(self.days_per_week) / 100
+            hours_a_day = int(self.mean_working_hours) / 100 / days_per_week if days_per_week else 0
+        if len(days) < 2 or not hours_a_day:
+            return self._add_additional_days({}, days)
+        main_code = max(days, key=lambda code: (days[code], hours[code], -int(code)))
+        result = {
+            code: half_up(hours[code] / hours_a_day) if hours[code] else half_up(days[code])
+            for code in days if code != main_code}
+        main_days = half_up(sum(days.values())) - sum(result.values())
+        if main_days <= 0:
+            # more days in hours than days of services (e.g. long days): the days of each code
+            return self._add_additional_days({}, days)
+        result[main_code] = main_days
+        return self._add_additional_days(result, days)
+
+    def _add_additional_days(self, result, days):
+        """ The days of the services with the days of additional hours only added to the code 1
+
+        :param result: {service code: days} of the balanced services, empty when they keep the days of their worked days
+        :param days: {service code: days of the worked days}
+        """
+        if not self.additional_days:
+            return result
+        if '1' not in result:
+            result['1'] = float_round(days.get('1', 0) * 2, 0, rounding_method='HALF-UP') / 2
+        result['1'] += self.additional_days
+        return result
 
     def _prepare_remunerations(self):
         salary_rules = self.declaration_data['salary_rules']
@@ -1099,12 +1408,18 @@ class DMFAOccupation(DMFANode):
         # Exclude payslips without remuneration to avoid having a sum of 27€ (ATNs)
         # On a full sick quarter that actually has no presence
         regular_gross_lines = lines.filtered(lambda l: l.salary_rule_id == regular_gross)
-        regular_gross_lines_no_remun = regular_gross_lines.filtered(lambda l: not l.slip_id._get_total_basic_wage_without_double_holiday())
+        slips_no_remun = regular_gross_lines.slip_id.filtered(
+            lambda p: not self.env['l10n_be.dmfa']._has_remuneration(p))
+        regular_gross_lines_no_remun = regular_gross_lines.filtered(lambda l: l.slip_id in slips_no_remun)
         no_remun = regular_gross_lines == regular_gross_lines_no_remun
         has_working_days = any(
             line.work_entry_type_id.count_as == 'working_time' and line.number_of_hours > 0
             for line in self.payslips.worked_days_line_ids
         )
+        onss_base = self.env.ref('l10n_be_hr_payroll.ONSS_BASE')
+        # the payslips whose gross salary (code 1) is declared
+        slips_with_gross = lines.filtered(
+            lambda line: line.salary_rule_id == regular_gross and not no_remun and line.slip_id.struct_id.code == 'BEMONTHLY').slip_id
         for line in lines:
             if no_remun and line.salary_rule_id in (
                     regular_gross,
@@ -1117,8 +1432,8 @@ class DMFAOccupation(DMFANode):
                     rule_atn_corr_2,
             ):
                 continue
-            if line.salary_rule_id == flexi_bonus:
-                # Already in the gross salary
+            if line.salary_rule_id in (flexi_bonus, commission_gross):
+                # Already in the gross salary (the commissions are pay of the quarter's work: remuneration code 1)
                 continue
             code = int(line.salary_rule_id.l10n_be_remuneration_code)
             # The pay of a flexi-job (with its flexi holiday pay) is declared under the code 22
@@ -1136,20 +1451,35 @@ class DMFAOccupation(DMFANode):
                 else:
                     frequency = None
                 lines_by_code[code, frequency] |= line
+                if code in (2, 14) and onss_base in line.salary_rule_id.category_ids and line.slip_id in slips_with_gross:
+                    # A bonus paid on the monthly payslip (e.g. the commissions lost on paid holidays) or a positive
+                    # regularization of the simple holiday pay (code 14) is in its gross salary: declared under its own
+                    # code, it isn't remuneration of the code 1 as well
+                    amount = self.line_amounts.get(line.id, line.total)
+                    amount_to_deduct_by_code[gross_code, None] += amount
                 if line.slip_id.struct_id.code == 'BECCT90' and line.code == 'BONUS_SALARY':
                     # A CCT 90 bonus is only remuneration above the ceiling, as on the payslip
-                    amount_to_deduct = min(line.total, line.slip_id._rule_parameter('cct90_employer_onss_threshold'))
+                    amount_to_deduct = min(line.total, line.slip_id._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold'))
                     if line.id in self.line_amounts and line.total:
                         amount_to_deduct *= self.line_amounts[line.id] / line.total
                     amount_to_deduct_by_code[code, frequency] += amount_to_deduct
-                if line.salary_rule_id == commission_gross:
-                    lines_to_deduct_by_code[gross_code, None] += line
+        # The pay of the Horeca overtime without contributions (service code 080) has no salary rule, it is paid from
+        # its worked days: declared under the remuneration code 013
+        worked_days_amount_by_code = defaultdict(float)
+        worked_days_amount_by_code[13, None] = sum(
+            wd.amount for wd in self.worked_days if wd.work_entry_type_id.dmfa_code == '80')
+        if worked_days_amount_by_code[13, None]:
+            lines_by_code[13, None] |= lines.browse()
         # La valeur zéro pour la remuneration est autorisée uniquement pour le solde du budget
         # mobilité (code rémunération 029).
         return DMFARemuneration.init_multi(sorted([(
             lines, code, frequency, lines_to_deduct_by_code[code, frequency], amount_to_deduct_by_code[code, frequency], self.line_amounts,
+            worked_days_amount_by_code[code, frequency],
         ) for (code, frequency), lines in lines_by_code.items()
-            if round(sum(self.line_amounts.get(l.id, l.total) for l in lines) - amount_to_deduct_by_code[code, frequency], 2) or code == 29], key=lambda t: (t[1], t[2] or 0)))
+            if round(
+                sum(self.line_amounts.get(l.id, l.total) for l in lines)
+                + worked_days_amount_by_code[code, frequency] - amount_to_deduct_by_code[code, frequency], 2,
+            ) or code == 29], key=lambda t: (t[1], t[2] or 0)))
 
     def _prepare_occupation_informations(self):
         infos_to_declare = []
@@ -1162,11 +1492,21 @@ class DMFAOccupation(DMFANode):
             infos_to_declare.append('flexi_notion')
         if any(self.remunerated_payslips.version_id.mapped('l10n_be_is_starterjob')):
             infos_to_declare.append('career_measure')
-        if get_flemish_training_worked_days(self.worked_days):
+        if self.env['l10n_be.dmfa']._get_flemish_training_worked_days(self.worked_days):
             infos_to_declare.append('flemish_training_hours')
-        # Mandatory for a worker exempted from work during the whole quarter
-        if self.contract.l10n_be_work_exemption != '0':
-            infos_to_declare.append('service_exemption_notion')
+        # Mandatory for a worker exempted from work during the whole quarter, declared for every occupation as a
+        # social secretariat does (0 without exemption)
+        infos_to_declare.append('service_exemption_notion')
+        # The remuneration paid by the employer for an illness: the workers of the construction sector (CP 124, brick
+        # industry CP 114), and from 2020/2 to 2024/1 the workers and the employees of all the sectors
+        versions = self.remunerated_payslips.version_id
+        all_sectors = ILLNESS_REMUNERATION_ALL_SECTORS[0] <= self.quarter_start <= ILLNESS_REMUNERATION_ALL_SECTORS[1]
+        construction_workers = any(
+            version.is_worker() and version.l10n_be_joint_committee_id.egov3_code in ILLNESS_REMUNERATION_JOINT_COMMITTEES
+            for version in versions)
+        if (all_sectors or construction_workers) and round(
+                self.env['l10n_be.dmfa']._get_illness_remuneration(self.worked_days), 2) > 0:
+            infos_to_declare.append('illness_remuneration')
         return DMFAOccupationInformation.init_multi([(self.remunerated_payslips, infos_to_declare, self.quarter_start, self.worked_days)] if infos_to_declare else [])
 
 
@@ -1174,8 +1514,12 @@ class DMFARemuneration(DMFANode):
     """
     Represents the paid amounts on payslips
     """
-    def __init__(self, payslip_lines, code, frequency=None, lines_to_deduct=None, amount_to_deduct=0, line_amounts=None, sequence=1):
-        """ :param line_amounts: {line id: amount} for the lines split between several occupations """
+    def __init__(self, payslip_lines, code, frequency=None, lines_to_deduct=None, amount_to_deduct=0, line_amounts=None,
+                 worked_days_amount=0, sequence=1):
+        """
+        :param line_amounts: {line id: amount} for the lines split between several occupations
+        :param worked_days_amount: the amount paid from worked days without salary rule
+        """
         super().__init__(payslip_lines.env, sequence=sequence)
         line_amounts = line_amounts or {}
 
@@ -1194,7 +1538,7 @@ class DMFARemuneration(DMFANode):
         amount = sum(
             -total(line) if line.code in ("HolPayRec", "IP.EXEMPT") or (line.code == "HolPayReg" and line.total < 0) else total(line)
             for line in payslip_lines
-        )
+        ) + worked_days_amount
         self.amount = format_amount(amount)
         if lines_to_deduct:
             amount_to_deduct += sum(total(line) for line in lines_to_deduct)
@@ -1219,11 +1563,13 @@ class DMFAOccupationInformation(DMFANode):
         self.hour_remun = -1
         self.service_exemption_notion = -1
         if 'service_exemption_notion' in infos_to_declare:
-            self.service_exemption_notion = payslips.version_id.sorted('date_version')[-1].l10n_be_work_exemption
+            self.service_exemption_notion = payslips.version_id.sorted('date_version')[-1:].l10n_be_work_exemption or '0'
         self.hour_remun_thousandth = -1
         self.posted_employee = -1
         self.first_week_guaranteed_salary = -1
         self.illness_gross_remun = -1
+        if 'illness_remuneration' in infos_to_declare:
+            self.illness_gross_remun = format_amount(self.env['l10n_be.dmfa']._get_illness_remuneration(worked_days))
         self.psddcl_exemption = -1
         self.suppl_pension_exemption = -1
         self.obligation_control = -1
@@ -1255,7 +1601,8 @@ class DMFAOccupationInformation(DMFANode):
         self.flemish_training_hours = -1
         if 'flemish_training_hours' in infos_to_declare:
             # Mandatory when an absence is for a Flemish training leave, in hundredths of hours
-            flemish_training_hours = sum(get_flemish_training_worked_days(worked_days).mapped('number_of_hours'))
+            flemish_training_hours = sum(
+                self.env['l10n_be.dmfa']._get_flemish_training_worked_days(worked_days).mapped('number_of_hours'))
             self.flemish_training_hours = format_amount(flemish_training_hours, width=7)
         self.regional_aid_measure = -1
 
@@ -1264,21 +1611,25 @@ class DMFAService(DMFANode):
     """
     Represents the worked hours/days
     """
-    def __init__(self, worked_days, sequence=1):
+    def __init__(self, worked_days, dmfa_code, days=None, sequence=1):
+        """
+        :param dmfa_code: the service code of the worked days
+        :param days: the days of the service (default: the days of the worked days, rounded to half days)
+        """
         super().__init__(worked_days.env, sequence=sequence)
-        if len(list(set(worked_days.mapped('work_entry_type_id.dmfa_code')))) > 1:
-            raise ValueError("Cannot mix work of different types.")
-
         self.contract = worked_days.mapped('version_id').sorted(key='date_start', reverse=True)[0]
 
-        work_entry_type = worked_days[0].work_entry_type_id
-        if not work_entry_type.dmfa_code:
-            raise UserError(self.env._('The following work entry type does not have a DMFA code set: %s', work_entry_type.name))
-        self.code = work_entry_type.dmfa_code.zfill(3)
+        if not dmfa_code:
+            raise UserError(self.env._('The following work entry type does not have a DMFA code set: %s', worked_days[0].work_entry_type_id.name))
+        self.code = dmfa_code.zfill(3)
 
         total_hours = sum(worked_days.mapped('number_of_hours'))
         total_days = sum(worked_days.mapped('number_of_days'))
-        total_days = round(total_days * 2) / 2  # Round to half days
+        total_days = float_round(total_days * 2, 0, rounding_method='HALF-UP') / 2 if days is None else days  # half days
+        if self.code == '080' and not total_days and total_hours:
+            # The Horeca overtime without contributions is worked on days declared under other codes: its hours
+            # without a day of their own get the technical minimum of 0.01 day
+            total_days = 0.01
         self.nbr_days = format_amount(total_days, width=5)
 
         self.nbr_hours = format_amount(total_hours, width=5)
@@ -1319,33 +1670,21 @@ class DMFAOccupationStructuralDeduction(DMFANode):
 
 
 class DMFAOccupationTargetGroup(DMFANode):
-    """Target-group reduction.
+    """Target-group reduction of an occupation line.
 
-    Quarterly computation: Pg = G x mu x beta_g, optionally capped at p_max
-    per occupation line (e.g. the artists reduction).
-    Works for all Target Group Deduction , just pass the deduction code and the G code
+    The amount, Pg = G x mu x beta_g optionally capped at p_max per occupation
+    line (e.g. the artists reduction), is computed by
+    hr.payslip._l10n_be_target_group_occupation_amount, shared with the payslips.
+    Works for all Target Group Deduction, just pass the deduction code and the amount.
     """
-    def __init__(self, payslips, services,
-                 hours_per_week, mu_global, code, G, p_max=None, starting_date=None, sequence=1):
+    def __init__(self, payslips, code, amount, starting_date=None, sequence=1):
         super().__init__(payslips.env, sequence=sequence)
         if not payslips:
             return
         self.employee = payslips[:1].employee_id
         self.deduction_code = code
         self.deduction_calculation_basis = -1
-        version = payslips[:1].version_id
-        mu = L10n_BeDmfa._get_l10n_be_mu(version, services=services)
-
-        uu_hours = version._get_reference_calendar().full_time_required_hours if version else 0
-        at_least_half_time = int(hours_per_week) / 100 >= (uu_hours / 2.0)
-        # No minimum for the reductions of the artists (4300) and of the subsidised contract employees (ACS)
-        at_least_half_time = at_least_half_time or code in (4000, 4001, 4300)
-        beta_g = payslips[:1]._l10n_be_reduction_beta_g(mu_global, at_least_half_time)
-
-        p = round_eurocent(G * mu * beta_g)
-        if p_max is not None:
-            p = min(p, p_max)
-        self.deduction_amount = format_amount(p)
+        self.deduction_amount = format_amount(amount)
         self.deduction_right_starting_date = starting_date if starting_date is not None else -1
         self.management_cost_nbr_months = -1
         self.replaced_inss = -1
@@ -1458,6 +1797,84 @@ class L10n_BeDmfa(models.Model):
     _description = 'DMFA'
     _order = "year desc, quarter desc"
 
+    @api.model
+    def _get_flemish_training_worked_days(self, worked_days):
+        flemish_training_types = (
+            self.env.ref('hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off', raise_if_not_found=False),
+            self.env.ref('hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off_with_meal_voucher', raise_if_not_found=False),
+        )
+        return worked_days.filtered(lambda wd: wd.work_entry_type_id in flemish_training_types)
+
+    @api.model
+    def _get_service_code(self, worked_days, quarter_start):
+        """ The DmfA service code of a worked days line in the quarter starting on `quarter_start`: the one of its work
+        entry type (_get_l10n_be_dmfa_code), but 3 for the extra-legal holidays of a blue collar (complementary holidays
+        paid by the employer, subject to the contributions, neither the holidays of the code 2 nor the compensatory rest
+        of the code 12)
+        https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/dmfa_fillinrules/servicedatadeclaration/workingtimecodification.html
+        """
+        work_entry_type = worked_days.work_entry_type_id
+        # _xmlid_to_res_id is cached: env.ref() would run an exists() query for each line
+        extra_legal_id = self.env['ir.model.data']._xmlid_to_res_id(
+            'hr_work_entry.l10n_be_work_entry_type_extra_legal', raise_if_not_found=False)
+        if work_entry_type.id == extra_legal_id and worked_days.version_id and worked_days.version_id.is_worker():
+            return '3'
+        return work_entry_type._get_l10n_be_dmfa_code(quarter_start)
+
+    @api.model
+    def _is_working_service(self, worked_days):
+        """ Whether the worked days are worked time of a service of the remuneration (S = W x 13 x U / H), no extra hours """
+        dmfa_code = worked_days.work_entry_type_id.dmfa_code
+        return bool(dmfa_code and dmfa_code.isdigit() and int(dmfa_code) in WAGE_SERVICE_CODES
+                    and not worked_days.work_entry_type_id.is_extra_hours)
+
+    @api.model
+    def _get_weeks(self, date_from, date_to):
+        """ The weeks between two dates (both included), to 4 decimals as a social secretariat counts them: the 30 days
+        of April are 4.2857 weeks """
+        return float_round(((date_to - date_from).days + 1) / 7, 4) if date_to >= date_from else 0
+
+    @api.model
+    def _get_variable_days_per_week(self, days, weeks):
+        """ The average days a week of a variable schedule: the days declared over the weeks of its occupation line, a
+        whole number of days when close to it (at most 7) """
+        days_per_week = float_round(days / weeks, 2)
+        if days_per_week > 6.92:
+            return 7.0
+        return next((float(whole) for lowest, highest, whole in VARIABLE_DAYS_PER_WEEK_TOLERANCES
+                     if lowest <= days_per_week <= highest), days_per_week)
+
+    @api.model
+    def _has_remuneration(self, payslip):
+        """ Whether the payslip pays a remuneration: a basic wage, or another remuneration subject to the contributions
+        paid without it (e.g. a bonus during a full career break), not only benefits in kind """
+        if payslip._get_total_basic_wage_without_double_holiday():
+            return True
+        # the benefits in kind subject to the contributions are in the gross salary
+        bik_categories = self.env.ref('l10n_be_hr_payroll.BIK') | self.env.ref('l10n_be_hr_payroll.ONSS_BASE')
+        salary_codes = payslip._get_salary_wage_line_codes() - {'DH_SALARY'}
+        salary = sum(line.total for line in payslip.line_ids if line.code in salary_codes)
+        benefits_in_kind = sum(
+            line.total for line in payslip.line_ids if bik_categories <= line.salary_rule_id.category_ids)
+        return round(salary - benefits_in_kind, 2) > 0
+
+    @api.model
+    def _get_illness_remuneration(self, worked_days):
+        """ The gross remuneration paid by the employer for an illness or a common law accident (zone 01011): the
+        guaranteed salary and the complements (CCT 12bis/13bis), subject or not to the ONSS contributions. Neither the
+        guaranteed daily salary of an interrupted day (017.42) nor the work accidents.
+        Source: DmfA glossary, zone 01011 IllnessGrossRemunAmount, and
+        https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/fill_in_dmfa/occupationrecord/nssoinformation/hourremuneration_construction.html
+        """
+        illness_types = [self.env.ref(f'hr_work_entry.{xmlid}', raise_if_not_found=False) for xmlid in (
+            'be_work_entry_type_sick_leave',  # 013.00 guaranteed monthly wage
+            'l10n_be_work_entry_type_work_incapacity_first_week',  # 010.00 guaranteed weekly wage
+            'l10n_be_work_entry_type_work_incapacity_worker_second_week',  # 082.00 workers, 8th to 14th day
+            'l10n_be_work_entry_type_work_incapacity_worker_second_week_short_term_employee',  # 072.01
+            'l10n_be_work_entry_type_work_incapacity_worker_after_second_week',  # 072.00 complement, 15th to 30th day
+        )]
+        return sum(worked_days.filtered(lambda wd: wd.is_paid and wd.work_entry_type_id in illness_types).mapped('amount'))
+
     @classmethod
     def _l10n_be_is_declared_in_days(cls, versions, payslips=None):
         """Whether the occupation's working time is declared in days only, so that its reductions count days
@@ -1512,15 +1929,23 @@ class L10n_BeDmfa(models.Model):
         return float_round(xx / (13 * dd), 2, rounding_method="HALF-UP") if dd else 0.0
 
     @classmethod
-    def _get_l10n_be_structural_deduction_3000(cls, payslips, mu_global, result_rules=None):
+    def _l10n_be_reference_wage(cls, ww, hh, uu):
+        """Quarterly reference wage S = W x (13 x U / H), computed per occupation
+        line: W the remuneration declared under the remuneration codes 1, 2, 4, 5
+        and 12, H the hours declared under the prestation codes 1, 3, 4, 5, 20 and 38
+        and U the weekly regime of the reference worker. Shared by the
+        declaration and the payslips.
+        https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/deductions/structuralreduction_targetgroupreductions/introduction.html
+        """
+        return round_eurocent(ww * round_eurocent(13.0 * uu / hh)) if hh else 0.0
+
+    @classmethod
+    def _get_l10n_be_payslips_wage_and_hours(cls, payslips, result_rules=None):
+        """(W, H) of the reference wage S of the payslips, see _l10n_be_reference_wage.
+        The amounts of the payslip being computed (current_payslip_id in the
+        context) are taken from the rules already computed, result_rules, rather
+        than from its lines, which are stale when it is recomputed."""
         payslips = payslips.filtered(lambda p: p.struct_id.code != 'BETERM')
-
-        if not payslips:
-            return 0.0
-
-        # U is read as _get_l10n_be_mu reads it: the versions of one occupation can have several reference calendars
-        # (e.g. two full-time schedules on other weekdays, each its own reference)
-        uu = payslips[:1].version_id._get_reference_calendar().full_time_required_hours
 
         def _remun_code_and_amount(code, total, rule):
             if code == 'HolPayRec':
@@ -1538,6 +1963,15 @@ class L10n_BeDmfa(models.Model):
         line_data = [_remun_code_and_amount(line.code, line.total, line.salary_rule_id) for line in other_slips.line_ids]
         commission_rule = "COMMISSION"
         commission_deduction = sum(line.total for line in other_slips.line_ids if line.salary_rule_id.code == commission_rule)
+        # a bonus of the monthly payslip (code 2) is also in its gross salary (code 1): counted once
+        onss_base = payslips.env.ref('l10n_be_hr_payroll.ONSS_BASE')
+
+        def is_bonus_in_gross(rule):
+            return int(rule.l10n_be_remuneration_code or 0) == 2 and onss_base in rule.category_ids
+
+        commission_deduction += sum(
+            line.total for line in other_slips.line_ids
+            if line.slip_id.struct_id.code == 'BEMONTHLY' and is_bonus_in_gross(line.salary_rule_id))
 
         if computing_payslip:
             result_rules = result_rules or {}
@@ -1555,6 +1989,11 @@ class L10n_BeDmfa(models.Model):
             entry = result_rules.get(commission_rule)
             if entry is not None:
                 commission_deduction += entry['total'] if isinstance(entry, dict) else entry
+            if computing_payslip.struct_id.code == 'BEMONTHLY':
+                for rule in remun_rules.filtered(is_bonus_in_gross):
+                    entry = result_rules.get(rule.code)
+                    if entry is not None:
+                        commission_deduction += entry['total'] if isinstance(entry, dict) else entry
 
         ww = float_round(
             sum(amt for code, amt in line_data if code in {1, 2, 4, 5, 12}) - commission_deduction,
@@ -1565,32 +2004,103 @@ class L10n_BeDmfa(models.Model):
             wd.number_of_hours for wd in payslips.worked_days_line_ids
             if wd.work_entry_type_id.dmfa_code and int(wd.work_entry_type_id.dmfa_code) in WAGE_SERVICE_CODES
         ), 2)
+        return ww, hh
 
+    @classmethod
+    def _get_l10n_be_reference_wage(cls, version, occupation=None, payslips=None, result_rules=None):
+        """Reference wage S of one occupation line, shared by the declaration and
+        the payslips as μ is (see _get_l10n_be_mu): from the remunerations and
+        services the occupation line declares, or from the payslips of the line
+        (see _get_l10n_be_payslips_wage_and_hours)."""
+        if not occupation and not payslips:
+            return 0.0
+        if occupation:
+            ww = sum(int(r.amount) / 100 for r in occupation.remunerations if int(r.code) in [1, 2, 4, 5, 12])
+            hh = sum(int(s.nbr_hours) / 100 for s in occupation.services if int(s.code) in WAGE_SERVICE_CODES)
+        else:  # working with payslips of one occupation line
+            ww, hh = cls._get_l10n_be_payslips_wage_and_hours(payslips, result_rules)
+        uu = version._get_reference_calendar().full_time_required_hours if version else 0
+        return cls._l10n_be_reference_wage(ww, hh, uu)
+
+    @api.model
+    def _l10n_be_get_flexible_weekly_hours_and_days(self, worked_days, date_from, date_to):
+        """The average weekly hours and days of the paid services of an occupation without a number of hours a week,
+        over the weeks between two dates (both included)."""
+        weeks = ((date_to - date_from).days + 1) / 7 if date_from and date_to and date_to >= date_from else 0
+        if not weeks:
+            return 0.0, 0.0
+        hours, days = self._l10n_be_get_flexible_hours_and_days(worked_days)
+        return float_round(hours / weeks, 2), float_round(days / weeks, 2)
+
+    @api.model
+    def _l10n_be_get_flexible_hours_and_days(self, worked_days):
+        """The hours and days of the paid services (no extra hours) of the worked days."""
+        service_lines = worked_days.filtered(self._is_working_service)
+        return sum(service_lines.mapped('number_of_hours')), sum(service_lines.mapped('number_of_days'))
+
+    @classmethod
+    def _get_l10n_be_structural_deduction_3000(cls, payslips, mu_global, result_rules=None, occupation=None):
+        """:param occupation: the DmfA occupation line of the payslips: when they are split between several occupation
+            lines (a change in the middle of a month), the reduction of this line only, on its share of the
+            remuneration and its own worked days (each line has its own reduction, never the whole payslip's)"""
+        payslips = payslips.filtered(lambda p: p.struct_id.code != 'BETERM')
+
+        if not payslips:
+            return 0.0
+
+        # U is read as _get_l10n_be_mu reads it: the versions of one occupation can have several reference calendars
+        # (e.g. two full-time schedules on other weekdays, each its own reference)
+        split = bool(occupation and occupation.line_amounts)
+        line_version = occupation.contract if split else payslips[:1].version_id
+        uu = line_version._get_reference_calendar().full_time_required_hours
+
+        worked_days = payslips.worked_days_line_ids
+        if split:
+            worked_days = occupation.worked_days.filtered(lambda wd: wd.payslip_id in payslips)
+            ww = float_round(sum(
+                cls._get_l10n_be_payslips_wage_and_hours(payslip, result_rules)[0] * occupation.payslip_rates.get(payslip.id, 1)
+                for payslip in payslips), 2)
+            hh = float_round(sum(
+                wd.number_of_hours for wd in worked_days
+                if wd.work_entry_type_id.dmfa_code and int(wd.work_entry_type_id.dmfa_code) in WAGE_SERVICE_CODES
+            ), 2)
+        else:
+            ww, hh = cls._get_l10n_be_payslips_wage_and_hours(payslips, result_rules)
         if not hh:
             return 0.0
 
-        ss = float_round(ww * float_round(13.0 * uu / hh, 2), 2)
+        quarter_start = date_utils.get_quarter(payslips[0].date_to)[0]
+        RuleParam = payslips.env['hr.rule.parameter'].sudo()
+        # The wage W of the 4th quarter of a worker whose year-end bonus is paid by a third party (a fund) is increased
+        if quarter_start.month == 10 and payslips[:1].version_id._l10n_be_has_year_end_bonus_paid_by_fund(quarter_start):
+            ww = float_round(ww * RuleParam._get_parameter_from_code(
+                'l10n_be_structural_reduction_fund_year_end_bonus_uplift', date=quarter_start), 2)
+
+        ss = cls._l10n_be_reference_wage(ww, hh, uu)
         zz = float_round(sum(
-            wd.number_of_hours for wd in payslips.worked_days_line_ids
+            wd.number_of_hours for wd in worked_days
             if wd.work_entry_type_id.dmfa_code and int(wd.work_entry_type_id.dmfa_code) in MU_SERVICE_CODES
         ), 2)
         mu = float_round(zz / (13 * uu), 2) if uu else 0.0
-        version = payslips[:1].version_id
-        if cls._l10n_be_is_declared_in_days(payslips.worked_days_line_ids.version_id | version, payslips):
+        version = line_version
+        if cls._l10n_be_is_declared_in_days(worked_days.version_id | version, payslips):
             # a full-time occupation is declared in days only: S = W x 13 x D / J, μ = X / (13 x D), whatever the hours
             # of its days (a 40-hour week, a shorter day, overtime hours)
             dd = version._l10n_be_get_days_per_week()
             # extra hours are no days of their own: worked on a day already counted
-            day_lines = payslips.worked_days_line_ids.filtered(
+            day_lines = worked_days.filtered(
                 lambda wd: wd.work_entry_type_id.dmfa_code and not wd.work_entry_type_id.is_extra_hours)
             jj = sum(wd.number_of_days for wd in day_lines if int(wd.work_entry_type_id.dmfa_code) in WAGE_SERVICE_CODES)
             xx = sum(wd.number_of_days for wd in day_lines if int(wd.work_entry_type_id.dmfa_code) in MU_SERVICE_CODES)
+            services = [s for s in (occupation.services if occupation else []) if s.sequence != 99]
+            if services:
+                # in the DmfA, the days its services declare (balanced in half days), as μ of the occupation reads them
+                jj = sum(int(s.nbr_days) / 100 for s in services if int(s.code) in WAGE_SERVICE_CODES)
+                xx = sum(int(s.nbr_days) / 100 for s in services if int(s.code) in MU_SERVICE_CODES)
             if jj and dd:
                 ss = float_round(ww * float_round(13.0 * dd / jj, 2), 2)
                 mu = float_round(xx / (13 * dd), 2)
 
-        quarter_start = date_utils.get_quarter(payslips[0].date_to)[0]
-        RuleParam = payslips.env['hr.rule.parameter'].sudo()
         alpha = RuleParam._get_parameter_from_code('cp200_occupation_deduction_3000_alpha', date=quarter_start, raise_if_not_found=False)
         s0 = RuleParam._get_parameter_from_code('cp200_occupation_deduction_3000_s0', date=quarter_start, raise_if_not_found=False)
         gamma = RuleParam._get_parameter_from_code('cp200_occupation_deduction_3000_gamma', date=quarter_start, raise_if_not_found=False)
@@ -1599,15 +2109,23 @@ class L10n_BeDmfa(models.Model):
         if not all(param is not None for param in [alpha, s0, gamma, s2]):
             return 0.0
 
-        rr = (
-            float_round(alpha * max(s0 - ss, 0), 2) +
-            float_round(gamma * max(s2 - ss, 0), 2)
-        )
+        # the reduction truncated to the cent as a whole, not each of its parts (a social secretariat's DmfA)
+        rr = float_round(alpha * max(s0 - ss, 0) + gamma * max(s2 - ss, 0), 2, rounding_method='DOWN')
 
         # No reduction below 27.5% of a full time, except for a worker at least half-time (average weekly hours of the
         # worker at least half the ones of the reference worker)
-        version = payslips[:1].version_id
-        at_least_half_time = (version.resource_calendar_id.hours_per_week or 0.0) >= uu / 2
+        version = line_version
+        hours_per_week = version.resource_calendar_id.hours_per_week or 0.0
+        if occupation and occupation.derived_hours:
+            # the average weekly hours the occupation line declares (e.g. a Horeca occasional worker's day)
+            hours_per_week = int(occupation.mean_working_hours) / 100
+        elif not hours_per_week and not version.l10n_be_time_credit:
+            # without a number of hours a week: the average weekly hours of the services of its payslips
+            date_from = max(filter(None, [min(payslips.mapped('date_from')), version.contract_date_start]))
+            date_to = min(filter(None, [max(payslips.mapped('date_to')), version.contract_date_end]))
+            hours_per_week = payslips.env['l10n_be.dmfa']._l10n_be_get_flexible_weekly_hours_and_days(
+                worked_days, date_from, date_to)[0]
+        at_least_half_time = hours_per_week >= uu / 2
         # The artists and the subsidised contract employees (ACS) have no minimum
         if mu_global < 0.275 and not at_least_half_time and not version._l10n_be_has_no_minimum_occupation():
             beta = 0.0
@@ -1807,7 +2325,7 @@ class L10n_BeDmfa(models.Model):
         action = self.env["ir.actions.act_window"]._for_xml_id("l10n_be_hr_payroll.hr_payslip_report_action_dmfa")
         action['context'] = {
             **literal_eval(action['context']),
-            'onss_certificate_id': bool(self.env.company.onss_certificate_id),
+            'onss_certificate_id': bool(self.env.company.root_id.onss_certificate_id),
         }
         return action
 
@@ -1851,11 +2369,12 @@ class L10n_BeDmfa(models.Model):
             month = int(dmfa.quarter) * 3
             dmfa.quarter_start, dmfa.quarter_end = date_utils.get_quarter(date(year, month, 1))
 
-    @api.depends('quarter_end')
+    @api.depends('quarter_end', 'branch_ids')
     def _compute_vehicle_ids(self):
         for dmfa in self:
+            # The cars of the branches are declared by their company
             vehicles_assignment = self.env['fleet.vehicle.assignation.log'].sudo().search([
-                ('vehicle_id.company_id', '=', dmfa.company_id.id),
+                ('vehicle_id.company_id', 'in', dmfa.branch_ids.ids),
                 ('vehicle_id.license_plate', '!=', False),
                 ('date_start', '<=', dmfa.quarter_end),
                 '|', ('date_end', '>=', dmfa.quarter_start), ('date_end', '=', False),
@@ -2195,13 +2714,31 @@ class L10n_BeDmfa(models.Model):
             },
         }
 
-    def _get_rendering_data(self):
+    def _get_rendering_data(self, *, preview=False, preview_company=None):
+        """ :param preview: only the employees the user can access, of ``preview_company`` (one company of the
+            declaration, all of them if not set), are rendered, and nothing is kept of the computation
+        """
         self.ensure_one()
         if self.declaration_type == 'consultation':
             return self._get_consultation_rendering_data()
         if self.declaration_type == 'modification' and self.declaration_method == 'batch':
             return self._get_modification_rendering_data()
+        if not preview:
+            return self._get_declaration_rendering_data()
+        # The computation of the declaration updates the states of the natural persons and the reduction lines
+        with closing(self.env.cr.savepoint()):
+            return self._get_declaration_rendering_data(preview=True, preview_company=preview_company)
+
+    def _get_declaration_rendering_data(self, preview=False, preview_company=None):
         payslips = self.payslip_ids
+        preview_companies = None
+        if preview:
+            # The company may come from the URL of the report
+            preview_companies = (preview_company & self.branch_ids) or self.branch_ids
+            accessible_employees = self.env['hr.employee'].sudo(False).with_context(active_test=False).search(
+                [('id', 'in', payslips.employee_id.ids)])
+            payslips = payslips.filtered(
+                lambda p: p.company_id in preview_companies and p.employee_id in accessible_employees)
 
         if self.has_blocking_issues:
             raise UserError(self.env._("Fix the validation errors before creating the report."))
@@ -2259,9 +2796,13 @@ class L10n_BeDmfa(models.Model):
             'holiday_starting_date': -1,
             'natural_persons': DMFANaturalPerson.init_multi(natural_person_args),
             'pretty_format': lambda a: str(round(int(a) / 100.0, 2)),
-            'vehicles': DMFACompanyVehicle.init_multi([(vehicle, eco_vehicles) for vehicle in self.vehicle_ids]),
+            'vehicles': DMFACompanyVehicle.init_multi([
+                (vehicle, eco_vehicles) for vehicle in self.vehicle_ids
+                if preview_companies is None or vehicle.company_id in preview_companies
+            ]),
             'schema_year_quarter': current_year_quarter,
-            'company_contributions': self._prepare_company_contributions(payslips)
+            'company_contributions': self._prepare_company_contributions(payslips, preview_companies),
+            'preview_company': preview_company,
         }
         self._check_occupation_dates(result['natural_persons'])
         self._check_occupations_without_hours(result['natural_persons'])
@@ -2351,7 +2892,7 @@ class L10n_BeDmfa(models.Model):
         employees_to_consult = self.env.context.get('employees_to_report')
         if not employees_to_consult:
             employees_to_consult = self.env['hr.employee'].search([
-                ('company_id', '=', self.company_id.id),
+                ('company_id', 'in', self.branch_ids.ids),
                 ('active', '=', True)])
 
         employees = employees_to_consult
@@ -2405,7 +2946,7 @@ class L10n_BeDmfa(models.Model):
         employees_to_modify = self.env.context.get('employees_to_report')
         if not employees_to_modify:
             employees_to_modify = self.env['hr.employee'].search([
-                ('company_id', '=', self.company_id.id),
+                ('company_id', 'in', self.branch_ids.ids),
                 ('active', '=', True)])
 
         valid_states = self.env['l10n_be.dmfa.natural_person.state'].search([
@@ -2424,7 +2965,7 @@ class L10n_BeDmfa(models.Model):
             ('date_to', '>=', self.quarter_start),
             ('date_to', '<=', self.quarter_end),
             ('state', 'in', ['validated', 'paid']),
-            ('company_id', '=', self.company_id.id),
+            ('company_id', 'in', self.branch_ids.ids),
         ])
         warrant_structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant')
         # Exclude CIP contracts from DmfA, as they only have a DIMONA
@@ -2527,7 +3068,7 @@ class L10n_BeDmfa(models.Model):
         self.payslip_ids.l10n_be_dmfa_id = self.id
         return res
 
-    def _prepare_company_contributions(self, payslips):
+    def _prepare_company_contributions(self, payslips, preview_companies=None):
         contributions_values = []
 
         # Cotisation due sur les participations aux bénéfices
@@ -2550,7 +3091,7 @@ class L10n_BeDmfa(models.Model):
         # cotisation doit être mentionné dans les cotisations dues pour l'ensemble de l'entreprise,
         # les numéros de plaques des véhicules concernés introduits dans l'écran prévu et
         # l'avantage déclaré avec les rémunérations du travailleur.
-        vehicle_onss = self._get_vehicles_contribution()
+        vehicle_onss = self._get_vehicles_contribution(preview_companies)
         if vehicle_onss != 0:
             contributions_values.append((payslips, '862', self.env._('Company Cars Global Contributions'), vehicle_onss))
 
@@ -2576,7 +3117,7 @@ class L10n_BeDmfa(models.Model):
         # Lorsque la DMFA est introduite via le web, la base de calcul de cette cotisation doit être
         # mentionnée dans les cotisations dues pour l’ensemble de l’entreprise et la cotisation est
         # calculée automatiquement.
-        group_basis, group_onss = self._get_group_insurance_contribution()
+        group_basis, group_onss = self._get_group_insurance_contribution(preview_companies)
         if group_onss != 0:
             contributions_values.append((payslips, '865', self.env._('Group Insurance Global Contributions'), group_onss, group_basis))
 
@@ -2609,12 +3150,13 @@ class L10n_BeDmfa(models.Model):
         for natural_person in employees_infos:
             for worker_record in natural_person.worker_records:
                 worker_code = worker_record.worker_code
+                employer_class = worker_record.employer_class
 
                 # Employee contributions
                 for contribution in worker_record.contributions:
                     amount = int(contribution.amount) / 100.0
                     total += amount
-                    key = (contribution.worker_code, contribution.contribution_type)
+                    key = (employer_class, contribution.worker_code, contribution.contribution_type)
                     contributions[key][0] += _format_basis(contribution.calculation_basis)
                     contributions[key][1] += amount
 
@@ -2622,7 +3164,7 @@ class L10n_BeDmfa(models.Model):
                 for contribution in worker_record.student_contributions:
                     amount = int(contribution.student_contribution_amount) / 100.0
                     total += amount
-                    key = (worker_code, -1)
+                    key = (employer_class, worker_code, -1)
                     contributions[key][0] += _format_basis(contribution.student_remun_amount)
                     contributions[key][1] += amount
 
@@ -2630,7 +3172,7 @@ class L10n_BeDmfa(models.Model):
                 for deduction in worker_record.deductions:
                     amount = int(deduction.amount) / 100.0
                     total -= amount
-                    key = (worker_code, deduction.code)
+                    key = (employer_class, worker_code, deduction.code)
                     deductions[key][0] += _format_basis(deduction.deduction_calculation_basis)
                     deductions[key][1] += amount
 
@@ -2639,7 +3181,7 @@ class L10n_BeDmfa(models.Model):
                     for occupation_deduction in occupation.occupation_deductions:
                         amount = int(occupation_deduction.deduction_amount) / 100.0
                         total -= amount
-                        key = (worker_code, occupation_deduction.deduction_code)
+                        key = (employer_class, worker_code, occupation_deduction.deduction_code)
                         deductions[key][0] += _format_basis(occupation_deduction.deduction_calculation_basis)
                         deductions[key][1] += amount
 
@@ -2649,21 +3191,23 @@ class L10n_BeDmfa(models.Model):
 
         contributions_summary = [
             {
+                'employer_class': employer_class,
                 'code': code,
                 'contribution_type': contribution_type,
                 'basis': round(basis, 2),
                 'amount': round(amount, 2),
             }
-            for (code, contribution_type), (basis, amount) in contributions.items()
+            for (employer_class, code, contribution_type), (basis, amount) in contributions.items()
             ]
         deductions_summary = [
             {
+                'employer_class': employer_class,
                 'worker_code': worker_code,
                 'code': code,
                 'basis': round(basis, 2),
                 'amount': round(amount, 2),
             }
-            for (worker_code, code), (basis, amount) in deductions.items()
+            for (employer_class, worker_code, code), (basis, amount) in deductions.items()
         ]
 
         return {
@@ -2672,15 +3216,25 @@ class L10n_BeDmfa(models.Model):
             'worker_deductions': deductions_summary,
         }
 
-    def _get_vehicles_contribution(self):
-        self.ensure_one()
-        payslips_sudo = self.env['hr.payslip'].sudo().search([
+    def _get_company_contribution_payslips(self, preview_companies=None):
+        """ The monthly payslips of the quarter, the contributions on which are declared for the whole company.
+
+        :param preview_companies: only the payslips of these companies, of the employees the user can access
+        """
+        domain = [
             ('date_to', '>=', self.quarter_start),
             ('date_to', '<=', self.quarter_end),
             ('state', 'in', ['validated', 'paid']),
             ('struct_id', '=', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id),
-            ('company_id', 'child_of', self.branch_ids.ids),
-        ])
+            ('company_id', 'in', (preview_companies or self.branch_ids).ids),
+        ]
+        if preview_companies is not None:
+            domain.append(('employee_id', 'in', self.env['hr.employee'].sudo(False).with_context(active_test=False)._search([])))
+        return self.env['hr.payslip'].sudo().search(domain)
+
+    def _get_vehicles_contribution(self, preview_companies=None):
+        self.ensure_one()
+        payslips_sudo = self._get_company_contribution_payslips(preview_companies)
 
         # CO2 fees that already declared & paid on employee monthly payslips
         payslip_co2_fees = payslips_sudo._get_line_values(['CO2FEE'], compute_sum=True)['CO2FEE']['sum']['total']
@@ -2696,7 +3250,7 @@ class L10n_BeDmfa(models.Model):
             covered_vehicle_ids = payslip_vehicles_by_month.get(current_month, set())
 
             pool_vehicles_assignment = self.env['fleet.vehicle.assignation.log'].sudo().search([
-                ('vehicle_id.company_id', '=', self.company_id.id),
+                ('vehicle_id.company_id', 'in', (preview_companies or self.branch_ids).ids),
                 ('vehicle_id.license_plate', '!=', False),
                 ('vehicle_id.id', 'not in', list(covered_vehicle_ids)),
                 ('date_start', '<=', current_month + relativedelta(months=1, days=-1)),
@@ -2738,15 +3292,8 @@ class L10n_BeDmfa(models.Model):
         onss_amount = round(basis * 0.1307, 2)
         return (round(basis, 2), onss_amount)
 
-    def _get_group_insurance_contribution(self):
-        regular_payslip = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
-        payslips_sudo = self.env['hr.payslip'].sudo().search([
-            ('date_to', '>=', self.quarter_start),
-            ('date_to', '<=', self.quarter_end),
-            ('state', 'in', ['validated', 'paid']),
-            ('struct_id', '=', regular_payslip.id),
-            ('company_id', 'in', self.branch_ids.ids),
-        ])
+    def _get_group_insurance_contribution(self, preview_companies=None):
+        payslips_sudo = self._get_company_contribution_payslips(preview_companies)
         line_values = payslips_sudo._get_line_values(
             ['GROUPINSURANCE'], vals_list=['amount', 'total'], compute_sum=True
         )
@@ -2775,6 +3322,48 @@ class L10n_BeDmfa(models.Model):
         if self.declaration_method == 'batch':
             return super().action_download_declaration_file()
         raise UserError(self.env._("No file available to download. Please generate the XML or PDF report first."))
+
+    def action_report_dmfa_preview(self):
+        self.ensure_one()
+        return {
+            'name': self.env._("DmfA Preview"),
+            'type': 'ir.actions.client',
+            'tag': 'l10n_be_hr_payroll.dmfa_preview',
+            'params': {'dmfa_id': self.id},
+        }
+
+    def _get_preview_company(self, company_id):
+        self.ensure_one()
+        if not company_id:
+            return self.env['res.company']
+        company = self.branch_ids.filtered(lambda c: c.id == company_id)
+        if not company:
+            raise UserError(self.env._("This company isn't one of the companies of the DmfA you can access."))
+        return company
+
+    def get_preview_companies(self):
+        """ The whole company, or one of its branches the user can access """
+        self.ensure_one()
+        companies = [{'id': False, 'name': self.env._("%(company)s (all branches)", company=self.company_id.name)}]
+        if len(self.branch_ids) > 1:
+            companies += [
+                {'id': company.id, 'name': company.name}
+                for company in self.company_id | self.branch_ids if company in self.env.user.company_ids
+            ]
+        return companies
+
+    def get_preview_html(self, company_id=False):
+        self.ensure_one()
+        html, _ = self.env['ir.actions.report'].sudo()._render_qweb_html(
+            'l10n_be_hr_payroll.action_report_dmfa_preview', self.ids,
+            data={'dmfa_preview': True, 'preview_company_id': self._get_preview_company(company_id).id})
+        return html
+
+    def action_print_preview(self, company_id=False):
+        """ The PDF of the preview, without replacing the one of the declaration """
+        self.ensure_one()
+        return self.env.ref('l10n_be_hr_payroll.action_report_dmfa').report_action(
+            self, data={'dmfa_preview': True, 'preview_company_id': self._get_preview_company(company_id).id})
 
     @api.depends('year', 'quarter')
     def _compute_eligible_payslip_ids(self):
@@ -2930,7 +3519,7 @@ class L10n_BeDmfa(models.Model):
             'quarter': self.quarter,
             'company_id': self.company_id.id,
             'parent_id': self.id,
-            'name': self.parent_id.name,
+            'name': self.name,
             'declaration_method': self.declaration_method,
             'correction_reason': self.correction_reason,
             'declaration_type': 'modification',
@@ -3077,54 +3666,15 @@ class L10n_BeDmfa(models.Model):
         })
 
     def _get_unexperienced_reduction_cycle_window(self, employee, reference_date):
-        def _quarter_start(d):
-            return date_utils.get_quarter(d)[0]
-
-        def _quarter_end(d):
-            return date_utils.get_quarter(d)[1]
-
-        def _next_quarter(d):
-            return _quarter_start(_quarter_end(d) + relativedelta(days=1))
-
-        def _quarter_diff(q1, q2):
-            return (q1.year - q2.year) * 4 + (q1.month - q2.month) // 3
-
-        current_quarter = _quarter_start(reference_date)
-
-        all_versions = employee.sudo().version_ids.filtered(
-            lambda v: v.contract_date_start).sorted('date_version')
-
-        contract_end_by_start = {}
-        for version in all_versions:
-            contract_end_by_start[version.contract_date_start] = version.contract_date_end
-
-        active_quarters = set()
-        for contract_start, contract_end in contract_end_by_start.items():
-            c_start_q = _quarter_start(contract_start)
-            c_end_q = _quarter_start(contract_end) if contract_end else current_quarter
-            q = c_start_q
-            while _quarter_diff(current_quarter, q) >= 0:
-                active_quarters.add(q)
-                if _quarter_diff(c_end_q, q) <= 0:
-                    break
-                q = _next_quarter(q)
-
-        sorted_active = sorted(active_quarters)
-        if not sorted_active:
+        """Full window (4 quarters) of the reduction right the reference date
+        belongs to, used to display the reduction period on the declaration."""
+        payslip = self.env['hr.payslip']
+        engagement_date = payslip._get_l10n_be_unexperienced_engagement_date(
+            employee, date_utils.get_quarter(reference_date)[0])
+        if not engagement_date:
             return None
-
-        cycle_start_idx = 0
-        for i in range(1, len(sorted_active)):
-            gap = _quarter_diff(sorted_active[i], sorted_active[i - 1]) - 1
-            if gap >= 4:
-                cycle_start_idx = i
-
-        cycle_quarter = sorted_active[cycle_start_idx]
-        if not cycle_quarter:
-            return None
-
-        window_start = cycle_quarter
-        window_end = _quarter_end(_next_quarter(_next_quarter(_next_quarter(cycle_quarter))))
+        window_start = date_utils.get_quarter(engagement_date)[0]
+        window_end = date_utils.get_quarter(payslip._l10n_be_unexperienced_last_quarter(engagement_date))[1]
         return window_start, window_end
 
 
@@ -3183,19 +3733,37 @@ class DMFANaturalPersonState(models.Model):
             version_map[occupation_id] = (str(int(version_id) + 1)).zfill(11)
         self.occupation_version_map = version_map
 
-    def validate_changes(self, checked_data, worker_code):
+    @api.model
+    def _get_worker_record_key(self, employer_class, worker_code, configured_employer_class):
+        """ The key of a worker record in `worker_record_data`: its worker code, prefixed by its employer category
+        when it differs from the employer category of the payroll configuration """
+        if employer_class and configured_employer_class and employer_class != configured_employer_class:
+            return f'{employer_class}-{worker_code}'
+        return worker_code
+
+    def validate_changes(self, checked_data, worker_code, from_consultation=False):
+        """ Compare the data of a worker record with its last declared state to get its update action.
+
+        :param bool from_consultation: the data are the ones known by the ONSS (DmfA consultation): they become the
+            reference state of the worker record, unchanged (the version number is the one of the consultation)
+        """
         self.ensure_one()
-        if worker_code not in self.worker_record_data:
-            self.worker_record_data[worker_code] = checked_data
-            self.worker_record_data[worker_code]['update_action'] = 3
-            self.version_number = str(int(self.version_number) + 1)
+        # The field gives a copy of its value, stored as JSON: compare in JSON and write the value back
+        worker_record_data = self.worker_record_data or {}
+        checked_data = self._fields['worker_record_data'].convert_to_cache(checked_data, self) or {}
+        if from_consultation:
+            self.worker_record_data = {**worker_record_data, worker_code: {**checked_data, 'update_action': 9}}
             return
-        if self.worker_record_data[worker_code] != checked_data:
-            self.worker_record_data[worker_code] = checked_data
-            self.worker_record_data[worker_code]['update_action'] = 1
-            self.version_number = str(int(self.version_number) + 1)
+        previous_data = worker_record_data.get(worker_code)
+        if previous_data is None:
+            update_action = 3
+        elif {key: value for key, value in previous_data.items() if key != 'update_action'} != checked_data:
+            update_action = 1
         else:
-            self.worker_record_data[worker_code]['update_action'] = 9
+            update_action = 9
+        if update_action != 9:
+            self.version_number = str(int(self.version_number or 0) + 1)
+        self.worker_record_data = {**worker_record_data, worker_code: {**checked_data, 'update_action': update_action}}
 
 
 class DMFAEmployeesWizard(models.TransientModel):

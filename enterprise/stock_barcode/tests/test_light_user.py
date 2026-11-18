@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import TransactionCase, new_test_user, tagged
 
 
 @tagged('-at_install', 'post_install')
@@ -73,6 +73,19 @@ class TestBarcodeLightUser(TransactionCase):
         self.assertTrue(quant._get_stock_barcode_data()['records']['stock.quant'])
         quant.action_apply_inventory()
         self.assertEqual(quant.quantity, 5)
+
+    def test_barcode_count_choices(self):
+        """ When counting, a barcode-only user is offered the same locations and lots as an
+        Inventory user, and counts can be assigned to it. """
+        inventory_user = new_test_user(self.env, login='inventory_user', groups='stock.group_stock_user')
+        self.assertEqual(
+            self.env['stock.quant'].with_user(self.barcode_user).fields_get(['location_id', 'lot_id'], ['domain']),
+            self.env['stock.quant'].with_user(inventory_user).fields_get(['location_id', 'lot_id'], ['domain']),
+        )
+        quant_user_domain = self.env['stock.quant'].fields_get(['user_id'], ['domain'])['user_id']['domain']
+        request_user_domain = self.env['stock.request.count'].fields_get(['user_id'], ['domain'])['user_id']['domain']
+        self.assertIn(self.barcode_user, self.env['res.users'].search(quant_user_domain))
+        self.assertIn(self.barcode_user, self.env['res.users'].search(request_user_domain))
 
     def test_barcode_lot_creation(self):
         """ Lots are created on the fly when scanning them in the Barcode app. """

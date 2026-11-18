@@ -308,7 +308,10 @@ class AccountMove(models.Model):
                 record.l10n_tr_gib_invoice_type = 'TEVKIFATIADE' if origin_withholds or withholds else 'IADE'
             elif withholds:
                 record.l10n_tr_gib_invoice_type = 'TEVKIFAT'
-            else:
+            elif not record.l10n_tr_gib_invoice_type or (
+                record.l10n_tr_gib_invoice_type in {'TEVKIFAT', *GIB_RETURN_INVOICE_TYPES}
+                and record.is_sale_document(include_receipts=True)
+            ):
                 record.l10n_tr_gib_invoice_type = 'SATIS'
 
     @api.depends(

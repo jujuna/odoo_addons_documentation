@@ -4,9 +4,11 @@ import base64
 import io
 from datetime import timedelta
 
+from reportlab.pdfgen import canvas
+
 from odoo import Command, fields
 from odoo.exceptions import AccessError, ValidationError, UserError
-from odoo.tools import file_open, mute_logger
+from odoo.tools import file_open, mute_logger, pdf
 from odoo.tools.pdf import (
     ArrayObject, DecodedStreamObject, DictionaryObject, NameObject, NumberObject, PdfFileReader, PdfFileWriter,
     create_string_object, generic,
@@ -357,6 +359,44 @@ class TestSignTemplate(TransactionCase):
         document = self.env['sign.template'].browse(res['id']).document_ids
         pdf_reader = PdfFileReader(io.BytesIO(document.raw.content), strict=False)
         self.assertEqual(pdf_reader.pages[2]['/Annots'][2].get_object()['/Ff'], 1, "The field should be read-only")
+
+    def test_flatten_pdf_with_form_fields(self):
+        """
+            Values filled without appearance streams (e.g. sale quotation headers) rely on the
+            /NeedAppearances flag of the form to be displayed, it must survive the fields locking.
+        """
+        form_buffer = io.BytesIO()
+        form = canvas.Canvas(form_buffer)
+        form.acroForm.textfield(name='partner_id__name', x=50, y=700, width=200, height=20)
+        form.showPage()
+        form.save()
+
+        # Fill the form as sale_pdf_quote_builder does, but keep the source form's fonts to avoid pypdf's missing-font warning
+        reader = pdf.PdfFileReader(io.BytesIO(form_buffer.getvalue()), strict=False)
+        writer = pdf.PdfFileWriter()
+        writer.append_pages_from_reader(reader)
+        acro_form = reader.trailer['/Root']['/AcroForm']
+        writer._root_object[NameObject('/AcroForm')] = acro_form.clone(writer) if hasattr(acro_form, 'clone') else acro_form
+        pdf.fill_form_fields_pdf(writer, {'partner_id__name': 'Azure Interior'})
+        filled_buffer = io.BytesIO()
+        writer.write(filled_buffer)
+
+        res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
+            attachment_data_list=[{'name': 'quotation.pdf', 'raw': filled_buffer.getvalue()}]
+        )
+        template = self.env['sign.template'].browse(res['id'])
+        preview = self.env['sign.template.preview'].create({'template_id': template.id, 'document_id': template.document_ids.id})
+        for step, pdf_data in [
+            ('template', template.document_ids.raw.content),
+            ('rendered', preview.pdf_data.content),
+        ]:
+            with self.subTest(step=step):
+                reader = pdf.PdfFileReader(io.BytesIO(pdf_data), strict=False)
+                field = reader.pages[0]['/Annots'][0].get_object()
+                self.assertEqual(field['/V'], 'Azure Interior')
+                self.assertEqual(field['/Ff'] & 1, 1, "The field should be locked")
+                acro_form = reader.trailer['/Root'].get('/AcroForm')
+                self.assertTrue(acro_form and acro_form.get_object().get('/NeedAppearances'), "The filled values should still be displayed")
 
     def test_update_document_preserves_sign_items(self):
         """ Ensure that updating a document in a sign template creates a new template and preserves sign items. """

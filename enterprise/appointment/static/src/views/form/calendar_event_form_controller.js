@@ -28,6 +28,11 @@ patch(CalendarEventFormController.prototype, {
             ...record.config.context,
             appointment_allow_overbooking: true,
         };
+        if (record.config.context.resource_ids === false) {
+            // Avoid displaying the "Missing Seats" modal when creating an event from the "Unassigned" row of the
+            // gantt view as they are aware than the reserved capacity is greater than the capacity of the resources.
+            return true;
+        }
         return new Promise((resolve) => {
             this.env.services.dialog.add(
                 ConfirmationDialog,

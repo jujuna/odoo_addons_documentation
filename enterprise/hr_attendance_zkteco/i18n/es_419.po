@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-10-23 01:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
@@ -78,20 +78,16 @@ msgid "Attendances ZKTeco BioTime"
 msgstr "Asistencias con ZKTeco BioTime"
 
 #. module: hr_attendance_zkteco
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
 msgid "BioTime"
 msgstr "BioTime"
 
 #. module: hr_attendance_zkteco
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
-msgid "Biotime"
-msgstr "Biotime"
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
-msgid "Biotime ID"
-msgstr "ID de Biotime"
+msgid "BioTime ID"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
@@ -239,11 +235,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid ""
-"Employee is not linked, make sure to set the Zkteco ID on the related "
-"employees."
+"Employee is not linked, make sure to set the ZKTeco Employee ID on the "
+"related employees."
 msgstr ""
-"El empleado no está vinculado. Asegúrate de definir el ID de Zkteco en los "
-"empleados relacionados."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -340,10 +334,8 @@ msgstr "Si está seleccionado, algunos mensajes tienen error de envío."
 
 #. module: hr_attendance_zkteco
 #: model:ir.module.module,summary:base.module_hr_attendance_zkteco
-msgid "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API"
+msgid "Integrate ZKTeco BioPro with attendances app via BioTime 8.5 & 9.0 API"
 msgstr ""
-"Integra Zkteco BioPro con la aplicación Asistencias a través de la API "
-"BioTime 8.5 y 9.0"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__message_is_follower
@@ -702,20 +694,20 @@ msgstr "Probar conexión"
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_attendance__terminal_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
-msgid "The Biotime terminal in which the record is created from"
-msgstr "La terminal de Biotime desde la que se crea el registro"
+msgid "The BioTime terminal in which the record is created from"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
-msgid "The ID of the Location that is defined in the Biotime server"
-msgstr "ID de la ubicación definida en el servidor de Biotime"
+msgid "The ID of the Location that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_zkteco_terminal__terminal_sn
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_terminal_view_form
-msgid "The ID of the terminal that is defined in the Biotime server"
-msgstr "ID de la terminal definido en el servidor de Biotime"
+msgid "The ID of the terminal that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -862,6 +854,11 @@ msgstr ""
 "de BioTime en Ajustes para iniciar la sincronización."
 
 #. module: hr_attendance_zkteco
+#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
+msgid "ZKTeco BioTime: Fetch Transactions"
+msgstr ""
+
+#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_attendance__zkteco_checkin_id
 msgid "ZKTeco Check-in ID"
 msgstr "ID de entrada de ZKTeco"
@@ -892,6 +889,12 @@ msgid "ZKTeco Terminal"
 msgstr "Terminal de ZKTeco"
 
 #. module: hr_attendance_zkteco
+#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
+#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
+msgid "ZKTeco Terminals"
+msgstr ""
+
+#. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_form
 msgid "ZKTeco Transaction"
 msgstr "Transacción de ZKTeco"
@@ -904,11 +907,6 @@ msgstr "Transacción de ZKTeco"
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_search
 msgid "ZKTeco Transactions"
 msgstr "Transacciones de ZKTeco"
-
-#. module: hr_attendance_zkteco
-#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
-msgid "ZkTeco Biotime: Fetch Transactions"
-msgstr "ZkTeco Biotime: Obtener transacciones"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_attendance__zkteco_checkin_transaction_id
@@ -961,12 +959,6 @@ msgid "Zkteco Server Url"
 msgstr "URL del servidor de Zkteco"
 
 #. module: hr_attendance_zkteco
-#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
-#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
-msgid "Zkteco Terminals"
-msgstr "Terminales ZKTeco"
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__zkteco_transaction_id
 msgid "Zkteco Transaction"
 msgstr "Transacción de ZKTeco"
@@ -987,8 +979,42 @@ msgstr "admin@ejemplo.com"
 msgid "https://biotime.example.com"
 msgstr "https://biotime.ejemplo.com"
 
-msgid "Website Messages"
-msgstr "Mensajes del sitio web"
+#~ msgid "Biotime"
+#~ msgstr "Biotime"
 
-msgid "Website communication history"
-msgstr "Historial de comunicación del sitio web"
+#~ msgid "Biotime ID"
+#~ msgstr "ID de Biotime"
+
+#~ msgid ""
+#~ "Employee is not linked, make sure to set the Zkteco ID on the related "
+#~ "employees."
+#~ msgstr ""
+#~ "El empleado no está vinculado. Asegúrate de definir el ID de Zkteco en "
+#~ "los empleados relacionados."
+
+#~ msgid ""
+#~ "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API"
+#~ msgstr ""
+#~ "Integra Zkteco BioPro con la aplicación Asistencias a través de la API "
+#~ "BioTime 8.5 y 9.0"
+
+#~ msgid "The Biotime terminal in which the record is created from"
+#~ msgstr "La terminal de Biotime desde la que se crea el registro"
+
+#~ msgid "The ID of the Location that is defined in the Biotime server"
+#~ msgstr "ID de la ubicación definida en el servidor de Biotime"
+
+#~ msgid "The ID of the terminal that is defined in the Biotime server"
+#~ msgstr "ID de la terminal definido en el servidor de Biotime"
+
+#~ msgid "ZkTeco Biotime: Fetch Transactions"
+#~ msgstr "ZkTeco Biotime: Obtener transacciones"
+
+#~ msgid "Zkteco Terminals"
+#~ msgstr "Terminales ZKTeco"
+
+#~ msgid "Website Messages"
+#~ msgstr "Mensajes del sitio web"
+
+#~ msgid "Website communication history"
+#~ msgstr "Historial de comunicación del sitio web"

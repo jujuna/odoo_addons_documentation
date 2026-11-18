@@ -36,7 +36,7 @@
     -->
     <template id="tax_id">
         <TaxID>
-            <TaxRegistrationNumber t-out="o._get_additional_identifier('AT_EN') or ''"/>
+            <TaxRegistrationNumber t-out="o._get_additional_identifier('AT_STEUERNUMMER') or o._get_additional_identifier('AT_EN') or ''"/>
             <VATNumber t-if="o.vat" t-out="o.vat"/>
         </TaxID>
     </template>
@@ -109,7 +109,7 @@
                         <t t-set="partner" t-value="partner_vals['partner']"/>
                         <AccountID t-out="partner.id"/>
                         <CustomerName t-out="partner.name"/>
-                        <t t-if="partner._get_additional_identifier('AT_EN')">
+                        <t t-if="partner._get_additional_identifier('AT_STEUERNUMMER') or partner._get_additional_identifier('AT_EN') or partner.vat">
                             <CustomerTaxID>
                                 <t t-call="l10n_at_saft.tax_id" o="partner"/>
                             </CustomerTaxID>
@@ -130,7 +130,7 @@
                         <t t-set="partner" t-value="partner_vals['partner']"/>
                         <AccountID t-out="partner.id"/>
                         <SupplierName t-out="partner.name"/>
-                        <t t-if="partner._get_additional_identifier('AT_EN')">
+                        <t t-if="partner._get_additional_identifier('AT_STEUERNUMMER') or partner._get_additional_identifier('AT_EN') or partner.vat">
                             <SupplierTaxID>
                                 <t t-call="l10n_at_saft.tax_id" o="partner"/>
                             </SupplierTaxID>

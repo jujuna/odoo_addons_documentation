@@ -12,8 +12,11 @@
 
     <template id="saft_template_inherit_l10n_no_saft" inherit_id="account_saft.saft_template" primary="True">
         <xpath expr="//StandardAccountID" position="replace">
-            <GroupingCategory>RF-1167</GroupingCategory>
-            <GroupingCode t-out="account.code[:4]"/>
+            <t t-if="company.account_fiscal_country_id.code != 'NO'">$0</t>
+            <t t-else="">
+                <GroupingCategory>RF-1167</GroupingCategory>
+                <GroupingCode t-out="account.code[:4]"/>
+            </t>
         </xpath>
         <xpath expr="//TaxCodeDetails" position="before">
             <TaxType>MVA</TaxType>
@@ -41,6 +44,12 @@
                     <t t-call="l10n_no_saft.balance_account"/>
                 </BalanceAccount>
             </Supplier>
+        </xpath>
+        <xpath expr="//Line//CustomerID" position="attributes">
+            <attribute name="t-if">line_vals['account_type'] == 'asset_receivable'</attribute>
+        </xpath>
+        <xpath expr="//Line//SupplierID" position="attributes">
+            <attribute name="t-if">line_vals['account_type'] == 'liability_payable'</attribute>
         </xpath>
         <xpath expr="//TaxInformation/t[@t-call]" position="attributes">
             <attribute name="t-call">l10n_no_saft.l10n_no_tax_information</attribute>

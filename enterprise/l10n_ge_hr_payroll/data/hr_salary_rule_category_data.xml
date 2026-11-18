@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bases: carried by the paid time types and by every rule feeding them -->
+    <record id="GE_REMUNERATION_BASE" model="hr.salary.rule.category">
+        <field name="name">Remuneration Base</field>
+        <field name="code">GE_REMUNERATION_BASE</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="note">Basic category to compute the net salary: the paid time types and every amount paid to or withheld from the employee.</field>
+    </record>
+
+    <record id="GE_TAXABLE" model="hr.salary.rule.category">
+        <field name="name">Taxable Salary</field>
+        <field name="code">GE_TAXABLE</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="note">Salary income paid in the period, in cash or in kind (Tax Code, art. 101), before the employee pension contribution and the privileges: column 7 of the declaration of tax withheld at source, and base of the funded pension contributions (Law on Funded Pensions, art. 2 and 3(6)). The per diem and the travel costs within the norms, the refund of the expenses incurred for the employer and the State benefits are left out.</field>
+    </record>
+
+    <record id="GE_FIXED_PAY" model="hr.salary.rule.category">
+        <field name="name">Fixed Pay</field>
+        <field name="code">GE_FIXED_PAY</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="note">Regular allowances of the contract added to the wage: with the wage, they give the month of remuneration of the severance and of the annual leave.</field>
+    </record>
+</odoo>

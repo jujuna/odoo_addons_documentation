@@ -9,6 +9,7 @@ import * as ProductScreenResto from "@pos_restaurant/../tests/tours/utils/produc
 import { delay } from "@web/core/utils/concurrency";
 import * as PosAppointment from "@pos_appointment/../tests/tours/utils/appointment_tours_util";
 import { refresh } from "@point_of_sale/../tests/generic_helpers/utils";
+import * as Notification from "@point_of_sale/../tests/generic_helpers/notification_util";
 
 const ProductScreen = { ...ProductScreenPos, ...ProductScreenResto };
 
@@ -223,5 +224,110 @@ registry.category("web_tour.tours").add("test_table_without_ressources", {
                     }
                 },
             },
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("test_booking_available_seats_and_check_in", {
+    steps: () =>
+        [
+            RestaurantAppointment.withLuxonTimeFreeze(1756297136578, [
+                Chrome.startPoS(),
+                Dialog.confirm("Open Register"),
+                PosAppointment.clickBookingButton(),
+                PosAppointment.isGanttViewShown(),
+
+                // Booking One: created with the New button, no default table.
+                PosAppointment.clickNewGanttBooking(),
+                RestaurantAppointment.checkFormBooking({
+                    seats: 2,
+                    tables: ["Booking Table A"],
+                    availableSeats: 18,
+                }),
+                // The combination with the fewest tables is preferred.
+                RestaurantAppointment.setFormBooking({ name: "Booking One", seats: 3 }),
+                RestaurantAppointment.checkFormBooking({ tables: ["Booking Table E"] }),
+                RestaurantAppointment.setFormBooking({ seats: 7 }),
+                RestaurantAppointment.checkFormBooking({
+                    tables: [
+                        "Booking Table A",
+                        "Booking Table B",
+                        "Booking Table C",
+                        "Booking Table D",
+                    ],
+                }),
+                // Keep tables B, C and D free so the linked tables priority of Booking Two is meaningful.
+                RestaurantAppointment.setFormBooking({ seats: 2 }),
+                RestaurantAppointment.checkFormBooking({ tables: ["Booking Table A"] }),
+                RestaurantAppointment.saveBooking("Booking One"),
+
+                // Booking Two: created from the Table E row, which must stay selected.
+                RestaurantAppointment.clickGanttCell("Booking Table E"),
+                RestaurantAppointment.checkFormBooking({
+                    seats: 4,
+                    tables: ["Booking Table E"],
+                    availableSeats: 16,
+                }),
+                // The seats aren't reset to the capacity of Table E.
+                RestaurantAppointment.setFormBooking({ name: "Booking Two", seats: 2 }),
+                RestaurantAppointment.checkFormBooking({ seats: 2, tables: ["Booking Table E"] }),
+                // The linked Table F is preferred over Table B, the first table of the pool.
+                RestaurantAppointment.setFormBooking({ seats: 6 }),
+                RestaurantAppointment.checkFormBooking({
+                    tables: ["Booking Table E", "Booking Table F"],
+                }),
+                RestaurantAppointment.setFormBooking({ seats: 4 }),
+                RestaurantAppointment.checkFormBooking({ tables: ["Booking Table E"] }),
+                // Once Table E is removed, it's no longer required and the seats select any table.
+                RestaurantAppointment.setFormBooking({
+                    removeTables: ["Booking Table E"],
+                    addTables: ["Booking Table G"],
+                }),
+                RestaurantAppointment.checkFormBooking({ tables: ["Booking Table G"] }),
+                RestaurantAppointment.setFormBooking({ seats: 2 }),
+                RestaurantAppointment.checkFormBooking({ tables: ["Booking Table B"] }),
+                RestaurantAppointment.saveBooking("Booking Two"),
+
+                // Booking Three: created with the New button, without any table.
+                PosAppointment.clickNewGanttBooking(),
+                RestaurantAppointment.checkFormBooking({
+                    tables: ["Booking Table C"],
+                    availableSeats: 14,
+                }),
+                RestaurantAppointment.setFormBooking({
+                    name: "Booking Three",
+                    removeTables: ["Booking Table C"],
+                }),
+                RestaurantAppointment.checkFormBooking({ name: "Booking Three", tables: [] }),
+                RestaurantAppointment.saveBooking("Booking Three"),
+
+                // Check In from the gantt popover.
+                PosAppointment.openGanttPopover("Booking One"),
+                RestaurantAppointment.checkInFromPopover(),
+                RestaurantAppointment.checkAssignedNotification(["Booking Table A 🪑2"]),
+
+                // Check In by dragging the kanban card.
+                PosAppointment.switchToView("kanban"),
+                PosAppointment.dragKanbanBookingToColumn("Booking Two", "Checked-In"),
+                RestaurantAppointment.checkAssignedNotification(["Booking Table B 🪑2"]),
+
+                // Check In from the kanban popover, without table.
+                PosAppointment.openKanbanPopover("Booking Three"),
+                RestaurantAppointment.checkInFromPopover(),
+                Notification.has("No table assigned", "warning"),
+                {
+                    content: "Close the sticky notification",
+                    trigger: '.o_notification:contains("No table assigned") .o_notification_close',
+                    run: "click",
+                },
+
+                // Back to Booked, then Check In again from the booking form.
+                PosAppointment.openKanbanPopover("Booking Three"),
+                RestaurantAppointment.editFromPopover(),
+                RestaurantAppointment.setStatusFromForm("Booked"),
+                PosAppointment.openKanbanPopover("Booking Three"),
+                RestaurantAppointment.editFromPopover(),
+                RestaurantAppointment.setStatusFromForm("Check In"),
+                Notification.has("No table assigned", "warning"),
+            ]),
         ].flat(),
 });

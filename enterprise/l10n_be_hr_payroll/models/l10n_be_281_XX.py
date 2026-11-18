@@ -7,6 +7,7 @@ from lxml import etree
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Domain
 from odoo.tools import BinaryBytes, file_path, format_amount
 
 from stdnum.be.vat import compact as vat_be_compact
@@ -101,13 +102,20 @@ class L10n_Be281_XX(models.Model):
     _description = 'HR Payroll 281.XX Declaration'
     _order = 'year'
 
+    def _get_default_company_id(self):
+        company = self.env.company
+        if company.parent_id:
+            raise UserError(self.env._('281.XX declarations can only be generated from a top-level company'))
+        return company
+
     active = fields.Boolean(default=True)
     reference = fields.Char(string="Reference", copy=False)
     name = fields.Char(string="Name", required=True, copy=False, readonly=True, default="Draft")
     year = fields.Selection(
         selection='_get_year_selection', string='Year', required=True,
         default=lambda x: str(fields.Date.today().year - 1))
-    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', default=_get_default_company_id)
+    branch_ids = fields.One2many('res.company', compute='_compute_branch_ids', compute_sudo=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('error', 'Error'),
@@ -177,7 +185,11 @@ class L10n_Be281_XX(models.Model):
     xml_filename = fields.Char(copy=False)
 
     error_message = fields.Text('Error Message', readonly=True, copy=False)
+    company_error_message = fields.Text(compute='_compute_company_error_message')
+    # Forms whose lines have an error, e.g. "281.10,281.45"
+    forms_with_error = fields.Char(compute='_compute_forms_with_error')
     withholding_warning = fields.Text(compute='_compute_withholding_warning')
+    declaration_warning = fields.Text(compute='_compute_declaration_warning')
 
     @api.model
     def default_get(self, fields):
@@ -218,6 +230,15 @@ class L10n_Be281_XX(models.Model):
             self.env[config['model']].create(related_vals)
         return reports
 
+    @api.depends('company_id')
+    def _compute_branch_ids(self):
+        # The declaration of the company is for all its branches
+        branches_by_root = self.env['res.company'].search([
+            ('id', 'child_of', self.company_id.ids),
+        ]).grouped('root_id')
+        for declaration in self:
+            declaration.branch_ids = branches_by_root.get(declaration.company_id, declaration.company_id)
+
     @api.depends('include_281_10', 'l10n_be_281_10_id_lines_count', 'include_281_13', 'l10n_be_281_13_id_lines_count',
         'include_281_18', 'l10n_be_281_18_id_lines_count', 'include_281_20', 'l10n_be_281_20_id_lines_count',
         'include_281_30', 'l10n_be_281_30_id_lines_count', 'include_281_45', 'l10n_be_281_45_id_lines_count')
@@ -228,6 +249,22 @@ class L10n_Be281_XX(models.Model):
                 if record[config['include_field']] and record[config['count_field']]:
                     types.append(report_key)
             record.form_types_display = ', '.join(types)
+
+    @api.depends('company_id', 'company_id.vat', 'company_id.zip', 'company_id.phone', 'company_id.street',
+                 'company_id.city', 'company_id.country_id')
+    @api.depends_context('uid')
+    def _compute_company_error_message(self):
+        for record in self:
+            errors = record._get_company_configuration_errors()
+            record.company_error_message = '\n'.join(errors)
+
+    @api.depends(*(f"{config['relation_field']}.line_ids.declaration_error" for config in REPORT_CONFIG.values()))
+    def _compute_forms_with_error(self):
+        for record in self:
+            record.forms_with_error = ','.join(
+                report_key for report_key, config in REPORT_CONFIG.items()
+                if any(record[config['relation_field']].line_ids.mapped('declaration_error'))
+            )
 
     @api.depends(
         'year', 'company_id', 'state', 'test_xml_file', 'xml_file',
@@ -258,6 +295,27 @@ class L10n_Be281_XX(models.Model):
                         expected_amount=format_amount(self.env, expected_amount, currency),
                     ))
             record.withholding_warning = '\n'.join(warnings)
+
+    @api.depends(
+        'year', 'company_id', 'state', 'test_xml_file', 'xml_file', 'payslip_ids',
+        *(config['include_field'] for config in REPORT_CONFIG.values()),
+    )
+    def _compute_declaration_warning(self):
+        for record in self:
+            warnings = []
+            if complementary_indemnity_warning := record.payslip_ids._l10n_be_get_complementary_indemnity_warning():
+                warnings.append(f"- {complementary_indemnity_warning}")
+            if (record.test_xml_file or record.xml_file) and record.state != 'error':
+                for report_key, config in REPORT_CONFIG.items():
+                    if not record[config['include_field']]:
+                        continue
+                    try:
+                        form_warnings = record[config['relation_field']]._get_declaration_warnings()
+                    except UserError:
+                        # Employee data became invalid since the last computation, which reports it when run again.
+                        continue
+                    warnings += [f"- {report_key}: {warning}" for warning in form_warnings]
+            record.declaration_warning = '\n'.join(warnings) or False
 
     def _get_withholding_sources(self):
         # Declaration of the year where the withholding taxes of each 281 form are declared: {281 form: source}.
@@ -338,18 +396,36 @@ class L10n_Be281_XX(models.Model):
             self.error_message = str(err)
             self.state = 'error'
 
+    def _get_company_configuration_errors(self):
+        """Errors of the configuration of the company preventing to generate the declaration.
+
+        :return: list of translated messages
+        """
+        self.ensure_one()
+        company = self.company_id
+        errors = []
+        if not company.vat or not company.zip:
+            errors.append(self.env._('The VAT or the ZIP number is not specified on your company.'))
+        if not company.street or not company.city or not company.country_id:
+            errors.append(self.env._('The street, the city or the country is not specified on your company.'))
+        elif company.country_id.code not in COUNTRY_CODES:
+            errors.append(self.env._('Unsupported country code %s on your company.', company.country_id.code))
+        if not company.phone:
+            errors.append(self.env._("The phone number is not specified on your company."))
+        else:
+            try:
+                company._phone_format(number=company.phone, raise_exception=True)
+            except UserError:
+                errors.append(self.env._("The phone number of your company is invalid."))
+        # Contact of the declaration (zone 0023)
+        if not self.env.user.email:
+            errors.append(self.env._("Your user has no email address: it is the contact email address of the declaration."))
+        return errors
+
     def _check_company_configuration(self):
-        if not self.company_id.vat or not self.company_id.zip:
-            raise UserError(self.env._('The VAT or the ZIP number is not specified on your company'))
-        if not self.company_id.phone:
-            raise UserError(self.env._("The phone number is not specified on your company."))
-        try:
-            self.company_id._phone_format(
-                number=self.company_id.phone,
-                raise_exception=True,
-            )
-        except UserError as e:
-            raise UserError(self.env._("The phone number is invalid.")) from e
+        errors = self._get_company_configuration_errors()
+        if errors:
+            raise UserError('\n'.join(errors))
 
     def _get_main_data(self):
         self.ensure_one()
@@ -381,8 +457,11 @@ class L10n_Be281_XX(models.Model):
         }
 
     def _get_xml_rendering_data(self):
+        """Data of the XML file, or ``{'employee_error': message}`` listing the errors of the company and of the
+        employees of all the forms, which are also set on the declaration lines."""
         self.ensure_one()
-        main_data = self._get_main_data()
+        company_errors = self._get_company_configuration_errors()
+        main_data = {} if company_errors else self._get_main_data()
 
         sequence = 0
         total_volgnummer = 0
@@ -391,14 +470,14 @@ class L10n_Be281_XX(models.Model):
         sheets_count = 0
         declarations_count = 0
         employees_data_map = {}
-        employee_errors = []
+        errors_by_report = {}
         for report_key, config in REPORT_CONFIG.items():
             result = {'employees_data': [], 'sum_volgnummer': 0, 'sum_control_total': 0, 'sum_withholding': 0, 'employees_with_error': {}}
             if self[config['include_field']] and self[config['count_field']]:
                 report = self[config['relation_field']]
                 employees = report.line_ids.employee_id
                 context_args = {'starting_sequence': sequence, 'round_281': True}
-                result = report.with_context(**context_args)._get_rendering_data(employees)
+                result = report.with_context(**context_args)._get_employees_rendering_data(employees)
                 mapping_lines = result['mapping_lines']
                 for employee_data in result['employees_data']:
                     employee_data['_xml_declaration_fields'] = report._get_xml_declaration_fields_markup(
@@ -406,8 +485,7 @@ class L10n_Be281_XX(models.Model):
                     )
                 declarations_count += 1
             if result.get('employees_with_error'):
-                for error_msg in result['employees_with_error'].values():
-                    employee_errors.append(f"- {error_msg}")
+                errors_by_report[report_key] = result['employees_with_error']
             report_number = report_key.split('.')[1]
             employees_data_map[f'employees_data_{report_number}'] = result['employees_data']
             sequence += len(result['employees_data'])
@@ -416,9 +494,9 @@ class L10n_Be281_XX(models.Model):
             total_control += result['sum_control_total']
             total_withholding += result['sum_withholding']
 
-        if employee_errors:
-            error_header = self.env._("Cannot generate the XML file. Please fix the following employee errors:\n\n")
-            return {'employee_error': error_header + "\n".join(employee_errors)}
+        self._set_declaration_errors(errors_by_report)
+        if company_errors or errors_by_report:
+            return {'employee_error': self._get_generation_error_message(company_errors, errors_by_report)}
 
         total_data = {
             'r8002_inkomstenjaar': self.year,
@@ -449,6 +527,31 @@ class L10n_Be281_XX(models.Model):
         }
         result.update(employees_data_map)
         return result
+
+    def _set_declaration_errors(self, errors_by_report):
+        """Set the errors of the employees on the lines of the forms, the PDF of the other employees can be generated.
+
+        :param errors_by_report: {report key: {employee: message}}
+        """
+        self.ensure_one()
+        for report_key, config in REPORT_CONFIG.items():
+            employees_with_error = errors_by_report.get(report_key, {})
+            for line in self[config['relation_field']].line_ids:
+                error = employees_with_error.get(line.employee_id, False)
+                if line.declaration_error != error:
+                    line.declaration_error = error
+
+    def _get_generation_error_message(self, company_errors, errors_by_report):
+        """One message listing all the errors of the company and of the employees of all the forms.
+
+        :param company_errors: list of messages
+        :param errors_by_report: {report key: {employee: message, possibly on several lines}}
+        """
+        error_lines = [f"- {error}" for error in company_errors]
+        for report_key, employees_with_error in errors_by_report.items():
+            for message in employees_with_error.values():
+                error_lines += [f"- {report_key}: {error}" for error in message.splitlines()]
+        return self.env._("Cannot generate the XML file. Please fix the following errors:\n\n%s", '\n'.join(error_lines))
 
     def _render_xml(self, is_test=False):
         self.ensure_one()
@@ -506,14 +609,13 @@ class L10n_Be281_XX(models.Model):
 
     def _get_target_declarations(self):
         self.ensure_one()
-        res_ids = []
-        for config in REPORT_CONFIG.values():
-            if self[config['include_field']] and self[config['count_field']]:
-                res_ids += self[config['relation_field']].ids
-        if res_ids:
-            return self.env['hr.payroll.employee.declaration'].search([
-                ('res_id', 'in', res_ids)
-            ])
+        domains = [
+            Domain('res_model', '=', config['model']) & Domain('res_id', 'in', self[config['relation_field']].ids)
+            for config in REPORT_CONFIG.values()
+            if self[config['include_field']] and self[config['count_field']]
+        ]
+        if domains:
+            return self.env['hr.payroll.employee.declaration'].search(Domain.OR(domains))
         return self.env['hr.payroll.employee.declaration']
 
     def action_mark_as_done(self):

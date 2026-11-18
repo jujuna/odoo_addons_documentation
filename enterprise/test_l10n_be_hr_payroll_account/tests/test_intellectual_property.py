@@ -4,12 +4,12 @@ import datetime
 
 from odoo.tests.common import tagged
 
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestPayslipNoAccountingCommon
 
 
 @tagged('post_install', '-at_install', 'payslips_validation')
-class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestIntellectualProperty(TestPayslipNoAccountingCommon, TestBelgiumCommon):
     """ Intellectual property (IP) rules applicable since 2026:
     - the IP is exempt from ONSS up to 30 % of the total remuneration, unless forced (DmfA code 47)
     - the IP withholding tax (15 %) only applies within that share and while the average IP of the
@@ -24,10 +24,9 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
     _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
-        cls.company_data['company'].current_payroll_config_id.write({
+        cls.env.company.current_payroll_config_id.write({
             'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
             'l10n_be_main_joint_committee': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
         })
@@ -44,6 +43,7 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
                 'ip_wage_rate': 0.25,  # IP = 662.5
                 'ip_onss': False,  # ONSS contributions are forced by default: test the exemption
                 'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+                'l10n_be_salary_scale_id': cls.env.ref('l10n_be_hr_payroll.cp200_b').id,
             },
             employee_fields={
                 'lang': 'fr_BE',  # payslips can only be validated in a Belgian language
@@ -139,3 +139,73 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertFalse(payslip.error_count)
         messages = [issue['message'] for issue in payslip.issues.values()]
         self.assertTrue(any('intellectual property limit' in message for message in messages), messages)
+
+    def test_ip_previous_years_average_without_start_year(self):
+        # The average of the 4 previous years leaves out the year the activity started in: started in 2025, the
+        # employee has no complete previous year in 2026 and the IP of 2025 (5000) doesn't make it exceed the
+        # yearly limit (1000)
+        self.employee.write({'review_state': '1_reviewed'})
+        self.version.write({'contract_date_start': datetime.date(2025, 6, 1), 'date_version': datetime.date(2025, 6, 1)})
+        self.assertEqual(self.employee.first_contract_date, datetime.date(2025, 6, 1))
+        self.version.wage = 20000.0  # IP = 5000
+        payslip_2025 = self._generate_payslip(datetime.date(2025, 12, 1), datetime.date(2025, 12, 31))
+        payslip_2025.action_payslip_done()
+        self.version.wage = 2650.0
+        self._add_rule_parameter_value('ip_limit', 1000, datetime.date(2026, 2, 1))
+
+        payslip = self._generate_payslip(self.date_from, self.date_to)
+        for code in ['IP.EXEMPT', 'IP.PART', 'IP', 'IP.DED']:
+            self._validate_rule_computed(payslip, code)
+
+    def test_ip_max_share_of_the_year(self):
+        # The 30 % share is assessed on the year: 848 of IP (32 % of 2650) on the April payslip, but 662.5 + 848 =
+        # 1510.5 of IP for 5300 of remuneration since January (28.5 %): the IP withholding tax applies
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip_march = self._generate_payslip(self.date_from, self.date_to)
+        payslip_march.action_payslip_done()
+        self.assertEqual(payslip_march.state, 'validated')
+        self.version.ip_wage_rate = 0.32
+        payslip = self._generate_payslip(datetime.date(2026, 4, 1), datetime.date(2026, 4, 30))
+        self.assertAlmostEqual(payslip.line_ids.filtered(lambda l: l.code == 'IP').total, 848, 2)
+        for code in ['IP.EXEMPT', 'IP.PART', 'IP', 'IP.DED']:
+            self._validate_rule_computed(payslip, code)
+
+        # Above 30 % of the remuneration of the year, the IP is a regular remuneration
+        self.version.ip_wage_rate = 0.4
+        payslip.compute_sheet()
+        for code in ['IP.PART', 'IP', 'IP.DED']:
+            self._validate_rule_computed(payslip, code, expected=False)
+
+    def test_ip_indexed_amounts(self):
+        # Indexed amounts of the income years (SPF Finances, explications IPP, cadre VII D): the lump-sum cost
+        # brackets and the yearly limit (since 2023)
+        expected = {
+            2018: (15990, 31990, None),
+            2019: (16320, 32640, None),
+            2020: (16560, 33110, None),
+            2021: (16680, 33360, None),
+            2022: (17090, 34170, None),
+            2023: (18720, 37450, 70220),
+            2024: (19480, 38970, 73070),
+            2025: (20100, 40190, 75360),
+            2026: (20590, 41180, 77220),
+        }
+        parameter = self.env['hr.rule.parameter']
+        for year, (bracket_1, bracket_2, limit) in expected.items():
+            day = datetime.date(year, 6, 1)
+            self.assertEqual(parameter._get_parameter_from_code('ip_deduction_bracket_1', day), bracket_1, year)
+            self.assertEqual(parameter._get_parameter_from_code('ip_deduction_bracket_2', day), bracket_2, year)
+            self.assertEqual(
+                parameter._get_parameter_from_code('ip_limit', day, raise_if_not_found=False) or None, limit, year)
+
+    def test_ip_above_max_share_2024(self):
+        # The 30 % share of the withholding tax applies since the income year 2024: IP (1060) above 30 % of the
+        # remuneration (2650) in 2024 is a regular remuneration. The ONSS exemption only exists since 2026.
+        self.version.ip_wage_rate = 0.4
+        payslip = self._generate_payslip(datetime.date(2024, 3, 1), datetime.date(2024, 3, 31))
+        for code in ['IP.EXEMPT', 'IP.PART', 'GROSSIP', 'IP', 'IP.DED']:
+            self._validate_rule_computed(payslip, code, expected=False)
+        # The share doesn't exist in 2023
+        payslip = self._generate_payslip(datetime.date(2023, 3, 1), datetime.date(2023, 3, 31))
+        for code in ['IP.PART', 'IP', 'IP.DED']:
+            self._validate_rule_computed(payslip, code)

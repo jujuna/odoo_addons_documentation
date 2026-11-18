@@ -12,6 +12,8 @@ class MrpEco(models.Model):
         'new_bom_id.operation_ids.quality_point_ids',
         'bom_id.operation_ids.quality_point_ids.test_type_id',
         'new_bom_id.operation_ids.quality_point_ids.test_type_id',
+        'bom_id.operation_ids.quality_point_ids.title',
+        'new_bom_id.operation_ids.quality_point_ids.title',
         'bom_id.operation_ids.quality_point_ids.note',
         'new_bom_id.operation_ids.quality_point_ids.note')
     def _compute_routing_change_ids(self):

@@ -10,5 +10,6 @@ patch(TicketScreen.prototype, {
             destinationOrder.l10n_mx_edi_usage = "G02";
             destinationOrder.l10n_mx_edi_cfdi_to_public = order.l10n_mx_edi_cfdi_to_public;
         }
+        await super.addAdditionalRefundInfo(...arguments);
     },
 });

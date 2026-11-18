@@ -2,6 +2,7 @@
 
 import calendar
 import datetime
+from collections import defaultdict
 
 from dateutil.relativedelta import relativedelta
 
@@ -10,8 +11,11 @@ from odoo.tests.common import freeze_time, tagged
 
 from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import convert_file
 import math
+
+IMPULSION_CODES = ('IMPULSION25', 'IMPULSION12')
 
 
 @tagged('post_install', '-at_install', 'payslips_validation', 'yoyo')
@@ -635,6 +639,160 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         cls.additional_hours_50_type = cls.env.ref('hr_work_entry.be_work_entry_type_additional_hours_50')
         cls.additional_hours_100_type = cls.env.ref('hr_work_entry.be_work_entry_type_additional_hours_100')
         cls.env['account.chart.template']._configure_payroll_account_be(cls.env.company)
+        # Compensate the loss on commission on PTO with the double holiday pay (SIMPLE_VARIABLE) instead of monthly
+        # (COM_LOSS_PTO): the tests of the monthly compensation select it
+        cls.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday').active = True
+
+        # Double holiday pay
+        cls.calendar_30_4h_per_week = cls.env['resource.calendar'].create({
+            'name': '30.4h calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 16.6}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 13, 'hour_to': 16.6}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 16.6}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 13, 'hour_to': 16.6}),
+            ]
+        })
+
+        partial_incapacity = cls.env.ref('hr_work_entry.l10n_be_work_entry_type_partial_incapacity')
+
+        cls.calendar_15_12h_per_week_med = cls.env['resource.calendar'].create({
+            'name': '15.12h med calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+            ]
+        })
+
+        cls.calendar_19h_per_week_med = cls.env['resource.calendar'].create({
+            'name': '19h med calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+            ]
+        })
+
+        cls.calendar_22_8h_per_week_med = cls.env['resource.calendar'].create({
+            'name': '22.8h med calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+            ]
+        })
+
+        cls.calendar_26_6h_per_week_med = cls.env['resource.calendar'].create({
+            'name': '26.6h med calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+            ]
+        })
+
+        cls.calendar_30_4h_per_week_med = cls.env['resource.calendar'].create({
+            'name': '30.4h med calendar',
+            'attendance_ids': [
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 3.8}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 3.8, 'work_entry_type_id': partial_incapacity.id}),
+            ]
+        })
+
+        cls.env.ref('hr.structure_type_employee_cp200').default_resource_calendar_id = cls.company.resource_calendar_id
+
+        # Impulsion plans
+        cls.cp200 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        cls.city_namur, cls.city_liege, cls.city_brussels, cls.city_eupen = cls.env['res.city'].create([{
+            'name': name,
+            'zipcode': zipcode,
+            'country_id': cls.env.ref('base.be').id,
+            'l10n_be_nis_code': nis_code,
+        } for name, zipcode, nis_code in (
+            ('Namur', '5000', '92094'),
+            ('Liège', '4000', '62063'),
+            ('Bruxelles', '1000', '21004'),
+            ('Eupen', '4700', '63023'),
+        )])
+        cls.partner_brussels = cls.env['res.partner'].create({'name': 'Brussels Work Address'})
+        cls.partner_namur = cls.env['res.partner'].create({'name': 'Namur Work Address'})
+        cls.env['hr.work.location'].create([{
+            'company_id': cls.env.company.id,
+            'bce_code': '8888888473',
+            'location_type': 'dmfa_unit',
+            'address_id': cls.partner_brussels.id,
+            'competence': 'br',
+        }, {
+            'company_id': cls.env.company.id,
+            'bce_code': '8888888176',
+            'location_type': 'dmfa_unit',
+            'address_id': cls.partner_namur.id,
+            'competence': 'wa',
+        }])
+
+    @classmethod
+    def _create_calendar(cls, hours_per_week, full_time_hours_per_week=40.0, hours_per_day=None):
+        hours_per_day = hours_per_day or (hours_per_week / 5.0)
+
+        return cls.env['resource.calendar'].sudo().create({
+            'name': f"{hours_per_week} Hours/Week",
+            'company_id': cls.env.company.id,
+            'hours_per_day': hours_per_day,
+            'hours_per_week': hours_per_week,
+            'full_time_required_hours': full_time_hours_per_week,
+            'attendance_ids': [(5, 0, 0)] + [
+                (0, 0, {
+                    'dayofweek': str(day),
+                    'hour_from': 8.0,
+                    'hour_to': 8.0 + hours_per_day,
+                    'work_entry_type_id': cls.env.ref(
+                        'hr_work_entry.generic_work_entry_type_attendance'
+                    ).id
+                })
+                for day in range(5)
+            ],
+        }).sudo(False)
 
     @classmethod
     def _generate_departure_data(cls, european_leave=False):
@@ -1565,6 +1723,141 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'EmpBonus.1': 28.02,
         }, skip_lines=True)
 
+    def test_employment_bonus_planned_cycle_reference(self):
+        # a Horeca schedule planned day by day whose reference regime is a two-week cycle of 36 hours (four 8-hour days,
+        # then five): U is the hours the cycle plans in April 2025, 19 days of 8 hours = 152 hours, not its average week
+        # spread over the 22 weekdays (36 / 5 x 22 = 158.4). Planned on the cycle's 19 days, H = U and S = W = 2,500:
+        # volet A 120.59, volet B 162.62 - 0.2699 x (2,500 - 2,175.25) = 74.97. Over 158.4 hours S was 16.45 x 158.4 =
+        # 2,605.68 and P = 0.96 x R: a bonus of 160.36 instead of 195.56
+        pattern = (8, 8, 0, 8, 8, 0, 0, 8, 8, 8, 8, 8, 0, 0)
+        reference = self.env['resource.calendar'].create({
+            'name': "36 hours, two-week cycle",
+            'company_id': self.env.company.id,
+            'calendar_type': 'variable',
+            'hours_per_week': 36,
+            'days_per_week': 4.5,
+            'full_time_required_hours': 36,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'date': datetime.date(1, 1, 1) + datetime.timedelta(days=offset),
+                'hour_from': 8.0,
+                'hour_to': 8.0 + hours,
+                'recurrency': True,
+                'recurrency_type': 'weeks',
+                'recurrency_interval': 2,
+                'recurrency_end_type': 'forever',
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id,
+            }) for offset, hours in enumerate(pattern) if hours],
+        })
+        start = datetime.date(2025, 4, 1)
+        planned = [day for day in (start + datetime.timedelta(days=offset) for offset in range(30))
+                   if pattern[(day - datetime.date(1, 1, 1)).days % 14]]
+        calendar = self.env['resource.calendar'].create({
+            'name': "Planned day by day",
+            'company_id': self.env.company.id,
+            'calendar_type': 'variable',
+            'hours_per_week': 36,
+            'days_per_week': 4.5,
+            'reference_calendar_id': reference.id,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'date': day,
+                'hour_from': 8.0,
+                'hour_to': 16.0,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id,
+            }) for day in planned],
+        })
+        self.version.write({
+            'resource_calendar_id': calendar.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'wage': 2500.0,
+            'fuel_card': 0,
+            'internet': 0,
+            'mobile': 0,
+            'meal_voucher_amount': 0,
+            'ip_wage_rate': 0,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302').id,
+        })
+        payslip = self._generate_payslip(start, datetime.date(2025, 4, 30))
+        is_full_time, paid_hours, total_hours, _paid_days, total_days = payslip._l10n_be_get_employment_bonus_fractions(payslip)
+        self.assertFalse(is_full_time)
+        self.assertEqual((paid_hours, total_hours, total_days), (152.0, 152.0, 19))
+        self._validate_payslip(payslip)
+
+    def test_employment_bonus_carry_over_partially_used_is_lost(self):
+        # January: bonus A 123.00, bonus B 165.87, ONSS 105.74
+        # - Paid A = min(105.74 ONSS, 123.00) = 105.74, carried over A = 123.00 - 105.74 = 17.26
+        # - Paid B = min(0.00 ONSS left after A, 165.87) = 0.00, carried over B = 165.87
+        self.version.write({
+            'contract_date_start': datetime.date(2026, 1, 1),
+            'wage': 800.0,
+        })
+        january = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self._validate_payslip(january)
+        explanations = {line.code: line.explanation for line in january.line_ids}
+        self.assertEqual(
+            explanations['EmpBonus.A.CO'],
+            "Result (17.26) = Max(0, Bonus (123.0) - Already paid (0.0) - ONSS (105.74)) - Already carried over (0.0)")
+        self.assertEqual(
+            explanations['EmpBonus.B.CO'],
+            "Result (165.87) = Max(0, Bonus (165.87) - Already paid (0.0) - Remaining ONSS after Volet A (0.0))"
+            " - Already carried over (0.0)")
+        january.action_payslip_done()
+
+        # February: bonus A 123.00, bonus B 60.54, ONSS 341.00
+        # - Paid A = min(341.00 ONSS, 123.00 + 17.26 carried over) = 140.26
+        # - Paid B = min(200.74 ONSS left after A, 60.54 + 165.87 carried over) = 200.74
+        # Only the bonus of the month not covered by its ONSS is carried over, not the unused carry over: carried over A
+        # = max(0, 123.00 - 341.00) = 0 and carried over B = max(0, 60.54 - 200.74) = 0, so no EmpBonus.*.CO line and
+        # the 25.67 left of the January carry over B (226.41 - 200.74) is lost
+        self.version.wage = 2600.0
+        february = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
+        self._validate_payslip(february)
+        february.action_payslip_done()
+
+        # March: nothing carried over from February
+        # - Paid A = min(341.00 ONSS, 123.00) = 123.00
+        # - Paid B = min(218.00 ONSS left after A, 60.54) = 60.54
+        march = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
+        self._validate_payslip(march)
+
+    def test_employment_bonus_carry_over_counted_once_per_month(self):
+        # The carry over of a month is the unused bonus of the whole month: a second payslip of the month corrects the
+        # carry over of the first one instead of adding its own
+        # January: bonus A 123.00, bonus B 165.87, ONSS 105.74
+        # - Paid A = 105.74, carried over A = 17.26
+        # - Paid B = 0.00, carried over B = 165.87
+        self.version.write({
+            'contract_date_start': datetime.date(2026, 1, 1),
+            'wage': 800.0,
+        })
+        january = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self._validate_payslip(january)
+        january.action_payslip_done()
+
+        # January off-cycle: ONSS 105.74
+        # - Paid A = min(105.74 ONSS, 123.00 - 105.74 already paid) = 17.26
+        # - Paid B = min(88.48 ONSS left after A, 165.87) = 88.48
+        # Unused bonus of January: A = 123.00 - 123.00 paid = 0, B = 165.87 - 88.48 paid = 77.39, the off-cycle carries
+        # over the difference with the 17.26 and 165.87 already carried over: -17.26 for A and -88.48 for B
+        january_off_cycle = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self._validate_payslip(january_off_cycle)
+        explanations = {line.code: line.explanation for line in january_off_cycle.line_ids}
+        self.assertEqual(
+            explanations['EmpBonus.A.CO'],
+            "Result (-17.26) = Max(0, Bonus (123.0) - Already paid (105.74) - ONSS (105.74))"
+            " - Already carried over (17.26)")
+        self.assertEqual(
+            explanations['EmpBonus.B.CO'],
+            "Result (-88.48) = Max(0, Bonus (165.87) - Already paid (0.0) - Remaining ONSS after Volet A (88.48))"
+            " - Already carried over (165.87)")
+        january_off_cycle.action_payslip_done()
+
+        # February: bonus A 123.00, bonus B 60.54, ONSS 341.00, carried over A 0.00 and B 77.39 (not 183.13 + 77.39)
+        # - Paid A = min(341.00 ONSS, 123.00) = 123.00
+        # - Paid B = min(218.00 ONSS left after A, 60.54 + 77.39 carried over) = 137.93
+        self.version.wage = 2600.0
+        february = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
+        self._validate_payslip(february)
+
     def _create_planned_full_time_calendar(self, planned):
         return self.env['resource.calendar'].create({
             'name': "Planned day by day",
@@ -1636,6 +1929,45 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertTrue(is_full_time)
         self.assertEqual((paid_days, total_days), (19, 21))
 
+    def test_employment_bonus_short_day_complete_month(self):
+        # a full-time week of four 9-hour days and a 4-hour Friday: paid for its 21 days of March 2025, the month is
+        # complete (J = D = 21, the Fridays count as days of the regime as they count as worked days) and S = W = 3,000:
+        # R = 120.59 - 0.2443 x (3,000 - 2,777.83) = 66.31, volet B 0. Counting the Fridays as half days (D = 19) made
+        # J > D and S = 142.86 x 19 = 2,714.34: volet A 120.59 and volet B 162.62 - 0.2699 x (2,714.34 - 2,175.25) =
+        # 17.12, a bonus of 137.71 instead of 66.31
+        calendar = self.env['resource.calendar'].create({
+            'name': "40 hours, short Friday",
+            'company_id': self.env.company.id,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'dayofweek': dayofweek,
+                'hour_from': hour_from,
+                'hour_to': hour_to,
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id,
+            }) for dayofweek, hour_from, hour_to in [
+                ("0", 8.0, 12.0), ("0", 13.0, 18.0),
+                ("1", 8.0, 12.0), ("1", 13.0, 18.0),
+                ("2", 8.0, 12.0), ("2", 13.0, 18.0),
+                ("3", 8.0, 12.0), ("3", 13.0, 18.0),
+                ("4", 8.0, 12.0),
+            ]],
+        })
+        calendar.reference_calendar_id = calendar
+        self.version.write({
+            'resource_calendar_id': calendar.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'wage': 3000.0,
+            'fuel_card': 0,
+            'internet': 0,
+            'mobile': 0,
+            'meal_voucher_amount': 0,
+            'ip_wage_rate': 0,
+        })
+        payslip = self._generate_payslip(datetime.date(2025, 3, 1), datetime.date(2025, 3, 31))
+        is_full_time, _paid_hours, _total_hours, paid_days, total_days = payslip._l10n_be_get_employment_bonus_fractions(payslip)
+        self.assertTrue(is_full_time)
+        self.assertEqual((paid_days, total_days), (21, 21))
+        self._validate_payslip(payslip)
+
     def test_employment_bonus_hours_without_recoverable_overtime(self):
         # overtime recovered later (026.00) pays its premium when worked, but its hours are declared when the rest is
         # taken: they are not hours H of the month for the employment bonus
@@ -1659,6 +1991,36 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         is_full_time, paid_hours, total_hours, _paid_days, _total_days = payslip._l10n_be_get_employment_bonus_fractions(payslip)
         self.assertFalse(is_full_time)
         self.assertEqual((paid_hours, total_hours), (157.6, 159.6))
+
+    def test_employment_bonus_hours_paid_later(self):
+        # additional hours paid with a later payslip, on a work entry type of the employer's own at a rate of 0, carry
+        # no pay in the month, but they are performed and declared with the performance code 1: they are hours H of the
+        # month for the employment bonus, the 91.2 hours of the half-time schedule and the 3 hours paid later, of the
+        # 167.2 hours of September 2025
+        paid_later_type = self.env.ref('hr_work_entry.be_work_entry_type_additional_hours').copy({
+            'name': "Additional hours paid later",
+            'code': 'TEST.PAID_LATER',
+            'amount_rate': 0.0,
+        })
+        self.assertEqual(paid_later_type.dmfa_code, '1')
+        self.version.resource_calendar_id = self.resource_calendar_half_time
+        self.version.wage_type = "hourly"
+        self.version.hourly_wage = 20
+        self.env['hr.leave'].create({
+            'work_entry_type_id': paid_later_type.id,
+            'request_date_from': datetime.datetime(2025, 9, 8, 17, 0),
+            'request_date_to': datetime.datetime(2025, 9, 8, 20, 0),
+            'request_hour_from': 17,
+            'request_hour_to': 20,
+            'employee_id': self.employee.id,
+        })
+        payslip = self._generate_payslip(datetime.date(2025, 9, 1), datetime.date(2025, 9, 30))
+        paid_later = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == 'TEST.PAID_LATER')
+        self.assertAlmostEqual(paid_later.number_of_hours, 3.0, places=2)
+        self.assertEqual(paid_later.amount, 0.0)
+        is_full_time, paid_hours, total_hours, _paid_days, _total_days = payslip._l10n_be_get_employment_bonus_fractions(payslip)
+        self.assertFalse(is_full_time)
+        self.assertEqual((paid_hours, total_hours), (94.2, 167.2))
 
     def test_employment_bonus_base_amount_rounded(self):
         # the base amount R of the employment bonus is rounded to the cent before the fraction of the month: paid by the
@@ -1954,7 +2316,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         september_payslip = self._generate_payslip(datetime.date(2020, 9, 1), datetime.date(2020, 9, 30))
 
         self.assertEqual(len(september_payslip.worked_days_line_ids), 2)
-        self.assertEqual(len(september_payslip.line_ids), 60)
+        self.assertEqual(len(september_payslip.line_ids), 61)
 
         self._validate_worked_days(september_payslip, {
             '002.00': (7.0, 53.2, 856.15),
@@ -2168,6 +2530,42 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
         self._validate_payslip(payslip)
 
+    def test_as_much_unpaid_leaves_with_public_holiday(self):
+        # Maternity leave from January 16th: 88 unpaid hours, 88 paid hours (80 worked and the public holiday of
+        # January 1st). The paid lines share half of the wage: 3000 / 2 = 1500, the public holiday is not added
+        # at the hourly rate on top of the half wage of the work (1363.64 + 138.46 = 1502.10)
+        self.version.write({
+            'wage': 3000,
+            'resource_calendar_id': self.resource_calendar_40_hours_per_week.id,
+            'reference_calendar_id': self.resource_calendar_40_hours_per_week.id,
+        })
+        self.env['resource.calendar.leaves'].create([{
+            'name': "New Year",
+            'calendar_id': self.resource_calendar_40_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 1, 1, 0, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 1, 23, 59, 59),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        }, {
+            'name': "Maternity Leave",
+            'calendar_id': self.resource_calendar_40_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'resource_id': self.employee.resource_id.id,
+            'date_from': datetime.datetime(2026, 1, 16, 0, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 31, 23, 59, 59),
+            'count_as': "absence",
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
+        }])
+
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+
+        self._validate_worked_days(payslip, {
+            '002.00': (10.0, 80.0, 1363.64),
+            '006.00': (1.0, 8.0, 136.36),
+            '128.00': (11.0, 88.0, 0.0),
+        })
+        self._validate_payslip(payslip, {'BASIC': 1500.0}, skip_lines=True)
+
     def test_more_unpaid_leaves_half_days(self):
         self.env['resource.calendar.leaves'].create([{
             'name': "Absence",
@@ -2278,7 +2676,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
         payslip_results = {
             'BASIC': 3707.12,
-            'CAR.PRIV': 126.50,  # 5.75 * 22.0 * 1.0
+            'CAR.PRIV': 253.00,  # 5.75 * 44.0 * 1.0
         }
         self._validate_payslip(payslip, payslip_results, skip_lines=True)
 
@@ -2310,6 +2708,25 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         }
         self._validate_payslip(payslip, payslip_results, skip_lines=True)
 
+    def test_private_car_cp200_2026_brackets(self):
+        # The value under the key n of the daily scale applies from n km to the next key excluded. CP 200 only
+        # intervenes from 3 km: the 1 and 2 km rows of the scale don't apply.
+        self.version.l10n_be_joint_committee_id.egov3_code = '200'
+        self.version.write({
+            'wage': 3707.12,
+            'private_car_employee_kilometer': 2,
+            'car_id': False,
+        })
+        payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
+        for kilometer, daily_amount in ((2, 0.0), (3, 1.10), (30, 3.37), (31, 3.48), (33, 3.48), (34, 3.69)):
+            with self.subTest(kilometer=kilometer):
+                self.version.private_car_employee_kilometer = kilometer
+                payslip.compute_sheet()
+                self._validate_payslip(payslip, {
+                    'BASIC': 3707.12,
+                    'CAR.PRIV': round(daily_amount * 22.0, 2),
+                }, skip_lines=True)
+
     def test_private_car_max_km(self):
         self.version.l10n_be_joint_committee_id.egov3_code = '302'
         self.version.write({
@@ -2320,7 +2737,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
         payslip_results = {
             'BASIC': 3707.12,
-            'CAR.PRIV': 290.84,
+            'CAR.PRIV': 581.68,
         }
         self._validate_payslip(payslip, payslip_results, skip_lines=True)
 
@@ -2434,7 +2851,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(october_payslip.input_line_ids), 0)
 
         self._validate_worked_days(october_payslip, {
-            '002.00': (13.0, 98.8, 1549.23),
+            '002.00': (13.0, 98.8, 1549.22),
             '013.00': (5.0, 38.0, 611.54),
             '122.00': (4.0, 30.4, 0.0),
         })
@@ -2769,7 +3186,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(october_payslip.input_line_ids), 0)
 
         self._validate_worked_days(october_payslip, {
-            '002.00': (10.0, 76.0, 1141.54),
+            '002.00': (10.0, 76.0, 1141.53),
             '013.00': (4.0, 30.4, 489.23),
             '122.00': (4.0, 30.4, 0.0),
             '147.00': (4.0, 30.4, 0.0),
@@ -3006,7 +3423,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(october_payslip.input_line_ids), 0)
 
         self._validate_worked_days(october_payslip, {
-            '002.00': (9.0, 68.4, 1019.23),
+            '002.00': (9.0, 68.4, 1019.21),
             '122.00': (9.0, 68.4, 0.0),
             '147.00': (4.0, 30.4, 0.0),
         })
@@ -3248,11 +3665,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.version.commission_on_target = 1000
         self.version.contract_date_start = datetime.date(2019, 1, 1)
 
-        commission_payslip = self._generate_payslip(datetime.date(2019, 12, 1), datetime.date(2019, 12, 31))
-
-        commission_payslip._set_input_value('COMMISSION', 8484)
-
-        commission_payslip.compute_sheet()
+        commission_payslip = self._generate_payslip(datetime.date(2019, 12, 1), datetime.date(2019, 12, 31), input_values={'COMMISSION': 8484})
         self.employee.write({'review_state': '1_reviewed'})
         commission_payslip.action_payslip_done()
 
@@ -3291,7 +3704,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'F_PROFESSIONAL_FEES': -4890.0,
             'TRANSPORT_TAX_DED': -410.4,
             'GROSS.NET.Y': 17379.6,
-            'Y.P.P': 5343.94,
+            'Y.P.P': 5343.95,
             'P.P.MARITAL.DED': -2097.2,
             'P.P.FAMILY.DED': 0.0,
             'P.P': -270.56,
@@ -3303,9 +3716,9 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'MEAL_VOUCHER_EMPLOYER': 133.56,
             'REP.FEES': 150.0,
             'IP': 662.5,
-            'IP.DED': -86.39,
+            'IP.DED': -36.7,
             'NET_TO_RECOVER': 0.0,
-            'NET': 2102.13,
+            'NET': 2151.82,
             'REMUNERATION': 2021.44,
             'CO2FEE': 27.24,
             'ONSSEMPLOYERBASIC': 673.23,
@@ -3315,7 +3728,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ONSSEMPLOYER_831': 6.19,
             'ONSSEMPLOYER_855': 45.51,
             'ONSSEMPLOYER_859': 2.69,
-            'ONSSEMPLOYER': 602.08,
+            'ONSSEMPLOYER': 596.46,
             'HOLIDAY_TAX_PROV_BASE': 2692.94,
             'HOLIDAY_TAX_PROV': 490.12,
         }
@@ -3420,12 +3833,12 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             {'account_id.code': '620200', 'debit': 7782.06, 'credit':    0.00},  # remuneration
             {'account_id.code': '453000', 'debit':    0.00, 'credit': 1722.22},  # PP
             {'account_id.code': '643000', 'debit': 1162.50, 'credit':    0.00},  # IP
-            {'account_id.code': '453000', 'debit':    0.00, 'credit':  151.59},  # IP DED
+            {'account_id.code': '453000', 'debit':    0.00, 'credit':   64.40},  # IP DED
             {'account_id.code': '454000', 'debit':    0.00, 'credit':  996.44},  # ONSS - Emp Bonus
             {'account_id.code': '620200', 'debit':  191.44, 'credit':    0.00},  # Private Car
             {'account_id.code': '620200', 'debit':  300.0, 'credit':    0.00},  # Representation Fees
             {'account_id.code': '743000', 'debit':    0.00, 'credit':   50.14},  # Meal vouchers
-            {'account_id.code': '455000', 'debit':    0.00, 'credit': 6515.61},  # NET
+            {'account_id.code': '455000', 'debit':    0.00, 'credit': 6602.80},  # NET
             {'account_id.code': '454000', 'debit':    0.00, 'credit':  581.62},  # ONSS Employer
             {'account_id.code': '621000', 'debit':  581.62, 'credit':    0.00},  # ONSS Employer
         ]
@@ -3493,11 +3906,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ip_wage_rate': 0,
         })
 
-        payslip = self._generate_payslip(datetime.date(2021, 1, 1), datetime.date(2021, 1, 31))
-
-        payslip._set_input_value('COMMISSION', 3000)
-
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(datetime.date(2021, 1, 1), datetime.date(2021, 1, 31), input_values={'COMMISSION': 3000})
 
         self.assertEqual(len(payslip.worked_days_line_ids), 1)
 
@@ -3952,7 +4361,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'name': 'Extra Hours 200%',
             'code': 'EXTRA_HOURS200',
             'amount_rate': 2,
-            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id])],
+            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id, self.env.ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF').id])],
         })
 
         self.leaves = self.env['resource.calendar.leaves'].create([{
@@ -3994,19 +4403,42 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
         self._validate_payslip(payslip)
 
+    def test_withholding_tax_reduction_extra_hours_category(self):
+        # The overtime giving right to the withholding tax reduction is the one of the category of the overtime tax
+        # relief, as for the 274.44/274.55 exemptions and the box 18 of the 281.10: an extra hours type without it
+        # is paid, but neither reduces the withholding tax nor is declared as overtime
+        extra_hours_entry_type = self.env['hr.work.entry.type'].create({
+            'name': 'Extra Hours 200%',
+            'code': 'EXTRA_HOURS200',
+            'amount_rate': 2,
+            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id])],
+        })
+        self.env['resource.calendar.leaves'].create({
+            'name': "14th JAN Extra Hours",
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'resource_id': self.employee.resource_id.id,
+            'date_from': datetime.datetime(2026, 1, 14, 7, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 14, 16, 36, 0),
+            'work_entry_type_id': extra_hours_entry_type.id,
+        })
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self.assertTrue(payslip.worked_days_line_ids.filtered(lambda l: l.work_entry_type_id == extra_hours_entry_type))
+        self.assertFalse(payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH'))
+
     def test_withholding_tax_reduction_extra_hours_with_different_rates(self):
         extra_hours_25_type = self.env['hr.work.entry.type'].create({
             'name': 'Extra Hours 125%',
             'code': 'EXTRA_HOURS125',
             'amount_rate': 1.25,
-            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id])],
+            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id, self.env.ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF').id])],
         })
 
         extra_hours_100_type = self.env['hr.work.entry.type'].create({
             'name': 'Extra Hours 200%',
             'code': 'EXTRA_HOURS200',
             'amount_rate': 2.0,
-            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id])],
+            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id, self.env.ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF').id])],
         })
 
         self.env['resource.calendar.leaves'].create([
@@ -4031,7 +4463,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         ])
 
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip.compute_sheet()
 
         # Basic hourly rate = 2650.0 * 3 / (13 * 38) ≈ 16.09312 €/h
         # Base amount per line (7.6h) = 7.6 * 16.09312 ≈ 122.30769 €
@@ -4039,11 +4470,11 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         # Deduction_2 (57.75%) = 122.30769 * 0.5775 ≈ 70.63269 €
         # Total Expected Reduction = -(81.71377 + 70.63269) ≈ 152.35 €
         self.assertAlmostEqual(payslip._get_withholding_extra_hours_reduction(), 152.35, places=2)
-        # It exceeds the withholding tax of the scale (P.P = -144.32 €): the reduction stops at that tax, the
+        # It exceeds the withholding tax of the scale (P.P = -144.33 €): the reduction stops at that tax, the
         # withholding tax is 0, not a refund
         deduction_line = payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH')
         self.assertTrue(deduction_line, "Rule P.P.DEDEH must be computed for multiple rates.")
-        self.assertAlmostEqual(deduction_line.total, 144.32, places=2)
+        self.assertAlmostEqual(deduction_line.total, 144.33, places=2)
 
         self._validate_payslip(payslip)
 
@@ -4071,16 +4502,16 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
     def test_withholding_tax_reduction_extra_hours_annual_cap_reached(self):
         """
-        Test that withholding tax reduction (P.P.DEDEH) is capped at the standard 360-hour annual limit
-        when l10n_be_has_white_cash_register is False on the company.
+        Test that withholding tax reduction (P.P.DEDEH) is capped at the yearly limit of hours of the joint
+        committee: 180 hours for CP200 (cp200_overtime_threshold, as in the 274.XX), the 360 hours of the hotel
+        industry (CP302) only apply to that joint committee, whatever the cash register.
 
         Accumulation Breakdown:
           - Jan 2026: 22 days * 7.6h = 167.2h
-          - Feb 2026: 20 days * 7.6h = 152.0h
-          - Total consumed before March = 319.2h
-          - Remaining annual cap for March = 360.0h - 319.2h = 40.8h
-          - March extra hours = 6 days * 7.6h = 45.6h (Exceeds remaining cap!)
-          - Eligible hours capped at min(45.6h, 40.8h) = 40.8h
+          - Remaining annual cap for February = 180.0h - 167.2h = 12.8h
+          - Feb 2026: 20 days * 7.6h = 152.0h (Exceeds remaining cap!)
+          - Eligible hours capped at min(152.0h, 12.8h) = 12.8h
+          - March: the cap is reached, no reduction
         """
 
         self.env.company.l10n_be_has_white_cash_register = False
@@ -4088,7 +4519,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'name': 'Extra Hours 200%',
             'code': 'EXTRA_HOURS200',
             'amount_rate': 2.0,
-            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id])],
+            'category_ids': [(6, 0, [self.env.ref('hr_payroll.EXTRA_HOURS').id, self.env.ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF').id])],
         })
 
         # January 2026: 22 extra working days * 7.6h = 167.2 extra hours
@@ -4106,8 +4537,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         jan_payslip.action_payslip_done()
 
         # February 2026: 20 extra working days * 7.6h = 152.0 extra hours
-        # Total extra hours consumed before March = 167.2h + 152.0h = 319.2h
-        # Remaining annual cap for March = 360.0h - 319.2h = 40.8h
         self.env['resource.calendar.leaves'].create([{
             'name': "FEB Extratime",
             'calendar_id': self.resource_calendar_38_hours_per_week.id,
@@ -4118,11 +4547,22 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'work_entry_type_id': extra_hours_entry_type.id,
         }])
         feb_payslip = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
+
+        # Calculation verification for Rule P.P.DEDEH in February:
+        # Basic Hourly Rate = 2650.0 * 3 / (13 * 38) ≈ 16.09312 €/h
+        # Eligible Extra Hours = min(152.0h registered, 12.8h remaining cap) = 12.8h
+        # Capped Base Amount = 12.8 hours * 16.09312 ≈ 205.99190 €
+        # Premium rate = 100% (>= 50%) -> Deduction Rate = 57.75%
+        # Expected Reduction = 205.99190 * 0.5775 ≈ 118.96 €
+        self.assertAlmostEqual(feb_payslip._get_withholding_extra_hours_reduction(), 118.96, places=2)
+        withholding_tax = -feb_payslip._get_line_values(['P.P'])['P.P'][feb_payslip.id]['total']
+        deduction_line = feb_payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH')
+        self.assertTrue(deduction_line, "Rule P.P.DEDEH should be computed on the February payslip up to the remaining annual cap.")
+        self.assertAlmostEqual(deduction_line.total, min(118.96, withholding_tax), places=2)
         feb_payslip.action_payslip_done()
 
-        # MAR -> 6 days * 7.6h = 45.6 extra hours
-        # Exceeds the 40.8h remaining cap! The reduction formula must limit calculation to min(45.6, 40.8) = 40.8h.
-        self.leaves = self.env['resource.calendar.leaves'].create([{
+        # MAR -> 6 days * 7.6h = 45.6 extra hours, the yearly cap is reached
+        self.env['resource.calendar.leaves'].create([{
             'name': "MAR Extratime Cap Exceeded",
             'calendar_id': self.resource_calendar_38_hours_per_week.id,
             'company_id': self.env.company.id,
@@ -4132,22 +4572,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'work_entry_type_id': extra_hours_entry_type.id,
         }])
         mar_payslip = self._generate_payslip(datetime.date(2026, 3, 1), datetime.date(2026, 3, 31))
-        mar_payslip.compute_sheet()
-
-        # Calculation verification for Rule P.P.DEDEH in March:
-        # Contract Wage = 2650.0 €
-        # Basic Hourly Rate = 2650.0 * 3 / (13 * 38) ≈ 16.09312 €/h
-        # Eligible Extra Hours = min(45.6h registered, 40.8h remaining cap) = 40.8h
-        # Capped Base Amount = 40.8 hours * 16.09312 ≈ 656.59919 €
-        # Premium rate = 100% (>= 50%) -> Deduction Rate = 57.75%
-        # Expected Reduction = 656.59919 * 0.5775 ≈ 379.19 €
-        self.assertAlmostEqual(mar_payslip._get_withholding_extra_hours_reduction(), 379.19, places=2)
-        # It exceeds the withholding tax of the scale: the reduction stops at that tax
-        withholding_tax = -mar_payslip._get_line_values(['P.P'])['P.P'][mar_payslip.id]['total']
-        self.assertLess(withholding_tax, 379.19)
-        deduction_line = mar_payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH')
-        self.assertTrue(deduction_line, "Rule P.P.DEDEH should be computed on the March payslip up to the remaining annual cap.")
-        self.assertAlmostEqual(deduction_line.total, withholding_tax, places=2)
+        self.assertEqual(mar_payslip._get_withholding_extra_hours_reduction(), 0)
+        self.assertFalse(mar_payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH').total)
 
     def test_withholding_tax_reduction_extra_hours_child_premium_pay_category(self):
         """
@@ -4179,6 +4605,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'amount_rate': 1.0,
             'category_ids': [(6, 0, [
                 self.env.ref('hr_payroll.EXTRA_HOURS').id,
+                self.env.ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF').id,
                 parent_category.id
             ])],
         })
@@ -4206,7 +4633,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         ])
 
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip.compute_sheet()
 
         # 4. Calculation verification for Rule P.P.DEDEH:
         # Contract Wage = 2650.0 €
@@ -4218,6 +4644,42 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         deduction_line = payslip.line_ids.filtered(lambda l: l.code == 'P.P.DEDEH')
         self.assertTrue(deduction_line, "Rule P.P.DEDEH must compute when qualification comes from child premium pay.")
         self.assertAlmostEqual(deduction_line.total, 141.27, places=2)
+
+        self._validate_payslip(payslip)
+
+    def test_withholding_tax_reduction_extra_hours_credit_time(self):
+        """The overtime reduction of a 4/5 time credit is computed on the same base as the employer's exemption
+        (art. 154bis and 275/1 CIR 92: the pay of the hours before the premium), at the hourly wage the overtime line
+        is valued at (the wage prorated by the time credit), not the full-time wage over the part-time weekly hours."""
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2120.0 * (5 / 4),
+            'work_time_rate': 1.0,
+        })
+        self.env['resource.calendar.leaves'].create({
+            'name': "15th JAN Extra Hours 150%",
+            'calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'company_id': self.env.company.id,
+            'resource_id': self.employee.resource_id.id,
+            'date_from': datetime.datetime(2026, 1, 15, 7, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 15, 16, 36, 0),
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_overtime').id,
+        })
+
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+
+        overtime_line = payslip.worked_days_line_ids.filtered(lambda l: l.code == '040.00')
+        self.assertAlmostEqual(overtime_line.number_of_hours, 7.6, places=2)
+        # The overtime line: 7.6h x 2120.0 (the wage after the 4/5 time credit) * 3 / (13 * 30.4) €/h x 150%
+        #   = 7.6 x 16.09312 x 1.5 ≈ 183.46 €; the base of the 274.44 and of the reduction: 183.46 / 1.5 ≈ 122.31 €
+        # Before the fix: 7.6h x 2650.0 (the full-time wage) * 3 / (13 * 30.4) = 20.11640 €/h x 57.75% ≈ 88.29 €
+        # After: 122.31 x 57.75% ≈ 70.63 € (the 274.44: 122.31 x 41.25% ≈ 50.45 €)
+        base = overtime_line.amount / overtime_line.work_entry_type_id.amount_rate
+        self.assertAlmostEqual(payslip._get_withholding_extra_hours_reduction(), base * 0.5775, places=2)
+        self.assertAlmostEqual(payslip._get_withholding_extra_hours_reduction(), 70.63, places=2)
 
         self._validate_payslip(payslip)
 
@@ -4246,7 +4708,10 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
         self.assertEqual(len(termination_payslip.worked_days_line_ids), 0)
 
-        self.assertAlmostEqual(termination_payslip.line_ids.filtered(lambda l: l.code == 'HOLIDAY_TERM_PP').amount, -658.99, places=2)
+        # Annexe III: the yearly normal pay (14,302.91) is below the limit for 2 children (17,060): the holiday pay
+        # (3,885.58) is exempted up to the difference (2,757.09), the rest is taxed at the rate of the yearly normal
+        # pay (26.25%), reduced by 20% for 2 children: 1,128.49 x 26.25% x 80%
+        self.assertAlmostEqual(termination_payslip.line_ids.filtered(lambda l: l.code == 'HOLIDAY_TERM_PP').amount, -236.98, places=2)
         self._validate_payslip(termination_payslip)
 
     def test_termination_holidays_pp_no_exoneration_reduction(self):
@@ -4326,6 +4791,12 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertAlmostEqual(termination_payslip.line_ids.filtered(lambda l: l.code == 'HOLIDAY_TERM_PP').amount, -2144.29, places=2)
         self._validate_payslip(termination_payslip)
 
+    def test_taxable_salary_without_onss(self):
+        # Taxed at the scale and paid with the net, never in the ONSS base: one input adds, the other deducts
+        for inputs in [{'TAXABLE_NO_ONSS': 500}, {'TAXABLE_NO_ONSS_DED': 100}]:
+            payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), input_values=inputs)
+            self._validate_payslip(payslip)
+
     def test_seized_amounts_are_deducted_from_the_net(self):
         amount_by_code = {
             'DEDUCTION': 100.0,
@@ -4333,7 +4804,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ASSIG_SALARY_PRIOR': 120.0,
             'ASSIG_SALARY': 130.0,
             'ATTACH_SALARY': 140.0,
-            'TRAFFIC_FINES': 150.0,
             'SALARYADVREC': 160.0,
         }
 
@@ -4351,6 +4821,32 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip._set_input_values(amount_by_code)
         payslip.compute_sheet()
         self._validate_payslip(payslip)
+
+    def test_seizable_amount_meal_voucher_contribution(self):
+        # The employee contribution to the meal vouchers is not deducted from the net remuneration
+        self.version.write({
+            'wage': 3000.0,
+            'meal_voucher_amount': 10.0,
+        })
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        payslip._set_input_values({
+            'HIRINGBONUS': 1000.0,
+            'ATTACH_SALARY': 10000.0,
+        })
+        payslip.compute_sheet()
+        self._validate_payslip(payslip)
+
+    def test_traffic_fines_paid_by_the_employer(self):
+        # A taxable benefit in kind subject to the contribution 889 instead of the ONSS. The light fines are exempt up
+        # to 150 EUR a year (January 100, February 50 of 100, March none), the serious ones never.
+        for date_from, date_to, inputs in [
+            (datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), {'TRAFFIC_FINES_LIGHT': 100}),
+            (datetime.date(2026, 2, 1), datetime.date(2026, 2, 28), {'TRAFFIC_FINES_LIGHT': 100}),
+            (datetime.date(2026, 3, 1), datetime.date(2026, 3, 31), {'TRAFFIC_FINES_LIGHT': 30, 'TRAFFIC_FINES': 200}),
+        ]:
+            payslip = self._generate_payslip(date_from, date_to, input_values=inputs)
+            self._validate_payslip(payslip)
+            payslip.action_payslip_done()
 
     def test_public_holiday_right_unemployment(self):
         # Note: The public holidays are paid the first 14 days of unemployment
@@ -4849,6 +5345,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self._validate_payslip(holiday_pay_2020)
 
     def test_holiday_attest_n_after_june(self):
+        # Compensate the loss on commission on PTO with the double holiday pay (SIMPLE_VARIABLE) instead of monthly (COM_LOSS_PTO)
+        self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday').active = True
         self._generate_departure_data()
 
         double_pay_payslip = self.env['hr.payslip'].create({
@@ -4916,6 +5414,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ip_wage_rate': 0.12,
             'commission_on_target': 1533.0,
             'bus_transport_employee_amount': 49.0,
+            'bus_transport_employee_kilometer': 5,
             'l10n_be_lsa_monthly_misc_base_amount': 279.31,
             'l10n_be_lsa_monthly_pro_other_amount': 119.69,
         })
@@ -4945,6 +5444,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ip_wage_rate': 0.12,
             'commission_on_target': 1433.33,
             'bus_transport_employee_amount': 49.0,
+            'bus_transport_employee_kilometer': 5,
             'l10n_be_lsa_monthly_misc_base_amount': 279.31,
             'l10n_be_lsa_monthly_pro_other_amount': 119.69,
             'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
@@ -5003,7 +5503,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'bike_transport_employee_kilometer': 1
         })
         payslip = self._generate_payslip(datetime.date(2022, 5, 1), datetime.date(2022, 5, 31))
-        payslip.compute_sheet()
         self.assertEqual(len(payslip.worked_days_line_ids), 1)
 
         self._validate_payslip(payslip)
@@ -5014,7 +5513,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'bike_transport_employee_kilometer': 1
         })
         payslip = self._generate_payslip(datetime.date(2022, 5, 1), datetime.date(2022, 5, 31))
-        payslip.compute_sheet()
         self.assertEqual(len(payslip.worked_days_line_ids), 1)
 
         self._validate_payslip(payslip)
@@ -5026,7 +5524,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'l10n_be_lsa_monthly_pro_other_amount': 115.27,
         })
         payslip = self._generate_payslip(datetime.date(2022, 5, 1), datetime.date(2022, 5, 31))
-        payslip.compute_sheet()
         self.assertEqual(len(payslip.worked_days_line_ids), 1)
         self.assertEqual(payslip.worked_days_line_ids.number_of_days, 20)  # Instead of 22
 
@@ -5042,7 +5539,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'l10n_be_lsa_monthly_pro_other_amount': 115.27,
         })
         payslip = self._generate_payslip(datetime.date(2022, 5, 1), datetime.date(2022, 5, 31))
-        payslip.compute_sheet()
         self.assertEqual(len(payslip.worked_days_line_ids), 2)
 
         self._validate_payslip(payslip)
@@ -5057,7 +5553,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'l10n_be_lsa_monthly_pro_other_amount': 115.27,
         })
         payslip = self._generate_payslip(datetime.date(2022, 5, 1), datetime.date(2022, 5, 31))
-        payslip.compute_sheet()
         self.assertEqual(len(payslip.worked_days_line_ids), 2)  # Work entries are overlapping
         credit_time = payslip.worked_days_line_ids.filtered(lambda w: w.code == '147.00')
         self.assertTrue(credit_time)
@@ -5304,7 +5799,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         })
 
         payslip = self._generate_payslip(datetime.date(2022, 7, 1), datetime.date(2022, 7, 31))
-        payslip.compute_sheet()
 
         self._validate_payslip(payslip)
 
@@ -5416,9 +5910,9 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip_dec = self._generate_payslip(datetime.date(2026, 12, 1), datetime.date(2026, 12, 31))
 
         # Recomputed 100% Wage Base (11.6 hours): 11.6h * 16.0931 €/h = 186.68 €
-        # Max Recoverable: min(100% Wage Base [186.68 €], Cap [10.00 €]) = 10.00 €
+        # Max Recoverable: min(100% Wage Base [186.68 €], Cap [10.00 € * 11.6 / 38 hours taken = 3.05 €]) = 3.05 €
         # Actual Recovered in July: 168.01 €
-        # HolPayReg = -(10.00 - 168.01) = 158.01 € (Reimbursement)
+        # HolPayReg = -(3.05 - 168.01) = 164.96 € (Reimbursement)
         self._validate_payslip(payslip_dec)
 
     def test_simple_n1_holiday_pay_recovery_lower_salary(self):
@@ -5669,9 +6163,9 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip_dec = self._generate_payslip(datetime.date(2026, 12, 1), datetime.date(2026, 12, 31))
 
         # Recomputed 100% Wage Base (11.6 hours): 11.6h * 16.0931 €/h = 186.68 €
-        # Max Recoverable: min(100% Wage Base [186.68 €], Cap [10.00 €]) = 10.00 €
+        # Max Recoverable: min(100% Wage Base [186.68 €], Cap [10.00 € * 11.6 / 38 hours taken = 3.05 €]) = 3.05 €
         # Actual Recovered in July: 168.01 €
-        # HolPayRegN = -(10.00 - 168.01) = 158.01 € (Reimbursement)
+        # HolPayRegN = -(3.05 - 168.01) = 164.96 € (Reimbursement)
         self._validate_payslip(payslip_dec)
 
     def test_simple_n_holiday_pay_recovery_lower_salary(self):
@@ -5816,15 +6310,62 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
         net_account_move_line = payslip.move_id.line_ids.filtered(lambda l: l.name == 'Net Salary')
         self.assertAlmostEqual(net_account_move_line.debit, 0.0, places=2)
-        self.assertAlmostEqual(net_account_move_line.credit, 2149.95, places=2)
+        self.assertAlmostEqual(net_account_move_line.credit, 2199.64, places=2)
 
         refund = payslip._action_refund_payslips()
         self._validate_payslip(refund)
         self.employee.write({'review_state': '1_reviewed'})
 
         net_account_move_line = refund.move_id.line_ids.filtered(lambda l: l.name == 'Net Salary')
-        self.assertAlmostEqual(net_account_move_line.debit, 2149.95, places=2)
+        self.assertAlmostEqual(net_account_move_line.debit, 2199.64, places=2)
         self.assertAlmostEqual(net_account_move_line.credit, 0.0, places=2)
+
+    def _correct_august_payslip_with_lower_wage(self, paid):
+        payslip = self._generate_payslip(datetime.date(2022, 8, 1), datetime.date(2022, 8, 31))
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        if paid:
+            payslip.action_payslip_paid()
+        payslip._action_refund_payslips()
+        self.version.wage -= 1000
+        self.employee.write({'review_state': '1_reviewed'})
+        correction = payslip._action_correct_payslips()
+        correction.action_payslip_done()
+        return payslip, correction
+
+    def test_negative_correction_delta_is_recovered(self):
+        """ The correction of a paid payslip pays the difference of net with the original payslip:
+        when it is negative, the employee owes it and it is recovered on the next payslips. """
+        payslip, correction = self._correct_august_payslip_with_lower_wage(paid=True)
+        debt = payslip.net_wage - correction.net_wage
+        self.assertGreater(debt, 0)
+        self.assertAlmostEqual(correction.correction_net_delta, -debt, places=2)
+        self.assertEqual(correction._get_line_values(['NET_TO_RECOVER'])['NET_TO_RECOVER'][correction.id]['total'], 0)
+
+        september = self._generate_payslip(datetime.date(2022, 9, 1), datetime.date(2022, 9, 30))
+        line_values = september._get_line_values(['NET_TO_RECOVER', 'NET'])
+        self.assertAlmostEqual(line_values['NET_TO_RECOVER'][september.id]['total'], -debt, places=2)
+        self.assertGreater(line_values['NET'][september.id]['total'], 0)
+
+        self.employee.write({'review_state': '1_reviewed'})
+        september.action_payslip_done()
+        move_lines = september.move_id.line_ids
+        recovery_line = move_lines.filtered(lambda l: l.name == 'Net Amount to Recover')
+        self.assertAlmostEqual(recovery_line.credit, debt, places=2)
+        self.assertEqual(recovery_line.account_id, move_lines.filtered(lambda l: l.name == 'Net Salary').account_id)
+        self.assertFalse(move_lines.filtered(lambda l: l.name == 'Adjustment Entry'))
+
+        # the debt is recovered once
+        october = self._generate_payslip(datetime.date(2022, 10, 1), datetime.date(2022, 10, 31))
+        self.assertEqual(october._get_line_values(['NET_TO_RECOVER'])['NET_TO_RECOVER'][october.id]['total'], 0)
+
+    def test_negative_correction_delta_of_unpaid_payslip(self):
+        """ Nothing was paid to the employee: a negative correction delta isn't owed. """
+        dummy, correction = self._correct_august_payslip_with_lower_wage(paid=False)
+        self.assertLess(correction.correction_net_delta, 0)
+
+        september = self._generate_payslip(datetime.date(2022, 9, 1), datetime.date(2022, 9, 30))
+        self.assertEqual(september._get_line_values(['NET_TO_RECOVER'])['NET_TO_RECOVER'][september.id]['total'], 0)
 
     def test_sick_time_off_without_guaranteed_salary_half_days_no_attendances(self):
         # Check the sick time off is not counted twice on half/full days
@@ -5876,7 +6417,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertAlmostEqual(sick.amount, 0, places=2)
         # Sick time off
         sick = wds.filtered(lambda wd: wd.code == "013.00")
-        self.assertAlmostEqual(sick.amount, 3180.35, places=2)
+        self.assertAlmostEqual(sick.amount, 3180.36, places=2)
 
         self._validate_payslip(payslip)
 
@@ -5946,6 +6487,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'european_leaves_amount': 0,
             'non_equivalent_days': 2,
             'paid_leaves': 0,
+            'postponed_leaves': 0,
+            'attest_paid_leaves': 0,
             'reference_hours_per_week': 38.0,
             'senior_youth_leaves': 0,
         }, occ1)
@@ -5960,6 +6503,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'european_leaves': 0,
             'european_leaves_amount': 0,
             'paid_leaves': 0,
+            'postponed_leaves': 0,
+            'attest_paid_leaves': 0,
             'reference_hours_per_week': 38.0,
             'senior_youth_leaves': 0,
         }, occ2)
@@ -6308,6 +6853,73 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2023, 6, 1), datetime.date(2023, 6, 30), struct_id=self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month').id)
         self._validate_payslip(payslip)
 
+    def _get_move_balances(self, payslip):
+        """ Balance (credit - debit) of the journal entry of the payslip, by account code. """
+        balances = defaultdict(float)
+        for line in payslip.move_id.line_ids:
+            balances[line.account_id.code] += line.credit - line.debit
+        return balances
+
+    def test_accounting_entries_thirteen_month(self):
+        payslip = self._generate_payslip(
+            datetime.date(2023, 12, 1), datetime.date(2023, 12, 31),
+            struct_id=self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month').id)
+        totals = {code: values[payslip.id]['total'] for code, values in payslip._get_line_values(
+            ['BONUS_BASIC', 'NET', 'ONSSTOTAL', 'ONSSEMPLOYER', 'M.ONSS', 'PPTOTAL']).items()}
+        self.assertTrue(all(totals.values()))
+        payslip.action_payslip_done()
+
+        self.assertFalse(payslip.move_id.line_ids.filtered(lambda line: line.name == 'Adjustment Entry'))
+        balances = self._get_move_balances(payslip)
+        self.assertAlmostEqual(balances['620200'], -totals['BONUS_BASIC'], places=2)
+        self.assertAlmostEqual(balances['455000'], totals['NET'], places=2)
+        self.assertAlmostEqual(balances['454000'], totals['ONSSTOTAL'] + totals['ONSSEMPLOYER'] - totals['M.ONSS'], places=2)
+        self.assertAlmostEqual(balances['453000'], totals['PPTOTAL'], places=2)
+
+    def test_accounting_entries_cct90(self):
+        payslip = self._generate_payslip(
+            datetime.date(2025, 1, 1), datetime.date(2025, 1, 31),
+            struct_id=self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90').id)
+        payslip._set_input_value('CCT90BONUSPLAN', 10000)
+        payslip.compute_sheet()
+        totals = {code: values[payslip.id]['total'] for code, values in payslip._get_line_values(
+            ['ONSS_BONUS', 'ONSS_SOLIDARITY_BONUS', 'ONSSEMPLOYER', 'BONUS_PP']).items()}
+        self.assertTrue(totals['ONSS_BONUS'] and totals['BONUS_PP'])
+        payslip.action_payslip_done()
+
+        # The worker contributions on the bonus and the employer contributions are owed to the ONSS
+        balances = self._get_move_balances(payslip)
+        self.assertAlmostEqual(
+            balances['454000'],
+            -totals['ONSS_BONUS'] - totals['ONSS_SOLIDARITY_BONUS'] + totals['ONSSEMPLOYER'], places=2)
+        self.assertAlmostEqual(balances['453000'], -totals['BONUS_PP'], places=2)
+
+    def test_accounting_entries_mobility_budget_special_contribution(self):
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        payslip._set_input_value('MOBILITY_PAYMENT', 1000.0)
+        payslip.compute_sheet()
+        contribution = payslip._get_line_values(['ONSSEMPLOYER_869'])['ONSSEMPLOYER_869'][payslip.id]['total']
+        self.assertLess(contribution, 0)
+        payslip.action_payslip_done()
+
+        move_line = payslip.move_id.line_ids.filtered(lambda line: line.name == 'Mobility Budget Special Contribution')
+        self.assertEqual(move_line.account_id.code, '454000')
+        self.assertAlmostEqual(move_line.credit, -contribution, places=2)
+        self.assertAlmostEqual(move_line.debit, 0.0, places=2)
+
+    def test_accounting_entries_onss_partner(self):
+        # Every amount owed to the ONSS is booked with the ONSS as partner, for the reconciliation
+        # with its payments and its partner ledger
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        payslip._set_input_value('MOBILITY_PAYMENT', 1000.0)
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        onss_lines = payslip.move_id.line_ids.filtered(lambda line: line.account_id.code == '454000')
+        self.assertTrue(onss_lines)
+        onss_partner = self.env.ref('l10n_be_hr_payroll.res_partner_onss')
+        for line in onss_lines:
+            self.assertEqual(line.partner_id, onss_partner, f"No ONSS partner on the line {line.name}")
+
     def test_simple_n_holiday_pay_recovery_2024(self):
         CONTRACT_START = datetime.date(2023, 1, 1)
         self.version.contract_date_start = CONTRACT_START
@@ -6479,9 +7091,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'count_as': 'absence',
         }])
 
-        commission_payslip = self._generate_payslip(datetime.date(2022, 12, 1), datetime.date(2022, 12, 31))
-        commission_payslip._set_input_value('COMMISSION', 10000)
-        commission_payslip.compute_sheet()
+        commission_payslip = self._generate_payslip(datetime.date(2022, 12, 1), datetime.date(2022, 12, 31), input_values={'COMMISSION': 10000})
         self.employee.write({'review_state': '1_reviewed'})
         commission_payslip.action_payslip_done()
 
@@ -6569,22 +7179,17 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
     def test_onss_and_tax_regularisation_01(self):
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
         periodic_payslip.action_payslip_done()
 
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'HIRINGBONUS': 10000})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('HIRINGBONUS', 10000)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('HIRINGBONUS', 10000)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'HIRINGBONUS': 10000})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6593,23 +7198,18 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             self.assertAlmostEqual(verification_results[code][verification_payslip.id]['total'], sum_result, 2)
 
     def test_onss_and_tax_regularisation_02(self):
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'HIRINGBONUS': 10000})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('HIRINGBONUS', 10000)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
         non_periodic_payslip.action_payslip_done()
 
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('HIRINGBONUS', 10000)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'HIRINGBONUS': 10000})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6619,22 +7219,17 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
 
     def test_onss_and_tax_regularisation_03(self):
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
         periodic_payslip.action_payslip_done()
 
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 350})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('COMMISSION', 350)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('COMMISSION', 350)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 350})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6643,23 +7238,18 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             self.assertAlmostEqual(verification_results[code][verification_payslip.id]['total'], sum_result, 2)
 
     def test_onss_and_tax_regularisation_04(self):
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 350})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('COMMISSION', 350)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
         non_periodic_payslip.action_payslip_done()
 
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('COMMISSION', 350)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 350})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6672,22 +7262,17 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'wage': 1500,
         })
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
         periodic_payslip.action_payslip_done()
 
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 5000})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('COMMISSION', 5000)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('COMMISSION', 5000)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 5000})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6699,24 +7284,19 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.version.write({
             'wage': 1500,
         })
-        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
+        non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 5000})
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip._set_input_value('COMMISSION', 5000)
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
         non_periodic_payslip.action_payslip_done()
 
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
         periodic_payslip.action_payslip_done()
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
-        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip._set_input_value('COMMISSION', 5000)
-        verification_payslip.compute_sheet()
+        verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'COMMISSION': 5000})
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -6729,20 +7309,17 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'wage': 1500,
         })
         periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        periodic_payslip.compute_sheet()
         periodic_payslip_results = self._validate_payslip(periodic_payslip)
         periodic_payslip.action_payslip_done()
 
         non_periodic_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
         non_periodic_payslip.ignore_worked_day_lines = True
-        non_periodic_payslip.compute_sheet()
         non_periodic_payslip_results = self._validate_payslip(non_periodic_payslip)
 
         (periodic_payslip | non_periodic_payslip).action_payslip_draft()
         (periodic_payslip | non_periodic_payslip).unlink()
 
         verification_payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        verification_payslip.compute_sheet()
 
         codes_to_check = ['BASIC', 'ONSSTOTAL', 'P.P', 'P.P.DED', 'PPTOTAL', 'M.ONSS', 'NET']
         verification_results = verification_payslip._get_line_values(codes_to_check)
@@ -7221,7 +7798,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'ONSSEMPLOYER_831': 1.54,
             'ONSSEMPLOYER_855': 11.33,
             'ONSSEMPLOYER_859': 0.67,
-            'ONSSEMPLOYER': 156.97,
+            'ONSSEMPLOYER': 156.98,
             'HOLIDAY_TAX_PROV_BASE': 670.38,
             'HOLIDAY_TAX_PROV': 122.01,
         }
@@ -7290,7 +7867,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             v_id = self.version.id if month <= 6 else version2.id
 
             slip = self._generate_payslip(date_from, date_to, version_id=v_id)
-            slip.compute_sheet()
 
             self.employee.write({'review_state': '1_reviewed'})
             slip.action_payslip_done()
@@ -7379,7 +7955,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             v_id = self.version.id if month <= 6 else version2.id
 
             slip = self._generate_payslip(date_from, date_to, version_id=v_id)
-            slip.compute_sheet()
 
             self.employee.write({'review_state': '1_reviewed'})
             slip.action_payslip_done()
@@ -7468,7 +8043,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             v_id = self.version.id if month <= 3 else version2.id
 
             slip = self._generate_payslip(date_from, date_to, version_id=v_id)
-            slip.compute_sheet()
 
             self.employee.write({'review_state': '1_reviewed'})
             slip.action_payslip_done()
@@ -7563,7 +8137,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             v_id = self.version.id if month <= 6 else version2.id
 
             slip = self._generate_payslip(date_from, date_to, version_id=v_id)
-            slip.compute_sheet()
 
             self.employee.write({'review_state': '1_reviewed'})
             slip.action_payslip_done()
@@ -7640,9 +8213,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         }, skip_lines=True)
 
     def test_min_withholding_tax(self):
-        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        payslip._set_input_value('P_P_ADJ', 400)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'P_P_ADJ': 400})
         self._validate_payslip(payslip)
 
     def test_fiscal_voluntarism(self):
@@ -7660,10 +8231,28 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
         self._validate_payslip(payslip)
 
-    def test_hiring_bonus(self):
+    def test_fiscal_voluntarism_accounting(self):
+        # The voluntary withholding tax is owed to the tax administration with the other withholding taxes
+        self.version.write({
+            'fiscal_voluntarism_type': 'fixed',
+            'fiscal_voluntarism_amount': 100,
+        })
         payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31))
-        payslip._set_input_value('HIRINGBONUS', 10000)
-        payslip.compute_sheet()
+        payslip.action_payslip_done()
+
+        self.assertAlmostEqual(payslip._get_line_values(['FISC_VOL'])['FISC_VOL'][payslip.id]['total'], -100, 2)
+        move_lines = payslip.move_id.line_ids
+        self.assertTrue(move_lines)
+        self.assertFalse(move_lines.filtered(lambda line: line.name == 'Adjustment Entry'))
+        withholding_lines = move_lines.filtered(lambda line: line.account_id.code == '453000')
+        self.assertIn(100, withholding_lines.mapped('credit'))
+
+    def test_hiring_bonus(self):
+        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'HIRINGBONUS': 10000})
+        self._validate_payslip(payslip)
+
+    def test_bonus(self):
+        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), input_values={'BONUS': 10000})
         self._validate_payslip(payslip)
 
     def test_atn_miscellaneous_cp200_employee(self):
@@ -7678,9 +8267,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
                 'eco_checks': 0,
                 'l10n_be_lsa_monthly_misc_base_amount': 0,
             })
-            payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), version_id=self.employee.version_id.id)
-            payslip._set_input_value('ATN_MISC', 100)
-            payslip.compute_sheet()
+            payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), version_id=self.employee.version_id.id, input_values={'ATN_MISC': 100})
             self._validate_payslip(payslip)
 
     def test_all_onss_rules_01(self):
@@ -7740,9 +8327,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 1, 31),
             employee_id=sales_rep_employee.id,
             version_id=sales_rep_employee.version_ids.id,
+            input_values={'COMMISSION': 300},
         )
-        jan_payslip._set_input_value('COMMISSION', 300)
-        jan_payslip.compute_sheet()
         self._validate_payslip(jan_payslip)
         jan_payslip.action_payslip_done()
 
@@ -7752,9 +8338,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 2, 28),
             employee_id=sales_rep_employee.id,
             version_id=sales_rep_employee.version_ids.id,
+            input_values={'COMMISSION': 600},
         )
-        feb_payslip._set_input_value('COMMISSION', 600)
-        feb_payslip.compute_sheet()
         self._validate_payslip(feb_payslip)
         feb_payslip.action_payslip_done()
 
@@ -7764,9 +8349,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 3, 31),
             employee_id=sales_rep_employee.id,
             version_id=sales_rep_employee.version_ids.id,
+            input_values={'COMMISSION': 800},
         )
-        mar_payslip._set_input_value('COMMISSION', 800)
-        mar_payslip.compute_sheet()
         self._validate_payslip(mar_payslip)
         mar_payslip.action_payslip_done()
 
@@ -7776,9 +8360,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 12, 31),
             employee_id=sales_rep_employee.id,
             version_id=sales_rep_employee.version_ids.id,
+            input_values={'COMMISSION': 300},
         )
-        dec_payslip._set_input_value('COMMISSION', 300)
-        dec_payslip.compute_sheet()
         self._validate_payslip(dec_payslip)
         dec_payslip.action_payslip_done()
 
@@ -7788,10 +8371,38 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2026, 1, 31),
             employee_id=sales_rep_employee.id,
             version_id=sales_rep_employee.version_ids.id,
+            input_values={'COMMISSION': 800},
         )
-        jan_next_payslip._set_input_value('COMMISSION', 800)
-        jan_next_payslip.compute_sheet()
         self._validate_payslip(jan_next_payslip)
+
+    def test_sales_rep_commission_advance_part_time(self):
+        """ The minimum guaranteed to a part-time sales representative is the part-time scale. """
+        sales_rep_employee = self.env['hr.employee'].create({
+            'name': 'Part-Time Sales Rep',
+            'date_version': '2025-01-01',
+            'contract_date_start': '2025-01-01',
+            'wage': 1300,
+            'resource_calendar_id': self.resource_calendar_half_time.id,
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp200_d').id,
+            'l10n_be_is_sale_representative': True,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'lang': 'fr_BE',
+        })
+        version = sales_rep_employee.version_ids
+        self.assertAlmostEqual(version.work_time_rate, 0.5, places=2)
+        # Min wage for category D and 0 year seniority in 2025 is 2500.47€, 1250.24€ at half-time
+        payslip = self._generate_payslip(
+            datetime.date(2025, 1, 1),
+            datetime.date(2025, 1, 31),
+            employee_id=sales_rep_employee.id,
+            version_id=version.id,
+        )
+        self.assertFalse(payslip.line_ids.filtered(lambda line: line.code == 'COMMISSION_ADV'))
+
+        version.wage = 1200
+        payslip.compute_sheet()
+        self.assertAlmostEqual(
+            payslip.line_ids.filtered(lambda line: line.code == 'COMMISSION_ADV').total, 2500.47 * 0.5 - 1200, places=2)
 
     def test_company_executive_01(self):
         payslip = self._generate_payslip(
@@ -7799,9 +8410,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 4, 30),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'ATN_SOCIAL_CONTRIB': 807.84},
         )
-        payslip._set_input_value('ATN_SOCIAL_CONTRIB', 807.84)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_02(self):
@@ -7818,9 +8428,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 4, 30),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'ATN_SOCIAL_CONTRIB': 264.14},
         )
-        payslip._set_input_value('ATN_SOCIAL_CONTRIB', 264.14)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_03(self):
@@ -7835,12 +8444,11 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2026, 1, 31),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={
+                'ATN_SOCIAL_CONTRIB': 1384.06,
+                'N_P_BASIC': 5949.34,
+            },
         )
-        payslip._set_input_values({
-            'ATN_SOCIAL_CONTRIB': 1384.06,
-            'N_P_BASIC': 5949.34,
-        })
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_04(self):
@@ -7856,9 +8464,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2026, 1, 31),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'N_P_BASIC': 11052.16},
         )
-        payslip._set_input_value('N_P_BASIC', 11052.16)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_05(self):
@@ -7873,12 +8480,11 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2026, 1, 31),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={
+                'ATN_SOCIAL_CONTRIB': 1384.06,
+                'N_P_BASIC': 77341.42,
+            },
         )
-        payslip._set_input_values({
-            'ATN_SOCIAL_CONTRIB': 1384.06,
-            'N_P_BASIC': 77341.42,
-        })
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_06(self):
@@ -7891,9 +8497,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 4, 30),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'ATN_SOCIAL_CONTRIB': 807.84},
         )
-        payslip._set_input_value('ATN_SOCIAL_CONTRIB', 807.84)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_07(self):
@@ -7906,9 +8511,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 4, 30),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'ATN_SOCIAL_CONTRIB': 807.84},
         )
-        payslip._set_input_value('ATN_SOCIAL_CONTRIB', 807.84)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_company_executive_08(self):
@@ -7921,9 +8525,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             datetime.date(2025, 4, 30),
             employee_id=self.company_executive_employee.id,
             version_id=self.company_executive_employee.version_ids.id,
+            input_values={'ATN_SOCIAL_CONTRIB': 807.84},
         )
-        payslip._set_input_value('ATN_SOCIAL_CONTRIB', 807.84)
-        payslip.compute_sheet()
         self._validate_payslip(payslip)
 
     def test_n1_holiday_pay_recovery_40_hours_working_schedule(self):
@@ -7970,7 +8573,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         }])
 
         payslip_feb = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
-        payslip_feb.compute_sheet()
 
         # HolPayRec is 90% of the 5 days/40 hours (40 * 20.62 * 0.90 = -742.32)
         self.assertAlmostEqual(
@@ -7981,7 +8583,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip_feb.action_payslip_done()
 
         payslip_dec = self._generate_payslip(datetime.date(2026, 12, 1), datetime.date(2026, 12, 31))
-        payslip_dec.compute_sheet()
 
         # HolPayRec is 90% of the remaining 5 days/40 hours (40 * 20.62 * 0.90 = -742.32)
         self.assertAlmostEqual(
@@ -8143,8 +8744,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
     def test_holiday_pay_regularization_positive_refund(self):
         """
         Monthly Wage = 2650.00 € (1 day leave = 122.31 € base, 90% HolPayRec = -110.08 €).
-        Cap = 50.00 € (< 110.08 €).
-        Result: HolPayReg = -(50.00 - 110.08) = +60.08 € (Refund).
+        Cap = 50.00 € for the 2 days of the attest, 25.00 € for the day taken (< 110.08 €).
+        Result: HolPayReg = -(25.00 - 110.08) = +85.08 € (Refund).
         """
         CONTRACT_START = datetime.date(2025, 1, 1)
         self.version.contract_date_start = CONTRACT_START
@@ -8178,7 +8779,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         reg_line = payslip.line_ids.filtered(lambda l: l.code == 'HolPayReg')
 
         self.assertAlmostEqual(rec_line.total, -110.08, places=2)
-        self.assertAlmostEqual(reg_line.total, 60.08, places=2)
+        self.assertAlmostEqual(reg_line.total, 85.08, places=2)
 
     def test_worker_sick_time_off_worked_days(self):
         self.employee.write({
@@ -8247,11 +8848,42 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip_jan = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
         payslip_feb = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
 
-        (payslip_jan | payslip_feb).compute_sheet()
-
         self._validate_payslip(payslip_jan)
 
         self._validate_payslip(payslip_feb)
+
+    def test_student_worker_guaranteed_salary_no_withholding_tax(self):
+        # Days 8 to 14 of a student manual worker's illness (082.00): the guaranteed salary is replacement revenue,
+        # without withholding tax as the rest of a student's pay
+        self.employee.write({
+            'wage': 2000,
+            'ip_wage_rate': 0,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00840').id,
+        })
+        self.env['hr.leave'].create({
+            'name': 'Sick Time Off',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2026, 1, 5),
+            'request_date_to': datetime.date(2026, 1, 16),
+            'employee_id': self.employee.id,
+        })
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+
+        self._validate_payslip(payslip)
+
+    def test_no_onss_dimona_dwd(self):
+        # A worker declared without ONSS (Dimona DWD) owes neither the worker's nor the employer's contributions and gets
+        # no employer reduction: the pay is taxed at the scale, the company car's CO2 contribution stays due
+        self.employee.write({
+            'wage': 750,
+            'ip_wage_rate': 0,
+            'l10n_be_dimona_category': 'dwd',
+        })
+        payslip = self._generate_payslip(datetime.date(2026, 10, 1), datetime.date(2026, 10, 31))
+        self.assertTrue(payslip.version_id.no_onss)
+
+        self._validate_payslip(payslip)
 
     def test_worker_work_accident_taxed_at_scale(self):
         # Days 8 to 30 of a worker's work accident (070.00): the employer's guaranteed salary at 85.88 % of the pay,
@@ -8325,20 +8957,20 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'calendar_id': self.resource_calendar_38_hours_per_week.id,
             'company_id': self.env.company.id,
             'date_from': datetime.datetime(2026, 2, 2, 5, 0, 0),
-            'date_to': datetime.datetime(2026, 2, 2, 16, 0, 0),
+            'date_to': datetime.datetime(2026, 2, 3, 16, 0, 0),
             'resource_id': False,
             'count_as': "absence",
             'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
         }])
 
-        com_payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        com_payslip._set_input_value('COMMISSION', 1000)
-        com_payslip.compute_sheet()
+        com_payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), input_values={'COMMISSION': 1000})
         com_payslip.action_payslip_done()
 
         public_holiday_payslip = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
-        # number_of_month = 1 (only Jan 2026), daily variable revenue = 1000 / (25 * 5/6) = 48.0
-        self._validate_payslip(public_holiday_payslip, {'COM_LOSS_PH': 48.0}, skip_lines=True)
+        # number_of_month = 1 (only Jan 2026), daily variable revenue = 1000 / (25 * 5/6) = 48.0, for 2 days
+        self._validate_payslip(public_holiday_payslip, {'COM_LOSS_PH': 96.0}, skip_lines=True)
+        loss_line = public_holiday_payslip.line_ids.filtered(lambda l: l.code == 'COM_LOSS_PH')
+        self.assertEqual((loss_line.quantity, loss_line.amount), (2, 48.0))
 
     def test_loss_on_commission_public_holiday_employee_joined_current_month(self):
         # If employee joined in current month, loss on variable during public holiday is the month commissions / number of days worked
@@ -8361,23 +8993,241 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
         }])
 
-        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip._set_input_value('COMMISSION', 1000)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), input_values={'COMMISSION': 1000})
         payslip.action_payslip_done()
 
         # 1000€ / 21 days = 47.62€
         self._validate_payslip(payslip, {'COM_LOSS_PH': 47.62}, skip_lines=True)
 
+    def test_loss_on_commission_sickness(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'commission_on_target': 0,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2025, 1, 1),
+        })
+
+        com_payslip = self._generate_payslip(datetime.date(2025, 12, 1), datetime.date(2025, 12, 31))
+        com_payslip._set_input_value('COMMISSION', 1000)
+        com_payslip.compute_sheet()
+        com_payslip.action_payslip_done()
+
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Sickness",
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 1, 5, 6, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 5, 18, 0, 0),
+            'resource_id': False,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+        }])
+
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        # 1000€ / 12 months = 83.33€/month; daily rate = 83.33 / (25 * 5/6) = 4.0€
+        self._validate_payslip(payslip, {'COM_LOSS_SICK': 4.0}, skip_lines=True)
+
+    def test_loss_on_commission_reference_periods(self):
+        # The variable revenue of a suspension is the average of the previous civil year (small unemployment), except
+        # for the sickness of the employees and the extra-legal holidays: the 12 months before the month
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'commission_on_target': 0,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2025, 1, 1),
+        })
+        for year, commission in ((2025, 1200), (2026, 600)):
+            com_payslip = self._generate_payslip(datetime.date(year, 2, 1), datetime.date(year, 2, 28), input_values={'COMMISSION': commission})
+            com_payslip.action_payslip_done()
+
+        self.env['resource.calendar.leaves'].create([{
+            'name': name,
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 6, day, 6, 0, 0),
+            'date_to': datetime.datetime(2026, 6, day, 18, 0, 0),
+            'resource_id': False,
+            'work_entry_type_id': self.env.ref(work_entry_type).id,
+        } for name, day, work_entry_type in (
+            ('Sickness', 2, 'hr_work_entry.be_work_entry_type_sick_leave'),
+            ('Small Unemployment', 3, 'hr_work_entry.l10n_be_work_entry_type_small_unemployment'),
+        )])
+
+        payslip = self._generate_payslip(datetime.date(2026, 6, 1), datetime.date(2026, 6, 30))
+        # sickness: 600 / 12 months = 50/month, daily rate = 50 / (25 * 5/6) = 2.4
+        # small unemployment: 1200 / 12 months of 2025 = 100/month, daily rate = 100 / (25 * 5/6) = 4.8
+        self._validate_payslip(payslip, {'COM_LOSS_SICK': 7.2}, skip_lines=True)
+
+    def test_loss_on_commission_absences_paid_by_employer(self):
+        # The variable revenue is only due on the absences paid by the employer: the 3 first days of the birth leave
+        # (007.05), not the next ones paid by the mutual insurance (128.05)
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'commission_on_target': 0,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2025, 1, 1),
+        })
+        com_payslip = self._generate_payslip(datetime.date(2025, 2, 1), datetime.date(2025, 2, 28), input_values={'COMMISSION': 1200})
+        com_payslip.action_payslip_done()
+
+        self.env['resource.calendar.leaves'].create([{
+            'name': 'Birth Leave',
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 6, day, 6, 0, 0),
+            'date_to': datetime.datetime(2026, 6, day, 18, 0, 0),
+            'resource_id': False,
+            'work_entry_type_id': self.env.ref(work_entry_type).id,
+        } for day, work_entry_type in (
+            (2, 'hr_work_entry.l10n_be_work_entry_type_paternity_company'),
+            (3, 'hr_work_entry.l10n_be_work_entry_type_paternity_company'),
+            (4, 'hr_work_entry.l10n_be_work_entry_type_paternity_legal'),
+        )])
+
+        payslip = self._generate_payslip(datetime.date(2026, 6, 1), datetime.date(2026, 6, 30))
+        # 1200 / 12 months of 2025 = 100/month, daily rate = 100 / (25 * 5/6) = 4.8, for the 2 days of 007.05
+        self._validate_payslip(payslip, {'COM_LOSS_SICK': 9.6}, skip_lines=True)
+
+    def test_loss_on_commission_pto(self):
+        self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly').active = True
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'commission_on_target': 0,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2025, 1, 1),
+        })
+
+        com_payslip = self._generate_payslip(datetime.date(2025, 12, 1), datetime.date(2025, 12, 31))
+        com_payslip._set_input_value('COMMISSION', 1000)
+        com_payslip.compute_sheet()
+        com_payslip.action_payslip_done()
+
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Legal Leave",
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 1, 5, 6, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 5, 18, 0, 0),
+            'resource_id': False,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_legal_leave').id,
+        }])
+
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        # 1000€ / 12 months = 83.33€/month; daily rate = 83.33 / (25 * 5/6) = 4.0€
+        # Booked as remuneration: BASIC 2650 + COM_LOSS_PTO 4 - IP 662.5
+        self._validate_payslip(payslip, {'COM_LOSS_PTO': 4.0, 'REMUNERATION': 1991.5}, skip_lines=True)
+
+        # When compensated with the double holiday pay, COM_LOSS_PTO should not be applied
+        monthly_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly')
+        double_holiday_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday')
+        double_holiday_benefit.active = True
+        payslip_annual = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self.assertNotIn('COM_LOSS_PTO', payslip_annual.line_ids.mapped('code'))
+        monthly_benefit.active = True
+
+        # The December settlement must deduct the PTO commission already paid.
+        payslip.action_payslip_done()
+        december_payslip = self._generate_payslip(datetime.date(2026, 12, 1), datetime.date(2026, 12, 31))
+        self._validate_payslip(december_payslip, {'SIMPLE_DECEMBER': 154.34}, skip_lines=True)
+
+    def test_loss_on_commission_pto_without_variable_revenues(self):
+        # Without variable revenues in the past, there is no loss on commission
+        self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly').active = True
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'commission_on_target': 0,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2025, 1, 1),
+        })
+
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Legal Leave",
+            'calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'company_id': self.env.company.id,
+            'date_from': datetime.datetime(2026, 1, 5, 6, 0, 0),
+            'date_to': datetime.datetime(2026, 1, 5, 18, 0, 0),
+            'resource_id': False,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_legal_leave').id,
+        }])
+
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+        self.assertIn('016.00', payslip.worked_days_line_ids.mapped('code'))
+        self.assertNotIn('COM_LOSS_PTO', payslip.line_ids.mapped('code'))
+
+    def test_loss_on_commission_pto_benefits_exclusive(self):
+        monthly_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly')
+        double_holiday_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday')
+        monthly_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_pto')
+        double_holiday_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_double_holiday_single_holiday_variable_revenues')
+        # Monthly by default on a new database (post init hook), with the double holiday pay on the updated ones
+        monthly_benefit.active = True
+        self.assertTrue(monthly_benefit.active)
+        self.assertFalse(double_holiday_benefit.active)
+        self.assertTrue(monthly_rule.active)
+        # SIMPLE_VARIABLE also pays the other joint committees: never archived by the choice
+        self.assertTrue(double_holiday_rule.active)
+
+        double_holiday_benefit.active = True
+        self.assertFalse(monthly_benefit.active)
+        self.assertFalse(monthly_rule.active)
+        self.assertTrue(double_holiday_rule.active)
+
+        with self.assertRaises(UserError):
+            double_holiday_benefit.active = False
+        with self.assertRaises(UserError):
+            (monthly_benefit | double_holiday_benefit).active = True
+
+        monthly_benefit.active = True
+        self.assertFalse(double_holiday_benefit.active)
+        self.assertTrue(monthly_rule.active)
+        self.assertTrue(double_holiday_rule.active)
+
+        with self.assertRaises(UserError):
+            monthly_benefit.unlink()
+
+    def test_loss_on_commission_pto_benefits_data_update(self):
+        # The choice is kept when the module is updated
+        monthly_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly')
+        double_holiday_benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_double_holiday')
+        monthly_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_pto')
+        for chosen_benefit, other_benefit in [(double_holiday_benefit, monthly_benefit), (monthly_benefit, double_holiday_benefit)]:
+            chosen_benefit.active = True
+            convert_file(self.env, 'l10n_be_hr_payroll', 'data/hr_contract_salary_benefit_data.xml', idref={}, mode='update')
+            self.assertTrue(chosen_benefit.active)
+            self.assertFalse(other_benefit.active)
+            self.assertEqual(monthly_rule.active, chosen_benefit == monthly_benefit)
+
+    def test_loss_on_commission_pto_monthly_other_joint_committee(self):
+        # Compensated monthly in JC 200 only (COM_LOSS_PTO): the double holiday pay of the other joint committees
+        # keeps the single holiday pay on the variable salary
+        self.env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly').active = True
+        self._generate_departure_data()
+        for joint_committee, simple_variable in [('l10n_be_joint_committee_200', 0.0), ('l10n_be_joint_committee_302', 480.08)]:
+            self.version_2020.l10n_be_joint_committee_id = self.env.ref(f'l10n_be_hr_payroll.{joint_committee}')
+            double_pay_payslip = self.env['hr.payslip'].create({
+                'employee_id': self.employee.id,
+                'version_id': self.version_2020.id,
+                'company_id': self.env.company.id,
+                'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+                'date_from': datetime.date(2020, 3, 1),
+                'date_to': datetime.date(2020, 3, 31),
+            })
+            double_pay_payslip.compute_sheet()
+            self.assertEqual(
+                double_pay_payslip._get_line_values(['SIMPLE_VARIABLE'])['SIMPLE_VARIABLE'][double_pay_payslip.id]['total'],
+                simple_variable, joint_committee)
+
     def test_cct90_payslip(self):
         cct90_struct = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90')
-        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), struct_id=cct90_struct.id)
-        payslip._set_input_value('CCT90BONUSPLAN', 10000)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(datetime.date(2025, 1, 1), datetime.date(2025, 1, 31), struct_id=cct90_struct.id, input_values={'CCT90BONUSPLAN': 10000})
         self._validate_payslip(payslip)
 
     def test_worker_payslip(self):
-        self.version.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302').id
+        self.version.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_100').id
         self.version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015').id
 
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 30))
@@ -8402,7 +9252,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.employee.write({'wage': 5000})
         # as wage is higher than threshold, employee will start taking bonus from the 27th day of economic unemployment.
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip.compute_sheet()
         payslip.action_payslip_done()
         self._validate_worked_days(payslip, {
             '137.00': (22.0, 167.2, 0.0),
@@ -8410,7 +9259,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self._validate_payslip(payslip)
 
         payslip = self._generate_payslip(datetime.date(2026, 2, 1), datetime.date(2026, 2, 28))
-        payslip.compute_sheet()
 
         self._validate_worked_days(payslip, {
             '137.00': (20.0, 152.0, 0.0),
@@ -8422,7 +9270,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.version.resource_calendar_id = self.resource_calendar_eco_unemployment_partial
 
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip.compute_sheet()
 
         self._validate_worked_days(payslip, {
             '002.00': (10.0, 76.0, 1223.08),
@@ -8454,7 +9301,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
                 employee_id=employee.id,
                 version_id=employee.current_version_id.id,
             ))
-            payslip[month].compute_sheet()
             payslip[month].action_payslip_done()
 
         self._validate_worked_days(payslip[0], {
@@ -8476,7 +9322,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.version.resource_calendar_id = self.resource_calendar_eco_unemployment_partial
 
         payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
-        payslip.compute_sheet()
 
         self._validate_worked_days(payslip, {
             '002.00': (10.0, 76.0, 1223.08),
@@ -8648,6 +9493,41 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         with self.assertRaises(ValidationError):
             payslip.action_payslip_done()
 
+    def test_part_time_additional_hours_batch(self):
+        """Payslips computed together: those without additional hours are reset, those with some
+        are checked as when computed alone."""
+        self.version.resource_calendar_id = self.resource_calendar_half_time
+        self.version.wage_type = "hourly"
+        self.version.hourly_wage = 20
+        self.env['hr.leave'].create({
+            'work_entry_type_id': self.additional_hours_50_type.id,
+            'request_date_from': datetime.datetime(2025, 10, 12, 10, 0),  # Sunday
+            'request_date_to': datetime.datetime(2025, 10, 12, 12, 0),
+            'request_hour_from': 10,
+            'request_hour_to': 12,
+            'employee_id': self.employee.id,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': "Test Payslip",
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.structure.id,
+            'date_from': date_from,
+            'date_to': date_to,
+        } for date_from, date_to in [
+            (datetime.date(2025, 9, 1), datetime.date(2025, 9, 30)),
+            (datetime.date(2025, 10, 1), datetime.date(2025, 10, 31)),
+        ]])
+        if self.car:
+            payslips.write({'vehicle_id': self.car.id})
+        payslips.compute_sheet()
+        september, october = payslips
+        self.assertEqual(september.l10n_be_sum_additional_hours, 0.0)
+        self.assertFalse(september.l10n_be_wrong_additional_hours_on_sundays_or_public_holidays)
+        self.assertTrue(october.l10n_be_wrong_additional_hours_on_sundays_or_public_holidays)
+        self.assertFalse(october.l10n_be_additional_hours_during_working_time)
+
     def test_part_time_additional_hours_daily_and_weekly_limits(self):
         """The 9 hours a day and the full time week are checked on the days and weeks that carry additional hours,
         not on long planned days or weeks without any. Variable part time schedule over two weeks: week A Monday to
@@ -8706,8 +9586,9 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(payslip.l10n_be_sum_additional_hours, 1.0)
         self.assertTrue(payslip.l10n_be_working_hours_limit_per_day_exceeded)
         self.assertTrue(payslip.l10n_be_working_hours_limit_per_week_exceeded)
-        with self.assertRaises(ValidationError):
-            payslip.action_payslip_done()
+        # The too many additional hours per day / week warnings do not block the payslips
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'validated')
 
     def test_part_time_additional_hours_exact_daily_limit(self):
         """A day of exactly 9 hours is within the daily limit, even when its pieces do not add up exactly in
@@ -8775,6 +9656,69 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2025, 9, 1), datetime.date(2025, 9, 30))
         self.assertAlmostEqual(payslip.l10n_be_sum_additional_hours, 12.0, places=2)
         self.assertFalse(payslip.l10n_be_sum_additional_hours > 12)
+
+    def test_reference_working_schedule_issue_blocks_validation(self):
+        # Putting itself as a reference calendar makes full_time_required_hours 19 from 38
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_half_time.id,
+            'reference_calendar_id': self.resource_calendar_half_time.id,
+        })
+        # Fix the full_time_required_hours so that the work time rate < 1
+        self.resource_calendar_half_time.full_time_required_hours = 38.0
+        # An employee who only had a past version on that schedule is not blocked
+        other_employee = self.env['hr.employee'].create({
+            'name': 'Former Half Time Employee',
+            'company_id': self.employee.company_id.id,
+            'date_version': datetime.date(2018, 1, 1),
+            'resource_calendar_id': self.resource_calendar_half_time.id,
+        })
+        other_employee.create_version({
+            'date_version': datetime.date(2019, 1, 1),
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+        })
+        blocked_employees = self.env['hr.payslip']._get_employees_from_records(self.resource_calendar_half_time)
+        self.assertIn(self.employee, blocked_employees)
+        self.assertNotIn(other_employee, blocked_employees)
+
+        payslip = self._generate_payslip(self.date_from, self.date_to)
+
+        with self.assertRaisesRegex(ValidationError, "Reference working schedule issue"):
+            payslip.action_payslip_done()
+
+    def test_employee_under_15_blocks_validation(self):
+        """The legal minimum working age applies to every employee under contract, not only to the students."""
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_less_than_15_student')
+        today = datetime.date.today()
+        self.assertNotEqual(self.version.employee_type_id.l10n_be_dimona_category, 'stu')
+        no_contract_employee = self.env['hr.employee'].create({
+            'name': 'Young Employee Without Contract',
+            'company_id': self.employee.company_id.id,
+            'birthday': today - relativedelta(years=14),
+        })
+
+        def flagged_employees():
+            return warning._get_warning_domain_records(self.env.companies)
+
+        # No birthday: not flagged
+        self.employee.birthday = False
+        self.assertNotIn(self.employee, flagged_employees())
+        # 15 years old today: not flagged
+        self.employee.birthday = today - relativedelta(years=15)
+        self.assertNotIn(self.employee, flagged_employees())
+        # Under 15 without contract: not flagged
+        self.assertNotIn(no_contract_employee, flagged_employees())
+
+        # Under 15 with a contract (not a student): flagged and the payslip validation is blocked
+        self.employee.birthday = today - relativedelta(years=14)
+        self.assertIn(self.employee, flagged_employees())
+        payslip = self._generate_payslip(self.date_from, self.date_to)
+        with self.assertRaisesRegex(ValidationError, "Employees under 15 years old"):
+            payslip.action_payslip_done()
+
+        # Back to 15 years old: the payslip can be validated
+        self.employee.birthday = today - relativedelta(years=15)
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'validated')
 
     def test_marital_status_separated(self):
         """Test separated marital status fallback to single parent reductions."""
@@ -8950,7 +9894,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(payslip.worked_days_line_ids), 2)
 
         self._validate_worked_days(payslip, {
-            '002.00': (13.0, 98.8, 1615.38),
+            '002.00': (13.0, 98.8, 1615.40),
             '158.00': (10.0, 76.0, 0),
         })
 
@@ -9205,7 +10149,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         doctor_withholding_tax_exemptions = doctor_payslip._get_line_values(['WITHHOLDING_TAX_EX_274_32'])['WITHHOLDING_TAX_EX_274_32'][doctor_payslip.id]['total']
         bachelor_withholding_tax_exemption = bachelor_1_payslip._get_line_values(['WITHHOLDING_TAX_EX_274_34'])['WITHHOLDING_TAX_EX_274_34'][bachelor_1_payslip.id]['total']
 
-        self.assertAlmostEqual(doctor_withholding_tax_exemptions, 3055.98, places=2)
+        self.assertAlmostEqual(doctor_withholding_tax_exemptions, 3055.99, places=2)
         self.assertAlmostEqual(bachelor_withholding_tax_exemption, 667.46, places=2)
 
         (doctor_payslip | bachelor_1_payslip).action_payslip_done()
@@ -9252,10 +10196,40 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertAlmostEqual(withholding_tax_exemption, min(pp_total, theoretical_exemption), places=2,
             msg="WITHHOLDING_TAX_EX_274_74 must equal the theoretical exemption capped at the withholding tax due")
 
+    @freeze_time("2026-01-01")
+    def test_withholding_tax_exemption_274_74_capped_without_flat_rate_tax(self):
+        # The team exemption is capped at the withholding tax on the remuneration: the flat-rate tax on the
+        # economic unemployment supplements is not part of that cap. Without scale tax, no exemption.
+        calendar = self.resource_calendar_eco_unemployment_partial
+        calendar.attendance_ids.filtered(
+            lambda a: a.work_entry_type_id == self.env.ref('hr_work_entry.be_work_entry_type_attendance')
+        ).category_options_ids = [Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_TEAM').id])]
+        self.version.resource_calendar_id = calendar
+        payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31))
+
+        is_eligible, theoretical_exemption = self.env['l10n_be.274_xx']._get_team_shift_exemption_vals(payslip)
+        self.assertTrue(is_eligible)
+        self.assertGreater(theoretical_exemption, 0.0)
+        line_values = payslip._get_line_values(['P.P', 'PPTOTAL', 'ECONOMIC_UNEMPLOYMENT.P.P', 'WITHHOLDING_TAX_EX_274_74'])
+        self.assertEqual(line_values['P.P'][payslip.id]['total'], 0.0)
+        self.assertGreater(line_values['PPTOTAL'][payslip.id]['total'], 0.0)
+        self.assertAlmostEqual(
+            line_values['PPTOTAL'][payslip.id]['total'], -line_values['ECONOMIC_UNEMPLOYMENT.P.P'][payslip.id]['total'], 2)
+        self.assertEqual(line_values['WITHHOLDING_TAX_EX_274_74'][payslip.id]['total'], 0.0)
+        self._validate_payslip(payslip)
+
+    def _set_night_premium(self, amount):
+        self.env['hr.rule.parameter.value'].create({
+            'rule_parameter_id': self.env.ref('l10n_be_hr_payroll.rule_parameter_cp_200_premium_pay_night_hourly_rate').id,
+            'date_from': datetime.date(2019, 1, 1),
+            'parameter_value': str(amount),
+        })
+
     def test_withholding_tax_exemption_274_75_computed_from_night_shift_premium(self):
         # All attendance hours are tagged as Night premium pay, well above the 1/3 threshold
-        # of hours paid at 100%, and the legal night premium rate (58.62% by default, way
-        # above the 12% eligibility threshold) is met by default.
+        # of hours paid at 100%, with a night premium of 5 EUR an hour, above 12% of the
+        # hourly wage of the employee.
+        self._set_night_premium(5.0)
         self.employee.resource_calendar_id.attendance_ids.write({
             'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id,
             'category_options_ids': [Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_NIGHT').id])],
@@ -9310,6 +10284,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         attendances.write({'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id})
         tagged = attendances.filtered(lambda attendance: attendance.dayofweek in ('0', '1'))
         declaration = self.env['l10n_be.274_xx']
+        # a night premium of 5 EUR an hour, above 12% of the hourly wage of the employee
+        self._set_night_premium(5.0)
         for option, month in (('PREMIUM_PAY_TEAM', 2), ('PREMIUM_PAY_NIGHT', 3)):
             with self.subTest(option=option):
                 tagged.category_options_ids = [Command.set([self.env.ref(f'l10n_be_hr_payroll.{option}').id])]
@@ -9461,13 +10437,13 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         bachelor_withholding_tax_exemption = line_values['WITHHOLDING_TAX_EX_274_34'][bachelor_payslip.id]['total']
         team_withholding_tax_exemption = line_values['WITHHOLDING_TAX_EX_274_74'][bachelor_payslip.id]['total']
 
-        # Withholding tax due: 72.91. The high-wage doctors make the quarter-of-32/33 cap
-        # very large, so the bachelor's own 80%-of-withholding cap is what binds: 58.33.
+        # Withholding tax due: 72.92. The high-wage doctors make the quarter-of-32/33 cap
+        # very large, so the bachelor's own 80%-of-withholding cap is what binds: 58.34.
         # The team exemption's own theoretical amount (22.8% of the wage tied to the
         # team-tagged hours, i.e. 22.8% of 1500 = 342.00) is far above what's left of the
-        # withholding tax (72.91 - 58.33 = 14.58), so it gets capped there instead.
-        self.assertAlmostEqual(pp_total, 72.91, places=2)
-        self.assertAlmostEqual(bachelor_withholding_tax_exemption, 58.33, places=2)
+        # withholding tax (72.92 - 58.34 = 14.58), so it gets capped there instead.
+        self.assertAlmostEqual(pp_total, 72.92, places=2)
+        self.assertAlmostEqual(bachelor_withholding_tax_exemption, 58.34, places=2)
         self.assertAlmostEqual(team_withholding_tax_exemption, 14.58, places=2,
             msg="The team exemption must be capped at what's left of the withholding tax (14.58) after the bachelor exemption, not its own theoretical amount (342.00)")
         self.assertLessEqual(bachelor_withholding_tax_exemption + team_withholding_tax_exemption, pp_total + 0.01,
@@ -9517,13 +10493,206 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         pp_total = line_values['PPTOTAL'][payslip.id]['total']
         team_withholding_tax_exemption = line_values['WITHHOLDING_TAX_EX_274_74'][payslip.id]['total']
 
-        # Withholding tax due: 675.43, above the exemption, so it isn't the binding constraint
-        # here. The granted amount is the taxable remuneration (2712.59) at the Team (22.8%)
-        # and Continuous Team (25%) rates in the share of their hours (half each: 23.9%):
-        # 2712.59 * 23.9% = 648.31.
-        self.assertAlmostEqual(pp_total, 675.43, places=2)
-        self.assertAlmostEqual(team_withholding_tax_exemption, 648.31, places=2,
-            msg="274.74 must grant the Team (22.8%) and Continuous Team (25%) rates on the taxable remuneration")
+        # Withholding tax due: 675.44, above the exemption, so it isn't the binding constraint
+        # here. The granted amount is the taxable remuneration (2712.59) at the Continuous Team
+        # rate (25%) in the share of its hours in all the hours of the month (30.4 / 152 = 20%),
+        # at the Team rate (22.8%) on the rest: 2712.59 * (20% * 25% + 80% * 22.8%) = 630.41.
+        self.assertAlmostEqual(pp_total, 675.44, places=2)
+        self.assertAlmostEqual(team_withholding_tax_exemption, 630.41, places=2,
+            msg="274.74 must grant the Continuous Team rate (25%) in the share of its hours in all the hours")
+
+    def test_withholding_tax_exemption_274_74_third_time_without_public_holidays(self):
+        # The third-time rule of the team exemption counts the paid hours of the period without the public holidays
+        # (nor the working time reduction days, the recovered overtime and the guaranteed salary from the 2nd week of
+        # sickness): the team hours (Mondays and Tuesday mornings) are below a third of the paid hours of the month,
+        # but reach a third of them without its three public holidays.
+        employee = self._create_researcher_employee('Team Worker With Public Holidays', False, 0, wage=3000)
+        calendar = self.resource_calendar_38_hours_per_week.copy()
+        employee.resource_calendar_id = calendar
+        attendances = calendar.attendance_ids.sorted(lambda a: (a.dayofweek, a.hour_from))
+        attendances.write({'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id})
+        attendances[0:3].category_options_ids = [Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_TEAM').id])]
+        self.env['resource.calendar.leaves'].create({
+            'name': "Public Holidays",
+            'calendar_id': calendar.id,
+            'company_id': self.env.company.id,
+            'resource_id': employee.resource_id.id,
+            'date_from': datetime.datetime(2019, 2, 6, 6, 0, 0),
+            'date_to': datetime.datetime(2019, 2, 8, 17, 0, 0),
+            'count_as': "absence",
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        })
+
+        payslip, = self._create_researcher_payslips(employee, datetime.date(2019, 2, 1), datetime.date(2019, 2, 28))
+
+        paid_hours = sum(payslip.worked_days_line_ids.mapped('number_of_hours'))
+        public_holiday_hours = sum(
+            payslip.worked_days_line_ids.filtered(lambda line: line.code == '006.00').mapped('number_of_hours'))
+        team_hours = payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_TEAM')
+        self.assertAlmostEqual(public_holiday_hours, 22.8, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_full_pay_worked_hours(), paid_hours - public_holiday_hours, places=2)
+        self.assertLess(team_hours, paid_hours / 3)
+        self.assertGreaterEqual(team_hours, (paid_hours - public_holiday_hours) / 3)
+        self._validate_rule_computed(payslip, 'WITHHOLDING_TAX_EX_274_74')
+
+    def _create_team_worker_with_time_off(self, name, team_attendances_count, time_off_periods):
+        """A worker of 38 hours a week whose first attendances of the week are in team, with time off over the given
+        (date_from, date_to, work entry type xmlid) periods, and his payslip of February 2019."""
+        employee = self._create_researcher_employee(name, False, 0, wage=3000)
+        calendar = self.resource_calendar_38_hours_per_week.copy()
+        employee.resource_calendar_id = calendar
+        attendances = calendar.attendance_ids.sorted(lambda a: (a.dayofweek, a.hour_from))
+        attendances.write({'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id})
+        attendances[:team_attendances_count].category_options_ids = [
+            Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_TEAM').id])]
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Time Off",
+            'calendar_id': calendar.id,
+            'company_id': self.env.company.id,
+            'resource_id': employee.resource_id.id,
+            'date_from': date_from,
+            'date_to': date_to,
+            'count_as': "absence",
+            'work_entry_type_id': self.env.ref(work_entry_type_xmlid).id,
+        } for date_from, date_to, work_entry_type_xmlid in time_off_periods])
+        payslip, = self._create_researcher_payslips(employee, datetime.date(2019, 2, 1), datetime.date(2019, 2, 28))
+        return payslip
+
+    def test_withholding_tax_exemption_274_74_third_time_with_time_off_on_team_days(self):
+        # The paid time off counts as team hours in the third-time rule on the days the worker would have worked in
+        # team, although the team premium isn't paid on it. Team on Mondays and Tuesdays (60.8 of the 152 hours of
+        # February 2019), two weeks of holidays (11-22/02, 4 team days) and a public holiday on a team day (04/02,
+        # neither in the team hours nor in the total): 22.8 worked team hours and 30.4 hours of holidays on team days
+        # reach a third of the 144.4 hours, the 22.8 worked team hours alone don't.
+        payslip = self._create_team_worker_with_time_off("Team Worker On Holidays", 4, [
+            (datetime.datetime(2019, 2, 11, 6, 0, 0), datetime.datetime(2019, 2, 22, 17, 0, 0), 'hr_work_entry.be_work_entry_type_legal_leave'),
+            (datetime.datetime(2019, 2, 4, 6, 0, 0), datetime.datetime(2019, 2, 4, 17, 0, 0), 'hr_work_entry.l10n_be_work_entry_type_bank_holiday'),
+        ])
+
+        worked_days = payslip.worked_days_line_ids
+        team_premium = self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_TEAM')
+        self.assertAlmostEqual(sum(worked_days.filtered(lambda line: line.code == '016.00').mapped('number_of_hours')), 76.0, places=2)
+        self.assertAlmostEqual(sum(worked_days.filtered(lambda line: line.code == '006.00').mapped('number_of_hours')), 7.6, places=2)
+        # The premium is only paid on the worked team hours
+        self.assertAlmostEqual(
+            sum(worked_days.filtered(lambda line: team_premium in line.category_options_ids).mapped('number_of_hours')), 22.8, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_leave_hours('PREMIUM_PAY_TEAM'), 30.4, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_TEAM'), 53.2, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_full_pay_worked_hours(), 144.4, places=2)
+        self._validate_rule_computed(payslip, 'WITHHOLDING_TAX_EX_274_74')
+
+    def test_withholding_tax_exemption_274_74_third_time_with_time_off_on_other_days(self):
+        # The time off on the days the worker would not have worked in team doesn't count as team hours: team on
+        # Mondays (30.4 of the 152 hours of February 2019), holidays on Wednesdays to Fridays of two weeks.
+        payslip = self._create_team_worker_with_time_off("Team Worker On Holidays Other Days", 2, [
+            (datetime.datetime(2019, 2, 13, 6, 0, 0), datetime.datetime(2019, 2, 15, 17, 0, 0), 'hr_work_entry.be_work_entry_type_legal_leave'),
+            (datetime.datetime(2019, 2, 20, 6, 0, 0), datetime.datetime(2019, 2, 22, 17, 0, 0), 'hr_work_entry.be_work_entry_type_legal_leave'),
+        ])
+
+        self.assertAlmostEqual(sum(
+            payslip.worked_days_line_ids.filtered(lambda line: line.code == '016.00').mapped('number_of_hours')), 45.6, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_leave_hours('PREMIUM_PAY_TEAM'), 0.0, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_TEAM'), 30.4, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_full_pay_worked_hours(), 152.0, places=2)
+        self._validate_rule_computed(payslip, 'WITHHOLDING_TAX_EX_274_74', expected=False)
+
+    def test_withholding_tax_exemption_274_74_third_time_and_split_rubrics(self):
+        # The rubrics of the third-time rule (circular 11/2021) and of the split of the taxable remuneration (from
+        # 2025) as Partena gives them: the recoverable overtime (026, the premium only, at a rate of 0) counts in
+        # both, the public holiday during temporary unemployment (086.00) in both, the carried over workers' holidays
+        # (142.24) and the paid rubrics from 108 (165.00) in neither, the guaranteed salary from the 2nd week of
+        # sickness (072) in the third-time rule until 2024 only, the premium rubrics (042-045) in neither.
+        payslip_2025 = self.env['hr.payslip'].new({'date_from': datetime.date(2025, 3, 1), 'date_to': datetime.date(2025, 3, 31)})
+        payslip_2024 = self.env['hr.payslip'].new({'date_from': datetime.date(2024, 3, 1), 'date_to': datetime.date(2024, 3, 31)})
+        for code, rate, third_time_2024, third_time_2025, split in [
+            ('002.00', 1.0, True, True, True),
+            ('026.00', 0.0, True, True, True),
+            ('086.00', 0.8588, True, True, True),
+            ('006.00', 1.0, False, False, True),
+            ('006.48', 2.0, True, True, True),
+            ('019.00', 1.0, False, False, True),
+            ('046.00', 1.0, False, False, True),
+            ('039.23', 1.0, True, True, False),
+            ('072.00', 1.0, True, False, False),
+            ('082.00', 0.8588, True, False, False),
+            ('142.00', 0.0, True, True, False),
+            ('142.20', 1.0, True, True, False),
+            ('142.24', 0.0, False, False, False),
+            ('165.00', 1.0, False, False, False),
+            ('044.00', 1.0, False, False, False),
+            ('158.00', 0.0, False, False, False),
+        ]:
+            work_entry_type = self.env['hr.work.entry.type'].new({'name': code, 'code': code, 'amount_rate': rate})
+            with self.subTest(code=code):
+                self.assertEqual(payslip_2024._l10n_be_is_shift_exemption_work_entry_type(work_entry_type), third_time_2024)
+                self.assertEqual(payslip_2025._l10n_be_is_shift_exemption_work_entry_type(work_entry_type), third_time_2025)
+                self.assertEqual(payslip_2025._l10n_be_is_shift_exemption_taxable_work_entry_type(work_entry_type), split)
+
+    def test_withholding_tax_exemption_274_74_contteam_share_on_taxable_hours(self):
+        # Since 2025, the taxable remuneration (and its withholding tax) is split between the continuous team rate (25%)
+        # and the team rate (22.8%) on the hours entering the taxable remuneration, not on the hours of the third-time
+        # rule (which decides the eligibility, unchanged): the public holidays count (in the continuous team hours on
+        # a continuous team day), the workers' annual holidays (142, paid by the holiday fund) don't. Continuous team on
+        # Mondays and Tuesdays (68.4 of the 159.6 hours of June 2025), team on Wednesdays and Thursdays (60.8 hours),
+        # Whit Monday (09/06) on a continuous team day, workers' holidays on Wednesday 11, Thursday 12 (team days) and
+        # Tuesday 24 (continuous team day).
+        employee = self._create_researcher_employee('Continuous Team Worker', False, 0, wage=3000)
+        calendar = self.resource_calendar_38_hours_per_week.copy()
+        employee.resource_calendar_id = calendar
+        attendances = calendar.attendance_ids.sorted(lambda a: (a.dayofweek, a.hour_from))
+        attendances.write({'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_attendance').id})
+        attendances[0:4].category_options_ids = [Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_CONTTEAM').id])]
+        attendances[4:8].category_options_ids = [Command.set([self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_TEAM').id])]
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Time Off",
+            'calendar_id': calendar.id,
+            'company_id': self.env.company.id,
+            'resource_id': employee.resource_id.id,
+            'date_from': date_from,
+            'date_to': date_to,
+            'count_as': "absence",
+            'work_entry_type_id': self.env.ref(work_entry_type_xmlid).id,
+        } for date_from, date_to, work_entry_type_xmlid in [
+            (datetime.datetime(2025, 6, 9, 6, 0, 0), datetime.datetime(2025, 6, 9, 17, 0, 0), 'hr_work_entry.l10n_be_work_entry_type_bank_holiday'),
+            (datetime.datetime(2025, 6, 11, 6, 0, 0), datetime.datetime(2025, 6, 12, 17, 0, 0), 'hr_work_entry.l10n_be_work_entry_type_worker_time_off'),
+            (datetime.datetime(2025, 6, 24, 6, 0, 0), datetime.datetime(2025, 6, 24, 17, 0, 0), 'hr_work_entry.l10n_be_work_entry_type_worker_time_off'),
+        ]])
+        payslip, = self._create_researcher_payslips(employee, datetime.date(2025, 6, 1), datetime.date(2025, 6, 30))
+
+        worked_days = payslip.worked_days_line_ids
+        self.assertAlmostEqual(sum(worked_days.filtered(lambda line: line.code == '006.00').mapped('number_of_hours')), 7.6, places=2)
+        self.assertAlmostEqual(sum(worked_days.filtered(lambda line: line.code == '142.00').mapped('number_of_hours')), 22.8, places=2)
+
+        # The third-time rule: the workers' holidays count (on a team or continuous team day as such), not the public
+        # holiday. 45.6 team and 60.8 continuous team hours reach a third of the 152 hours: eligible.
+        self.assertAlmostEqual(payslip._get_l10n_be_full_pay_worked_hours(), 152.0, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_TEAM'), 60.8, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_CONTTEAM'), 60.8, places=2)
+        self.assertTrue(self.env['l10n_be.274_xx']._is_team_exemption_eligible(payslip))
+
+        # The split: the public holiday counts, on a continuous team day, the workers' holidays don't. 60.8 continuous
+        # team hours (53.2 worked, 7.6 of public holiday) over the 136.8 taxable hours (159.6 - 22.8 of holidays),
+        # 44.44% instead of the 40% (60.8 / 152) of the hours of the third-time rule.
+        taxable_filter = payslip._l10n_be_is_shift_exemption_taxable_work_entry_type
+        self.assertAlmostEqual(payslip._get_l10n_be_full_pay_worked_hours(taxable_filter), 136.8, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_CONTTEAM', taxable_filter), 60.8, places=2)
+        self.assertAlmostEqual(payslip._get_l10n_be_contteam_share(), 60.8 / 136.8, places=4)
+
+        # The theoretical exemption: 2274.63 * (44.44% * 25% + 55.56% * 22.8%) = 540.86 (538.63 with the 40% share of
+        # the third-time rule), capped to the withholding tax (423.06) on the payslip.
+        self._validate_rule_computed(payslip, 'WITHHOLDING_TAX_EX_274_74')
+        line_values = payslip._get_line_values(['GROSS', 'PPTOTAL', 'T_WITHHOLDING_TAX_EX_274_74', 'WITHHOLDING_TAX_EX_274_74'])
+        self.assertAlmostEqual(line_values['GROSS'][payslip.id]['total'], 2274.63, places=2)
+        self.assertAlmostEqual(line_values['T_WITHHOLDING_TAX_EX_274_74'][payslip.id]['total'], 540.86, places=2)
+        self.assertAlmostEqual(line_values['PPTOTAL'][payslip.id]['total'], 423.06, places=2)
+        self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_74'][payslip.id]['total'], 423.06, places=2)
+
+    def test_keyed_withholding_tax(self):
+        # The withholding tax keyed on the payslip (P.P input) is the tax of the payslip: the reductions of the scale,
+        # computed on the tax of the scale (the fiscal work bonus P.P.DED here), don't apply on top of it
+        for inputs in [{}, {'P.P': 150}]:
+            payslip = self._generate_payslip(datetime.date(2026, 1, 1), datetime.date(2026, 1, 31), input_values=inputs)
+            self._validate_payslip(payslip)
 
     def test_gpa_full_time_credit_period(self):
         # Full suspension still occupies calendar time, even with zero working hours.
@@ -9665,3 +10834,2573 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         #   version 3 theoretical hours = 36 * 20 / 30 = 24
         #   version 2 amount = wage - shoter periods theoretical hours * hourly rate = 2000 - (20 + 24) * (2000 * 3 / (20 * 13))
         self._validate_payslip(payslip)
+
+    def test_double_holidays(self):
+        self.version.write({
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self.assertEqual(len(payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_variable_with_sunday_premiums(self):
+        """ The Sunday and public holiday premiums of the reference period are part of the variable remuneration of
+        the double holiday pay, as the social secretariats compute it, not of the other averages of the variable
+        revenues (13th month, notice, loss on commission) """
+        employee = self.employee
+        monthly = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'date_from': datetime.date(2021, 3, 1),
+            'date_to': datetime.date(2021, 3, 31),
+        })
+        monthly.compute_sheet()
+        sunday_premium = self.env['hr.salary.rule'].search([('code', '=', 'PREMSUN')], limit=1)
+        self.env['hr.payslip.line'].create({
+            'slip_id': monthly.id,
+            'salary_rule_id': sunday_premium.id,
+            'name': sunday_premium.name,
+            'code': 'PREMSUN',
+            'amount': 120.0,
+            'quantity': 1.0,
+            'rate': 100.0,
+            'total': 120.0,
+            'employee_id': employee.id,
+            'version_id': self.version.id,
+        })
+        monthly.action_payslip_done()
+
+        double_holiday = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30),
+        })
+        reference = double_holiday.with_context(variable_revenue_date_from=double_holiday.date_from)
+        # 120 EUR of premiums over the 12 months of the reference period
+        self.assertAlmostEqual(reference._get_last_year_average_variable_revenues(included_codes=('PREMSUN', 'PREMHOL')), 10.0, places=2)
+        self.assertEqual(reference._get_last_year_average_variable_revenues(), 0.0)
+        self.assertGreater(double_holiday._get_l10n_be_double_holiday_variable_revenues(), 0.0)
+
+    def test_double_holiday_hourly_wage(self):
+        # The double holiday pay of an employee paid by the hour is computed on his monthly wage: the hourly wage
+        # times the hours of a week times 13 / 3
+        self.version.write({'transport_mode_car': False})
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30),
+        })
+        hours_per_week = self.version._l10n_be_get_hours_per_week(2021)
+        self.version.write({'wage_type': 'monthly', 'wage': 20 * hours_per_week * 13 / 3})
+        monthly_double_pay = payslip._l10n_be_get_paid_double_holiday()
+        self.assertGreater(monthly_double_pay, 0)
+        self.version.write({'wage_type': 'hourly', 'hourly_wage': 20})
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), monthly_double_pay, places=2)
+
+    def test_double_holiday_no_right(self):
+        self.version.contract_date_start = datetime.date(2021, 1, 1)
+        self.version.date_version = datetime.date(2021, 1, 1)
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self.assertEqual(len(payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_excluded_versions(self):
+        # No double holiday pay for the individual vocational trainings (PFI), the students, the former workers paid a
+        # supplementary indemnity (RCC) and the workers of a foreign employer without a place of business in Belgium
+        # (employer category 212): left out of the pay run, and a payslip added by hand pays nothing
+        payrun = self.env['hr.payslip.run'].create({
+            'name': 'Double Holiday Pay',
+            'date_start': datetime.date(2021, 6, 1),
+            'date_end': datetime.date(2021, 6, 30),
+            'company_id': self.env.company.id,
+            'structure_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        rcc_worker_code = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00879')
+        cases = [
+            ({}, True),
+            ({'l10n_be_dimona_category': False, 'l10n_be_worker_code_id': False}, True),
+            ({'l10n_be_dimona_category': 'ivt'}, False),
+            ({'l10n_be_dimona_category': 'stu'}, False),
+            ({'l10n_be_worker_code_id': rcc_worker_code.id}, False),
+        ]
+        regular_values = {
+            'l10n_be_dimona_category': self.version.l10n_be_dimona_category,
+            'l10n_be_worker_code_id': self.version.l10n_be_worker_code_id.id,
+        }
+        for values, has_double_holiday_pay in cases:
+            with self.subTest(values=values):
+                self.version.write({**regular_values, **values})
+                self.assertEqual(self.employee in payrun._get_valid_versions().employee_id, has_double_holiday_pay)
+                self.assertEqual(bool(payslip._l10n_be_get_paid_double_holiday()), has_double_holiday_pay)
+
+        self.version.write(regular_values)
+        payroll_config = self.version.payroll_config_id
+        for employer_category, has_double_holiday_pay in [
+            (self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00212'), False),
+            # A payroll config without employer category keeps the double holiday pay.
+            (self.env['l10n.be.employer.category'], True),
+            (self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010'), True),
+        ]:
+            with self.subTest(employer_category=employer_category.dmfa_code):
+                payroll_config.l10n_be_employer_category_id = employer_category
+                self.assertEqual(self.employee in payrun._get_valid_versions().employee_id, has_double_holiday_pay)
+                self.assertEqual(bool(payslip._l10n_be_get_paid_double_holiday()), has_double_holiday_pay)
+
+    def test_double_holidays_months_after_individual_vocational_training(self):
+        # Hired on 01/07/2020 after an individual vocational training (PFI): only the months of the employment
+        # contract count
+        self.version.write({
+            'transport_mode_car': False,
+            'l10n_be_dimona_category': 'ivt',
+        })
+        employment_version = self.employee.create_version({
+            'date_version': datetime.date(2020, 7, 1),
+            'l10n_be_dimona_category': 'oth',
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': employment_version.id,
+            'company_id': self.env.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        double_holiday_pay, explanation = payslip._l10n_be_get_paid_double_holiday(get_explanation=True)
+        self.assertEqual(explanation['months'], 6)
+        self.assertAlmostEqual(payslip._get_line_values(['DOUBLE'])['DOUBLE'][payslip.id]['total'], double_holiday_pay * 0.85, places=2)
+
+    def test_double_holidays_incomplete_year_full_time(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_complete_year_credit_time(self):
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week,
+            'work_time_rate': 1.0,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_incomplete_year_credit_time(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week,
+            'work_time_rate': 1.0,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_credit_time_unassimilated_month(self):
+        # 4/5 time credit all through the reference year 2020 and the whole of February on unpaid leave (unassimilated):
+        # February counts for nothing, the 11 other months in full
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week,
+            'work_time_rate': 1.0,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2020, 2, 1),
+            'request_date_to': datetime.date(2020, 2, 29),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        _amount, explanation = payslip._l10n_be_get_paid_double_holiday(get_explanation=True)
+        self.assertAlmostEqual(explanation['months'], 11, 2)
+        payslip.compute_sheet()
+        self.assertTrue(payslip._get_line_values(['DOUBLE'])['DOUBLE'][payslip.id]['total'])
+
+    def test_double_holidays_time_credit_after_reference_year(self):
+        # Full time all through the reference year 2020, 4/5 time credit from January 2021: the double holiday pay of
+        # June 2021 is 92% of June's gross pay (art. 38, 2° AR 30.03.1967), the time credit's, for the 12 months of 2020
+        time_credit_version = self.employee.create_version({
+            'date_version': datetime.date(2021, 1, 1),
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'work_time_rate': 1.0,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': time_credit_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        # June's gross pay: 2650 x 4/5 = 2120, and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 2129, 2)
+        payslip.compute_sheet()
+        line_values = payslip._get_line_values(['DOUBLE', 'DOUBLE_COMPLEMENTARY'])
+        self.assertAlmostEqual(line_values['DOUBLE'][payslip.id]['total'], 1809.65, 2)  # 2129 x 85%
+        self.assertAlmostEqual(line_values['DOUBLE_COMPLEMENTARY'][payslip.id]['total'], 149.03, 2)  # 2129 x 7%
+
+    def test_double_holidays_complete_year_part_time(self):
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_incomplete_year_part_time(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_children_no_reduction(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'transport_mode_car': False,
+        })
+
+        self.employee.write({
+            'children': 2,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_children_with_reductions(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'transport_mode_car': False,
+        })
+
+        self.employee.write({
+            'children': 6,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # This single employee's 6 children family deduction brings the theoretical tax to zero, so DH_PP is exempted.
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_variable_revenues_complete_year(self):
+        commission_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2020, 5, 1),
+            'date_to': datetime.datetime(2020, 5, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        commission_payslip._set_input_value('COMMISSION', 3000)
+
+        commission_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        commission_payslip.action_payslip_done()
+
+        self.version.write({
+            'commission_on_target': 1000,
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_variable_revenues_incomplete_year(self):
+        commission_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2020, 5, 1),
+            'date_to': datetime.datetime(2020, 5, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        commission_payslip._set_input_value('COMMISSION', 3000)
+        commission_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        commission_payslip.action_payslip_done()
+
+        self.version.write({
+            'commission_on_target': 1000,
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_variable_revenues_incomplete_year_with_attest(self):
+        commission_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2020, 9, 1),
+            'date_to': datetime.datetime(2020, 9, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        commission_payslip._set_input_value('COMMISSION', 6000)
+        commission_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        commission_payslip.action_payslip_done()
+
+        self.version.write({
+            'commission_on_target': 1000,
+            'contract_date_start': datetime.date(2020, 7, 1),
+            'transport_mode_car': False,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2020, 7, 1),
+        })
+        self.env["l10n.be.holiday.attest"].create([
+            {
+                "employee_id": self.employee.id,
+                "date_from": datetime.date(2020, 1, 1),
+                "date_to": datetime.date(2020, 6, 30),
+                "prev_work_hours_per_week": 19,
+                "prev_reference_work_hours_per_week": 38,
+                "prev_work_days_per_week": 5,
+                "prev_simple_holiday_pay_paid": 0,
+                "prev_double_holiday_pay_paid": 1245.33,
+            },
+        ])
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_holiday_attest_40_over_38(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 7, 1),
+            'transport_mode_car': False,
+        })
+
+        self.env["l10n.be.holiday.attest"].create([
+            {
+                "employee_id": self.employee.id,
+                "date_from": datetime.date(2020, 1, 1),
+                "date_to": datetime.date(2020, 6, 30),
+                "prev_work_hours_per_week": 40,
+                "prev_reference_work_hours_per_week": 38,
+                "prev_work_days_per_week": 5,
+                "prev_simple_holiday_pay_paid": 0,
+                "prev_double_holiday_pay_paid": 1245.33,
+            },
+        ])
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_european_time_off(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 3, 15),
+            'transport_mode_car': False,
+        })
+
+        self.employee.write({
+            'children': 2,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'European Time Off',
+            'work_entry_type_id': self.european_time_off_type.id,
+            'request_date_from': datetime.date(2020, 5, 4),
+            'request_date_to': datetime.date(2020, 5, 4),
+            'employee_id': self.employee.id,
+        })
+
+        european_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2020, 5, 1),
+            'date_to': datetime.datetime(2020, 5, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        european_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        european_payslip.action_payslip_done()
+        self.assertEqual(european_payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20').amount, 122.31)
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_european_time_off_over_2_years(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2019, 1, 1),
+            'transport_mode_car': False,
+        })
+
+        self.employee.write({
+            'children': 2,
+        })
+
+        # Takes all the 4 weeks of european time off in Feb 2019
+        # Should recover 2650 € in 2020
+        self.env['hr.leave'].create({
+            'name': 'European Time Off',
+            'work_entry_type_id': self.european_time_off_type.id,
+            'request_date_from': datetime.date(2019, 2, 1),
+            'request_date_to': datetime.date(2019, 2, 28),
+            'employee_id': self.employee.id,
+        })
+
+        european_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2019, 2, 1),
+            'date_to': datetime.datetime(2019, 2, 28),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        european_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        european_payslip.action_payslip_done()
+        self.assertEqual(european_payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20').amount, 2650)
+
+        payslip_2020 = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2020, 6, 1),
+            'date_to': datetime.date(2020, 6, 30)
+        })
+        payslip_2020.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip_2020.action_payslip_done()
+
+        # We recover the maximum amount in 2020, and we should recover the remaining in 2021
+        # 2650 - 2438 = 212 €
+        self._validate_payslip(payslip_2020)
+
+        payslip_2021 = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip_2021.compute_sheet()
+
+        self._validate_payslip(payslip_2021)
+
+    def test_double_holidays_company_car(self):
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self.assertEqual(len(payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(payslip)
+
+    def test_double_holidays_pay_recovery(self):
+        self.version.write({
+            'transport_mode_car': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30),
+        })
+        payslip._set_input_value('DOUBLERECOVERY', 438)
+        payslip.compute_sheet()
+
+        self.assertEqual(len(payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_recovery(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 8, 3),
+            'wage': 1956.69,
+        })
+
+        self.env["l10n.be.holiday.attest"].create([
+            {
+                "employee_id": self.employee.id,
+                "date_from": datetime.date(2020, 1, 1),
+                "date_to": datetime.date(2020, 6, 30),
+                "prev_work_hours_per_week": 38,
+                "prev_reference_work_hours_per_week": 38,
+                "prev_work_days_per_week": 5,
+                "prev_simple_holiday_pay_paid": 0,
+                "prev_double_holiday_pay_paid": 2781.82,
+            }
+        ])
+
+        double_pay_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2021, 6, 1),
+            'date_to': datetime.datetime(2021, 6, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'company_id': self.env.company.id,
+        })
+        double_pay_payslip._set_input_value('MONTH', 11)
+        double_pay_payslip.compute_sheet()
+
+        self.assertAlmostEqual(double_pay_payslip._get_input_line_amount('DOUBLERECOVERY'), 900.08, 2)
+
+        self.assertEqual(len(double_pay_payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(double_pay_payslip)
+
+    def test_double_holiday_recovery_half_time_multi_attest(self):
+        # Note: The employee was occupied with 2 half times over the same period
+        self.version.write({
+            'contract_date_start': datetime.date(2020, 8, 3),
+            'wage': 2322.22,
+        })
+
+        self.env["l10n.be.holiday.attest"].create([
+            {
+                "employee_id": self.employee.id,
+                "date_from": datetime.date(2020, 6, 1),
+                "date_to": datetime.date(2020, 7, 31),
+                "prev_assimilated_days": 45,
+                "prev_simple_holiday_pay_paid": 0,
+                "prev_double_holiday_pay_paid": 520.89,
+                "prev_work_hours_per_week": 19,
+                "prev_reference_work_hours_per_week": 38,
+                "prev_work_days_per_week": 5,
+            },
+            {
+                "employee_id": self.employee.id,
+                "date_from": datetime.date(2020, 6, 1),
+                "date_to": datetime.date(2020, 7, 31),
+                "prev_assimilated_days": 45,
+                "prev_simple_holiday_pay_paid": 0,
+                "prev_double_holiday_pay_paid": 491.62,
+                "prev_work_hours_per_week": 19,
+                "prev_reference_work_hours_per_week": 38,
+                "prev_work_days_per_week": 5,
+            },
+        ])
+        double_pay_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2021, 6, 1),
+            'date_to': datetime.datetime(2021, 6, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'company_id': self.env.company.id,
+        })
+        double_pay_payslip._set_input_value('MONTH', 7)
+        double_pay_payslip.compute_sheet()
+
+        self.assertAlmostEqual(double_pay_payslip._get_input_line_amount('DOUBLERECOVERY'), 369.76, 2)
+
+        self.assertEqual(len(double_pay_payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(double_pay_payslip)
+
+    def test_double_holiday_recovery_multi_certificates_capped(self):
+        """
+        - Employee enters on 25/03/2024
+        - Two holiday attests in 2023 with different regimes
+        - Recovery must be capped to the computed entitlement
+        """
+
+        self.version.write({
+            'contract_date_start': datetime.date(2024, 3, 25),
+            'wage': 3750.00,
+        })
+
+        self.env['l10n.be.holiday.attest'].create([
+            {
+                'employee_id': self.employee.id,
+                'date_from': datetime.date(2023, 1, 1),
+                'date_to': datetime.date(2023, 10, 8),
+                'prev_simple_holiday_pay_paid': 0,
+                'prev_double_holiday_pay_paid': 5627.34,
+                'prev_work_hours_per_week': 38,
+                'prev_reference_work_hours_per_week': 38,
+                'prev_work_days_per_week': 5,
+            },
+            {
+                'employee_id': self.employee.id,
+                'date_from': datetime.date(2023, 10, 9),
+                'date_to': datetime.date(2023, 12, 31),
+                'prev_simple_holiday_pay_paid': 0,
+                'prev_double_holiday_pay_paid': 2075.60,
+                'prev_work_hours_per_week': 36.66,
+                'prev_reference_work_hours_per_week': 38,
+                'prev_work_days_per_week': 5,
+            },
+        ])
+
+        # Payslip
+        double_pay_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2024, 6, 1),
+            'date_to': datetime.datetime(2024, 6, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'company_id': self.env.company.id,
+        })
+
+        double_pay_payslip._set_input_value('MONTH', 12)
+        double_pay_payslip.compute_sheet()
+
+        # Expected recovery:
+        # Total capped recovery = 3423.69
+        # Remaining balance = 26.31 (taxable)
+        self.assertAlmostEqual(
+            double_pay_payslip._get_input_line_amount('DOUBLERECOVERY'),
+            3421.93,
+            2,
+        )
+
+        # No worked days expected
+        self.assertEqual(len(double_pay_payslip.worked_days_line_ids), 0)
+
+        self._validate_payslip(double_pay_payslip)
+
+    def test_double_holiday_recovery_working_more_prorate_new_cap(self):
+        """
+        Employee works MORE now = limit using OLD smaller fraction
+
+        We prorate:
+        - Theoretical cap
+        - New DP
+        """
+
+        # New job (2025)
+        calendar_32h_40h = self._create_calendar(32)
+
+        self.version.write({
+            'resource_calendar_id': calendar_32h_40h.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'wage': 2500.00,
+        })
+
+        # Holiday attest from previous employer (2024)
+        self.env['l10n.be.holiday.attest'].create([{
+            'employee_id': self.employee.id,
+            'date_from': datetime.date(2024, 1, 1),
+            'date_to': datetime.date(2024, 12, 31),
+            'prev_simple_holiday_pay_paid': 0,
+            'prev_double_holiday_pay_paid': 4049.76,
+            'prev_work_hours_per_week': 25,
+            'prev_reference_work_hours_per_week': 38,
+            'prev_work_days_per_week': 5,
+        }])
+
+        double_pay_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2025, 6, 1),
+            'date_to': datetime.datetime(2025, 6, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref(
+                'l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'
+            ).id,
+            'company_id': self.env.company.id,
+        })
+
+        double_pay_payslip._set_input_value('MONTH', 12)
+        double_pay_payslip.compute_sheet()
+
+        # Expected recovery
+        self.assertAlmostEqual(
+            double_pay_payslip._get_input_line_amount('DOUBLERECOVERY'),
+            1891.45,
+            2
+        )
+
+        self.assertEqual(len(double_pay_payslip.worked_days_line_ids), 0)
+
+        payslip_results = {
+            'DOUBLERECOVERY': -1891.45,
+            'DH_BASIC': 2308.28,  # (2500 + internet 5 + mobile subscription 4) x 92%
+        }
+
+        self._validate_payslip(double_pay_payslip, payslip_results, skip_lines=True)
+
+    def test_double_holiday_recovery_working_less_prorate_old_certificate(self):
+        """
+        Rule 3:
+        Employee works LESS now = prorate OLD certificate
+
+        We prorate:
+        - Certificate amount (downwards)
+        - Then compare with new salary cap
+        """
+        calendar_30h_40h = self._create_calendar(30)
+
+        # New job (2025) → smaller schedule
+        self.version.write({
+            'resource_calendar_id': calendar_30h_40h.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'wage': 2500.00,
+        })
+
+        # Holiday attest from previous employer (2024)
+        self.env['l10n.be.holiday.attest'].create([{
+            'employee_id': self.employee.id,
+            'date_from': datetime.date(2024, 1, 1),
+            'date_to': datetime.date(2024, 12, 31),
+            'prev_simple_holiday_pay_paid': 0,
+            'prev_double_holiday_pay_paid': 4417.92 / 2,
+            'prev_work_hours_per_week': 32,
+            'prev_reference_work_hours_per_week': 38,
+            'prev_work_days_per_week': 5,
+        }])
+
+        double_pay_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2025, 6, 1),
+            'date_to': datetime.datetime(2025, 6, 30),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref(
+                'l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'
+            ).id,
+            'company_id': self.env.company.id,
+        })
+
+        double_pay_payslip._set_input_value('MONTH', 12)
+        double_pay_payslip.compute_sheet()
+
+        # Expected recovery
+        self.assertAlmostEqual(
+            double_pay_payslip._get_input_line_amount('DOUBLERECOVERY'),
+            1967.36,
+            2
+        )
+
+        self.assertEqual(len(double_pay_payslip.worked_days_line_ids), 0)
+
+        payslip_results = {
+            'DOUBLERECOVERY': -1967.36,
+            'DH_BASIC': 2308.28,  # (2500 + internet 5 + mobile subscription 4) x 92%
+        }
+
+        self._validate_payslip(double_pay_payslip, payslip_results, skip_lines=True)
+
+    def test_double_holidays_commission_first_incomplete_month(self):
+        # If a payslip (first one or mid-month signing is incomplete and has commissions
+        # take them into account
+        self.version.write({
+            'contract_date_start': datetime.date(2021, 12, 7),
+            'commission_on_target': 1500,
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2021, 12, 7),
+        })
+
+        payslip = self._generate_payslip(datetime.date(2021, 12, 1), datetime.date(2021, 12, 31), input_values={'COMMISSION': 300})
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+
+        double_payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2022, 6, 1),
+            'date_to': datetime.date(2022, 6, 30)
+        })
+        double_payslip.compute_sheet()
+
+        self._validate_payslip(double_payslip)
+
+    def test_double_holidays_full_time_credit_time(self):
+        # Check that a full time credit time is not taken into account
+        # on the number of occupation months
+        self.version.write({
+            'name': "Full Time Parental Time Off",
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'work_time_rate': 0,
+            'wage': 2400,
+            'resource_calendar_id': self.resource_calendar_0_hours_per_week.id,
+            'contract_date_start': datetime.date(2021, 1, 1),
+        })
+        self.version.employee_id.write({
+            'l10n_be_fictive_hire_date': datetime.date(2021, 1, 1),
+        })
+
+        double_payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2022, 6, 1),
+            'date_to': datetime.date(2022, 6, 30)
+        })
+        double_payslip.compute_sheet()
+
+        self._validate_payslip(double_payslip)
+
+    def test_double_holidays_european_time_off_current_year(self):
+        # Check that european time off taken on the current year
+        # are not recovered on the double holiday pay (and left for next year)
+
+        self.env['hr.leave'].create({
+            'name': 'European Time Off',
+            'work_entry_type_id': self.european_time_off_type.id,
+            'request_date_from': '2022-05-09',
+            'request_date_to': '2022-05-12',
+            'employee_id': self.employee.id,
+        })
+
+        european_payslip = self.env['hr.payslip'].create({
+            'version_id': self.version.id,
+            'date_from': datetime.datetime(2022, 5, 1),
+            'date_to': datetime.datetime(2022, 5, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.env.company.id,
+        })
+        european_payslip.action_refresh_from_work_entries()
+        self.employee.write({'review_state': '1_reviewed'})
+        european_payslip.action_payslip_done()
+        self.assertEqual(european_payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20').amount, 489.23)
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2022, 6, 1),
+            'date_to': datetime.date(2022, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_01(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'date_version': datetime.date(2025, 1, 1),
+            'wage': 2000,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_02(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': datetime.date(2025, 6, 30),
+            'wage': 2000,
+        })
+
+        part_time_version = self.env['hr.version'].create([{
+            'date_version': datetime.date(2025, 7, 1),
+            'contract_date_start': datetime.date(2025, 7, 1),
+            'employee_id': self.version.employee_id.id,
+            'resource_calendar_id': self.calendar_30_4h_per_week.id,
+            'wage': 1500,
+        }])
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': part_time_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_03(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 7, 1),
+            'date_version': datetime.date(2025, 7, 1),
+            'wage': 2000,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_04(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 9, 15),
+            'date_version': datetime.date(2025, 9, 15),
+            'wage': 2000,
+        })
+        # Holiday attest from previous employer (2024)
+        self.env['l10n.be.holiday.attest'].create([{
+            'employee_id': self.employee.id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2025, 5, 25),
+            'prev_simple_holiday_pay_paid': 0,
+            'prev_double_holiday_pay_paid': 2781.82,
+            'prev_work_hours_per_week': 38,
+            'prev_reference_work_hours_per_week': 38,
+            'prev_work_days_per_week': 5,
+        }])
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_05(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 9, 15),
+            'date_version': datetime.date(2025, 9, 15),
+            'wage': 2000,
+        })
+
+        self.env['l10n.be.holiday.attest'].create([{
+            'employee_id': self.employee.id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2025, 5, 25),
+            'prev_simple_holiday_pay_paid': 0,
+            'prev_double_holiday_pay_paid': 2781.82,
+            'prev_work_hours_per_week': 38 * 0.7895,
+            'prev_reference_work_hours_per_week': 38,
+            'prev_work_days_per_week': 5,
+        }])
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_06(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2025, 1, 1),
+            'request_date_to': datetime.date(2025, 1, 8),
+            'employee_id': self.employee.id,
+        })
+
+        self.env['hr.leave'].with_context(skip_allocation_check=True).create({
+            'name': 'Unjustified leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_unjustified_reason').id,
+            'request_date_from': datetime.date(2025, 2, 1),
+            'request_date_to': datetime.date(2025, 2, 8),
+            'employee_id': self.employee.id,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 3, 1),
+            'request_date_to': datetime.date(2025, 3, 8),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # The computation basis for the double and double complementary should be:
+        #   ((23/31)/12 + (20/28)/12 + 10/12) * 2000 = 1909.37€
+        #   DOUBLE = 1909.37 * 0.85 = 1622.96€
+        #   DOUBLE_COMPLEMENTARY = 1909.37 * 0.07 = 133.66€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_07(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 6, 10),
+            'request_date_to': datetime.date(2025, 9, 15),
+            'employee_id': self.employee.id,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2025, 9, 30),
+            'request_date_to': datetime.date(2025, 10, 8),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # The computation basis for the double and double complementary should be:
+        #   (5/12 + (9/30)/12 + (14/30)/12 + (23/31)/12 + 2/12) * 2000 = 1418.10€
+        #   DOUBLE = 1418.10 * 0.85 = 1205.39€
+        #   DOUBLE_COMPLEMENTARY = 1418.10 * 0.07 = 99.27€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_08(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 9, 1),
+            'date_version': datetime.date(2025, 9, 1),
+            'wage': 4000,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_case_09(self):
+        self.version.write({
+            'contract_date_start': datetime.date(2025, 3, 2),
+            'date_version': datetime.date(2025, 3, 2),
+            'wage': 3000,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_12_months_sickness(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 1, 1),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Double holiday should be full as first 12 months of sickness are taken into account
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_13_months_sickness(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 12, 1),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Double holiday should be prorated as only the first 12 months of sickness are taken into account
+        # The computation basis for the double and double complementary should be:
+        #   (11/12) * 2000 = 1833.33€
+        #   DOUBLE = 1909.37 * 0.85 = 1558.33€
+        #   DOUBLE_COMPLEMENTARY = 1909.37 * 0.07 = 128.33€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_24_months_sickness(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 1, 1),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Double holiday should be zero as only the first 12 months of sickness are taken into account
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_sickness_relapse_chain_over_12_months(self):
+        """Two sick leaves linked by the relapse flag form a single chain.
+
+        Leave A: Jan 1 2024 - Sep 30 2024  (9 months)
+        Leave B: Oct 10 2024 - Dec 31 2025  (marked as relapse, within 14-day window)
+
+        Chain origin = Jan 1 2024, 12-month cutoff = Jan 1 2025 + 10 days from back to work
+        """
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave A',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 1, 1),
+            'request_date_to': datetime.date(2024, 9, 30),
+            'employee_id': self.employee.id,
+        })
+
+        last_sick_leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)]).sorted('request_date_from')[-1]
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave B (relapse)',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 10, 10),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': last_sick_leave.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Basis = 9/31/12 * 2000 = 48.39€
+        # DOUBLE = 48.39 * 0.85 = 41.13€
+        # DOUBLE_COMPLEMENTARY = 48.39 * 0.07 = 3.39€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_sickness_no_relapse_new_chain(self):
+        """Two sick leaves within the relapse window but the second is NOT marked as a relapse.
+
+        Leave A: Jan 1 2025 - Mar 31 2025  (3 months)
+        Leave B: Apr 10 2025 - Dec 31 2025  (within 14 days of A, but NOT a relapse)
+
+        Because B is not a relapse, it starts a fresh chain.  Both chains are < 12 months
+        so every sick day in 2025 is assimilated → double holiday is full.
+        """
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave A',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 1, 1),
+            'request_date_to': datetime.date(2025, 3, 31),
+            'employee_id': self.employee.id,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave B (NOT a relapse)',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 4, 10),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': False,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Both chains < 12 months → full assimilation
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_unpaid_leave_spanning_two_months(self):
+        """An unpaid leave that straddles a month boundary must be split correctly.
+
+        Leave: Jan 25 - Feb 5 2025 (unpaid)
+          → Jan deduction: 7 calendar days (Jan 25-31)
+          → Feb deduction: 5 calendar days (Feb 1-5)
+        """
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2025, 1, 25),
+            'request_date_to': datetime.date(2025, 2, 5),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # Basis = (24/31 + 23/28 + 10) / 12 * 2000 = 1932.60€
+        # DOUBLE = 1932.60 * 0.85 = 1642.71€
+        # DOUBLE_COMPLEMENTARY = 1932.60 * 0.07 = 135.28€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_sickness_cutoff_at_month_boundary(self):
+        """Sick leave chain whose 12-month cutoff falls exactly on a month boundary.
+
+        Leave: Feb 1 2024 - Dec 31 2025  (single leave)
+        Chain origin = Feb 1 2024, 12-month cutoff = Feb 1 2025.
+
+        In 2025:
+          - Jan 2025 (before cutoff): fully assimilated → no deduction
+          - Feb 1 2025 onwards: non-assimilated
+
+        Non-assimilated days in 2025:
+          Feb: 28 days, Mar-Dec: 10 full months
+
+        Assimilated months: only January (1/12).
+        """
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 2, 1),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # The computation basis for the double and double complementary should be:
+        #   BASIS = 1/12 * 2000 = 166.67€
+        #   DOUBLE = 166.67 * 0.85 = 141.67€
+        #   DOUBLE_COMPLEMENTARY = 166.67 * 0.07 = 11.67€
+        self._validate_payslip(payslip)
+
+    def test_double_holiday_sickness_back_to_work(self):
+        """Relapse chain that crosses the 12-month boundary after a brief return to work.
+
+        Leave A: Mar 1 2024 - Feb 1 2025  (chain origin = Mar 1 2024)
+        Leave B: Feb 10 2025 - Feb 16 2025  (relapse within 14-day window)
+        Leave C: Mar 1 2025 - Dec 31 2025  (relapse)
+        """
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 2000,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 3, 1),
+            'request_date_to': datetime.date(2025, 2, 1),
+            'employee_id': self.employee.id,
+        })
+
+        last_sick_leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)]).sorted('request_date_from')[-1]
+
+        sick_leave_2 = self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 2, 10),
+            'request_date_to': datetime.date(2025, 2, 16),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': last_sick_leave.id,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 3, 1),
+            'request_date_to': datetime.date(2025, 12, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': sick_leave_2.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        payslip.compute_sheet()
+
+        # The computation basis for the double and double complementary should be:
+        #   BASIS = 2/12 + 20/31/12 * 2000 = 440.86€
+        #   DOUBLE = 440.86 * 0.85 = 374.73€
+        #   DOUBLE_COMPLEMENTARY = 440.86 * 0.07 = 30.86€
+        self._validate_payslip(payslip)
+
+    def test_part_time_med_01(self):
+        self.version.write({
+            'date_version': datetime.date(2024, 4, 1),
+            'contract_date_start': datetime.date(2024, 4, 1),
+            'contract_date_end': datetime.date(2025, 5, 4),
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 5, 5),
+            'contract_date_start': datetime.date(2025, 5, 5),
+            'contract_date_end': datetime.date(2025, 6, 6),
+            'resource_calendar_id': self.calendar_19h_per_week_med.id,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 6, 7),
+            'contract_date_start': datetime.date(2025, 6, 7),
+            'contract_date_end': datetime.date(2025, 9, 24),
+            'resource_calendar_id': self.calendar_26_6h_per_week_med.id,
+        })
+
+        latest_version = self.employee.create_version({
+            'date_version': datetime.date(2025, 9, 25),
+            'contract_date_start': datetime.date(2025, 9, 25),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_30_4h_per_week_med.id,
+            'wage': 3276.77
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': latest_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3276.77 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
+
+    def test_part_time_med_02(self):
+        self.version.write({
+            'date_version': datetime.date(2024, 8, 1),
+            'contract_date_start': datetime.date(2024, 8, 1),
+            'contract_date_end': datetime.date(2025, 8, 24),
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 8, 25),
+            'contract_date_start': datetime.date(2025, 8, 25),
+            'contract_date_end': datetime.date(2025, 12, 31),
+            'resource_calendar_id': self.calendar_19h_per_week_med.id,
+        })
+
+        latest_version = self.employee.create_version({
+            'date_version': datetime.date(2026, 1, 1),
+            'contract_date_start': datetime.date(2026, 1, 1),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_30_4h_per_week.id,
+            'wage': 1981.49,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': latest_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1981.49 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
+
+    def test_part_time_med_03(self):
+        self.version.write({
+            'date_version': datetime.date(2024, 1, 1),
+            'contract_date_start': datetime.date(2024, 1, 1),
+            'contract_date_end': datetime.date(2025, 9, 21),
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 9, 22),
+            'contract_date_start': datetime.date(2025, 9, 22),
+            'contract_date_end': datetime.date(2025, 11, 23),
+            'resource_calendar_id': self.calendar_15_12h_per_week_med.id,
+            'work_time_rate': 1.0,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 11, 24),
+            'contract_date_start': datetime.date(2025, 11, 24),
+            'contract_date_end': datetime.date(2026, 1, 25),
+            'resource_calendar_id': self.calendar_22_8h_per_week_med.id,
+            'work_time_rate': 1.0,
+        })
+
+        latest_version = self.employee.create_version({
+            'date_version': datetime.date(2026, 1, 26),
+            'contract_date_start': datetime.date(2026, 1, 26),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_30_4h_per_week_med.id,
+            'work_time_rate': 1.0,
+            'wage': 3711.22,
+        })
+
+        sick_leave1 = self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 1, 3),
+            'request_date_to': datetime.date(2024, 1, 12),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 1, 24),
+            'request_date_to': datetime.date(2024, 2, 29),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': sick_leave1.id,
+        })
+
+        last_sick_leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)]).sorted('request_date_from')[-1]
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 3, 6),
+            'request_date_to': datetime.date(2024, 5, 3),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': last_sick_leave.id,
+        })
+
+        last_sick_leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)]).sorted('request_date_from')[-1]
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 5, 6),
+            'request_date_to': datetime.date(2025, 1, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': last_sick_leave.id,
+        })
+
+        last_sick_leave = self.env['hr.leave'].search([('employee_id', '=', self.employee.id)]).sorted('request_date_from')[-1]
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 2, 3),
+            'request_date_to': datetime.date(2025, 9, 21),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': last_sick_leave.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': latest_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1245.22, 2)
+
+    def test_part_time_med_04(self):
+        self.version.write({
+            'date_version': datetime.date(2024, 3, 1),
+            'contract_date_start': datetime.date(2024, 3, 1),
+            'contract_date_end': datetime.date(2024, 12, 31),
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': datetime.date(2025, 7, 31),
+            'resource_calendar_id': self.calendar_19h_per_week_med.id,
+            'work_time_rate': 1.0,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 8, 1),
+            'contract_date_start': datetime.date(2025, 8, 1),
+            'contract_date_end': datetime.date(2025, 8, 19),
+            'resource_calendar_id': self.employee.company_id.resource_calendar_id.id,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 8, 20),
+            'contract_date_start': datetime.date(2025, 8, 20),
+            'contract_date_end': datetime.date(2026, 2, 28),
+            'resource_calendar_id': self.calendar_19h_per_week_med.id,
+            'work_time_rate': 1.0,
+        })
+
+        latest_version = self.employee.create_version({
+            'date_version': datetime.date(2026, 3, 1),
+            'contract_date_start': datetime.date(2026, 3, 1),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_30_4h_per_week.id,
+            'wage': 3616.76,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 10, 10),
+            'request_date_to': datetime.date(2024, 12, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        origin_leave = self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 6, 19),
+            'request_date_to': datetime.date(2025, 7, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 8, 1),
+            'request_date_to': datetime.date(2025, 8, 19),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+            'l10n_be_sickness_relapse_origin_leave_id': origin_leave.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': latest_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3616.76 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
+
+    def test_part_time_med_05(self):
+        self.version.write({
+            'date_version': datetime.date(2024, 7, 1),
+            'contract_date_start': datetime.date(2024, 7, 1),
+            'contract_date_end': datetime.date(2025, 4, 30),
+            'resource_calendar_id': self.calendar_30_4h_per_week.id,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 5, 1),
+            'contract_date_start': datetime.date(2025, 5, 1),
+            'contract_date_end': datetime.date(2025, 8, 31),
+            'resource_calendar_id': self.calendar_15_12h_per_week_med.id,
+            'work_time_rate': 1.0,
+        })
+
+        self.employee.create_version({
+            'date_version': datetime.date(2025, 9, 1),
+            'contract_date_start': datetime.date(2025, 9, 1),
+            'contract_date_end': datetime.date(2025, 10, 23),
+            'resource_calendar_id': self.calendar_30_4h_per_week.id,
+        })
+
+        latest_version = self.employee.create_version({
+            'date_version': datetime.date(2025, 10, 24),
+            'contract_date_start': datetime.date(2025, 10, 24),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_22_8h_per_week_med.id,
+            'work_time_rate': 1.0,
+            'wage': 2303.61,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2024, 12, 31),
+            'request_date_to': datetime.date(2024, 12, 31),
+            'employee_id': self.employee.id,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 1, 1),
+            'request_date_to': datetime.date(2025, 4, 30),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 7, 14),
+            'request_date_to': datetime.date(2025, 8, 31),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2025, 9, 1),
+            'request_date_to': datetime.date(2025, 10, 23),
+            'employee_id': self.employee.id,
+            'l10n_be_sickness_relapse': True,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': latest_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 2091.30, 2)
+
+    def test_long_unpaid_leave(self):
+        self.version.write({
+            'date_version': datetime.date(2025, 1, 1),
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'contract_date_end': False,
+            'wage': 5805.46,
+        })
+
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2025, 3, 31),
+            'request_date_to': datetime.date(2027, 3, 30),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2026, 6, 1),
+            'date_to': datetime.date(2026, 6, 30)
+        })
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1437.98, 2)
+
+    def _impulsion_employee_vals(self, name, plan, date_start, birthday=datetime.date(1990, 1, 1), city=None, contract=True, **values):
+        """
+        Returns the values of an employee with the given impulsion plan and start date.
+        Set contract=True to create a contract version, or False to create an information version.
+        """
+        vals = {
+            'name': name,
+            'birthday': birthday,
+            'company_id': self.env.company.id,
+            'country_id': self.env.ref('base.be').id,
+            'private_country_id': self.env.ref('base.be').id,
+            'private_city_id': (self.city_namur if city is None else city).id,
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'date_version': date_start,
+            'wage': 2500.0,
+            'l10n_be_impulsion_plan': plan,
+            **values,
+        }
+        if contract:
+            vals.setdefault('contract_date_start', date_start)
+        return vals
+
+    def _create_impulsion_employees(self, vals_list):
+        """
+        Creates in batch the employees of the values built with _impulsion_employee_vals.
+        Returns the employees in the order of vals_list.
+        """
+        return self.env['hr.employee'].create(vals_list)
+
+    def _create_impulsion_employee(self, *args, **kwargs):
+        return self._create_impulsion_employees([self._impulsion_employee_vals(*args, **kwargs)])
+
+    def _add_contract(self, employee, date_start, date_end=False, **values):
+        return employee.create_version({
+            'date_version': date_start,
+            'contract_date_start': date_start,
+            'contract_date_end': date_end,
+            'fixed_term': bool(date_end),
+            **values,
+        })
+
+    def _add_information_version(self, employee, grant_date, **values):
+        return employee.create_version({
+            'date_version': grant_date,
+            'contract_date_start': False,
+            'contract_date_end': False,
+            **values,
+        })
+
+    def _compute_payslips(self, employee_months, validate=False):
+        """
+        Creates and computes in batch one monthly payslip per (employee, first day of the month), on the version
+        in effect at the end of the month. Returns the payslips in the order of employee_months.
+        """
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month_start:%m/%Y} {employee.name}',
+            'employee_id': employee.id,
+            'version_id': employee._get_version(month_start + relativedelta(day=31)).id,
+            'date_from': month_start,
+            'date_to': month_start + relativedelta(day=31),
+            'company_id': self.env.company.id,
+        } for employee, month_start in employee_months])
+        payslips.compute_sheet()
+        if validate:
+            payslips.action_payslip_done()
+        return payslips
+
+    def _get_impulsion_lines(self, payslip, code):
+        return payslip.line_ids.filtered(lambda line: line.code == code)
+
+    def _assert_impulsion_line(self, payslip, code, expected_total, msg):
+        """
+        Checks the total of the Impulsion line ``code`` of the payslip, and that the rule of the other plan
+        isn't computed. ``msg`` describes the rule being checked: it's shown, with the employee and the month,
+        when the assertion fails.
+        """
+        context = f"{payslip.employee_id.name}, payslip {payslip.date_from:%m/%Y}"
+        self.assertAlmostEqual(
+            sum(self._get_impulsion_lines(payslip, code).mapped('total')), expected_total, places=2,
+            msg=f"{context}: {msg}",
+        )
+        other_code = next(other for other in IMPULSION_CODES if other != code)
+        self.assertFalse(
+            self._get_impulsion_lines(payslip, other_code),
+            f"{context}: the {other_code} rule should not be computed for a {code} plan",
+        )
+
+    def _assert_no_impulsion_line(self, payslip, msg):
+        """ Checks that none of the Impulsion rules is computed on the payslip """
+        computed_codes = [code for code in IMPULSION_CODES if self._get_impulsion_lines(payslip, code)]
+        self.assertFalse(
+            computed_codes,
+            f"{payslip.employee_id.name}, payslip {payslip.date_from:%m/%Y}: {msg} (computed: {computed_codes})",
+        )
+
+    def _get_warning_records(self, xmlid, records):
+        warning = self.env.ref(f'l10n_be_hr_payroll.{xmlid}')
+        return warning._get_warning_python_records({'active_ids': records.ids})[0]
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_impulsion_deductions(self):
+        employees = self._create_impulsion_employees([
+            self._impulsion_employee_vals('Employee without Impulsion Plan', False, datetime.date(2025, 1, 1), birthday=datetime.date(1995, 1, 1)),
+            self._impulsion_employee_vals('Employee with Impulsion 25yo', '25yo', datetime.date(2025, 1, 1), birthday=datetime.date(2002, 1, 1)),
+            self._impulsion_employee_vals('Employee with Impulsion 12mo', '12mo', datetime.date(2025, 1, 1), birthday=datetime.date(1995, 1, 1)),
+        ])
+        # 4 days of unpaid leave in March: 18 paid days * 7.6 hours / (4 * 38 hours) = 90 %
+        # The coefficient computation was updated to match the DRS
+        self.env['hr.leave'].create([{
+            'employee_id': employee.id,
+            'request_date_from': datetime.date(2026, 3, 17),
+            'request_date_to': datetime.date(2026, 3, 21),
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+        } for employee in employees])
+
+        (
+            no_plan_jan, no_plan_feb, no_plan_mar,
+            rw1_jan, rw1_feb, rw1_mar,
+            rw2_jan, rw2_feb, rw2_mar,
+        ) = self._compute_payslips([
+            (employee, datetime.date(2026, month, 1)) for employee in employees for month in (1, 2, 3)
+        ], validate=True)
+
+        for payslip in (no_plan_jan, no_plan_feb, no_plan_mar):
+            self._assert_no_impulsion_line(payslip, "an employee without Impulsion plan should not get any Impulsion deduction")
+
+        for payslip in (rw1_jan, rw1_feb):
+            self._assert_impulsion_line(
+                payslip, 'IMPULSION25', -500.0,
+                "a full-time month of the first 24 months of the <25 years plan should be fully deducted (500 €)")
+        self._assert_impulsion_line(
+            rw1_mar, 'IMPULSION25', -450.0,
+            "4 days of unpaid leave should prorate the deduction on the paid hours: 136.8 / (4 * 38) = 90% of 500 €")
+
+        for payslip in (rw2_jan, rw2_feb):
+            self._assert_impulsion_line(
+                payslip, 'IMPULSION12', -250.0,
+                "the months 13 to 18 of a 12 months+ plan granted before 2026 should be deducted 250 €")
+        self._assert_impulsion_line(
+            rw2_mar, 'IMPULSION12', -225.0,
+            "4 days of unpaid leave should prorate the deduction on the paid hours: 136.8 / (4 * 38) = 90% of 250 €")
+
+    def test_25yo_new_hire_2025_brackets(self):
+        """
+        Test that for an employee hired on 01/09/2025 without an information version, the contract start is
+        considered the grant date and the brackets before 2026 apply:
+        < 24 months: 500 €
+        24 - 30 months: 250 €
+        30 - 36 months: 125 € for 6
+        """
+        employee = self._create_impulsion_employee('New Hire 2025', '25yo', datetime.date(2025, 9, 1), birthday=datetime.date(2002, 1, 1))
+        self.assertEqual(
+            employee.version_id._get_l10n_be_impulsion_start_date(), datetime.date(2025, 9, 1),
+            "without information version, the contract start should be the grant date")
+
+        month_1, month_24, month_25, month_30, month_31, month_36, month_37 = self._compute_payslips([
+            (employee, month_start) for month_start in (
+                datetime.date(2025, 9, 1),
+                datetime.date(2027, 8, 1),
+                datetime.date(2027, 9, 1),
+                datetime.date(2028, 2, 1),
+                datetime.date(2028, 3, 1),
+                datetime.date(2028, 8, 1),
+                datetime.date(2028, 9, 1),
+            )
+        ])
+        self._assert_impulsion_line(month_1, 'IMPULSION25', -500.0, "The first month should be deducted 500 €")
+        self._assert_impulsion_line(month_24, 'IMPULSION25', -500.0, "The 24th month should be deducted 500 €")
+        self._assert_impulsion_line(month_25, 'IMPULSION25', -250.0, "From the 25th month, a plan granted before 2026 should be deducted 250 €")
+        self._assert_impulsion_line(month_30, 'IMPULSION25', -250.0, "The 30th month should still be deducted 250 €")
+        self._assert_impulsion_line(month_31, 'IMPULSION25', -125.0, "From the 31st month, a plan granted before 2026 should be deducted 125 €")
+        self._assert_impulsion_line(month_36, 'IMPULSION25', -125.0, "The 36th month should still be deducted 125 €")
+        self._assert_impulsion_line(month_37, 'IMPULSION25', 0.0, "No deduction should be applied after 36 months for a plan granted before 2026")
+
+    def test_25yo_new_hire_2026_only_24_months(self):
+        """
+        Test that for an employee hired after 01/01/2026 new brackets with only the 24 months at 500 € apply.
+        """
+        employee = self._create_impulsion_employee('New Hire 2026', '25yo', datetime.date(2026, 3, 1), birthday=datetime.date(2004, 1, 1))
+        month_1, month_24, month_25 = self._compute_payslips([
+            (employee, datetime.date(2026, 3, 1)),
+            (employee, datetime.date(2028, 2, 1)),
+            (employee, datetime.date(2028, 3, 1)),
+        ])
+        self._assert_impulsion_line(month_1, 'IMPULSION25', -500.0, "The first month should be deducted 500 €")
+        self._assert_impulsion_line(month_24, 'IMPULSION25', -500.0, "The 24th month should still be deducted 500 €")
+        self._assert_impulsion_line(month_25, 'IMPULSION25', 0.0, "A plan granted from 2026 should not be deducted after 24 months (no 250 € and 125 € brackets anymore)")
+
+    def test_25yo_age_checked_at_grant_date(self):
+        """
+        Test that the employee is under 25 years old at the grant date, not at the payslip date.
+        """
+        employee_under_25, employee_over_25 = self._create_impulsion_employees([
+            self._impulsion_employee_vals('Turns 25', '25yo', datetime.date(2025, 9, 1), birthday=datetime.date(2001, 1, 1)),
+            self._impulsion_employee_vals('Already 25', '25yo', datetime.date(2025, 9, 1), birthday=datetime.date(2000, 1, 1)),
+        ])
+        payslip_under_25, payslip_over_25 = self._compute_payslips([
+            (employee_under_25, datetime.date(2026, 3, 1)),
+            (employee_over_25, datetime.date(2025, 9, 1)),
+        ])
+        self._assert_impulsion_line(payslip_under_25, 'IMPULSION25', -500.0, "An employee under 25 years old at the grant date should keep the deduction after turning 25")
+        self._assert_impulsion_line(payslip_over_25, 'IMPULSION25', 0.0, "An employee who is 25 years old or more at the grant date should not receive the deduction")
+
+    def test_part_time_allowance_matches_drs(self):
+        """
+        Test that a 4/5 worker with absences gets the same allowance on the payslip and in the
+        DRS WECH008: paid hours / (4 * full-time weekly hours).
+        """
+        employee = self._create_impulsion_employee(
+            'Part Time 4/5', '25yo', datetime.date(2026, 1, 1), birthday=datetime.date(2004, 1, 1),
+            resource_calendar_id=self.resource_calendar_4_5_friday_off.id,
+        )
+        # 2 days of unpaid leave on Tuesday and Wednesday
+        self.env['hr.leave'].create({
+            'employee_id': employee.id,
+            'request_date_from': datetime.date(2026, 3, 17),
+            'request_date_to': datetime.date(2026, 3, 18),
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+        })
+        payslip = self._compute_payslips([(employee, datetime.date(2026, 3, 1))], validate=True)
+        # 16 paid days (Monday to Thursday) * 7.6 hours = 121.6 hours, 500 € * 121.6 / 152 = 400 €
+        self._assert_impulsion_line(payslip, 'IMPULSION25', -400.0, "The deduction should be prorated on the paid hours over 4 weeks of a full-time worker: 121.6 / 152 = 80% of 500 €")
+
+        drs = self.env['l10n.be.drs'].search([('employee_id', '=', employee.id), ('identification', '=', 'WECH008')])
+        self.assertEqual(drs.risk_id, self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_011'), "Validating the payslip of a -25 years plan should create a WECH008 declaration for the risk 011")
+        self.assertEqual(drs.payslip_id, payslip, "The declaration should be linked to the validated payslip of the month")
+        self.assertAlmostEqual(drs.paid_hours, 121.6, places=2, msg="The declaration should report the paid hours of the payslip")
+        self.assertAlmostEqual(
+            -sum(self._get_impulsion_lines(payslip, 'IMPULSION25').mapped('total')), drs.work_allowance, places=2,
+            msg="The deduction on the payslip should match the work allowance declared in the DRS WECH008")
+
+    def test_no_activation_after_june_2026(self):
+        """
+        Test that an impulsion plan granted after the last activation date (30/06/2026) gives a warning
+        and is not paid.
+        An impulsion plan granted before the last activation date but with a contract after the cutoff is still paid.
+        """
+        late_grant_employee, granted_before_employee = self._create_impulsion_employees([
+            self._impulsion_employee_vals('Late Grant', '25yo', datetime.date(2026, 9, 1), birthday=datetime.date(2004, 1, 1)),
+            self._impulsion_employee_vals(
+                'Granted Before Cutoff', '12mo', datetime.date(2026, 6, 1), contract=False, birthday=datetime.date(1990, 1, 1)),
+        ])
+        self._add_contract(granted_before_employee, datetime.date(2026, 9, 1))
+        late_grant_payslip, granted_before_payslip = self._compute_payslips([
+            (late_grant_employee, datetime.date(2026, 9, 1)),
+            (granted_before_employee, datetime.date(2026, 9, 1)),
+        ])
+        self._assert_impulsion_line(
+            late_grant_payslip, 'IMPULSION25', 0.0,
+            "A plan granted after the last activation date (30/06/2026) should not be applied in the payslip")
+        self._assert_impulsion_line(
+            granted_before_payslip, 'IMPULSION12', -500.0,
+            "A plan granted before the last activation date should be applied, even with a contract starting after it")
+
+        self.assertEqual(
+            self._get_warning_records(
+                'hr_payroll_warning_impulsion_after_activation_cutoff',
+                late_grant_employee.version_ids + granted_before_employee.version_ids,
+            ),
+            late_grant_employee.version_id,
+            "Only the version whose right starts after the last activation date should get the warning",
+        )
+
+    def test_no_payment_after_end_date(self):
+        """
+        Test that no payment is made after the program end date (31/12/2029). The plans granted before 30/06/2026
+        end before 31/12/2029: the end is moved to 31/10/2026 with a new value of the parameter to check it applies.
+        """
+        rule_parameter = self.env['hr.rule.parameter']
+        self.assertTrue(
+            rule_parameter._get_parameter_from_code('l10n_be_impulsion_payment_permitted', date=datetime.date(2029, 12, 1)),
+            "The Impulsion plans should still be payable in December 2029")
+        self.assertFalse(
+            rule_parameter._get_parameter_from_code('l10n_be_impulsion_payment_permitted', date=datetime.date(2030, 1, 1)),
+            "The Impulsion plans should not be payable from January 2030")
+
+        self.env['hr.rule.parameter.value'].create({
+            'rule_parameter_id': self.env.ref('l10n_be_hr_payroll.rule_parameter_l10n_be_impulsion_payment_permitted').id,
+            'parameter_value': 'False',
+            'date_from': datetime.date(2026, 11, 1),
+        })
+        employee = self._create_impulsion_employee('End Date', '25yo', datetime.date(2025, 9, 1), birthday=datetime.date(2002, 1, 1))
+        last_month, after_end = self._compute_payslips([
+            (employee, datetime.date(2026, 10, 1)),
+            (employee, datetime.date(2026, 11, 1)),
+        ])
+        self._assert_impulsion_line(
+            last_month, 'IMPULSION25', -500.0, "The month of the end date of the plans should still apply the deduction")
+        self._assert_impulsion_line(
+            after_end, 'IMPULSION25', 0.0, "A payslip starting after the end date of the plans should not apply the deduction")
+
+    def test_carried_over_right(self):
+        """
+        Test that a carried over grant from a previous employee is correctly applied.
+        RW2 (12+ months) granted at the previous employer with 10 months remaining (14 months used), hired on
+        01/03/2026.
+        The information version is dated to 01/03/2026 - 14 months = 01/01/2025.
+        The brackets before 2026 apply, 250 € for the months 15 to 18 and 125 € for the months 19 to 24.
+        """
+        employee = self._create_impulsion_employee('Carried Over', '12mo', datetime.date(2025, 1, 1), contract=False)
+        contract = self._add_contract(employee, datetime.date(2026, 3, 1))
+        self.assertEqual(
+            contract._get_l10n_be_impulsion_start_date(), datetime.date(2025, 1, 1),
+            "the grant date should be the date of the information version before the contract")
+
+        payslips = self._compute_payslips([(employee, datetime.date(2026, 3, 1) + relativedelta(months=index)) for index in range(12)])
+        for month_number, payslip in enumerate(payslips, start=15):
+            if month_number <= 18:
+                self._assert_impulsion_line(
+                    payslip, 'IMPULSION12', -250.0,
+                    f"Month {month_number} since the grant: the months 15 to 18 of a plan granted before 2026 should be applied with a deduction of 250 €")
+            elif month_number <= 24:
+                self._assert_impulsion_line(
+                    payslip, 'IMPULSION12', -125.0,
+                    f"Month {month_number} since the grant: the months 19 to 24 of a plan granted before 2026 should be applied with a deduction of 125 €")
+            else:
+                self._assert_impulsion_line(
+                    payslip, 'IMPULSION12', 0.0,
+                    f"Month {month_number} since the grant: the 10 months left of the carried over right are used up")
+        self.assertFalse(
+            self._get_warning_records('hr_payroll_warning_impulsion_after_activation_cutoff', employee.version_ids),
+            "A right granted before the last activation date should not get the activation warning")
+
+    def test_fixed_term_then_permanent_contract(self):
+        """
+        Test that a fixed-term contract followed by a permanent one without interruption continues the count from
+        the information version, or from the first contract without it.
+        """
+        with_information, without_information = self._create_impulsion_employees([
+            self._impulsion_employee_vals('With Information', '12mo', datetime.date(2025, 1, 1), contract=False),
+            self._impulsion_employee_vals(
+                'Without Information', '12mo', datetime.date(2025, 2, 1), contract_date_end=datetime.date(2025, 7, 31), fixed_term=True),
+        ])
+        self._add_contract(with_information, datetime.date(2025, 2, 1), datetime.date(2025, 7, 31))
+        permanent = self._add_contract(with_information, datetime.date(2025, 8, 1))
+        self.assertEqual(
+            permanent._get_l10n_be_impulsion_start_date(), datetime.date(2025, 1, 1),
+            "The count should go back through the fixed-term contract to the information version")
+
+        permanent = self._add_contract(without_information, datetime.date(2025, 8, 1))
+        self.assertEqual(
+            permanent._get_l10n_be_impulsion_start_date(), datetime.date(2025, 2, 1),
+            "Without information version, the count should start on the fixed-term contract")
+
+        with_information_month_12, with_information_month_13, without_information_month_12, without_information_month_13 = \
+            self._compute_payslips([
+                (with_information, datetime.date(2025, 12, 1)),
+                (with_information, datetime.date(2026, 1, 1)),
+                (without_information, datetime.date(2026, 1, 1)),
+                (without_information, datetime.date(2026, 2, 1)),
+            ])
+        self._assert_impulsion_line(
+            with_information_month_12, 'IMPULSION12', -500.0, "Month 12 since the information version should be deducted 500 €")
+        self._assert_impulsion_line(
+            with_information_month_13, 'IMPULSION12', -250.0,
+            "Month 13 since the information version should be deducted 250 €: the permanent contract continues the count")
+        self._assert_impulsion_line(
+            without_information_month_12, 'IMPULSION12', -500.0, "Month 12 since the fixed-term contract should be deducted 500 €")
+        self._assert_impulsion_line(
+            without_information_month_13, 'IMPULSION12', -250.0,
+            "Month 13 since the fixed-term contract should be deducted 250 €: the permanent contract continues the count")
+
+    def test_interruption_restarts_from_new_grant(self):
+        """
+        Test that after an interruption, the new information version holds the new grant and
+        the count restarts from it. Without it, the count restarts from the new contract.
+        """
+        employee, without_information = self._create_impulsion_employees([
+            self._impulsion_employee_vals('Rehired', '12mo', datetime.date(2024, 1, 1), contract=False),
+            self._impulsion_employee_vals(
+                'Rehired Without Information', '12mo', datetime.date(2024, 2, 1), contract_date_end=datetime.date(2024, 6, 30), fixed_term=True),
+        ])
+        first_contract = self._add_contract(employee, datetime.date(2024, 2, 1), datetime.date(2024, 6, 30))
+        self._add_information_version(employee, datetime.date(2025, 3, 1))
+        second_contract = self._add_contract(employee, datetime.date(2025, 4, 1))
+        self.assertEqual(
+            first_contract._get_l10n_be_impulsion_start_date(), datetime.date(2024, 1, 1),
+            "The first contract should count from the first information version")
+        self.assertEqual(
+            second_contract._get_l10n_be_impulsion_start_date(), datetime.date(2025, 3, 1),
+            "After an interruption, the count should restart from the new information version")
+
+        month_2, month_12, month_13 = self._compute_payslips([
+            (employee, datetime.date(2025, 4, 1)),
+            (employee, datetime.date(2026, 2, 1)),
+            (employee, datetime.date(2026, 3, 1)),
+        ])
+        self._assert_impulsion_line(
+            month_2, 'IMPULSION12', -500.0, "Month 2 since the new grant should be deducted 500 €, as a new right")
+        self._assert_impulsion_line(month_12, 'IMPULSION12', -500.0, "Month 12 since the new grant should be deducted 500 €")
+        self._assert_impulsion_line(month_13, 'IMPULSION12', -250.0, "Month 13 since the new grant should be deducted 250 €")
+
+        second_contract = self._add_contract(without_information, datetime.date(2025, 4, 1))
+        self.assertEqual(
+            second_contract._get_l10n_be_impulsion_start_date(), datetime.date(2025, 4, 1),
+            "After an interruption without information version, the count should restart from the new contract")
+
+    def test_eligibility_follows_residence(self):
+        """
+        Test that the eligibility follows the residence in French-speaking Wallonia, not the
+        work location.
+        An employee working in Brussels but residing in Liège should have eligibility based on residence.
+        An employee working in Liège but residing in Brussels should not have eligibility based on residence.
+        """
+        liege_in_brussels, brussels_in_namur, eupen_in_namur = self._create_impulsion_employees([
+            self._impulsion_employee_vals(
+                'Liège Resident', '12mo', datetime.date(2026, 1, 1), city=self.city_liege, address_id=self.partner_brussels.id),
+            self._impulsion_employee_vals(
+                'Brussels Resident', '12mo', datetime.date(2026, 1, 1), city=self.city_brussels, address_id=self.partner_namur.id),
+            self._impulsion_employee_vals(
+                'Eupen Resident', '12mo', datetime.date(2026, 1, 1), city=self.city_eupen, address_id=self.partner_namur.id),
+        ])
+        self.assertRecordValues((liege_in_brussels + brussels_in_namur + eupen_in_namur).version_id, [
+            {'l10n_be_working_region': 'br'},
+            {'l10n_be_working_region': 'wa'},
+            {'l10n_be_working_region': 'wa'},
+        ])
+        self.assertEqual(
+            [version._get_l10n_be_employee_residence_region() for version in (liege_in_brussels + brussels_in_namur + eupen_in_namur).version_id],
+            ['wa', 'br', 'cg'],
+            "The residence region should come from the NIS code of the home city",
+        )
+
+        liege_payslip, brussels_payslip, eupen_payslip = self._compute_payslips([
+            (liege_in_brussels, datetime.date(2026, 1, 1)),
+            (brussels_in_namur, datetime.date(2026, 1, 1)),
+            (eupen_in_namur, datetime.date(2026, 1, 1)),
+        ])
+        self._assert_impulsion_line(
+            liege_payslip, 'IMPULSION12', -500.0, "A resident of Liège should be eligible for the impulsion plan, even when working in Brussels")
+        self._assert_no_impulsion_line(
+            brussels_payslip, "A resident of Brussels should not be eligible for the impulsion plan, even when working in Namur")
+        self._assert_no_impulsion_line(
+            eupen_payslip, "A resident of the German-speaking Community should not be eligible for the impulsion plan")
+
+    def test_moving_out_of_wallonia(self):
+        """
+        Test that a new version with an address outside Wallonia stops the deduction from its effective date.
+        """
+        employee = self._create_impulsion_employee('Moving Out', '12mo', datetime.date(2026, 1, 1), city=self.city_liege)
+        employee.create_version({'date_version': datetime.date(2026, 5, 1), 'private_city_id': self.city_brussels.id})
+        before_move, after_move = self._compute_payslips([
+            (employee, datetime.date(2026, 4, 1)),
+            (employee, datetime.date(2026, 5, 1)),
+        ])
+        self._assert_impulsion_line(
+            before_move, 'IMPULSION12', -500.0, "The deduction should be paid while residing in Wallonia")
+        self._assert_no_impulsion_line(
+            after_move, "Moving to Brussels should stop the deduction starting the month of the address change")
+
+    @freeze_time('2026-03-15')
+    def test_information_version_no_side_effect(self):
+        """
+        Test that creating an information version 2 years before hiring does not affect
+        the payroll computations based on the first contract.
+        """
+        hire_date = datetime.date(2025, 9, 1)
+        with_information, without_information = self._create_impulsion_employees([
+            self._impulsion_employee_vals('With Information', '12mo', datetime.date(2023, 9, 1), contract=False, birthday=datetime.date(1968, 1, 1)),
+            self._impulsion_employee_vals('Without Information', '12mo', hire_date, birthday=datetime.date(1968, 1, 1)),
+        ])
+        self._add_contract(with_information, hire_date)
+
+        for employee in [with_information, without_information]:
+            with self.subTest(employee=employee.name):
+                contract = employee._get_version(hire_date)
+                # Holiday years, seniority and occupation
+                self.assertEqual(
+                    employee._get_first_version_date(), hire_date,
+                    "The information version should not be the first version used for payroll computations")
+                self.assertEqual(
+                    employee._get_first_contract_date(), hire_date, "The seniority should start on the first non-information version (version with a contract start date)")
+                self.assertEqual(
+                employee._get_first_versions(), contract, "The first versions should only contain contract versions")
+                self.assertRecordValues(employee, [{
+                    'first_contract_year_n1': '2024',
+                    'first_contract_year_n2': '2023',
+                    'l10n_be_company_seniority_years': 0,
+                    'l10n_be_company_seniority_months': 6,
+                }])
+                self.assertEqual(
+                    contract._get_occupation_dates()[-1][1], hire_date,
+                    "The DmfA and DRS occupation should start on the contract start date, not on the information version date")
+                # DmfA reduction for the 4th to 6th hires before 2024
+                self.assertFalse(
+                    self.env['l10n_be.dmfa']._is_eligible_for_fourth_to_sixth_hire_reduction_before_2024(employee),
+                    "An information version starting in 2023 should not make the employee eligible for the 4th to 6th hire reduction before 2024 if the actual hire date is later")
+                # CP 200 year-end bonus: hired after June
+                thirteen_month = self.env['hr.payslip'].create({
+                    'name': f'13th month {employee.name}',
+                    'employee_id': employee.id,
+                    'version_id': contract.id,
+                    'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month').id,
+                    'date_from': datetime.date(2025, 12, 1),
+                    'date_to': datetime.date(2025, 12, 31),
+                    'company_id': self.env.company.id,
+                })
+                self.assertEqual(
+                    thirteen_month._get_paid_amount_13th_month(), 0.0,
+                    "An employee hired after June should not get the CP 200 year-end bonus of the hiring year")
+                departure = self.env['hr.employee.departure'].create({
+                    'employee_id': employee.id,
+                    'departure_reason_id': self.env.ref('hr.departure_fired').id,
+                    'dismissal_date': datetime.date(2026, 3, 31),
+                })
+                self.assertEqual(
+                    departure.l10n_be_first_contract_date, hire_date, "The information version should not be used to compute the departure notice seniority")
+
+        elderly_params = [
+            self.env['hr.payslip']._l10n_be_elderly_reduction_params(employee, datetime.date(2026, 3, 31), 'wa')
+            for employee in [with_information, without_information]
+        ]
+        self.assertEqual(
+            elderly_params[0], elderly_params[1],
+            "The information version should not change the Walloon reduction for older workers")
+
+    def test_information_version_no_guaranteed_salary_first_month(self):
+        """
+        Test that an information version does not affect sick leave computation.
+        A worker sick in the first month of the contract should be unpaid, even with an
+        information version 2 years before hiring.
+        """
+        worker = self._create_impulsion_employee(
+            'Worker', '12mo', datetime.date(2024, 3, 1), contract=False,
+            l10n_be_worker_code_id=self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015').id,
+        )
+        self._add_contract(worker, datetime.date(2026, 3, 1))
+        self.env['hr.leave'].create({
+            'employee_id': worker.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': datetime.date(2026, 3, 2),
+            'request_date_to': datetime.date(2026, 3, 6),
+        })
+        leaves = self.env['hr.leave'].search([('employee_id', '=', worker.id)])
+        self.assertEqual(
+            leaves.work_entry_type_id,
+            self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period'),
+            "A worker sick in the first month of the contract should not get the guaranteed salary even if there is an information version with a earlier start date",
+        )
+
+    def test_impulsion_warnings(self):
+        no_city = self.env['res.city']
+        namur, no_nis, brussels, eupen, france = self._create_impulsion_employees([
+            self._impulsion_employee_vals('Namur Resident', '12mo', datetime.date(2026, 1, 1)),
+            self._impulsion_employee_vals('No NIS Code', '12mo', datetime.date(2026, 1, 1), city=no_city),
+            self._impulsion_employee_vals('Brussels Resident', '12mo', datetime.date(2026, 1, 1), city=self.city_brussels),
+            self._impulsion_employee_vals('Eupen Resident', '12mo', datetime.date(2026, 1, 1), city=self.city_eupen),
+            self._impulsion_employee_vals(
+                'France Resident', '12mo', datetime.date(2026, 1, 1), city=no_city, private_country_id=self.env.ref('base.fr').id),
+        ])
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_impulsion_residence')
+        records, _, *__ = warning._get_warning_python_records(
+            {'active_ids': (namur + no_nis + brussels + eupen + france).version_id.ids})
+        self.assertEqual(
+            records, (no_nis + brussels + eupen + france).version_id,
+            "Every Impulsion plan without a residence in French-speaking Wallonia should get the residence warning")
+
+        # Since 01/07/2023, a fixed-term contract must last at least 2 months
+        employee_contract_too_short, employee_contract_two_months = self._create_impulsion_employees([
+            self._impulsion_employee_vals(
+                'Too Short', '12mo', datetime.date(2026, 1, 1), contract_date_end=datetime.date(2026, 2, 27), fixed_term=True),
+            self._impulsion_employee_vals(
+                'Two Months', '12mo', datetime.date(2026, 1, 1), contract_date_end=datetime.date(2026, 2, 28), fixed_term=True),
+        ])
+        self.assertEqual(
+            self._get_warning_records('hr_payroll_warning_impulsion_short_fixed_term', (employee_contract_too_short + employee_contract_two_months).version_id),
+            employee_contract_too_short.version_id,
+            "only a fixed-term contract shorter than 2 months should get the warning",
+        )
+
+        # 0 € in payslip while the plan is still set: right exhausted after 12 months since 01/01/2026
+        payslip_plan_paid, payslip_plan_exhausted = self._compute_payslips([
+            (namur, datetime.date(2026, 12, 1)),
+            (namur, datetime.date(2027, 1, 1)),
+        ])
+        self.assertEqual(
+            self._get_warning_records('hr_payroll_warning_impulsion_zero_amount', payslip_plan_paid + payslip_plan_exhausted),
+            payslip_plan_exhausted,
+            "Only the payslip with a 0 € deduction while the plan is still set should get the warning",
+        )

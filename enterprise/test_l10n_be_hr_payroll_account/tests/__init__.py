@@ -6,7 +6,6 @@ from . import test_payslip
 from . import test_13th_month
 from . import test_dmfa
 from . import test_flexi_at_work
-from . import test_double_holiday
 from . import test_drs
 from . import test_drs_end_of_contract
 from . import test_drs_health_insurance
@@ -33,5 +32,5 @@ from . import test_commuting_fuel_card
 from . import test_scientific_research_exemption
 from . import test_payroll_config_settings
 from . import test_apprenticeship_min_wage
-from . import test_dmfa_structural_deduction
 from . import test_warrant
+from . import test_dmfa_preview

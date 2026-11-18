@@ -10,7 +10,7 @@ class ReportQuality_ControlQuality_Worksheet(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        docs = self.env['quality.check'].browse(docids).sudo()
+        docs = self.env['quality.check'].browse(docids)
 
         return {
             'doc_ids': docids,

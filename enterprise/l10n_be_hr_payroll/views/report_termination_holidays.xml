@@ -137,8 +137,8 @@
                     <t t-set="occupations" t-value="o.employee_id.get_l10n_be_holiday_attest_occupations(o.date_to.year)"/>
                     <t t-foreach="occupations" t-as="occupation">
                         <tr>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                             <td class="py-0 text-center">
                                 <t t-out="occupation['hours_per_week']"/>/<t t-out="occupation['reference_hours_per_week']"/>
                             </td>
@@ -178,7 +178,7 @@
                 <tbody>
                     <tr>
                         <td class="py-0" style="width: 40%;">
-                            Simple holiday allowance
+                            Simple holiday pay with ONSS
                         </td>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('GROSS_REF')"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
@@ -196,22 +196,22 @@
                     </tr>
                     <tr>
                         <td class="py-0" style="width: 40%;">
-                            Double holiday pay
+                            Double holiday pay subject to the special contribution (13.07 %)
                         </td>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('GROSS_REF')"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                         <td class="py-0 text-center">6,80 %</td>
-                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY DOUBLE').total"
+                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY_DOUBLE').total"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                     </tr>
                     <tr>
                         <td class="py-0" style="width: 40%;">
-                            Supplementary double holiday pay
+                            Double holiday pay not subject to the special contribution
                         </td>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('GROSS_REF')"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                         <td class="py-0 text-center">0,87 %</td>
-                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY DOUBLE COMPLEMENTARY').total"
+                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY_DOUBLE_COMPLEMENTARY').total"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                     </tr>
                 </tbody>
@@ -370,56 +370,6 @@
             <h2 class="fs-1 mb-0 fw-bold">Please forward this to the employer where you are taking your vacation in  <span t-out="o.date_to.year"/></h2>
             <h2 class="fs-3 mb-3">Based on this certificate, the employer will determine your entitlement to vacation time and deduct the amounts mentioned from your vacation pay.</h2>
 
-            <!-- N-1 year postponed vacation days -->
-            <strong class="fw-bold fs-4">postponed vacation days</strong>
-            <table class="fs-4 table table-sm table-bordered border-dark">
-                <thead>
-                    <tr>
-                        <td class="py-0 text-center">
-                            Vacation year
-                        </td>
-                        <td class="py-0 text-center">
-                            Q/S december
-                        </td>
-                        <td class="py-0 text-center">
-                            Work schedule
-                        </td>
-                        <td t-if="not is_worker" class="py-0 text-center">
-                            Balance of accrued vacation days<div>remaining days / quota to be taken</div>
-                        </td>
-                        <td class="py-0 text-center">
-                            due date
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t t-set="version_n2" t-value="o.employee_id._get_version(o.date_to.replace(year=o.date_to.year - 2, month=12, day=31))"/>
-                    <tr t-if="o._get_input_line_amount('PPTO2')">
-                        <td class="py-0 text-center" t-out="o.date_to.year - 2"/>
-                        <td class="py-0 text-center">
-                            <t t-out="version_n2.resource_calendar_id.hours_per_week"/> / <t t-out="version_n2._get_reference_calendar().hours_per_week"/>
-                        </td>
-                        <td class="py-0 text-center" t-out="version_n2.resource_calendar_id.days_per_week"/>
-                        <td t-if="not is_worker" class="py-0 text-center">
-                            <t t-out="o._get_input_line_amount('PPTO2')"/> / <t t-out="o._get_input_line_amount('TPPTO2')"/>
-                        </td>
-                        <td class="py-0 text-center" t-out="o.date_to.year"/>
-                    </tr>
-                    <t t-set="version_n1" t-value="o.employee_id._get_version(o.date_to.replace(year=o.date_to.year - 1, month=12, day=31))"/>
-                    <tr t-if="o._get_input_line_amount('PPTO1')">
-                        <td class="py-0 text-center" t-out="o.date_to.year - 1"/>
-                        <td class="py-0 text-center">
-                            <t t-out="version_n1.resource_calendar_id.hours_per_week"/> / <t t-out="version_n1._get_reference_calendar().hours_per_week"/>
-                        </td>
-                        <td class="py-0 text-center" t-out="version_n1.resource_calendar_id.days_per_week"/>
-                        <td t-if="not is_worker" class="py-0 text-center">
-                            <t t-out="o._get_input_line_amount('PPTO1')"/> / <t t-out="o._get_input_line_amount('TPPTO1')"/>
-                        </td>
-                        <td class="py-0 text-center" t-out="o.date_to.year + 1"/>
-                    </tr>
-                </tbody>
-            </table>
-
             <!-- N-1 year occupancy line information -->
             <strong class="fw-bold fs-4">Occupancy Line Information - Holiday exercise <span t-out="o.date_to.year - 1" class="ms-1"/></strong>
             <table class="fs-4 table table-sm table-bordered border-dark">
@@ -447,8 +397,8 @@
                 <tbody>
                     <t t-foreach="o.employee_id.get_l10n_be_holiday_attest_occupations(o.date_to.year-1)" t-as="occupation">
                         <tr>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                             <td class="py-0 text-center">
                                 <t t-out="occupation['hours_per_week']"/>/<t t-out="occupation['reference_hours_per_week']"/>
                             </td>
@@ -486,23 +436,31 @@
                             Legal holidays
                         </td>
                         <td t-if="not is_worker" class="py-0 text-center">
+                            Legal holidays based on a holiday certificate / voucher
+                        </td>
+                        <td t-if="not is_worker" class="py-0 text-center">
                             Additional (European) holidays
+                        </td>
+                        <td t-if="not is_worker" class="py-0 text-center">
+                            Postponed vacation days
                         </td>
                     </tr>
                 </thead>
                 <tbody>
                     <t t-foreach="o.employee_id.get_l10n_be_holiday_attest_occupations(o.date_to.year)" t-as="occupation">
                         <tr>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
-                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_start']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                            <td class="py-0 text-center text-nowrap" t-out="occupation['date_end']" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                             <td class="py-0 text-center">
                                 <t t-out="occupation['hours_per_week']"/>/<t t-out="occupation['reference_hours_per_week']"/>
                             </td>
                             <td class="py-0 text-center">
                                 <t t-out="occupation['days_per_week']"/>/<t t-out="round((occupation['reference_hours_per_week'] * occupation['days_per_week']) / occupation['hours_per_week'], 2) if occupation['hours_per_week'] else occupation['days_per_week']"/>
                             </td>
-                            <td t-if="not is_worker" class="py-0 text-center" t-out="occupation['paid_leaves']"/>
+                            <td t-if="not is_worker" class="py-0 text-center" t-out="occupation['paid_leaves'] - occupation['attest_paid_leaves']"/>
+                            <td t-if="not is_worker" class="py-0 text-center" t-out="occupation['attest_paid_leaves']"/>
                             <td t-if="not is_worker" class="py-0 text-center" t-out="occupation['european_leaves']"/>
+                            <td t-if="not is_worker" class="py-0 text-center" t-out="occupation['postponed_leaves']"/>
                         </tr>
                     </t>
                 </tbody>
@@ -537,7 +495,7 @@
                 <tbody>
                     <tr>
                         <td class="py-0" style="width: 30%;">
-                            Simple holiday allowance
+                            Simple holiday pay with ONSS
                         </td>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('ALLOCATION') - o._get_input_line_amount('TIME_OFF_TAKEN')"/>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('ALLOCATION') or 0"/>
@@ -559,31 +517,81 @@
                     </tr>
                     <tr>
                         <td class="py-0" style="width: 30%;">
-                            Double holiday pay
+                            Double holiday pay subject to the special contribution (13.07 %)
                         </td>
                         <td class="bg-dark"/>
                         <td class="bg-dark"/>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('GROSS_REF')"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                         <td class="py-0 text-center">6,80 %</td>
-                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY DOUBLE').total"
+                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY_DOUBLE').total"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                     </tr>
                     <tr>
                         <td class="py-0" style="width: 30%;">
-                            Supplementary double holiday pay
+                            Double holiday pay not subject to the special contribution
                         </td>
                         <td class="bg-dark"/>
                         <td class="bg-dark"/>
                         <td class="py-0 text-center" t-out="o._get_input_line_amount('GROSS_REF')"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                         <td class="py-0 text-center">0,87 %</td>
-                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY DOUBLE COMPLEMENTARY').total"
+                        <td class="py-0 text-center" t-out="o.line_ids.filtered(lambda line: line.code == 'PAY_DOUBLE_COMPLEMENTARY').total"
                             t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
                     </tr>
                 </tbody>
             </table>
             </t>
+
+            <!-- N-1 year postponed vacation days -->
+            <strong class="fw-bold fs-4">postponed vacation days</strong>
+            <table class="fs-4 table table-sm table-bordered border-dark">
+                <thead>
+                    <tr>
+                        <td class="py-0 text-center">
+                            Vacation year
+                        </td>
+                        <td class="py-0 text-center">
+                            Q/S december
+                        </td>
+                        <td class="py-0 text-center">
+                            Work schedule
+                        </td>
+                        <td t-if="not is_worker" class="py-0 text-center">
+                            Balance of accrued vacation days<div>remaining days / quota to be taken</div>
+                        </td>
+                        <td class="py-0 text-center">
+                            due date
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="version_n2" t-value="o.employee_id._get_version(o.date_to.replace(year=o.date_to.year - 2, month=12, day=31))"/>
+                    <tr t-if="o._get_input_line_amount('PPTO2')">
+                        <td class="py-0 text-center" t-out="o.date_to.year - 2"/>
+                        <td class="py-0 text-center">
+                            <t t-out="version_n2.resource_calendar_id.hours_per_week"/> / <t t-out="version_n2._get_reference_calendar().hours_per_week"/>
+                        </td>
+                        <td class="py-0 text-center" t-out="version_n2.resource_calendar_id.days_per_week"/>
+                        <td t-if="not is_worker" class="py-0 text-center">
+                            <t t-out="o._get_input_line_amount('PPTO2')"/> / <t t-out="o._get_input_line_amount('TPPTO2')"/>
+                        </td>
+                        <td class="py-0 text-center" t-out="o.date_to.replace(month=12, day=31)" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                    </tr>
+                    <t t-set="version_n1" t-value="o.employee_id._get_version(o.date_to.replace(year=o.date_to.year - 1, month=12, day=31))"/>
+                    <tr t-if="o._get_input_line_amount('PPTO1')">
+                        <td class="py-0 text-center" t-out="o.date_to.year - 1"/>
+                        <td class="py-0 text-center">
+                            <t t-out="version_n1.resource_calendar_id.hours_per_week"/> / <t t-out="version_n1._get_reference_calendar().hours_per_week"/>
+                        </td>
+                        <td class="py-0 text-center" t-out="version_n1.resource_calendar_id.days_per_week"/>
+                        <td t-if="not is_worker" class="py-0 text-center">
+                            <t t-out="o._get_input_line_amount('PPTO1')"/> / <t t-out="o._get_input_line_amount('TPPTO1')"/>
+                        </td>
+                        <td class="py-0 text-center" t-out="o.date_to.replace(year=o.date_to.year + 1, month=12, day=31)" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                    </tr>
+                </tbody>
+            </table>
 
             <!-- Signature -->
             <div class="d-flex align-items-center fs-3">
@@ -616,7 +624,8 @@
 <template id="report_termination_holidays_n1_lang">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-call="l10n_be_hr_payroll.report_termination_holidays_n1"/>
+            <t t-set="o" t-value="o.with_context(lang=o._get_payslips_pdf_lang()[o][0])"/>
+            <t t-call="l10n_be_hr_payroll.report_termination_holidays_n1" t-lang="o.env.lang"/>
         </t>
     </t>
 </template>

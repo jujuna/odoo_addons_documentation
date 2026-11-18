@@ -871,6 +871,41 @@ class TestIntrastatReport(TestAccountReportsCommon):
             options,
         )
 
+    def test_rounding_supplementary_units(self):
+        """ Test rounding of supplementary unit amounts in report """
+        self.product_unit_supplementary_unit.intrastat_supplementary_unit_amount = 1.23456
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2022-05-15',
+            'date': '2022-05-15',
+            'company_id': self.company_data['company'].id,
+            'intrastat_country_id': self.env.ref('base.be').id,
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_unit_supplementary_unit.id,
+                    'quantity': 10,
+                    'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                    'price_unit': 10,
+                    'tax_ids': [],
+                }),
+            ]
+        })
+        invoice.action_post()
+        options = self._generate_options(self.report, date_from=fields.Date.from_string('2022-05-01'), date_to=fields.Date.from_string('2022-05-31'))
+        lines = self.report._get_lines(options)
+        self.assertLinesValues(
+            lines,
+            #    Name                                      CommodityFlow    Country      CommodityCode  SupplementaryUnits
+            #
+            [0,                                                               1,           2,              5,                11],
+            [
+                ('Intrastat',                                                '',          '',             '',                ''),
+                ('Dispatch - QV999999999999 - 93012000 - BE',   '19 (Dispatch)',   'Belgium',     '93012000',         '12.35'),
+            ],
+            options,
+        )
+
     def test_xlsx_output(self):
         """ XSLX output should be slightly different to the values in the UI. The UI should be readable, and the XLSX should be closer to the declaration format.
             Rather than patching the print_xlsx function, this test compares the results of the report when the options contain the keys that signify the content

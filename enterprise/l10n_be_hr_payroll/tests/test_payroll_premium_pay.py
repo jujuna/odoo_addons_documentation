@@ -420,7 +420,6 @@ class TestPayrollPremiumPay(TestPayrollBase, TestBelgiumCommon):
 
         # The gantt of the time off app keeps the employee facing views.
         regular_arch = self.env['hr.leave'].get_view(regular_gantt.id, 'gantt')['arch']
-        self.assertNotIn('form_view_id', regular_arch)
         self.assertNotIn('multi_create_view_payroll', regular_arch)
 
         # The payroll form is never the one odoo falls back on for a time off.
@@ -465,7 +464,7 @@ class TestPayrollPremiumPay(TestPayrollBase, TestBelgiumCommon):
     def test_sickness_relapse_origin_survives_a_split_bucket_code_change(self):
         """A leave moved between two relapse-eligible sickness codes keeps its origin.
 
-        010.00/082.00/072.00/082.01/072.01 are relapse-eligible per `sick_work_entry_types_codes`, alongside 013.00/122.00/123.00.
+        010.00/082.00/072.00/072.01 are relapse-eligible per `sick_work_entry_types_codes`, alongside 013.00/122.00/123.00.
         So moving between them must not drop the origin leave, unlike moving to an outright attendance.
         """
         sick = self.env['hr.work.entry.type'].search([

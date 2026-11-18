@@ -28,18 +28,19 @@
 # Halil, 2023
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-14 13:35+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 16:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/helpdesk/"
 "tr/>\n"
 "Language: tr\n"
@@ -75,6 +76,30 @@ msgid ""
 "    - Install additional features easily using your team form view.\n"
 "\n"
 msgstr ""
+"\n"
+"Yardım Masası - Bilet Yönetim uygulaması\n"
+"================================\n"
+"\n"
+"Özellikler:\n"
+"\n"
+"    - Destek biletlerini çözüme ulaştırmak için farklı aşamalarda işleyin.\n"
+"    - Öncelikler, türler, açıklamalar ve etiketler atayarak destek "
+"biletlerinizi tanımlayın.\n"
+"    - Yazışma özelliğini kullanarak ek bilgileri çalışma arkadaşlarınıza "
+"iletin ve biletler hakkında onlara bildirim gönderin.\n"
+"    - Uyarlanabilir gösterge paneli ve kolay kullanımli kanban görünümünden "
+"faydalanarak biletlerinizi çözüme ulaştırın.\n"
+"    - 'Raporlar' menüsündeki pivot görünümünü kullanarak biletlerinizi iyice "
+"analiz edin.\n"
+"    - Dilerseniz otomatik atama yöntemi kullanarak ekipler luşturup "
+"üyelerini belirleyin.\n"
+"    - Otomatik olarak biletler oluşturmak ve müşteriler ile iletişim kurmak "
+"için e-posta rumuzları kullanın.\n"
+"    - Biletlerinize otomatik olarak Hizmet Seviyesi Anlaşması son tarihleri "
+"ekleyin.\n"
+"    - Kullanıcı değerlendirmeleriyle müşteri geri bildirimleri toplayın.\n"
+"    - Ekip form görünümünü kullanarak kolayca ilave özellikler yükleyin.\n"
+"\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -151,94 +176,116 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
 msgid "<b>Tip: Create tickets from incoming emails</b>"
-msgstr ""
+msgstr "<b>İpucu: Gelen e-postalardan bilet oluşturun</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_4
 msgid "<b>Tip: Don't let stalled tickets slip under the radar</b>"
-msgstr ""
+msgstr "<b>İpucu: Bekleyen biletlerin gözden kaçmasına izin vermeyin</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
 msgid "<b>Tip: Filter your tickets with one click</b>"
-msgstr ""
+msgstr "<b>İpucu: Biletlerinizi tek tıkla filtreleyin</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_1
 msgid "<b>Tip: Identify bottlenecks at a glance</b>"
-msgstr ""
+msgstr "<b>İpucu: Darboğazları bir bakışta belirleyin</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_2
 msgid "<b>Tip: Team-Specific Fields</b>"
-msgstr ""
+msgstr "<b>İpucu: Ekibe Özgü Alanlar</b>"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.auto_close_reminder_email_template
 msgid ""
 "<div>\n"
-"                Hello <t t-out=\"object.sudo().partner_id.name\"/>,<br/><br/"
-">\n"
+"                Hello <t t-out=\"object.sudo().partner_id.name\"></t>,"
+"<br><br>\n"
 "                We noticed there hasn’t been any activity on your support "
 "ticket\n"
 "                <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
 "                    <a t-att-href=\"object.get_portal_url()\">#<t t-"
-"out=\"object.id\"/> (<t t-out=\"object.name\"/>)</a>\n"
+"out=\"object.id\"></t> (<t t-out=\"object.name\"></t>)</a>\n"
 "                </t>\n"
 "                <t t-else=\"\">\n"
-"                    <strong>#<t t-out=\"object.id\"/> (<t t-"
-"out=\"object.name\"/>)</strong>\n"
+"                    <strong>#<t t-out=\"object.id\"></t> (<t t-"
+"out=\"object.name\"></t>)</strong>\n"
 "                </t>\n"
-"                for a while.<br/><br/>\n"
+"                for a while.<br><br>\n"
 "                If your issue has been resolved, no action is needed - the "
 "ticket will automatically close in <t t-"
-"out=\"object.team_id.auto_close_reminder_delay\"/> days.<br/><br/>\n"
+"out=\"object.team_id.auto_close_reminder_delay\"></t> days.<br><br>\n"
 "                If you still need help, simply reply to this email and we "
-"will keep your ticket open.<br/><br/>\n"
-"                <t t-out=\"object.company_id.name\"/> Support Team\n"
+"will keep your ticket open.<br><br>\n"
+"                <t t-out=\"object.company_id.name\"></t> Support Team\n"
 "            </div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"                Merhaba <t t-out=\"object.sudo().partner_id.name\"></t>,<br>"
+"<br>\n"
+"                Destek biletinizde bir süredir herhangi bir hareketlilik "
+"olmadığını fark ettik:\n"
+"                <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
+"                    <a t-att-href=\"object.get_portal_url()\">#<t t-"
+"out=\"object.id\"></t> (<t t-out=\"object.name\"></t>)</a>\n"
+"                </t>\n"
+"                <t t-else=\"\">\n"
+"                    <strong>#<t t-out=\"object.id\"></t> (<t t-"
+"out=\"object.name\"></t>)</strong>\n"
+"                </t>\n"
+"                <br><br>\n"
+"                Sorununuz çözüldüyse herhangi bir işlem yapmanız gerekmez - "
+"bilet <t t-out=\"object.team_id.auto_close_reminder_delay\"></t> gün içinde "
+"otomatik olarak kapatılacaktır.<br><br>\n"
+"                Hala yardıma ihtiyacınız varsa, bu e-postayı yanıtlamanız "
+"yeterlidir; biletinizi açık tutacağız.<br><br>\n"
+"                <t t-out=\"object.company_id.name\"></t> Destek Ekibi\n"
+"            </div>\n"
+"        "
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.solved_ticket_request_email_template
 msgid ""
 "<div>\n"
 "        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/"
-"Sir</t>,<br/><br/>\n"
+"Sir</t>,<br><br>\n"
 "        We would like to inform you that we have closed your ticket "
 "(reference <t t-out=\"object.ticket_ref or ''\">15</t>).\n"
 "        We trust that the services provided have met your expectations and "
-"that you have found a satisfactory resolution to your issue.<br/><br/>\n"
+"that you have found a satisfactory resolution to your issue.<br><br>\n"
 "        However, if you have any further questions or comments, please do "
 "not hesitate to reply to this email to re-open your ticket.\n"
 "        Our team is always here to help you and we will be happy to assist "
-"you with any further concerns you may have.<br/><br/>\n"
+"you with any further concerns you may have.<br><br>\n"
 "        Thank you for choosing our services and for your cooperation "
 "throughout this process. We truly value your business and appreciate the "
-"opportunity to serve you.<br/><br/>\n"
-"        Kind regards,<br/><br/>\n"
+"opportunity to serve you.<br><br>\n"
+"        Kind regards,<br><br>\n"
 "        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team.\n"
 "    </div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"        Sayın <t t-out=\"object.sudo().partner_id.name or 'Madam/"
-"Sir'\">Hanımefendi/Beyefendi</t>,<br/><br/>\n"
-"        Biletinizin (referans: <t t-out=\"object.id or ''\">15</t>) "
-"kapatıldığını bildirmek isteriz. \n"
-"        Sunulan hizmetlerin beklentilerinizi karşıladığını ve sorununuz için "
-"tatmin edici bir çözüm bulduğunuzu umuyoruz.<br/><br/>\n"
-"        Ancak başka sorularınız veya yorumlarınız olursa bileti yeniden "
-"açmak için lütfen bu e-postaya yanıt vermekten çekinmeyin. \n"
-"        Ekibimiz her zaman size yardımcı olmak için burada ve gelecekteki "
-"her türlü konuda destek vermekten memnuniyet duyarız.<br/><br/>\n"
-"        Hizmetlerimizi seçtiğiniz ve süreç boyunca iş birliğiniz için "
-"teşekkür ederiz. İşinizi gerçekten önemsiyoruz ve size hizmet etme fırsatı "
-"için müteşekkiriz.<br/><br/>\n"
-"        Saygılarımızla,<br/><br/>\n"
-"        <t t-out=\"object.team_id.name or 'Helpdesk'\"> Yardım Masası</t> "
-"Ekibi.\n"
+"        Sayın <t t-out=\"object.sudo().partner_id.name or 'Hanımefendi/"
+"Beyefendi'\">Hanımefendi/Beyefendi</t>,<br><br>\n"
+"        Biletinizi kapattığımızı bildirmek isteriz (referans <t t-"
+"out=\"object.ticket_ref or ''\">15</t>).\n"
+"        Sağlanan hizmetlerin beklentilerinizi karşıladığını ve sorununuz "
+"için tatmin edici bir çözüm bulduğunuzu umuyoruz.<br><br>\n"
+"        Ancak, başka sorularınız veya yorumlarınız varsa, biletinizi yeniden "
+"açmak için lütfen bu e-postayı yanıtlamaktan çekinmeyin.\n"
+"        Ekibimiz size yardımcı olmak için her zaman buradadır ve olası diğer "
+"endişelerinizde size destek olmaktan mutluluk duyacağız.<br><br>\n"
+"        Hizmetlerimizi tercih ettiğiniz ve bu süreçteki iş birliğiniz için "
+"teşekkür ederiz. İşinize gerçekten değer veriyor ve size hizmet etme "
+"fırsatını takdir ediyoruz.<br><br>\n"
+"        Saygılarımızla,<br><br>\n"
+"        <t t-out=\"object.team_id.name or 'Yardım Masası'\">Yardım Masası</"
+"t> Ekibi.\n"
 "    </div>\n"
 "        "
 
@@ -246,29 +293,29 @@ msgstr ""
 #: model:mail.template,body_html:helpdesk.rating_ticket_request_email_template
 msgid ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
-">\n"
-"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()"
+"\"></t>\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></t>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
 "                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
-"<br/><br/>\n"
+"<br><br>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Hello,<br/>\n"
+"                Hello,<br>\n"
 "            </t>\n"
 "            Please take a moment to rate our services related to the ticket "
 "\"<strong t-out=\"object.name or ''\">Table legs are unbalanced</strong>\"\n"
 "            <t t-if=\"object._rating_get_operator().name\">\n"
 "                assigned to <strong t-"
-"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br/"
-">\n"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>."
+"<br>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                .<br/><br/>\n"
+"                .<br><br>\n"
 "            </t>\n"
 "        </td></tr>\n"
 "        <tr><td style=\"text-align: center;\">\n"
@@ -276,7 +323,7 @@ msgid ""
 "style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
 "                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
 "                    <strong>Tell us how you feel about our services</"
-"strong><br/>\n"
+"strong><br>\n"
 "                    <span style=\"text-color: #888888\">(click on one of "
 "these smileys)</span>\n"
 "                </td></tr>\n"
@@ -288,21 +335,21 @@ msgid ""
 "                                <a t-attf-href=\"/rate/{{ access_token }}/"
 "5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
 "                                    <img alt=\"Happy\" src=\"/rating/static/"
-"src/img/rating_5.png\" title=\"Happy\"/>\n"
+"src/img/rating_5.png\" title=\"Happy\">\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
 "                                <a t-attf-href=\"/rate/{{ access_token }}/"
 "3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
 "                                    <img alt=\"Neutral\" src=\"/rating/"
-"static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"static/src/img/rating_3.png\" title=\"Neutral\">\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
 "                                <a t-attf-href=\"/rate/{{ access_token }}/"
 "1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
 "                                    <img alt=\"Unhappy\" src=\"/rating/"
-"static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+"static/src/img/rating_1.png\" title=\"Unhappy\">\n"
 "                                </a>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -312,10 +359,10 @@ msgid ""
 "        </td></tr>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            We appreciate your feedback. It helps us improve continuously.\n"
-"            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
-"12px; opacity: 0.5; color: #454748;\">This customer survey has been sent "
-"because your ticket has been moved to the stage <b t-"
-"out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
+"            <br><br><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; "
+"opacity: 0.5; color: #454748;\">This customer survey has been sent because "
+"your ticket has been moved to the stage <b t-out=\"object.stage_id.name or "
+"''\">In Progress</b>.</span>\n"
 "        </td></tr>\n"
 "    </tbody>\n"
 "    </table>\n"
@@ -323,80 +370,80 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
-">\n"
-"   <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\">"
+"</t>\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></t>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
-"   <tbody>\n"
+"    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                Merhaba <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
-"<br/><br/>\n"
-"           </t>\n"
+"                Merhaba <t t-out=\"partner.name or ''\">Brandon Freeman</t>"
+",<br><br>\n"
+"            </t>\n"
 "            <t t-else=\"\">\n"
-"                Merhaba,<br/>\n"
+"                Merhaba,<br>\n"
 "            </t>\n"
 "            \"<strong t-out=\"object.name or ''\">Masa ayakları dengesiz</"
-"strong>\" bileti ile ilgili hizmetlerimizi değerlendirmek için lütfen bir "
-"dakikanızı ayırın.\n"
-"           <t t-if=\"object._rating_get_operator().name\">\n"
-"                <strong t-out=\"object._rating_get_operator().name or ''\"> "
-"Mitchell Admin</strong> kullanıcısına atanmıştır.<br/>\n"
+"strong>\" biletinizle ilgili hizmetlerimizi değerlendirmek için lütfen bir "
+"dakikanızı ayırın\n"
+"            <t t-if=\"object._rating_get_operator().name\">\n"
+"                (<strong t-out=\"object._rating_get_operator().name or ''\">"
+"Mitchell Admin</strong> atandı).<br>\n"
 "            </t>\n"
-"           <t t-else=\"\">\n"
-"                .<br/><br/>\n"
-"           </t>\n"
+"            <t t-else=\"\">\n"
+"                .<br><br>\n"
+"            </t>\n"
 "        </td></tr>\n"
 "        <tr><td style=\"text-align: center;\">\n"
 "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
-"               <tr><td style=\"font-size: 14px; text-align:center;\">\n"
-"                   <strong>Hizmetlerimiz hakkında ne düşündüğünüzü bize "
-"söyleyin</strong><br/>\n"
-"                   <span style=\"text-color: #888888\">(bu ifadelerden "
+"                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
+"                    <strong>Hizmetlerimiz hakkındaki düşüncelerinizi bize "
+"iletin</strong><br>\n"
+"                    <span style=\"text-color: #888888\">(bu gülen yüzlerden "
 "birine tıklayın)</span>\n"
 "                </td></tr>\n"
 "                <tr><td style=\"font-size: 14px;\">\n"
 "                    <table style=\"width:100%;text-align:center;margin-"
 "top:2rem;\">\n"
-"                       <tr>\n"
+"                        <tr>\n"
 "                            <td>\n"
-"                               <a t-attf-href=\"/rate/{{ access_token }}/5\" "
-"t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Happy\" src=\"/rating/static/"
-"src/img/rating_5.png\" title=\"Happy\"/>\n"
-"                               </a>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Mutlu\" src=\"/rating/static/"
+"src/img/rating_5.png\" title=\"Mutlu\">\n"
+"                                </a>\n"
 "                            </td>\n"
-"                           <td>\n"
+"                            <td>\n"
 "                                <a t-attf-href=\"/rate/{{ access_token }}/"
 "3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                   <img alt=\"Neutral\" src=\"/rating/static/"
-"src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"                                    <img alt=\"Nötr\" src=\"/rating/static/"
+"src/img/rating_3.png\" title=\"Nötr\">\n"
 "                                </a>\n"
-"                           </td>\n"
-"                            <td>\n"
-"                               <a t-attf-href=\"/rate/{{ access_token }}/1\" "
-"t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Unhappy\" src=\"/rating/"
-"static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
-"                               </a>\n"
 "                            </td>\n"
-"                       </tr>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Üzgün\" src=\"/rating/static/"
+"src/img/rating_1.png\" title=\"Üzgün\">\n"
+"                                </a>\n"
+"                            </td>\n"
+"                        </tr>\n"
 "                    </table>\n"
-"               </td></tr>\n"
-"           </table>\n"
+"                </td></tr>\n"
+"            </table>\n"
 "        </td></tr>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
-"            Geri bildirimleriniz için teşekkür ederiz. Sürekli gelişmemize "
+"            Geri bildiriminiz için teşekkür ederiz. Sürekli gelişmemize "
 "yardımcı oluyor.\n"
-"           <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; "
+"            <br><br><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; "
 "opacity: 0.5; color: #454748;\">Bu müşteri anketi, biletiniz <b t-"
-"out=\"object.stage_id.name or ''\">In Progress</b> aşamasına taşındığı için "
+"out=\"object.stage_id.name or ''\">Devam Ediyor</b> aşamasına taşındığı için "
 "gönderilmiştir.</span>\n"
 "        </td></tr>\n"
 "    </tbody>\n"
-"   </table>\n"
+"    </table>\n"
 "</div>\n"
 "        "
 
@@ -405,7 +452,7 @@ msgstr ""
 msgid ""
 "<div>\n"
 "    Dear <t t-out=\"object.sudo().partner_id.name or "
-"object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br/><br/>\n"
+"object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br><br>\n"
 "    Your request\n"
 "    <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.get_portal_url()\">\n"
@@ -414,21 +461,21 @@ msgid ""
 "''\">Table legs are unbalanced</a>\n"
 "    </t>\n"
 "    has been received and is being reviewed by our <t t-"
-"out=\"object.team_id.name or ''\">VIP Support</t> team.<br/><br/>\n"
+"out=\"object.team_id.name or ''\">VIP Support</t> team.<br><br>\n"
 "    The reference for your ticket is <strong><t t-out=\"object.ticket_ref or "
-"''\">15</t></strong>.<br/><br/>\n"
+"''\">15</t></strong>.<br><br>\n"
 "\n"
-"    To provide any additional information, simply reply to this email.<br/"
-"><br/>\n"
+"    To provide any additional information, simply reply to this email."
+"<br><br>\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
 "        Don't hesitate to visit our <a t-attf-"
 "href=\"{{ object.team_id.get_knowledge_base_url() }}\">Help Center</a>. You "
 "might find the answer to your question.\n"
-"        <br/><br/>\n"
+"        <br><br>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
 "        Feel free to close your ticket if our help is no longer needed. "
-"Thank you for your collaboration.<br/><br/>\n"
+"Thank you for your collaboration.<br><br>\n"
 "    </t>\n"
 "\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
@@ -476,19 +523,101 @@ msgid ""
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\">Visit Help Center</a>\n"
-"        </t><br/><br/>\n"
+"        </t><br><br>\n"
 "    </div>\n"
 "\n"
-"    Best regards,<br/><br/>\n"
+"    Best regards,<br><br>\n"
 "    <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team\n"
 "</div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"    Sayın <t t-out=\"object.sudo().partner_id.name or object.sudo()"
+".partner_name or 'Hanımefendi/Beyefendi'\">Hanımefendi/Beyefendi</t>,<br><br>"
+"\n"
+"    İsteğiniz\n"
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url"
+"()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ "
+"object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Masa "
+"ayakları dengesiz</a>\n"
+"    </t>\n"
+"    alınmıştır ve <t t-out=\"object.team_id.name or ''\">VIP Destek</t> "
+"ekibimiz tarafından incelenmektedir.<br><br>\n"
+"    Bilet referansınız: <strong><t t-out=\"object.ticket_ref or ''\">15</t></"
+"strong>.<br><br>\n"
+"\n"
+"    Ek bilgi sağlamak için bu e-postayı yanıtlamanız yeterlidir.<br><br>\n"
+"    <t t-if=\"object.team_id.show_knowledge_base\">\n"
+"        <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}\">"
+"Yardım Merkezimizi</a> ziyaret etmekten çekinmeyin. Sorunuzun yanıtını orada "
+"bulabilirsiniz.\n"
+"        <br><br>\n"
+"    </t>\n"
+"    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
+"        Artık yardıma ihtiyacınız kalmadıysa biletinizi kapatmaktan "
+"çekinmeyin. İş birliğiniz için teşekkür ederiz.<br><br>\n"
+"    </t>\n"
+"\n"
+"    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.use_website_helpdesk_form\">\n"
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
+"or '', object.get_portal_url())\" target=\"_blank\">Bileti Görüntüle</a>\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">"
+"Bileti Görüntüle</a>\n"
+"        </t>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
+"(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
+"target=\"_blank\">Bileti Kapat</a>\n"
+"        </t>\n"
+"        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
+"object.access_token)\" target=\"_blank\">Bileti Kapat</a>\n"
+"        </t>\n"
+"        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
+"object.team_id.use_website_helpdesk_knowledge or "
+"object.team_id.use_website_helpdesk_slides\">\n"
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
+"target=\"_blank\">Yardım Merkezini Ziyaret Et</a>\n"
+"        </t><br><br>\n"
+"    </div>\n"
+"\n"
+"    Saygılarımızla,<br><br>\n"
+"    <t t-out=\"object.team_id.name or 'Yardım Masası'\">Yardım Masası</t> "
+"Ekibi\n"
+"</div>\n"
+"        "
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/> Set an Alias Domain"
 msgstr ""
+"<i class=\"oi me-2\" data-icon=\"east\"/> Bir Takma Ad Etki Alanı Ayarla"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -566,6 +695,10 @@ msgid ""
 "will be automatically sent to customers by email when their ticket reaches a "
 "stage where ratings are enabled.</span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"lightbulb\"/>\n"
+"                                    <span class=\"ms-2\">Biletleri, "
+"değerlendirmelerin etkin olduğu bir aşamaya ulaştığında müşterilere otomatik "
+"olarak e-posta yoluyla bir değerlendirme isteği gönderilecektir.</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -589,7 +722,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -603,7 +736,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -706,7 +839,7 @@ msgstr "<span><b>Takipçiler </b></span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>@</span>"
-msgstr ""
+msgstr "<span>@</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -745,7 +878,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>days before closure</span>"
-msgstr ""
+msgstr "<span>kapanışa kalan gün sayısı</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -755,7 +888,7 @@ msgstr "<span>gün süren hareketsizlik</span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "<span>days</span>"
-msgstr ""
+msgstr "<span>gün</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -782,7 +915,7 @@ msgstr "<strong>Takma Ad </strong>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<strong>Send</strong>"
-msgstr ""
+msgstr "<strong>Gönder</strong>"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_defaults
@@ -842,7 +975,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_state
@@ -890,6 +1023,8 @@ msgid ""
 "Add team-specific property fields to tickets to better customize your "
 "helpdesk management process."
 msgstr ""
+"Yardım masası yönetim sürecinizi daha iyi özelleştirmek için biletlere ekibe "
+"özel özellik alanları ekleyin."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1024,7 +1159,7 @@ msgstr "Bu aşamaları silmek istediğinizden emin misiniz?"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_active
 msgid "Ask for Ratings"
-msgstr ""
+msgstr "Değerlendirme iste"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.action_helpdesk_tag_assignment
@@ -1092,12 +1227,12 @@ msgstr "Ek Sayısı"
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_auto_assignment
 msgid "Auto Assignment"
-msgstr ""
+msgstr "Otomatik Atama"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_ticket_reminder
 msgid "Auto-Close Reminder"
-msgstr ""
+msgstr "Otomatik Kapatma Hatırlatması"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1222,11 +1357,13 @@ msgid ""
 "Can manage helpdesk teams and stages, with access to reporting and "
 "configuration."
 msgstr ""
+"Yardım masası ekiplerini ve aşamalarını yönetebilir, raporlama ve "
+"yapılandırmaya erişebilir."
 
 #. module: helpdesk
 #: model:res.groups,comment:helpdesk.group_helpdesk_user
 msgid "Can manage tickets in helpdesk teams they have access to."
-msgstr ""
+msgstr "Erişimleri olan yardım masası ekiplerindeki biletleri yönetebilir."
 
 #. module: helpdesk
 #: model:helpdesk.stage,name:helpdesk.stage_cancelled
@@ -1259,6 +1396,8 @@ msgid ""
 "Check the stage tracker on tickets to quickly spot bottlenecks in your "
 "helpdesk workflow."
 msgstr ""
+"Yardım masası iş akışınızdaki darboğazları hızlıca tespit etmek için "
+"biletlerdeki aşama takipçisini kontrol edin."
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
@@ -1266,6 +1405,8 @@ msgid ""
 "Click the Kanban progress bar to quickly filter tickets by status within the "
 "current stage."
 msgstr ""
+"Mevcut aşama içindeki biletleri duruma göre hızlıca filtrelemek için Kanban "
+"ilerleme çubuğuna tıklayın."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1700,17 +1841,18 @@ msgstr "İsim Göster"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Domain"
-msgstr ""
+msgstr "Alan Adı"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__criteria_domain
 msgid "Domain to filter the tickets to which this SLA policy will be applied."
 msgstr ""
+"Bu SLA politikasının uygulanacağı biletleri filtrelemek için etki alanı."
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__duration_stage_tracking
 msgid "Duration Stage Tracking"
-msgstr ""
+msgstr "Aşama Süresi Takibi"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__assign_method__balanced
@@ -1759,12 +1901,14 @@ msgstr "E-posta alan adı, örneğin 'odoo@example.com' adresindeki 'example.com
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__reminder_email_template_id
 msgid "Email template used for the auto-close reminder."
-msgstr ""
+msgstr "Otomatik kapatma hatırlatması için kullanılan e-posta şablonu."
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Email template used to send rating requests for helpdesk tickets."
 msgstr ""
+"Yardım masası biletleri için değerlendirme istekleri göndermekte kullanılan "
+"e-posta şablonu."
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
@@ -1772,6 +1916,8 @@ msgid ""
 "Emails sent to your Helpdesk Team's email address automatically create "
 "tickets in your pipeline."
 msgstr ""
+"Yardım Masası Ekibinizin e-posta adresine gönderilen e-postalar, kanalınızda "
+"otomatik olarak bilet oluşturur."
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.rating_ticket_request_email_template
@@ -1846,7 +1992,7 @@ msgstr "İlk atama tarihi"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Fold by Default"
-msgstr ""
+msgstr "Varsayılan Olarak Katla"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__fold
@@ -2019,7 +2165,7 @@ msgstr "Yardım Masasına Genel Bakış"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_sla
 msgid "Helpdesk SLA Policy"
-msgstr ""
+msgstr "Yardım Masası SLA Politikası"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_stage
@@ -2034,7 +2180,7 @@ msgstr "Yardım Masası Aşama Silme Sihirbazı"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag
 msgid "Helpdesk Tag"
-msgstr ""
+msgstr "Yardım Masası Etiketi"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag_assignment
@@ -2093,7 +2239,7 @@ msgstr "Yardım Masası Talepleri"
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.auto_close_reminder_email_template
 msgid "Helpdesk: Auto-Close Reminder"
-msgstr ""
+msgstr "Yardım Masası: Otomatik Kapatma Hatırlatması"
 
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.solved_ticket_request_email_template
@@ -2113,7 +2259,7 @@ msgstr "Yardım Masası: Bilet Alındı"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "High"
-msgstr ""
+msgstr "Yüksek"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -2253,7 +2399,7 @@ msgstr "Hareketsizlik Süresi (gün)"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Inactive delay period(days)"
-msgstr ""
+msgstr "Etkin olmayan gecikme süresi (gün)"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__privacy_visibility__invited_internal
@@ -2420,7 +2566,7 @@ msgstr "Yerel bölüm bazlı gelen algılama"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Low"
-msgstr ""
+msgstr "Düşük"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__0
@@ -2452,7 +2598,7 @@ msgstr ""
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__time
@@ -2624,7 +2770,7 @@ msgstr "Sonraki Aktivitie Türü"
 #. module: helpdesk
 #: model:res.groups.privilege,placeholder:helpdesk.res_groups_privilege_helpdesk
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -2661,7 +2807,7 @@ msgstr "Henüz veri yok!"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "No email"
-msgstr ""
+msgstr "E-posta yok"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -2931,7 +3077,7 @@ msgstr ""
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Period of inactivity before the reminder is sent."
-msgstr ""
+msgstr "Hatırlatma gönderilmeden önceki etkin olmama süresi."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -3023,6 +3169,8 @@ msgid ""
 "Quickly identify tickets that have been stuck in the same stage for too long "
 "instead of progressing."
 msgstr ""
+"İlerlemek yerine çok uzun süre aynı aşamada takılı kalan biletleri hızla "
+"belirleyin."
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_rating_rating
@@ -3049,7 +3197,7 @@ msgstr "Değerlendirme Ort Metni"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Rating Email"
-msgstr ""
+msgstr "Değerlendirme E-postası"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rating_last_feedback
@@ -3164,6 +3312,8 @@ msgstr ""
 msgid ""
 "Reminder sent to customers before their ticket is closed due to inactivity"
 msgstr ""
+"Etkinlik eksikliği nedeniyle biletleri kapatılmadan önce müşterilere "
+"gönderilen hatırlatma"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_repair
@@ -3229,7 +3379,7 @@ msgstr "Çürüme"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Rotting in"
-msgstr ""
+msgstr "Çürüyor"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_id
@@ -3374,13 +3524,13 @@ msgstr "\"Atanan Kişi\" içinde ara"
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Description"
-msgstr ""
+msgstr "Açıklamada Ara"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Messages"
-msgstr ""
+msgstr "İletilerde Ara"
 
 #. module: helpdesk
 #. odoo-python
@@ -3415,6 +3565,8 @@ msgid ""
 "Send an automatic reminder email to customers before their ticket is closed "
 "due to inactivity"
 msgstr ""
+"Müşterilerin biletleri, etkinlik gösterilmemesi nedeniyle kapatılmadan önce "
+"onlara otomatik bir hatırlatma e-postası gönderin"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -3448,7 +3600,7 @@ msgstr "Hizmet"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Set Up Ratings on Stages"
-msgstr ""
+msgstr "Aşamalarda Değerlendirmeleri Ayarla"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.solved_ticket_request_email_template
@@ -3527,7 +3679,7 @@ msgstr "Aşama Değişti"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__name
 msgid "Stage Name"
-msgstr ""
+msgstr "Aşama Adı"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
@@ -3593,7 +3745,7 @@ msgstr "Konu"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Success"
-msgstr ""
+msgstr "Başarılı"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_7days_success
@@ -3675,6 +3827,9 @@ msgid ""
 "The auto-close period must be longer than the reminder email delay. Please "
 "set a higher inactivity period or a shorter reminder delay."
 msgstr ""
+"Otomatik kapatma süresi, hatırlatma e-postası gecikmesinden daha uzun "
+"olmalıdır. Lütfen daha uzun bir hareketsizlik süresi veya daha kısa bir "
+"hatırlatma gecikmesi ayarlayın."
 
 #. module: helpdesk
 #. odoo-python
@@ -3718,7 +3873,7 @@ msgstr "Bu aşamalarda geçirilen süre, SLA hesaplamasına dahil edilmeyecektir
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 msgid "There are currently no Tickets for your account."
-msgstr ""
+msgstr "Hesabınız için şu anda herhangi bir Destek Bileti bulunmuyor."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
@@ -3819,6 +3974,8 @@ msgid ""
 "Ticket Closed - Reference {{ object.ticket_ref if object.ticket_ref else "
 "15 }}"
 msgstr ""
+"Bilet Kapatıldı - Referans {{ object.ticket_ref if object.ticket_ref else "
+"15 }}"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__ticket_count
@@ -3971,22 +4128,22 @@ msgstr "İpucu: Gelen e-postalardan biletler oluşturun"
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_4
 msgid "Tip: Don't let stalled tickets slip under the radar"
-msgstr ""
+msgstr "İpucu: Bekleyen biletlerin gözden kaçmasına izin vermeyin"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_3
 msgid "Tip: Filter your tickets with one click"
-msgstr ""
+msgstr "İpucu: Biletlerinizi tek tıkla filtreleyin"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_1
 msgid "Tip: Identify bottlenecks at a glance"
-msgstr ""
+msgstr "İpucu: Darboğazları bir bakışta belirleyin"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_2
 msgid "Tip: Team-Specific Fields"
-msgstr ""
+msgstr "İpucu: Ekibe Özel Alanlar"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_my_ticket_action_no_create
@@ -4056,7 +4213,7 @@ msgstr "Biletler üzerinde harcanan zamanı takip edin"
 #. module: helpdesk
 #: model:ir.module.module,summary:base.module_helpdesk
 msgid "Track, prioritize, and solve customer tickets"
-msgstr ""
+msgstr "Müşteri biletlerini takip edin, önceliklendirin ve çözün"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4072,12 +4229,12 @@ msgstr "Kayıtlardaki istisna etkinliğinin türü."
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "UTM Referansı"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Unanswered"
-msgstr ""
+msgstr "Yanıtlanmamış"
 
 #. module: helpdesk
 #. odoo-python
@@ -4292,7 +4449,7 @@ msgstr ""
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
@@ -4341,7 +4498,7 @@ msgstr "Bilet Belgesini takip etmeye davet edildiniz:"
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.auto_close_reminder_email_template
 msgid "Your support ticket will be closed soon"
-msgstr ""
+msgstr "Destek talebiniz yakında kapatılacaktır"
 
 #. module: helpdesk
 #. odoo-python
@@ -4373,7 +4530,7 @@ msgstr "örn. Ürün hasarlı ulaştı"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "e.g. Qualification"
-msgstr ""
+msgstr "Örnek: Nitelik"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4383,7 +4540,7 @@ msgstr "örn. sirketim.com"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "e.g. support"
-msgstr ""
+msgstr "örn. destek"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_slides
@@ -4437,6 +4594,206 @@ msgstr "{{ object.name }}"
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "👤 Unassigned"
 msgstr "👤 Atanmamış"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/"
+#~ "Sir'\">Madam/Sir</t>,<br/><br/>\n"
+#~ "        We would like to inform you that we have closed your ticket "
+#~ "(reference <t t-out=\"object.ticket_ref or ''\">15</t>).\n"
+#~ "        We trust that the services provided have met your expectations "
+#~ "and that you have found a satisfactory resolution to your issue.<br/><br/"
+#~ ">\n"
+#~ "        However, if you have any further questions or comments, please do "
+#~ "not hesitate to reply to this email to re-open your ticket.\n"
+#~ "        Our team is always here to help you and we will be happy to "
+#~ "assist you with any further concerns you may have.<br/><br/>\n"
+#~ "        Thank you for choosing our services and for your cooperation "
+#~ "throughout this process. We truly value your business and appreciate the "
+#~ "opportunity to serve you.<br/><br/>\n"
+#~ "        Kind regards,<br/><br/>\n"
+#~ "        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> "
+#~ "Team.\n"
+#~ "    </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "        Sayın <t t-out=\"object.sudo().partner_id.name or 'Madam/"
+#~ "Sir'\">Hanımefendi/Beyefendi</t>,<br/><br/>\n"
+#~ "        Biletinizin (referans: <t t-out=\"object.id or ''\">15</t>) "
+#~ "kapatıldığını bildirmek isteriz. \n"
+#~ "        Sunulan hizmetlerin beklentilerinizi karşıladığını ve sorununuz "
+#~ "için tatmin edici bir çözüm bulduğunuzu umuyoruz.<br/><br/>\n"
+#~ "        Ancak başka sorularınız veya yorumlarınız olursa bileti yeniden "
+#~ "açmak için lütfen bu e-postaya yanıt vermekten çekinmeyin. \n"
+#~ "        Ekibimiz her zaman size yardımcı olmak için burada ve gelecekteki "
+#~ "her türlü konuda destek vermekten memnuniyet duyarız.<br/><br/>\n"
+#~ "        Hizmetlerimizi seçtiğiniz ve süreç boyunca iş birliğiniz için "
+#~ "teşekkür ederiz. İşinizi gerçekten önemsiyoruz ve size hizmet etme "
+#~ "fırsatı için müteşekkiriz.<br/><br/>\n"
+#~ "        Saygılarımızla,<br/><br/>\n"
+#~ "        <t t-out=\"object.team_id.name or 'Helpdesk'\"> Yardım Masası</t> "
+#~ "Ekibi.\n"
+#~ "    </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()"
+#~ "\"/>\n"
+#~ "    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\">\n"
+#~ "    <tbody>\n"
+#~ "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+#~ "            <t t-if=\"partner.name\">\n"
+#~ "                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
+#~ "<br/><br/>\n"
+#~ "            </t>\n"
+#~ "            <t t-else=\"\">\n"
+#~ "                Hello,<br/>\n"
+#~ "            </t>\n"
+#~ "            Please take a moment to rate our services related to the "
+#~ "ticket \"<strong t-out=\"object.name or ''\">Table legs are unbalanced</"
+#~ "strong>\"\n"
+#~ "            <t t-if=\"object._rating_get_operator().name\">\n"
+#~ "                assigned to <strong t-"
+#~ "out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>."
+#~ "<br/>\n"
+#~ "            </t>\n"
+#~ "            <t t-else=\"\">\n"
+#~ "                .<br/><br/>\n"
+#~ "            </t>\n"
+#~ "        </td></tr>\n"
+#~ "        <tr><td style=\"text-align: center;\">\n"
+#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+#~ "                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
+#~ "                    <strong>Tell us how you feel about our services</"
+#~ "strong><br/>\n"
+#~ "                    <span style=\"text-color: #888888\">(click on one of "
+#~ "these smileys)</span>\n"
+#~ "                </td></tr>\n"
+#~ "                <tr><td style=\"font-size: 14px;\">\n"
+#~ "                    <table style=\"width:100%;text-align:center;margin-"
+#~ "top:2rem;\">\n"
+#~ "                        <tr>\n"
+#~ "                            <td>\n"
+#~ "                                <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                    <img alt=\"Happy\" src=\"/rating/"
+#~ "static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+#~ "                                </a>\n"
+#~ "                            </td>\n"
+#~ "                            <td>\n"
+#~ "                                <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                    <img alt=\"Neutral\" src=\"/rating/"
+#~ "static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+#~ "                                </a>\n"
+#~ "                            </td>\n"
+#~ "                            <td>\n"
+#~ "                                <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                    <img alt=\"Unhappy\" src=\"/rating/"
+#~ "static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+#~ "                                </a>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                    </table>\n"
+#~ "                </td></tr>\n"
+#~ "            </table>\n"
+#~ "        </td></tr>\n"
+#~ "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+#~ "            We appreciate your feedback. It helps us improve "
+#~ "continuously.\n"
+#~ "            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+#~ "12px; opacity: 0.5; color: #454748;\">This customer survey has been sent "
+#~ "because your ticket has been moved to the stage <b t-"
+#~ "out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
+#~ "        </td></tr>\n"
+#~ "    </tbody>\n"
+#~ "    </table>\n"
+#~ "</div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()"
+#~ "\"/>\n"
+#~ "   <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\">\n"
+#~ "   <tbody>\n"
+#~ "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+#~ "            <t t-if=\"partner.name\">\n"
+#~ "                Merhaba <t t-out=\"partner.name or ''\">Brandon Freeman</"
+#~ "t>,<br/><br/>\n"
+#~ "           </t>\n"
+#~ "            <t t-else=\"\">\n"
+#~ "                Merhaba,<br/>\n"
+#~ "            </t>\n"
+#~ "            \"<strong t-out=\"object.name or ''\">Masa ayakları dengesiz</"
+#~ "strong>\" bileti ile ilgili hizmetlerimizi değerlendirmek için lütfen bir "
+#~ "dakikanızı ayırın.\n"
+#~ "           <t t-if=\"object._rating_get_operator().name\">\n"
+#~ "                <strong t-out=\"object._rating_get_operator().name or "
+#~ "''\"> Mitchell Admin</strong> kullanıcısına atanmıştır.<br/>\n"
+#~ "            </t>\n"
+#~ "           <t t-else=\"\">\n"
+#~ "                .<br/><br/>\n"
+#~ "           </t>\n"
+#~ "        </td></tr>\n"
+#~ "        <tr><td style=\"text-align: center;\">\n"
+#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+#~ "               <tr><td style=\"font-size: 14px; text-align:center;\">\n"
+#~ "                   <strong>Hizmetlerimiz hakkında ne düşündüğünüzü bize "
+#~ "söyleyin</strong><br/>\n"
+#~ "                   <span style=\"text-color: #888888\">(bu ifadelerden "
+#~ "birine tıklayın)</span>\n"
+#~ "                </td></tr>\n"
+#~ "                <tr><td style=\"font-size: 14px;\">\n"
+#~ "                    <table style=\"width:100%;text-align:center;margin-"
+#~ "top:2rem;\">\n"
+#~ "                       <tr>\n"
+#~ "                            <td>\n"
+#~ "                               <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                    <img alt=\"Happy\" src=\"/rating/"
+#~ "static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+#~ "                               </a>\n"
+#~ "                            </td>\n"
+#~ "                           <td>\n"
+#~ "                                <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                   <img alt=\"Neutral\" src=\"/rating/"
+#~ "static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+#~ "                                </a>\n"
+#~ "                           </td>\n"
+#~ "                            <td>\n"
+#~ "                               <a t-attf-href=\"/rate/{{ access_token }}/"
+#~ "1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+#~ "                                    <img alt=\"Unhappy\" src=\"/rating/"
+#~ "static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+#~ "                               </a>\n"
+#~ "                            </td>\n"
+#~ "                       </tr>\n"
+#~ "                    </table>\n"
+#~ "               </td></tr>\n"
+#~ "           </table>\n"
+#~ "        </td></tr>\n"
+#~ "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+#~ "            Geri bildirimleriniz için teşekkür ederiz. Sürekli "
+#~ "gelişmemize yardımcı oluyor.\n"
+#~ "           <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+#~ "12px; opacity: 0.5; color: #454748;\">Bu müşteri anketi, biletiniz <b t-"
+#~ "out=\"object.stage_id.name or ''\">In Progress</b> aşamasına taşındığı "
+#~ "için gönderilmiştir.</span>\n"
+#~ "        </td></tr>\n"
+#~ "    </tbody>\n"
+#~ "   </table>\n"
+#~ "</div>\n"
+#~ "        "
 
 #~ msgid "Select the <b>customer</b> of your ticket."
 #~ msgstr "Biletinizin <b>müşterisini</b>seçin."

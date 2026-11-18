@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo auto_sequence="1">
+    <!-- MoF Decision 0369 (2020). "Minority interests" and "Group share" (consolidated statements only) are left out. -->
+    <record id="l10n_la_balance_sheet" model="account.report">
+        <field name="name">Statement of Financial Position</field>
+        <field name="name@lo_LA">ໃບລາຍງານຖານະການເງິນ</field>
+        <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="custom_handler_model_id" ref="account_reports.model_account_balance_sheet_report_handler"/>
+        <field name="country_id" ref="base.la"/>
+        <field name="filter_date_range" eval="False"/>
+        <field name="filter_analytic_groupby" eval="True"/>
+        <field name="filter_unfold_all" eval="True"/>
+        <field name="filter_line_comparison" eval="True"/>
+        <field name="filter_journals" eval="False"/>
+        <field name="filter_multi_company">selector</field>
+        <field name="filter_hierarchy">by_default</field>
+        <field name="default_opening_date_filter">today</field>
+        <field name="column_ids">
+            <record id="l10n_la_balance_sheet_balance" model="account.report.column">
+                <field name="name">Balance</field>
+                <field name="name@lo_LA">ຍອດເງິນ</field>
+                <field name="expression_label">balance</field>
+            </record>
+        </field>
+        <field name="line_ids">
+            <record id="l10n_la_bs_assets" model="account.report.line">
+                <field name="name">ASSETS</field>
+                <field name="name@lo_LA">ຊັບສິນ</field>
+                <field name="hierarchy_level">0</field>
+                <field name="horizontal_split_side">left</field>
+                <field name="children_ids">
+                    <record id="l10n_la_bs_current_assets" model="account.report.line">
+                        <field name="name">Current assets</field>
+                        <field name="name@lo_LA">ຊັບສິນໝູນວຽນ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="children_ids">
+                            <record id="l10n_la_bs_cash" model="account.report.line">
+                                <field name="name">Cash and cash equivalents</field>
+                                <field name="name@lo_LA">ເງິນສົດ ແລະ ທຽບເທົ່າເງິນສົດ</field>
+                                <field name="code">LA_BS_CASH</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">10</field>
+                            </record>
+                            <record id="l10n_la_bs_financial_instruments" model="account.report.line">
+                                <field name="name">Financial instruments and other financial assets</field>
+                                <field name="name@lo_LA">ເຄື່ອງມືການເງິນ ແລະ ຊັບສິນຄ້າຍຄືກັນ</field>
+                                <field name="code">LA_BS_FIN_INSTR</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">11</field>
+                            </record>
+                            <record id="l10n_la_bs_trade_receivables" model="account.report.line">
+                                <field name="name">Trade receivables</field>
+                                <field name="name@lo_LA">ລູກໜີ້ການຄ້າ</field>
+                                <field name="code">LA_BS_TRADE_REC</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">12</field>
+                            </record>
+                            <record id="l10n_la_bs_inventories" model="account.report.line">
+                                <field name="name">Inventories</field>
+                                <field name="name@lo_LA">ເຄື່ອງໃນສາງ</field>
+                                <field name="code">LA_BS_INVENTORIES</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">13</field>
+                            </record>
+                            <record id="l10n_la_bs_other_current_receivables" model="account.report.line">
+                                <field name="name">Trade and other receivables</field>
+                                <field name="name@lo_LA">ໜີ້ຕ້ອງຮັບ ແລະ ຊັບສິນຄ້າຍຄືກັນ</field>
+                                <field name="code">LA_BS_REC_SIMILAR</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="aggregation_formula">LA_BS_OTHER_REC.balance + LA_BS_TAX_REC.balance + LA_BS_OTHER_CA.balance</field>
+                                <field name="children_ids">
+                                    <record id="l10n_la_bs_other_receivables" model="account.report.line">
+                                        <field name="name">Other receivables</field>
+                                        <field name="name@lo_LA">ລູກໜີ້ອື່ນໆ</field>
+                                        <field name="code">LA_BS_OTHER_REC</field>
+                                        <field name="hierarchy_level">5</field>
+                                        <field name="groupby">account_id</field>
+                                        <field name="account_codes_formula">14\(146) + 15 + 160 + 161 + 162 + 163 + 1690 + 1691 + 1692</field>
+                                    </record>
+                                    <record id="l10n_la_bs_tax_receivables" model="account.report.line">
+                                        <field name="name">Tax</field>
+                                        <field name="name@lo_LA">ອາກອນ</field>
+                                        <field name="code">LA_BS_TAX_REC</field>
+                                        <field name="hierarchy_level">5</field>
+                                        <field name="groupby">account_id</field>
+                                        <field name="account_codes_formula">164 + 165 + 166 + 167 + 168 + 1693</field>
+                                    </record>
+                                    <record id="l10n_la_bs_other_current_assets" model="account.report.line">
+                                        <field name="name">Other current assets</field>
+                                        <field name="name@lo_LA">ຊັບສິນໝູນວຽນອື່ນໆ</field>
+                                        <field name="code">LA_BS_OTHER_CA</field>
+                                        <field name="hierarchy_level">5</field>
+                                        <field name="groupby">account_id</field>
+                                        <field name="account_codes_formula">146 + 5</field>
+                                    </record>
+                                </field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="l10n_la_bs_total_current_assets" model="account.report.line">
+                        <field name="name">Total current assets (I)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ຊັບສິນໝູນວຽນ ( I )</field>
+                        <field name="code">LA_BS_CA</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_CASH.balance + LA_BS_FIN_INSTR.balance + LA_BS_TRADE_REC.balance + LA_BS_INVENTORIES.balance + LA_BS_REC_SIMILAR.balance</field>
+                    </record>
+                    <record id="l10n_la_bs_non_current_assets" model="account.report.line">
+                        <field name="name">Non-current assets</field>
+                        <field name="name@lo_LA">ຊັບສິນບໍ່ໝູນວຽນ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="children_ids">
+                            <record id="l10n_la_bs_financial_assets" model="account.report.line">
+                                <field name="name">Financial assets</field>
+                                <field name="name@lo_LA">ຊັບສິນການເງິນ</field>
+                                <field name="code">LA_BS_FIN_ASSETS</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">20\(206) + 213 + 214 + 216 + 217 + 218 + 2194 + 226 + 237 + 290 + 2914</field>
+                            </record>
+                            <record id="l10n_la_bs_inv_subsidiaries" model="account.report.line">
+                                <field name="name">Investments in subsidiaries</field>
+                                <field name="name@lo_LA">ເງິນລົງທຶນ ບໍລິສັດໃນເຄືອ (ໃນກຸ່ມ)</field>
+                                <field name="code">LA_BS_INV_SUB</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">210 + 2190 + 2910</field>
+                            </record>
+                            <record id="l10n_la_bs_inv_associates" model="account.report.line">
+                                <field name="name">Investments in associates</field>
+                                <field name="name@lo_LA">ເງິນລົງທຶນ ໃນວິສາຫະກິດຂາຮຸ້ນ</field>
+                                <field name="code">LA_BS_INV_ASSOC</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">211 + 2191 + 2911</field>
+                            </record>
+                            <record id="l10n_la_bs_inv_joint" model="account.report.line">
+                                <field name="name">Investments in jointly controlled entities</field>
+                                <field name="name@lo_LA">ເງິນລົງທຶນ ໃນບໍລິສັດທີ່ຄວບຄຸມຮ່ວມກັນ</field>
+                                <field name="code">LA_BS_INV_JOINT</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">212 + 2192 + 2912</field>
+                            </record>
+                            <record id="l10n_la_bs_investment_property" model="account.report.line">
+                                <field name="name">Investment property</field>
+                                <field name="name@lo_LA">ອະສັງຫາລິມະຊັບ ເພື່ອການລົງທຶນ</field>
+                                <field name="code">LA_BS_INV_PROPERTY</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">206</field>
+                            </record>
+                            <record id="l10n_la_bs_ppe" model="account.report.line">
+                                <field name="name">Property, plant and equipment</field>
+                                <field name="name@lo_LA">ຊັບສົມບັດຄົງທີ່ ມີຕົວຕົນ</field>
+                                <field name="code">LA_BS_PPE</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">22\(226) + 231 + 2381 + 241 + 243 + 282 + 2841 + 2843 + 292 + 2941 + 2943</field>
+                            </record>
+                            <record id="l10n_la_bs_biological_assets" model="account.report.line">
+                                <field name="name">Biological assets</field>
+                                <field name="name@lo_LA">ຊັບສິນ ຊີວະພາບ</field>
+                                <field name="code">LA_BS_BIOLOGICAL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">25 + 285 + 295</field>
+                            </record>
+                            <record id="l10n_la_bs_goodwill" model="account.report.line">
+                                <field name="name">Goodwill</field>
+                                <field name="name@lo_LA">ຄ່ານິຍົມ</field>
+                                <field name="code">LA_BS_GOODWILL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">2427</field>
+                            </record>
+                            <record id="l10n_la_bs_intangible_assets" model="account.report.line">
+                                <field name="name">Other intangible assets</field>
+                                <field name="name@lo_LA">ຊັບສົມບັດຄົງທີ່ ບໍ່ມີຕົວຕົນ</field>
+                                <field name="code">LA_BS_INTANGIBLE</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">232 + 2382 + 242\(2427) + 2842 + 2942</field>
+                            </record>
+                            <record id="l10n_la_bs_deferred_tax_assets" model="account.report.line">
+                                <field name="name">Deferred tax assets</field>
+                                <field name="name@lo_LA">ອາກອນເຍື້ອນຊຳລະ</field>
+                                <field name="code">LA_BS_DTA</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">27</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="l10n_la_bs_total_non_current_assets" model="account.report.line">
+                        <field name="name">Total non-current assets (II)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ຊັບສິນບໍ່ໝູນວຽນ ( II )</field>
+                        <field name="code">LA_BS_NCA</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_FIN_ASSETS.balance + LA_BS_INV_SUB.balance + LA_BS_INV_ASSOC.balance + LA_BS_INV_JOINT.balance + LA_BS_INV_PROPERTY.balance + LA_BS_PPE.balance + LA_BS_BIOLOGICAL.balance + LA_BS_GOODWILL.balance + LA_BS_INTANGIBLE.balance + LA_BS_DTA.balance</field>
+                    </record>
+                    <record id="l10n_la_bs_total_assets" model="account.report.line">
+                        <field name="name">TOTAL ASSETS (I + II)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ຊັບສິນທັງໝົດ ( I + II )</field>
+                        <field name="code">LA_BS_TA</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_CA.balance + LA_BS_NCA.balance</field>
+                    </record>
+                </field>
+            </record>
+            <record id="l10n_la_bs_liabilities_equity" model="account.report.line">
+                <field name="name">LIABILITIES AND EQUITY</field>
+                <field name="name@lo_LA">ໜີ້ສິນ ແລະ ທຶນ</field>
+                <field name="hierarchy_level">0</field>
+                <field name="horizontal_split_side">right</field>
+                <field name="children_ids">
+                    <record id="l10n_la_bs_current_liabilities" model="account.report.line">
+                        <field name="name">Current liabilities</field>
+                        <field name="name@lo_LA">ໜີ້ສິນໝູນວຽນ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="children_ids">
+                            <record id="l10n_la_bs_bank_overdrafts" model="account.report.line">
+                                <field name="name">Bank overdrafts</field>
+                                <field name="name@lo_LA">ເງິນເບີກເກີນບັນຊີ</field>
+                                <field name="code">LA_BS_OVERDRAFTS</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-411</field>
+                            </record>
+                            <record id="l10n_la_bs_trade_payables" model="account.report.line">
+                                <field name="name">Trade and other payables</field>
+                                <field name="name@lo_LA">ໜີ້ຕ້ອງສົ່ງການຄ້າ ແລະ ອື່ນໆ</field>
+                                <field name="code">LA_BS_TRADE_PAY</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-40 - 421 - 44</field>
+                            </record>
+                            <record id="l10n_la_bs_short_term_borrowings" model="account.report.line">
+                                <field name="name">Financial liabilities, short-term borrowings</field>
+                                <field name="name@lo_LA">ໜີ້ສິນການເງິນ, ເງິນກູ້ຢືມ ໄລຍະສັ້ນ</field>
+                                <field name="code">LA_BS_ST_BORROW</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-41\(411)</field>
+                            </record>
+                            <record id="l10n_la_bs_state_payables" model="account.report.line">
+                                <field name="name">State - Debts payable (levies - taxes)</field>
+                                <field name="name@lo_LA">ໜີ້ຕ້ອງສົ່ງລັດ ( ຄ່າພາສີ-ອາກອນ )</field>
+                                <field name="code">LA_BS_STATE_PAY</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-43</field>
+                            </record>
+                            <record id="l10n_la_bs_st_employee_benefits" model="account.report.line">
+                                <field name="name">Short-term employee benefit obligations</field>
+                                <field name="name@lo_LA">ພັນທະໄລຍະສັ້ນ ຜົນປະໂຫຍດຂອງພະນັກງານ</field>
+                                <field name="code">LA_BS_ST_EMPLOYEE</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-420 - 422</field>
+                            </record>
+                            <record id="l10n_la_bs_other_current_payables" model="account.report.line">
+                                <field name="name">Other current payables</field>
+                                <field name="name@lo_LA">ໜີ້ຕ້ອງສົ່ງ ໝູນວຽນອື່ນໆ</field>
+                                <field name="code">LA_BS_OTHER_CL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-45</field>
+                            </record>
+                            <record id="l10n_la_bs_st_provisions" model="account.report.line">
+                                <field name="name">Short-term provisions</field>
+                                <field name="name@lo_LA">ເງິນແຮ-ໜີ້ສິນໝູນວຽນ</field>
+                                <field name="code">LA_BS_ST_PROV</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-46</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="l10n_la_bs_total_current_liabilities" model="account.report.line">
+                        <field name="name">Total current liabilities (I)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ໜີ້ສິນໝູນວຽນ ( I )</field>
+                        <field name="code">LA_BS_CL</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_OVERDRAFTS.balance + LA_BS_TRADE_PAY.balance + LA_BS_ST_BORROW.balance + LA_BS_STATE_PAY.balance + LA_BS_ST_EMPLOYEE.balance + LA_BS_OTHER_CL.balance + LA_BS_ST_PROV.balance</field>
+                    </record>
+                    <record id="l10n_la_bs_non_current_liabilities" model="account.report.line">
+                        <field name="name">Non-current liabilities</field>
+                        <field name="name@lo_LA">ໜີ້ສິນບໍ່ໝູນວຽນ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="children_ids">
+                            <record id="l10n_la_bs_long_term_borrowings" model="account.report.line">
+                                <field name="name">Financial liabilities, long-term borrowings</field>
+                                <field name="name@lo_LA">ໜີ້ສິນທາງການເງິນ, ເງິນກູ້ຢືມ ໄລຍະຍາວ</field>
+                                <field name="code">LA_BS_LT_BORROW</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-47</field>
+                            </record>
+                            <record id="l10n_la_bs_lt_employee_benefits" model="account.report.line">
+                                <field name="name">Long-term employee benefit obligations</field>
+                                <field name="name@lo_LA">ພັນທະໄລຍະຍາວ ຜົນປະໂຫຍດຂອງພະນັກງານ</field>
+                                <field name="code">LA_BS_LT_EMPLOYEE</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-491</field>
+                            </record>
+                            <record id="l10n_la_bs_other_non_current_payables" model="account.report.line">
+                                <field name="name">Other non-current payables</field>
+                                <field name="name@lo_LA">ໜີ້ຕ້ອງສົ່ງ ບໍ່ໝູນວຽນອື່ນໆ</field>
+                                <field name="code">LA_BS_OTHER_NCL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-481 - 482</field>
+                            </record>
+                            <record id="l10n_la_bs_lt_provisions" model="account.report.line">
+                                <field name="name">Provisions - Non-current liabilities</field>
+                                <field name="name@lo_LA">ເງິນແຮ-ໜີ້ສິນບໍ່ໝູນວຽນ</field>
+                                <field name="code">LA_BS_LT_PROV</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-49\(491)</field>
+                            </record>
+                            <record id="l10n_la_bs_deferred_tax_liabilities" model="account.report.line">
+                                <field name="name">Deferred tax liabilities</field>
+                                <field name="name@lo_LA">ອາກອນ ເຍື້ອນຊຳລະ</field>
+                                <field name="code">LA_BS_DTL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-483</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="l10n_la_bs_total_non_current_liabilities" model="account.report.line">
+                        <field name="name">Total non-current liabilities (II)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ໜີ້ສິນບໍ່ໝູນວຽນ ( II )</field>
+                        <field name="code">LA_BS_NCL</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_LT_BORROW.balance + LA_BS_LT_EMPLOYEE.balance + LA_BS_OTHER_NCL.balance + LA_BS_LT_PROV.balance + LA_BS_DTL.balance</field>
+                    </record>
+                    <record id="l10n_la_bs_equity" model="account.report.line">
+                        <field name="name">Equity</field>
+                        <field name="name@lo_LA">ທຶນຕົນເອງ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="children_ids">
+                            <record id="l10n_la_bs_share_capital" model="account.report.line">
+                                <field name="name">Share capital</field>
+                                <field name="name@lo_LA">ທຶນຈົດທະບຽນ</field>
+                                <field name="code">LA_BS_CAPITAL</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-30\(304)</field>
+                            </record>
+                            <record id="l10n_la_bs_share_premium" model="account.report.line">
+                                <field name="name">Share premium</field>
+                                <field name="name@lo_LA">ສ່ວນເພີ່ມມູນຄ່າຮຸ້ນ</field>
+                                <field name="code">LA_BS_PREMIUM</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-304</field>
+                            </record>
+                            <record id="l10n_la_bs_reserves" model="account.report.line">
+                                <field name="name">Reserves</field>
+                                <field name="name@lo_LA">ຄັງສຳຮອງ</field>
+                                <field name="code">LA_BS_RESERVES</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="groupby">account_id</field>
+                                <field name="account_codes_formula">-31</field>
+                            </record>
+                            <!-- 32, plus earlier years not closed yet (Odoo's "Result Brought Forward"). -->
+                            <record id="l10n_la_bs_retained_earnings" model="account.report.line">
+                                <field name="name">Retained earnings (profit or loss carried forward)</field>
+                                <field name="name@lo_LA">ຜົນໄດ້ຮັບຍົກມາ ( ກຳໄລ ຫຼື ຂາດທຶນ ຍົກມາ )</field>
+                                <field name="code">LA_BS_RETAINED</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="expression_ids">
+                                    <record id="l10n_la_bs_retained_earnings_carried" model="account.report.expression">
+                                        <field name="label">carried_forward</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-32</field>
+                                        <field name="date_scope">from_beginning</field>
+                                    </record>
+                                    <record id="l10n_la_bs_retained_earnings_previous_years" model="account.report.expression">
+                                        <field name="label">previous_years</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-6 - 7 - 999999</field>
+                                        <field name="date_scope">to_beginning_of_fiscalyear</field>
+                                    </record>
+                                    <record id="l10n_la_bs_retained_earnings_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">LA_BS_RETAINED.carried_forward + LA_BS_RETAINED.previous_years</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <!-- 33 (booked by the year-end closing entry), plus the current year not closed yet. -->
+                            <record id="l10n_la_bs_net_profit" model="account.report.line">
+                                <field name="name">Net profit or loss for the year</field>
+                                <field name="name@lo_LA">ຜົນໄດ້ຮັບສຸດທິ ໃນປີ</field>
+                                <field name="code">LA_BS_NET_PROFIT</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="expression_ids">
+                                    <record id="l10n_la_bs_net_profit_booked" model="account.report.expression">
+                                        <field name="label">booked</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-33</field>
+                                        <field name="date_scope">from_beginning</field>
+                                    </record>
+                                    <record id="l10n_la_bs_net_profit_current_year" model="account.report.expression">
+                                        <field name="label">current_year</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-6 - 7 - 999999</field>
+                                        <field name="date_scope">from_fiscalyear</field>
+                                    </record>
+                                    <record id="l10n_la_bs_net_profit_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">LA_BS_NET_PROFIT.booked + LA_BS_NET_PROFIT.current_year</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <!-- Not in the MoF template. Code CTA: the balance sheet handler opens its audit view for it. -->
+                            <record id="l10n_la_bs_cta" model="account.report.line">
+                                <field name="name">Cumulative translation adjustment</field>
+                                <field name="name@lo_LA">ສ່ວນປ່ຽນແປງອັດຕາແລກປ່ຽນເງິນຕາຕ່າງປະເທດ ສະສົມ</field>
+                                <field name="code">CTA</field>
+                                <field name="hierarchy_level">3</field>
+                                <field name="hide_if_zero" eval="True"/>
+                                <field name="expression_ids">
+                                    <record id="l10n_la_bs_cta_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">custom</field>
+                                        <field name="formula">_report_engine_cumulative_translation_adjustment</field>
+                                        <field name="subformula">balance</field>
+                                        <field name="auditable" eval="True"/>
+                                    </record>
+                                </field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="l10n_la_bs_total_equity" model="account.report.line">
+                        <field name="name">Total equity (III)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ທຶນຕົນເອງ ( III )</field>
+                        <field name="code">LA_BS_EQ</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_CAPITAL.balance + LA_BS_PREMIUM.balance + LA_BS_RESERVES.balance + LA_BS_RETAINED.balance + LA_BS_NET_PROFIT.balance + CTA.balance</field>
+                    </record>
+                    <record id="l10n_la_bs_total_liabilities_equity" model="account.report.line">
+                        <field name="name">TOTAL LIABILITIES AND EQUITY (I + II + III)</field>
+                        <field name="name@lo_LA">ລວມຍອດ ໜີ້ສິນ + ທຶນ ( I + II + III )</field>
+                        <field name="code">LA_BS_TLE</field>
+                        <field name="hierarchy_level">1</field>
+                        <field name="aggregation_formula">LA_BS_CL.balance + LA_BS_NCL.balance + LA_BS_EQ.balance</field>
+                    </record>
+                </field>
+            </record>
+        </field>
+    </record>
+</odoo>

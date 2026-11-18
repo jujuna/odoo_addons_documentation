@@ -24,6 +24,11 @@ class TestL10nClEdiPos(TestL10nClEdiCommon, TestPointOfSaleHttpCommon):
             'l10n_cl_activity_description': 'activity_test',
             'vat': '76086428-5',
         })
+        self.main_pos_config.journal_id = self.sale_journal
+        # The invoice is sent to the SII when created from the PoS: use the DEMO mode to avoid external requests
+        self.company.l10n_cl_dte_service_provider = 'SIIDEMO'
+        # The invoice date is computed in the user's timezone and must not be after the current date in Chile
+        self.user.tz = 'America/Santiago'
         self.main_pos_config.with_user(self.pos_user).open_ui()
         self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'test_receipt_header_content', login="accountman")
 
@@ -93,3 +98,25 @@ class TestCLEdiPos(TestL10nClEdiCommon, TestPoSCommon):
         session.close_session_from_ui({})
         order = self.env['pos.order'].browse(result['pos.order'][0]['id'])
         self.assertEqual(order.state, 'done')
+
+    def test_cl_pos_invoice_journal_without_documents(self):
+        """ An invoice in a journal not using documents must not get a SII document type. """
+        self.config.journal_id = self.env['account.journal'].create({
+            'name': 'Non-fiscal Sales',
+            'code': 'NFS',
+            'type': 'sale',
+            'l10n_latam_use_documents': False,
+        })
+        self.open_new_session(0.0)
+        product1 = self.create_product('Product 1', self.categ_basic, 10, 5)
+        order_data = self.create_ui_order_data(
+            [(product1, 1)],
+            pos_order_ui_args={'invoice_type': 'boleta'},
+            payments=[(self.bank_pm1, 10)],
+            customer=self.partner_sii,
+            is_invoiced=True,
+        )
+        self.env['pos.order'].sync_from_ui([order_data])
+        invoice = self.pos_session.order_ids.account_move
+        self.assertTrue(invoice)
+        self.assertFalse(invoice.l10n_latam_document_type_id)

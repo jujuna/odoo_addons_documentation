@@ -3,8 +3,12 @@
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 
+from odoo import Command
 from odoo.addons.hr_payroll.tests.common import TestPayrollBase
+from odoo.addons.l10n_be_hr_payroll.models.hr_dmfa import DMFAWorkerContribution
+from odoo.addons.l10n_be_hr_payroll.models.utils import format_amount
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 from odoo.tests import tagged
 
@@ -15,6 +19,10 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.be_employee_emp_type = cls.env.ref('hr.contract_type_employee')
+        cls.be_worker_emp_type = cls.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_be_worker')
+        cls.be_apprent_emp_type = cls.env.ref('hr.contract_type_apprenticeship')
+
         cls.be_employee = cls.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495')
         cls.be_worker = cls.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015')
         cls.be_acs = cls.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00484')
@@ -24,6 +32,24 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         cls.category_employee = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010')
         cls.category_horeca = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00017')
         cls.category_food_industry = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00048')
+
+        worker_codes = (
+            cls.be_employee |
+            cls.be_worker |
+            cls.be_acs |
+            cls.be_employee_no_salary_moderation |
+            cls.be_worker_no_salary_moderation
+        )
+
+        categories = (
+            cls.category_employee |
+            cls.category_horeca |
+            cls.category_food_industry
+        )
+
+        categories.write({
+            'allowed_worker_code_ids': [Command.set(worker_codes.ids)]
+        })
 
         cls.cp_200 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
         cls.cp_302 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
@@ -56,6 +82,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
                 'contract_date_end': False,
                 'wage': 1000,
                 'l10n_be_flexi_monthly_wage': 1000,
+                'employee_type_id': cls.be_employee_emp_type.id,
                 'l10n_be_worker_code_id': cls.be_employee.id,
                 'l10n_be_joint_committee_id': cls.cp_200.id,
                 'resource_calendar_id': cls.env.ref('l10n_be_hr_payroll.resource_calendar_std_38h').id,
@@ -134,6 +161,77 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         """
         self.check_condition('ONSS', True)
         self.check_condition_dimona_categories('ONSS', ['dwd', 'o17', 's17', 't17', 'stg', 'tri', 'ivt'], False)
+
+    def test_internship_withholding_tax_rate(self):
+        """ The allowance of the transition internships (Dimona STG and TRI), without ONSS, bears the flat
+        withholding tax rate of 11.11%, as the professional immersion contracts """
+        self.version.contract_date_start = date(2026, 1, 1)
+        self.version.contract_date_end = date(2026, 3, 31)
+        for category in ('stg', 'tri', 'ivt'):
+            self.version.l10n_be_dimona_category = category
+            self.payslip.compute_sheet()
+            values = self.payslip._get_line_values(['ONSS', 'P.P'])
+            self.assertFalse(values['ONSS'][self.payslip.id]['total'], category)
+            self.assertAlmostEqual(values['P.P'][self.payslip.id]['total'], -1000 * 11.11 / 100, 2, msg=category)
+
+    def test_wijninckx_contribution_rate(self):
+        """ The Wijninckx contribution (867) is 3% from 2018 to 2025, 12.5% from the contribution year 2026 """
+        rule = self.env.ref('l10n_be_hr_payroll.l10n_be_employees_salary_onss_employer_867')
+        for date_from, rate in [(date(2025, 12, 1), 3.0), (date(2026, 12, 1), 12.5)]:
+            payslip = self.env['hr.payslip'].create({
+                'name': f'Payslip {date_from}',
+                'date_from': date_from,
+                'employee_id': self.employee.id,
+                'company_id': self.company.id,
+                'struct_id': self.struct.id,
+                'input_line_ids': [Command.create({'salary_rule_id': rule.id, 'amount': 10000})],
+            })
+            payslip.compute_sheet()
+            self.assertAlmostEqual(payslip._get_line_values(['ONSSEMPLOYER_867'])['ONSSEMPLOYER_867'][payslip.id]['total'], 100 * rate, 2)
+
+    def test_cct90_yearly_ceilings(self):
+        """ The ceilings of the CCT 90 bonuses (ONSS: 4255 EUR, withholding tax: 3701 EUR in 2026) are per worker and
+        per calendar year: a second bonus of the year only uses what the first one left """
+        cct90_struct = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90')
+        payslips = self.env['hr.payslip']
+        for month in (3, 9):
+            payslip = self.env['hr.payslip'].create({
+                'name': f'CCT90 2026-{month}',
+                'date_from': date(2026, month, 1),
+                'date_to': date(2026, month, 1) + relativedelta(day=31),
+                'employee_id': self.employee.id,
+                'company_id': self.company.id,
+                'struct_id': cct90_struct.id,
+            })
+            payslip._set_input_value('CCT90BONUSPLAN', 3000)
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+            payslips |= payslip
+        line_values = payslips._get_line_values(
+            ['ONSS_SOLIDARITY_BONUS', 'ONSS_BONUS', 'PP_EXEMP', 'ONSSEMPLOYER_888'], vals_list=['amount', 'total'])
+        first, second = payslips.ids
+        # first bonus: within the ceilings
+        self.assertAlmostEqual(line_values['ONSS_SOLIDARITY_BONUS'][first]['amount'], 3000, 2)
+        self.assertFalse(line_values['ONSS_BONUS'][first]['amount'])
+        self.assertAlmostEqual(line_values['ONSSEMPLOYER_888'][first]['amount'], 3000, 2)
+        # second bonus: 4255 - 3000 = 1255 left below the ONSS ceiling, the rest is remuneration
+        self.assertAlmostEqual(line_values['ONSS_SOLIDARITY_BONUS'][second]['amount'], 1255, 2)
+        self.assertAlmostEqual(line_values['ONSS_BONUS'][second]['amount'], 1745, 2)
+        self.assertAlmostEqual(line_values['ONSSEMPLOYER_888'][second]['amount'], 1255, 2)
+        # the withholding tax exemption of the year is at most 3701
+        first_exemption = -line_values['PP_EXEMP'][first]['total']
+        self.assertLess(first_exemption, 3701)
+        self.assertAlmostEqual(first_exemption - line_values['PP_EXEMP'][second]['total'], 3701, 2)
+
+    def test_restructuring_cap_before_30_follows_s0(self):
+        """ The monthly wage cap of the restructuring reduction for the workers under 30 years is a third of the low
+        wage threshold S0 (category 1) of the structural reduction, at each of its indexations """
+        get_parameter = self.env['hr.rule.parameter']._get_parameter_from_code
+        for date_ref in (date(2024, 7, 1), date(2025, 4, 1), date(2026, 1, 1), date(2026, 7, 1)):
+            self.assertAlmostEqual(
+                get_parameter('onss_restructuring_before_30', date_ref),
+                round(get_parameter('cp200_occupation_deduction_3000_s0', date_ref) / 3, 2),
+                2, msg=str(date_ref))
 
     def test_onss_employee_computation(self):
         """
@@ -458,6 +556,45 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
                 self.assertAlmostEqual(values['PPTOTAL'], -values['HORECA_OCC_PP'], 2, payslip.name)
         self.assertGreater(used, 50, "The third month goes past the worker's contingent")
 
+    def test_horeca_occasional_scale_premium(self):
+        """
+        HORECA_OCC_SCALE_PREMIUM, HORECA_OCC_SCALE_PREMIUM_FLAT
+        The premiums of a Horeca occasional worker taxed at the scale: covered by the flat wage on the days of the
+        worker's contingent, out of the flat rate of withholding tax
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00317')
+        self.version.write({
+            'contract_date_start': date(2026, 4, 1),
+            'l10n_be_dimona_category': 'ext',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00011').id,
+            'l10n_be_joint_committee_id': self.cp_302.id,
+            'wage_type': 'hourly',
+            'hourly_wage': 15.0,
+        })
+        self.version.generate_work_entries(date(2026, 4, 1), date(2026, 4, 30))
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Extra April {premium}',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+            'date_from': date(2026, 4, 1),
+        } for premium in (0, 24)])
+        payslips[1]._set_input_value('HORECA_OCC_SCALE_PREMIUM', 24)
+        payslips.compute_sheet()
+        codes = ['BASIC', 'SALARY', 'GROSS', 'HORECA_OCC_TAXABLE', 'HORECA_OCC_PP', 'HORECA_OCC_SCALE_PREMIUM',
+                 'HORECA_OCC_SCALE_PREMIUM_FLAT']
+        values = payslips._get_line_values(codes)
+        without, with_premium = ({code: values[code][payslip.id]['total'] for code in codes} for payslip in payslips)
+        self.assertEqual(with_premium['HORECA_OCC_SCALE_PREMIUM'], 24)
+        # all the days of the month are flat wage days: the whole premium is covered by the flat wage
+        self.assertEqual(with_premium['HORECA_OCC_SCALE_PREMIUM_FLAT'], 24)
+        self.assertAlmostEqual(with_premium['SALARY'], without['SALARY'], 2)
+        # the flat rate taxes the same pay, the scale taxes the premium
+        self.assertAlmostEqual(with_premium['HORECA_OCC_TAXABLE'], without['HORECA_OCC_TAXABLE'], 2)
+        self.assertAlmostEqual(with_premium['HORECA_OCC_PP'], without['HORECA_OCC_PP'], 2)
+        self.assertFalse(without['GROSS'])
+        self.assertAlmostEqual(with_premium['GROSS'], 24, 2)
+
     def test_horeca_occasional_no_withholding_taxes(self):
         # an occasional Horeca worker without withholding taxes (a cross-border worker) pays neither the flat rate nor
         # the scale
@@ -584,6 +721,20 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.version.l10n_be_worker_code_id = self.be_worker
         self.check_quarter_total('ONSSEMPLOYER_260', [432] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 40 / 100)
 
+    def test_onss_260_quarterly_minimum(self):
+        """
+        ONSSEMPLOYER_260
+        The minimum of the activation contribution (300 EUR under 60 years) is a quarterly one: due once on the
+        quarter, not on each payslip, as in the DmfA
+        """
+        self.employee.birthday = date(2025 - 59, 1, 1)
+        self.version.write({'l10n_be_work_exemption': '2', 'wage': 150})
+        # 150 x 62.5% = 93.75 a month, 281.25 on the quarter: raised to the minimum of 300
+        self.check_quarter_total('ONSSEMPLOYER_260', [300, 0, 0], 300)
+        # 400 x 62.5% = 250 a month, 750 on the quarter: no minimum
+        self.version.wage = 400
+        self.check_quarter_total('ONSSEMPLOYER_260', [300, 200, 250], 750)
+
     def test_onss_450_condition(self):
         """
         ONSSEMPLOYER_450
@@ -608,6 +759,113 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         basic, mobile, holiday_pay = (lines[code][self.payslip.id]['total'] for code in ('BASIC', 'ATN.MOB', 'FLEXI_PECULE'))
         self.assertTrue(mobile)
         self.assertAlmostEqual(holiday_pay, (basic + mobile) * 7.67 / 100, delta=0.005)
+
+        # a benefit in kind without ONSS is no flexi wage: no flexi holiday pay on it
+        self.payslip._set_input_value('ATN_MISC_NO_ONSS', 20)
+        self.payslip.compute_sheet()
+        lines = self.payslip._get_line_values(['ATN_MISC_NO_ONSS', 'FLEXI_PECULE'])
+        self.assertAlmostEqual(lines['ATN_MISC_NO_ONSS'][self.payslip.id]['total'], 20, places=2)
+        self.assertAlmostEqual(lines['FLEXI_PECULE'][self.payslip.id]['total'], holiday_pay, places=2)
+
+    def test_flexi_exemption_cap(self):
+        """
+        FLEXI_EXEMPTION
+        The flexi remuneration is tax exempt up to a yearly cap (18,440 EUR in 2026), without any
+        cap for the legal pensioners. The early retirement status has nothing to do with it.
+        """
+        self.version.write({
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': date(2026, 3, 31),
+            'l10n_be_dimona_category': 'flx',
+        })
+
+        def flexi_exemption(wage, **version_values):
+            self.version.write({'l10n_be_flexi_monthly_wage': wage, **version_values})
+            payslip = self.env['hr.payslip'].create({
+                'name': 'Flexi Payslip',
+                'date_from': '2026-01-01',
+                'employee_id': self.employee.id,
+                'company_id': self.company.id,
+                'struct_id': self.struct.id,
+            })
+            return self.get_total(payslip, 'FLEXI_EXEMPTION'), self.get_total(payslip, 'P.P')
+
+        # Standard cap
+        self.assertAlmostEqual(flexi_exemption(20000)[0], -18440, 2)
+        # Legal pensioner: no cap
+        exemption, withholding_tax = flexi_exemption(20000, l10n_be_is_retired=True)
+        self.assertAlmostEqual(exemption, -21534, 2)
+        self.assertAlmostEqual(withholding_tax, 0, 2)
+        # Early retirement status, not retired: standard cap
+        self.assertAlmostEqual(flexi_exemption(9000, l10n_be_is_retired=False, l10n_be_early_retirement_status=True)[0], -9690.3, 2)
+
+    def test_flexi_exemption_no_cap_before_2024(self):
+        """
+        FLEXI_EXEMPTION
+        The yearly cap of the exemption applies from the income of 2024.
+        """
+        self.version.write({
+            'date_version': date(2023, 1, 1),
+            'contract_date_start': date(2023, 1, 1),
+            'contract_date_end': date(2023, 3, 31),
+            'l10n_be_dimona_category': 'flx',
+            'l10n_be_flexi_monthly_wage': 20000,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Flexi Payslip 2023',
+            'date_from': '2023-01-01',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+        })
+        self.assertAlmostEqual(self.get_total(payslip, 'FLEXI_EXEMPTION'), -21534, 2)
+
+    def test_flexi_exemption_cap_same_period(self):
+        """
+        FLEXI_EXEMPTION
+        A validated flexi payslip ending the same day as the computed one consumes the yearly cap.
+        """
+        self.version.write({
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': date(2026, 3, 31),
+            'l10n_be_dimona_category': 'flx',
+            'l10n_be_flexi_monthly_wage': 10000,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': 'Flexi Payslip %s' % i,
+            'date_from': '2026-01-01',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+        } for i in range(2)])
+        self.assertAlmostEqual(self.get_total(payslips[0], 'FLEXI_EXEMPTION'), -10767, 2)
+        payslips[0].action_payslip_done()
+        self.assertAlmostEqual(self.get_total(payslips[1], 'FLEXI_EXEMPTION'), -(18440 - 10767), 2)
+
+    def test_flexi_hourly_wage_four_decimals(self):
+        # the flexi hourly wage keeps the four decimals of the hourly scale: the hours are paid at that exact rate, the
+        # pay of every day rounded to the cent (22 days of 7.6 hours: 22 x 113.12, not 167.2 x 14.8839 = 2488.59)
+        self.version.write({
+            'contract_date_start': date(2026, 4, 1),
+            'contract_date_end': date(2026, 4, 30),
+            'l10n_be_dimona_category': 'flx',
+            'wage_type': 'hourly',
+            'l10n_be_flexi_hourly_wage': 14.8839,
+        })
+        self.assertEqual(self.version.l10n_be_flexi_hourly_wage, 14.8839)
+        self.version.generate_work_entries(date(2026, 4, 1), date(2026, 4, 30))
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Flexi April',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+            'date_from': date(2026, 4, 1),
+        })
+        payslip.compute_sheet()
+        attendance = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '002.00')
+        self.assertTrue(attendance.number_of_hours)
+        self.assertAlmostEqual(attendance.number_of_hours, 167.2, places=2)
+        self.assertAlmostEqual(attendance.amount, 2488.64, places=2)
 
     def test_onss_450_computation(self):
         """
@@ -885,6 +1143,168 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.payroll_config.onss_importance_code = '5'
         self.check_quarter_total('ONSSEMPLOYER_820', [1.62] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.15 / 100)
 
+    def test_onss_820_construction(self):
+        """
+        ONSSEMPLOYER_820
+        The workers of the construction (category 024) pay the subsistence security fund in percentage: 14.77 % for the
+        employers of less than 20 workers (type 0), 13.27 % from 20 workers (type 5), on the gross remuneration at 108 %
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00024')
+        self.payroll_config.onss_importance_code = '3'  # 10 to 19 workers
+        self.version.write({
+            'l10n_be_worker_code_id': self.be_worker.id,
+            'l10n_be_joint_committee_id': self.construction_sector.id,
+        })
+        self.assertTrue(self.payslip._should_apply_onss_contribution('820'))
+        self.check_condition('ONSSEMPLOYER_820', True)
+        uplift = self.payslip._rule_parameter('worker_onss_calculation_basis_uplift')
+        self.assertEqual(self.payslip._get_fse_percentage_contribution_type(), '0')
+        self.check_quarter_total('ONSSEMPLOYER_820', [159.52, 159.51, 159.52], 3000 * uplift * 14.77 / 100)
+
+        self.payroll_config.onss_importance_code = '4'  # 20 to 49 workers
+        self.assertEqual(self.payslip._get_fse_percentage_contribution_type(), '5')
+        self.check_quarter_total('ONSSEMPLOYER_820', [143.32, 143.31, 143.32], 3000 * uplift * 13.27 / 100)
+
+        # The DmfA declares the contribution with the same type and rate
+        contribution = DMFAWorkerContribution(self.quarter_payslips, 3000 * uplift, date(2026, 1, 1), 820)
+        self.assertEqual(contribution.contribution_type, '5')
+        self.assertEqual(contribution.amount, format_amount(round(3000 * uplift * 13.27 / 100, 2)))
+
+        # The hotel industry keeps its threshold of 50 workers
+        self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.assertEqual(self.payslip._get_fse_percentage_contribution_type(), '0')
+        self.payroll_config.onss_importance_code = '5'
+        self.assertEqual(self.payslip._get_fse_percentage_contribution_type(), '5')
+
+    def test_onss_826_construction_flat_amount(self):
+        """
+        ONSSEMPLOYER_826
+        The contribution to the subsistence security fund of the construction workers (category 024) is a flat amount
+        by quarter (644 euros) prorated on the occupation fraction μ(c): not a remuneration, without the 108% basis of
+        the blue collars
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00024')
+        self.version.write({
+            'l10n_be_worker_code_id': self.be_worker.id,
+            'l10n_be_joint_committee_id': self.construction_sector.id,
+        })
+        self.employee.birthday = date(1990, 1, 1)
+        self.check_condition('ONSSEMPLOYER_826', True)
+        self.quarter_payslips.action_payslip_draft()
+        quarter_total = 0
+        for payslip in self.quarter_payslips:
+            quarter_total += self.get_total(payslip, 'ONSSEMPLOYER_826')
+            payslip.action_payslip_done()
+        mu = self.payslip._calculate_dmfa_occupation_fraction(self.quarter_payslips)
+        self.assertTrue(mu)
+        self.assertAlmostEqual(quarter_total, round(644 * mu / 100, 2), 2)
+
+    @freeze_time('2026-10-27')
+    def test_onss_826_young_worker_age_at_quarter_end(self):
+        """
+        ONSSEMPLOYER_826
+        The flat contribution to the subsistence security fund of the construction workers (category 024) is reduced
+        for the workers younger than 25 (type 2): their age at the end of the quarter of the payslip, not today
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00024')
+        self.version.write({
+            'l10n_be_worker_code_id': self.be_worker.id,
+            'l10n_be_joint_committee_id': self.construction_sector.id,
+        })
+        # 24 years old at the end of the first quarter of 2026, 25 today
+        self.employee.birthday = date(2001, 5, 15)
+        self.check_condition('ONSSEMPLOYER_826', True)
+        self.quarter_payslips.action_payslip_draft()
+        quarter_total = 0
+        for payslip in self.quarter_payslips:
+            quarter_total += self.get_total(payslip, 'ONSSEMPLOYER_826')
+            payslip.action_payslip_done()
+        mu = self.payslip._calculate_dmfa_occupation_fraction(self.quarter_payslips)
+        self.assertTrue(mu)
+        self.assertAlmostEqual(quarter_total, round(444 * mu / 100, 2), 2)
+        self.assertEqual(self.payslip._get_fse_flat_contribution_type(), 2)
+        # The DmfA declares the reduced type
+        contribution = DMFAWorkerContribution(self.quarter_payslips, 3000, date(2026, 1, 1), 826)
+        self.assertEqual(contribution.contribution_type, 2)
+
+        # 25 years old at the end of the quarter
+        self.employee.birthday = date(2001, 3, 31)
+        self.assertEqual(self.payslip._get_fse_flat_contribution_type(), 0)
+
+    def test_l10n_be_employer_category_occasional_worker_merge(self):
+        """
+        Horeca companies no longer need a dedicated payroll configuration for category 317:
+        an employee declared as an occasional worker (DIMONA category "ext") is automatically
+        reported under 317 even though the company is only configured with 017.
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.assertEqual(self.version._l10n_be_get_employer_category_dmfa_code(), '017')
+
+        self.version.l10n_be_dimona_category = 'ext'
+        self.assertEqual(self.version._l10n_be_get_employer_category_dmfa_code(), '317')
+
+        # The merge only applies to employer categories that define an occasional counterpart
+        self.payroll_config.l10n_be_employer_category_id = self.category_employee
+        self.assertEqual(self.version._l10n_be_get_employer_category_dmfa_code(), self.category_employee.dmfa_code)
+
+        # The Existence Security Fund contribution (820) applies to both regular (017) and
+        # occasional (317) Horeca workers, whether the occasional one is declared under a merged
+        # 017 payroll configuration or a dedicated 317 one
+        self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.version.l10n_be_worker_code_id = self.be_worker
+        self.version.l10n_be_dimona_category = False
+        self.assertTrue(self.payslip._should_apply_onss_contribution('820'))
+        self.check_condition('ONSSEMPLOYER_820', True)
+
+        # Occasional workers are declared under their own worker code (011), for which the ONSS
+        # rates/combinations of category 317 are loaded (see common.py)
+        self.version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00011')
+        self.version.l10n_be_dimona_category = 'ext'
+        self.assertTrue(self.payslip._l10n_be_is_horeca_occasional())
+        self.check_condition('ONSSEMPLOYER_820', True)
+        self.assertEqual(self.payslip._get_onss_rates(contribution_type='1'), self.payslip._rule_parameter(
+            'l10n_be_onss_rates_317_011_1', self.payslip.date_to))
+
+        # Without the imported rates of 317 for its worker code, an occasional worker keeps the ones of 017
+        self.version.l10n_be_worker_code_id = self.be_worker
+        self.assertEqual(self.payslip._get_onss_rates(contribution_type='1'), self.payslip._rule_parameter(
+            'l10n_be_onss_rates_017_015_1', self.payslip.date_to))
+        combinations_017 = self.payslip._rule_parameter('l10n_be_onss_combinations_017_015', self.payslip.date_to)
+        self.assertTrue(combinations_017.get('820'))
+        self.assertEqual(self.payslip._get_owedness_codes('820'), combinations_017['820'])
+
+        # The employer category of a payslip is the one of its own payroll configuration (e.g. set manually)
+        self.payslip.payroll_config_id = self.env['payroll.config.settings'].create({
+            'company_id': self.payslip.company_id.id,
+            'date_version': date(2100, 1, 1),
+            'l10n_be_employer_category_id': self.category_employee.id,
+        })
+        self.assertEqual(self.payslip._l10n_be_get_employer_category_dmfa_code(), self.category_employee.dmfa_code)
+        self.assertEqual(self.version._l10n_be_get_employer_category_dmfa_code(), '317')
+
+        # Without employer category
+        self.assertFalse(self.version._l10n_be_get_employer_category_dmfa_code(self.env['l10n.be.employer.category']))
+
+        # The salary scales of the occasional workers (317) can be chosen with a 017 configuration
+        category_317 = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00317')
+        self.assertEqual(category_317.regular_category_id, self.category_horeca)
+        self.assertFalse(self.category_horeca.regular_category_id)
+        occasional_scales = self.env['l10n_be.salary.scale'].search([('employer_category_id', '=', category_317.id)])
+        self.assertTrue(occasional_scales)
+        self.assertEqual(self.env['l10n_be.salary.scale'].search([
+            ('employer_category_id.regular_category_id', '=', self.category_horeca.id),
+        ]), occasional_scales)
+        self.assertFalse(self.env['l10n_be.salary.scale'].search([('employer_category_id.regular_category_id', '=', False)]))
+        self.assertFalse(self.env['l10n_be.salary.scale'].search([
+            ('employer_category_id.regular_category_id', '=', self.category_employee.id),
+        ]))
+
+        # The DmfA worker records of the occasional workers are kept apart from the regular ones of the same worker code
+        state_model = self.env['l10n_be.dmfa.natural_person.state']
+        self.assertEqual(state_model._get_worker_record_key('317', '015', '017'), '317-015')
+        self.assertEqual(state_model._get_worker_record_key('317', '015', '317'), '015')
+        self.assertEqual(state_model._get_worker_record_key('017', '015', '017'), '015')
+
     def test_onss_825_condition(self):
         """
         ONSSEMPLOYER_825
@@ -893,6 +1313,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.assertFalse(self.payslip._should_apply_onss_contribution('825'))
 
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.version.employee_type_id = self.be_worker_emp_type
         self.version.l10n_be_worker_code_id = self.be_worker
         self.assertTrue(self.payslip._should_apply_onss_contribution('825'))
         self.check_condition('ONSSEMPLOYER_825', False)
@@ -946,6 +1367,17 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
                 })
                 self.assertAlmostEqual(self.get_total(self.payslip, rule_code), 0, places=2)
 
+        # Same exclusion of the extras with a payroll configuration dedicated to the occasional workers (317)
+        self.version.write({
+            'l10n_be_worker_code_id': self.be_worker.id,
+            'l10n_be_dimona_category': 'oth',
+            'l10n_be_apprenticeship_contract_number': False,
+        })
+        self.assertTrue(self.payslip._must_contribute_retirement_fund())
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00317')
+        self.version.l10n_be_dimona_category = 'ext'
+        self.assertFalse(self.payslip._must_contribute_retirement_fund())
+
     def test_onss_825_computation(self):
         """
         ONSSEMPLOYER_825
@@ -954,6 +1386,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         # Worker - Contribution Due
         self.payroll_config.l10n_be_worker_retirement_fund = '0'
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.version.employee_type_id = self.be_worker_emp_type
         self.version.l10n_be_worker_code_id = self.be_worker
         self.check_quarter_total('ONSSEMPLOYER_825', [11.88] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.1 / 100)
 
@@ -979,9 +1412,6 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
         self.version.l10n_be_worker_code_id = self.be_acs
-        self.assertTrue(self.payslip._should_apply_onss_contribution('830'))
-        self.check_condition('ONSSEMPLOYER_830', False)
-
         self.version.l10n_be_joint_committee_id = self.cp_302
         self.check_condition('ONSSEMPLOYER_830', True)
         self.check_condition_dimona_categories('ONSSEMPLOYER_830', ['stu', 'ivt', 'flx'], False)
@@ -1061,6 +1491,34 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.check_condition('ONSSEMPLOYER_835', True)
 
         self.check_condition_dimona_categories('ONSSEMPLOYER_835', ['stu', 'ivt', 'flx'], False)
+
+    def test_onss_835_exclusions(self):
+        """
+        ONSSEMPLOYER_835
+        No contribution on the notice indemnity of the notaries (employer category 435), nor for the apprentices of
+        the construction employers (worker code 439, or 495 with an apprenticeship)
+        """
+        self.assertFalse(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00435')
+        self.assertFalse(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        termination_payslip = self.env['hr.payslip'].create({
+            'name': 'Termination Fees',
+            'date_from': '2026-03-01',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees').id,
+        })
+        self.assertTrue(termination_payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00024')
+        self.assertFalse(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        self.assertFalse(termination_payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        self.version.l10n_be_worker_code_id = self.be_employee_no_salary_moderation  # 439
+        self.assertTrue(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        self.version.write({'l10n_be_worker_code_id': self.be_employee.id, 'l10n_be_apprenticeship_contract_number': 'A123'})
+        self.assertTrue(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
+        self.payroll_config.l10n_be_employer_category_id = self.category_food_industry
+        self.assertFalse(self.payslip._l10n_be_is_excluded_from_employee_retirement_fund())
 
     def test_onss_835_computation(self):
         """
@@ -1143,6 +1601,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         """
         self.assertFalse(self.payslip._should_apply_onss_contribution('857'))
 
+        self.version.employee_type_id = self.be_apprent_emp_type
         self.version.l10n_be_worker_code_id = self.be_employee_no_salary_moderation
         self.assertTrue(self.payslip._should_apply_onss_contribution('857'))
         self.check_condition('ONSSEMPLOYER_857', True)

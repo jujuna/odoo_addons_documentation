@@ -39,11 +39,18 @@ class HrEmployee(models.Model):
         return action
 
     def action_generate_offer(self):
+        """Open the form of a new simulation offer for the employee.
+
+        Unlike ``hr.version.action_generate_offer()``, no offer is created: its default values
+        (:meth:`_get_offer_values`) are passed in the context of the action.
+        """
 
         offer_validity_period = self.env['ir.config_parameter'].sudo().get_int(
             'hr_contract_salary.employee_salary_simulator_link_validity') or 30
         offer_values = self._get_offer_values()
-        offer_values['default_validity_days_count'] = offer_validity_period
+        # the validity of the offer is its expiration date (validity_days_count is computed from it)
+        offer_values['default_offer_end_date'] = fields.Date.to_string(
+            fields.Date.add(fields.Date.context_today(self), days=offer_validity_period))
 
         action = self.env['ir.actions.act_window']._for_xml_id('hr_contract_salary.action_hr_offer_new')
         action['domain'] = [('employee_id', 'in', self.id), ('is_simulation_offer', '=', False)]
@@ -56,12 +63,18 @@ class HrEmployee(models.Model):
         return action
 
     def _get_offer_values(self):
+        """Return the default values of the offer opened by :meth:`action_generate_offer`.
+
+        The keys are context keys (``default_<field>``), not field names.
+
+        :rtype: dict
+        """
         self.ensure_one()
         return {
             'default_company_id': self.company_id.id,
             'default_final_yearly_costs': self.final_yearly_costs,
             'default_salary_amount': self.final_yearly_costs,
-            'default_structure_type_id': self.structure_type_id,
+            'default_structure_type_id': self.structure_type_id.id,
             'default_budget_type': 'yearly_employer',
             'default_job_title': self.job_id.name,
             'default_employee_job_id':  self.job_id.id,

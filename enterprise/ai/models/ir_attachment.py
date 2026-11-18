@@ -204,7 +204,7 @@ class IrAttachment(models.Model):
 
     @api.model
     def _get_records_to_embed_domain(self):
-        return super()._get_records_to_embed_domain() & Domain("ai_sources_ids", "!=", False) & Domain("ai_sources_ids.status", "!=", "failed")
+        return super()._get_records_to_embed_domain() & Domain("ai_sources_ids", "!=", False) & Domain("ai_sources_ids.status", "not in", ["failed", "skipped"])
 
     def _get_embedding_models(self):
         self.ensure_one()

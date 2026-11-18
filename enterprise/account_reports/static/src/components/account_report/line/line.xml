@@ -13,6 +13,7 @@
             data-id="line"
             t-att-class="this.lineClasses + (this.shouldHide() ? ' o_hidden' : '')"
             t-ref="this.lineRef"
+            t-att-data-line-id="this.props.line.id"
         >
             <!-- Name column -->
             <t t-component="this.controller.component('AccountReportLineName')" t-props="{

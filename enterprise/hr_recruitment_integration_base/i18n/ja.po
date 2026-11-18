@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
-"PO-Revision-Date: 2026-10-08 13:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-10-27 12:15+0000\n"
 "Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "hr_recruitment_integration_base/ja/>\n"
@@ -48,7 +48,8 @@ msgstr "<span class=\"px-2\">-</span>"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid ""
 "<span class=\"text-muted\" invisible=\"campaign_end_date\">No limit</span>"
-msgstr "<span class=\"text-muted\" invisible=\"campaign_end_date\">制限なし</span>"
+msgstr ""
+"<span class=\"text-muted\" invisible=\"campaign_end_date\">制限なし</span>"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
@@ -454,6 +455,8 @@ msgid "Job Board"
 msgstr "求人情報サイト"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
+#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_kanban
 msgid "Job Board Posts"
 msgstr "求人情報サイト投稿"
@@ -462,12 +465,6 @@ msgstr "求人情報サイト投稿"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Job Boards"
 msgstr "求人情報サイト"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
-#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
-msgid "Job Boards Posts"
-msgstr "求人情報サイト投稿"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_job
@@ -584,8 +581,8 @@ msgstr "次の活動タイプ"
 #: code:addons/hr_recruitment_integration_base/models/hr_recruitment_platform.py:0
 msgid "No API call defined for this platform please contact the administrator"
 msgstr ""
-"このプラットフォームにはAPIコールが定義されていません。管理者までご連絡下さい"
-"。"
+"このプラットフォームにはAPIコールが定義されていません。管理者までご連絡下さ"
+"い。"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -680,12 +677,8 @@ msgstr "更新価格"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.actions.server,name:hr_recruitment_integration_base.action_publish_on_job_board
-msgid "Publish on Job Board"
-msgstr "求人ボードに公開"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
-msgid "Publish on Jobs Board"
+msgid "Publish on Job Board"
 msgstr "求人ボードに公開"
 
 #. module: hr_recruitment_integration_base
@@ -697,8 +690,8 @@ msgstr "求人ボードに公開"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.actions.act_window,help:hr_recruitment_integration_base.action_open_hr_job_post
-msgid "Publish one of our job position to a Jobs Board"
-msgstr "求人ボードに自社の求人情報を掲載する"
+msgid "Publish one of our job positions on a Job Board"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban_search
@@ -810,8 +803,8 @@ msgid ""
 "job             position. The Recruiter is automatically added to all "
 "meetings with the Applicant."
 msgstr ""
-"採用担当者は、この求人ポジションの全ての応募者の採用担当者フィールドの"
-"デフォルト値となります。採用担当者は、応募者との全てのミーティングに自動的に"
+"採用担当者は、この求人ポジションのすべての応募者の採用担当者フィールドのデ"
+"フォルト値となります。採用担当者は、応募者とのすべてのミーティングに自動的に"
 "追加されます。"
 
 #. module: hr_recruitment_integration_base
@@ -841,15 +834,16 @@ msgid ""
 "This action will update the job post on the platform. This action will cost %"
 "(price)s credits. Do you want to continue?"
 msgstr ""
-"このアクションにより、プラットフォーム上の求人情報が更新されます。 この"
-"アクションには %(price)s クレジットがかかります。続けますか?"
+"このアクションにより、プラットフォーム上の求人情報が更新されます。 このアク"
+"ションには %(price)s クレジットがかかります。続けますか?"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__date_from
 msgid ""
 "This will update the applicant's availability status once they are hired for "
 "this position."
-msgstr "このポジションに採用された時点で、応募者の空き状況ステータスが更新されます。"
+msgstr ""
+"このポジションに採用された時点で、応募者の空き状況ステータスが更新されます。"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_exception_decoration
@@ -906,8 +900,17 @@ msgstr "プラットフォームアイコン"
 msgid "updated"
 msgstr "更新済"
 
-msgid "Website Messages"
-msgstr "ウェブサイトメッセージ"
+#~ msgid "Job Boards Posts"
+#~ msgstr "求人情報サイト投稿"
 
-msgid "Website communication history"
-msgstr "ウェブサイト通信履歴"
+#~ msgid "Publish on Jobs Board"
+#~ msgstr "求人ボードに公開"
+
+#~ msgid "Publish one of our job position to a Jobs Board"
+#~ msgstr "求人ボードに自社の求人情報を掲載する"
+
+#~ msgid "Website Messages"
+#~ msgstr "ウェブサイトメッセージ"
+
+#~ msgid "Website communication history"
+#~ msgstr "ウェブサイト通信履歴"

@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from unittest.mock import patch
 
 from lxml import etree
 
@@ -36,9 +37,14 @@ class TestL10nBe28118(TestPayrollCommon):
         return self.env.ref(f'l10n_be_hr_payroll.l10n_be_281_mapping_274_18_{field}')
 
     def _extra_rule(self):
-        return self.income_rule.copy({'name': 'Custom replacement income', 'code': 'REPLACEMENT.CUSTOM'})
+        # Out of the taxable category of the nature, read by the 274.18
+        return self.income_rule.copy({
+            'name': 'Custom replacement income',
+            'code': 'REPLACEMENT.CUSTOM',
+            'category_ids': [Command.unlink(self.env.ref('l10n_be_hr_payroll.TAXABLE_18').id)],
+        })
 
-    def _payslip(self, amounts):
+    def _payslip(self, amounts, **values):
         payslip = self.env['hr.payslip'].create({
             'name': 'Replacement income',
             'employee_id': self.employee.id,
@@ -47,6 +53,7 @@ class TestL10nBe28118(TestPayrollCommon):
             'date_from': date(2026, 1, 1),
             'date_to': date(2026, 1, 31),
             'state': 'validated',
+            **values,
         })
         self.env['hr.payslip.line'].create([{
             'name': rule.name,
@@ -114,9 +121,15 @@ class TestL10nBe28118(TestPayrollCommon):
         fiche = etree.fromstring(bytes(sheet.declaration_id.xml_file)).find('.//Fiche28118')
         self.assertIsNotNone(fiche)
         rounded_values = sheet.with_context(round_281=True)._get_rendering_data(self.employee)['employees_data'][0]
+        skipped_tags = set(sheet.declaration_id.l10n_be_281_18_ids._get_mapping_lines(2025).filtered('skip_if_falsy').mapped('tag'))
         for tag, value in rounded_values.items():
-            if tag.startswith('f18_'):
+            if tag in skipped_tags and not value:
+                self.assertIsNone(fiche.find(tag), tag)
+            elif tag.startswith('f18_'):
                 self.assertEqual(fiche.findtext(tag), str(value))
+        # Belcotax only accepts 598.81 in zone 2081, the optional text zones are left out when empty
+        for tag in ('f18_2081_bonus', 'f18_2102_kas', 'f18_2103_kasvrijaanvullendpensioen', 'f18_2109_fiscaalidentificat'):
+            self.assertIsNone(fiche.find(tag), tag)
         self.assertEqual(fiche.findtext('f18_2064_ziekteofinvaliditeit'), str(int(round(income, 2) * 100)))
         self.assertEqual(fiche.findtext('f18_2070_bedrijfsvoorheffing'), str(int(round(withholding, 2) * 100)))
         self.assertEqual(
@@ -149,6 +162,66 @@ class TestL10nBe28118(TestPayrollCommon):
         self.assertTrue(payslip.line_ids.filtered(lambda line: line.code == 'REPLACEMENT_REVENUE').total)
         self.assertFalse(payslip.line_ids.filtered(lambda line: line.code == 'REPLACEMENT_REVENUE.P.P').total)
 
+    def test_cross_border_workers(self):
+        # The form is due without withholding tax, with the supporting documents of the exemption (zone 2035)
+        self.employee.version_id.l10n_be_resident_situation = 'cross_border'
+        self._sick_days(self._payslip([(self.income_rule, 100)]), 3)
+        values = self._values(self._annual())
+        self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 100)
+        self.assertEqual(values['f18_2070_bedrijfsvoorheffing'], 0)
+        self.assertEqual(values['f18_2035_verantwoordingsstukken'], 1)
+
+    def test_amounts_transferred_from_the_281_10(self):
+        # Without taxable remuneration of the year, the special social security contribution and the personal
+        # pension contributions of the 281.10 are declared on the 281.18 (boxes 8 and 10)
+        self._payslip([(self.income_rule, 100), (self.withholding_rule, -20)])
+        other_employee = self.create_employee([{
+            'name': 'Former Employee',
+            'company_id': self.belgian_company.id,
+            'contract_date_start': date(2025, 1, 1),
+            'niss': '85010100214',
+            'private_street': 'Rue du Test 2',
+            'private_zip': '1000',
+            'private_city': 'Brussels',
+            'l10n_be_legal_first_name': 'Former',
+            'l10n_be_legal_last_name': 'Employee',
+        }])
+        self.env['hr.payslip'].create({
+            'name': 'Special contribution',
+            'employee_id': other_employee.id,
+            'company_id': self.belgian_company.id,
+            'version_id': other_employee.version_id.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'state': 'validated',
+        })
+
+        def transferred_amounts(sheet, employee_payslips, all_line_values):
+            return {other_employee: {
+                'special_contribution': 18.6,
+                'group_insurance': 50.0,
+                'individual_continuation': 5.0,
+                'free_pension': 10.0,
+            }}
+
+        with patch.object(self.env.registry['l10n_be.281_18'], '_get_transferred_281_10_amounts', transferred_amounts):
+            sheet = self._annual()
+            self.assertIn(other_employee, sheet.line_ids.employee_id)
+            data = {
+                values['employee']: values
+                for values in sheet._get_rendering_data(sheet.line_ids.employee_id)['employees_data']
+            }
+        values = data[other_employee]
+        self.assertEqual(values['f18_2071_bijzonderebijdrage'], 18.6)
+        self.assertEqual(values['f18_2068_gewonebijdragen'], 50)
+        self.assertEqual(values['f18_2069_individuelevoortzettingbijdragen'], 5)
+        self.assertEqual(values['f18_2128_vrijaanvullendpensioenwerknemers'], 10)
+        self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 0)
+        self.assertAlmostEqual(values['f18_2059_totaalcontrole'], 18.6 + 50 + 5, 2)
+        values = data[self.employee]
+        self.assertEqual(values['f18_2071_bijzonderebijdrage'], 0)
+        self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 100)
+
     def test_day_count_follows_mapping(self):
         payslip = self._payslip([(self.income_rule, 100)])
         payslip.worked_days_line_ids = [Command.create({
@@ -159,22 +232,63 @@ class TestL10nBe28118(TestPayrollCommon):
         self._mapping('2090').evaluation_value = "result = worked_days['082.00'] * 2"
         self.assertEqual(self._values(self._annual())['f18_2090_dagen'], 6)
 
+    def _sick_days(self, payslip, days):
+        payslip.worked_days_line_ids = [Command.create({
+            'version_id': payslip.version_id.id,
+            'work_entry_type_id': self.env['hr.work.entry.type'].search([('code', '=', '082.00')], limit=1).id,
+            'number_of_days': days,
+        })]
+
+    def test_arrears(self):
+        # The arrears of indemnities are taxable separately: code 272, without their days
+        self.employee.version_id.contract_date_start = date(2025, 1, 1)
+        self._sick_days(self._payslip([(self.income_rule, 100), (self.withholding_rule, -20)]), 3)
+        self._sick_days(self._payslip(
+            [(self.income_rule, 40), (self.withholding_rule, -8)],
+            date_from=date(2025, 6, 1), date_to=date(2025, 6, 30),
+            l10n_be_arrear_salary=True, l10n_be_fiscal_date=date(2026, 1, 31),
+        ), 2)
+        values = self._values(self._annual())
+        self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 100)
+        self.assertEqual(values['f18_2067_belastbareachterstallen'], 40)
+        self.assertEqual(values['f18_2070_bedrijfsvoorheffing'], 28)
+        self.assertEqual(values['f18_2090_dagen'], 3)
+        self.assertEqual(values['f18_2059_totaalcontrole'], 168)
+        # The 274.18 declares the withholding tax of both
+        monthly = self._monthly()
+        self.assertEqual(sum(monthly.mapped('taxable_amount')), 140)
+        self.assertEqual(sum(monthly.mapped('withholding_amount')), 28)
+
+    def test_half_days(self):
+        # Python rounds 2.5 to 2, a half day is rounded up
+        self._sick_days(self._payslip([(self.income_rule, 100)]), 2.5)
+        values = self._values(self._annual())
+        self.assertEqual(values['f18_2090_dagen'], 3)
+        self.assertIsInstance(values['f18_2090_dagen'], int)
+
+    def test_pdf_days(self):
+        self._sick_days(self._payslip([(self.income_rule, 100)]), 3)
+        sheet = self._annual()
+        report_data = sheet._post_process_rendering_data_pdf(sheet._get_rendering_data(self.employee))[self.employee]
+        self.assertEqual(report_data['f18_2090_dagen'], '3 days')
+        self.assertEqual(report_data['f18_2091_dagen'], '0 days')
+
     def test_281_18_mapping_does_not_feed_274_18(self):
         rule = self._extra_rule()
-        self._mapping('2064').salary_rule_ids += rule
+        self._mapping('2064').evaluation_value = "result = mapped_total['REPLACEMENT_REVENUE'] + mapped_total['REPLACEMENT.CUSTOM']"
         self._payslip([(rule, 40)])
         values = self._values(self._annual())
         self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 40)
         self.assertFalse(self._monthly())
 
-    def test_274_18_mapping_does_not_feed_281_18(self):
+    def test_274_18_categories_do_not_feed_281_18(self):
         rule = self._extra_rule()
+        rule.category_ids += self.env.ref('l10n_be_hr_payroll.TAXABLE_18')
+        # Copied with the withholding tax category of the nature
         custom_tax = self.withholding_rule.copy({
             'name': 'Custom replacement withholding',
             'code': 'REPLACEMENT.CUSTOM.PP',
         })
-        self._274_mapping('taxable').salary_rule_ids += rule
-        self._274_mapping('withholding').evaluation_value = "result = -mapped_total['REPLACEMENT.CUSTOM.PP']"
         self._payslip([(rule, 40), (custom_tax, -8)])
         monthly = self._monthly()
         self.assertEqual(monthly.taxable_amount, 40)
@@ -236,6 +350,91 @@ class TestL10nBe28118(TestPayrollCommon):
         # As on the 281.18, the correction cancels the payslip
         self.assertFalse(self._monthly())
 
+    def test_negative_amounts(self):
+        # A correction in 2025 of an indemnity paid in 2024: Belcotax refuses the negative amounts, they are set to
+        # 0 with their days, and the recovery is to be declared by hand
+        self.employee.version_id.contract_date_start = date(2024, 1, 1)
+        self._sick_days(self._payslip(
+            [(self.income_rule, -100), (self.withholding_rule, 20)],
+            date_from=date(2025, 6, 1), date_to=date(2025, 6, 30)), 3)
+        # Only negative amounts: no form, the employee is reported on the declaration
+        sheet = self._annual(2025)
+        self.assertNotIn(self.employee, sheet.line_ids.employee_id)
+        warnings = sheet._get_declaration_warnings()
+        self.assertEqual(len(warnings), 1)
+        self.assertIn('Replacement Employee: only negative amounts', warnings[0])
+
+        # With arrears of indemnities paid during the year, the form declares them, without the negative amounts
+        self._payslip(
+            [(self.income_rule, 40), (self.withholding_rule, -8)],
+            date_from=date(2024, 6, 1), date_to=date(2024, 6, 30),
+            l10n_be_arrear_salary=True, l10n_be_fiscal_date=date(2025, 7, 31))
+        sheet = self._annual(2025)
+        values = self._values(sheet)
+        self.assertEqual(values['f18_2064_ziekteofinvaliditeit'], 0)
+        self.assertEqual(values['f18_2090_dagen'], 0)
+        self.assertEqual(values['f18_2067_belastbareachterstallen'], 40)
+        self.assertEqual(values['f18_2070_bedrijfsvoorheffing'], 0)
+        self.assertEqual(values['f18_2059_totaalcontrole'], 40)
+        declaration = sheet.declaration_id
+        declaration.action_generate_xml()
+        self.assertEqual(declaration.state, 'ready', declaration.error_message)
+        self.assertIn('Replacement Employee', declaration.declaration_warning)
+        self.assertIn('2064, 2070', declaration.declaration_warning)
+        fiche = etree.fromstring(bytes(declaration.xml_file)).find('.//Fiche28118')
+        self.assertEqual(fiche.findtext('f18_2064_ziekteofinvaliditeit'), '0')
+        self.assertEqual(fiche.findtext('f18_2067_belastbareachterstallen'), '4000')
+
+    def test_extra_legal_complements(self):
+        # The extra-legal complements of the employer after the guaranteed salary are replacement income: taxed as
+        # such and declared on the 281.18, the sickness ones in 269, the work accident ones in 270
+        sick_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_sickness_complement')
+        accident_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_work_accident_complement')
+        self.employee.version_id.contract_date_start = date(2025, 1, 1)
+
+        def compute(inputs):
+            payslip = self.env['hr.payslip'].create({
+                'name': 'Complements',
+                'employee_id': self.employee.id,
+                'version_id': self.employee.version_id.id,
+                'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+                'date_from': date(2025, 3, 1),
+                'date_to': date(2025, 3, 31),
+                'input_line_ids': [Command.create({'salary_rule_id': rule.id, 'amount': amount}) for rule, amount in inputs],
+            })
+            payslip.compute_sheet()
+            return payslip, {line.code: line.total for line in payslip.line_ids}
+
+        _payslip, without_complement = compute([])
+        payslip, totals = compute([(sick_rule, 300.0), (accident_rule, 200.0)])
+        self.assertAlmostEqual(totals['REPLACEMENT_REVENUE'] - without_complement.get('REPLACEMENT_REVENUE', 0), 500.0, 2)
+        self.assertAlmostEqual(totals['GROSS'], without_complement['GROSS'], 2)
+        self.assertLess(totals['REPLACEMENT_REVENUE.P.P'], 0)
+        payslip.action_payslip_done()
+
+        values = self._values(self._annual(2025))
+        self.assertAlmostEqual(values['f18_2064_ziekteofinvaliditeit'], totals['REPLACEMENT_REVENUE'] - 200.0, 2)
+        self.assertAlmostEqual(values['f18_2065_beroepsziekte'], 200.0, 2)
+        self.assertAlmostEqual(values['f18_2070_bedrijfsvoorheffing'], -totals['REPLACEMENT_REVENUE.P.P'], 2)
+
+    def test_complementary_indemnity_worker_code(self):
+        # A payslip of a bridging pension (RCC) is declared as remuneration by Odoo: warn on the declarations
+        self.employee.version_id.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00879')
+        self._payslip([(self.income_rule, 100)])
+        report = self.env['l10n_be.274_xx'].with_company(self.belgian_company).create({
+            'year': 2026,
+            'month': '1',
+            'company_id': self.belgian_company.id,
+        })
+        self.assertIn('Replacement Employee', report.l10n_be_complementary_indemnity_warning)
+        sheet = self._annual()
+        self.assertIn('879', sheet.declaration_id.declaration_warning)
+        self.assertIn('Replacement Employee', sheet.declaration_id.declaration_warning)
+
+        self.employee.version_id.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015')
+        sheet = self._annual()
+        self.assertFalse(sheet.declaration_id.declaration_warning)
+
     def _check_274_18_refund(self):
         # A refund carries the negation of the payslip it reverses: it is kept with it and cancels it, as when the
         # payslip is corrected
@@ -264,17 +463,20 @@ class TestL10nBe28118(TestPayrollCommon):
 
     def test_mapping_year_and_fiscal_date(self):
         rule = self._extra_rule()
-        for mapping in self._mapping('2064') | self._274_mapping('taxable'):
-            mapping.date_to = date(2026, 12, 31)
-            mapping.copy({
-                'date_from': date(2027, 1, 1),
-                'date_to': False,
-                'salary_rule_ids': [Command.set(rule.ids)],
-            })
+        mapping = self._mapping('2064')
+        mapping.date_to = date(2026, 12, 31)
+        mapping.copy({
+            'date_from': date(2027, 1, 1),
+            'date_to': False,
+            'evaluation_value': "result = mapped_total['REPLACEMENT.CUSTOM']",
+        })
+        # The 274.18 reads the taxable category of the nature, whatever the year
+        rule.category_ids += self.env.ref('l10n_be_hr_payroll.TAXABLE_18')
         payslip = self._payslip([(rule, 60)])
         self.assertNotIn(self.employee, self._annual().line_ids.employee_id)
-        self.assertFalse(self._monthly())
+        self.assertEqual(self._monthly().taxable_amount, 60)
         payslip.l10n_be_fiscal_date = date(2027, 1, 31)
+        self.assertFalse(self._monthly())
         self.assertEqual(self._values(self._annual(2027))['f18_2064_ziekteofinvaliditeit'], 60)
         self.assertEqual(self._monthly(2027).taxable_amount, 60)
         certificate_sheet = self.env['l10n_be.274_xx'].with_company(self.belgian_company).new({

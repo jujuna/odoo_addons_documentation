@@ -1681,6 +1681,7 @@ class TestWorkOrderProcess(TestWorkOrderProcessCommon):
         """ Plan a workorder and edit the scheduled start date, when we start
         the workorder, the scheduled finish date should be updated"""
         self.env.ref('base.group_user').write({'implied_ids': [(4, self.env.ref('mrp.group_mrp_routings').id)]})
+        self.workcenter_1.resource_id.tz = 'Europe/Brussels'
         mo_form = Form(self.env['mrp.production'])
         mo_form.product_id = self.product_4
         mo_form.bom_id = self.planning_bom

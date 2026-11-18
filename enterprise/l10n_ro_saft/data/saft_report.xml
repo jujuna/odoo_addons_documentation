@@ -31,8 +31,11 @@
         <xpath expr="//MasterFiles/GeneralLedgerAccounts/Account/AccountID" position="attributes">
             <attribute name="t-out">account.code</attribute>
         </xpath>
-        <xpath expr="//MasterFiles/GeneralLedgerAccounts/Account/StandardAccountID" position="attributes">
-            <attribute name="t-out">account.id</attribute>
+        <xpath expr="//StandardAccountID" position="replace">
+            <t t-if="company.account_fiscal_country_id.code != 'RO'">$0</t>
+            <t t-else="">
+                <StandardAccountID t-out="account.id"/>
+            </t>
         </xpath>
 
         <!-- Customers must be shown, even if empty -->
@@ -389,13 +392,16 @@
             <InvoiceNo t-out="move_vals['name']"/>
             <t t-set="partner_info" t-value="partner_detail_map[move_vals['partner_id']]"/>
             <t t-set="partner" t-value="partner_info['partner']"/>
-            <CustomerInfo t-if="'customer' in partner_info['types']">
+            <!-- CustomerInfo and SupplierInfo are an xs:choice in the ANAF schema.
+                 The role comes from the invoice type, not from the partner's global roles. -->
+            <t t-set="is_sale_invoice" t-value="move_vals['type'] in ('out_invoice', 'out_refund')"/>
+            <CustomerInfo t-if="is_sale_invoice">
                 <CustomerID t-out="partner_info['registration_number']"/>
                 <BillingAddress t-foreach="partner_info['addresses']" t-as="partner_address">
                     <t t-call="account_saft.address"/>
                 </BillingAddress>
             </CustomerInfo>
-            <SupplierInfo t-if="'supplier' in partner_info['types']">
+            <SupplierInfo t-else="">
                 <SupplierID t-out="partner_info['registration_number']"/>
                 <BillingAddress t-foreach="partner_info['addresses']" t-as="partner_address">
                     <t t-call="account_saft.address"/>

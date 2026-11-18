@@ -1,6 +1,7 @@
 import { patch } from "@web/core/utils/patch";
 import { EpsonFiscalPrinter } from "../../fiscal_printer/epson_fiscal_printer";
 import { PosTicketPrinterPlugin } from "@point_of_sale/app/plugins/pos_ticket_printer_plugin";
+import { _t } from "@web/core/l10n/translation";
 
 patch(PosTicketPrinterPlugin.prototype, {
     get fiscalPrinter() {
@@ -12,6 +13,39 @@ patch(PosTicketPrinterPlugin.prototype, {
         }
 
         return await super.createPrinterInstance(...arguments);
+    },
+    // The fiscal printer only accepts fiscal XML commands, it cannot print a rendered receipt.
+    async print({ printer }) {
+        if (printer.printer_type === "it_fiscal_printer") {
+            return {
+                successful: false,
+                message: {
+                    title: _t("Printing failed"),
+                    body: _t("The fiscal printer can only print fiscal documents."),
+                },
+            };
+        }
+        return super.print(...arguments);
+    },
+    async printWithFallback({
+        iframe,
+        webFallback = true,
+        download = false,
+        printer = this.defaultPrinter,
+        fallbacks = this.config.receipt_printer_ids,
+    } = {}) {
+        const printers = [printer, ...fallbacks].filter(Boolean);
+        if (
+            !download &&
+            printers.length &&
+            printers.every((p) => p.printer_type === "it_fiscal_printer")
+        ) {
+            if (webFallback) {
+                this.printWeb(iframe);
+            }
+            return;
+        }
+        return super.printWithFallback(...arguments);
     },
     async printOrderReceipt({
         basic = false,

@@ -6,14 +6,15 @@
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 00:38+0000\n"
+"POT-Creation-Date: 2026-11-06 17:48+0000\n"
+"PO-Revision-Date: 2026-11-09 14:35+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "hr_appraisal_survey/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +30,9 @@ msgid ""
 "This module adds an integration with Survey to ask feedbacks to any "
 "employee, based on a survey to fill.\n"
 msgstr ""
+"\n"
+"Bu modül, doldurulacak bir ankete dayalı olarak çalışanlardan geri bildirim "
+"almak üzere Anket modülüyle entegrasyon sağlar.\n"
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
@@ -52,18 +56,18 @@ msgid ""
 "\">\n"
 "                    Dear <t t-out=\"object.partner_id.name or "
 "'participant'\">[participant]</t>,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    As part of our 360° feedback process, <t t-"
 "out=\"ctx.get('logged_user')\">[Current user]</t> would love\n"
 "                    to get your insights on <t t-out=\"ctx.get('employee')"
 "\">[the employee]</t>'s performance.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Your feedback is valuable in helping us recognize "
 "strengths and identify growth opportunities.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    It should only take a few minutes, and you can submit "
 "your feedback via the link below:\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <div style=\"text-align: center; margin: 24px 0;\">\n"
 "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
@@ -75,9 +79,9 @@ msgid ""
 "                    </div>\n"
 "                    Please complete the survey before <t t-"
 "out=\"ctx.get('deadline')\">[the specified deadline]</t>.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Thank you for your time and honesty!\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-if=\"ctx.get('user_body')\">\n"
 "                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
 "                            <t t-out=\"ctx.get('user_body')\">[Optional "
@@ -87,11 +91,49 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+"20px;\">\n"
+"                    Sayın <t t-out=\"object.partner_id.name or "
+"'participant'\">[participant]</t>,\n"
+"                    <br>\n"
+"                    360° geri bildirim sürecimizin bir parçası olarak, <t t-"
+"out=\"ctx.get('logged_user')\">[Current user]</t> <t t-out=\"ctx.get"
+"('employee')\">[the employee]</t> performansı hakkındaki görüşlerinizi almak "
+"istiyor.\n"
+"                    <br>\n"
+"                    Geri bildiriminiz, güçlü yanları fark etmemize ve "
+"gelişim fırsatlarını belirlememize yardımcı olmada çok değerlidir.\n"
+"                    <br>\n"
+"                    Sadece birkaç dakikanızı alacak; geri bildiriminizi "
+"aşağıdaki bağlantı aracılığıyla gönderebilirsiniz:\n"
+"                    <br>\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
+"                        <a t-att-href=\"object.get_start_url()\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"                            Geri bildiriminizi verin\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    Lütfen anketi <t t-out=\"ctx.get('deadline')\">[the "
+"specified deadline]</t> tarihinden önce tamamlayın.\n"
+"                    <br>\n"
+"                    Zamanınız ve dürüstlüğünüz için teşekkür ederiz!\n"
+"                    <br>\n"
+"                    <t t-if=\"ctx.get('user_body')\">\n"
+"                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
+"                            <t t-out=\"ctx.get('user_body')\">[Optional "
+"comment]</t>\n"
+"                        </div>\n"
+"                    </t>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/>Değerlendirmeye git"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
@@ -158,7 +200,7 @@ msgstr "Yeni bir anket ekle"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Add feedback recipients..."
-msgstr ""
+msgstr "Geri bildirim alıcılarını ekle..."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_3
@@ -201,7 +243,7 @@ msgstr "Değerlendirme"
 #. module: hr_appraisal_survey
 #: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
 msgid "Appraisal - Survey"
-msgstr ""
+msgstr "Değerleme - Anket"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
@@ -649,7 +691,7 @@ msgstr "Çalışan Değerlendirmesinin Genel Amacı"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "Partner"
-msgstr ""
+msgstr "İş Ortağı"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_user_input__requested_by
@@ -790,7 +832,7 @@ msgstr "Değerlendirme geri bildirimi toplamak için çalışanlara gönderildi"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
 msgid "Shared with everybody"
-msgstr ""
+msgstr "Herkesle paylaşıldı"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
@@ -1093,19 +1135,18 @@ msgstr "Geri bildirim isteyin"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "at the request of"
-msgstr ""
+msgstr "isteği üzerine"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_fill_form_start
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_page_print
-#, fuzzy
 msgid "for"
 msgstr "için"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "on"
-msgstr ""
+msgstr ":"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view

@@ -20,17 +20,18 @@
 # Murat Durmuş <muratd@projetgrup.com>, 2022
 # Halil, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"PO-Revision-Date: 2026-11-09 16:35+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "sale_renting/tr/>\n"
 "Language: tr\n"
@@ -48,12 +49,16 @@ msgid ""
 "Manage status of products, rentals, delays\n"
 "Manage user and manager notifications\n"
 msgstr ""
+"\n"
+"Ürün kiralamaları (ürünler, teklif­ler, faturalar vb.) belirtin \n"
+"Ürünlerin, kiralamaların, gecikmelerin durumunu yönetin \n"
+"Kullanıcı ve yönetici bildirimlerini yönetin\n"
 
 #. module: sale_renting
 #. odoo-python
 #: code:addons/sale_renting/models/sale_order_line.py:0
 msgid "%(amount)s / %(duration_unit)s"
-msgstr ""
+msgstr "%(amount)s / %(duration_unit)s"
 
 #. module: sale_renting
 #. odoo-python
@@ -108,16 +113,17 @@ msgstr "<strong class=\"d-block mt-3\">Teslimat Adresi</strong>"
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_rental_portal_details
 msgid "<strong class=\"smaller text-uppercase text-muted\">Pick Up</strong>"
 msgstr ""
+"<strong class=\"smaller text-uppercase text-muted\">Teslim Alma</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_rental_portal_details
 msgid "<strong class=\"smaller text-uppercase text-muted\">Return</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">İade</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
 msgid "<strong>Contact:</strong>"
-msgstr ""
+msgstr "<strong>Kişi</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_order_line_gantt_schedule
@@ -127,7 +133,7 @@ msgstr "<strong>Sipariş # — </strong>"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_saleorder_document
 msgid "<strong>Pick-up</strong>"
-msgstr ""
+msgstr "<strong>Teslim Alma</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_order_line_gantt_schedule
@@ -142,7 +148,7 @@ msgstr "<strong>Dönüş — </strong>"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_saleorder_document
 msgid "<strong>Return</strong>"
-msgstr ""
+msgstr "<strong>İade</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_order_line_gantt_schedule
@@ -156,12 +162,14 @@ msgid ""
 "A rental combo product can only contain rental products with the same "
 "periodicity."
 msgstr ""
+"Bir kiralık karma ürün yalnızca aynı periyoda sahip kiralık ürünleri "
+"içerebilir."
 
 #. module: sale_renting
 #. odoo-python
 #: code:addons/sale_renting/models/sale_order_line.py:0
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Bir hata oluştu. Lütfen tekrar deneyin."
 
 #. module: sale_renting
 #. odoo-javascript
@@ -173,12 +181,12 @@ msgstr "İlk olarak, kiralamak için bazı ürünler oluşturalım."
 #: model:ir.ui.menu,name:sale_renting.menu_product_attributes
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Attributes"
-msgstr ""
+msgstr "Nitelikler"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Availabilities"
-msgstr ""
+msgstr "Müsaitlik"
 
 #. module: sale_renting
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_order_line__rental_status__pickup
@@ -191,7 +199,7 @@ msgstr "Rezerve edildi"
 #. module: sale_renting
 #: model:product.attribute,name:sale_renting.pa_breakfast
 msgid "Breakfast"
-msgstr ""
+msgstr "Kahvaltı"
 
 #. module: sale_renting
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_order__rental_status__cancel
@@ -202,7 +210,7 @@ msgstr "İptal Edildi"
 #. module: sale_renting
 #: model:ir.ui.menu,name:sale_renting.menu_product_categories
 msgid "Categories"
-msgstr ""
+msgstr "Kategoriler"
 
 #. module: sale_renting
 #. odoo-javascript
@@ -292,12 +300,12 @@ msgstr "Yeni bir kiralık ürün oluşturun!"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Create standardized offers with default products."
-msgstr ""
+msgstr "Varsayılan ürünlerle standartlaştırılmış teklifler oluşturun."
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_order_action
 msgid "Create your first rental order"
-msgstr ""
+msgstr "İlk kiralama siparişinizi oluşturun"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_rental_order_wizard__create_uid
@@ -377,7 +385,7 @@ msgstr "Gün"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Days during which pickup and return are possible."
-msgstr ""
+msgstr "Teslim alma ve iadenin mümkün olduğu günler."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
@@ -420,6 +428,8 @@ msgstr "Beklenen Getiri"
 msgid ""
 "For nightly rentals, the pickup time must be later than the return time."
 msgstr ""
+"Gece konaklamalı kiralamalarda teslim alma saati, iade saatinden daha geç "
+"olmalıdır."
 
 #. module: sale_renting
 #. odoo-javascript
@@ -430,12 +440,12 @@ msgstr "Siparişler menüsüne gidin."
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Grant discounts on sales order lines."
-msgstr ""
+msgstr "Satış siparişi satırlarında indirim uygulayın."
 
 #. module: sale_renting
 #: model:product.template,description_sale:sale_renting.spa_access_product_template
 msgid "Half-day access to spa facilities including sauna and relaxation area."
-msgstr ""
+msgstr "Sauna ve dinlenme alanı dahil spa tesislerine yarım günlük erişim."
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__has_pickable_lines
@@ -445,7 +455,7 @@ msgstr "Seçilebilir Hatları Var"
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__has_rentable_lines
 msgid "Has Rentable Lines"
-msgstr ""
+msgstr "Kiralanabilir Satırlara Sahiptir"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__has_returnable_lines
@@ -493,7 +503,7 @@ msgstr "Fatura ve Teslim Adresi:"
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order_line__is_product_rentable
 msgid "Is Product Rentable"
-msgstr ""
+msgstr "Ürün Kiralanabilir"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order_line__is_rental
@@ -558,7 +568,7 @@ msgstr "Şimdi bir sipariş oluşturalım."
 #. module: sale_renting
 #: model:product.template,name:sale_renting.luxury_room_template
 msgid "Luxury Room"
-msgstr ""
+msgstr "Lüks Oda"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
@@ -566,21 +576,25 @@ msgid ""
 "Make your quote attractive by adding header pages, product descriptions and "
 "footer pages to your quote."
 msgstr ""
+"Teklifinize kapak sayfaları, ürün açıklamaları ve alt bilgi sayfaları "
+"ekleyerek teklifinizi cazip hale getirin."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Manage Promotions, Coupons, Loyalty cards, Gift cards & eWallet."
 msgstr ""
+"Promosyonları, Kuponları, Sadakat kartlarını, Hediye kartlarını ve e-Cüzdanı "
+"yönetin."
 
 #. module: sale_renting
 #: model:ir.module.module,summary:base.module_sale_renting
 msgid "Manage rental contracts, deliveries and returns"
-msgstr ""
+msgstr "Kira sözleşmelerini, teslimatları ve iadeleri yönetin"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_res_config_settings__module_sale_management_renting
 msgid "Module Sale Management Renting"
-msgstr ""
+msgstr "Satış Yönetimi Kiralama Modülü"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
@@ -597,7 +611,7 @@ msgstr "Sonraki İşlem"
 #. odoo-python
 #: code:addons/sale_renting/const.py:0
 msgid "Night"
-msgstr ""
+msgstr "Gece"
 
 #. module: sale_renting
 #. odoo-python
@@ -609,7 +623,7 @@ msgstr "Geceler"
 #. module: sale_renting
 #: model:product.attribute.value,name:sale_renting.pav_breakfast_no
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.action_rental_report
@@ -619,7 +633,7 @@ msgstr "Henüz veri yok!"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.product_template_form_view_rental
 msgid "Not for Rent"
-msgstr ""
+msgstr "Kiralık Değil"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_order_line_form_schedule
@@ -646,7 +660,7 @@ msgstr "Sipariş #"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_tree
 msgid "Order Date"
-msgstr ""
+msgstr "Sipariş Tarihi"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_rental_order_wizard_line__order_line_id
@@ -662,7 +676,7 @@ msgstr "Siparişler"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "PDF Quote builder"
-msgstr ""
+msgstr "PDF Teklif oluşturucu"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.product_template_form_view_rental
@@ -672,12 +686,12 @@ msgstr "Dönemsellik"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Pick up & Returns"
-msgstr ""
+msgstr "Teslim Alma ve İadeler"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_tree
 msgid "Pick up Date"
-msgstr ""
+msgstr "Teslim Alma Tarihi"
 
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_rental_order_wizard
@@ -726,7 +740,7 @@ msgstr "Alış Makbuzu#"
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__pickup_time
 #: model:ir.model.fields,field_description:sale_renting.field_product_template__pickup_time
 msgid "Pickup Time"
-msgstr ""
+msgstr "Teslim Alma Saati"
 
 #. module: sale_renting
 #: model:ir.actions.report,name:sale_renting.action_report_rental_saleorder
@@ -748,7 +762,7 @@ msgstr "Alıcı:"
 #: code:addons/sale_renting/static/src/js/dashboard/dashboard.js:0
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 msgid "Pickups"
-msgstr ""
+msgstr "Teslim Almalar"
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_order_action
@@ -756,21 +770,23 @@ msgid ""
 "Plan rentals, check product availability and manage pickups and returns all "
 "in one place."
 msgstr ""
+"Kiralama planlayın, ürün uygunluğunu kontrol edin ve teslim alma ve iadeleri "
+"tek bir yerden yönetin."
 
 #. module: sale_renting
 #: model:product.template,name:sale_renting.premium_bike_product_template
 msgid "Premium Bike"
-msgstr ""
+msgstr "Premium Bisiklet"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Prevent selling without a linked product"
-msgstr ""
+msgstr "Bağlı bir ürün olmadan satışı önle"
 
 #. module: sale_renting
 #: model:ir.actions.act_window,name:sale_renting.product_pricelist_item_action_multi_edit
 msgid "Price Rules"
-msgstr ""
+msgstr "Fiyat Kuralları"
 
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_product_pricelist
@@ -780,13 +796,13 @@ msgstr "Fiyat Listesi"
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_product_pricelist_item
 msgid "Pricelist Rule"
-msgstr ""
+msgstr "Fiyat Listesi Kuralı"
 
 #. module: sale_renting
 #: model:ir.ui.menu,name:sale_renting.menu_catalog_pricelists
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Pricelists"
-msgstr ""
+msgstr "Fiyat Listeleri"
 
 #. module: sale_renting
 #: model:product.template,name:sale_renting.printer_template
@@ -842,7 +858,7 @@ msgstr "Projektör"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Promotions, Loyalty & Gift Card"
-msgstr ""
+msgstr "Promosyonlar, Sadakat ve Hediye Kartı"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__qty_in_rent
@@ -866,7 +882,7 @@ msgstr "Teklif Gönderildi"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Quotation Templates"
-msgstr ""
+msgstr "Teklif Şablonları"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_search_view
@@ -879,7 +895,7 @@ msgstr "Teklifler"
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/labeled_field_short_labels.js:0
 msgid "R:"
-msgstr ""
+msgstr "İ:"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__remaining_hours
@@ -917,7 +933,7 @@ msgstr "Kira Analiz Raporu"
 #: model:ir.model.fields,field_description:sale_renting.field_res_company__rental_resource_calendar_id
 #: model:ir.model.fields,field_description:sale_renting.field_res_config_settings__rental_resource_calendar_id
 msgid "Rental Calendar"
-msgstr ""
+msgstr "Kiralık Takvimi"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order_line__rental_color
@@ -928,7 +944,7 @@ msgstr "Kiralık Renk"
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__is_rental_order
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order_line__order_is_rental
 msgid "Rental Order"
-msgstr ""
+msgstr "Kiralama Siparişi"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_rental_order_wizard_line__rental_order_wizard_id
@@ -944,7 +960,7 @@ msgstr "Kiralama Siparişleri"
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__rent_periodicity
 #: model:ir.model.fields,field_description:sale_renting.field_product_template__rent_periodicity
 msgid "Rental Periodicity"
-msgstr ""
+msgstr "Kiralama Periyodu"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_order__rental_return_date
@@ -1019,7 +1035,7 @@ msgstr "Dönüş tarihi"
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__return_time
 #: model:ir.model.fields,field_description:sale_renting.field_product_template__return_time
 msgid "Return Time"
-msgstr ""
+msgstr "İade Saati"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_kanban
@@ -1042,7 +1058,7 @@ msgstr "İade"
 #: code:addons/sale_renting/static/src/js/dashboard/dashboard.js:0
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 msgid "Returns"
-msgstr ""
+msgstr "İadeler"
 
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_sale_order
@@ -1093,13 +1109,13 @@ msgstr "Tarifeli Kiralama"
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/tours/rental.js:0
 msgid "Select the periodicity at which you want to rent this product."
-msgstr ""
+msgstr "Bu ürünü kiralamak istediğiniz periyodu seçin."
 
 #. module: sale_renting
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/tours/rental.js:0
 msgid "Select the product in the list."
-msgstr ""
+msgstr "Listeden ürünü seçin."
 
 #. module: sale_renting
 #. odoo-javascript
@@ -1111,11 +1127,14 @@ msgstr "Kiralık ürününüzü seçin."
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Sell variants of a product using attributes (size, color, etc.)."
 msgstr ""
+"Nitelikleri (beden, renk vb.) kullanarak bir ürünün varyantlarını satın."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Set multiple prices per product, automated discounts, etc."
 msgstr ""
+"Her ürün için birden fazla birim fiyat ve otomatik iskontolar vb. özel "
+"fiyatları ayarlayın."
 
 #. module: sale_renting
 #: model:ir.actions.act_window,name:sale_renting.action_rental_config_settings
@@ -1131,7 +1150,7 @@ msgstr "Müşteri siparişine biraz gecikme maliyeti eklenecektir."
 #. module: sale_renting
 #: model:product.template,name:sale_renting.spa_access_product_template
 msgid "Spa Access"
-msgstr ""
+msgstr "Spa Erişimi"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_search_view
@@ -1188,6 +1207,8 @@ msgstr "Sipariş iade edildi."
 #: model:ir.model.constraint,message:sale_renting.constraint_product_template_check_24h_pickup_and_return_time
 msgid "The pickup and return time must be between 0 and 24h (not included)."
 msgstr ""
+"Teslim alma ve iade saati 0 ile 24 saat arasında olmalıdır (24 saat dahil "
+"değildir)."
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_rental_order_wizard__is_late
@@ -1223,7 +1244,7 @@ msgstr ""
 #: code:addons/sale_renting/static/src/js/dashboard/dashboard.js:0
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 msgid "To Confirm"
-msgstr ""
+msgstr "Onayla"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_order_line_search_schedule
@@ -1235,14 +1256,14 @@ msgstr "Bugün Yapılacak"
 #: code:addons/sale_renting/static/src/js/dashboard/dashboard.js:0
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 msgid "To Invoice"
-msgstr ""
+msgstr "Faturalanacak"
 
 #. module: sale_renting
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/dashboard/dashboard.js:0
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 msgid "Today"
-msgstr ""
+msgstr "Bugün"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_tree
@@ -1303,7 +1324,7 @@ msgstr "Hafta"
 #. module: sale_renting
 #: model:product.attribute.value,name:sale_renting.pav_breakfast_yes
 msgid "Yes"
-msgstr ""
+msgstr "Evet"
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_product_template_action

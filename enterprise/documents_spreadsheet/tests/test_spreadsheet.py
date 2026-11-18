@@ -1,9 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+from unittest.mock import patch
 
 from .common import SpreadsheetTestCommon
 from odoo.addons.base.tests.files import GIF_RAW
+from odoo import Command, fields
 from odoo.exceptions import AccessError
 from odoo.tests import tagged, Form
 from odoo.tests.common import new_test_user
@@ -120,6 +122,42 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         frozen_spreadsheet.action_update_access_rights(access_internal='view', partners={partner: ('view', None)})
         self.assertEqual(frozen_spreadsheet.access_internal, 'view')
         self.assertEqual(frozen_spreadsheet.access_ids.role, 'view')
+
+    def test_revoke_link_access_on_selected_frozen_folder_across_batches(self):
+        manager = new_test_user(
+            self.env, login='frozen_folder_manager',
+            groups='base.group_user,documents.group_documents_manager',
+        )
+        documents = self.env['documents.document']
+        parent = documents.create({
+            'name': 'Parent', 'type': 'folder',
+            'owner_id': self.spreadsheet_user.id,
+            'access_internal': 'none', 'access_via_link': 'edit',
+            'access_ids': [Command.create({
+                'partner_id': manager.partner_id.id, 'role': False,
+                'last_access_date': fields.Datetime.now(),
+            })],
+        })
+        frozen = documents.create({
+            'name': 'Selected frozen folder', 'type': 'folder',
+            'handler': 'frozen_folder', 'folder_id': parent.id,
+            'owner_id': self.spreadsheet_user.id,
+            'access_internal': 'none', 'access_via_link': 'edit',
+            'is_access_via_link_hidden': False, 'access_ids': [],
+        })
+        filler = documents.create({
+            'name': 'Document', 'type': 'url',
+            'url': 'https://example.com', 'owner_id': manager.id,
+            'access_internal': 'none', 'access_via_link': 'edit',
+        })
+        # The selected child lies beyond the first batch, and the caller's
+        # edit permission on it disappears when its parent's link is revoked.
+        selection = (parent + filler + frozen).with_user(manager)
+        self.assertEqual(frozen.with_user(manager).user_permission, 'edit')
+        self.assertFalse(frozen.access_ids.filtered(lambda access: access.partner_id == manager.partner_id))
+        with patch('odoo.addons.documents.models.documents_document.ACCESS_UPDATE_BATCH_SIZE', 2):
+            selection.action_update_access_rights(access_via_link='none')
+        self.assertEqual(set(selection.sudo().mapped('access_via_link')), {'none'})
 
     def test_action_create_shortcut(self):
         self.archive_existing_spreadsheet()

@@ -236,6 +236,30 @@ class TestPlanningHr(TestCommonPlanning):
 
     def test_gantt_progress_bars(self):
         slots, department = self.employee_work_planning_hours_info_tests_data()
+
+        fully_flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Fully Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 0,
+            'hours_per_day': 0,
+        })
+        employee_flex = self.env['hr.employee'].create({
+            'name': 'Flexible Worker',
+            'department_id': department.id,
+            'resource_calendar_id': fully_flexible_calendar.id,
+            'planning_role_ids': self.role_c.ids,
+            'default_planning_role_id': self.role_c.id,
+        })
+        flex_slot = self.env['planning.slot'].create({
+            'resource_ids': employee_flex.resource_id.ids,
+            'start_datetime': datetime(2015, 11, 8, 8, 0),
+            'end_datetime': datetime(2015, 11, 8, 13, 0),
+            'department_id': department.id,
+            'role_id': self.role_c.id,
+        })
+        slots += flex_slot
+
         self.employee_joseph.write({
             'planning_role_ids': self.role_a.ids,
             'default_planning_role_id': self.role_a.id,
@@ -257,14 +281,18 @@ class TestPlanningHr(TestCommonPlanning):
         )
 
         progress_bars = gantt_data['progress_bars']['role_id']
+        progress_bars_res = gantt_data['progress_bars']['resource_ids']
         total_progress_bar = gantt_data['progress_bars']['__default'][False]
+
         self.assertEqual(12, progress_bars[self.role_a.id]['value'], "slots total = 8 + 4 assigned to Joseph")
         self.assertEqual(24, progress_bars[self.role_a.id]['max_value'], "Joseph have role_a")
 
         self.assertEqual(8, progress_bars[self.role_b.id]['value'], "slots total = 8 assigned to Bert")
         self.assertEqual(24, progress_bars[self.role_b.id]['max_value'], "Bert have role_b")
 
-        self.assertEqual(20, total_progress_bar['value'], "sum of value of the last key in progress_bars")
+        self.assertEqual(0.0, progress_bars_res[employee_flex.resource_id.id]['max_value'], "Flexible Worker is fully flexible")
+
+        self.assertEqual(25, total_progress_bar['value'], "sum of value of the last key in progress_bars")
         self.assertEqual(48, total_progress_bar['max_value'], "sum of max_value of the last key in progress_bars")
 
         gantt_data = self.env["planning.slot"].get_gantt_data(
@@ -279,8 +307,24 @@ class TestPlanningHr(TestCommonPlanning):
         progress_bars = gantt_data['progress_bars']['department_id']
         total_progress_bar = gantt_data['progress_bars']['__default'][False]
 
-        self.assertEqual(20, progress_bars[department.id]['value'], "slots total = 20")
+        self.assertEqual(25, progress_bars[department.id]['value'], "slots total = 25")
         self.assertEqual(48, progress_bars[department.id]['max_value'], "Both employees work in this department")
 
-        self.assertEqual(20, total_progress_bar['value'], "sum of value of the last key in progress_bars")
+        self.assertEqual(25, total_progress_bar['value'], "sum of value of the last key in progress_bars")
         self.assertEqual(48, total_progress_bar['max_value'], "sum of max_value of the last key in progress_bars")
+
+    def test_shift_follows_employee_manager_and_department(self):
+        """Check that a shift's manager and department follow the changes made on its employee."""
+        manager_a, manager_b = self.env['hr.employee'].create([{'name': 'Manager A'}, {'name': 'Manager B'}])
+        department_a, department_b = self.env['hr.department'].create([{'name': 'Department A'}, {'name': 'Department B'}])
+        self.employee_bert.write({'parent_id': manager_a.id, 'department_id': department_a.id})
+        slot = self.env['planning.slot'].create({
+            'resource_ids': self.resource_bert.ids,
+            'start_datetime': datetime(2015, 11, 9, 8),
+            'end_datetime': datetime(2015, 11, 9, 17),
+        })
+        self.assertRecordValues(slot, [{'manager_id': manager_a.id, 'department_id': department_a.id}])
+
+        self.employee_bert.write({'parent_id': manager_b.id, 'department_id': department_b.id})
+        self.assertRecordValues(slot, [{'manager_id': manager_b.id, 'department_id': department_b.id}])
+        self.assertEqual(self.env['planning.slot'].search([('manager_id', '=', manager_b.id)]), slot)

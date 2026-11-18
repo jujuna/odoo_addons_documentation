@@ -1,6 +1,7 @@
 from .common import TestAccountReportsCommon
 
 from odoo import fields, Command
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from unittest.mock import patch
@@ -2372,3 +2373,24 @@ class TestReportEngines(TestAccountReportsCommon):
             ],
             options,
         )
+
+    def test_report_line_expression_with_invalid_subformula(self):
+        """Test report generation with an invalid expression subformula raises UserError."""
+        report = self._create_report([
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('14.0'),
+                code='test',
+            ),
+        ])
+        options = self._generate_options(report, '2026-01-01', '2026-12-31')
+
+        for subformula in ('Test', 'round(abc)', 'round(2)Test'):
+            with self.subTest(subformula=subformula):
+                report.line_ids.expression_ids.subformula = subformula
+                with self.assertRaises(UserError) as error:
+                    report.get_report_information(options)
+
+                self.assertEqual(
+                    str(error.exception),
+                    f'Invalid subformula in expression "balance" of line "test_line_1": {subformula}',
+                )

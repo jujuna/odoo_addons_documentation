@@ -51,7 +51,7 @@ class L10nBeMealVouchersReport(models.Model):
     ref = fields.Char(string='Ref')
     employee_count = fields.Integer(string='Employees', compute='_compute_line_item_counts_and_total_value')
     voucher_count = fields.Integer(string='Meal Vouchers', compute='_compute_line_item_counts_and_total_value')
-    total_value = fields.Integer(string='Value', compute='_compute_line_item_counts_and_total_value')
+    total_value = fields.Monetary(string='Value', compute='_compute_line_item_counts_and_total_value')
     currency_id = fields.Many2one(related='company_id.currency_id')
     export_filename_csv = fields.Char()
     export_filename_xlsx = fields.Char()
@@ -149,13 +149,9 @@ class L10nBeMealVouchersReport(models.Model):
                     ('report_id', '=', report.id),
                 ])
             else:
-                company_ids = report.branch_ids.ids
-                if self.env.company.parent_id:
-                    company_ids = self.env.company.id
-
                 report.meal_vouchers_line_ids = self.env['l10n_be.meal.vouchers.line'].sudo().search([
                     ('report_id', '=', False),
-                    ('company_id', 'in', company_ids),
+                    ('company_id', 'in', report.branch_ids.ids),
                     ('year', '=', report.year),
                     ('month', '=', report.month),
                 ])
@@ -237,9 +233,8 @@ class L10nBeMealVouchersReport(models.Model):
             lambda p: line_values['MEAL_V_EMP'][p.id]['total'] < 0)
         return current_month_payslips | previous_month_correction_payslips
 
-    def action_generate_meal_vouchers_report(self):
+    def _get_export_headers_and_rows(self):
         self.ensure_one()
-
         headers = ['Name', 'NISS', 'Value', 'Quantity', 'Total']
         rows = []
         for line in self.meal_vouchers_line_ids.sorted('employee_id'):
@@ -250,13 +245,21 @@ class L10nBeMealVouchersReport(models.Model):
                 line.total,
                 line.total_value,
             ))
+        return headers, rows
 
-        filename = f"{self.year}_{str(self.month).zfill(2)}_MealVoucher"
+    def _get_export_csv_content(self, headers, rows):
         output = io.StringIO()
         writer = csv.writer(output)
         writer.writerow(headers)
         writer.writerows(rows)
-        file_content_csv = output.getvalue().encode('utf-8')
+        return output.getvalue().encode('utf-8')
+
+    def action_generate_meal_vouchers_report(self):
+        self.ensure_one()
+
+        headers, rows = self._get_export_headers_and_rows()
+        filename = f"{self.year}_{str(self.month).zfill(2)}_MealVoucher"
+        file_content_csv = self._get_export_csv_content(headers, rows)
         output = io.BytesIO()
         import xlsxwriter  # noqa: PLC0415
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -294,7 +297,7 @@ class L10nBeMealVouchersReport(models.Model):
         year = str(today.year)
 
         report = self.search([
-            ('company_id', '=', self.company_id.id),
+            ('company_id', '=', self.env.company.id),
             ('month', '=', month),
             ('year', '=', year),
         ], limit=1)
@@ -344,6 +347,15 @@ class L10nBeMealVouchersReport(models.Model):
             ))
         for report in self:
             if target_state == 'done':
+                # The payslips linked to the report are the ones of its current lines: they must be
+                # the ones of the file sent to the issuer, or the vouchers of a payslip validated since
+                # the file was generated would never be ordered.
+                if report.export_file_csv and report.export_file_csv.content != report._get_export_csv_content(
+                        *report._get_export_headers_and_rows()):
+                    raise UserError(self.env._(
+                        'The meal vouchers of %s changed since its file was generated. Generate the file again '
+                        'and send it before marking the report as done.', report.name,
+                    ))
                 report._link_payslips_to_report()
             elif target_state in ('canceled', 'draft') and report.state == 'done':
                 report._unlink_payslips_from_report()
@@ -509,7 +521,7 @@ class L10nBeMealVouchersLine(models.Model):
         current_month_start = date(report_year, report_month, 1)
         if self.report_id and self.report_id.state == 'done':
             payslips = self.env['hr.payslip'].search(_get_payslips_domain(
-                branch_ids=self.report_id.branch_ids,
+                branch_ids=self.report_id.branch_ids.ids,
                 employee_id=self.employee_id.id,
                 date_from=None,
                 prev_date_from=current_month_start,
@@ -518,8 +530,9 @@ class L10nBeMealVouchersLine(models.Model):
             line_values = payslips._get_line_values(['MEAL_V_EMP'])
             return payslips.filtered(lambda p: line_values['MEAL_V_EMP'][p.id]['total'] < 0)
 
+        # The lines of an open report are not linked to it: they are the ones of the payslips of their company
         payslips = self.env['hr.payslip'].search(_get_payslips_domain(
-            branch_ids=self.report_id.branch_ids,
+            branch_ids=self.company_id.ids,
             employee_id=self.employee_id.id,
             date_from=None,
             prev_date_from=current_month_start,

@@ -39,7 +39,7 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
             'company_id': cls.company_id.id,
         })
         account = cls.env['res.partner.bank'].create({
-            'account_number': 'BE02151804051200',
+            'account_number': 'BE68539007547034',
             'bank_name': 'ING',
             'bank_bic': 'BBRUBEBB',
             'partner_id': partner.id,
@@ -109,7 +109,9 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
             ('active', '=', False),
         ])
         self.assertTrue(job_changing_employee.active, 'Employee is active')
-        self.assertTrue(new_version.metro_transport_employee_amount, 300)
-        self.assertTrue(new_version.metro_transport_reimbursed_amount, (300 / 12) * 0.718)
+        self.assertEqual(new_version.metro_transport_employee_amount, 300)
+        self.assertEqual(new_version.metro_transport_employee_kilometer, 8)
         self.assertTrue(new_version.metro_transport_periodicity, 'yearly')
+        # CP 200 subscription priced by distance: reimbursed with the 71.8% train table amount for 8 km
+        self.assertTrue(new_version.metro_transport_reimbursed_amount)
         self.assertEqual(new_version.ip_wage_rate, 0.5, 'The new contract should have an ip_wage_rate of 0.5 (50%)')

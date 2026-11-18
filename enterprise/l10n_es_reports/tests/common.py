@@ -114,5 +114,5 @@ class TestEsAccountReportsCommon(TestAccountReportsCommon):
         options['l10n_es_reports_boe_wizard_id'] = wizard.id
         tax_report_handler = self.env[f'l10n_es.mod{modelo_number}.tax.report.handler']
         boe_file = tax_report_handler.export_boe(options)
-        boe_file['file_content'] = boe_file['file_content'].decode()
+        boe_file['file_content'] = boe_file['file_content']
         return boe_file

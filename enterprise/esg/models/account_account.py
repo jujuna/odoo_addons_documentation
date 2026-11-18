@@ -16,6 +16,8 @@ class AccountAccount(models.Model):
 
     @api.onchange('account_type')
     def _onchange_account_type(self):
+        res = super()._onchange_account_type()
+
         if (
             self._origin.account_type in self.ESG_VALID_ACCOUNT_TYPES
             and self.account_type not in self.ESG_VALID_ACCOUNT_TYPES
@@ -35,6 +37,8 @@ class AccountAccount(models.Model):
                     ),
                 },
             }
+
+        return res
 
     @api.model_create_multi
     def create(self, vals_list):

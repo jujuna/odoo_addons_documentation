@@ -1,0 +1,287 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * ai_marketing_automation
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-11-02 03:19+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
+"ai_marketing_automation/ja/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_marketing_automation
+#: model_terms:ai.prompt.button,prompt:ai_marketing_automation.ai_prompt_help_create_campaign
+msgid ""
+"# Create Campaign - interaction flow\n"
+"\n"
+"This defines how you talk to the user. All campaign construction, consistency and\n"
+"validation rules come from your system prompt and still apply in full.\n"
+"\n"
+"1. Ask one short question about what the campaign is for. No examples, no preamble.\n"
+"\n"
+"2. If their answer already tells you how the campaign should work, acknowledge it in a few\n"
+"   words and go to step 3. Otherwise ask one follow-up about how it should work. Ask only for\n"
+"   what is genuinely missing - never make them repeat something they already said.\n"
+"\n"
+"3. Build it into the campaign this conversation was opened on. Never create a campaign - one\n"
+"   already exists, even if it looks empty. Give it a descriptive title while you are there.\n"
+"   Do not ask for confirmation before the first draft. At most five activities: keep it simple\n"
+"   enough to refine.\n"
+"\n"
+"4. Sort, then verify against your checklist. Do not report success unless it passed.\n"
+"\n"
+"5. Summarise in two or three sentences and ask if they want to change anything.\n"
+"\n"
+"For any follow-up request: edit this same campaign, sort and verify again, then summarise and\n"
+"ask again. Never start a new campaign mid-conversation."
+msgstr ""
+"# キャンペーン作成 - インタラクションフロー\n"
+"\n"
+"これはユーザーとの対話方法を定義します。キャンペーンの構築、整合性、および\n"
+"検証に関するすべてのルールはシステムプロンプトに由来し、引き続き完全に適用さ"
+"れます。\n"
+"\n"
+"1. キャンペーンの目的について、短い質問を1つ行います。例示や前置きは不要です"
+"。\n"
+"\n"
+"2. 回答からキャンペーンの動作方法がすでにわかる場合は、手短に\n"
+"確認の旨を伝えてステップ3へ進みます。そうでない場合は、動作方法について"
+"フォローアップの質問を1つ行います。真に\n"
+"不足している情報のみを質問してください。ユーザーがすでに答えた内容を決して繰"
+"り返させないでください。\n"
+"\n"
+"3. この会話が開始された対象のキャンペーン内に構築します。決してキャンペーンを"
+"新規作成しないでください。たとえ\n"
+"空に見えても、すでに1つ存在しています。その際、わかりやすいタイトルを付けてく"
+"ださい。\n"
+"初稿の前に確認を求めないでください。アクティビティは最大5つまでとし、後から調"
+"整しやすいよう\n"
+"十分にシンプルに保ちます。\n"
+"\n"
+"4. 並べ替えを行い、チェックリストに照らして検証します。合格しない限り成功を報"
+"告しないでください。\n"
+"\n"
+"5. 2〜3文で要約し、変更したい点があるかどうかを尋ねます。\n"
+"\n"
+"6. 以後のいかなるフォローアップリクエストに対しても：この同じキャンペーンを編"
+"集し、再度並べ替えて検証した上で、要約して\n"
+"再度確認してください。会話の途中で新しいキャンペーンを開始することは決してし"
+"ないでください。"
+
+#. module: ai_marketing_automation
+#: model_terms:ai.prompt.button,prompt:ai_marketing_automation.ai_prompt_improve_campaign
+msgid ""
+"# Improve Campaign - interaction flow\n"
+"\n"
+"This defines how you talk to the user. All campaign construction, consistency and\n"
+"validation rules come from your system prompt and still apply in full.\n"
+"\n"
+"Be direct and concise. No compliments, no introductions.\n"
+"\n"
+"1. The campaign is the one this conversation was opened on. Read it first. If the user means\n"
+"   a different campaign, tell them to open that one - never create a campaign here.\n"
+"\n"
+"2. Read its actual configuration - activities, triggers, structure, mailings. Do not reason\n"
+"   from names alone.\n"
+"\n"
+"3. Propose two or three specific improvements as short bullets. Substance only, no cosmetic\n"
+"   changes. Change nothing yet.\n"
+"\n"
+"4. Ask: \"Should I go ahead and apply these changes?\" Wait.\n"
+"\n"
+"5. Once confirmed, apply them to the existing campaign, preserving everything you were not\n"
+"   asked to change.\n"
+"\n"
+"6. Sort, then verify against your checklist. Do not report success unless it passed.\n"
+"\n"
+"7. Summarise what changed in two or three sentences and ask if they want further tweaks.\n"
+"\n"
+"For any follow-up request: edit this same campaign, sort and verify again, then summarise and\n"
+"ask again."
+msgstr ""
+"# キャンペーン改善 - インタラクションフロー\n"
+"\n"
+"これはユーザとの対話方法を定義します。キャンペーンの構築、整合性、および\n"
+"検証に関するすべてのルールはシステムプロンプトに由来し、引き続き完全に適用さ"
+"れます。\n"
+"\n"
+"直接的かつ簡潔に伝えてください。お世辞や前置きは不要です。\n"
+"\n"
+"1. 対象のキャンペーンは、この会話が開始された元のキャンペーンです。まずそれを"
+"読み取ります。ユーザが\n"
+"別のキャンペーンを指している場合は、そのキャンペーンを開くよう伝えてください"
+"。ここでキャンペーンを新規作成してはなりません。\n"
+"\n"
+"2. 実際の設定(活動、トリガ、構造、メーリング)を読み取ります。名前\n"
+"だけで推測しないでください。\n"
+"\n"
+"3. 具体的な改善点を2〜3点、短い箇条書きで提案します。実質的な内容のみとし、表"
+"面的な\n"
+"変更は除外します。この段階ではまだ何も変更しないでください。\n"
+"\n"
+"4.「これらの変更を適用してもよろしいですか？」と尋ねます。待機してください"
+"。\n"
+"\n"
+"5. 確認が取れたら、変更を指示されていない部分はすべて維持したまま、既存の\n"
+"キャンペーンに変更を適用します。\n"
+"\n"
+"6. 並べ替えを行い、チェックリストに照らして検証します。合格しない限り成功を報"
+"告しないでください。\n"
+"\n"
+"7. 変更内容を2〜3文で要約し、さらに微調整が必要かどうかを尋ねます。\n"
+"\n"
+"以後のいかなるフォローアップリクエストに対しても：この同じキャンペーンを編集"
+"し、再度並べ替えて検証した上で、要約して\n"
+"再度確認してください。"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.js:0
+#: code:addons/ai_marketing_automation/static/src/components/systray_action/systray_action_patch.js:0
+msgid "AI Campaign Assistant"
+msgstr "AIキャンペーンアシスタント"
+
+#. module: ai_marketing_automation
+#: model:ir.module.module,shortdesc:base.module_ai_marketing_automation
+msgid "AI Marketing Automation"
+msgstr "AIマーケティングオートメーション"
+
+#. module: ai_marketing_automation
+#: model:ir.model,name:ai_marketing_automation.model_ai_session
+msgid "AI Session"
+msgstr "AIセッション"
+
+#. module: ai_marketing_automation
+#: model:ir.model,name:ai_marketing_automation.model_ai_tool
+msgid "AI Tool"
+msgstr "AIツール"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,name:ai_marketing_automation.ir_actions_check_module_installed
+msgid "AI Tool: Check Module Installed"
+msgstr "AIツール: モジュールのインストール確認"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,name:ai_marketing_automation.ir_actions_delete_campaign_step
+msgid "AI Tool: Delete Step"
+msgstr "AIツール: ステップを削除"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,name:ai_marketing_automation.ir_actions_sort_campaign_steps
+msgid "AI Tool: Sort Steps"
+msgstr "AIツール: ステップを並び替え"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.xml:0
+msgid "AI icon"
+msgstr "AIアイコン"
+
+#. module: ai_marketing_automation
+#: model:ir.model,name:ai_marketing_automation.model_ai_composer
+msgid "AI model configurations (Default Prompt) for text drafting."
+msgstr "文章作成用 AIモデル設定(デフォルトプロンプト)"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.js:0
+msgid "AI service not available."
+msgstr "AIサービスは利用不可です。"
+
+#. module: ai_marketing_automation
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_composer__interface_key
+msgid "Action"
+msgstr "アクション"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.xml:0
+msgid "Ask AI"
+msgstr "Ask AI"
+
+#. module: ai_marketing_automation
+#: model:ir.module.module,description:base.module_ai_marketing_automation
+#: model:ir.module.module,summary:base.module_ai_marketing_automation
+msgid "Automatically create campaigns from livechat."
+msgstr "ライブチャットからキャンペーンを自動作成します。"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.js:0
+msgid "Campaign"
+msgstr "キャンペーン"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_description:ai_marketing_automation.ir_actions_check_module_installed
+msgid "Check if a given module is installed or not."
+msgstr "指定したモジュールがインストールされているかどうかを確認します。"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_thinking_text:ai_marketing_automation.ir_actions_check_module_installed
+msgid "Checking for module availability."
+msgstr "モジュールの利用可否を確認しています。"
+
+#. module: ai_marketing_automation
+#: model:ir.model.fields.selection,name:ai_marketing_automation.selection__ai_composer__interface_key__campaign_builder_ai
+msgid "Create and edit a marketing campaign"
+msgstr "マーケティングキャンペーンを作成・編集"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_description:ai_marketing_automation.ir_actions_delete_campaign_step
+msgid ""
+"Delete a step from a marketing campaign, repairing the surrounding workflow."
+" This is the only supported way to remove a campaign activity."
+msgstr ""
+"周辺のワークフローを修復しながら、マーケティングキャンペーンからステップを削"
+"除します。これはキャンペーン活動を削除する唯一サポートされている方法です。"
+
+#. module: ai_marketing_automation
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_composer__display_name
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_session__display_name
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_tool__display_name
+msgid "Display Name"
+msgstr "表示名"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.js:0
+msgid "Failed to open AI chat."
+msgstr "AIチャットを開けませんでした。"
+
+#. module: ai_marketing_automation
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_composer__id
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_session__id
+#: model:ir.model.fields,field_description:ai_marketing_automation.field_ai_tool__id
+msgid "ID"
+msgstr "ID"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_thinking_text:ai_marketing_automation.ir_actions_delete_campaign_step
+msgid "Removing a campaign step."
+msgstr "キャンペーンステップを削除しています。"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_description:ai_marketing_automation.ir_actions_sort_campaign_steps
+msgid "Sort the activities to be displayed correctly."
+msgstr "活動が正しく表示されるように並べ替えます。"
+
+#. module: ai_marketing_automation
+#: model:ir.actions.server,ai_tool_thinking_text:ai_marketing_automation.ir_actions_sort_campaign_steps
+msgid "Sorting campaign activities."
+msgstr "キャンペーン活動を並べ替えています。"
+
+#. module: ai_marketing_automation
+#. odoo-javascript
+#: code:addons/ai_marketing_automation/static/src/components/campaign_flow_view/campaign_flow_views_ai.xml:0
+msgid "or"
+msgstr "または"

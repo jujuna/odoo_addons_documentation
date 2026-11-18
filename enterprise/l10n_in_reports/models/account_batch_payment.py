@@ -23,7 +23,7 @@ class AccountBatchPayment(models.Model):
             raise UserError(_("Please configure the bank template in the %s Journal to generate the csv file.", journal.name))
         attachment = self.env['ir.attachment'].create({
             'name': f"{self.name}_payorder.csv",
-            'raw': self.get_csv_data(),
+            'raw': self.get_csv_data().encode(),
             'res_model': 'account.batch.payment',
             'res_id': self.id,
         })

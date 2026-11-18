@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-10-21 16:08+0000\n"
+"PO-Revision-Date: 2026-11-02 17:33+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "quality_control/nl/>\n"
@@ -38,6 +38,17 @@ msgid ""
 "tolerance\n"
 "* Define your stages for the quality alerts\n"
 msgstr ""
+"\n"
+"Kwaliteitscontrole\n"
+"=============== \n"
+"\n"
+"* Definieer kwaliteitscontrolepunten die kwaliteitscontroles zullen "
+"genereren, bij productieorders of werkorders (quality_mrp).\n"
+"* Kwaliteitswaarschuwingen kunnen onafhankelijk worden gemaakt of "
+"gerelateerd zijn aan kwaliteitscontroles\n"
+"* Mogelijkheid om een meting toe te voegen aan de kwaliteitscontrole met een "
+"minimale / maximale tolerantie\n"
+"* Definieer je fases voor de kwaliteitswaarschuwingen\n"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -122,7 +133,7 @@ msgstr "<span class=\"o_stat_text\">Kwaliteitscontroles</span>"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.res_partner_view_form_inherit_quality_control
 msgid "<span class=\"o_stat_text\">Quality Rate</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Kwaliteitspercentage</span>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -130,6 +141,9 @@ msgid ""
 "<span class=\"oi o_button_icon\" data-icon=\"troubleshoot\" style=\"padding-"
 "left: 10px;\" role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
 msgstr ""
+"<span class=\"oi o_button_icon\" data-icon=\"troubleshoot\" style=\"padding-"
+"left: 10px;\" role=\"img\" aria-label=\"Statistieken\" "
+"title=\"Statistieken\"/>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -260,7 +274,7 @@ msgstr "Terug"
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_picking_batch
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Batchtransfer"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__check_ids
@@ -270,7 +284,7 @@ msgstr "Controleren"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_move_line_view_list_from_batch
 msgid "Check Quality"
-msgstr ""
+msgstr "Kwaliteit controleren"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__check_state
@@ -324,7 +338,7 @@ msgstr "Afmeting bevestigen"
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__measure_frequency_type
@@ -364,7 +378,7 @@ msgstr "Controle per:"
 #. module: quality_control
 #: model:ir.module.module,summary:base.module_quality_control
 msgid "Control the quality of your products"
-msgstr ""
+msgstr "Controleer de kwaliteit van je producten"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
@@ -384,7 +398,7 @@ msgstr "Waarschuwing maken"
 #. module: quality_control
 #: model:ir.model,website_form_label:quality_control.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "Klant aanmaken"
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_action_check
@@ -515,7 +529,7 @@ msgstr "Bewerken"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Effective Date Last Year"
-msgstr ""
+msgstr "Ingangsdatum vorig jaar"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
@@ -574,7 +588,7 @@ msgstr "Toekomstige activiteiten"
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
+msgstr "HTTP-routing"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__hide_picking_id
@@ -692,7 +706,7 @@ msgstr "Te late activiteiten"
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
 msgid "Lot"
-msgstr ""
+msgstr "Partij"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
@@ -755,7 +769,7 @@ msgstr "Afmeting succes"
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -883,6 +897,13 @@ msgid ""
 "                Lot = A quality check is requested for each new product "
 "quantity registered, with partial quantity checks also possible."
 msgstr ""
+"Bewerking = Eén kwaliteitscontrole wordt gevraagd op het niveau van de "
+"bewerking.\n"
+"                Product = Een kwaliteitscontrole wordt gevraagd per "
+"product.\n"
+"                Partij = Een kwaliteitscontrole wordt gevraagd voor elke "
+"nieuwe geregistreerde producthoeveelheid, waarbij gedeeltelijke "
+"hoeveelheidscontroles ook mogelijk zijn."
 
 #. module: quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_dashboard
@@ -1085,7 +1106,7 @@ msgstr "Kwaliteitscontroleanalyses"
 #: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_check_count
 #: model:ir.model.fields,field_description:quality_control.field_res_users__quality_check_count
 msgid "Quality Check Count"
-msgstr ""
+msgstr "Aantal kwaliteitscontroles"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__quality_check_fail
@@ -1118,7 +1139,7 @@ msgstr "Kwaliteitscontrole hoeveelheid"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__quality_check_todo
 msgid "Quality Check Todo"
-msgstr ""
+msgstr "Kwaliteitscontrole te doen"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
@@ -1189,7 +1210,7 @@ msgstr "Kwaliteitspunten"
 #: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_rate
 #: model:ir.model.fields,field_description:quality_control.field_res_users__quality_rate
 msgid "Quality Rate"
-msgstr ""
+msgstr "Kwaliteitspercentage"
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
@@ -1253,7 +1274,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/quality_control/models/quality_spreadsheet_template.py:0
 msgid "Quality templates"
-msgstr ""
+msgstr "Kwaliteitssjablonen"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_line
@@ -1433,12 +1454,12 @@ msgstr "Succescel"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__supplier_count
 msgid "Supplier Count"
-msgstr ""
+msgstr "Aantal leveranciers"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
 msgid "Suppliers"
-msgstr ""
+msgstr "Leveranciers"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
@@ -1517,7 +1538,7 @@ msgstr ""
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__quality_rate
 msgid "The percentage of quality checks that passed."
-msgstr ""
+msgstr "Het percentage kwaliteitscontroles dat is geslaagd."
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value

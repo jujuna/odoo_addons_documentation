@@ -69,3 +69,26 @@ class TestTaxReturn(TestAccountReportsCommon):
             country_code='NL',
             main_company=self.env.company,
         )
+
+    def test_pay_wizard_uses_new_belastingdienst_bank_account(self):
+        """ The payment wizard uses the bank account of the Belastingdienst in use since 2026-05-01. """
+        tax_return = self.env['account.return'].search([
+            ('type_id', '=', self.basic_return_type.id),
+            ('company_id', '=', self.env.company.id),
+        ], order='date_from', limit=1)
+
+        def assert_pay_wizard_bank_account():
+            action = tax_return._get_pay_wizard()
+            wizard = self.env['l10n_nl_reports.vat.pay.wizard'].browse(action['res_id'])
+            self.assertEqual(wizard.partner_bank_id.sanitized_account_number, 'NL04RABO0200112244')
+
+        assert_pay_wizard_bank_account()
+
+        # Account set by the data of databases installed before the change
+        old_bank_account = self.env.ref('l10n_nl_reports.belastingdienst_current_account')
+        old_bank_account.allow_out_payment = False
+        old_bank_account.account_number = 'NL86INGB0002445588'
+        assert_pay_wizard_bank_account()
+
+        self.basic_return_type.payment_partner_bank_id.action_archive()
+        assert_pay_wizard_bank_account()

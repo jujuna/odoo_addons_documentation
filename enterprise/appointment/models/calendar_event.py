@@ -204,6 +204,11 @@ class CalendarEvent(models.Model):
         Users are still able to force a value if they wish but the assumption is that
         they will prefer resources that fits properly over keeping the current ones.
         """
+        if self.env.context.get('resource_ids') is False:
+            # Avoid suggesting resources if the context requests no resource, as for the "Unassigned" row
+            # of the gantt view.
+            return
+
         for event in self.filtered(lambda event:
             event.appointment_type_schedule_based_on == 'resources'
             and event.appointment_type_manage_capacity

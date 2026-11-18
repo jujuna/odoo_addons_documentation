@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import models, fields, api
+from odoo.addons.l10n_br_avatax.models.account_external_tax_mixin import COUNTRY_TO_AVATAX_CODE, COUNTRY_TO_ALPHA_3_CODE
 
 
 class AccountExternalTaxMixin(models.AbstractModel):
@@ -145,13 +146,17 @@ class AccountExternalTaxMixin(models.AbstractModel):
                 'federalTaxId': partner_shipping_id._get_preferred_legal_entity_identifier_vals().get('value', ''),
                 'address': {
                     'number': partner_shipping_id.street_number,
-                    'street': partner_shipping_id.street,
+                    'street': partner_shipping_id.street_name,
                     'neighborhood': partner_shipping_id.street2,
                     'zipcode': partner_shipping_id.zip,
                     'cityName': partner_shipping_id.city,
                     'state': partner_shipping_id.state_id.code,
+                    'country': COUNTRY_TO_ALPHA_3_CODE.get(partner_shipping_id.country_code, 'BRA'),
+                    'countryCode': COUNTRY_TO_AVATAX_CODE.get(partner_shipping_id.country_code),
                 }
             })
+            if partner_shipping_id.street_number2:
+                locations['rendered']['address']['complement'] = partner_shipping_id.street_number2
 
             if service_operation := params['operation_type'].l10n_br_service_operation_indicator:
                 res['header'].setdefault('services', {})['indOp'] = service_operation

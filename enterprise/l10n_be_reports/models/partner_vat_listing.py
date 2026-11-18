@@ -104,10 +104,8 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
         duplicate_partner_ids = self._get_duplicate_vat_partners_ids(report, options)
         if duplicate_partner_ids:
             warnings['l10n_be_reports.duplicate_partner_vat'] = {
-                'ids': list(duplicate_partner_ids),
+                'vats': list(set(self.env['res.partner'].browse(duplicate_partner_ids).mapped('vat'))),
                 'alert_type': 'warning',
-                'name': _('Duplicate VAT number'),
-                'context': {'search_default_group_by_vat_number': 1},
             }
 
     def action_warning_partners(self, options, params):
@@ -120,6 +118,9 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             'type': 'ir.actions.act_window',
             'context': params.get('context', {}),
         }
+
+    def action_duplicate_vat_partners(self, options, params):
+        return self.env['account.ec.sales.report.handler.common']._get_duplicate_vat_partners(params['vats'])
 
     def _get_duplicate_vat_partners_ids(self, report, options):
         partners_id_vat_map = self._get_accepted_partners_vat_map(report, options)
@@ -320,6 +321,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             vat_amounts_where=vat_amounts_where,
         )
 
+        self.env.flush_all()
         self.env.cr.execute(query)
         return dict(self.env.cr.fetchall())
 

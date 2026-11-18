@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class PlanningSend(models.TransientModel):
@@ -7,18 +7,10 @@ class PlanningSend(models.TransientModel):
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, store=False, export_string_translation=False)
     sending_medium = fields.Selection(related="company_id.planning_medium")
 
-    @api.depends('employee_ids', 'sending_medium')
-    def _compute_employees_no_email(self):
-        whatsapp = self.filtered(lambda p: p.sending_medium == 'whatsapp')
-        super(PlanningSend, self - whatsapp)._compute_employees_no_email()
-        for planning in whatsapp:
-            planning.employees_no_email = planning.employee_ids.filtered(lambda employee: not employee.work_phone)
-
-    def _inverse_employees_no_email(self):
-        whatsapp = self.filtered(lambda p: p.sending_medium == 'whatsapp')
-        super(PlanningSend, self - whatsapp)._inverse_employees_no_email()
-        for planning in whatsapp:
-            planning.employee_ids = planning.employees_no_email + planning.employee_ids.filtered('work_phone')
+    def _get_employee_contact_skipped_message(self):
+        if self.sending_medium != "whatsapp":
+            return super()._get_employee_contact_skipped_message()
+        return self.env._("Shifts published: employees without a work phone number were skipped")
 
     def action_check_emails(self):
         if self.sending_medium != "whatsapp":

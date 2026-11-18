@@ -82,6 +82,36 @@ class TestPayrollEcoVouchersExport(TestPayrollCommon, HttpCase):
             status_value = sheet.cell(row=2, column=last_col_index).value
             self.assertIn(status_value, ['Active', 'End of collaboration'])
 
+    def test_eco_vouchers_export_birth_date_and_language(self):
+        # The birth date is exported as announced in the header (dd/mm/yyyy), left empty when unknown,
+        # and the Belgian languages are exported as such.
+        self.authenticate('admin', 'admin')
+        self.env['res.lang']._activate_lang('nl_BE')
+        employees = self.employee_test | self.employee_a
+        niss_test, niss_a = self.generate_fake_niss(), self.generate_fake_niss()
+        employees[0].write({'lang': 'nl_BE', 'niss': niss_test})
+        employees[1].niss = niss_a
+        employees.write({'birthday': False})
+        employees[0].birthday = date(1990, 1, 31)
+        employees.version_id.l10n_be_joint_committee_id = self.cp200
+        self.create_and_validate_payslips(employees, 2026, [6])
+        wizard = self.env['l10n.be.eco.vouchers.wizard'].with_company(self.belgian_company).create({
+            'company_id': self.belgian_company.id,
+            'reference_year': 2026,
+        })
+        self.assertEqual(wizard.line_ids.employee_id & employees, employees)
+
+        response = self.url_open(f'/export/ecovouchers/{wizard.id}')
+        self.assertEqual(response.status_code, 200)
+        if not load_workbook:
+            return
+        sheet = load_workbook(io.BytesIO(response.content))['Worksheet']
+        rows = {row[0]: row for row in sheet.iter_rows(min_row=2, values_only=True)}
+        row_test, row_a = (rows[niss.replace('.', '').replace('-', '')] for niss in (niss_test, niss_a))
+        self.assertEqual(row_test[7], '31/01/1990')
+        self.assertEqual(row_test[9], 'NL')
+        self.assertFalse(row_a[7].strip())
+
     def test_report_can_only_be_generated_from_root_company(self):
         companies = self.multibranch_company
         with self.assertRaises(UserError):

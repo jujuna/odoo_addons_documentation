@@ -171,3 +171,49 @@ class TestInterCompanySaleToPurchaseWithStock(TestInterCompanyRulesCommonStock):
             {"product_uom_qty": 1, "quantity": 1, "price_unit": 3},
             {"product_uom_qty": 1, "quantity": 1, "price_unit": 2},
         ])
+
+    def test_05_inter_company_delivery_address_transit_sublocation(self):
+        """ Company A sells to Company B with a delivery address whose customer location is a transit
+        sublocation of the inter-company transit. The delivery goes to that sublocation and the receipt
+        of Company B, synchronized with the delivery, takes the goods from it.
+        """
+        self.company_b.write({
+            'intercompany_generate_purchase_orders': True,
+            'intercompany_sync_delivery_receipt': True,
+            'intercompany_document_state': 'posted',
+        })
+        product = self.env['product.product'].create({
+            'is_storable': True,
+            'name': 'Product',
+            'company_id': False,
+        })
+        warehouse_a = self.env['stock.warehouse'].search([('company_id', '=', self.company_a.id)], limit=1)
+        self.env['stock.quant']._update_available_quantity(product, warehouse_a.lot_stock_id, quantity=1)
+        interco_location = self.env.ref('stock.stock_location_inter_company')
+        transit_location = self.env['stock.location'].create({
+            'name': 'Company B Transit',
+            'location_id': interco_location.id,
+            'usage': 'transit',
+            'company_id': False,
+        })
+        # The customer location is company dependent: set it for Company A, the seller
+        delivery_address = self.env['res.partner'].with_company(self.company_a).create({
+            'name': 'Company B Delivery',
+            'parent_id': self.company_b.partner_id.id,
+            'property_stock_customer': transit_location.id,
+        })
+
+        with Form(self.env['sale.order'].with_company(self.company_a)) as sale_form:
+            sale_form.partner_id = self.company_b.partner_id
+            sale_form.partner_shipping_id = delivery_address
+            with sale_form.order_line.new() as line:
+                line.product_id = product
+                line.product_uom_qty = 1
+            sale_to_b = sale_form.save()
+        sale_to_b.with_company(self.company_a).action_confirm()
+        delivery = sale_to_b.picking_ids
+        delivery.with_company(self.company_a).button_validate()
+
+        purchase_from_a = self.env['purchase.order'].with_company(self.company_b).search([('partner_ref', '=', sale_to_b.name)])
+        self.assertRecordValues(delivery.move_line_ids, [{'location_dest_id': transit_location.id, 'quantity': 1}])
+        self.assertRecordValues(purchase_from_a.picking_ids.move_line_ids, [{'location_id': transit_location.id, 'quantity': 1}])

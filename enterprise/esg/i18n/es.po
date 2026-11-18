@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-10-22 18:27+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-10 15:34+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/esg/es/>"
 "\n"
@@ -2940,7 +2940,7 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_governance
 msgid "<strong>Attribute</strong>"
-msgstr ""
+msgstr "<strong>Atributo</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -3695,7 +3695,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "<strong>Name</strong>"
-msgstr ""
+msgstr "<strong>Nombre</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
@@ -4596,7 +4596,7 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b1
 msgid "<strong>Type</strong>"
-msgstr ""
+msgstr "<strong>Tipo</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -5193,10 +5193,10 @@ msgstr ""
 #. module: esg
 #: model:mail.template,body_html:esg.mail_template_esg_metric_ask_feedback
 msgid ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
 "                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+"\"></t>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
@@ -5206,18 +5206,18 @@ msgid ""
 "                            <t t-out=\"logged_user\">[Current user]</t> "
 "invites you to participate in the CSRD double materiality review for <t t-"
 "out=\"company_name\">[Company Name]</t>. We are looking for your input on: "
-"<br/>\n"
+"<br>\n"
 "                            - How the company impacts the environment, "
-"society, and the economy. <br/>\n"
+"society, and the economy. <br>\n"
 "                            - How these impacts could affect the company "
-"financially. <br/>\n"
+"financially. <br>\n"
 "                            Please complete your review by <t t-"
 "out=\"deadline\">[specified deadline]</t> to help us meet CSRD requirements. "
 "Your expertise is important for an accurate assessment. </span>\n"
-"                        <br/> Thank you for your contribution. <br/>\n"
+"                        <br> Thank you for your contribution. <br>\n"
 "                        Best regards, <t t-out=\"logged_user\">[Current "
 "user]</t>\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
 "center;\">\n"
 "                            <a t-att-href=\"object.get_start_url()\" t-attf-"
@@ -5232,45 +5232,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
-"                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
-"                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        </p><p style=\"margin-left:5px\">Estimado/a <t t-"
-"out=\"object.partner_id.name or 'stakeholder'\">[parte interesada]:</t></p>\n"
-"                        <span>\n"
-"                            <t t-out=\"logged_user\">[Usuario actual]</t> te "
-"invita a participar en la evaluación de doble materialidad CSRD de <t t-"
-"out=\"company_name\">[Nombre de la empresa]</t>. Nos gustaría saber qué "
-"opinas sobre: <br/>\n"
-"                            - La manera en la que la empresa genera un "
-"impacto en el medio ambiente, la sociedad y la economía. <br/>\n"
-"                            - La manera en que este impacto podría afectar "
-"financieramente a la empresa. <br/>\n"
-"                            Por favor, completa la evaluación antes del <t t-"
-"out=\"deadline\">[fecha límite]</t> para ayudarnos a cumplir con los "
-"requisitos de la CSRD. Tu conocimiento es clave para garantizar una "
-"evaluación precisa. </span>\n"
-"                        <br/> Gracias por tu colaboración. <br/>\n"
-"                        Atentamente, <t t-out=\"logged_user\">[Usuario "
-"actual]</t>\n"
-"                        <br/><br/>\n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
-"center;\">\n"
-"                            <a t-att-href=\"object.get_start_url()\" t-attf-"
-"style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\">\n"
-"                                Empezar la evaluación\n"
-"                            </a>\n"
-"                        </div>\n"
-"                    \n"
-"                </div>\n"
-"            "
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c1
@@ -5350,7 +5311,7 @@ msgstr "Los datos de la ADEME ya están actualizados."
 #. module: esg
 #: model:ir.model,name:esg.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Grupos de acceso"
 
 #. module: esg
 #: model:res.groups,comment:esg.esg_group_user
@@ -5412,7 +5373,7 @@ msgstr "Tomar medidas"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action_value_history__action_id
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__message_needaction
@@ -5431,7 +5392,7 @@ msgstr "Acción requerida"
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_pivot_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "Actions"
-msgstr ""
+msgstr "Acciones"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -6202,7 +6163,7 @@ msgstr "Número de archivos adjuntos"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "Attachments"
-msgstr ""
+msgstr "Archivos adjuntos"
 
 #. module: esg
 #. odoo-python
@@ -6213,7 +6174,7 @@ msgstr "Auditoría de emisiones"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_metric_ask_feedback__author_id
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #. module: esg
 #: model:ir.model,name:esg.model_factors_auto_assignment_wizard
@@ -6996,6 +6957,8 @@ msgid ""
 "Calculate and report your company's Environmental, Social, and Governance "
 "impact."
 msgstr ""
+"Calcule y informe del impacto Ambiental, Social y de Gobernanza (ESG) de su "
+"compañía."
 
 #. module: esg
 #. odoo-javascript
@@ -7646,7 +7609,7 @@ msgstr "Ordenador"
 #. module: esg
 #: model:ir.model,name:esg.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Ajustes de configuración"
 
 #. module: esg
 #: model:ir.ui.menu,name:esg.menu_esg_configuration
@@ -7836,7 +7799,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor__country_ids
 msgid "Countries"
-msgstr ""
+msgstr "Países"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -8028,7 +7991,7 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
 msgid "Customers"
-msgstr ""
+msgstr "Clientes"
 
 #. module: esg
 #: model_terms:ir.actions.act_window,help:esg.action_view_esg_csrd_report
@@ -8723,7 +8686,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:esg.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:esg.field_res_groups__display_name
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre a mostrar"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b9
@@ -8804,7 +8767,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_kanban_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_search_view
 msgid "Done"
-msgstr ""
+msgstr "Hecho"
 
 #. module: esg
 #: model:ir.model.fields.selection,name:esg.selection__esg_metric__materiality_type__double
@@ -9344,7 +9307,7 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
 msgid "Employees"
-msgstr ""
+msgstr "Empleados"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -10265,7 +10228,7 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_general_information
 msgid "General Information"
-msgstr ""
+msgstr "Información general"
 
 #. module: esg
 #: model_terms:ir.actions.act_window,help:esg.action_view_metrics
@@ -10793,7 +10756,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Icono"
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__activity_exception_icon
@@ -11905,7 +11868,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_metric_ask_feedback__lang
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #. module: esg
 #. odoo-javascript
@@ -12641,6 +12604,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:esg.field_esg_nace__name
 #: model:ir.model.fields,field_description:esg.field_esg_other_emission__name
 #: model:ir.model.fields,field_description:esg.field_esg_tag__name
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_list_view
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_search_view
 msgid "Name"
 msgstr "Nombre"
 
@@ -12946,7 +12911,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:esg.field_esg_metric__notes
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b4
 msgid "Notes"
-msgstr ""
+msgstr "Notas"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__message_needaction_counter
@@ -13476,7 +13441,7 @@ msgstr "Padre"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
 msgid "Parent Company"
-msgstr ""
+msgstr "Compañía padre"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_source__parent_path
@@ -14487,7 +14452,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_search_view
 msgid "Priority"
-msgstr ""
+msgstr "Prioridad"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e3
@@ -15052,12 +15017,12 @@ msgstr "Reemplazar asignaciones existentes"
 #. module: esg
 #: model:ir.ui.menu,name:esg.menu_esg_report
 msgid "Report"
-msgstr ""
+msgstr "Informe"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_report__report_type
 msgid "Report Type"
-msgstr ""
+msgstr "Tipo de informe"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c3
@@ -15683,7 +15648,7 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:esg.action_view_metrics
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_search_view
 msgid "Social"
-msgstr ""
+msgstr "Social"
 
 #. module: esg
 #: model:knowledge.article,template_name:esg.esg_csrd_knowledge_article_template_csrd_appendix_social
@@ -15927,7 +15892,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor__state_ids
 msgid "States"
-msgstr ""
+msgstr "Provincias"
 
 #. module: esg
 #: model:esg.emission.source,name:esg.esg_emission_source_direct_1
@@ -15938,7 +15903,7 @@ msgstr "Combustión estacionaria"
 #: model:ir.model.fields,field_description:esg.field_esg_metric__status
 #: model:ir.model.fields,field_description:esg.field_esg_report__status
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__activity_state
@@ -16300,7 +16265,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:esg.field_esg_metric__tag_ids
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s3
@@ -16367,7 +16332,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Target"
-msgstr ""
+msgstr "Destino"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__target_end_date
@@ -16686,7 +16651,7 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c4
 msgid "Technology"
-msgstr ""
+msgstr "Tecnología"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -18713,7 +18678,7 @@ msgstr "Periodo de validez"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action_value_history__value
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -20882,3 +20847,85 @@ msgid ""
 "“Sensitive areas” typically include Natura 2000, Ramsar sites, UNESCO "
 "reserves, or equivalent national designations."
 msgstr ""
+
+#~ msgid ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/>\n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Dear <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[Stakeholder]</t></p>\n"
+#~ "                        <span>\n"
+#~ "                            <t t-out=\"logged_user\">[Current user]</t> "
+#~ "invites you to participate in the CSRD double materiality review for <t t-"
+#~ "out=\"company_name\">[Company Name]</t>. We are looking for your input "
+#~ "on: <br/>\n"
+#~ "                            - How the company impacts the environment, "
+#~ "society, and the economy. <br/>\n"
+#~ "                            - How these impacts could affect the company "
+#~ "financially. <br/>\n"
+#~ "                            Please complete your review by <t t-"
+#~ "out=\"deadline\">[specified deadline]</t> to help us meet CSRD "
+#~ "requirements. Your expertise is important for an accurate assessment. </"
+#~ "span>\n"
+#~ "                        <br/> Thank you for your contribution. <br/>\n"
+#~ "                        Best regards, <t t-out=\"logged_user\">[Current "
+#~ "user]</t>\n"
+#~ "                        <br/><br/>\n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                                Start the Review\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/>\n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Estimado/a <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[parte interesada]:</t></"
+#~ "p>\n"
+#~ "                        <span>\n"
+#~ "                            <t t-out=\"logged_user\">[Usuario actual]</t> "
+#~ "te invita a participar en la evaluación de doble materialidad CSRD de <t "
+#~ "t-out=\"company_name\">[Nombre de la empresa]</t>. Nos gustaría saber qué "
+#~ "opinas sobre: <br/>\n"
+#~ "                            - La manera en la que la empresa genera un "
+#~ "impacto en el medio ambiente, la sociedad y la economía. <br/>\n"
+#~ "                            - La manera en que este impacto podría "
+#~ "afectar financieramente a la empresa. <br/>\n"
+#~ "                            Por favor, completa la evaluación antes del "
+#~ "<t t-out=\"deadline\">[fecha límite]</t> para ayudarnos a cumplir con los "
+#~ "requisitos de la CSRD. Tu conocimiento es clave para garantizar una "
+#~ "evaluación precisa. </span>\n"
+#~ "                        <br/> Gracias por tu colaboración. <br/>\n"
+#~ "                        Atentamente, <t t-out=\"logged_user\">[Usuario "
+#~ "actual]</t>\n"
+#~ "                        <br/><br/>\n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                                Empezar la evaluación\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "

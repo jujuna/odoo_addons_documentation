@@ -1,5 +1,5 @@
 from odoo import models
-from odoo.tools import format_date
+from odoo.tools import float_repr, float_round, format_date
 
 
 class HrExportWorkEntries(models.TransientModel):
@@ -16,8 +16,8 @@ class HrExportWorkEntries(models.TransientModel):
                 (self.env._('External Code'), lambda args: args['we_collection']['work_entries'][0]['work_entry_type_id']['external_code'] or ''),
                 (self.env._('Employee Name'), lambda args: args['employee_id'].name),
                 (self.env._('Employee Ext. Code'), lambda args: args['employee_id'].external_code or ''),
-                (self.env._('NISS'), lambda args: args['employee_id'].niss),
-                (self.env._('Duration'), lambda args: str(round(int(args['we_collection']['duration'] // 3600), 2))),
+                (self.env._('NISS'), lambda args: args['employee_id'].niss or ''),
+                (self.env._('Duration'), lambda args: float_repr(float_round(args['we_collection']['duration'] / 3600, precision_digits=2), 2)),
             ]
             return columns
         else:

@@ -4,7 +4,7 @@
         <field name="name">l10n_be.281_xx.declaration.view.list</field>
         <field name="model">hr.payroll.employee.declaration</field>
         <field name="arch" type="xml">
-            <list editable="bottom" js_class="employee_declaration_list" create="0" delete="0">
+            <list editable="bottom" js_class="employee_declaration_list" create="0" delete="0" decoration-danger="declaration_error">
                 <field name="employee_id" options="{'no_create': True, 'no_create_edit': True}" readonly="pdf_file" widget="many2one_avatar_employee"/>
                 <field name="pdf_file" readonly="1" filename="pdf_filename" widget="binary"/>
                 <field name="state" widget="badge" column_invisible="parent.state != 'done'"
@@ -12,7 +12,7 @@
                        decoration-success="state == 'pdf_generated'"
                        decoration-primary="state == 'pdf_posted'"
                        decoration-danger="state == 'error'"/>
-                <field name="declaration_error" optional="hide"/>
+                <field name="declaration_error" optional="show"/>
                 <button name="action_print_pdf" type="object" string="Print"
                         invisible="parent.state == 'done'"/>
             </list>

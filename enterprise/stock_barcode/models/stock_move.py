@@ -1,8 +1,19 @@
 
-from odoo import models
+from odoo import api, models
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
+
+    @api.model
+    def action_generate_lot_line_vals(self, context_data, mode, first_lot, count, lot_text):
+        picking_type_id = context_data.get('barcode_picking_type_id')
+        default_generation_mode = context_data.get('barcode_default_generation_mode')
+        if picking_type_id and default_generation_mode in ('all', 'only_one') and self.env.user.has_group('stock_barcode.group_barcode_user'):
+            # Only Inventory manager can update the operation types' settings but the generation
+            # mode must be updated when Barcode users generate lots. In such case, we use sudo.
+            picking_type = self.env['stock.picking.type'].browse(picking_type_id)
+            picking_type.sudo().barcode_default_snln_generation = default_generation_mode
+        return super().action_generate_lot_line_vals(context_data, mode, first_lot, count, lot_text)
 
     def _get_fields_stock_barcode(self):
         return [

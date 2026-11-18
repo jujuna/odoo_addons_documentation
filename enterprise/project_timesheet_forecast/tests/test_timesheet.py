@@ -15,6 +15,14 @@ class TestPlanningTimesheet(TestCommonForecast):
 
         cls.setUpEmployees()
         cls.setUpProjects()
+        for group in ("hr_timesheet.group_hr_timesheet_approver", "project.group_project_user"):
+            cls.planning_manager_user.group_ids += cls.env.ref(group)
+        cls.slot_bert_horizon = cls.env["planning.slot"].create({
+            "resource_ids": cls.resource_bert.ids,
+            "project_id": cls.project_horizon.id,
+            "start_datetime": datetime(2025, 1, 22, 8, 0, 0),
+            "end_datetime": datetime(2025, 1, 22, 17, 0, 0),
+        })
 
     def test_gantt_progress_bar_group_by_project(self):
         """
@@ -83,6 +91,18 @@ class TestPlanningTimesheet(TestCommonForecast):
             'date': date(2024, 1, 15),
         })
         self.assertEqual(slot.effective_hours, 2)
+
+    def test_open_timesheets_domain_without_hr_rights(self):
+        self.assertFalse(self.planning_manager_user.has_group("hr.group_hr_user"))
+        slot = self.slot_bert_horizon.with_user(self.planning_manager_user)
+        action = slot.action_open_timesheets()
+        self.assertIn(("employee_id", "in", self.employee_bert.ids), list(action["domain"]))
+
+    def test_open_timesheets_default_employee_without_hr_rights(self):
+        self.assertFalse(self.planning_manager_user.has_group("hr.group_hr_user"))
+        slot = self.slot_bert_horizon.with_user(self.planning_manager_user)
+        action = slot.action_open_timesheets()
+        self.assertEqual(action["context"]["default_employee_id"], self.employee_bert.id)
 
     def test_planning_analysis_report_fields(self):
         ''' This test ensure that the fields of the planning analysis report are correctly computed'''

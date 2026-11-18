@@ -96,6 +96,11 @@
         <field name="company_id" ref="base.demo_company_nl"/>
     </record>
 
+    <record id="nl_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_nl"/>
+    </record>
+
     <record id="hr_employee_wouter" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_wouter')).name"/>
         <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
@@ -125,7 +130,7 @@
         <field name="study_field">Mechanical Engineering</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_nl_hr_payroll.res_partner_bank_account_wouter'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_nl_hr_payroll.nl_hr_job_developer"/>
         <field name="department_id" ref="l10n_nl_hr_payroll.nl_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_nl_hr_payroll.structure_type_employee_nl"/>
         <field name="wage_type">monthly</field>
@@ -168,7 +173,7 @@
         <field name="study_field">Computer Science</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_nl_hr_payroll.res_partner_bank_account_lotte'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_nl_hr_payroll.nl_hr_job_developer"/>
         <field name="department_id" ref="l10n_nl_hr_payroll.nl_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_nl_hr_payroll.structure_type_employee_nl"/>
         <field name="wage_type">monthly</field>

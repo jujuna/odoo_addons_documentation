@@ -315,7 +315,7 @@ const salaryConfigTourPersonalInfo = () => [
         },
     },
     {
-        trigger: 'span[name="Gross"][value="2671.14"]',
+        trigger: 'span[name="Gross"][value="2665.81"]',
     },
     {
         content: "Take Extra-Legal Leaves",
@@ -333,7 +333,7 @@ const salaryConfigTourPersonalInfo = () => [
         run: "edit 10 && click label:contains(Bus)",
     },
     {
-        trigger: 'span[name="Gross"][value="2610.38"]',
+        trigger: 'span[name="Gross"][value="2604.69"]',
     },
 ];
 
@@ -409,7 +409,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "click",
         },
         {
-            trigger: 'span[name="Gross"][value="2671.14"]',
+            trigger: 'span[name="Gross"][value="2665.81"]',
         },
         {
             content: "Unchoose a car",
@@ -430,7 +430,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 10 && click label:contains(bus)",
         },
         {
-            trigger: 'span[name="Gross"][value="2972.49"]',
+            trigger: 'span[name="Gross"][value="2972.04"]',
         },
         {
             content: "Unchoose Public Transportation",
@@ -451,7 +451,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 60 && click label:contains(train)",
         },
         {
-            trigger: 'span[name="Gross"][value="2913.05"]',
+            trigger: 'span[name="Gross"][value="2911.64"]',
         },
         {
             content: "Unchoose Train Transportation",
@@ -467,7 +467,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 150 && click label:contains(private)",
         },
         {
-            trigger: 'span[name="Gross"][value="2892.42"]',
+            trigger: 'span[name="Gross"][value="2890.67"]',
         },
         {
             content: "Change km_home_work on personal info",
@@ -475,7 +475,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 75 && click label.col-form-label:contains(Company Car)",
         },
         {
-            trigger: 'span[name="Gross"][value="2934.17"]',
+            trigger: 'span[name="Gross"][value="2933.1"]',
         },
         {
             content: "Reset 150 km",
@@ -483,7 +483,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 150 && click label.col-form-label:contains(Company Car)",
         },
         {
-            trigger: 'span[name="Gross"][value="2892.42"]',
+            trigger: 'span[name="Gross"][value="2890.67"]',
         },
         {
             content: "Unchoose Private Car Transportation",
@@ -499,7 +499,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "click",
         },
         {
-            trigger: 'span[name="Gross"][value="2982.81"]',
+            trigger: 'span[name="Gross"][value="2982.53"]',
         },
         {
             content: "Choose Bike 2",
@@ -507,7 +507,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "selectByLabel Bike 2",
         },
         {
-            trigger: 'span[name="Gross"][value="2965.61"]',
+            trigger: 'span[name="Gross"][value="2965.06"]',
         },
         {
             content: "Choose Bike 1",
@@ -515,7 +515,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "selectByLabel Bike 1",
         },
         {
-            trigger: 'span[name="Gross"][value="2982.81"]',
+            trigger: 'span[name="Gross"][value="2982.53"]',
         },
         {
             content: "Unchoose Bike",
@@ -531,7 +531,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 0 && click label:contains(Internet)",
         },
         {
-            trigger: 'span[name="Gross"][value="3026.13"]',
+            trigger: 'span[name="Gross"][value="3027.43"]',
         },
         {
             content: "Reset Internet",
@@ -548,7 +548,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "click",
         },
         {
-            trigger: 'span[name="Gross"][value="2671.14"]',
+            trigger: 'span[name="Gross"][value="2665.81"]',
         },
         {
             content: "Take Fuel Card",
@@ -556,7 +556,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "range 250",
         },
         {
-            trigger: 'span[name="Gross"][value="2499.2"]',
+            trigger: 'span[name="Gross"][value="2491.09"]',
         },
         {
             content: "Untake Fuel Card",
@@ -564,7 +564,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "range 0",
         },
         {
-            trigger: 'span[name="Gross"][value="2671.14"]',
+            trigger: 'span[name="Gross"][value="2665.81"]',
         },
         {
             content: "Unchoose a car",
@@ -651,7 +651,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_sign_again", {
             expectUnloadPage: true,
         },
         {
-            trigger: 'span[name="Gross"][value="2934.97"]',
+            trigger: 'span[name="Gross"][value="2934.54"]',
         },
         {
             content: "Choose a car",
@@ -669,7 +669,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_sign_again", {
             },
         },
         {
-            trigger: 'span[name="Gross"][value="2610.38"]',
+            trigger: 'span[name="Gross"][value="2604.69"]',
         },
         ...salaryConfigTourSubmitAndSign()
     ],
@@ -1299,7 +1299,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_with_mobility_b
             run: "range 10",
         },
         {
-            trigger: 'span[name="Gross"][value="2532.67"]',
+            trigger: 'span[name="Gross"][value="2527.21"]',
         },
         {
             content: "Take Mobility Budget",
@@ -1307,22 +1307,17 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_with_mobility_b
             run: "click",
         },
         {
-            trigger: 'span[name="Gross"][value="2524.11"]',
+            // the mobility budget is computed after the other values
+            trigger: 'input[name="l10n_be_mobility_budget_amount_monthly"]:value(509.92)',
         },
         {
-            trigger: 'span[name="Net"][value="2166"]',
+            trigger: 'span[name="Gross"][value="2532.72"]',
         },
         {
-            trigger: 'span[name="Employer Cost"][value="56359.8"]',
+            trigger: 'span[name="Net"][value="1994.44"]',
         },
         {
-            trigger: 'body',
-            run: function () {
-                var input = this.anchor.querySelector('input[name="l10n_be_mobility_budget_amount_monthly"]');
-                if (input.value != '508.19') {
-                    throw new Error("Mobility Budget Amount is not correct.");
-                }
-            },
+            trigger: 'span[name="Employer Cost"][value="53752.2"]',
         },
         ...salaryConfigTourSubmitAndSign()
     ],

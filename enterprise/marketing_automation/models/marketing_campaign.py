@@ -454,7 +454,10 @@ class MarketingCampaign(models.Model):
                 marketing_activity_id.parent_id = old_to_new.get(
                     marketing_activity_id.parent_id)
             # TDE note: add unit tests
-            new_campaign.marketing_activity_ids.mass_mailing_id.campaign_id = new_campaign.utm_campaign_id
+            new_campaign.marketing_activity_ids.mass_mailing_id.write({
+                'campaign_id': new_campaign.utm_campaign_id,
+                'state': 'done'
+            })
 
         return new_campaigns
 

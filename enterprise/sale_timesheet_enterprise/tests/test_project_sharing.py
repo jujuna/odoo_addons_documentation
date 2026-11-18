@@ -91,24 +91,29 @@ class TestProjectSharing(TestProjectSharingCommon):
         # 3) Check if the portal user can see the timesheets into that task
         # The portal user is added to the followers of the task to enable its read access to it.
         task.message_subscribe(partner_ids=self.user_portal.partner_id.ids)
-        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids'])
+        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids', 'portal_timesheet_ids'])
         self.assertEqual(len(task_read_with_portal_user[0]['timesheet_ids']), 2, 'The external collaborator should see the both timesheets created in that task.')
+        self.assertEqual(len(task_read_with_portal_user[0]['portal_timesheet_ids']), 2, 'The external collaborator should see the both timesheets created in that task.')
 
         # 4) Change the "Invoicing Policy" in Timesheets app. That is set `sale.invoiced_timesheet` to 'approved'
         self.env['ir.config_parameter'].sudo().set_str('sale.invoiced_timesheet', 'approved')
+        task.invalidate_recordset(['portal_timesheet_ids'])
 
         # 5) Check if the portal user can see no timesheets into the task.
-        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids'])
+        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids', 'portal_timesheet_ids'])
         self.assertFalse(task_read_with_portal_user[0]['timesheet_ids'], 'The external collaborator should see no timesheets into that task since the timesheets are not validated.')
+        self.assertFalse(task_read_with_portal_user[0]['portal_timesheet_ids'], 'The external collaborator should see no timesheets into that task since the timesheets are not validated.')
 
         # 6) Validate at least a timesheet related to that task.
         timesheet1 = timesheets[0]
         timesheet1.action_validate_timesheet()
+        task.invalidate_recordset(['portal_timesheet_ids'])
         self.assertTrue(timesheet1.validated, 'The timesheet should be validated')
 
         # 7) Check if the portal user can see the validated timesheet(s) into that task.
-        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids'])
+        task_read_with_portal_user = task.with_user(self.user_portal).read(['timesheet_ids', 'portal_timesheet_ids'])
         self.assertEqual(len(task_read_with_portal_user[0]['timesheet_ids']), 1, 'The external collaborator should only see the timesheet validated into that task and not all timesheets.')
+        self.assertEqual(len(task_read_with_portal_user[0]['portal_timesheet_ids']), 1, 'The external collaborator should only see the timesheet validated into that task and not all timesheets.')
 
     def test_project_sharing_remaining_hours(self):
         project_shared = self.project_portal

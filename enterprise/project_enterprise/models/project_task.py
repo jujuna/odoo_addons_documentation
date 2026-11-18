@@ -2008,15 +2008,17 @@ class ProjectTask(models.Model):
             :return: A dictionary with the field_name of tasks as key and list of records.
         """
         results = {}
-        project_id = self.env.context.get('default_project_id', False)
-        # get domains
+        project_ids = [default_id] if (default_id := self.env.context.get('default_project_id')) else False
+        if not project_ids and (task_domain := self.env.context.get('gantt_task_domain')):
+            project_ids = self.env['project.task']._search(task_domain).subselect(SQL('project_id'))
+
         result_domains = self._prepare_domains_for_all_deadlines(date_start, date_end)
         project_domain = Domain(result_domains['project'])
         milestone_domain = Domain(result_domains['milestone'])
 
-        if project_id:
-            project_domain &= Domain('id', '=', project_id)
-            milestone_domain &= Domain('project_id', '=', project_id)
+        if project_ids:
+            project_domain &= Domain('id', 'in', project_ids)
+            milestone_domain &= Domain('project_id', 'in', project_ids)
         results['project_id'] = self.env['project.project'].search_read(
             project_domain,
             ['id', 'name', 'date', 'date_start']

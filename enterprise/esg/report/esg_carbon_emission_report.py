@@ -9,6 +9,7 @@ class EsgCarbonEmissionReport(models.Model):
     _name = 'esg.carbon.emission.report'
     _description = 'ESG Carbon Emissions Report'
     _auto = False
+    _rec_names_search = ['name', 'product_id']
 
     date = fields.Date(required=True)
     date_end = fields.Date()
@@ -87,6 +88,12 @@ class EsgCarbonEmissionReport(models.Model):
         for emission in self:
             if not emission._origin.id or emission._origin.id > 0:
                 emission.currency_id = emission.esg_emission_factor_id.currency_id
+
+    @api.depends('product_id', 'name')
+    @api.depends_context('lang')
+    def _compute_display_name(self):
+        for emission in self:
+            emission.display_name = ' - '.join(filter(None, [emission.product_id.display_name, emission.name]))
 
     def _other_emission_select(self):
         return SQL("""

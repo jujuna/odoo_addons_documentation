@@ -37,6 +37,7 @@ class HrApplicant(models.Model):
             applicant.salary_offers_count = mapped_data.get(applicant.id, 0)
 
     def _move_to_hired_stage(self):
+        """Move the applicant to the first *Hired* recruitment stage of its job (if any)."""
         self.ensure_one()
         first_hired_stage = self.env['hr.recruitment.stage'].search([
             '|',
@@ -80,6 +81,7 @@ class HrApplicant(models.Model):
         return action
 
     def archive_applicant(self):
+        """Refuse the offers of the applicants before refusing them."""
         message = _("The offer has been marked as refused when the linked applicant was declined.")
         refuse_reason = self.env.ref("hr_contract_salary.refusal_reason_others", raise_if_not_found=False)
 
@@ -87,6 +89,13 @@ class HrApplicant(models.Model):
         return super().archive_applicant()
 
     def action_generate_offer(self):
+        """Create an offer for the applicant and open it.
+
+        The offer is created from :meth:`_get_offer_values`, with ``offer_end_date`` set from
+        the ``hr_contract_salary.access_token_validity`` parameter (30 by default).
+
+        :raise UserError: if the applicant has no name.
+        """
         if not self.partner_name:
             raise UserError(_('Offer link can not be sent without an applicant name.'))
 
@@ -94,7 +103,8 @@ class HrApplicant(models.Model):
             'hr_contract_salary.access_token_validity') or 30
         offer_values = self._get_offer_values()
 
-        offer_values['validity_days_count'] = offer_validity_period
+        # the validity of the offer is its expiration date (validity_days_count is computed from it)
+        offer_values['offer_end_date'] = fields.Date.add(fields.Date.context_today(self), days=offer_validity_period)
         offer = self.env['hr.contract.salary.offer'].with_context(
             default_contract_template_id=self._get_contract_template().id).create(offer_values)
 
@@ -117,6 +127,13 @@ class HrApplicant(models.Model):
         }
 
     def _get_offer_values(self):
+        """Return the values of the offer created by :meth:`action_generate_offer`.
+
+        The contract template is :meth:`_get_contract_template`, and its ``final_yearly_costs``
+        is the initial yearly employer budget.
+
+        :rtype: dict
+        """
         self.ensure_one()
         contract_template = self._get_contract_template()
         return {
@@ -132,6 +149,10 @@ class HrApplicant(models.Model):
         }
 
     def _get_contract_template(self):
+        """Return the contract template of the job, else any contract template of the company.
+
+        :rtype: hr.version
+        """
         contract_template = self.job_id.contract_template_id if self.job_id else False
         if not contract_template:
             contract_template = self.env['hr.version'].search(domain=[

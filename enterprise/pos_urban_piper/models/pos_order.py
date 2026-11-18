@@ -176,13 +176,12 @@ class PosOrder(models.Model):
             _("Aggregator Discount: %(currency)s %(value)s", currency=pos_config.currency_id.symbol, value=discount.get('value'))
             for discount in discounts_data if not discount.get('is_merchant_discount')
         ])
-        pos_reference, tracking_number = pos_config._get_next_order_refs()
+        pos_reference = pos_config._get_next_order_refs()[0]
         aggregator = urbanpiper_store.aggregator_lines.filtered_domain([('delivery_provider_id', '=', pos_delivery_provider.id)])
         store_preset = urbanpiper_store.preset_id
         pos_order = self.create({
             'partner_id': aggregator._get_order_customer(data['customer']).id,
             'pos_reference': pos_reference,
-            'tracking_number': tracking_number,
             'config_id': pos_config.id,
             'session_id': pos_config.current_session_id.id,
             'company_id': pos_config.company_id.id,
@@ -512,7 +511,7 @@ class PosOrder(models.Model):
             aggregators.filtered_domain([('delivery_provider_id', '=', self.delivery_provider_id.id)]).payment_method_id
             or aggregators.payment_method_id[0]
         )
-        self.env['pos.make.payment'].with_context({'active_id': self.id}).create({
+        self.env['pos.make.payment'].sudo().with_context({'active_id': self.id}).create({
             'amount': self.amount_total,
             'payment_method_id': payment_method.id,
         }).check()

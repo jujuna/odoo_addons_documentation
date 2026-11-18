@@ -247,6 +247,15 @@
         <field name="company_id" ref="base.demo_company_mx"/>
     </record>
 
+    <record id="mx_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_mx"/>
+    </record>
+    <record id="mx_hr_job_trainee" model="hr.job">
+        <field name="name">Trainee</field>
+        <field name="company_id" ref="base.demo_company_mx"/>
+    </record>
+
     <record id="base.hr_employee_cesar" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_cesar')).name"/>
         <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
@@ -278,7 +287,7 @@
         <field name="l10n_mx_ssn">20008509461</field>
         <field name="registration_number">001</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_cesar'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -323,7 +332,7 @@
         <field name="l10n_mx_ssn">20804909461</field>
         <field name="registration_number">002</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_cecilia'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -374,7 +383,7 @@
         <field name="l10n_mx_ssn">20997609461</field>
         <field name="registration_number">003</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_xochilt'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -419,7 +428,7 @@
         <field name="l10n_mx_ssn">20926709461</field>
         <field name="registration_number">004</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_karla'))]"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -464,7 +473,7 @@
         <field name="l10n_mx_ssn">12218029094</field>
         <field name="registration_number">005</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_maria'))]"/>
-        <field name="job_id" ref="hr.job_trainee"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_trainee"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -509,7 +518,7 @@
         <field name="l10n_mx_ssn">45908012345</field>
         <field name="registration_number">006</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_felix'))]"/>
-        <field name="job_id" ref="hr.job_trainee"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll.mx_hr_job_trainee"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>

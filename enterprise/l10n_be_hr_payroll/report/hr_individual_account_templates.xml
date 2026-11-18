@@ -32,11 +32,11 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Joint committee</td>
-                                                    <td>200.000</td>
+                                                    <td><span t-out="report_data['version'].l10n_be_joint_committee_id.egov3_code"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Name of the joint committee</td>
-                                                    <td>Joint committee for employees</td>
+                                                    <td><span t-out="report_data['version'].l10n_be_joint_committee_id.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Social security organization</td>
@@ -44,7 +44,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>ONSS Number</td>
-                                                    <td><span t-field="payroll_config_id.l10n_be_employer_category_id.dmfa_code"/><span t-field="payroll_config_id.onss_registration_number"/></td>
+                                                    <td><span t-out="report_data['version']._l10n_be_get_employer_category_dmfa_code(payroll_config_id.l10n_be_employer_category_id)"/><span t-field="payroll_config_id.onss_registration_number"/></td>
                                                 </tr>
                                                 <tr t-if="report_data['version'].is_employee()">
                                                     <td>Accident insurance organization</td>
@@ -130,7 +130,10 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Professional qualification</td>
-                                                    <td><span t-out="report_data['version'].l10n_be_salary_scale_id.name"/></td>
+                                                    <td>
+                                                        <span t-if="report_data['version'].l10n_be_salary_scale_id" t-out="report_data['version'].l10n_be_salary_scale_id.name"/>
+                                                        <span t-elif="report_data['version'].display_l10n_be_scale">Unknown</span>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Entry date</td>

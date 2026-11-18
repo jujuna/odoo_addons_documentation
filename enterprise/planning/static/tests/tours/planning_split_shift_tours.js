@@ -2,10 +2,9 @@ import { registry } from "@web/core/registry";
 
 async function splitPill(helpers, index = 0) {
     const pillEl = helpers.anchor;
-    if (pillEl.parentElement.dataset.pillId === "__pill__8") {
-        pillEl.scrollIntoView({ block: "end" });
-        await new Promise(requestAnimationFrame);
-    }
+    // The split tool relies on elementsFromPoint, so the pill must be in the viewport
+    pillEl.scrollIntoView({ block: "center", inline: "center" });
+    await new Promise(requestAnimationFrame);
     const style = getComputedStyle(pillEl.parentElement); // wrapper style
     const first = +style.getPropertyValue("grid-column-start").slice(1);
     const last = +style.getPropertyValue("grid-column-end").slice(1);
@@ -13,8 +12,25 @@ async function splitPill(helpers, index = 0) {
     const { width, height } = pillEl.getBoundingClientRect();
     const position = { x: ((index + 1) * width) / span, y: height / 2 };
     await helpers.hover(pillEl, { position, relative: true });
-    await new Promise(requestAnimationFrame);
-    helpers.click(pillEl, { position, relative: true });
+    // The pill click only splits if the split tool is already rendered at the hovered position
+    // (hover computation is throttled, and a stale tool may come from the scroll above)
+    const rowStart = style.getPropertyValue("grid-row-start");
+    const splitCol = first + index + 1;
+    await helpers.waitUntil(
+        () => {
+            const toolEl = document.querySelector(".o_gantt_pill_split_tool");
+            if (!toolEl) {
+                return false;
+            }
+            const toolStyle = getComputedStyle(toolEl);
+            return (
+                toolStyle.getPropertyValue("grid-row-start") === rowStart &&
+                +toolStyle.getPropertyValue("grid-column-start").slice(1) === splitCol
+            );
+        },
+        { timeout: 2000 }
+    );
+    await helpers.click(pillEl, { position, relative: true });
 }
 
 registry.category("web_tour.tours").add('planning_split_shift_week', {

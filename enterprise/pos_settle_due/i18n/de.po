@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:48+0000\n"
-"PO-Revision-Date: 2026-10-19 11:33+0000\n"
+"POT-Creation-Date: 2026-10-30 17:49+0000\n"
+"PO-Revision-Date: 2026-11-04 12:35+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "pos_settle_due/de/>\n"
@@ -50,13 +50,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "Are you sure you want to cancel the settlement process?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie den Abrechnungsprozess abbrechen möchten?"
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "Cancel Settlement"
-msgstr ""
+msgstr "Abrechnung abbrechen"
 
 #. module: pos_settle_due
 #: model:ir.model,name:pos_settle_due.model_res_company
@@ -87,6 +87,12 @@ msgstr "Kreditlimit:"
 
 #. module: pos_settle_due
 #. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
+msgid "Deposit Money"
+msgstr "Geld einzahlen"
+
+#. module: pos_settle_due
+#. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Deposit money"
 msgstr "Geld einzahlen"
@@ -95,19 +101,19 @@ msgstr "Geld einzahlen"
 #. odoo-python
 #: code:addons/pos_settle_due/models/res_partner.py:0
 msgid "Deposit money from PoS session %s"
-msgstr ""
+msgstr "Geld aus Kassensitzung %s einzahlen"
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Deposit successful."
-msgstr ""
+msgstr "Einzahlung erfolgreich."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Deposit:"
-msgstr ""
+msgstr "Einzahlung:"
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -139,7 +145,7 @@ msgstr "Fällig"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Due:"
-msgstr ""
+msgstr "Fällig:"
 
 #. module: pos_settle_due
 #: model:ir.model.fields,field_description:pos_settle_due.field_account_move__id
@@ -154,7 +160,7 @@ msgstr "ID"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/payment_screen/payment_screen.js:0
 msgid "Invalid Payment"
-msgstr ""
+msgstr "Ungültige Zahlung"
 
 #. module: pos_settle_due
 #: model_terms:ir.ui.view,arch_db:pos_settle_due.due_account_move_list_view
@@ -165,7 +171,7 @@ msgstr "Rechnungsdatum"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Invoice(s) settled successfully."
-msgstr ""
+msgstr "Rechnung(en) erfolgreich beglichen."
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -184,6 +190,8 @@ msgstr "Journalbuchung"
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Pay later payments cannot be used when settling invoices."
 msgstr ""
+"Zahlungen mit der Zahlungsmethode „Später bezahlen“ können beim Begleichen "
+"von Rechnungen nicht verwendet werden."
 
 #. module: pos_settle_due
 #: model:ir.model,name:pos_settle_due.model_pos_config
@@ -198,13 +206,20 @@ msgstr "Kassensitzung"
 #. module: pos_settle_due
 #: model:ir.module.module,shortdesc:base.module_pos_settle_due
 msgid "Point of Sale Settle Due"
-msgstr ""
+msgstr "Kassensystem Abrechnung fällig"
 
 #. module: pos_settle_due
 #. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Settle Invoice"
 msgstr "Abrechnen"
+
+#. module: pos_settle_due
+#. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
+msgid "Settle Invoice (%(name)s)"
+msgstr "Abrechnen (%(name)s)"
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -216,12 +231,13 @@ msgstr "Abrechnen"
 #: model:ir.module.module,summary:base.module_pos_settle_due
 msgid "Settle partner's due in the POS UI."
 msgstr ""
+"Fällige Partnerzahlungen in der Kassensystem-Benutzeroberfläche begleichen."
 
 #. module: pos_settle_due
 #. odoo-python
 #: code:addons/pos_settle_due/models/account_move.py:0
 msgid "Settling invoice %(invoice)s"
-msgstr ""
+msgstr "%(invoice)s abrechnen"
 
 #. module: pos_settle_due
 #: model:ir.model.fields,field_description:pos_settle_due.field_res_partner__invoices_amount_due
@@ -256,13 +272,13 @@ msgstr "Ja"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "You cannot change the customer while settling invoices."
-msgstr ""
+msgstr "Sie können den Kunden nicht ändern, während Sie abrechnen."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "You cannot have a change when settling invoices."
-msgstr ""
+msgstr "Beim Abrechnen ist kein Wechselgeld möglich."
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -270,3 +286,5 @@ msgstr ""
 msgid ""
 "You cannot validate a payment of 0 amount when you are depositing money."
 msgstr ""
+"Sie können keine Zahlung mit einem Betrag von 0 validieren, wenn Sie Geld "
+"einzahlen."

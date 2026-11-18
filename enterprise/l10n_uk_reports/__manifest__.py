@@ -20,6 +20,7 @@ MTD-VAT API to HMRC.
     'data': [
         'views/views.xml',
         'views/res_users_views.xml',
+        'views/res_config_settings_views.xml',
         'wizard/hmrc_send_wizard.xml',
         'data/account_return_data.xml',
         'data/config_parameter.xml',

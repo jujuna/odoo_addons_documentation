@@ -5,24 +5,23 @@ import { deserializeDateTime } from "@web/core/l10n/dates";
 export class JsonFieldResource extends JsonField {
     static template = "pos_restauramt_appointment.JsonFieldResource";
 
-    get timeAndPersonDetails() {
-        const formattedValue = JSON.parse(this.formattedValue || "{}");
-        if (this.formattedValue) {
-            // formattedValue.event_start is the start time in UTC
-            const localStartTime = deserializeDateTime(formattedValue.event_start);
-            return {
-                time: localStartTime.toFormat("h:mm a"),
-                person: formattedValue.capacity,
-            };
-        } else {
+    get usage() {
+        const value = this.props.record.data[this.props.name];
+        if (!value?.event_id) {
             return false;
         }
+        return {
+            start: deserializeDateTime(value.event_start).toFormat("HH:mm"),
+            stop: deserializeDateTime(value.event_stop).toFormat("HH:mm"),
+            capacity: value.capacity,
+        };
     }
 }
 
 export const jsonFieldResource = {
     ...jsonField,
     component: JsonFieldResource,
+    listViewWidth: 125,
 };
 
 registry.category("fields").add("json_field_resource", jsonFieldResource);

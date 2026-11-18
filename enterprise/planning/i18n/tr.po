@@ -17,18 +17,19 @@
 # Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2023
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 16:34+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/planning/"
 "tr/>\n"
 "Language: tr\n"
@@ -44,18 +45,20 @@ msgid ""
 "\n"
 "Schedule your teams and employees with shift.\n"
 msgstr ""
+"\n"
+"Vardiya ile ekiplerinizi ve çalışanlarınızı planlayın.\n"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/components/conflicting_slot_ids_field/conflicting_slot_ids_field.js:0
 msgid "%(display_name)s (%(start_datetime)s - %(end_datetime)s)"
-msgstr ""
+msgstr "%(display_name)s (%(start_datetime)s - %(end_datetime)s)"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/resource_resource.py:0
 msgid "%(resource_name)s \t --(%(role)s)--"
-msgstr ""
+msgstr "%(resource_name)s \t --(%(role)s)--"
 
 #. module: planning
 #. odoo-python
@@ -67,13 +70,13 @@ msgstr "%(resource_name)s (%(role)s)"
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "%s are looking for a replacement"
-msgstr ""
+msgstr "%s bir yedek arıyor"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "%s is looking for a replacement"
-msgstr ""
+msgstr "%s bir yedek arıyor"
 
 #. module: planning
 #: model:ir.actions.report,print_report_name:planning.report_planning_slot
@@ -146,12 +149,12 @@ msgstr "<b>Rolü:</b>"
 #. module: planning
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_0
 msgid "<b>Tip: Plan faster</b>"
-msgstr ""
+msgstr "<b>İpucu: Daha hızlı planlayın</b>"
 
 #. module: planning
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_1
 msgid "<b>Tip: Quickly schedule multiple shifts</b>"
-msgstr ""
+msgstr "<b>İpucu: Birden fazla vardıyayı hızlıca planlayın</b>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -159,6 +162,8 @@ msgid ""
 "<br/>\n"
 "                                Employees can no longer remove themselves"
 msgstr ""
+"<br/>\n"
+"                                Çalışanlar artık kendilerini çıkaramaz"
 
 #. module: planning
 #: model:mail.template,body_html:planning.email_template_planning_planning
@@ -167,7 +172,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee')\">Dear <t t-"
 "out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('start_datetime') and "
 "ctx.get('end_datetime')\">\n"
 "                        Your upcoming shifts from <t t-"
@@ -195,7 +200,7 @@ msgid ""
 "                            </a>\n"
 "                        </div>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('planning_url') and "
 "(ctx.get('slot_unassigned') or (object.allow_self_unassign and "
 "object.self_unassign_days_before))\">\n"
@@ -212,8 +217,8 @@ msgid ""
 "of the shift.\n"
 "                        </t>\n"
 "                    </p>\n"
-"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/"
-">\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']"
+"\"></p>\n"
 "                    <p t-if=\"ctx.get('is_internal_user') and not "
 "object.allow_self_unassign\">In case your current schedule doesn't suit you, "
 "we encourage you to reach out to your colleagues and request to switch "
@@ -221,6 +226,63 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p t-if=\"ctx.get('employee')\">Sayın <t t-"
+"out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
+"                    <p t-else=\"\">Merhaba,</p>\n"
+"                    <br>\n"
+"                    <p t-if=\"ctx.get('start_datetime') and ctx.get"
+"('end_datetime')\">\n"
+"                        <t t-out=\"format_date(ctx['start_datetime'])\">05-"
+"05-2021</t>\n"
+"                        ile <t t-out=\"format_date(ctx['end_datetime'])\">05-"
+"11-2021</t> tarihleri arasındaki yaklaşan vardiyalarınız yayınlandı.\n"
+"                    </p>\n"
+"                    <div style=\"display: flex; margin: 15px;\">\n"
+"                        <div t-if=\"ctx.get('planning_url')\" style=\"margin-"
+"right: 15px;\">\n"
+"                            <a t-att-href=\"ctx['planning_url']\" "
+"target=\"_blank\" t-att-style=\"'font-size: 12px; color: ' + "
+"(company.email_primary_color or '#FFFFFF') + '; background-color: ' + "
+"(company.email_secondary_color or '#875A7B') + '; padding: 8px 12px 11px; "
+"text-decoration: none !important; font-weight: bold;'\">\n"
+"                                Planlamanızı Görüntüle\n"
+"                            </a>\n"
+"                        </div>\n"
+"                        <div t-if=\"ctx.get('planning_url_ics')\">\n"
+"                            <a target=\"_blank\" t-att-"
+"href=\"ctx['planning_url_ics']\" t-att-style=\"'font-size: 12px; color: ' + "
+"(company.email_secondary_color or '#875A7B') + '; padding: 8px 12px 11px; "
+"text-decoration: none !important; font-weight: bold;'\">\n"
+"                                Takvime Ekle\n"
+"                            </a>\n"
+"                        </div>\n"
+"                    </div>\n"
+"                    <br>\n"
+"                    <p t-if=\"ctx.get('planning_url') and (ctx.get"
+"('slot_unassigned') or (object.allow_self_unassign and "
+"object.self_unassign_days_before))\">\n"
+"                        <t t-if=\"ctx.get('slot_unassigned')\">\n"
+"                            Ayrıca, bazı boş vardiyalar olduğunu ve "
+"ilgileniyorsanız ve uygunsanız, lütfen kendinizi bu vardiyalara atamanızı "
+"hatırlatmak isteriz.\n"
+"                        </t>\n"
+"                        <t t-if=\"object.allow_self_unassign and "
+"object.self_unassign_days_before\">\n"
+"                            Size atanan bir vardiyada çalışamayacak "
+"durumdaysanız, lütfen vardiya başlangıcından <t t-"
+"out=\"object.self_unassign_days_before or ''\">5</t> gün önce kendinizi bu "
+"vardiyadan çıkarın.\n"
+"                        </t>\n"
+"                    </p>\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\">"
+"</p>\n"
+"                    <p t-if=\"ctx.get('is_internal_user') and not "
+"object.allow_self_unassign\">Mevcut programınız size uymuyorsa, "
+"meslektaşlarınıza ulaşmanızı ve vardiya değiştirme talebinde bulunmanızı "
+"öneririz. Sizinle vardiya değiştirmek isteyebilirler.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: planning
 #: model:mail.template,body_html:planning.email_template_shift_switch_email
@@ -229,7 +291,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
 "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p>\n"
 "                        The following shift that you requested to switch has "
 "been re-assigned\n"
@@ -298,85 +360,86 @@ msgid ""
 "or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p t-if=\"ctx.get('old_assignee_name')\">Sevgili <t t-"
+"                    <p t-if=\"ctx.get('old_assignee_name')\">Sayın <t t-"
 "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Merhaba,</p>\n"
-"                    <br/>\n"
-"                   <p> \n"
-"                        Değiştirilmesini talep ettiğiniz aşağıdaki vardiya,\n"
-"                       <t t-if=\"ctx.get('new_assignee_names')\"> adresinden "
-"<t t-out=\"ctx['new_assignee_names']\">adresine Marc Demo</t></t> olarak "
-"yeniden atanmıştır.\n"
-"                   </p>\n"
-"                    <table style=\"margin-left: 30px;\"> \n"
-"                       <tr t-if=\"(ctx.get('start_datetime') and "
-"ctx.get('end_datetime'))                                   or "
-"ctx.get('allocated_hours')                                   or "
-"ctx.get('allocated_percentage')\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\"> "
+"                    <br>\n"
+"                    <p>\n"
+"                        Değiştirilmesini talep ettiğiniz aşağıdaki vardiya "
+"yeniden atandı\n"
+"                        <t t-if=\"ctx.get('new_assignee_names')\"> - <t t-"
+"out=\"ctx['new_assignee_names']\">Marc Demo</t></t>.\n"
+"                    </p>\n"
+"                    <table style=\"margin-left: 30px;\">\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and ctx.get"
+"('end_datetime'))                                   or ctx.get"
+"('allocated_hours')                                   or ctx.get"
+"('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Tarih</th>\n"
 "                            <td style=\"padding: 5px;\">\n"
-"                               <span t-if=\"ctx.get('start_datetime') and "
+"                                <span t-if=\"ctx.get('start_datetime') and "
 "ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
-"(                                     ctx['start_datetime'],                                     "
-"ctx['end_datetime'],                                 )\"> \n"
-"                                    31 Mayıs 2021, 08:00 ⟶ 31 Mayıs 2021, "
-"16:00\n"
-"                               </span>\n"
+"(                                     "
+"ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
+"                                </span>\n"
 "                                <span t-if=\"ctx.get('allocated_hours')\" "
-"style=\"opacity: 0.5;\"> \n"
-"                                    (<t t-out=\"ctx['allocated_hours']"
-"\">4:00</t>h)\n"
-"                               </span>\n"
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']\">"
+"4:00</t>s)\n"
+"                                </span>\n"
 "                                <span t-if=\"ctx.get('allocated_percentage') "
-"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\"> \n"
-"                                    (<t t-out=\"ctx['allocated_percentage']"
-"\">50</t>%)\n"
-"                               </span>\n"
-"                            </td> \n"
-"                       </tr>\n"
-"                        <tr t-if=\"object.role_id\"> \n"
-"                           <th style=\"padding: 5px; text-align: left;\"> "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-"
+"out=\"ctx['allocated_percentage']\">50</t>%)\n"
+"                                </span>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"object.role_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Rol</th>\n"
 "                            <td style=\"padding: 5px;\" t-"
 "out=\"object.role_id.name or ''\">Barmen</td>\n"
 "                        </tr>\n"
-"                       <tr t-if=\"hasattr(object, 'project_id') and "
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
 "object.project_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\"> "
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Proje</th>\n"
-"                            <td style=\"padding: 5px;\" t-"
-"out=\"object.sudo().project_id.name or ''\">Toplantı</td>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".project_id.name or ''\">Toplanma</td>\n"
 "                        </tr>\n"
-"                       <tr t-if=\"hasattr(object, 'task_id') and "
+"                        <tr t-if=\"hasattr(object, 'task_id') and "
 "object.task_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\"> "
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Görev</th>\n"
-"                            <td style=\"padding: 5px;\" t-"
-"out=\"object.sudo().task_id.name or ''\">Şef</td>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".task_id.name or ''\">Şef</td>\n"
 "                        </tr>\n"
-"                       <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
 "object.sale_line_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\"> "
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Satış Siparişi Kalemi</th>\n"
-"                            <td style=\"padding: 5px;\" t-"
-"out=\"object.sudo().sale_line_id.name or ''\">Kahve</td>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".sale_line_id.name or ''\">Kahve</td>\n"
 "                        </tr>\n"
-"                       <tr t-if=\"hasattr(object, 'name') and "
-"object.name\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\"> "
+"                        <tr t-if=\"hasattr(object, 'name') and object.name\">"
+"\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
 "Not</th>\n"
 "                            <td style=\"padding: 5px;\" t-out=\"object.name "
 "or ''\">/</td>\n"
 "                        </tr>\n"
-"                   </table>\n"
-"                    <br/> \n"
-"               </div> \n"
+"                    </table>\n"
+"                    <br>\n"
+"                </div>\n"
 "            "
 
 #. module: planning
@@ -394,6 +457,8 @@ msgid ""
 "<i class=\"oi oi-filled ps-1 mt-1 d-touch-none\" data-"
 "icon=\"calendar_today\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
 msgstr ""
+"<i class=\"oi oi-filled ps-1 mt-1 d-touch-none\" data-"
+"icon=\"calendar_today\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_public_view_form
@@ -426,6 +491,9 @@ msgid ""
 "group_field_service_allow_customer_report\" class=\"text-muted\">Hide prices "
 "on customer report</span>"
 msgstr ""
+"<span invisible=\"not group_field_service_allow_material or not "
+"group_field_service_allow_customer_report\" class=\"text-muted\">Müşteri "
+"raporunda fiyatları gizle</span>"
 
 #. module: planning
 #: model_terms:web_tour.tour,rainbow_man_message:planning.planning_tour
@@ -467,7 +535,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-"
 "out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('open_shift_available')\">We have a "
 "new shift opening:</p>\n"
 "                    <p t-else=\"\">You have been assigned the following "
@@ -562,7 +630,7 @@ msgid ""
 "                            Add to iCal/Outlook\n"
 "                        </a>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-if=\"ctx.get('open_shift_available')\">\n"
 "                        <p t-if=\"ctx.get('is_internal_user')\">\n"
 "                            If you are interested and available, please "
@@ -584,6 +652,140 @@ msgid ""
 "                </div>\n"
 "            </body>"
 msgstr ""
+"<style>\n"
+"                    .top_button {\n"
+"                        color: #FFFFFF;\n"
+"                        background-color: #714B67;\n"
+"                        border: solid #714B67;\n"
+"                        flex: 1 1 60%;\n"
+"                    }\n"
+"                    .button_box {\n"
+"                        display: flex;\n"
+"                        flex-wrap: wrap;\n"
+"                        gap: 10px;\n"
+"                        margin: 20px 15px 0px 15px;\n"
+"                    }\n"
+"                </style>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee_name')\">Sayın <t t-"
+"out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
+"                    <p t-else=\"\">Merhaba,</p>\n"
+"                    <br>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">Yeni bir "
+"vardiya açıldı:</p>\n"
+"                    <p t-else=\"\">Aşağıdaki vardiyaya atandınız:</p>\n"
+"                    <table style=\"margin-left: 30px;\">\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and ctx.get"
+"('end_datetime'))                                   or ctx.get"
+"('allocated_hours')                                   or ctx.get"
+"('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Tarih</th>\n"
+"                            <td style=\"padding: 5px;\">\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     "
+"ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']\">"
+"4:00</t>s)\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-"
+"out=\"ctx['allocated_percentage']\">50</t>%)\n"
+"                                </span>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"object.role_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Rol</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">Barmen</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Proje</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".project_id.name or ''\">Toplanma</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'task_id') and "
+"object.task_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Görev</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".task_id.name or ''\">Şef</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Satış Siparişi Kalemi</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".sale_line_id.name or ''\">Kahve</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and object.name\">"
+"\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Not</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                    <div class=\"button_box\">\n"
+"                        <a t-if=\"ctx.get('available_link')\" t-att-"
+"href=\"ctx['available_link']\" target=\"_blank\" t-att-style=\"'font-size: "
+"12px; color: ' + (company.email_primary_color or '#FFFFFF') + '; background-"
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Bu vardiyaya kendimi ata\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('unavailable_link')\" t-att-"
+"href=\"ctx['unavailable_link']\" target=\"_blank\" t-att-style=\"'font-size: "
+"12px; color: ' + (company.email_primary_color or '#FFFFFF') + '; background-"
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Müsait değilim\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('google_url')\" t-att-"
+"href=\"ctx['google_url']\" target=\"_blank\" t-att-style=\"'font-size: 12px; "
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Google Takvim'e Ekle\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('iCal_url')\" t-att-"
+"href=\"ctx['iCal_url']\" target=\"_blank\" t-att-style=\"'font-size: 12px; "
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            iCal/Outlook'a Ekle\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    <br>\n"
+"                    <t t-if=\"ctx.get('open_shift_available')\">\n"
+"                        <p t-if=\"ctx.get('is_internal_user')\">\n"
+"                            İlgileniyorsanız ve uygunsanız, lütfen kendinizi "
+"bu boş vardiyaya atayın.\n"
+"                        </p>\n"
+"                        <p t-else=\"\">\n"
+"                            Bu vardiyayı almak istiyorsanız lütfen "
+"yöneticinizle iletişime geçin.\n"
+"                        </p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p t-if=\"ctx.get('is_internal_user') and not "
+"object.allow_self_unassign\">\n"
+"                            Mevcut vardiya size uymuyorsa, meslektaşlarınıza "
+"ulaşmanızı ve vardiya değiştirme talebinde bulunmanızı öneririz. Sizinle "
+"vardiya değiştirmek isteyebilirler.\n"
+"                        </p>\n"
+"                    </t>\n"
+"                </div>\n"
+"            </body>"
 
 #. module: planning
 #: model:ir.model.constraint,message:planning.constraint_planning_recurrency_check_until_limit
@@ -603,12 +805,12 @@ msgstr "Bir vardiya, tekrarı ile aynı şirkette olmalıdır."
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "A template for this shift already exists"
-msgstr ""
+msgstr "Bu değişiklik için bir şablon zaten mevcuttur"
 
 #. module: planning
 #: model:ir.model,name:planning.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Erişim Grupları"
 
 #. module: planning
 #. odoo-javascript
@@ -670,7 +872,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Allocated Hours"
-msgstr ""
+msgstr "Tahsis Edilen Saatler"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__allocated_hours
@@ -709,11 +911,13 @@ msgid ""
 "Allow employees to request a replacement or remove themselves from shifts "
 "when they are unavailable"
 msgstr ""
+"Çalışanların müsait olmadıklarında yedek talep etmelerine veya kendilerini "
+"vardiyalardan çıkarmalarına izin verin"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Analytics"
-msgstr ""
+msgstr "Analitikler"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_report_action_analysis
@@ -764,7 +968,7 @@ msgstr ""
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_resource_resource__assigned_employee_id
 msgid "Assigned To"
-msgstr ""
+msgstr "Atanan"
 
 #. module: planning
 #. odoo-javascript
@@ -790,7 +994,7 @@ msgstr "Avatar"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_planning_field_service_sale_timesheet
 msgid "Billing"
-msgstr ""
+msgstr "Faturalama"
 
 #. module: planning
 #: model:ir.ui.menu,name:planning.planning_menu_schedule_by_resource
@@ -806,25 +1010,27 @@ msgstr "Rol"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_hooks.js:0
 msgid "Bye-bye, record!"
-msgstr ""
+msgstr "Güle güle, kayıt!"
 
 #. module: planning
 #: model:res.groups,comment:planning.group_planning_manager
 msgid "Can manage all shifts, with access to reporting and configuration."
-msgstr ""
+msgstr "Raporlama ve yapılandırma erişimi ile tüm vardiyaları yönetebilir."
 
 #. module: planning
 #: model:res.groups,comment:planning.group_planning_user
 msgid ""
 "Can view all published shifts, but can only edit shifts assigned to them."
 msgstr ""
+"Tüm yayınlanan vardiyaları görüntüleyebilir, ancak yalnızca kendisine atanan "
+"vardiyaları düzenleyebilir."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Cancel Request"
-msgstr ""
+msgstr "Talebi iptal et"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_view_form_simplified
@@ -834,7 +1040,7 @@ msgstr "Sohbet"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Collect intervention requests via an online form"
-msgstr ""
+msgstr "Müdahale taleplerini çevrimiçi form aracılığıyla toplayın"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_role__color
@@ -870,7 +1076,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Complete worksheets using custom templates"
-msgstr ""
+msgstr "Özel taslaklar kullanarak çalışma sayfalarını tamamlayın"
 
 #. module: planning
 #: model:ir.model,name:planning.model_res_config_settings
@@ -902,6 +1108,13 @@ msgid "Copy previous week"
 msgstr "Önceki haftayı kopyala"
 
 #. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Could not undo scheduling"
+msgstr "Planlama geri alınamadı"
+
+#. module: planning
 #: model:planning.role,name:planning.planning_role_crane
 msgid "Crane"
 msgstr "Vinç"
@@ -909,17 +1122,17 @@ msgstr "Vinç"
 #. module: planning
 #: model:ir.model,website_form_label:planning.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "Vardiya Oluştur"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Create new quotations directly from interventions"
-msgstr ""
+msgstr "Doğrudan müdahalelerden yeni teklifler oluşturun"
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_res_config_settings__group_field_service_allow_quotations
 msgid "Create new quotations directly from interventions."
-msgstr ""
+msgstr "Doğrudan müdahalelerden yeni teklifler oluşturun."
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_open_shifts
@@ -957,12 +1170,12 @@ msgstr "Oluşturuldu"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_customer_ratings
 msgid "Customer Ratings"
-msgstr ""
+msgstr "Müşteri Memnuniyeti"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_customer_report
 msgid "Customer Report"
-msgstr ""
+msgstr "Müşteri Raporu"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
@@ -1033,6 +1246,9 @@ msgid ""
 "Waiter). Create open shifts for the roles needed for a mission, then assign "
 "them to available resources."
 msgstr ""
+"Kaynaklarınızın üstleneceği rolleri tanımlayın (örn. Aşçı, Barmen, Garson). "
+"Bir görev için gerekli rollere açık vardiyalar oluşturun, ardından bunları "
+"mevcut kaynaklara atayın."
 
 #. module: planning
 #. odoo-javascript
@@ -1059,12 +1275,12 @@ msgstr "Departman"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__department_id
 msgid "Departments"
-msgstr ""
+msgstr "Departmanlar"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_card
 msgid "Description"
-msgstr ""
+msgstr "Açıklama"
 
 #. module: planning
 #: model:planning.role,name:planning.planning_role_developer
@@ -1113,6 +1329,9 @@ msgid ""
 "it. Hold <b>Ctrl</b> (or <b>Cmd</b> on Mac) while dragging a shift to "
 "duplicate it."
 msgstr ""
+"Yeniden planlamak için bir vardıyayı başka bir güne, yeniden atamak için "
+"başka bir satıra sürükleyin. Vardıyayı kopyalamak için sürüklerken <b>Ctrl</"
+"b> (veya Mac'te <b>Cmd</b>) tuşunu basılı tutun."
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__duration
@@ -1167,7 +1386,7 @@ msgstr "Çalışan"
 #. module: planning
 #: model:ir.model,name:planning.model_hr_employee_departure
 msgid "Employee Departure"
-msgstr ""
+msgstr "Çalışanın İşten Ayrılması"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_view_form_simplified
@@ -1204,7 +1423,7 @@ msgstr "Bitiş Saati"
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_equipment
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Equipment"
-msgstr ""
+msgstr "Ekipman"
 
 #. module: planning
 #: model:ir.model.constraint,message:planning.constraint_hr_employee_employee_token_unique
@@ -1225,7 +1444,7 @@ msgstr "Ekstra Mesaj"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_quotations
 msgid "Extra Quotations"
-msgstr ""
+msgstr "Ekstra Teklifler"
 
 #. module: planning
 #. odoo-javascript
@@ -1236,42 +1455,42 @@ msgstr "Yeniden zamanlama geri alınamadı"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_planning_field_service
 msgid "Field Service"
-msgstr ""
+msgstr "Saha Servisi"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_quotations
 msgid "Field Service Extra Quotations"
-msgstr ""
+msgstr "Saha Servisi Ekstra Teklifleri"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_geolocation
 msgid "Field Service Geolocation"
-msgstr ""
+msgstr "Saha Servisi Coğrafi Konum"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_customer_ratings
 msgid "Field Service: Allow Customer Ratings"
-msgstr ""
+msgstr "Saha Servisi: Müşteri Puanlamasına İzin Ver"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_customer_report
 msgid "Field Service: Allow Customer Report"
-msgstr ""
+msgstr "Saha Servisi: Müşteri Raporuna İzin Ver"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_equipment
 msgid "Field Service: Allow Equipment Tracking"
-msgstr ""
+msgstr "Saha Servisi: Ekipman Takibine İzin Ver"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_allow_material
 msgid "Field Service: Allow material on interventions"
-msgstr ""
+msgstr "Saha Servisi: Müdahalelerde malzemeye izin ver"
 
 #. module: planning
 #: model:res.groups,name:planning.group_field_service_hide_price
 msgid "Field Service: Hide Price"
-msgstr ""
+msgstr "Saha Servisi: Fiyatı Gizle"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_my_calendar
@@ -1323,7 +1542,7 @@ msgstr "Vardiya oluştur"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_geolocation
 msgid "Geolocation"
-msgstr ""
+msgstr "Coğrafi Konum"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_hr_employee__has_slots
@@ -1334,7 +1553,7 @@ msgstr "Zaman Aralığı Var"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_hide_price
 msgid "Hide Price"
-msgstr ""
+msgstr "Fiyatı Gizle"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot_template__name
@@ -1396,17 +1615,17 @@ msgstr "Açık Vardiyaları içerir"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 msgid "Internal note..."
-msgstr ""
+msgstr "Dahili not..."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Invoice the travel time to the customer's location"
-msgstr ""
+msgstr "Seyahat süresini müşterinin konumuna faturalandır"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Invoice your time and materials to your customers"
-msgstr ""
+msgstr "Zamanınızı ve malzemelerinizi müşterilerinize faturalandırın"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_planning__is_planning_preview
@@ -1496,7 +1715,7 @@ msgstr "Şablonlarla kodlama geçişlerini kolaylaştırın."
 #. module: planning
 #: model:ir.module.module,summary:base.module_planning
 msgid "Manage your employees' schedule"
-msgstr ""
+msgstr "Çalışanlarınızın programını yönetin"
 
 #. module: planning
 #: model:planning.role,name:planning.planning_role_management
@@ -1520,7 +1739,7 @@ msgstr "Mazlemeler"
 #. module: planning
 #: model:ir.model,name:planning.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menü"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__publication_warning
@@ -1531,12 +1750,12 @@ msgstr "Son Yayından Beri Değiştirildi"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_planning_field_service_stock
 msgid "Module Planning Field Service Stock"
-msgstr ""
+msgstr "Modül Planlama Saha Servisi Stok"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_website_planning_field_service
 msgid "Module Website Planning Field Service"
-msgstr ""
+msgstr "Modül Websitesi Planlama Saha Servisi"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__planning_recurrency__repeat_unit__month
@@ -1584,11 +1803,13 @@ msgid ""
 "Need several people for the afternoon shift this week? Schedule them all at "
 "once ⚡"
 msgstr ""
+"Bu hafta öğleden sonraki vardiya için birkaç kişiye mi ihtiyacınız var? "
+"Hepsini tek seferde planlayın ⚡"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Needs Attention"
-msgstr ""
+msgstr "Dikkat Gerektiriyor"
 
 #. module: planning
 #. odoo-javascript
@@ -1607,7 +1828,7 @@ msgstr "New_Shift"
 #. module: planning
 #: model:res.groups.privilege,placeholder:planning.res_groups_privilege_planning
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #. module: planning
 #. odoo-python
@@ -1689,7 +1910,7 @@ msgstr "Tekrar Sayısı"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__resources_without_correct_role_count
 msgid "Number of resources that do not have the right role"
-msgstr ""
+msgstr "Doğru role sahip olmayan kaynak sayısı"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
@@ -1732,7 +1953,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Operations"
-msgstr ""
+msgstr "Operasyonlar"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_send__start_datetime
@@ -1743,13 +1964,13 @@ msgstr "Dönem"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 msgid "Plan"
-msgstr ""
+msgstr "Planla"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Plan Shift"
-msgstr ""
+msgstr "Vardiya Planla"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -1834,7 +2055,7 @@ msgstr "Tekrarlama Planlaması"
 #: code:addons/planning/models/planning_planning.py:0
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Planning Report.pdf"
-msgstr ""
+msgstr "Planlama Raporu.pdf"
 
 #. module: planning
 #: model:ir.model,name:planning.model_planning_role
@@ -1908,13 +2129,25 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Please set a start and end date on the shift before sending it."
-msgstr ""
+msgstr "Vardiyayı göndermeden önce başlangıç ve bitiş tarihlerini belirleyin."
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer_controls.xml:0
 msgid "Press Ctrl to duplicate the shift"
 msgstr "Vardiyay çoğaltmak için Ctrl tuşuna basın"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's copied shifts removed"
+msgstr "Önceki haftanın kopyalanan vardiyaları kaldırıldı"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's shifts copied"
+msgstr "Önceki haftanın vardiyaları kopyalandı"
 
 #. module: planning
 #. odoo-javascript
@@ -1933,12 +2166,12 @@ msgstr "Kaynak takvimini yazdırın"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Products"
-msgstr ""
+msgstr "Ürünler"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__group_field_service_allow_material
 msgid "Products on Shifts"
-msgstr ""
+msgstr "Vardiyalardaki Ürünler"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_project_forecast
@@ -1962,6 +2195,8 @@ msgid ""
 "Provide the customer with an intervention report, collect their signature, "
 "and email them a copy"
 msgstr ""
+"Müşteriye bir müdahale raporu sunun, imzalarını alın ve bir kopyasını e-"
+"posta ile gönderin"
 
 #. module: planning
 #: model:ir.model,name:planning.model_hr_employee_public
@@ -1987,7 +2222,7 @@ msgstr "Yayınla ve Gönder"
 #. module: planning
 #: model:ir.actions.act_window,name:planning.planning_send_action
 msgid "Publish & Send the Schedule"
-msgstr ""
+msgstr "Programı Yayınla ve Gönder"
 
 #. module: planning
 #. odoo-javascript
@@ -2005,7 +2240,7 @@ msgstr "Kalite Kontrol Görevlisi"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Quotations"
-msgstr ""
+msgstr "Teklifler"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_company__planning_generation_interval
@@ -2049,12 +2284,12 @@ msgstr "Kaldır"
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Remove Myself"
-msgstr ""
+msgstr "Kendimi Kaldır"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__res_company__planning_employee_unavailabilities__unassign
 msgid "Remove themselves from shifts"
-msgstr ""
+msgstr "Kendilerini vardiyalardan kaldır"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__repeat
@@ -2097,12 +2332,12 @@ msgstr "Repetitions"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Replacement Requests"
-msgstr ""
+msgstr "Değiştirme Talepleri"
 
 #. module: planning
 #: model:ir.model,name:planning.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "Rapor işlemi"
 
 #. module: planning
 #: model:ir.ui.menu,name:planning.planning_menu_reporting
@@ -2114,12 +2349,12 @@ msgstr "Raporlama"
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Request Replacement"
-msgstr ""
+msgstr "Değiştirme Talep Et"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__res_company__planning_employee_unavailabilities__switch
 msgid "Request a replacement"
-msgstr ""
+msgstr "Değiştirme talep et"
 
 #. module: planning
 #: model:ir.actions.server,name:planning.model_planning_slot_action_reset_to_draft
@@ -2134,7 +2369,7 @@ msgstr "Kaynak"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__resource_roles
 msgid "Resource Roles"
-msgstr ""
+msgstr "Kaynak Rolleri"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__resource_ids
@@ -2150,7 +2385,7 @@ msgstr "Kaynaklar"
 #: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Resources unavailable for the selected period."
-msgstr ""
+msgstr "Seçili dönem için kaynaklar kullanılamıyor."
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__role_id
@@ -2227,7 +2462,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Sales & Billing"
-msgstr ""
+msgstr "Satış ve Faturalandırma"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
@@ -2283,6 +2518,8 @@ msgid ""
 "Schedule onsite interventions, invoice time and materials, and complete "
 "custom worksheets"
 msgstr ""
+"Yerinde müdahaleleri planlayın, zaman ve malzemeler için fatura düzenleyin "
+"ve özel çalışma sayfalarını doldurun"
 
 #. module: planning
 #. odoo-python
@@ -2294,7 +2531,7 @@ msgstr "Çalışanlarınıza gönderilen program"
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Schedule this shift to save it as a template"
-msgstr ""
+msgstr "Bu değişikliği şablon olarak kaydetmek için planlayın"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_schedule_by_resource
@@ -2310,7 +2547,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:planning.selection__planning_analysis_report__state__2_published
 #: model:ir.model.fields.selection,name:planning.selection__planning_slot__state__2_published
 msgid "Scheduled"
-msgstr ""
+msgstr "Planlandı"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_planning__access_token
@@ -2360,7 +2597,7 @@ msgstr "Vardiya"
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__planning_employee_unavailabilities
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Shift Changes"
-msgstr ""
+msgstr "Vardiya Değişiklikleri"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
@@ -2398,6 +2635,12 @@ msgstr "Vardiya kaldırılamadı"
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift divided into two"
+msgstr "Vardiya ikiye bölündü"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shift duplicated"
 msgstr "Vardiya çoğaltıldı"
 
@@ -2406,7 +2649,7 @@ msgstr "Vardiya çoğaltıldı"
 #: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shift partially scheduled"
-msgstr ""
+msgstr "Vardiya kısmen planlandı"
 
 #. module: planning
 #. odoo-javascript
@@ -2437,7 +2680,7 @@ msgstr "Şablon olarak kaydedilen vardiya"
 #: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shift scheduled"
-msgstr ""
+msgstr "Vardiya planlandı"
 
 #. module: planning
 #. odoo-python
@@ -2446,15 +2689,34 @@ msgid "Shift sent"
 msgstr "Vardiya gönderildi"
 
 #. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift unscheduled"
+msgstr "Vardiya planlanmadı"
+
+#. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Shifts Planned"
 msgstr "Planlanan Vardiya Planı"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts could not be merged back"
+msgstr "Vardiyalar geri birleştirilemedi"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Shifts in Conflict"
 msgstr "Çatışmadaki Değişimler"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts merged back"
+msgstr "Vardiyalar geri birleştirildi"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
@@ -2465,7 +2727,7 @@ msgstr "Ekip Üyenizin Vardiyaları"
 #. odoo-python
 #: code:addons/planning/wizard/planning_send.py:0
 msgid "Shifts published — employees without a work email were skipped"
-msgstr ""
+msgstr "Değişiklikler yayınlandı — iş e-postası olmayan çalışanlar atlandı"
 
 #. module: planning
 #. odoo-python
@@ -2477,7 +2739,13 @@ msgstr "Vardiya taslağa dönüştürüldü"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shifts scheduled"
-msgstr ""
+msgstr "Vardiyalar planlandı"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts unscheduled"
+msgstr "Vardiyalar programdan çıkarıldı"
 
 #. module: planning
 #: model:planning.role,name:planning.planning_shipping_associate
@@ -2523,14 +2791,14 @@ msgstr "Bitiş Tarihi"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__switch_employee_ids
 msgid "Switch Employee"
-msgstr ""
+msgstr "Çalışan Değiştir"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Take Shift"
-msgstr ""
+msgstr "Vardiyayı Al"
 
 #. module: planning
 #. odoo-python
@@ -2539,6 +2807,8 @@ msgid ""
 "The Planning report cannot be added to the print menu. Please use the Print "
 "action available in the Planning calendar and Gantt views."
 msgstr ""
+"Planlama raporu yazdırma menüsüne eklenemez. Lütfen Planlama takvimi ve "
+"Gantt görünümlerinde bulunan Yazdır eylemini kullanın."
 
 #. module: planning
 #. odoo-python
@@ -2547,6 +2817,8 @@ msgid ""
 "The Planning report cannot be printed from here. Please use the Print action "
 "available in the Planning calendar and Gantt views."
 msgstr ""
+"Planlama raporu buradan yazdırılamaz. Lütfen Planlama takvimi ve Gantt "
+"görünümlerinde bulunan Yazdır eylemini kullanın."
 
 #. module: planning
 #: model:ir.model.constraint,message:planning.constraint_res_company_planning_self_unassign_days_before_positive
@@ -2634,6 +2906,7 @@ msgstr "Başlangıç saati negatif olamaz."
 msgid ""
 "The start hour cannot be after the end hour for a one-day shift template."
 msgstr ""
+"Bir günlük vardiya şablonunda başlangıç saati, bitiş saatinden sonra olamaz."
 
 #. module: planning
 #. odoo-python
@@ -2700,7 +2973,7 @@ msgstr "Bu yöntem iki yuvalık yer tutmaktadır."
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid ""
 "This resource is not available for this shift during the selected period."
-msgstr ""
+msgstr "Bu kaynak, seçilen dönem boyunca bu vardiya için mevcut değil."
 
 #. module: planning
 #. odoo-javascript
@@ -2713,7 +2986,7 @@ msgstr "Seçilen Vardiya"
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "This shift is already assigned."
-msgstr ""
+msgstr "Bu değişiklik zaten atanmıştır."
 
 #. module: planning
 #. odoo-javascript
@@ -2724,12 +2997,12 @@ msgstr "Bu vardiya tekrarlanmaktadır. Sil:"
 #. module: planning
 #: model:digest.tip,name:planning.digest_tip_planning_0
 msgid "Tip: Plan faster"
-msgstr ""
+msgstr "İpucu: Daha hızlı planlayın"
 
 #. module: planning
 #: model:digest.tip,name:planning.digest_tip_planning_1
 msgid "Tip: Quickly schedule multiple shifts"
-msgstr ""
+msgstr "İpucu: Birden fazla vardiyayı hızla planlayın"
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_planning_slot__repeat
@@ -2748,22 +3021,24 @@ msgstr ""
 #: model:ir.model.fields,help:planning.field_res_config_settings__group_field_service_allow_equipment
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Track customer equipment and intervention history"
-msgstr ""
+msgstr "Müşteri ekipmanını ve müdahale geçmişini takip edin"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Track customer satisfaction for interventions"
-msgstr ""
+msgstr "Müdahaleler için müşteri memnuniyetini takip edin"
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_res_config_settings__group_field_service_allow_customer_ratings
 msgid "Track customer satisfaction for interventions."
-msgstr ""
+msgstr "Müdahaleler için müşteri memnuniyetini takip edin."
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_res_config_settings__group_field_service_allow_geolocation
 msgid "Track technicians' location on a live map during work hours."
 msgstr ""
+"Teknisyenlerin konumunu çalışma saatleri boyunca canlı harita üzerinden "
+"takip edin."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -2771,18 +3046,22 @@ msgid ""
 "Track technicians' locations during work hours and record their locations at "
 "shift start and completion"
 msgstr ""
+"Çalışma saatleri boyunca teknisyenlerin konumlarını takip edin ve vardiya "
+"başlangıcında ve bitişinde konumlarını kaydedin"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid ""
 "Track the materials used during interventions and bill them to the customer"
 msgstr ""
+"Müdahaleler sırasında kullanılan malzemeleri takip edin ve müşteriye "
+"faturalandırın"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_company__field_service_travel_fees
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__field_service_travel_fees
 msgid "Travel Fees"
-msgstr ""
+msgstr "Yol Ücretleri"
 
 #. module: planning
 #. odoo-python
@@ -2807,20 +3086,20 @@ msgstr "Tanımsız %(group)s"
 #: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Undo"
-msgstr ""
+msgstr "Geri Al"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/components/planning_popover_footer/planning_popover_footer.xml:0
 #: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_popover.xml:0
 msgid "Unschedule"
-msgstr ""
+msgstr "Planlamayı iptal et"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Unscheduled Shift"
-msgstr ""
+msgstr "Planlanmamış Vardiya"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__planning_recurrency__repeat_type__until
@@ -2842,7 +3121,7 @@ msgstr "Kullanıcı"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__user_ids
 msgid "Users"
-msgstr ""
+msgstr "Kullanıcılar"
 
 #. module: planning
 #. odoo-python
@@ -2853,23 +3132,23 @@ msgstr "Planlamayı Görüntüle"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_slot_template_view_form
 msgid "Visible to all"
-msgstr ""
+msgstr "Herkes tarafından görülebilir"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__website_planning_field_service
 msgid "Website Form"
-msgstr ""
+msgstr "Websitesi Formu"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_company__website_planning_field_service
 msgid "Website Planning Field Service"
-msgstr ""
+msgstr "Websitesi Planlama Saha Servisi"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Week %(start_date)s - %(end_date)s"
-msgstr ""
+msgstr "%(start_date)s. Hafta - %(end_date)s"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_recurrency__repeat_type
@@ -2884,6 +3163,8 @@ msgid ""
 "When assigning this employee to a shift, the related material will "
 "automatically be assigned as well."
 msgstr ""
+"Bu çalışanı bir vardiyaya atarken, ilgili materyal de otomatik olarak "
+"atanacaktır."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_slot_template_view_form
@@ -2893,7 +3174,7 @@ msgstr "Çalışma Günleri"
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__module_planning_field_service_worksheet
 msgid "Worksheets"
-msgstr ""
+msgstr "Çalışma Sayfası"
 
 #. module: planning
 #. odoo-javascript
@@ -3025,12 +3306,12 @@ msgstr "tüm vardiyalar"
 #: code:addons/planning/static/src/components/conflicting_slot_ids_field/conflicting_slot_ids_field.xml:0
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_card_inherit
 msgid "conflicts"
-msgstr ""
+msgstr "çatışmalar"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "days before the shift starts."
-msgstr ""
+msgstr "vardiya başlamasından önceki günler."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_view_form_inherit
@@ -3060,19 +3341,19 @@ msgstr "Ad Soyad"
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_card_inherit
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 msgid "lack the required role."
-msgstr ""
+msgstr "gerekli role sahip değil."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_card_inherit
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 msgid "lacks the required role."
-msgstr ""
+msgstr "gerekli role sahip değil."
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/components/conflicting_slot_ids_field/conflicting_slot_ids_field.js:0
 msgid "other ones."
-msgstr ""
+msgstr "diğerleri."
 
 #. module: planning
 #: model:ir.model,name:planning.model_planning_calendar_resource
@@ -3083,7 +3364,7 @@ msgstr "takvi̇mi̇ kaynağı planlama"
 #. odoo-python
 #: code:addons/planning/models/hr_employee.py:0
 msgid "resource_ids"
-msgstr ""
+msgstr "resource_ids"
 
 #. module: planning
 #. odoo-javascript
@@ -3101,6 +3382,164 @@ msgstr "seçilen vardiya"
 #: model:mail.template,subject:planning.email_template_slot_single
 msgid "{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
 msgstr "{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
+#~ "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
+#~ "                    <p t-else=\"\">Hello,</p>\n"
+#~ "                    <br/>\n"
+#~ "                    <p>\n"
+#~ "                        The following shift that you requested to switch "
+#~ "has been re-assigned\n"
+#~ "                        <t t-if=\"ctx.get('new_assignee_names')\"> to <t "
+#~ "t-out=\"ctx['new_assignee_names']\">Marc Demo</t></t>.\n"
+#~ "                    </p>\n"
+#~ "                    <table style=\"margin-left: 30px;\">\n"
+#~ "                        <tr t-if=\"(ctx.get('start_datetime') and "
+#~ "ctx.get('end_datetime'))                                   or "
+#~ "ctx.get('allocated_hours')                                   or "
+#~ "ctx.get('allocated_percentage')\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Date</th>\n"
+#~ "                            <td style=\"padding: 5px;\">\n"
+#~ "                                <span t-if=\"ctx.get('start_datetime') "
+#~ "and ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+#~ "(                                     ctx['start_datetime'],                                     "
+#~ "ctx['end_datetime'],                                 )\">\n"
+#~ "                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, "
+#~ "4:00 PM\n"
+#~ "                                </span>\n"
+#~ "                                <span t-if=\"ctx.get('allocated_hours')\" "
+#~ "style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-out=\"ctx['allocated_hours']"
+#~ "\">4:00</t>h)\n"
+#~ "                                </span>\n"
+#~ "                                <span t-"
+#~ "if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != "
+#~ "'100'\" style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-"
+#~ "out=\"ctx['allocated_percentage']\">50</t>%)\n"
+#~ "                                </span>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"object.role_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Role</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.role_id.name or ''\">Bartender</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'project_id') and "
+#~ "object.project_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Project</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'task_id') and "
+#~ "object.task_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Task</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().task_id.name or ''\">Chef</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+#~ "object.sale_line_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Sales Order Item</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'name') and "
+#~ "object.name\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Note</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.name or ''\">/</td>\n"
+#~ "                        </tr>\n"
+#~ "                    </table>\n"
+#~ "                    <br/>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p t-if=\"ctx.get('old_assignee_name')\">Sevgili <t t-"
+#~ "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
+#~ "                    <p t-else=\"\">Merhaba,</p>\n"
+#~ "                    <br/>\n"
+#~ "                   <p> \n"
+#~ "                        Değiştirilmesini talep ettiğiniz aşağıdaki "
+#~ "vardiya,\n"
+#~ "                       <t t-if=\"ctx.get('new_assignee_names')\"> "
+#~ "adresinden <t t-out=\"ctx['new_assignee_names']\">adresine Marc Demo</t></"
+#~ "t> olarak yeniden atanmıştır.\n"
+#~ "                   </p>\n"
+#~ "                    <table style=\"margin-left: 30px;\"> \n"
+#~ "                       <tr t-if=\"(ctx.get('start_datetime') and "
+#~ "ctx.get('end_datetime'))                                   or "
+#~ "ctx.get('allocated_hours')                                   or "
+#~ "ctx.get('allocated_percentage')\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\"> Tarih</th>\n"
+#~ "                            <td style=\"padding: 5px;\">\n"
+#~ "                               <span t-if=\"ctx.get('start_datetime') and "
+#~ "ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+#~ "(                                     ctx['start_datetime'],                                     "
+#~ "ctx['end_datetime'],                                 )\"> \n"
+#~ "                                    31 Mayıs 2021, 08:00 ⟶ 31 Mayıs 2021, "
+#~ "16:00\n"
+#~ "                               </span>\n"
+#~ "                                <span t-if=\"ctx.get('allocated_hours')\" "
+#~ "style=\"opacity: 0.5;\"> \n"
+#~ "                                    (<t t-out=\"ctx['allocated_hours']"
+#~ "\">4:00</t>h)\n"
+#~ "                               </span>\n"
+#~ "                                <span t-"
+#~ "if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != "
+#~ "'100'\" style=\"opacity: 0.5;\"> \n"
+#~ "                                    (<t t-"
+#~ "out=\"ctx['allocated_percentage']\">50</t>%)\n"
+#~ "                               </span>\n"
+#~ "                            </td> \n"
+#~ "                       </tr>\n"
+#~ "                        <tr t-if=\"object.role_id\"> \n"
+#~ "                           <th style=\"padding: 5px; text-align: left;\"> "
+#~ "Rol</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.role_id.name or ''\">Barmen</td>\n"
+#~ "                        </tr>\n"
+#~ "                       <tr t-if=\"hasattr(object, 'project_id') and "
+#~ "object.project_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\"> Proje</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().project_id.name or ''\">Toplantı</td>\n"
+#~ "                        </tr>\n"
+#~ "                       <tr t-if=\"hasattr(object, 'task_id') and "
+#~ "object.task_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\"> Görev</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().task_id.name or ''\">Şef</td>\n"
+#~ "                        </tr>\n"
+#~ "                       <tr t-if=\"hasattr(object, 'sale_line_id') and "
+#~ "object.sale_line_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\"> Satış Siparişi Kalemi</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().sale_line_id.name or ''\">Kahve</td>\n"
+#~ "                        </tr>\n"
+#~ "                       <tr t-if=\"hasattr(object, 'name') and "
+#~ "object.name\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\"> Not</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.name or ''\">/</td>\n"
+#~ "                        </tr>\n"
+#~ "                   </table>\n"
+#~ "                    <br/> \n"
+#~ "               </div> \n"
+#~ "            "
 
 #~ msgid ""
 #~ "<span>The employee assigned would like to switch shifts with someone else."

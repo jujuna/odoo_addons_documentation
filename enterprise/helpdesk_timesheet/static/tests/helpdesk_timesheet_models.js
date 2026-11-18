@@ -92,7 +92,7 @@ helpdeskModels.HelpdeskTicket = HelpdeskTicket;
 helpdeskModels.HelpdeskTeam = HelpdeskTeam;
 helpdeskModels.HelpdeskTicketReportAnalysis = HelpdeskTicketReportAnalysis;
 helpdeskModels.HelpdeskTicket._views = {
-    "list": `<list><field name="name"/></list>`,
+    list: `<list><field name="name"/></list>`,
 };
 
 export function defineHelpdeskTimesheetModels() {

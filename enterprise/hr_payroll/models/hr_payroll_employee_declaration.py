@@ -80,6 +80,18 @@ class HrPayrollEmployeeDeclaration(models.Model):
             record.version_id = version
 
     def _generate_pdf(self):
+        """
+        Render and store the PDF of these declarations, sheet by sheet.
+
+        For each sheet: call ``_get_rendering_data`` with the employees of the declarations, then
+        ``_post_process_rendering_data_pdf``, and render the report ``_get_pdf_report`` for each
+        employee, in its language, with ``data``: ``report_data`` (data of the employee),
+        ``employee``, ``company_id`` and ``payroll_config_id`` (current payroll configuration of
+        the employee company). The files are stored by the ``_process_files`` of the sheet;
+        errors are stored in the ``pdf_error`` of the sheet or in ``declaration_error``.
+        Called by the cron ``hr.payslip._cron_generate_pdf`` on the declarations flagged
+        ``pdf_to_generate``.
+        """
         report_sudo = self.env["ir.actions.report"].sudo()
         declarations_by_sheet = defaultdict(lambda: self.env['hr.payroll.employee.declaration'])
         for declaration in self:
@@ -120,7 +132,9 @@ class HrPayrollEmployeeDeclaration(models.Model):
                 _logger.info('Printing %s (%s/%s)', sheet._description, counter, sheet_count)
                 counter += 1
                 sheet_filename = sheet._get_pdf_filename(employee)
-                sheet_file, dummy = report_sudo.with_context(lang=employee.lang or self.env.lang)._render_qweb_pdf(
+                # in the document layout of the company of the employee, not the one of the current company
+                company = employee.company_id or sheet.company_id
+                sheet_file = report_sudo.with_company(company).with_context(lang=employee.lang or self.env.lang)._render_qweb_pdf(
                     report_id,
                     [employee.id],
                     data={
@@ -129,7 +143,7 @@ class HrPayrollEmployeeDeclaration(models.Model):
                         "company_id": employee.company_id,
                         "payroll_config_id": employee.company_id.current_payroll_config_id,
                     },
-                )
+                )[0]
                 pdf_files.append((employee, sheet_filename, sheet_file))
             if pdf_files:
                 sheet._process_files(pdf_files)
@@ -148,6 +162,12 @@ class HrPayrollEmployeeDeclaration(models.Model):
         return res
 
     def action_generate_pdf(self):
+        """
+        Flag these declarations (all the draft declarations if called on an empty recordset)
+        for PDF generation, and trigger the PDF generation cron.
+
+        :return: client action notifying the user and reloading the view
+        """
         if self:
             self.write({'pdf_to_generate': True, 'declaration_error': False})
             self.env.ref('hr_payroll.ir_cron_generate_payslip_pdfs')._trigger()
@@ -174,10 +194,13 @@ class HrPayrollEmployeeDeclaration(models.Model):
         Synchronously generates the pdf file and downloads it for a single declaration.
         """
         self.ensure_one()
+        # The error of a previous generation may be fixed since then
+        self.declaration_error = False
         self._generate_pdf()
 
-        if self.declaration_error:
-            raise UserError(self.env._("Cannot generate PDF: %s", self.declaration_error))
+        error = self.declaration_error or (not self.pdf_file and self.env[self.res_model].browse(self.res_id).pdf_error)
+        if error:
+            raise UserError(self.env._("Cannot generate PDF: %s", error))
 
         return {
             'type': 'ir.actions.act_url',
@@ -187,6 +210,7 @@ class HrPayrollEmployeeDeclaration(models.Model):
 
     @api.autovacuum
     def _gc_orphan_declarations(self):
+        """Delete the declarations whose sheet (``res_model``, ``res_id``) no longer exists."""
         orphan_ids = []
         grouped_declarations = self._read_group([], ['res_model'], ['res_id:array_agg'])
         for res_model, res_ids in grouped_declarations:

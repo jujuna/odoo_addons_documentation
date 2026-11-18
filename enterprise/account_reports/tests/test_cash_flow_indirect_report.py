@@ -95,6 +95,7 @@ class TestCashFlowIndirectReport(TestAccountReportsCommon):
         bank_move_2025.action_post()
 
     def test_cash_flow_indirect_full_report(self):
+        self.ensure_installed('account_asset')
         options = self._generate_options(self.report, '2026-01-01', '2026-12-31')
 
         lines = self.report._get_lines(options)

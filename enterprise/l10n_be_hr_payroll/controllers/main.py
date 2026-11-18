@@ -6,13 +6,27 @@ import re
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import fields, http
+from odoo import http
 from odoo.http import request
 from odoo.http.stream import content_disposition
 
 from odoo.addons.hr_payroll.controllers.main import HrPayroll
 
 _logger = logging.getLogger(__name__)
+
+
+class L10nBeSocialBalanceSheetController(http.Controller):
+
+    @http.route('/l10n_be_hr_payroll/social_balance_sheet/<int:wizard_id>/xlsx', type='http', auth='user')
+    def export_social_balance_sheet_xlsx(self, wizard_id):
+        wizard = request.env['l10n.be.social.balance.sheet'].browse(wizard_id).exists()
+        if not wizard:
+            raise request.not_found()
+        filename, content = wizard.with_company(wizard.company_id)._get_xlsx_file()
+        return request.make_response(content, headers=[
+            ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+            ('Content-Disposition', content_disposition(filename)),
+        ])
 
 
 class L10nBeHrPayrollEcoVoucherController(http.Controller):
@@ -69,13 +83,10 @@ class L10nBeHrPayrollEcoVoucherController(http.Controller):
             employee_name = re.sub(r"[\(].*?[\)]", "", employee.legal_name)
             quantity = 1
             amount = round(line.amount, 2)
-            birthdate = employee.birthday or fields.Date.today()
-            lang = employee.lang
-            if lang == 'fr_FR':
-                lang = 'FR'
-            elif lang == 'nl_NL':
-                lang = 'NL'
-            else:
+            birthdate = employee.birthday
+            # French and Dutch whatever the country (fr_BE, nl_BE, ...)
+            lang = (employee.lang or '')[:2].upper()
+            if lang not in ('FR', 'NL'):
                 lang = 'EN'
 
             rows.append((
@@ -86,7 +97,7 @@ class L10nBeHrPayrollEcoVoucherController(http.Controller):
                 quantity,
                 amount,
                 quantity * amount,
-                f'{birthdate:%m/%d/%Y}',
+                f'{birthdate:%d/%m/%Y}' if birthdate else ' ',
                 'F' if employee.sex == 'female' else 'M',
                 lang,
                 ' ', ' ', ' ', ' ', ' ', ' ', ' ',

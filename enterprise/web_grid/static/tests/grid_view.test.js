@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
+import { beforeEach, clear, describe, expect, test } from "@odoo/hoot";
 import {
     hover,
     press,
@@ -1769,6 +1769,33 @@ describe("grid_view_desktop", () => {
         expect("button[name='action_test_invisible']").toHaveCount(0);
     });
 
+    test("custom buttons in grid view are called with the user context", async () => {
+        onRpc("/web/dataset/call_button/*", async (request) => {
+            const { params } = await request.json();
+            expect.step(params.method);
+            expect(params.kwargs.context).toMatchObject({
+                lang: serverState.lang,
+                uid: serverState.userId,
+            });
+            return false;
+        });
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `<grid>
+                <button name="action_test" string="Test" type="object"/>
+                <field name="project_id" type="row"/>
+                <field name="date" type="col">
+                    <range name="week" string="Week" span="week" step="day"/>
+                </field>
+                <field name="unit_amount" type="measure" widget="float_time"/>
+            </grid>`,
+        });
+
+        await contains("button[name='action_test']").click();
+        expect.verifySteps(["action_test"]);
+    });
+
     test("date should be grouped by month in year range", async () => {
         expect.assertions(1);
 
@@ -2270,7 +2297,7 @@ describe("grid_view_desktop", () => {
 
         onRpc((args) => {
             if (args.method === "formatted_read_group") {
-                expect.step("formatted_read_group"); 
+                expect.step("formatted_read_group");
                 expect(args.kwargs.groupby).toEqual(["date:day", "task_id", "project_id"]);
             }
         });
@@ -2304,6 +2331,27 @@ describe("grid_view_desktop", () => {
 
         // warning shown, then a reload that must not include other_date
         expect.verifySteps(["notification", "formatted_read_group"]);
+    });
+
+    test("discarding a cleared cell with escape keep its value", async () => {
+        onRpc("grid_update_cell", () => expect.step("grid_update_cell"));
+
+        const arch = Line._views["grid"].replace("<grid>", '<grid editable="1">');
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch,
+        });
+
+        await hover(".o_grid_row .o_grid_cell_readonly:eq(1)");
+        await contains(".o_grid_cell").click();
+        await animationFrame();
+        await clear();
+        await press("escape");
+        await animationFrame();
+        expect.verifySteps([], {
+            message: "the grid should not be updated since we discarded changes.",
+        });
     });
 });
 

@@ -256,6 +256,7 @@ def build_json_feed(account, messages):
             ],
         },
         separators=(",", ":"),
+        ensure_ascii=False,  # Don't escape non-ascii strings to keep the feed under the 10MiB limit
     )
 
 

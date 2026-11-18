@@ -160,6 +160,8 @@ class HrEmployee(models.Model):
                 Command.create({'group_id': group.id, 'role': 'edit'})
                 for group in employee.company_id._get_documents_employee_folders_editor_groups()
             ],
+            'res_model': 'hr.employee',
+            'res_id': employee.id,
         } for employee in employees_without_folder]).sudo(self.env.su)
         for employee, folder in zip(employees_without_folder, folders):
             employee.hr_employee_folder_id = folder.id

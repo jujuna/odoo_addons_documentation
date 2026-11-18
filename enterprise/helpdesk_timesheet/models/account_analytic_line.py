@@ -181,6 +181,10 @@ class AccountAnalyticLine(models.Model):
         }
 
     @api.model
+    def _get_timesheet_systray_pre_filled_form_fields(self):
+        return [*super()._get_timesheet_systray_pre_filled_form_fields(), 'helpdesk_ticket_id']
+
+    @api.model
     def _get_assistant_odoo_models(self):
         return {
             **super()._get_assistant_odoo_models(),

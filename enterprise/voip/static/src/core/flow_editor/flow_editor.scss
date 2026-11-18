@@ -137,11 +137,11 @@
     }
 
     &_port {
+        --o-flow-port-stroke: var(--gray-600);
+        --o-flow-port-fill: var(--card-bg);
         width: 0.875rem;
         height: 0.875rem;
-        border: 2px solid var(--gray-600);
         border-radius: 50%;
-        background: var(--card-bg);
         transform: translateY(-50%);
         z-index: 2;
         cursor: crosshair;
@@ -150,6 +150,16 @@
             position: absolute;
             inset: -0.5rem;
             content: "";
+        }
+
+        // An SVG circle rather than a rounded border: under the viewport's
+        // scale(), Chrome snaps a box's edges to device pixels one by one, so
+        // a 50% radius border turns oval at fractional zooms and screen scales.
+        &_dot {
+            pointer-events: none;
+            fill: var(--o-flow-port-fill);
+            stroke: var(--o-flow-port-stroke);
+            stroke-width: 2px;
         }
 
         &_input {
@@ -161,19 +171,19 @@
         }
 
         &_connected {
-            border-color: var(--link-color);
-            background: var(--link-color);
+            --o-flow-port-stroke: var(--link-color);
+            --o-flow-port-fill: var(--link-color);
         }
 
         &_valid {
-            border-color: var(--o-success, #198754);
-            background: var(--o-success, #198754);
+            --o-flow-port-stroke: var(--o-success, #198754);
+            --o-flow-port-fill: var(--o-success, #198754);
             box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.2);
         }
 
         &_invalid {
-            border-color: var(--o-danger, #dc3545);
-            background: var(--o-danger, #dc3545);
+            --o-flow-port-stroke: var(--o-danger, #dc3545);
+            --o-flow-port-fill: var(--o-danger, #dc3545);
             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.2);
         }
     }

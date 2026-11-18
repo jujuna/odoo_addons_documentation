@@ -491,12 +491,14 @@ class TestPlanningLeaves(TestCommon):
 
         custom_leave, half_day_leave = self.env['hr.work.entry.type'].create([{
             'name': 'Custom Leave',
+            'count_as': 'absence',
             'code': 'Custom Leave',
             'requires_allocation': False,
             'request_unit': 'hour',
             'unit_of_measure': 'hour',
         }, {
             'name': 'Half day',
+            'count_as': 'absence',
             'code': 'Half day',
             'requires_allocation': False,
             'request_unit': 'half_day',

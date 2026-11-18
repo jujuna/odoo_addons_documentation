@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
 "PO-Revision-Date: 2026-10-20 10:34+0000\n"
 "Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
 "Language-Team: Czech <https://translate.odoo.com/projects/odoo-20/planning/"
@@ -162,7 +162,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee')\">Dear <t t-"
 "out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('start_datetime') and "
 "ctx.get('end_datetime')\">\n"
 "                        Your upcoming shifts from <t t-"
@@ -190,7 +190,7 @@ msgid ""
 "                            </a>\n"
 "                        </div>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('planning_url') and "
 "(ctx.get('slot_unassigned') or (object.allow_self_unassign and "
 "object.self_unassign_days_before))\">\n"
@@ -207,8 +207,8 @@ msgid ""
 "of the shift.\n"
 "                        </t>\n"
 "                    </p>\n"
-"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/"
-">\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']"
+"\"></p>\n"
 "                    <p t-if=\"ctx.get('is_internal_user') and not "
 "object.allow_self_unassign\">In case your current schedule doesn't suit you, "
 "we encourage you to reach out to your colleagues and request to switch "
@@ -224,7 +224,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
 "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p>\n"
 "                        The following shift that you requested to switch has "
 "been re-assigned\n"
@@ -293,7 +293,7 @@ msgid ""
 "or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                </div>\n"
 "            "
 msgstr ""
@@ -386,7 +386,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-"
 "out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('open_shift_available')\">We have a "
 "new shift opening:</p>\n"
 "                    <p t-else=\"\">You have been assigned the following "
@@ -481,7 +481,7 @@ msgid ""
 "                            Add to iCal/Outlook\n"
 "                        </a>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-if=\"ctx.get('open_shift_available')\">\n"
 "                        <p t-if=\"ctx.get('is_internal_user')\">\n"
 "                            If you are interested and available, please "
@@ -818,6 +818,13 @@ msgstr ""
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_controller.xml:0
 msgid "Copy previous week"
 msgstr "Kopírovat předchozí týden"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Could not undo scheduling"
+msgstr ""
 
 #. module: planning
 #: model:planning.role,name:planning.planning_role_crane
@@ -1830,6 +1837,18 @@ msgstr ""
 
 #. module: planning
 #. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's copied shifts removed"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's shifts copied"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
 #: code:addons/planning/static/src/views/planning_calendar/planning_calendar_controller.xml:0
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_controller.xml:0
 msgid "Print"
@@ -2310,6 +2329,12 @@ msgstr "Směnu nelze odstranit"
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift divided into two"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shift duplicated"
 msgstr "Směna duplikována"
 
@@ -2358,15 +2383,34 @@ msgid "Shift sent"
 msgstr "Směna odeslána"
 
 #. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift unscheduled"
+msgstr ""
+
+#. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Shifts Planned"
 msgstr "Plánované směny"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts could not be merged back"
+msgstr ""
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Shifts in Conflict"
 msgstr "Konfliktní směny"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts merged back"
+msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
@@ -2389,6 +2433,12 @@ msgstr "Směny resetovány na návrh"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shifts scheduled"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts unscheduled"
 msgstr ""
 
 #. module: planning

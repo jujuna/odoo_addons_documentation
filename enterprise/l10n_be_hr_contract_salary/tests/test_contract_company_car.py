@@ -71,3 +71,46 @@ class TestContractCompanyCar(TestSalaryPackageItems):
             car.driver_id,
             "Driver (driver_id) must NOT be auto-assigned upon payroll selection."
         )
+
+    def test_sign_item_vehicle_auto_value(self):
+        """ The car and bike sign items of a version are filled with the name of the vehicle. """
+        brand = self.env['fleet.vehicle.model.brand'].create({'name': 'Test Brand'})
+        car_model, new_car_model, bike_model, new_bike_model = self.env['fleet.vehicle.model'].create([{
+            'name': name,
+            'brand_id': brand.id,
+            'vehicle_type': vehicle_type,
+        } for name, vehicle_type in [
+            ('Car Model', 'car'), ('New Car Model', 'car'), ('Bike Model', 'bike'), ('New Bike Model', 'bike'),
+        ]])
+        car, bike = self.env['fleet.vehicle'].create([
+            {'model_id': car_model.id, 'company_id': self.company_id.id},
+            {'model_id': bike_model.id, 'company_id': self.company_id.id},
+        ])
+        version = self.env['hr.version'].search(
+            [('employee_id', '=', self.employee.id), ('active', '=', True)], limit=1,
+        )
+        sign_request_item = self.env['sign.request.item']
+
+        def get_auto_value(vehicule):
+            return sign_request_item._get_vehicule_auto_value(
+                'Default', version, f'transport_mode_{vehicule}', vehicule=vehicule)
+
+        version.write({
+            'transport_mode_car': True,
+            'car_id': car.id,
+            'transport_mode_bike': True,
+            'bike_id': bike.id,
+        })
+        self.assertEqual(get_auto_value('car'), car.name)
+        self.assertEqual(get_auto_value('bike'), bike.name)
+
+        version.write({
+            'car_id': False,
+            'has_new_car': True,
+            'new_car_model_id': new_car_model.id,
+            'bike_id': False,
+            'new_bike': True,
+            'new_bike_model_id': new_bike_model.id,
+        })
+        self.assertEqual(get_auto_value('car'), new_car_model.name)
+        self.assertEqual(get_auto_value('bike'), new_bike_model.name)

@@ -20,17 +20,13 @@ class HrVersion(models.Model):
     internet_invoice_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     internet_invoice = fields.Binary(related="employee_id.internet_invoice", groups="hr.group_hr_manager", readonly=False)
     double_holiday_wage = fields.Monetary(compute='_compute_double_holiday_wage', groups="hr_payroll.group_hr_payroll_user")
-    employee_type_id = fields.Many2one('hr.employee.type', "Employee Type",
-                                       index='btree_not_null',
-                                       default=lambda self: self.env.ref('hr.contract_type_employee',
-                                                                         raise_if_not_found=False) if self.env.company.country_id.code == "BE" else self.env['hr.employee.type'])
     l10n_be_bicyle_cost = fields.Float(compute='_compute_l10n_be_bicyle_cost', groups="hr_payroll.group_hr_payroll_user")
     l10n_be_13th_month_in_warrant = fields.Boolean("13th Month paid in warrant", groups="hr_payroll.group_hr_payroll_user")
 
-    @api.depends('has_bicycle')
+    @api.depends('has_bicycle', 'transport_mode_bike', 'employee_id.km_home_work')
     def _compute_l10n_be_bicyle_cost(self):
         for version in self:
-            if not version.has_bicycle:
+            if not version.has_bicycle and not version.transport_mode_bike:
                 version.l10n_be_bicyle_cost = 0
             else:
                 version.l10n_be_bicyle_cost = self._get_private_bicycle_cost(version.employee_id.km_home_work)
@@ -223,7 +219,7 @@ class HrVersion(models.Model):
         new_bike = bike == 'new'
         if new_bike:
             return {
-                'transport_mode_bike': False,
+                'transport_mode_bike': True,
                 'new_bike': True,
                 'new_bike_model_id': int(bike_id),
                 'bike_id': False,

@@ -2,6 +2,8 @@ from freezegun import freeze_time
 
 from odoo.tests import tagged, Form
 
+from odoo.addons.http_routing.tests.common import MockRequest
+from odoo.addons.l10n_be_hr_contract_salary.controllers.main import HrContractSalary
 from odoo.addons.l10n_be_hr_payroll.tests.test_hr_version import TestPayrollHrVersion
 
 
@@ -52,3 +54,43 @@ class TestHrVersion(TestPayrollHrVersion):
             'contract_date_start': "2026-01-02",
         })
         self.assertTrue(self.student_emp.l10n_be_last_dimona_declaration_id, 'A dimona action should\'ve been triggered!')
+
+    def test_salary_configurator_new_bike(self):
+        version = self.employee.version_id
+        bike_model = self._create_bike_model()
+        version.write(version._get_benefit_values_company_bike_depreciated_cost({}, {
+            'fold_company_bike_depreciated_cost': True,
+            'select_company_bike_depreciated_cost': f'new-{bike_model.id}',
+        }))
+        self.assertTrue(version.transport_mode_bike)
+        self.assertTrue(version.new_bike)
+        self.assertEqual(version.company_bike_depreciated_cost, 50.0)
+        # Still requested (and costing the employer) after a recompute of "Uses company bike"
+        version.new_bike = True
+        self.assertEqual(version.new_bike_model_id, bike_model)
+        self.assertEqual(version.company_bike_depreciated_cost, 50.0)
+
+    def test_salary_configurator_student_eco_checks(self):
+        offer = self.env['hr.contract.salary.offer'].create({
+            'employee_id': self.student_emp.id,
+            'company_id': self.test_company.id,
+        })
+        with MockRequest(self.env):
+            initial_values = HrContractSalary()._get_benefits_values(self.student_emp.version_id, offer)[-1]
+        self.assertEqual(initial_values['eco_checks'], 0)
+
+    def test_private_bicycle_cost(self):
+        version = self.employee.version_id
+        self.employee.km_home_work = 50
+        self.assertEqual(version.l10n_be_bicyle_cost, 0)
+        bike = self.env['fleet.vehicle'].create({
+            'model_id': self._create_bike_model().id,
+            'company_id': self.employee.company_id.id,
+        })
+        # The bicycle allowance is also due to the employees riding a company bike
+        self.employee.bike_id = bike
+        version.invalidate_recordset(['l10n_be_bicyle_cost'])
+        with freeze_time('2026-05-01'):
+            # 4 x min(10.80 € daily cap, 0.27 € x 50 km x 2)
+            self.assertAlmostEqual(version.l10n_be_bicyle_cost, 43.2, places=2)
+            self.assertAlmostEqual(self.env['hr.version']._get_private_bicycle_cost(50), 43.2, places=2)

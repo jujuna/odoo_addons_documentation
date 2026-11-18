@@ -13,6 +13,11 @@ class HrContractSignDocumentWizard(models.TransientModel):
 
     @api.depends('version_id')
     def _compute_sign_template_ids(self):
+        """Add the sign template of the version to the documents to sign.
+
+        The *Contract Update* template for an amendment (the current version, or a version whose
+        contract does not start after the current one), the *New Contract* template otherwise.
+        """
         for wizard in self:
             version = wizard.version_id
             if not version:

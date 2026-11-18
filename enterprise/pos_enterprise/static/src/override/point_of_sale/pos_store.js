@@ -9,6 +9,7 @@ patch(PosStore.prototype, {
         const result = await super.sendOrderInPreparation(o, opts);
         if (this.config.preparationDisplayCategories.size > 0) {
             try {
+                o.updateLastOrderChange(opts);
                 await this.syncAllOrders({
                     orders: [o],
                     force: true,
@@ -39,5 +40,8 @@ patch(PosStore.prototype, {
         }
 
         return result;
+    },
+    hasDevice(opts = {}) {
+        return super.hasDevice(opts) || this.config.preparationDisplayCategories.size > 0;
     },
 });

@@ -295,22 +295,23 @@ class TestAiToolUpdateRecords(TestAICallbackCommon):
     def test_update_records_accepted_posts_preview_link_multiple_records(self):
         """A preview proper preview message should be posted in the channel when a creation tool call is accepted which modifies multiple records."""
 
+        partner, another_partner = self.env["res.partner"].create([
+            {"name": "Test Partner"},
+            {"name": "Another Partner"},
+        ])
+
         action = self.env["ir.actions.act_window"].create(
             {
-                "res_model": "ai.agent",
+                "res_model": "res.partner",
             },
         )
 
         menu = self.env["ir.ui.menu"].create(
             {
-                "name": "Test Agents",
+                "name": "Test Partners",
                 "action": f"{action._name},{action.id}",
             },
         )
-
-        another_agent = self.env["ai.agent"].create({
-            "name": "Another agent",
-        })
 
         session = self._create_ai_session(self.agent)
 
@@ -324,20 +325,20 @@ class TestAiToolUpdateRecords(TestAICallbackCommon):
 
         mocked_responses = [
             self.mock_tool_response(self.update_tool, {
-                "explanation": "Updating Test Agent to Jimmy",
-                "preview_menus": [{"model_name": "ai.agent", "menu_id": menu.id}],
+                "explanation": "Updating Test Partner to Jimmy",
+                "preview_menus": [{"model_name": "res.partner", "menu_id": menu.id}],
                 'updates': [
                     {
-                        'model_name': 'ai.agent',
-                        'domain': f"[('id', '=', {self.agent.id})]",
+                        'model_name': 'res.partner',
+                        'domain': f"[('id', '=', {partner.id})]",
                         'changes': [{
                             'field': 'name',
                             'value': 'Jimmy',
                         }],
                     },
                     {
-                        'model_name': 'ai.agent',
-                        'domain': f"[('id', '=', {another_agent.id})]",
+                        'model_name': 'res.partner',
+                        'domain': f"[('id', '=', {another_partner.id})]",
                         'changes': [{
                             'field': 'name',
                             'value': 'Bob',
@@ -348,18 +349,18 @@ class TestAiToolUpdateRecords(TestAICallbackCommon):
         ]
 
         with self.mock_callback_completions(mocked_responses):
-            self._post_user_message_on_session(session, "Change agent name")
+            self._post_user_message_on_session(session, "Change partner names")
 
         # should ask for the confirmation
         self.assertEqual(session.pending_tool_call['call_id'], 2)
 
         # pending confirmation should preview the changes
         self.assertIn(
-            'AI Agent "Test Agent": Agent Name → Jimmy AI Agent "Another agent": Agent Name → Bob',
+            'Contact "Test Partner": Name → Jimmy Contact "Another Partner": Name → Bob',
             html_to_inner_content(session.pending_tool_call['user_input_request']['body']),
         )
-        self.assertEqual(self.agent.name, "Test Agent", "Change should not be done before accepting.")
-        self.assertEqual(another_agent.name, 'Another agent', "Change should not be done before accepting.")
+        self.assertEqual(partner.name, "Test Partner", "Change should not be done before accepting.")
+        self.assertEqual(another_partner.name, 'Another Partner', "Change should not be done before accepting.")
 
         # confirm tool
         with self.mock_callback_completions([self.mock_text_response("Changes done")]):
@@ -367,19 +368,19 @@ class TestAiToolUpdateRecords(TestAICallbackCommon):
 
         self.assertFalse(session.pending_tool_call)
 
-        self.assertEqual(self.agent.name, 'Jimmy', "Name should have been updated")
-        self.assertEqual(another_agent.name, 'Bob', "Name should have been updated")
+        self.assertEqual(partner.name, 'Jimmy', "Name should have been updated")
+        self.assertEqual(another_partner.name, 'Bob', "Name should have been updated")
 
         all_message_contents = [
             msg.body for msg in session.channel_id.message_ids[::-1]
         ]
 
         self.assertIn(
-            # agents were updated: ai_agentic replaces the generic link note
-            "self-updated its configuration",
+            f'has updated <a href="/web#action={action.id}&amp;domain=',
             all_message_contents[-1],
             "Preview message should be posted in the channel after update is accepted",
         )
+        self.assertIn('>records (Contact)</a>', all_message_contents[-1])
         self.assertEqual(all_message_contents[-2], '<p>Changes done</p>')
 
     def test_update_records_raises_value_error_on_sql_constraint_fail(self):

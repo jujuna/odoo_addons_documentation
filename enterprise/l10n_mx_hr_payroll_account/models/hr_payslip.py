@@ -206,19 +206,19 @@ class HrPayslip(models.Model):
         cfdi_values['nomina_emisor'] = {
             'curp': self.company_id.l10n_mx_curp if self._l10n_mx_is_curp_needed() else False,
             'registro_patronal': self.company_id.l10n_mx_imss_id,
-            'rfc_patron_origen': self.company_id.vat,
         }
 
         bank_account = self.employee_id.bank_account_ids[:1]
         is_clabe = bank_account and len(bank_account.sanitized_account_number) == 18
         base_contribution_salary_rule = self.env.ref('l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary', raise_if_not_found=False)
         base_contribution_salary = rules_amount[base_contribution_salary_rule] if base_contribution_salary_rule and base_contribution_salary_rule in rules_amount else 0
-        seniority_days = (self.date_to - self.version_id.contract_date_start).days
+        seniority_start = self.employee_id._get_first_contract_date()
+        seniority_days = (self.date_to - seniority_start).days
         seniority = f'P{seniority_days + 1}D' if seniority_days < 7 else f'P{seniority_days // 7}W'
         cfdi_values['nomina_receptor'] = {
             'curp': self.employee_id.l10n_mx_curp,
             'num_seguridad_social': self.employee_id.l10n_mx_ssn,
-            'fecha_inicio_rel_laboral': self.version_id.contract_date_start.isoformat(),
+            'fecha_inicio_rel_laboral': seniority_start.isoformat(),
             'antigüedad': seniority,
             'tipo_contrato': self.version_id.employee_type_id.code,
             'tipo_regimen': self.version_id.l10n_mx_regime_type,

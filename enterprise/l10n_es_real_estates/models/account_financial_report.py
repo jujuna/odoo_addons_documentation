@@ -21,12 +21,11 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
         })
         return invoice_types_by_xmlid
 
-    def export_boe(self, options):
+    def _get_boe_content(self, options):
         """ Overridden from l10n_es_reports to append the real estates record at
         the end of the generated BOE file.
         """
-        result = super().export_boe(options)
-        file_content = result['file_content'].decode()
+        file_content = super()._get_boe_content(options)
         dummy, year = self._get_mod_period_and_year(options)
         current_company = self.env.company
 
@@ -41,8 +40,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
 
         file_content += self._call_on_partner_sublines(boe_report_options, 'l10n_es_real_estates.mod_347_real_estates', lambda report_data: self._write_type2_real_estates_records(report_data, year, current_company))
 
-        result['file_content'] = file_content.encode()
-        return result
+        return file_content
 
     def _get_required_partner_ids_for_boe(self, mod_invoice_type, date_from, date_to, boe_wizard, operation_key, operation_class):
         rslt = super()._get_required_partner_ids_for_boe(mod_invoice_type, date_from, date_to, boe_wizard, operation_key, operation_class)

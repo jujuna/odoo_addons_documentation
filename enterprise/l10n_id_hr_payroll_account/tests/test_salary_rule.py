@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from odoo.tests import tagged
 from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 
@@ -333,7 +333,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             if i == 12:
                 payslip = slip
 
-        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BASE': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'GROSS_TOTAL': 10454000.0, 'GROSS': 10454000.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 5784134.78, 'JHT_JP': -3469565.22, 'PTKP': 54000000.0, 'PKP': 57649000.0, 'PPH21': -234885.0, 'NET': 9365115.0}
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BASE': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'GROSS_TOTAL': 10454000.0, 'GROSS': 10454000.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 6000000.0, 'JHT_JP': -3469565.22, 'PTKP': 54000000.0, 'PKP': 57433000.0, 'PPH21': -224085.0, 'NET': 9375915.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_end_of_contract_3(self):
@@ -434,6 +434,31 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         self.assertEqual(nov_payslip_2.l10n_id_include_pkp_ptkp, True)
         self.assertEqual(dec_payslip_2.l10n_id_include_pkp_ptkp, False)
 
+    def test_pkp_ptkp_show_up_once(self):
+        """ With several payslips in the last month of the year/contract, only the last one includes
+        the PKP/PTKP computation """
+        # semi-monthly
+        dec_payslip_1 = self._generate_payslip(date(2024, 12, 1), date(2024, 12, 15))
+        dec_payslip_2 = self._generate_payslip(date(2024, 12, 16), date(2024, 12, 31))
+        self.assertEqual(dec_payslip_1.l10n_id_include_pkp_ptkp, False)
+        self.assertEqual(dec_payslip_2.l10n_id_include_pkp_ptkp, True)
+
+        # weekly, from monday to sunday
+        dec_payslip_1 = self._generate_payslip(date(2024, 12, 16), date(2024, 12, 22))
+        dec_payslip_2 = self._generate_payslip(date(2024, 12, 23), date(2024, 12, 29))
+        self.assertEqual(dec_payslip_1.l10n_id_include_pkp_ptkp, False)
+        self.assertEqual(dec_payslip_2.l10n_id_include_pkp_ptkp, True)
+
+    def test_pkp_ptkp_show_up_once_end_of_contract(self):
+        """ With several payslips in the last month of the contract, only the one including the end
+        of contract includes the PKP/PTKP computation """
+        # semi-monthly, contract ends in the middle of the second half of August
+        self.version.contract_date_end = date(2024, 8, 20)
+        aug_payslip_1 = self._generate_payslip(date(2024, 8, 1), date(2024, 8, 15))
+        aug_payslip_2 = self._generate_payslip(date(2024, 8, 16), date(2024, 8, 31))
+        self.assertEqual(aug_payslip_1.l10n_id_include_pkp_ptkp, False)
+        self.assertEqual(aug_payslip_2.l10n_id_include_pkp_ptkp, True)
+
     def test_end_of_year_jabatan(self):
         """" Test to make sure biaya jabatan at the end of year is correct"""
         # payroll cycle every 14th, employee starts from october
@@ -443,6 +468,98 @@ class TestPayslipValidation(TestPayslipValidationCommon):
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BASE': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'GROSS_TOTAL': 10454000.0, 'GROSS': 10454000.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 1000000.0, 'JHT_JP': -600000.0, 'PTKP': 54000000.0, 'PKP': 0.0, 'PPH21': 261350.0, 'NET': 9861350.0}
         self._validate_payslip(payslip2, payslip_results)
+
+    def test_end_of_year_jabatan_weekly(self):
+        """ Weekly payroll: biaya jabatan is capped to 500.000 per month with a payslip, not per payslip """
+        self.version.write({
+            'contract_date_start': date(2024, 11, 18),
+            'wage': 4e6,
+        })
+
+        # from monday to sunday: 1 payslip ends in November, 5 in December
+        for week in range(6):
+            slip = self._generate_payslip(
+                date(2024, 11, 18) + timedelta(weeks=week),
+                date(2024, 11, 24) + timedelta(weeks=week),
+            )
+            slip.action_payslip_done()
+        payslip = slip
+
+        # 5% * 6 * 4.181.600 = 1.254.480 => capped to 2 months * 500.000
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 4000000.0, 'BASE': 4000000.0, 'BPJS_JKK': 9600.0, 'BPJS_JKM': 12000.0, 'BPJS_Kesehatan': 160000.0, 'GROSS_TOTAL': 4181600.0, 'GROSS': 4181600.0, 'JHT': -80000.0, 'BPJS_KESEHATAN_DED': -40000.0, 'JP': -40000.0, 'JABATAN': 1000000.0, 'JHT_JP': -720000.0, 'PTKP': 54000000.0, 'PKP': 0.0, 'PPH21': 0.0, 'NET': 3840000.0}
+        self._validate_payslip(payslip, payslip_results)
+
+    def test_end_of_year_jabatan_semi_monthly(self):
+        """ Semi-monthly payroll: biaya jabatan is capped to 6.000.000 per year, even with 24 payslips """
+        self.version.wage = 5e6
+        for i in range(1, 13):
+            drange = PERIOD[i]
+            self._generate_payslip(
+                date(2024, i, 1),
+                date(2024, i, 15),
+            ).action_payslip_done()
+            slip = self._generate_payslip(
+                date(2024, i, 16),
+                date(2024, i, drange[1]),
+            )
+            slip.action_payslip_done()
+
+            if i == 12:
+                payslip = slip
+
+        # 5% * 24 * 5.227.000 = 6.272.400 => capped to 12 months * 500.000
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 5000000.0, 'BASE': 5000000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'BPJS_Kesehatan': 200000.0, 'GROSS_TOTAL': 5227000.0, 'GROSS': 5227000.0, 'JHT': -100000.0, 'BPJS_KESEHATAN_DED': -50000.0, 'JP': -50000.0, 'JABATAN': 6000000.0, 'JHT_JP': -3600000.0, 'PTKP': 54000000.0, 'PKP': 61848000.0, 'PPH21': -3277200.0, 'NET': 1522800.0}
+        self._validate_payslip(payslip, payslip_results)
+
+    def test_end_of_year_jabatan_bonus(self):
+        """ Biaya jabatan is capped on the yearly total: a bonus month above 500.000 is compensated
+        by the months below the cap """
+        self.version.wage = 5e6
+        for i in range(1, 12):
+            drange = PERIOD[i]
+            self._generate_payslip(
+                date(2024, i, drange[0]),
+                date(2024, i, drange[1]),
+            ).action_payslip_done()
+
+        payslip = self._generate_payslip(
+            date(2024, 12, 1),
+            date(2024, 12, 31),
+        )
+        payslip._set_input_values({
+            self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
+            self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
+            self.env.ref('l10n_id_hr_payroll.salary_rule_id_thr').code: 2e7,
+        })
+        payslip.compute_sheet()
+
+        # 5% * (11 * 5.227.000 + 25.227.000) = 4.136.200, below the cap of 6.000.000
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 5000000.0, 'THR': 20000000.0, 'BASE': 25000000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'BPJS_Kesehatan': 200000.0, 'GROSS_TOTAL': 25227000.0, 'GROSS': 25227000.0, 'JHT': -100000.0, 'BPJS_KESEHATAN_DED': -50000.0, 'JP': -50000.0, 'JABATAN': 4136200.0, 'JHT_JP': -1800000.0, 'PTKP': 54000000.0, 'PKP': 22787000.0, 'PPH21': -1139350.0, 'NET': 23660650.0}
+        self._validate_payslip(payslip, payslip_results)
+
+    def test_end_of_year_other_employee(self):
+        """ The payslips of other employees are not taken into account in the yearly computations """
+        self.version.contract_date_start = date(2024, 12, 1)
+        other_employee = self.env['hr.employee'].create({
+            'name': 'ID Employee 2',
+            'resource_calendar_id': self.resource_calendar.id,
+            'structure_type_id': self.version.structure_type_id.id,
+            'contract_date_start': date(2024, 1, 1),
+            'date_version': date(2024, 1, 1),
+            'wage': 1e8,
+        })
+        self._generate_payslip(
+            date(2024, 11, 1),
+            date(2024, 11, 30),
+            employee_id=other_employee.id,
+            version_id=other_employee.version_id.id,
+        ).action_payslip_done()
+
+        payslip = self._generate_payslip(date(2024, 12, 1), date(2024, 12, 31))
+
+        # only the employee's own December payslip is used for JABATAN and PKP
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BASE': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'GROSS_TOTAL': 10454000.0, 'GROSS': 10454000.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 500000.0, 'JHT_JP': -300000.0, 'PTKP': 54000000.0, 'PKP': 0.0, 'PPH21': 0.0, 'NET': 9600000.0}
+        self._validate_payslip(payslip, payslip_results)
 
     def test_pkp_above_zero(self):
         """ Test that PKP is non-negative and when PKP is 0, then return all paid PPH21 amount """
@@ -755,7 +872,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             if i == 8:
                 payslip = slip
 
-        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -1038983.0, 'GROSS_TOTAL': 9985017.0, 'GROSS': 9415017.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 3970750.85, 'JHT_JP': -2400000.0, 'PTKP': 54000000.0, 'PKP': 24485000.0, 'PPH21': 1038983.0, 'NET': 9600000.0}
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -1040533.0, 'GROSS_TOTAL': 9983467.0, 'GROSS': 9413467.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 4000000.0, 'JHT_JP': -2400000.0, 'PTKP': 54000000.0, 'PKP': 24454000.0, 'PPH21': 1040533.0, 'NET': 9600000.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_end_of_contract_2_gross_up(self):
@@ -774,7 +891,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             if i == 12:
                 payslip = slip
 
-        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -154588.0, 'GROSS_TOTAL': 10869412.0, 'GROSS': 10299412.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 5785562.58, 'JHT_JP': -3469565.22, 'PTKP': 54000000.0, 'PKP': 60761000.0, 'PPH21': 154588.0, 'NET': 9600000.0}
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -192388.0, 'GROSS_TOTAL': 10831612.0, 'GROSS': 10261612.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 6000000.0, 'JHT_JP': -3469565.22, 'PTKP': 54000000.0, 'PKP': 60509000.0, 'PPH21': 192388.0, 'NET': 9600000.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_end_of_contract_3_gross_up(self):
@@ -792,7 +909,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             if i == 11:
                 payslip = slip
 
-        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -464591.0, 'GROSS_TOTAL': 10559409.0, 'GROSS': 9989409.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 5499470.45, 'JHT_JP': -3300000.0, 'PTKP': 54000000.0, 'PKP': 54941000.0, 'PPH21': 464591.0, 'NET': 9600000.0}
+        payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 10000000.0, 'BPJS_JKK': 24000.0, 'BPJS_JKM': 30000.0, 'BPJS_Kesehatan': 400000.0, 'JHT_COMP': 370000.0, 'JP_COMP': 200000.0, 'BASE_GROSS_UP': 10454000.0, 'TAXALW': -464591.0, 'GROSS_TOTAL': 10559409.0, 'GROSS': 9989409.0, 'JHT': -200000.0, 'BPJS_KESEHATAN_DED': -100000.0, 'JP': -100000.0, 'JABATAN': 5500000.0, 'JHT_JP': -3300000.0, 'PTKP': 54000000.0, 'PKP': 54941000.0, 'PPH21': 464591.0, 'NET': 9600000.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_end_of_year_with_allowance_gross_up(self):
@@ -1031,6 +1148,26 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'BPJS_KESEHATAN_DED_PREV': -35000.0,
         }, skip_lines=True)
 
+    def test_bpjs_joined_after_cutoff_with_fixed_allowance(self):
+        """BPJS arrears are computed on the previous month's BASIC + Fixed Allowance."""
+        self.version.contract_date_start = date(2024, 6, 20)
+        self.employee.l10n_id_fixed_allowance = 2e6
+
+        june = self._generate_payslip(date(2024, 6, 1), date(2024, 6, 30))
+        self.assertTrue(june._l10n_id_is_bpjs_kesehatan_deferred())
+        june.action_payslip_done()
+
+        # Wage = 10M, 7 days worked in June, 7/20 * 10M = 3.5M = basic salary
+        # Fixed allowances = 2M, Basic + Fixed = 5.5M for June
+        # Base for July 10M wage + 2M fixed = 12M, 4% for BPJS_Kesehatan 1% for BPJS_KESEHATAN_DED
+        july = self._generate_payslip(date(2024, 7, 1), date(2024, 7, 31))
+        self._validate_payslip(july, {
+            'BPJS_Kesehatan': 480000.0,
+            'BPJS_KESEHATAN_PREV': 220000.0,
+            'BPJS_KESEHATAN_DED': -120000.0,
+            'BPJS_KESEHATAN_DED_PREV': -55000.0,
+        }, skip_lines=True)
+
     def test_bpjs_joined_after_cutoff_without_arrears(self):
         """Late joiners do not get BPJS arrears when the input is disabled."""
         self.version.contract_date_start = date(2024, 6, 20)
@@ -1053,3 +1190,39 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         july_codes = july.line_ids.mapped('code')
         self.assertNotIn('BPJS_KESEHATAN_PREV', july_codes)
         self.assertNotIn('BPJS_KESEHATAN_DED_PREV', july_codes)
+
+    def test_gross_up_bpjs_allowance_accounting(self):
+        """Employee BPJS shares paid as allowances are expensed, the deductions book the payable once."""
+        self.version.l10n_id_payroll_type = 'gross_up'
+        allowance_rules = (
+            self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_bpjs_kesehatan_emp')
+            | self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_bpjs_kesehatan_emp_arrears')
+            | self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_jht_alw')
+            | self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_jp_alw')
+        )
+        for rule in allowance_rules:
+            self.assertEqual(rule.account_debit.code, '61100060')
+            self.assertFalse(rule.account_credit)
+        allowance_rules.active = True
+
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        self._validate_payslip(payslip, {
+            'BPJS_KESEHATAN_EMP': 100000.0,
+            'JHT_ALW': 200000.0,
+            'JP_ALW': 100000.0,
+            'NET': 10000000.0,
+        }, skip_lines=True)
+        payslip.action_payslip_done()
+
+        move_lines = payslip.move_id.line_ids
+        self.assertNotIn('Adjustment Entry', move_lines.mapped('name'))
+        balances = {
+            code: sum(move_lines.filtered(lambda line: line.account_id.code == code).mapped('balance'))
+            for code in ('61100010', '61100060', '25110020', '25110110')
+        }
+        self.assertEqual(balances, {
+            '61100010': 10000000.0,  # Employee Salary: basic salary only
+            '61100060': 1424000.0,  # BPJS Expense: company 1,024,000 + employee shares 400,000
+            '25110020': -924000.0,  # BPJS Ketenagakerjaan: JKK + JKM + JHT/JP company + JHT/JP employee
+            '25110110': -500000.0,  # BPJS Kesehatan: company 400,000 + employee 100,000
+        })

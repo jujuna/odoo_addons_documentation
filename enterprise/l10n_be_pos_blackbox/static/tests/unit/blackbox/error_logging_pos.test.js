@@ -2,25 +2,12 @@ import { test, describe, expect } from "@odoo/hoot";
 import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_model_definitions";
 import {
     setupPosBlackboxEnv,
+    fdmErrorResponse,
     waitForUnawaitedCalls,
 } from "@l10n_be_pos_blackbox/../tests/unit/utils";
 import { onRpc, patchTranslations } from "@web/../tests/web_test_helpers";
 
 definePosModels();
-
-const fdmErrorResponse = () =>
-    new Response(
-        JSON.stringify({
-            errors: [
-                {
-                    message: "The FDM is locked",
-                    path: ["signWorkIn"],
-                    extensions: { code: "FDM_LOCKED", category: "FDM" },
-                },
-            ],
-        }),
-        { headers: { "Content-Type": "application/json" } }
-    );
 
 // A `fetch` that never completed rejects with one of the following errors
 const unreachableFdmErrors = [

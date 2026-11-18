@@ -44,3 +44,10 @@ class TestSalaryConfig(HttpCase):
         with freeze_time('2025-01-01'):
             self.offer_from_applicant.contract_start_date = '2025-06-01'
             self.start_tour(self.offer_from_applicant.url, 'hr_contract_salary_payroll_tour', login='admin')
+
+    def test_resume_value_type_selection(self):
+        """Each value type of the resume lines is listed once, with its own label."""
+        selection = self.env['hr.contract.salary.resume']._fields['value_type'].selection
+        keys = [key for key, _label in selection]
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertEqual(dict(selection)['sum'], 'Sum of Benefits Values')

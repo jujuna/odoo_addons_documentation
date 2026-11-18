@@ -10,6 +10,7 @@
                     </button>
                     <t t-if="this.ui.isSmall" t-call="mrp_workorder.MrpDisplay.BurgerMenu"/>
                     <ControlPanelButtons t-if="this.groups.workorders &amp;&amp; !this.state.firstLoad"
+                        t-key="this.state.workcenters.map((wc) => wc.id).join(',')"
                         productionCount="this.productions.length"
                         workorders="this.filteredWorkorders"
                         workcenters="this.state.workcenters"

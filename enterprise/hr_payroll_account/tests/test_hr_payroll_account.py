@@ -788,3 +788,23 @@ class TestHrPayrollAccount(TestHrPayrollAccountCommon):
         self.assertEqual(payslip_2.move_id.company_id, company_2)
         self.assertEqual(self.hr_payslip_john.move_id.journal_id, self.hr_payslip_john.journal_id)
         self.assertEqual(payslip_2.move_id.journal_id, journal_2)
+
+    def test_no_journal_issue_uses_payslip_company(self):
+        """ Check that the 'No Journal on Structure' issue reads the structure journal of the
+        payslip's company, even when recomputed in an environment without allowed companies,
+        whose company is the user's default company """
+        company_2 = self.env['res.company'].create({
+            'name': 'Company 2',
+        })
+        user = new_test_user(
+            self.env, login='payroll_multi_company', groups='hr_payroll.group_hr_payroll_manager',
+            company_id=company_2.id, company_ids=[Command.set((self.company_us | company_2).ids)],
+        )
+        self.assertTrue(self.hr_payslip_john.journal_id)
+        self.assertFalse(self.hr_structure_softwaredeveloper.with_company(company_2).journal_id)
+
+        self.hr_payslip_john.compute_sheet()
+        self.env(user=user, context={}).flush_all()
+
+        messages = [issue['message'] for issue in (self.hr_payslip_john.issues or {}).values()]
+        self.assertNotIn("No Journal on Structure", messages)

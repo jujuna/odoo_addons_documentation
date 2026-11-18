@@ -118,6 +118,8 @@ class AppointmentCalendarController(CalendarController):
         appointment_invite = event.appointment_invite_id
         if not event:
             return request.not_found()
+        if not appointment_type:
+            return request.not_found()
         if cancel_status := self._get_prevent_cancel_status(event):
             return request.redirect(f'/calendar/view/{access_token}?state={cancel_status}&partner_id={partner_id}')
         event.sudo().action_cancel_meeting([int(partner_id)] if partner_id else [])

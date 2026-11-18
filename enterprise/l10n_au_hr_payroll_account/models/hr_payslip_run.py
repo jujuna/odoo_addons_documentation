@@ -104,6 +104,11 @@ class HrPayslipRun(models.Model):
             return all(slip.state in ['validated', 'paid', 'cancel'] for slip in self.mapped('slip_ids'))
         return super()._are_payslips_ready()
 
+    def _unlink_emptied_payruns(self):
+        # the STP records are found through the payslips, delete them before the payslips are detached
+        self._l10n_au_on_payrun_delete()
+        super()._unlink_emptied_payruns()
+
     @api.ondelete(at_uninstall=False)
     def _l10n_au_on_payrun_delete(self):
         self.env["l10n_au.stp"] \

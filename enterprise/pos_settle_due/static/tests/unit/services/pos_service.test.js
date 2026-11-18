@@ -19,5 +19,9 @@ describe("pos_store.js", () => {
         expect(currentOrder.payment_ids).toHaveLength(1);
         expect(selectedPaymentLine.amount).toBe(50);
         expect(selectedPaymentLine.payment_method_id).toBe(expectedPaymentMethod);
+        selectedPaymentLine.setAmount(25);
+        expect(currentOrder.totalDue).toBe(25);
+        expect(currentOrder.lines[0].price_unit).toBe(25);
+        expect(currentOrder.prices.taxDetails.total_amount).toBe(25);
     });
 });

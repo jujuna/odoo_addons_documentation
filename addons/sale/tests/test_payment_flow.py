@@ -137,11 +137,10 @@ class TestSalePayment(AccountPaymentCommon, MailCase, PaymentHttpCommon, SaleCom
             tx_values = CustomerPortal()._get_payment_values(
                 self.sale_order,
                 is_down_payment=False,
-                payment_amount=self.sale_order._get_prepayment_required_amount(),
             )
         self.assertEqual(tx_values["amount"], self.sale_order.amount_total)
 
-    def test_confirmed_transactions_comfirms_so_with_multiple_transaction(self):
+    def test_confirmed_transactions_confirms_so_with_multiple_transaction(self):
         """Test that a confirmed transaction confirms a SO even if one or more non-confirmed
         transactions are linked."""
         # Create the payment
@@ -342,6 +341,24 @@ class TestSalePayment(AccountPaymentCommon, MailCase, PaymentHttpCommon, SaleCom
         self.assertEqual(self.sale_order.state, "draft")
         self.assertFalse(tx.invoice_ids)
         self.assertFalse(self.sale_order.invoice_ids)
+
+    def test_split_payment_without_prepayment_does_not_confirm_order(self):
+        """Test that a partial payment doesn't confirm an order that doesn't require prepayment."""
+        self.sale_order.prepayment_percent = 0.0
+        self.amount = self.sale_order.amount_total / 2
+        self._create_transaction(
+            flow="direct", sale_order_ids=[self.sale_order.id], state="done", reference="Split 1"
+        )
+        with mute_logger("odoo.addons.sale.models.payment_transaction"):
+            self._run_post_processing()
+        self.assertEqual(self.sale_order.state, "draft")
+
+        self._create_transaction(
+            flow="direct", sale_order_ids=[self.sale_order.id], state="done", reference="Split 2"
+        )
+        with mute_logger("odoo.addons.sale.models.payment_transaction"):
+            self._run_post_processing()
+        self.assertEqual(self.sale_order.state, "sale")
 
     def test_already_confirmed_so_payment(self):
         # Set automatic invoice

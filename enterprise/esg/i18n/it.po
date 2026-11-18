@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-10-21 16:08+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-10 15:56+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/esg/it/>"
 "\n"
@@ -2143,12 +2143,14 @@ msgid ""
 "<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
 "title=\"Calendar\"/>"
 msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
+"title=\"Calendario\"/>"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_form_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_kanban_view
 msgid "<i class=\"oi oi-fw\" data-icon=\"east\" title=\"arrow\"/>"
-msgstr ""
+msgstr "<i class=\"oi oi-fw\" data-icon=\"east\" title=\"arrow\"/>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s3
@@ -2221,6 +2223,9 @@ msgid ""
 "attachments, will be displayed as a table in this section of the final PDF "
 "report.</small>"
 msgstr ""
+"<small class=\"text-muted\">Le azioni collegate alle metriche, insieme ai "
+"relativi allegati, saranno visualizzate sotto forma di tabella in questa "
+"sezione del resoconto in PDF finale.</small>"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_kanban_view
@@ -2236,7 +2241,7 @@ msgstr "<span class=\"ms-2\">kgCO₂e</span>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "<span class=\"o_stat_text\">Metric</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Metrica</span>"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
@@ -2654,7 +2659,7 @@ msgstr "<span>/</span>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
 msgid "<span>Actions</span>"
-msgstr ""
+msgstr "<span>Azioni</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c9
@@ -2811,7 +2816,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
 msgid "<span>Reached</span>"
-msgstr ""
+msgstr "<span>Raggiunto</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -3553,7 +3558,7 @@ msgstr "<strong>Valore attuale (%)</strong>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "<strong>Current</strong>"
-msgstr ""
+msgstr "<strong>Attuale</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_environmental_a
@@ -3636,7 +3641,7 @@ msgstr "<strong>Durata</strong>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "<strong>ESRS</strong>"
-msgstr ""
+msgstr "<strong>ESRS</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c8
@@ -3759,7 +3764,7 @@ msgstr "<strong>Donna</strong>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "<strong>Files</strong>"
-msgstr ""
+msgstr "<strong>File</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -4141,7 +4146,7 @@ msgstr "<strong>Mitigazione</strong>"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_actions_table
 msgid "<strong>Name</strong>"
-msgstr ""
+msgstr "<strong>Nome</strong>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
@@ -6022,10 +6027,10 @@ msgstr ""
 #. module: esg
 #: model:mail.template,body_html:esg.mail_template_esg_metric_ask_feedback
 msgid ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
 "                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+"\"></t>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
@@ -6035,18 +6040,18 @@ msgid ""
 "                            <t t-out=\"logged_user\">[Current user]</t> "
 "invites you to participate in the CSRD double materiality review for <t t-"
 "out=\"company_name\">[Company Name]</t>. We are looking for your input on: "
-"<br/>\n"
+"<br>\n"
 "                            - How the company impacts the environment, "
-"society, and the economy. <br/>\n"
+"society, and the economy. <br>\n"
 "                            - How these impacts could affect the company "
-"financially. <br/>\n"
+"financially. <br>\n"
 "                            Please complete your review by <t t-"
 "out=\"deadline\">[specified deadline]</t> to help us meet CSRD requirements. "
 "Your expertise is important for an accurate assessment. </span>\n"
-"                        <br/> Thank you for your contribution. <br/>\n"
+"                        <br> Thank you for your contribution. <br>\n"
 "                        Best regards, <t t-out=\"logged_user\">[Current "
 "user]</t>\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
 "center;\">\n"
 "                            <a t-att-href=\"object.get_start_url()\" t-attf-"
@@ -6061,38 +6066,38 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
 "                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+"\"></t>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
 "                        </p><p style=\"margin-left:5px\">Ciao <t t-"
 "out=\"object.partner_id.name or 'stakeholder'\">[Stakeholder]</t></p>\n"
 "                        <span>\n"
 "                            <t t-out=\"logged_user\">[Utente attuale]</t> ti "
 "invita a partecipare all'analisi della doppia materialità prevista dalla "
-"CSRD per <t t-out=\"company_name\">[Nome azienda]</t>. Vorremmo avere la tua "
-"opinione su: <br/>\n"
+"CSRD per <t t-out=\"company_name\">[nome azienda]</t>. Vorremmo avere la tua "
+"opinione su: <br>\n"
 "                            - impatto dell'azienda su ambiente, società ed "
-"economia; <br/>\n"
-"                            - conseguenze finanziarie degli impatti; "
-"sull'azienda. <br/>\n"
+"economia; <br>\n"
+"                            - conseguenze finanziarie degli impatti "
+"sull'azienda.<br>\n"
 "                            Completa la revisione entro il <t t-"
-"out=\"deadline\">[data di scadenza specificata]</t> per aiutarci a "
-"rispettare i requisiti della CSRD. La tua esperienza è importante per una "
-"valutazione accurata. </span>\n"
-"                        <br/> Grazie per aver contribuito. <br/>\n"
-"                        Saluti, <t t-out=\"logged_user\">[Utente attuale</"
-"t>\n"
-"                        <br/><br/>\n"
+"out=\"deadline\">[scadenza specificata]</t> per aiutarci a rispettare i "
+"requisiti della CSRD. La tua esperienza è importante per una valutazione "
+"accurata. </span>\n"
+"                        <br> Grazie per aver contribuito. <br>\n"
+"                        Saluti, <t t-out=\"logged_user\">[utente attuale]</t>"
+"\n"
+"                        <br><br>\n"
 "                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
 "center;\">\n"
 "                            <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
 "                                Inizia revisione\n"
 "                            </a>\n"
@@ -6252,7 +6257,7 @@ msgstr "Riga movimento contabile"
 #. odoo-python
 #: code:addons/esg/models/esg_assignation_line.py:0
 msgid "Account: %s"
-msgstr ""
+msgstr "Conto: %s"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_search_view
@@ -6480,6 +6485,11 @@ msgid ""
 "                They are the actionable items that help achieve its ESG "
 "goals, including the targets set to track progress over time."
 msgstr ""
+"Le azioni sono i passaggi o le misure specifiche che un'organizzazione "
+"adotta per implementare la propria strategia ESG.\n"
+"                Sono gli elementi azionabili che aiutano a raggiungere i "
+"propri obiettivi ESG, inclusi i traguardi fissati per monitorare i progressi "
+"nel tempo."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e3
@@ -7301,12 +7311,12 @@ msgstr "Giorni medi di pagamento dei clienti nell'anno di rendicontazione"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Average customer payment days in the base year"
-msgstr ""
+msgstr "Giorni medi di pagamento dei clienti nell'anno di riferimento"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Average customer payment days in the reporting year"
-msgstr ""
+msgstr "Giorni medi di pagamento dei clienti nell'anno di rendicontazione"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b11
@@ -7340,7 +7350,7 @@ msgstr "Numero medio di dipendenti"
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Average number of employees in the base year"
-msgstr ""
+msgstr "Numero medio di dipendenti nell'anno di riferimento"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -7716,28 +7726,28 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Baseline"
-msgstr ""
+msgstr "Riferimento"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__baseline_end_date
 msgid "Baseline End Date"
-msgstr ""
+msgstr "Data di fine periodo di riferimento"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_list_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Baseline Period"
-msgstr ""
+msgstr "Periodo di riferimento"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__baseline_start_date
 msgid "Baseline Start Date"
-msgstr ""
+msgstr "Data di inizio periodo di riferimento"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__baseline_value
 msgid "Baseline Value"
-msgstr ""
+msgstr "Valore di riferimento"
 
 #. module: esg
 #: model:knowledge.article,template_name:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -8238,7 +8248,7 @@ msgstr "Categoria"
 #. odoo-python
 #: code:addons/esg/models/esg_assignation_line.py:0
 msgid "Category: %s"
-msgstr ""
+msgstr "Categoria: %s"
 
 #. module: esg
 #. odoo-python
@@ -9127,7 +9137,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor__country_ids
 msgid "Countries"
-msgstr ""
+msgstr "Paesi"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -9160,7 +9170,7 @@ msgstr "Coperto dai contratti collettivi"
 #. odoo-javascript
 #: code:addons/esg/static/src/components/esg_dashboard/esg_action_box/esg_action_box.xml:0
 msgid "Create Action"
-msgstr ""
+msgstr "Crea azione"
 
 #. module: esg
 #: model:ir.actions.server,name:esg.action_create_assignation_rules
@@ -9195,7 +9205,7 @@ msgstr "Crea rendiconto VSME"
 #. module: esg
 #: model_terms:ir.actions.act_window,help:esg.action_view_esg_action
 msgid "Create actions."
-msgstr ""
+msgstr "Crea azioni."
 
 #. module: esg
 #: model_terms:ir.actions.act_window,help:esg.action_view_assignation_rule
@@ -9283,18 +9293,18 @@ msgstr "Valuta"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Current"
-msgstr ""
+msgstr "Attuale"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__current_value
 msgid "Current Value"
-msgstr ""
+msgstr "Valore attuale"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__current_value_date
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Current Value Date"
-msgstr ""
+msgstr "Data valore attuale"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b2
@@ -10458,12 +10468,12 @@ msgstr "Criteri ESG"
 #. module: esg
 #: model:ir.model,name:esg.model_esg_action
 msgid "ESG Action"
-msgstr ""
+msgstr "Azione ESG"
 
 #. module: esg
 #: model:ir.model,name:esg.model_esg_action_value_history
 msgid "ESG Action Target Value History"
-msgstr ""
+msgstr "Storico valore target azione ESG"
 
 #. module: esg
 #: model:ir.model,name:esg.model_esg_carbon_emission_report
@@ -10938,7 +10948,7 @@ msgstr "Tragitto dipendente"
 #. module: esg
 #: model:esg.tag,name:esg.esg_tag_demo_wellbeing
 msgid "Employee Wellbeing"
-msgstr ""
+msgstr "Benessere dipendenti"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -10962,7 +10972,7 @@ msgstr "Il turnover dei dipendenti (%) è calcolato come segue:"
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Employee turnover rate in the base year"
-msgstr ""
+msgstr "Tasso di turnover dei dipendenti nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -11166,7 +11176,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
 msgid "Enter description here..."
-msgstr ""
+msgstr "Inserisci qui la descrizione..."
 
 #. module: esg
 #: model:ir.model.fields.selection,name:esg.selection__esg_esrs__category__1_environment
@@ -11870,6 +11880,7 @@ msgstr "Dipendenti donne a tempo pieno nell'anno di rendicontazione"
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Full-time gender not declared in the base year"
 msgstr ""
+"Genere non dichiarato dipendenti a tempo pieno durante l'anno di riferimento"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -11957,7 +11968,7 @@ msgstr "Formuna intensità GES:"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_gj
 msgid "GJ"
-msgstr ""
+msgstr "GJ"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_gas_kanban_view
@@ -12050,7 +12061,7 @@ msgstr "Divario retributivo di genere (%)"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Gender pay gap in the base year"
-msgstr ""
+msgstr "Divario retributivo di genere nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -12328,7 +12339,7 @@ msgstr "Ha messaggio"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__has_target
 msgid "Has Target"
-msgstr ""
+msgstr "Ha obiettivo"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b7
@@ -12384,6 +12395,8 @@ msgid ""
 "Helps you track, manage, and improve your environmental, social, and "
 "governance (ESG) impact."
 msgstr ""
+"Ti aiuta a monitorare, gestire e migliorare il tuo impatto sui criteri ESG "
+"(ambientale, sociale e di governance)."
 
 #. module: esg
 #: model:esg.gas,name:esg.esg_gas_pfc_c2f6
@@ -12652,12 +12665,12 @@ msgstr "IUCN/KPI interni"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Icona"
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr ""
+msgstr "Icona per indicare un'attività eccezione."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
@@ -12990,7 +13003,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
 msgid "Impact, Risk, and Opportunity (IRO) Assessment"
-msgstr ""
+msgstr "Valutazione dell'impatto, del rischio e dell'opportunità (IRO)"
 
 #. module: esg
 #: model:knowledge.article,template_name:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -13391,7 +13404,7 @@ msgstr "Incorporazione per riferimento"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Independent contractors in the base year"
-msgstr ""
+msgstr "Collaboratori indipendenti nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -13705,7 +13718,7 @@ msgstr "Gas obbligatorio"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_j
 msgid "J"
-msgstr ""
+msgstr "J"
 
 #. module: esg
 #. odoo-python
@@ -14396,7 +14409,7 @@ msgstr "Priorità bassa"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_mj
 msgid "MJ"
-msgstr ""
+msgstr "MJ"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -14653,7 +14666,7 @@ msgstr "Misura"
 #: model:ir.model.fields,field_description:esg.field_esg_action__measure_type
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Measure Type"
-msgstr ""
+msgstr "Tipo di misura"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b10
@@ -14668,7 +14681,7 @@ msgstr "Retribuzione oraria lorda mediana - Dipendenti di sesso maschile"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Median hourly pay for men in the base year"
-msgstr ""
+msgstr "Retribuzione oraria mediana per gli uomini nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -14679,7 +14692,7 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Median hourly pay for women in the base year"
-msgstr ""
+msgstr "Retribuzione oraria mediana per le donne nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -14694,7 +14707,7 @@ msgstr "Mezzo (Aria/Acqua/Suolo)"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Medium Priority"
-msgstr ""
+msgstr "Priorità media"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_search_view
@@ -14877,17 +14890,17 @@ msgstr "Monetario"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "My Actions"
-msgstr ""
+msgstr "Le mie azioni"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr ""
+msgstr "Scadenza mie attività"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.emission_factor_search_view
 msgid "My Country"
-msgstr ""
+msgstr "Il mio Paese"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_report_search_view
@@ -14938,6 +14951,8 @@ msgstr "NOx"
 #: model:ir.model.fields,field_description:esg.field_esg_nace__name
 #: model:ir.model.fields,field_description:esg.field_esg_other_emission__name
 #: model:ir.model.fields,field_description:esg.field_esg_tag__name
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_list_view
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_search_view
 msgid "Name"
 msgstr "Nome"
 
@@ -15000,22 +15015,22 @@ msgstr "Nuovi requisiti UE sulla riduzione dei rifiuti"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Prossimo evento del calendario delle attività"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr ""
+msgstr "Scadenza prossima attività"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_summary
 msgid "Next Activity Summary"
-msgstr ""
+msgstr "Riepilogo prossima attività"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
+msgstr "Tipologia prossima attività"
 
 #. module: esg
 #: model:esg.gas,name:esg.esg_gas_nf3
@@ -15037,7 +15052,7 @@ msgstr "Protossido di azoto (N₂O) (t)"
 #. module: esg
 #: model:res.groups.privilege,placeholder:esg.res_groups_privilege_esg
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. module: esg
 #: model_terms:ir.actions.act_window,help:esg.action_view_metrics
@@ -15054,7 +15069,7 @@ msgstr "Ancora nessuna emissione!"
 #. odoo-python
 #: code:addons/esg/models/esg_action.py:0
 msgid "No Metric"
-msgstr ""
+msgstr "Nessuna metrica"
 
 #. module: esg
 #. odoo-python
@@ -15068,7 +15083,7 @@ msgstr ""
 #: code:addons/esg/static/src/components/esg_dashboard/esg_action_box/esg_action_box.xml:0
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "No Target Set"
-msgstr ""
+msgstr "Nessun obiettivo impostato"
 
 #. module: esg
 #. odoo-python
@@ -15191,14 +15206,14 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Non-salaried workers in the base year"
-msgstr ""
+msgstr "Lavoratori non salariati nell'anno base"
 
 #. module: esg
 #. odoo-javascript
 #: code:addons/esg/static/src/components/esg_dashboard/esg_action_box/esg_action_box.xml:0
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Not Reached"
-msgstr ""
+msgstr "Non raggiunto"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -15346,12 +15361,13 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Number of Employees without a working schedule in the base year"
-msgstr ""
+msgstr "Numero di dipendenti senza un orario di lavoro nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Number of Employees without a working schedule in the reporting year"
 msgstr ""
+"Numero di dipendenti senza un orario di lavoro nell'anno di riferimento"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_social_b
@@ -15376,7 +15392,7 @@ msgstr "Numero di dipendenti che hanno lasciato l'azienda"
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Number of employees who left in the base year"
-msgstr ""
+msgstr "Numero di dipendenti che hanno lasciato nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -15749,7 +15765,7 @@ msgstr "Altre emissioni indirette"
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_metric_form_view
 msgid "Other Info"
-msgstr ""
+msgstr "Altre informazioni"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c7
@@ -15947,7 +15963,7 @@ msgstr "Dipendenti donne a tempo parziale nell'anno di rendicontazione"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Part-time gender not declared in the base year"
-msgstr ""
+msgstr "Dipendenti part-time con genere non dichiarato nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -15990,7 +16006,7 @@ msgstr "Partner"
 #. odoo-python
 #: code:addons/esg/models/esg_assignation_line.py:0
 msgid "Partner: %s"
-msgstr ""
+msgstr "Partner: %s"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -16066,13 +16082,14 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Percentage of Employees without a working schedule in the base year"
-msgstr ""
+msgstr "Percentuale di dipendenti senza orario di lavoro nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid ""
 "Percentage of Employees without a working schedule in the reporting year"
 msgstr ""
+"Percentuale di dipendenti senza orario di lavoro nell'anno di riferimento"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -16366,7 +16383,7 @@ msgstr "Percentuale dei pagamenti effettuati in tempo nell'anno di riferimento"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Percentage of payments on time in the base year"
-msgstr ""
+msgstr "Percentuale di pagamenti effettuati puntualmente nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -16403,7 +16420,7 @@ msgstr "Perfluorocarburo (PFC)"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Period"
-msgstr ""
+msgstr "Periodo"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -17352,7 +17369,7 @@ msgstr "Uso e smaltimento del prodotto"
 #. odoo-python
 #: code:addons/esg/models/esg_assignation_line.py:0
 msgid "Product: %s"
-msgstr ""
+msgstr "Prodotto: %s"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
@@ -17746,7 +17763,7 @@ msgstr "Valutazioni"
 #: model:ir.model.fields,field_description:esg.field_esg_action__is_reached
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Reached"
-msgstr ""
+msgstr "Raggiunto"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor__region
@@ -18164,12 +18181,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:esg.field_esg_action__responsible_user_id
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Responsible"
-msgstr ""
+msgstr "Responsabile"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "Utente responsabile"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_report__responsible_user_ids
@@ -18910,7 +18927,7 @@ msgstr "Dichiarazione sulla due diligence (GOV-4)"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor__state_ids
 msgid "States"
-msgstr ""
+msgstr "Stati"
 
 #. module: esg
 #: model:esg.emission.source,name:esg.esg_emission_source_direct_1
@@ -18931,6 +18948,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Stato basato sulle attività\n"
+"In ritardo: scadenza già superata\n"
+"Oggi: attività in data odierna\n"
+"Pianificato: attività future."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -19286,18 +19307,18 @@ msgstr "Tabella 9: turnover dei dipendenti"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Table: Actions across all ESRS topics"
-msgstr ""
+msgstr "Tabella: azioni su tutti gli argomenti ESRS"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Table: Employee distribution by country"
-msgstr ""
+msgstr "Tabella: distribuzione dei dipendenti per Paese"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Table: Employee distribution by department/job position"
-msgstr ""
+msgstr "Tabella: distribuzione dei dipendenti per ufficio/posizione lavorativa"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -19425,28 +19446,28 @@ msgstr "Adotta misure per affrontare tali impatti negativi"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Target"
-msgstr ""
+msgstr "Obiettivo"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__target_end_date
 msgid "Target End Date"
-msgstr ""
+msgstr "Data di fine obiettivo"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_list_view
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_search_view
 msgid "Target Period"
-msgstr ""
+msgstr "Periodo obiettivo"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__target_start_date
 msgid "Target Start Date"
-msgstr ""
+msgstr "Data di inizio obiettivo"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action__target_value
 msgid "Target Value"
-msgstr ""
+msgstr "Valore obiettivo"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e4
@@ -19872,7 +19893,7 @@ msgstr "Tecnologia"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Temporary workers via agencies in the base year"
-msgstr ""
+msgstr "Lavoratori interinali tramite agenzie nell'anno base"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
@@ -19937,7 +19958,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__metric_id
 msgid "The CSRD metric associated with this action."
-msgstr ""
+msgstr "La metrica CSRD associata a questa azione."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c8
@@ -19981,6 +20002,8 @@ msgid ""
 "The approach used to express the baseline and target values, based on either "
 "a physical quantity or a monetary value."
 msgstr ""
+"L'approccio utilizzato per esprimere i valori di base e obiettivo, basato su "
+"una quantità fisica o su un valore monetario."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e1
@@ -20265,6 +20288,8 @@ msgid ""
 "The company to which this action applies. If not set, the action is "
 "considered applicable to all companies."
 msgstr ""
+"L'azienda a cui si applica questa azione. Se non impostata, l'azione viene "
+"considerata applicabile a tutte le aziende."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -20342,7 +20367,7 @@ msgstr "La composizione e la diversità degli organi sono le seguenti:"
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_emission_factor__country_ids
 msgid "The countries where this emission factor is relevant."
-msgstr ""
+msgstr "I Paesi in cui questo fattore di emissione è rilevante."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_general_information
@@ -20369,7 +20394,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__current_value_date
 msgid "The date of the most recently recorded value."
-msgstr ""
+msgstr "La data del valore registrato più di recente."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -20379,12 +20404,13 @@ msgstr "La divulgazione si applica alle <strong>proprie operazioni</strong>,"
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__target_end_date
 msgid "The end date by which the target is expected to be achieved."
-msgstr ""
+msgstr "La data finale entro la quale si prevede di raggiungere l'obiettivo."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__baseline_end_date
 msgid "The end date used as a reference point to measure progress."
 msgstr ""
+"La data finale utilizzata come punto di riferimento per misurare i progressi."
 
 #. module: esg
 #. odoo-python
@@ -20478,7 +20504,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__value_history_ids
 msgid "The historic record of measured values for this target."
-msgstr ""
+msgstr "Lo storico dei valori misurati per questo obiettivo."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b3
@@ -20549,7 +20575,7 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__current_value
 msgid "The most recently recorded value, taken from the value history."
-msgstr ""
+msgstr "Il valore registrato più di recente, tratto dallo storico dei valori."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s2
@@ -21113,16 +21139,19 @@ msgstr ""
 #: model:ir.model.fields,help:esg.field_esg_action__target_start_date
 msgid "The start date by which the target is expected to be achieved."
 msgstr ""
+"La data di inizio entro la quale si prevede di raggiungere l'obiettivo."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__baseline_start_date
 msgid "The start date used as a reference point to measure progress."
 msgstr ""
+"La data di inizio utilizzata come punto di riferimento per misurare i "
+"progressi."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_emission_factor__state_ids
 msgid "The states where this emission factor is relevant."
-msgstr ""
+msgstr "Gli stati in cui questo fattore di emissione è rilevante."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_governance
@@ -21292,11 +21321,13 @@ msgstr ""
 msgid ""
 "The unit of measure used to express both the baseline and target values."
 msgstr ""
+"L'unità di misura utilizzata per esprimere sia i valori di riferimento che "
+"quelli obiettivo."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__responsible_user_id
 msgid "The user responsible for this action."
-msgstr ""
+msgstr "L'utente responsabile di questa azione."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_strategy
@@ -21319,12 +21350,12 @@ msgstr ""
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__baseline_value
 msgid "The value of the metric at the baseline year."
-msgstr ""
+msgstr "Il valore della metrica nell'anno di riferimento."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__target_value
 msgid "The value the metric is expected to reach at the target year."
-msgstr ""
+msgstr "Il valore che la metrica dovrebbe raggiungere nell'anno obiettivo."
 
 #. module: esg
 #. odoo-python
@@ -21333,6 +21364,8 @@ msgid ""
 "There is a significant difference between the stakeholder %(scope)s and "
 "yours. This may be worth reviewing."
 msgstr ""
+"Esiste una differenza significativa tra lo stakeholder %(scope)s e il tuo. "
+"Potrebbe valere la pena verificarlo."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_iro_management
@@ -21600,7 +21633,7 @@ msgstr ""
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "This description will be included in the report"
-msgstr ""
+msgstr "La descrizione sarà inclusa nel resoconto"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s4
@@ -21886,6 +21919,10 @@ msgid ""
 "emissions and our suppliers' strong carbon policies further limit any "
 "significant negative impact."
 msgstr ""
+"Questo argomento è considerato irrilevante poiché le nostre operazioni "
+"producono emissioni di gas serra minime e le rigorose politiche in materia "
+"di emissioni dei nostri fornitori limitano ulteriormente qualsiasi impatto "
+"negativo significativo."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e4
@@ -22089,7 +22126,7 @@ msgstr "Tasso totale di incidenti registrabili (TRIR)"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Total revenue/sales"
-msgstr ""
+msgstr "Ricavi/vendite totali"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e3
@@ -22325,7 +22362,7 @@ msgstr "Tipo di resoconto (modulo VSME Basic o modulo VSME Comprehensive)"
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Tipo di attività eccezione sul record."
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_account_move_line__esg_uncertainty_value
@@ -22631,7 +22668,7 @@ msgstr "Periodo di validità"
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_action_value_history__value
 msgid "Value"
-msgstr ""
+msgstr "Valore"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -22642,7 +22679,7 @@ msgstr "Informazioni sulla catena del valore"
 #: model:ir.model.fields,field_description:esg.field_esg_action__value_history_ids
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "Value History"
-msgstr ""
+msgstr "Cronologia valori"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -23381,7 +23418,7 @@ msgstr "[Filiale 1]"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_a
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c7
@@ -23449,7 +23486,7 @@ msgstr "ad es. Impronta di carbonio"
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_action_form_view
 msgid "e.g. Diversity Training"
-msgstr ""
+msgstr "ad es. Formazione sulla diversità"
 
 #. module: esg
 #: model_terms:ir.ui.view,arch_db:esg.esg_gas_form_view
@@ -23512,7 +23549,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/esg/models/esg_metric.py:0
 msgid "financial severity score"
-msgstr ""
+msgstr "punteggio di gravità finanziaria"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b7
@@ -23558,18 +23595,18 @@ msgstr "ID"
 #. odoo-python
 #: code:addons/esg/models/esg_metric.py:0
 msgid "impact and financial severity scores"
-msgstr ""
+msgstr "punteggi di impatto e gravità finanziaria"
 
 #. module: esg
 #. odoo-python
 #: code:addons/esg/models/esg_metric.py:0
 msgid "impact severity score"
-msgstr ""
+msgstr "punteggio di gravità dell'impatto"
 
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_kj
 msgid "kJ"
-msgstr ""
+msgstr "kJ"
 
 #. module: esg
 #: model:ir.model.fields,field_description:esg.field_esg_emission_factor_line__quantity
@@ -23582,7 +23619,7 @@ msgstr "kg"
 #. module: esg
 #: model:uom.uom,name:esg.esg_uom_kg_co2
 msgid "kgCO₂"
-msgstr ""
+msgstr "kgCO₂"
 
 #. module: esg
 #. odoo-javascript
@@ -23594,7 +23631,7 @@ msgstr "kgCO₂e /"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_km2
 msgid "km²"
-msgstr ""
+msgstr "km²"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e3
@@ -23636,7 +23673,7 @@ msgstr "t"
 #. module: esg
 #: model:uom.uom,name:esg.esg_uom_t_co2
 msgid "tCO₂"
-msgstr ""
+msgstr "tCO₂"
 
 #. module: esg
 #. odoo-python
@@ -23653,7 +23690,7 @@ msgstr "tCO₂eq"
 #. module: esg
 #: model:uom.uom,name:esg.product_uom_toe
 msgid "toe"
-msgstr ""
+msgstr "tep"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b7
@@ -24215,7 +24252,7 @@ msgstr "{{ country_of_main_operations }}"
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_actions
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "{{ csrd_report_actions_global }}"
-msgstr ""
+msgstr "{{ csrd_report_actions_global }}"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -25086,6 +25123,87 @@ msgid ""
 msgstr ""
 "Le “aree sensibili” includono tipicamente Natura 2000, siti Ramsar, riserve "
 "UNESCO o designazioni nazionali equivalenti."
+
+#~ msgid ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/>\n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Dear <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[Stakeholder]</t></p>\n"
+#~ "                        <span>\n"
+#~ "                            <t t-out=\"logged_user\">[Current user]</t> "
+#~ "invites you to participate in the CSRD double materiality review for <t t-"
+#~ "out=\"company_name\">[Company Name]</t>. We are looking for your input "
+#~ "on: <br/>\n"
+#~ "                            - How the company impacts the environment, "
+#~ "society, and the economy. <br/>\n"
+#~ "                            - How these impacts could affect the company "
+#~ "financially. <br/>\n"
+#~ "                            Please complete your review by <t t-"
+#~ "out=\"deadline\">[specified deadline]</t> to help us meet CSRD "
+#~ "requirements. Your expertise is important for an accurate assessment. </"
+#~ "span>\n"
+#~ "                        <br/> Thank you for your contribution. <br/>\n"
+#~ "                        Best regards, <t t-out=\"logged_user\">[Current "
+#~ "user]</t>\n"
+#~ "                        <br/><br/>\n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                                Start the Review\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/>\n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Ciao <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[Stakeholder]</t></p>\n"
+#~ "                        <span>\n"
+#~ "                            <t t-out=\"logged_user\">[Utente attuale]</t> "
+#~ "ti invita a partecipare all'analisi della doppia materialità prevista "
+#~ "dalla CSRD per <t t-out=\"company_name\">[Nome azienda]</t>. Vorremmo "
+#~ "avere la tua opinione su: <br/>\n"
+#~ "                            - impatto dell'azienda su ambiente, società "
+#~ "ed economia; <br/>\n"
+#~ "                            - conseguenze finanziarie degli impatti; "
+#~ "sull'azienda. <br/>\n"
+#~ "                            Completa la revisione entro il <t t-"
+#~ "out=\"deadline\">[data di scadenza specificata]</t> per aiutarci a "
+#~ "rispettare i requisiti della CSRD. La tua esperienza è importante per una "
+#~ "valutazione accurata. </span>\n"
+#~ "                        <br/> Grazie per aver contribuito. <br/>\n"
+#~ "                        Saluti, <t t-out=\"logged_user\">[Utente attuale</"
+#~ "t>\n"
+#~ "                        <br/><br/>\n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                                Inizia revisione\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
 
 #~ msgid "Average number of employees in base year"
 #~ msgstr "Numero medio di dipendenti nell'anno di riferimento"

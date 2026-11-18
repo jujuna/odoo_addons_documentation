@@ -3,11 +3,14 @@
 import base64
 import copy
 import json
+import requests
+from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.tests import TransactionCase, tagged
 from odoo.tools import SQL
 
+from odoo.addons.ai.models.ai_session import AiSession
 from odoo.addons.ai.utils.ai_fields_tools import UnresolvedQuery
 from odoo.addons.test_ai_fields.tests.common import TestAIFieldsCommon
 from odoo.addons.base.tests.files import PNG_B64, PNG_RAW
@@ -423,7 +426,7 @@ class TestAiFields(TestAIFieldsCommon):
         self.assertEqual(str(cm_2.exception), "Missing context")
 
     def test_fill_ai_field_exception(self):
-        """Check that if an error occurs during the method filling the fields, an empty string is set so that field will not be reprocessed for the record"""
+        """Check that if the AI cannot resolve the value, an empty string is set so that the field will not be reprocessed for the record"""
         model = self.env["test.ai.fields.model"]
         self.env["ir.model.fields"].create({"name": "x_ai_char", "ttype": "char", "ai": True, "system_prompt": "char prompt", "model_id": self.env["ir.model"]._get(model._name).id})
         record = model.create({})
@@ -434,7 +437,8 @@ class TestAiFields(TestAIFieldsCommon):
         mock_responses = [
             self.mock_ai_field_response("", False, "missing context")
         ]
-        with self.mock_completion_request(mock_responses):
+        with self.mock_completion_request(mock_responses), \
+            self.assertLogs('odoo.addons.ai_fields.models.models', 'WARNING'):
             record._fill_ai_field(model._fields.get('x_ai_char'))
         self.env.flush_all()
         self.env.cr.execute(SQL("SELECT x_ai_char FROM test_ai_fields_model WHERE id = %s", record.id))
@@ -442,7 +446,7 @@ class TestAiFields(TestAIFieldsCommon):
         self.assertEqual(res[0], "")
 
     def test_fill_ai_property_exception(self):
-        """Check that if an error occurs during the method filling the properties, a falsy value is set so that the property will not be reprocessed for the record"""
+        """Check that if the AI cannot resolve the value, a falsy value is set so that the property will not be reprocessed for the record"""
         parent = self.env["test.ai.fields.parent"].create({})
         ai_char_p_def = {"type": "char", "name": "char", "ai": True, "system_prompt": 'hey'}
         parent.write({"properties_definition": [ai_char_p_def]})
@@ -458,12 +462,28 @@ class TestAiFields(TestAIFieldsCommon):
         mock_responses = [
             self.mock_ai_field_response("", False, "missing context")
         ]
-        with self.mock_completion_request(mock_responses):
+        with self.mock_completion_request(mock_responses), \
+            self.assertLogs('odoo.addons.ai_fields.models.models', 'WARNING'):
             record._fill_ai_property('properties', ai_char_p_def)
         self.env.flush_all()
         self.env.cr.execute(SQL("SELECT properties FROM test_ai_fields_model WHERE id = %s", record.id))
         res = self.env.cr.fetchone()
         self.assertEqual(res[0], {"char": False})
+
+    def test_fill_ai_service_error(self):
+        """Check that if the AI service fails, AI fields and properties are left empty so that they are processed again by the next cron run"""
+        model = self.env["test.ai.fields.model"]
+        self.env["ir.model.fields"].create({"name": "x_ai_char", "ttype": "char", "ai": True, "system_prompt": "char prompt", "model_id": self.env["ir.model"]._get(model._name).id})
+        ai_char_p_def = {"type": "char", "name": "char", "ai": True, "system_prompt": 'hey'}
+        parent = self.env["test.ai.fields.parent"].create({"properties_definition": [ai_char_p_def]})
+        record = model.create({"parent_id": parent.id, "properties": [{"type": "char", "name": "char"}]})
+        with patch.object(AiSession, '_get_completions', side_effect=requests.exceptions.Timeout), \
+            self.assertLogs('odoo.addons.ai_fields.models.models', 'WARNING'):
+            record._fill_ai_field(model._fields['x_ai_char'])
+            record._fill_ai_property('properties', ai_char_p_def)
+        self.env.flush_all()
+        self.env.cr.execute(SQL("SELECT x_ai_char, properties FROM test_ai_fields_model WHERE id = %s", record.id))
+        self.assertEqual(self.env.cr.fetchone(), (None, {}))
 
     def test_base_field_ai(self):
         IrModelFields = self.env['ir.model.fields']

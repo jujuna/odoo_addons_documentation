@@ -33,13 +33,20 @@
                         invisible="country_code != 'TR' or state == 'done' or picking_type_code != 'incoming' or not l10n_tr_nilvera_edispatch_xml_id or l10n_tr_nilvera_dispatch_type == 'IS_DESPATCH'"
                         string="Update From GİB e-Dispatch (XML)"/>
             </xpath>
-            <field name="origin" position="after">
+            <xpath expr="//field[@name='backorder_id']/.." position="inside">
                 <label for="l10n_tr_nilvera_send_status" invisible="country_code != 'TR' or state == 'draft' or picking_type_code != 'outgoing'"/>
                 <div name="nilvera_div"
                      class="o_row o_align_center"
                      invisible="country_code != 'TR' or state == 'draft' or picking_type_code != 'outgoing'">
                      <div class="d-flex align-items-center gap-2">
-                        <field name="l10n_tr_nilvera_send_status" class="w-auto"/>
+                        <field name="l10n_tr_nilvera_send_status"
+                               class="w-auto"
+                               widget="badge"
+                               decoration-muted="l10n_tr_nilvera_send_status == 'not_sent'"
+                               decoration-info="l10n_tr_nilvera_send_status == 'sent'"
+                               decoration-warning="l10n_tr_nilvera_send_status in ('waiting', 'unknown', 'pdf_not_fetched')"
+                               decoration-success="l10n_tr_nilvera_send_status == 'succeed'"
+                               decoration-danger="l10n_tr_nilvera_send_status == 'error'"/>
                         <button
                             name="l10n_tr_nilvera_get_dispatch_status"
                             type="object"
@@ -49,7 +56,7 @@
                             icon="refresh"/>
                     </div>
                 </div>
-            </field>
+            </xpath>
             <xpath expr="//notebook/page[@name='operations']" position="after">
                 <page name="l10n_tr_edispatch" string="e-Dispatch" invisible="country_code != 'TR' or picking_type_code == 'internal' or not partner_id">
                     <group>

@@ -66,7 +66,7 @@ class HrPayrollEmployeeDeclaration(models.Model):
         super()._generate_pdf()
         declarations_by_sheet = self.grouped(lambda d: (d.res_model, d.res_id))
         for (res_model, res_id), declarations in declarations_by_sheet.items():
-            if issubclass(self.env.registry[res_model], self.env.registry['l10n_hk.ird']):
+            if not issubclass(self.env.registry[res_model], self.env.registry['l10n_hk.ird']):
                 continue  # Only apply this logic to Hong Kong reports inheriting from the IRD parent report.
             sheet = self.env[res_model].browse(res_id)
             if sheet.pdf_error:

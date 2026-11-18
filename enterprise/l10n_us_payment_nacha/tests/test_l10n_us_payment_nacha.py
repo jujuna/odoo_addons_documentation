@@ -97,22 +97,22 @@ class TestNacha(AccountTestInvoicingCommon):
         expected = [
             # header
             f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            company_1_data         {self.batch.id:8d}",
-            # batch header for payments today "BATCH 0"
-            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            # batch header for payments today "BATCH 1"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 1   201130201130   1ORIGINAT0000001",
             # entry detail for payment "partner_a_1"
-            "632123456780987654321        0000012345               partner_a               0ORIGINAT0000000",
+            "632123456780987654321        0000012345               partner_a               0ORIGINAT0000001",
             # entry detail for payment "partner_b_2"
-            "622123456780987654321        0000056789               partner_b               0ORIGINAT0000001",
-            # batch control record for "BATCH 0"
-            "82200000020024691356000000000000000000069134COMPANY                            ORIGINAT0000000",
-            # batch header for payments tomorrow "BATCH 1"
-            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 1   201201201201   1ORIGINAT0000001",
-            # entry detail for payment "partner_a_2"
-            "632123456780987654321        0000054321               partner_a               0ORIGINAT0000000",
-            # entry detail for payment "partner_b_1"
-            "622123456780987654321        0000045678               partner_b               0ORIGINAT0000001",
+            "622123456780987654321        0000056789               partner_b               0ORIGINAT0000002",
             # batch control record for "BATCH 1"
-            "82200000020024691356000000000000000000099999COMPANY                            ORIGINAT0000001",
+            "82200000020024691356000000000000000000069134COMPANY                            ORIGINAT0000001",
+            # batch header for payments tomorrow "BATCH 2"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 2   201201201201   1ORIGINAT0000002",
+            # entry detail for payment "partner_a_2"
+            "632123456780987654321        0000054321               partner_a               0ORIGINAT0000001",
+            # entry detail for payment "partner_b_1"
+            "622123456780987654321        0000045678               partner_b               0ORIGINAT0000002",
+            # batch control record for "BATCH 2"
+            "82200000020024691356000000000000000000099999COMPANY                            ORIGINAT0000002",
             # file control record
             "9000002000001000000040049382712000000000000000000169133                                       ",
         ]
@@ -125,26 +125,26 @@ class TestNacha(AccountTestInvoicingCommon):
         expected = [
             # header
             f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            company_1_data         {self.batch.id:8d}",
-            # batch header for payments today "BATCH 0"
-            "5200company_1_data  00000000000123456789COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            # batch header for payments today "BATCH 1"
+            "5200company_1_data  00000000000123456789COMPANY   CCDBATCH 1   201130201130   1ORIGINAT0000001",
             # entry detail for payment "partner_a_1"
-            "632123456780987654321        0000012345               partner_a               0ORIGINAT0000000",
+            "632123456780987654321        0000012345               partner_a               0ORIGINAT0000001",
             # entry detail for payment "partner_b_2"
-            "622123456780987654321        0000056789               partner_b               0ORIGINAT0000001",
-            # offset entry for "BATCH 0"
-            "627123456780223344556        0000069134               OFFSET                  0ORIGINAT0000002",
-            # batch control record for "BATCH 0"
-            "82000000030037037034000000069134000000069134COMPANY                            ORIGINAT0000000",
-            # batch header for payments tomorrow "BATCH 1"
-            "5200company_1_data  00000000000123456789COMPANY   CCDBATCH 1   201201201201   1ORIGINAT0000001",
-            # entry detail for payment "partner_a_2"
-            "632123456780987654321        0000054321               partner_a               0ORIGINAT0000000",
-            # entry detail for payment "partner_b_1"
-            "622123456780987654321        0000045678               partner_b               0ORIGINAT0000001",
+            "622123456780987654321        0000056789               partner_b               0ORIGINAT0000002",
             # offset entry for "BATCH 1"
-            "627123456780223344556        0000099999               OFFSET                  0ORIGINAT0000002",
+            "627123456780223344556        0000069134               OFFSET                  0ORIGINAT0000003",
             # batch control record for "BATCH 1"
-            "82000000030037037034000000099999000000099999COMPANY                            ORIGINAT0000001",
+            "82000000030037037034000000069134000000069134COMPANY                            ORIGINAT0000001",
+            # batch header for payments tomorrow "BATCH 2"
+            "5200company_1_data  00000000000123456789COMPANY   CCDBATCH 2   201201201201   1ORIGINAT0000002",
+            # entry detail for payment "partner_a_2"
+            "632123456780987654321        0000054321               partner_a               0ORIGINAT0000001",
+            # entry detail for payment "partner_b_1"
+            "622123456780987654321        0000045678               partner_b               0ORIGINAT0000002",
+            # offset entry for "BATCH 2"
+            "627123456780223344556        0000099999               OFFSET                  0ORIGINAT0000003",
+            # batch control record for "BATCH 2"
+            "82000000030037037034000000099999000000099999COMPANY                            ORIGINAT0000002",
             # file control record
             "9000002000002000000060074074068000000169133000000169133                                       ",
             # padding
@@ -194,18 +194,18 @@ class TestNacha(AccountTestInvoicingCommon):
         expected = [
             # header
             f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            company_1_data         {self.batch.id:8d}",
-            # batch header for payment today "BATCH 0"
-            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            # batch header for payment today "BATCH 1"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 1   201130201130   1ORIGINAT0000001",
             # entry detail — VAT (cols 40-54) and Individual Name (cols 55-76) come from partner_a (commercial), not invoice_contact (child)
-            "632123456780987654321        0000010000987654321      partner_a               0ORIGINAT0000000",
-            # batch control record for "BATCH 0"
-            "82200000010012345678000000000000000000010000COMPANY                            ORIGINAT0000000",
-            # batch header for payment tomorrow "BATCH 1"
-            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 1   201201201201   1ORIGINAT0000001",
-            # entry detail — same commercial-partner VAT and Name as batch 0
-            "632123456780987654321        0000005000987654321      partner_a               0ORIGINAT0000000",
+            "632123456780987654321        0000010000987654321      partner_a               0ORIGINAT0000001",
             # batch control record for "BATCH 1"
-            "82200000010012345678000000000000000000005000COMPANY                            ORIGINAT0000001",
+            "82200000010012345678000000000000000000010000COMPANY                            ORIGINAT0000001",
+            # batch header for payment tomorrow "BATCH 2"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 2   201201201201   1ORIGINAT0000002",
+            # entry detail — same commercial-partner VAT and Name as batch 1
+            "632123456780987654321        0000005000987654321      partner_a               0ORIGINAT0000001",
+            # batch control record for "BATCH 2"
+            "82200000010012345678000000000000000000005000COMPANY                            ORIGINAT0000002",
             # file control record
             "9000002000001000000020024691356000000000000000000015000                                       ",
             # padding

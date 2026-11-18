@@ -10,6 +10,10 @@ from . import controllers
 
 def _l10n_be_hr_payroll_post_install(env):
     env.ref('base.be')._adapt_work_entry_types_to_country()
+    # The new databases compensate the loss on commission on paid time off monthly (the data default, with the
+    # double holiday pay, keeps the behaviour of the databases installed before the choice was introduced).
+    # Before archiving the rules: restoring the benefit restores its rule.
+    env.ref('l10n_be_hr_payroll.l10n_be_loss_on_commission_pto_monthly').active = True
     env['l10n.be.joint.committee'].search([]).write({'active': False})
     env['hr.salary.rule'].search([('country_id', '=', env.ref('base.be').id)]).write({'active': False})
     env['hr.payroll.structure'].search([('country_id', '=', env.ref('base.be').id)]).write({'active': False})

@@ -363,6 +363,11 @@ class HrPayslip(models.Model):
             return number_of_days - self._get_number_of_non_full_pay_days()
         return number_of_days
 
+    def _get_worked_day_lines_hours_per_day(self, version):
+        if self.struct_id.country_id.code == 'HK':
+            return version.resource_calendar_id.hours_per_day or 8
+        return super()._get_worked_day_lines_hours_per_day(version)
+
     def _get_credit_time_lines(self):
         if self.struct_id.country_id.code != 'HK':
             return super()._get_credit_time_lines()

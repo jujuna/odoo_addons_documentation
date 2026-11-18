@@ -200,6 +200,11 @@
         <field name="allow_out_payment">True</field>
     </record>
 
+    <record id="ch_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_ch"/>
+    </record>
+
     <record id="employee_mark_frank" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ch_hr_payroll.res_partner_employee_mark')).name"/>
         <field name="company_id" ref="base.demo_company_ch"/>
@@ -209,7 +214,7 @@
         <field name="birthday">1990-01-01</field>
         <field name="sex">male</field>
         <field name="country_id" ref="base.ch"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_ch_hr_payroll.ch_hr_job_developer"/>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ch_hr_payroll.res_partner_bank_employee_mark'))]"/>
         <field name="private_street">Bahnhofstrasse 1</field>
         <field name="private_zip">6003</field>

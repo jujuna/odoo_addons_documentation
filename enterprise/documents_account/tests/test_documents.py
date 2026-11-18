@@ -861,15 +861,16 @@ class TestAccountMoveSendDocument(DocumentsAccountTestCommon, TestAccountMoveSen
     def test_log_note_and_incoming_email_document_creation(self):
         """
         Test that posting a file via log note or incoming email syncs to Documents ONLY if its mimetype
-        is explicitly allowed by `_should_attach_to_record` (e.g., PDFs, CSVs). Unlisted formats (e.g., images)
-        are orphaned and must not trigger a document sync.
+        is explicitly allowed by `_should_attach_to_record` (e.g., PDFs, CSVs, or images not from email alias).
+        Inline images from incoming email alias are orphaned and must not trigger a document sync.
         """
         test_cases = [
             ('invoice.pdf', 'application/pdf', PDF_RAW, True),
             ('receipt.png', 'image/png', b'dummy image content', False),
         ]
         origins = ('log_note', 'email')
-        for origin, (filename, mimetype, content, should_sync) in product(origins, test_cases):
+        for origin, (filename, mimetype, content, expected_sync) in product(origins, test_cases):
+            should_sync = expected_sync if origin == 'email' else True
             with self.subTest(origin=origin, filename=filename, mimetype=mimetype):
                 if origin == 'log_note':
                     invoice = self.init_invoice("in_invoice", amounts=[1000], post=False)

@@ -4,6 +4,9 @@ import { registerPythonTemplate } from "@point_of_sale/app/utils/convert_python_
 
 export const unpatchPrepDataPlugin = patch(PosDataPlugin.prototype, {
     async loadInitialData() {
+        if (odoo.debug === "assets") {
+            window.performance.mark("pos_data_service_init");
+        }
         const pdisId = odoo.preparation_display.id;
         const data = await this.orm.call("pos.prep.display", "load_preparation_data", [
             parseInt(pdisId),

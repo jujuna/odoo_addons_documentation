@@ -124,7 +124,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         - From 01/07 to 30/09, he worked at 4/5 time
         - From 01/10 to 31/12, he worked at mid time
 
-        Normally, we must allocate max 14.5 days to Georges and 12 days to John for this year.
+        Normally, we must allocate max 15 days to Georges and 12 days to John for this year.
 
         Description of the calculations:
         ------------------------------
@@ -133,7 +133,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
             - From 01/06 to 31/08, he worked at full time, 5 days/week. We compute this: 152 * 3 / 12 = 38 hours
             - From 01/09 to 31/12, he worked at 4/5, 4 days/weeks. We compute this: 152 * 4 / 5 * 4 / 12 = 40.53333 hours
             In total, we have 110,200033333 hours and we convert it in days to have the value in paid_time_off
-            which is equal to: 14,500004386 days (rounded DOWN to the nearest half-day: 14.5 days)
+            which is equal to: 14,500004386 days (rounded up to the unit: 15 days)
             = 110,200033333 / (38 / 5) = 110,200033333 hours / 7.6 hours/day
             (his next year contract is still the 4/5 one, 30.4h/week over 4 days = 7.6 hours/day: same rate as the
             reference calendar here, so it makes no difference which one is used)
@@ -145,12 +145,12 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
             - From 10/01 To 12/31, we compute: 152 x 1 / 2 x 3 / 12 = 19 hours
             In total, we have 121.6 hours and we convert it in days to have the value in paid_time_off, using his
             *next* year contract's own rate (mid-time, 19h/week over 3 days = 6.3333 hours/day): 121.6 / (19 / 3)
-            = 19.2 days, rounded DOWN to 19.0 -- then capped at 4 weeks of his working schedule
+            = 19.2 days, rounded up to 20 -- then capped at 4 weeks of his working schedule
             (4 x 3 days/week = 12 days.
         """
         self.assertEqual(len(self.wizard.alloc_employee_ids), 6, "Normally we should find 6 employees to allocate their paid time off for the next period")
 
-        self.assertEqual(self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_georges.id).paid_time_off, 14.5, "Georges should have 14.5 days paid time offs for this year.")
+        self.assertEqual(self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_georges.id).paid_time_off, 15, "Georges should have 15 days paid time offs for this year.")
         self.assertEqual(self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_john.id).paid_time_off, 12, "John Doe should have 12 days paid time offs for this year.")
         self.assertEqual(self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_gustavo.id).paid_time_off, 20, "Gustavo should have 20 days paid time offs for this year.")
         self.assertEqual(self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_fernando.id).paid_time_off, 24, "Fernando should have 24 days paid time offs for this year.")
@@ -169,16 +169,16 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         (30.4 hours per week) individually before summing: his full-time period (38 hours/week) is capped down
         to 30.4 hours/week, giving 31.67 + 30.4 + 40.53 = 102.6 hours instead of 110,200033333. We convert this
         in days for Georges, that is :
-        102.6 / (30.4 hours per week / 4 days) = 13.5 days
+        102.6 / (30.4 hours per week / 4 days) = 13.5 days, rounded up to 14 days
 
         After the calculation done in test above, we need to convert 121.6 in days for the mid time of John, that is :
-        121.6 / (19 hours per week / 3 days) = 19.2 days (we round to 19 days)
+        121.6 / (19 hours per week / 3 days) = 19.2 days (rounded up to 20 days)
         But since an employee should never have more than 4 weeks of paid time off, his total is reduced to 4 weeks of 3 days a week aka 12 days
         """
         self.assertEqual(len(self.wizard.alloc_employee_ids), 6, "Normally, we should find 6 employees to allocate their paid time off for the next period")
 
         alloc_employee = self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_georges.id)
-        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 13.5, "With a 4/5 time in this period, Georges could have 16 days of paid time off but his working schedule in last period allow him 13.5 days")
+        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 14, "With a 4/5 time in this period, Georges could have 16 days of paid time off but his working schedule in last period allow him 14 days")
         self.assertAlmostEqual(alloc_employee.hours_to_allocate, 102.8, places=1)
 
         alloc_employee = self.wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_john.id)
@@ -189,7 +189,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         allocations = self.env['hr.leave.allocation'].search(view['domain'])
         georges_allocation = allocations.filtered(lambda alloc: alloc.employee_id.id == self.employee_georges.id)
 
-        self.assertEqual(georges_allocation.number_of_days, 13.5)
+        self.assertEqual(georges_allocation.number_of_days, 14)
         self.assertAlmostEqual(georges_allocation.number_of_hours, 102.8, places=1, msg="based on the last year, we retain that Georges can have at most 16 days of paid time off")
 
         john_allocation = allocations.filtered(lambda alloc: alloc.employee_id.id == self.employee_john.id)
@@ -203,7 +203,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         - He worked 3 months for the previous employer with 50% occupation rate.
         - From 01/10 to 31/12, he worked at full time, 5 days/week
 
-        Normally, we must allocate max 7.5 days to the employee for this year
+        Normally, we must allocate max 8 days to the employee for this year
 
         Description of the calculations:
         ------------------------------
@@ -213,15 +213,64 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
             - From 01/10 to 31/12, he worked at full time, 5 days/week. We compute this: 152 * 3 / 12 = 38 hours
 
             In total, we have 57 hours and we convert it in days to have the value in paid_time_off
-            which is equal to: 7.5 days (57 hours / 7.6 hours/day, already an exact half-day, so
-            rounding DOWN to the nearest half-day leaves it unchanged)
+            which is equal to: 7.5 days (57 hours / 7.6 hours/day), rounded up to the unit: 8 days
         """
-        self.assertEqual(
-            self.wizard.alloc_employee_ids.filtered(
-                lambda alloc: alloc.employee_id == self.employee_with_attestation
-            ).paid_time_off,
-            7.5,
-            "The employee should have 7.5 days paid time offs for this year.")
+        alloc_employee = self.wizard.alloc_employee_ids.filtered(
+            lambda alloc: alloc.employee_id == self.employee_with_attestation
+        )
+        self.assertEqual(alloc_employee.paid_time_off, 8, "The employee should have 8 days paid time offs for this year.")
+        # The details of the tooltip: about 38 hours worked (5.05 days, rounded up to 6) and 19 hours of the attest
+        # (the 2 other days)
+        self.assertRecordValues(alloc_employee, [{
+            'accrued_days_from_work': 6,
+            'accrued_days_from_holiday_attest': 2,
+            'total_accrued_days': 8,
+        }])
+        self.assertEqual(len(alloc_employee.worked_periods), 1)
+        self.assertEqual(alloc_employee.worked_periods[0]['date_start'], f'{self.wizard.year}-10-01')
+        self.assertAlmostEqual(alloc_employee.worked_periods[0]['hours'], alloc_employee.accrued_hours_from_work, 2)
+        self.assertAlmostEqual(alloc_employee.accrued_hours_from_work, 38, 0)
+        self.assertAlmostEqual(alloc_employee.total_accrued_hours, 57, 0)
+
+        # The details are not stored: they are computed again when read later
+        alloc_employee.invalidate_recordset()
+        self.assertEqual(alloc_employee.accrued_days_from_holiday_attest, 2)
+
+    @freeze_time('2023-01-01')
+    def test_allocating_paid_time_off_details_add_up(self):
+        """ When the cap is reached, the days of the worked periods and of the holiday attest still add up to the
+        paid time off of the period. """
+        employee = self.create_employee({
+            'name': 'Employee With Attestation Over The Cap',
+            'date_version': date(2022, 3, 1),
+            'contract_date_start': date(2022, 3, 1),
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+            'l10n_be_dimona_category': 'oth',
+        })
+        employee.l10n_be_holiday_attest_ids = [Command.create({
+            'date_from': date(2022, 1, 1),
+            'date_to': date(2022, 6, 30),
+            'prev_work_hours_per_week': 38,
+            'prev_reference_work_hours_per_week': 38,
+            'prev_work_days_per_week': 5,
+            'prev_simple_holiday_pay_paid': 0,
+            'prev_double_holiday_pay_paid': 1000,
+        })]
+        wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': '2022', 'employee_ids': employee.ids})
+        alloc_employee = wizard.alloc_employee_ids.filtered(lambda alloc: alloc.employee_id == employee)
+        self.assertEqual(alloc_employee.paid_time_off, 20)
+        self.assertEqual(alloc_employee.accrued_days_from_work, 17)
+        self.assertEqual(alloc_employee.accrued_days_from_holiday_attest, 3)
+
+    def test_cap_days_and_hours_float_error(self):
+        # The days are rounded up to the unit: 15 days of 7.4 hours added up by tenths of day give 15.000000000000002
+        # days, still 15 days
+        hours = sum([7.4 * 0.1] * 150)
+        self.assertGreater(hours / 7.4, 15)
+        days, _hours = self.env['hr.payroll.alloc.paid.leave']._cap_days_and_hours(hours, 7.4, 20)
+        self.assertEqual(days, 15)
+        days, _hours = self.env['hr.payroll.alloc.paid.leave']._cap_days_and_hours(7.4 * 15.2, 7.4, 20)
+        self.assertEqual(days, 16)
 
     def test_allocating_paid_time_off_with_attestation_shorter_previous_week(self):
         """
@@ -241,7 +290,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
           ~79/313 of the year * 4 weeks * 38h/week = ~38.4h
 
         Total ~72.8h, converted to days at the current employer's rate (38h/5 days = 7.6h/day):
-        ~72.8 / 7.6 = ~9.58, rounded down to the nearest half-day = 9.5 days.
+        ~72.8 / 7.6 = ~9.58, rounded up to the unit = 10 days.
         """
         year = self.employee_with_attestation.first_contract_date.year
 
@@ -269,7 +318,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': str(year)})
         alloc_employee = wizard.alloc_employee_ids.filtered(lambda a: a.employee_id == employee)
 
-        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 9.5)
+        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 10)
         self.assertAlmostEqual(alloc_employee.hours_to_allocate, 72.83, places=2)
 
     # This situation occurred during the migration to the version model. Some employees had one version in BE
@@ -395,6 +444,28 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         self.assertEqual(allocations.date_from, public_holiday.date_to.replace(day=1).date(), "The allocation's date_from should be the first day of the month of the public holiday.")
         self.assertEqual(allocations.date_to, public_holiday.date_to.replace(day=31, month=12).date(), "The allocation's date_to should be the last day of the year of the public holiday.")
 
+    def test_create_allocation_public_holiday_on_sunday_brussels_time(self):
+        # All Saints' Day 2026 is a Sunday, stored in UTC from midnight in Brussels: only the Sunday is compensated,
+        # not the Saturday on which the UTC period starts
+        self.belgian_company.tz = 'Europe/Brussels'
+        self.env.user.tz = 'Europe/Brussels'
+        public_holiday = self.env['resource.calendar.leaves'].create({
+            'name': 'All Saints',
+            'date_from': datetime(2026, 10, 31, 23, 0, 0),
+            'date_to': datetime(2026, 11, 1, 22, 59, 59),
+            'company_id': self.belgian_company.id,
+        })
+        action = public_holiday.action_open_multi_allocations_wizard()
+        self.assertEqual(action['context']['default_duration'], 1)
+        wizard = self.env['hr.leave.allocation.generate.multi.wizard'].with_context(**action['context']).create({})
+        wizard.employee_ids = self.employee_georges
+        wizard.action_generate_allocations()
+        allocation = self.env['hr.leave.allocation'].search([
+            ('public_holiday_id', '=', public_holiday.id),
+            ('employee_id', '=', self.employee_georges.id),
+        ])
+        self.assertEqual(allocation.number_of_days, 1)
+
     def test_create_allocation_public_holiday_non_working_day_new_employee(self):
         public_holiday = self.env['resource.calendar.leaves'].create({
             'name': 'Public Holiday on Weekend',
@@ -436,6 +507,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         executive_jc = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
         company_executive = self.create_employee({
             'name': 'New Employee',
+            'employee_type_id': self.env.ref("hr.contract_type_company_executive").id,
             'l10n_be_joint_committee_id': executive_jc.id,
             'date_version': date(2023, 1, 1),
             'resource_calendar_id': self.resource_calendar_40_hours.id,
@@ -668,6 +740,43 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         self.assertEqual(allocation.date_from, date(2026, 1, 1))
         self.assertEqual(allocation.date_to, date(2026, 12, 31))
 
+    def test_unassimilated_absences_reduce_allocation(self):
+        """
+        Only the days worked and assimilated give legal holidays: 8 weeks of unassimilated absence (304 hours of a
+        38 hours week) in 2025 reduce the 4 weeks of 2026 by 8 x 4 / 52 weeks: 152 - 23.38 = 128.62 hours, 16.92
+        days of 7.6 hours, rounded up to 17 days.
+        """
+        employee = self.create_employee({
+            'name': 'Unassimilated Absences',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'contract_date_end': False,
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+            'l10n_be_dimona_category': 'oth',
+        })
+        unassimilated_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_unpredictable')
+        self.assertIn('UNASSIMILATED', unassimilated_type.category_ids.mapped('code'))
+        for month in (3, 4):
+            payslip = self.env['hr.payslip'].create({
+                'employee_id': employee.id,
+                'version_id': employee.version_id.id,
+                'date_from': date(2025, month, 1),
+                'date_to': date(2025, month, 28),
+            })
+            payslip.worked_days_line_ids = [Command.clear(), Command.create({
+                'work_entry_type_id': unassimilated_type.id,
+                'version_id': employee.version_id.id,
+                'number_of_days': 20,
+                'number_of_hours': 152,
+            })]
+            payslip.state = 'validated'
+            self.assertEqual(payslip.struct_id.code, 'BEMONTHLY')
+
+        wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': '2025'})
+        alloc = wizard.alloc_employee_ids.filtered(lambda alloc: alloc.employee_id == employee)
+        self.assertAlmostEqual(alloc.hours_to_allocate, 152 - 304 / 38 * 4 / 52 * 38, places=2)
+        self.assertEqual(alloc.paid_time_off_to_allocate, 17)
+
     def test_six_days_per_week_allocation(self):
         """
         A worker on 40 hours/week over 6 days/week (~6h40 /day), fully worked all of 2025 with no
@@ -751,8 +860,8 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         employer change, just a schedule change at the same employer.
 
         Capped at the lower of the old and new absolute hours/week -- here the *old*, lower rate --
-        this is 4 weeks at 35h/week = 140 hours, i.e. 18 days (140 / (38 / 5) = 140 / 7.6 hours/day
-        = 18.42, rounded down to the nearest half-day).
+        this is 4 weeks at 35h/week = 140 hours, i.e. 19 days (140 / (38 / 5) = 140 / 7.6 hours/day
+        = 18.42, rounded up to the unit).
         """
         calendar_35 = self.resource_calendar.copy({
             'name': 'Started at 35h/week (5 days)',
@@ -781,7 +890,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': '2025'})
         alloc_employee = wizard.alloc_employee_ids.filtered(lambda a: a.employee_id == employee)
 
-        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 18)
+        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 19)
         self.assertEqual(alloc_employee.hours_to_allocate, 140)
 
     def test_allocating_paid_time_off_with_amendment(self):
@@ -791,7 +900,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         off over its own period of 2025:
         - 01/01 -> 30/06: 155 / 313 days * 4 weeks * 19h = 37.64 hours
         - 01/07 -> 31/12: 158 / 313 days * 4 weeks * 38h = 76.73 hours
-        Total: 114.36 hours, i.e. 15 days (114.36 / 7.6 hours/day = 15.05, rounded down).
+        Total: 114.36 hours, i.e. 16 days (114.36 / 7.6 hours/day = 15.05, rounded up).
         """
         employee = self.create_employee({
             'name': 'Amended Schedule',
@@ -809,7 +918,7 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': '2025'})
         alloc_employee = wizard.alloc_employee_ids.filtered(lambda a: a.employee_id == employee)
 
-        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 15)
+        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 16)
         self.assertAlmostEqual(alloc_employee.hours_to_allocate, 114.36, places=2)
 
     def test_create_allocation_public_holiday_non_working_day_with_amendments(self):
@@ -891,3 +1000,27 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
             ('public_holiday_id', 'in', public_holidays.ids),
         ])
         self.assertEqual(allocations, allocation_2022)
+
+    @freeze_time('2023-01-15')
+    def test_allocation_warning_employees(self):
+        """ Once the December pay run is closed, the employees whose allocation of next year differs from the
+        expected one are in the warning, for the current and for the previous year. """
+        Employee = self.env['hr.employee']
+        self.assertFalse(Employee._get_employees_allocation_warning(2022) & self.employee_georges)
+        self.env['hr.payslip.run'].create({
+            'name': 'December 2022',
+            'date_start': date(2022, 12, 1),
+            'date_end': date(2022, 12, 31),
+            'company_id': self.belgian_company.id,
+        }).state = '02_close'
+        self.assertIn(self.employee_georges, Employee._get_employees_allocation_warning(2022))
+        # the warning of the previous year opens the wizard of that year for these employees
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_paid_time_off_allocation_last_year')
+        records, _details, additional_context, _localdict = warning._get_warning_python_records({})
+        self.assertIn(self.employee_georges, records)
+        self.assertEqual(additional_context['default_year'], '2022')
+        self.assertEqual(additional_context['default_employee_ids'], records.ids)
+
+        self.wizard.alloc_employee_ids = self.wizard.alloc_employee_ids.filtered(lambda alloc: alloc.employee_id == self.employee_georges)
+        self.wizard.generate_allocation()
+        self.assertNotIn(self.employee_georges, Employee._get_employees_allocation_warning(2022))

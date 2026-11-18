@@ -4,8 +4,72 @@ import time
 from datetime import date
 
 import odoo.tests
+from odoo.tests.common import new_test_user
+from odoo.addons.base.tests.common import BaseCommon
+from odoo.addons.hr_payroll.tests.common import TestPayrollBase
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 from odoo.addons.mail.tests.common import mail_new_test_user
+
+
+class TestBelgianCompanyCommon(BaseCommon):
+    """Independent user and Belgian company, without chart of accounts.
+
+    Same user and company as ``AccountTestInvoicingCommon`` with ``setup_country('be')``
+    (``accountman`` on the new company ``company_1_data``), for the classes that check no
+    accounting: installing the Belgian chart of accounts and the accounting data takes about
+    8 seconds per class.
+    """
+
+    _test_user_groups = None
+
+    @classmethod
+    def get_default_groups(cls):
+        # The groups of the AccountTestInvoicingCommon user
+        no_group = cls.env['res.groups']
+        return (
+            super().get_default_groups()
+            | cls.quick_ref('product.group_product_manager')
+            | (cls.env.ref('mrp.group_mrp_manager', False) or no_group)
+            | (cls.env.ref('purchase.group_purchase_manager', False) or no_group)
+            | (cls.env.ref('stock.group_stock_manager', False) or no_group)
+            | cls.quick_ref('account.group_account_manager')
+            | cls.quick_ref('account.group_account_user')
+            | cls.quick_ref('account.group_validate_bank_account')
+            | cls.quick_ref('base.group_system')
+        )
+
+    @classmethod
+    def setup_independent_user(cls):
+        return new_test_user(
+            cls.env,
+            name='Because I am accountman!',
+            login='accountman',
+            password='accountman',
+            email='accountman@test.com',
+            group_ids=cls.get_default_groups().ids,
+            company_id=cls.env.company.id,
+        )
+
+    @classmethod
+    def setup_independent_company(cls, **kwargs):
+        belgium = cls.env.ref('base.be')
+        return cls._create_company(
+            name='company_1_data',
+            country_id=belgium.id,
+            currency_id=belgium.currency_id.id,
+            account_opening_date=False,
+            **kwargs,
+        )
+
+
+class TestPayslipNoAccountingCommon(TestPayrollBase, TestBelgianCompanyCommon):
+    """``TestPayslipValidationCommon`` (hr_payroll_account) without chart of accounts: the
+    validated payslips create no journal entry."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env.user.group_ids += cls.env.ref('hr_payroll.group_hr_payroll_manager')
 
 
 class TestPayrollAccountCommon(odoo.tests.HttpCase, TestBelgiumCommon):

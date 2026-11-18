@@ -177,6 +177,20 @@ export class DocumentsDocument extends models.ServerModel {
         return super.web_search_read(...arguments);
     }
 
+    /** Override to set all documents as recently accessed
+     */
+    web_read_group() {
+        const kwargs = arguments[0];
+        const domain = kwargs?.domain;
+        if (domain) {
+            const folderLeafIdx = domain.findIndex((leaf) => leaf[0] === "user_folder_id");
+            if (folderLeafIdx !== -1 && domain[folderLeafIdx][2] === "RECENT") {
+                domain.splice(folderLeafIdx, 1, ["user_permission", "!=", "none"]);
+            }
+        }
+        return super.web_read_group(...arguments);
+    }
+
     action_move_folder(folder, target, before_folder_id = false) {
         const record = this.filter((r) => folder.id === r.id);
         record.folder_id = target;

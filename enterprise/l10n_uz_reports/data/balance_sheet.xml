@@ -627,7 +627,7 @@
                                             <record id="account_financial_report_l10n_uz_bs_eq_cye_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
                                                 <field name="engine">domain</field>
-                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected'])]"/>
+                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected', 'equity_retained'])]"/>
                                                 <field name="date_scope">from_fiscalyear</field>
                                                 <field name="subformula">-sum</field>
                                             </record>
@@ -642,7 +642,7 @@
                                             <record id="account_financial_report_l10n_uz_bs_eq_oye_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
                                                 <field name="engine">domain</field>
-                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected'])]"/>
+                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected', 'equity_retained'])]"/>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                                 <field name="subformula">-sum</field>
                                             </record>

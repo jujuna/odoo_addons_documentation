@@ -52,11 +52,6 @@ class AccountChartTemplate(models.AbstractModel):
             rules_mapping[bpjs_kesehatan_rule]['debit'] = bpjs_expense
             rules_mapping[bpjs_kesehatan_rule]['credit'] = accrued_payable_bpjs_kesehatan
 
-        for xml_id in ('salary_rule_id_gross_up_bpjs_kesehatan_emp', 'salary_rule_id_gross_up_bpjs_kesehatan_emp_arrears'):
-            bpjs_kesehatan_emp_rule = self.env.ref('l10n_id_hr_payroll.%s' % xml_id)
-            rules_mapping[bpjs_kesehatan_emp_rule]['debit'] = '61100060'
-            rules_mapping[bpjs_kesehatan_emp_rule]['credit'] = '25110110'
-
         jht_company_rule = self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_jht_company')
         rules_mapping[jht_company_rule]['debit'] = bpjs_expense
         rules_mapping[jht_company_rule]['credit'] = accrued_payable_bpjs_ketenagakerjaan
@@ -64,6 +59,15 @@ class AccountChartTemplate(models.AbstractModel):
         jp_company_rule = self.env.ref('l10n_id_hr_payroll.salary_rule_id_gross_up_jp_company')
         rules_mapping[jp_company_rule]['debit'] = bpjs_expense
         rules_mapping[jp_company_rule]['credit'] = accrued_payable_bpjs_ketenagakerjaan
+
+        # Employee BPJS share paid as an allowance (Gross Up): expense only, the deductions book the payable
+        for xml_id in (
+            'salary_rule_id_gross_up_bpjs_kesehatan_emp',
+            'salary_rule_id_gross_up_bpjs_kesehatan_emp_arrears',
+            'salary_rule_id_gross_up_jht_alw',
+            'salary_rule_id_gross_up_jp_alw',
+        ):
+            rules_mapping[self.env.ref('l10n_id_hr_payroll.%s' % xml_id)]['debit'] = bpjs_expense
 
         # Tax allowance (Gross Up)
         tax_allowance_rule = self.env.ref('l10n_id_hr_payroll.l10n_id_hr_payroll_structure_id_employee_salary_tax_allowance')

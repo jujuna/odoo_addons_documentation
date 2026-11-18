@@ -1,0 +1,560 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * l10n_uy_edi_pos
+#
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 18:22+0000\n"
+"PO-Revision-Date: 2026-11-05 20:55+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-20/l10n_uy_edi_pos/es_419/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Language: es_419\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"\n"
+"\n"
+"NOTE: This is required since the e-Ticket exceeds the minimum amount.\n"
+"Minimum amount = 5000 Uruguayan Indexed Unit (>%(min_amount)s)"
+msgstr ""
+"\n"
+"NOTA: Esto es obligatorio, ya que el e-Ticket supera el importe mínimo.\n"
+"Monto mínimo = 5000 Unidades Indexadas Uruguayas (>%(min_amount)s)"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.module.module,description:base.module_l10n_uy_edi_pos
+msgid ""
+"\n"
+"Uruguayan electronic invoicing (CFE via Uruware) for the Point of Sale.\n"
+"\n"
+"Orders whose customer is identified with a RUT are invoiced through the standard e-Invoice\n"
+"pipeline (account.move). Any other order (CI/DNI/passport/none/Consumidor Final) issues an\n"
+"e-Ticket (or e-Ticket Credit Note for refunds) directly from the pos.order.\n"
+msgstr ""
+"\n"
+"Facturación electrónica uruguaya (CFE a través de Uruware) para Punto de "
+"venta.\n"
+"\n"
+"Las órdenes cuyo cliente se identifica con un RUT se facturan a través del "
+"flujo estándar de\n"
+"facturación electrónica (account.move). Cualquier otra orden (CI/DNI/"
+"pasaporte/sin identificación/consumidor final) genera un\n"
+"e-Ticket (o una nota de crédito de e-Ticket para los reembolsos) "
+"directamente desde pos.order.\n"
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.ticket_cfe_screen
+msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/>Download"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/>Descargar"
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.ticket_cfe_screen
+msgid "<strong>Amounting to:</strong>"
+msgstr "<strong>Por un importe de:</strong>"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "A credit note e-Ticket needs the original order to be informed."
+msgstr ""
+"Una nota de crédito de e-Ticket requiere que indiques la orden original."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "A credit note must reference the CFE of the order it refunds."
+msgstr ""
+"Una nota de crédito debe hacer referencia al CFE de la orden que reembolsa."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"A non-billable product cannot have taxes. Please remove the taxes from line "
+"'%(line_name)s' to continue."
+msgstr ""
+"Un producto no facturable no puede tener impuestos. Elimina los impuestos de "
+"la línea '%(line_name)s' para continuar."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid "Accepted"
+msgstr "Aceptado"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"All lines should have a VAT tax (only one per line). Check line "
+"'%(line_name)s'"
+msgstr ""
+"Todas las líneas deben tener un impuesto de IVA (solo uno por línea), revisa "
+"la línea '%(line_name)s'"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"An e-Ticket was already accepted by DGI for %(orders)s. Invoicing it now "
+"would report the same sale twice."
+msgstr ""
+"La DGI ya aceptó un e-Ticket para %(orders)s. Si lo facturas ahora, se "
+"informará la misma venta dos veces."
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_error
+msgid "CFE Error"
+msgstr "Error de CFE"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_document_number
+msgid "CFE Number"
+msgstr "Número de CFE"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_pdf_attachment_id
+msgid "CFE PDF"
+msgstr "PDF del CFE"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_cfe_state
+msgid "CFE Status"
+msgstr "Estado del CFE"
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/feedback_screen/feedback_screen.js:0
+msgid "CFE error"
+msgstr "Error de CFE"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"Cannot create a credit note e-Ticket: the original order does not have an "
+"accepted CFE yet. Send the CFE of the original order first."
+msgstr ""
+"No puedes crear una nota de crédito de e-Ticket porque la DGI aún no aceptó "
+"el CFE de la orden original. Envía primero el CFE de la orden original."
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_res_config_settings
+msgid "Config Settings"
+msgstr "Ajustes de configuración"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_config__l10n_uy_final_consumer_limit
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_res_config_settings__pos_l10n_uy_final_consumer_limit
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.res_config_settings_view_form
+msgid "Consumidor Final Max Amount"
+msgstr "Importe máximo para Consumidor Final"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,website_form_label:l10n_uy_edi_pos.model_res_partner
+msgid "Create a Customer"
+msgstr "Crear un cliente"
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/utils/order_payment_validation.js:0
+msgid ""
+"Customer Account cannot be used for an unidentified customer.\n"
+"Please select a customer with a valid identification number before continuing."
+msgstr ""
+"No puedes usar la cuenta de cliente para un cliente sin identificar.\n"
+"Selecciona un cliente con un número de identificación válido antes de "
+"continuar."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/utils/order_payment_validation.js:0
+msgid "Customer Required"
+msgstr "Se requiere el cliente"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/res_partner.py:0
+msgid ""
+"Deleting the partner %s is not allowed because it is required by the "
+"Uruguayan point of sale."
+msgstr ""
+"No puedes eliminar al contacto %s porque el punto de venta uruguayo lo "
+"requiere."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "Discount"
+msgstr "Descuento"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_l10n_uy_edi_document__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_config__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_res_partner__display_name
+msgid "Display Name"
+msgstr "Nombre a mostrar"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "ERROR"
+msgstr "ERROR"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_l10n_uy_edi_document
+msgid "Electronic Fiscal Document (CFE - UY)"
+msgstr "Documento fiscal electrónico (CFE - UY)"
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid "Error"
+msgstr "Error"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "Error getting the PDF file: %s"
+msgstr "Error al obtener el archivo PDF: %s"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "For e-Ticket and related DN and CN you can only report up to 700 lines"
+msgstr ""
+"Para los e-Tickets y sus notas de débito y crédito relacionadas, solo puedes "
+"reportar hasta 700 líneas"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_l10n_uy_edi_document__id
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_config__id
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__id
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_res_config_settings__id
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_enable_send
+msgid "L10N Uy Edi Enable Send"
+msgstr "Habilitar el envío de EDI para Uruguay"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_is_enabled
+msgid "L10N Uy Edi Is Enabled"
+msgstr "EDI de Uruguay está habilitado"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_document_number
+msgid "Legal serie and number of the CFE assigned by Uruware/DGI."
+msgstr "Serie legal y número de CFE asignado por Uruware/DGI."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/utils/order_payment_validation.js:0
+msgid "Limit Exceeded"
+msgstr "Límite excedido"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_config__l10n_uy_final_consumer_limit
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_res_config_settings__pos_l10n_uy_final_consumer_limit
+msgid ""
+"Maximum POS sale amount for unidentified customers (Consumidor Final, or any customer missing a valid identification).\n"
+"The legal threshold is 5,000 UI (Res. DGI 531/2022), net of VAT, converted at the UI value fixed at the prior calendar-year end (2026: ~ UYU 32,117). Update this value yearly."
+msgstr ""
+"Importe máximo de venta en el Punto de venta para clientes sin identificar "
+"(Consumidor Final o cualquier cliente sin una identificación válida).\n"
+"El límite legal es de 5.000 UI (Res. DGI 531/2022), neto de IVA, convertido "
+"según el valor de la UI al cierre del año calendario anterior (2026: ~ UYU "
+"32,117). Actualiza este valor cada año."
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.res_config_settings_view_form
+msgid ""
+"Maximum POS sale amount for unidentified customers (Consumidor Final, or any"
+" customer missing a valid identification). Legal threshold is 5,000 UI (Res."
+" DGI 531/2022), net of VAT, at the prior-year-end UI rate (2026: ~ UYU "
+"32,117). Update yearly."
+msgstr ""
+"Importe máximo de venta en el Punto de venta para clientes sin identificar "
+"(Consumidor Final o cualquier cliente sin una identificación válida). El "
+"límite legal es de 5.000 UI (Res. DGI 531/2022), neto de IVA, según el valor "
+"de la UI al cierre del año anterior (2026: ~ UYU 32,117). Actualiza este "
+"valor cada año."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"Not valid Currency Rate, need to be greater than 0 to be accepted by DGI "
+"(%(used_rate)s)"
+msgstr ""
+"La cotización de la moneda no es válida. Debe ser mayor que 0 para que la "
+"DGI la acepte (%(used_rate)s)"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "Not valid Uruguayan tax, only VAT taxes are supported (%(taxes_name)s)"
+msgstr ""
+"Impuesto uruguayo no válido. Solo se admiten impuestos de IVA (%(taxes_name)"
+"s)"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"Orders for a customer identified with a RUT must be invoiced (e-Invoice), "
+"not sent as an e-Ticket."
+msgstr ""
+"Las órdenes de los clientes identificados con un RUT deben facturarse "
+"mediante una factura electrónica, no mediante un e-Ticket."
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "Configuración del punto de venta"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model,name:l10n_uy_edi_pos.model_pos_order
+msgid "Point of Sale Order"
+msgstr "Orden del punto de venta"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_l10n_uy_edi_document__pos_order_id
+msgid "Pos Order"
+msgstr "Orden del punto de venta"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "Problem with Receiver identification number: %(exp_msg)s"
+msgstr "Problema con el número de identificación del receptor: %(exp_msg)s"
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid "Rejected"
+msgstr "Rechazado"
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.pos_order_view_form
+msgid "Send CFE"
+msgstr "Enviar CFE"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_cfe_state
+msgid "State of the electronic document"
+msgstr "Estado del documento electrónico"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "The %(document_type)s was created successfully"
+msgstr "%(document_type)s se creó con éxito"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"The CFE cannot be generated for this order:\n"
+"\t- %(errors)s"
+msgstr ""
+"No se puede generar el CFE para esta orden:\n"
+"\t- %(errors)s"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"The CFE of the original order was rejected by DGI, so no credit note can "
+"reference it. The sale itself was annulled and needs no credit note."
+msgstr ""
+"La DGI rechazó el CFE de la orden original, por lo que ninguna nota de "
+"crédito puede hacer referencia a él. La venta se anuló y no requiere una "
+"nota de crédito."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/feedback_screen/feedback_screen.js:0
+msgid ""
+"The CFE of this order was not issued. The order can be sent again from Orders: select the order, then Send CFE.\n"
+"\n"
+"%s"
+msgstr ""
+"El CFE de esta orden no se emitió. Puedes volver a enviar la orden desde "
+"Órdenes: selecciona la orden y haz clic en Enviar CFE.\n"
+"\n"
+"%s"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "The currency does not exist on DGI currencies table %s"
+msgstr "La moneda no existe en la tabla de monedas de la DGI: %s"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "The customer of the CFE needs to have a valid Uruguayan identification"
+msgstr "El cliente del CFE debe tener una identificación uruguaya válida"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "The invoice has no Uruguayan document type to build a CFE from."
+msgstr "La factura no tiene un tipo de documento uruguayo para generar un CFE."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"The original order was not reported to DGI, so its refund cannot be either. "
+"Refund it outside of the electronic point of sale."
+msgstr ""
+"La orden original no se informó a la DGI, por lo que tampoco puedes informar "
+"su reembolso. Registra el reembolso fuera del punto de venta electrónico."
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.ticket_cfe_screen
+msgid ""
+"The printable version of this sale is not available yet.\n"
+"                        Please try again later or contact the shop."
+msgstr ""
+"La versión imprimible de esta venta aún no está disponible.\n"
+"                        Inténtalo de nuevo más tarde o comunícate con la "
+"tienda."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"This CFE has been generated in DEMO Mode. It is considered as accepted and "
+"it won't be sent to DGI."
+msgstr ""
+"Este CFE se generó en modo DEMO. Se considera aceptado y no se enviará a la "
+"DGI."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/utils/order_payment_validation.js:0
+msgid ""
+"This order exceeds the maximum amount allowed for an unidentified customer.\n"
+"Maximum allowed amount: %(limit)s\n"
+"Please select a customer with a valid identification number before continuing."
+msgstr ""
+"Esta orden supera el importe máximo permitido para un cliente sin "
+"identificar.\n"
+"Importe máximo permitido: %(limit)s\n"
+"Selecciona un cliente con un número de identificación válido antes de "
+"continuar."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"To create the CFE document first complete your company data (%(company_name)s):\n"
+"\t- %(errors)s"
+msgstr ""
+"Para crear el CFE, primero completa los datos de tu empresa (%(company_name)"
+"s):\n"
+"\t- %(errors)s"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.module.module,shortdesc:base.module_l10n_uy_edi_pos
+msgid "Uruguay - Electronic Invoicing for POS"
+msgstr "Uruguay - Facturación electrónica para PdV"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,field_description:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_document_id
+msgid "Uruguay CFE"
+msgstr "CFE de Uruguay"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_document_id
+msgid ""
+"Uruguay: the e-Ticket of this sale, an invoiced order carries its CFE on the"
+" invoice."
+msgstr ""
+"Uruguay: El e-Ticket de esta venta. Si la orden se factura, su CFE aparece "
+"en la factura."
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_pdf_attachment_id
+msgid ""
+"Uruguay: the legal PDF representation of the e-Ticket, as Uruware returned "
+"it."
+msgstr ""
+"Uruguay: Representación legal en PDF del e-Ticket, tal como la devuelve "
+"Uruware."
+
+#. module: l10n_uy_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_uy_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid "Waiting for DGI"
+msgstr "En espera de la DGI"
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.pos_order_view_form
+msgid "Warning: the CFE was not correctly sent to DGI."
+msgstr "Advertencia: El CFE no se envió de forma correcta a la DGI."
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"You cannot combine included and not included taxes on the same document"
+msgstr ""
+"No puedes combinar impuestos incluidos y no incluidos en un mismo documento"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid ""
+"You need to fill in the receiver details: address, city, province, country "
+"and ID number"
+msgstr ""
+"Necesitas configurar los detalles del receptor: dirección, ciudad, "
+"provincia, país y Número de Identificación"
+
+#. module: l10n_uy_edi_pos
+#. odoo-python
+#: code:addons/l10n_uy_edi_pos/models/pos_order.py:0
+msgid "You need to have the UYI rate before validating documents"
+msgstr "Necesitas tener la tasa de UYI antes de validar los documentos"
+
+#. module: l10n_uy_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi_pos.ticket_cfe_screen
+msgid "Your fiscal document"
+msgstr "Tu documento fiscal"
+
+#. module: l10n_uy_edi_pos
+#: model:ir.model.fields,help:l10n_uy_edi_pos.field_pos_order__l10n_uy_edi_error
+msgid "error details for CFEs in the 'error' state."
+msgstr "Detalles del error de los CFE en estado \"error\"."

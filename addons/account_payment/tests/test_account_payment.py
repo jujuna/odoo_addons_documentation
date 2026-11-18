@@ -518,50 +518,53 @@ class TestAccountPayment(AccountPaymentCommon):
             )
             self.assertTrue(payment_qr_mock.called)
 
-    def test_partial_reconcile_with_payments_coming_from_provider(self):
-        """ Test that we not allow partial reconcile on payments coming from
-            payment provider.
-        """
-        provider = self.env['payment.provider'].create({
-            'name': 'Test',
-            'journal_id': self.company_data['default_journal_bank'].id,
+    def test_post_process_existing_payment_provider_reference(self):
+        """Provider reference should propagate to a pre-existing payment."""
+        tx = self._create_transaction(
+            "direct",
+            provider_reference="provider_ref",
+            state="done",
+        )
+
+        payment_method_line = tx.provider_id.journal_id.inbound_payment_method_line_ids.filtered(
+            lambda line: line.payment_provider_id == tx.provider_id
+        )
+
+        payment = self.env["account.payment"].create({
+            "amount": tx.amount,
+            "payment_type": "inbound",
+            "currency_id": tx.currency_id.id,
+            "partner_id": tx.partner_id.id,
+            "partner_type": "customer",
+            "journal_id": tx.provider_id.journal_id.id,
+            "company_id": tx.company_id.id,
+            "payment_method_line_id": payment_method_line.id,
+            "memo": tx.reference,
         })
-        payment_method = self.env["payment.method"].create({
-            "name": "Payment method",
-            "code": "unknown",
-            "provider_id": provider.id,
-        })
-        invoice = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.partner_a.id,
-            'journal_id': self.company_data['default_journal_sale'].id,
-            'invoice_line_ids': [
-                Command.create({
-                    'account_id': self.company_data['default_account_revenue'].id,
-                    'product_id': self.product_a.id,
-                    'quantity': 1,
-                    'price_unit': 100,
-                })
-            ]
-        })
-        payment_transaction = self.env['payment.transaction'].create({
-            'provider_id': provider.id,
-            'payment_method_id': payment_method.id,
-            'invoice_ids': [invoice.id],
-            'partner_id': self.partner_a.id,
-            'amount': 200,
-            'currency_id': invoice.currency_id.id,
-        })
-        payment_transaction.with_context(payment_safe_write=True)._create_payment(payment_method_line_id=self.company_data['default_journal_bank'].inbound_payment_method_line_ids[0].id)
-        self._run_post_processing()
-        payment = payment_transaction.payment_id
-        invoice.action_post()
         payment.action_post()
-        statement_line = self.env['account.bank.statement.line'].create({
-            'journal_id': self.company_data['default_journal_bank'].id,
-            'date': '2026-01-01',
-            'partner_id': self.partner_a.id,
-            'amount': 100.0,
-        })
-        inv_line = payment.move_id.line_ids.filtered(lambda l: l.balance == 200)
-        self.assertFalse(statement_line._get_partial_amounts(-200, inv_line, -100, -100))
+
+        tx.with_context(payment_safe_write=True).payment_id = payment
+
+        with patch.object(
+                self.env.registry["payment.transaction"],
+                "_create_payment",
+                autospec=True,
+        ) as create_payment_mock:
+            self._run_post_processing()
+
+        create_payment_mock.assert_not_called()
+
+        expected_reference = f"{tx.reference} - {tx.provider_reference}"
+        self.assertEqual(payment.memo, expected_reference)
+
+        liquidity_lines, counterpart_lines, _writeoff_lines = payment._seek_for_lines()
+        expected_line_name = f"{payment.payment_method_line_id.name}: {expected_reference}"
+
+        self.assertEqual(
+            liquidity_lines.mapped("name"),
+            [expected_line_name],
+        )
+        self.assertEqual(
+            counterpart_lines.mapped("name"),
+            [expected_line_name],
+        )

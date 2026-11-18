@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged, freeze_time
+
 from odoo.addons.l10n_ca_payment_cpa005.tests.common import CPA005Common
 
 
@@ -96,3 +98,67 @@ class TestCPA005EFT(CPA005Common):
             self.journal._l10n_ca_cpa005_next_file_creation_nr(), "9991", "FCN different from what was set."
         )
         self.assertEqual(self.journal._l10n_ca_cpa005_next_file_creation_nr(), "0002", "FCN should have rolled over back to 0002.")
+
+    def test_cpa005_financial_institution_number_sources(self):
+        bank = self.bank_partner_a
+        ca_clearing_label = self.env.ref("base.clearing_label_ca")
+
+        self.assertEqual(bank._l10n_ca_cpa005_get_financial_institution_number(), "055566666")
+
+        # Both fields hold the same information, the Canadian one wins when both are set
+        bank.write({"clearing_label_id": ca_clearing_label.id, "clearing_number": "0004-12345"})
+        self.assertEqual(bank._l10n_ca_cpa005_get_financial_institution_number(), "055566666")
+
+        # The generic clearing number is used, separators included, when the Canadian field is empty
+        bank.l10n_ca_financial_institution_number = False
+        self.assertEqual(bank._l10n_ca_cpa005_get_financial_institution_number(), "000412345")
+
+        # A clearing number that is not a Canadian institution number is rejected
+        with self.assertRaisesRegex(ValidationError, "must be a 9 digit number"):
+            bank.clearing_number = "12345"
+        with self.assertRaisesRegex(ValidationError, "must be a 9 digit number"):
+            bank.clearing_number = "100412345"
+
+        # Neither can a clearing number of another country
+        bank.write({"clearing_label_id": self.env.ref("base.clearing_label_us").id, "clearing_number": "000412345"})
+        self.assertFalse(bank._l10n_ca_cpa005_get_financial_institution_number())
+
+    def test_cpa005_with_generic_clearing_number(self):
+        """The generated file is the same whether the institution numbers are set on the
+        Canadian field or on the generic clearing number."""
+        expected = self.batch._generate_cpa005_file()  # fixes the file creation number on the batch
+
+        ca_clearing_label = self.env.ref("base.clearing_label_ca")
+        for bank in self.journal.bank_account_id | self.bank_partner_a | self.bank_partner_b:
+            bank.write(
+                {
+                    "clearing_label_id": ca_clearing_label.id,
+                    "clearing_number": bank.l10n_ca_financial_institution_number,
+                    "l10n_ca_financial_institution_number": False,
+                }
+            )
+
+        self.assertEqual(self.batch._generate_cpa005_file(), expected)
+
+    def test_cpa005_file_routing_header(self):
+        """ RBC files start with their File Transmission Routing Record, which the system parameter can replace. """
+        self.assertTrue(self.batch._generate_cpa005_file().startswith("A000000001"), "Only RBC needs a routing record.")  # default bank from setup != RBC
+
+        bank_sudo = self.journal.bank_account_id.sudo()
+        bank_sudo.write(
+            {
+                "clearing_label_id": self.env.ref("base.clearing_label_ca").id,
+                "clearing_number": "000312345",  # digits [1:4] == '003', it's RBC
+                "l10n_ca_financial_institution_number": False,  # it would win over the clearing number
+            }
+        )
+        generated = self.batch._generate_cpa005_file().splitlines()
+        self.assertEqual(generated[0], "$$AA01CPA1464[PROD[NL$$")
+        self.assertTrue(generated[1].startswith("A000000001"), "The routing record is not a logical record.")
+        self.assertTrue(generated[-1].startswith("Z000000006"), "The routing record is not a logical record.")
+
+        self.env['ir.config_parameter'].sudo().set_str('l10n_ca_payment_cpa005.rbc_file_routing_header', "$$AA01CPA1464[TEST[NL$$")
+        self.assertTrue(self.batch._generate_cpa005_file().startswith("$$AA01CPA1464[TEST[NL$$\r\nA000000001"))
+
+        bank_sudo.clearing_number = "022233333"  # not RBC
+        self.assertTrue(self.batch._generate_cpa005_file().startswith("A000000001"), "The parameter only overrides RBC's routing record.")

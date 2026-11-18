@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
-from odoo.tests import Form, tagged
+from odoo.tests import Form
+from odoo.tools import mute_logger
 from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarcodeClientAction
 
 
@@ -931,17 +932,21 @@ class TestMRPBarcodeClientAction(TestBarcodeClientAction):
             'restrict_scan_tracking_number': 'mandatory',
             'barcode_validation_full': False,
         })
-        # Update `component_lot` to make it tracked by SN.
+        # Update `component_lot` to make it tracked by SN and add another tracked component that won't be scanned in Barcode app.
         self.component_lot.write({'name': 'Compo Serial', 'barcode': 'compo_sn', 'tracking': 'serial'})
+        self.bom_lot.bom_line_ids = [Command.create({'product_id': self.productserial1.id, 'product_qty': 1})]
         serial_numbers = self.env['stock.lot'].create([{
             'name': f'sn-00{i}',
             'product_id': self.component_lot.id,
-        } for i in range(1, 5)])
+        } for i in range(1, 5)] + [{
+            'name': f'sn-extra-{i}',
+            'product_id': self.productserial1.id,
+        } for i in range(1, 3)])
         # Add products in stock.
         self.env['stock.quant']._update_available_quantity(self.component01, self.stock_location, quantity=99)
         for sn in serial_numbers:
-            self.env['stock.quant']._update_available_quantity(self.component_lot, self.stock_location, quantity=1, lot_id=sn)
-        # Create two MO, each using a different operation type and a BoM where the final product and one of its component are tracked.
+            self.env['stock.quant']._update_available_quantity(sn.product_id, self.stock_location, quantity=1, lot_id=sn)
+        # Create two MO, each using a different operation type and a BoM where the final product and some of its components are tracked.
         manufacturing_orders = self.env['mrp.production'].create([{
             'bom_id': self.bom_lot.id,
             'picking_type_id': operation_type.id,
@@ -949,7 +954,11 @@ class TestMRPBarcodeClientAction(TestBarcodeClientAction):
         manufacturing_orders.action_confirm()
         manufacturing_orders[0].name = "MO1"
         manufacturing_orders[1].name = "MO2"
-        self.start_tour('/odoo/barcode', 'test_barcode_production_settings', login='admin')
+        with mute_logger('odoo.http'):  # ignore the intended UserError in the test
+            self.start_tour('/odoo/barcode', 'test_barcode_production_settings', login='admin')
+        # The tracked component is consumed when lot/serial number scanning is not mandatory on the operation type.
+        self.assertEqual(manufacturing_orders[0].move_raw_ids[2].state, 'done')
+        self.assertEqual(manufacturing_orders[1].move_raw_ids[2].state, 'cancel')
 
     def test_no_split_uncompleted_done_move(self):
         """

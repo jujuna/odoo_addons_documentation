@@ -201,10 +201,10 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         march = late._get_line_values(['GROSS', 'ATN.INT'], extra_domain=self._line_domain(3))
         self.assertEqual(january['GROSS'][late.id]['total'], 0.0)
         self.assertNotEqual(march['GROSS'][late.id]['total'], 0.0)
-        self.assertNotEqual(
+        self.assertEqual(
             january['ATN.INT'][late.id]['total'], 0.0,
-            "The benefit in kind stays declared in the pay period")
-        self.assertEqual(march['ATN.INT'][late.id]['total'], 0.0)
+            "January is declared: the benefit in kind is declared with the withholding tax withheld on it")
+        self.assertNotEqual(march['ATN.INT'][late.id]['total'], 0.0)
 
     def test_payslip_of_an_undeclared_period_keeps_its_pay_period(self):
         late = self._validate_payslip(self.late_employee, 1, '2026-03-10')
@@ -255,11 +255,12 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         january_values = corrections._get_line_values(['GROSS'], extra_domain=self._line_domain(1))
         self.assertNotEqual(january_values['GROSS'][corrections.id]['total'], 0.0)
 
-    def test_a_correction_never_rewrites_the_attachment_of_its_lines(self):
-        """The period of a correction is a property of the payslip, not of its lines.
+    def test_a_deferred_correction_declares_its_benefits_in_kind_with_it(self):
+        """A correction declared in the fiscal period takes its benefits in kind along.
 
-        A line keeps the attachment its salary rule gives it, so a benefit in kind stays
-        declared in the pay period whichever period the payslip itself ends up in.
+        The withholding tax on the delta of a benefit in kind is withheld when the correction is
+        paid: the taxable amount it is withheld on is declared in the same period, not in the pay
+        period already declared.
         """
         january = self._validate_payslip(self.employee, 1, '2026-01-28')
         self._create_274(1).action_generate_xml()
@@ -273,40 +274,56 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         self.assertFalse(
             corrections.line_ids.filtered(lambda line: line.code == 'GROSS').l10n_be_follow_pay_period,
             "A correction leaves the attachment of a taxable salary line alone")
-        self.assertTrue(
+        self.assertFalse(
             corrections.line_ids.filtered(lambda line: line.code == 'ATN_ELEC').l10n_be_follow_pay_period,
-            "A benefit in kind keeps the attachment of its salary rule")
+            "The benefit in kind of a deferred correction follows its fiscal period")
 
         january_values = corrections._get_line_values(['ATN_ELEC'], extra_domain=self._line_domain(1))
+        march_values = corrections._get_line_values(['ATN_ELEC'], extra_domain=self._line_domain(3))
+        self.assertEqual(january_values['ATN_ELEC'][corrections.id]['total'], 0.0)
         self.assertNotEqual(
-            january_values['ATN_ELEC'][corrections.id]['total'], 0.0,
-            "The benefit in kind is declared in the pay period it belongs to")
+            march_values['ATN_ELEC'][corrections.id]['total'], 0.0,
+            "The benefit in kind is declared with the withholding tax withheld on it")
 
-    def test_a_deferred_payslip_declares_its_benefits_in_kind_in_its_pay_period(self):
-        """Raise a benefit in kind, correct months later: the benefit stays in the pay period.
+    def test_a_correction_kept_in_its_pay_period_keeps_its_benefits_in_kind_there(self):
+        """A correction lowering the declaration goes back to its pay period, its benefits in kind too."""
+        self.employee.version_id.electricity_amount = 100.0
+        january = self._validate_payslip(self.employee, 1, '2026-01-28')
+        self._create_274(1).action_generate_xml()
 
-        The declaration rebuilds its taxable base from the amounts it is made of, so the benefit
-        follows its own attachment instead of riding along inside the taxable salary aggregate.
+        self.employee.version_id.wage = 2600.0
+        _, corrections = self._correct(january, '2026-03-10')
+        self.assertEqual(corrections.l10n_be_fiscal_date, date(2026, 1, 31))
+        self.assertTrue(
+            corrections.line_ids.filtered(lambda line: line.code == 'ATN_ELEC').l10n_be_follow_pay_period,
+            "A correction declared in its pay period keeps the attachment of its salary rules")
+
+    def test_a_deferred_correction_declares_its_whole_taxable_salary_in_the_fiscal_period(self):
+        """Raise a benefit in kind, correct months later: the whole delta is declared now.
+
+        The declaration rebuilds its taxable base from the amounts it is made of: with the benefit
+        in kind attached to the fiscal period too, nothing of the correction is left in the pay
+        period, and the fiscal period declares a positive taxable salary with its withholding tax.
         """
         january = self._validate_payslip(self.employee, 1, '2026-01-28')
         self._file_274(1, '274-2026-01')
 
         self.employee.version_id.electricity_amount = 100.0
-        _, corrections = self._correct(january, '2026-03-10')
+        refunds, corrections = self._correct(january, '2026-03-10')
         self.assertEqual(corrections.l10n_be_fiscal_date, date(2026, 3, 10))
 
         base = self.env['hr.payslip']._get_gross_wage_base_categories()['GROSS']
         january_base = corrections._l10n_be_get_declaration_base(base, date(2026, 1, 1), date(2026, 1, 31))
         march_base = corrections._l10n_be_get_declaration_base(base, date(2026, 3, 1), date(2026, 3, 31))
         gross = corrections._get_line_values(['GROSS'])['GROSS'][corrections.id]['total']
+        self.assertAlmostEqual(january_base[corrections.id], 0.0, 2)
+        self.assertAlmostEqual(march_base[corrections.id], gross, 2)
 
-        benefits = corrections.line_ids.filtered('l10n_be_follow_pay_period')
-        self.assertAlmostEqual(
-            january_base[corrections.id], sum(benefits.mapped('total')), 2,
-            "January declares exactly the amounts attached to the pay period")
-        self.assertAlmostEqual(
-            january_base[corrections.id] + march_base[corrections.id], gross, 2,
-            "The taxable salary is split across the two periods, nothing lost nor counted twice")
+        march = self._create_274(3)
+        self.assertIn(corrections, march._get_valid_payslips())
+        self.assertIn(refunds, march._get_valid_payslips())
+        self.assertGreater(march.taxable_amount_10, 0.0, "The raised benefit in kind is declared with its delta")
+        self.assertGreater(march.pp_amount_10, 0.0)
 
     def test_a_declaration_base_matches_the_aggregate_it_replaces(self):
         """With nothing deferred, rebuilding the base gives the aggregate line to the cent."""
@@ -316,8 +333,8 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         gross = payslip._get_line_values(['GROSS'])['GROSS'][payslip.id]['total']
         self.assertAlmostEqual(rebuilt[payslip.id], gross, 2)
 
-    def test_the_fiscal_period_still_declares_what_the_modification_left_out(self):
-        """A modification declares the pay period half; the fiscal period keeps the other half."""
+    def test_the_fiscal_period_declares_what_the_modification_leaves_out(self):
+        """A modification of the pay period declares nothing of a deferred correction; the fiscal period does."""
         january = self._validate_payslip(self.employee, 1, '2026-01-28')
         original = self._file_274(1, '274-2026-01')
 
@@ -331,11 +348,9 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
             'declaration_type': 'modification',
             'parent_id': original.id,
         })
-        self.assertIn(corrections, modification._get_valid_payslips(),
-                      "The pay period half of the correction belongs to the January modification")
-        modification.action_generate_xml()
-        modification.belcotax_reference = '274-2026-01-M1'
-        modification.action_mark_done()
+        self.assertAlmostEqual(
+            modification.taxable_amount_10, 0.0, 2,
+            "A deferred correction leaves nothing to declare in its pay period, its benefits in kind included")
 
         september = self._create_274(9)
         self.assertIn(corrections, september._get_valid_payslips(),
@@ -357,6 +372,7 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         self.assertFalse(september._get_valid_payslips(), "Nothing is attached to September yet")
         september.line_ids  # force the stored computation while the period is still empty
 
+        # A raised benefit in kind is declared with its withholding tax: no negative nature blocks the XML
         self.employee.version_id.electricity_amount = 100.0
         _, corrections = self._correct(january, '2026-09-10')
         self.assertEqual(corrections.l10n_be_fiscal_date, date(2026, 9, 10))
@@ -470,3 +486,37 @@ class TestPayrollFiscalPeriod(TestPayrollCommon):
         self.assertEqual(
             refund_line.l10n_be_follow_pay_period, correction_line.l10n_be_follow_pay_period,
             "The reversal follows the attachment of the correction replacing it")
+
+    def _get_274_cards(self):
+        warning_model = self.env['hr.payroll.warning']
+        warning_ids = warning_model.get_payroll_dashboard_data()['warning_ids']
+        return [
+            card for card in warning_model.get_payroll_dashboard_warning_cards(warning_ids)
+            if card['name'].startswith('Withholding taxes:')
+        ]
+
+    def test_274_warning_quarterly_declarations(self):
+        """A company declaring its withholding taxes each quarter is warned once per quarter."""
+        company = self.employee.company_id
+        company.first_payrun_date = date(2026, 1, 1)
+        company._get_payroll_config(date(2026, 1, 1)).l10n_be_declaration_frequency = 'quarterly'
+        self._validate_payslip(self.employee, 1, '2026-01-28')
+
+        with freeze_time('2026-03-10'):
+            self.assertEqual(self._get_274_cards(), [], "The first quarter is not ended yet")
+
+        with freeze_time('2026-04-10'):
+            cards = self._get_274_cards()
+            self.assertEqual([card['name'] for card in cards], ['Withholding taxes: Q1 2026'])
+            action = self.env['hr.payroll.warning'].with_context(
+                **cards[0]['button_action']['context'],
+            ).action_l10n_be_report_warning()
+        sheet = self.env['l10n_be.274_xx'].browse(action['params']['report_id'])
+        self.assertEqual(sheet.declaration_frequency, 'quarterly')
+        self.assertEqual((sheet.date_start, sheet.date_end), (date(2026, 1, 1), date(2026, 3, 31)))
+        sheet.action_generate_xml()
+        sheet.belcotax_reference = '274-2026-Q1'
+        sheet.action_mark_done()
+
+        with freeze_time('2026-05-10'):
+            self.assertEqual(self._get_274_cards(), [], "The first quarter is declared")

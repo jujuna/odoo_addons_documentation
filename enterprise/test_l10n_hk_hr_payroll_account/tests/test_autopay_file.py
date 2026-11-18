@@ -2,6 +2,7 @@
 import re
 
 from datetime import date, datetime
+from freezegun import freeze_time
 
 from odoo import Command, release
 from odoo.exceptions import UserError
@@ -258,6 +259,61 @@ class TestAutoPayFile(TestL10NHkHrPayrollAccountCommon):
                     'export_format': 'l10n_hk_mri',
                     'l10n_hk_autopay_payment_set_code': payment_set_code,
                     'l10n_hk_autopay_first_party_reference': first_party_reference,
+                })
+                with self.assertRaisesRegex(UserError, expected_error):
+                    wizard.generate_payment_report()
+
+    @freeze_time('2025-05-31 12:00:00')
+    def test_citi_autopay_file(self):
+        """ Test that bank accounts are paid as Salary Credits (22) and FPS proxies as HK Faster Payments (23),
+        with each value at its spec position (Ref No), and that account numbers are zero-padded to 9 digits. """
+        common_fields = {2: 'HK', 3: '848987654321', 4: 'HKD', 5: '33104.80', 7: '20250531', 20: 'TEST EMPLOYEE', 36: 'SALARY MAY 2025'}
+        for export_format, bank_account_values, employee_values, expected_fields in [
+            ('l10n_hk_citi_autopay', {}, {'l10n_hk_autopay_account_type': 'bban'}, {1: 'ATP', 34: '004-123-456789012', 79: '22'}),
+            ('l10n_hk_citi_autopay', {'account_number': "123-45678901"}, {'l10n_hk_autopay_account_type': 'bban'}, {1: 'ATP', 34: '004-123-045678901', 79: '22'}),
+            ('l10n_hk_citi_autopay_payroll', {}, {'l10n_hk_autopay_account_type': 'bban'}, {1: 'HKP', 34: '004-123-456789012', 79: '22'}),
+            ('l10n_hk_citi_autopay_payroll', {}, {'l10n_hk_autopay_account_type': 'svid', 'l10n_hk_autopay_svid': '0240402'}, {1: 'HKP', 24: 'SVID', 25: '0240402', 79: '23'}),
+            ('l10n_hk_citi_autopay_payroll', {}, {'l10n_hk_autopay_account_type': 'mobn', 'l10n_hk_autopay_mobile': '+852-92223333'}, {1: 'HKP', 24: 'MOBN', 25: '+852-92223333', 79: '23'}),
+            ('l10n_hk_citi_autopay_payroll', {}, {'l10n_hk_autopay_account_type': 'emal', 'l10n_hk_autopay_email': 'test.employee@example.com'}, {1: 'HKP', 24: 'EMAL', 79: '23', 94: 'test.employee', 95: 'example.com'}),
+        ]:
+            with self.subTest(export_format=export_format, bank_account_values=bank_account_values, account_type=employee_values['l10n_hk_autopay_account_type']):
+                self.bank_account.write({'account_number': "123-456789012", **bank_account_values})
+                self.employee.write(employee_values)
+                wizard = self.env['hr.payroll.payment.report.wizard'].create({
+                    'payslip_ids': [self.payslip.id],
+                    'payslip_run_id': self.payrun.id,
+                    'effective_date': date(2025, 5, 31),
+                    'export_format': export_format,
+                })
+                wizard.generate_payment_report()
+                line = self.payrun.payment_report.decode().strip()
+                self.assertEqual(len(line.split('@')), 113)
+                fields = {ref: value for ref, value in enumerate(line.split('@'), start=1) if value}
+                self.assertDictEqual(fields, {**common_fields, **expected_fields})
+
+    @freeze_time('2025-05-31 12:00:00')
+    def test_citi_autopay_file_invalid(self):
+        """ Test that the export is blocked for HKID payments, account numbers not between 9 and 12 digits,
+        FPS IDs that are not 7 characters, holder names or proxy IDs with characters not allowed by Citibank,
+        and value dates outside of today to 20 days in advance. """
+        for bank_account_values, employee_values, effective_date, expected_error in [
+            ({}, {'l10n_hk_autopay_account_type': 'hkid'}, date(2025, 5, 31), "not supported by Citibank"),
+            ({'account_number': "1234567890123"}, {}, date(2025, 5, 31), "account number of 9 to 12 digits"),
+            ({'account_number': "12345678"}, {}, date(2025, 5, 31), "account number of 9 to 12 digits"),
+            ({}, {'l10n_hk_autopay_account_type': 'svid', 'l10n_hk_autopay_svid': '12345678'}, date(2025, 5, 31), "7 characters"),
+            ({'holder_name': "陳大文"}, {'l10n_hk_autopay_account_type': 'svid', 'l10n_hk_autopay_svid': '0240402'}, date(2025, 5, 31), "Account Holder Name"),
+            ({}, {'l10n_hk_autopay_account_type': 'emal', 'l10n_hk_autopay_email': 'test_employee@example.com'}, date(2025, 5, 31), "FPS proxy ID contains"),
+            ({}, {}, date(2025, 5, 30), "Value Date"),
+            ({}, {}, date(2025, 6, 21), "Value Date"),
+        ]:
+            with self.subTest(bank_account_values=bank_account_values, employee_values=employee_values, effective_date=effective_date):
+                self.bank_account.write({'account_number': "123456789012", 'holder_name': "Test Employee", **bank_account_values})
+                self.employee.write({'l10n_hk_autopay_account_type': 'bban', **employee_values})
+                wizard = self.env['hr.payroll.payment.report.wizard'].create({
+                    'payslip_ids': [self.payslip.id],
+                    'payslip_run_id': self.payrun.id,
+                    'effective_date': effective_date,
+                    'export_format': 'l10n_hk_citi_autopay',
                 })
                 with self.assertRaisesRegex(UserError, expected_error):
                     wizard.generate_payment_report()

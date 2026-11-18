@@ -37,7 +37,6 @@
                     <button name="action_mark_done" string="Mark as done" type="object" class="oe_highlight" invisible="state != 'ready' or declaration_method == 'batch'"/>
                     <button name="action_mark_paid" string="Mark as paid" type="object" class="oe_highlight" invisible="state != 'done'"/>
                     <button name="action_open_report_employees_wizard" string="Generate XML report" type="object" class="oe_highlight"  invisible="declaration_method == 'web' or declaration_type == 'original' or xml_file"/>
-                    <button name="action_open_report_employees_wizard" string="Re-Generate XML report" type="object" invisible="declaration_type == 'original' or xml_file or declaration_type != 'original'"/>
                     <button name="generate_declaration_xml_report" string="Generate XML report" type="object" class="oe_highlight"  invisible="declaration_method == 'web' or xml_file or declaration_type != 'original' or is_invalid"/>
                     <button name="generate_declaration_xml_report" string="Generate XML report" type="object" class="oe_highlight"  invisible="declaration_method == 'web' or xml_file or declaration_type != 'original' or not is_invalid" disabled='1'/>
                     <button name="generate_dmfa_pdf_report" string="Generate PDF report" type="object" class="oe_highlight"  invisible="declaration_method == 'batch' or dmfa_pdf or is_invalid"/>
@@ -54,8 +53,8 @@
                     <button name="generate_declaration_xml_report" string="Re-Generate XML report" type="object" invisible="declaration_method == 'web' or not xml_file or state not in ('ready', 'error')"/>
                     <button name="generate_dmfa_pdf_report" string="Re-Generate PDF report" type="object" invisible="declaration_method == 'batch' or not dmfa_pdf or state not in ('ready', 'error')"/>
                     <button name="action_reset_to_draft" string="Set To Draft" type="object" invisible="state not in ('ready', 'error')"/>
-                    <button name="%(action_report_dmfa_preview)d" string="Preview" type="action" class="btn btn-secondary" invisible="is_invalid"/>
-                    <button name="%(action_report_dmfa_preview)d" string="Preview" type="action" class="btn btn-secondary" invisible="not is_invalid" disabled='1'/>
+                    <button name="action_report_dmfa_preview" string="Preview" type="object" class="btn btn-secondary" invisible="is_invalid"/>
+                    <button name="action_report_dmfa_preview" string="Preview" type="object" class="btn btn-secondary" invisible="not is_invalid" disabled='1'/>
                 </header>
                 <sheet>
                     <div role="alert" class="alert alert-info text-center" invisible="not state == 'pending'">
@@ -279,26 +278,6 @@
                 </sheet>
                 <chatter/>
             </form>
-        </field>
-    </record>
-
-    <record id="l10n_be_dmfa_view_search" model="ir.ui.view">
-        <field name="name">l10n_be.dmfa.search</field>
-        <field name="model">l10n_be.dmfa</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="year"/>
-                <separator/>
-                <filter string="Current Company" name="filter_current_company"
-                        domain="[('company_id', '=', allowed_company_ids[0])]"
-                        groups="base.group_multi_company"/>
-                <group>
-                    <filter string="Year" name="group_by_year" domain="[]" context="{'group_by': 'year'}"/>
-                    <filter string="Company" name="group_by_company" domain="[]"
-                            context="{'group_by': 'company_id'}"
-                            groups="base.group_multi_company"/>
-                </group>
-            </search>
         </field>
     </record>
 

@@ -36,3 +36,23 @@ test("attributeData does not crash when the line with a custom attribute is dele
     expect(comp.attributeData[0].name).toBe("Customization");
     expect(comp.attributeData[0].value).toBe("Yes");
 });
+
+test("orderline renders a line with values from several attributes", async () => {
+    const store = await setupPosPrepDisplayEnv();
+    await createPrepDisplayTicket(store, {
+        lines: [
+            {
+                qty: 1,
+                product_id: 5,
+                full_product_name: "Burger",
+                attribute_value_ids: [5, 7],
+            },
+        ],
+    });
+    const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+
+    // Would throw "Got duplicate key in t-foreach" if the key were not unique
+    const comp = await mountWithCleanup(Orderline, { props: { orderline: prepLine } });
+    expect(comp.attributeData.map((a) => a.id)).toEqual([10, 11]);
+    expect(".o_preparation_display_orderline .fst-italic p").toHaveCount(2);
+});

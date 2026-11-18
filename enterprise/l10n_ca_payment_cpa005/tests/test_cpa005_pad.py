@@ -126,6 +126,58 @@ class TestCPA005PAD(CPA005Common):
         for generated_line, expected_line in zip(generated, expected):
             self.assertEqual(generated_line, expected_line, "Generated line in CPA 005 file does not match expected.")
 
+    def test_cpa005_pad_with_generic_clearing_number(self):
+        """The generated PAD file is the same whether the institution numbers are set on the
+        Canadian field or on the generic clearing number.
+        """
+        payments = (
+            self._create_cpa005_payment(partner_id=self.partner_a, partner_bank_id=self.bank_partner_a, amount=123.45)
+            | self._create_cpa005_payment(partner_id=self.partner_b, partner_bank_id=self.bank_partner_b, amount=456.78)
+        )
+        batch = self._create_batch_payment(payments)
+        expected = batch._generate_cpa005_file()  # fixes the file creation number on the batch
+
+        ca_clearing_label = self.env.ref('base.clearing_label_ca')
+        for bank in self.journal.bank_account_id | self.bank_partner_a | self.bank_partner_b:
+            bank.write({
+                'clearing_label_id': ca_clearing_label.id,
+                'clearing_number': bank.l10n_ca_financial_institution_number,
+                'l10n_ca_financial_institution_number': False,
+            })
+
+        self.assertFalse(batch.check_payments_for_errors())
+        self.assertEqual(batch._generate_cpa005_file(), expected)
+
+    def test_cpa005_pad_file_routing_header(self):
+        """ RBC PAD files also start with the File Transmission Routing Record, which is not a logical record. """
+        payments = (
+            self._create_cpa005_payment(partner_id=self.partner_a, partner_bank_id=self.bank_partner_a, amount=123.45)
+            | self._create_cpa005_payment(partner_id=self.partner_b, partner_bank_id=self.bank_partner_b, amount=456.78)
+        )
+        batch = self._create_batch_payment(payments)
+        self.assertTrue(batch._generate_cpa005_file().startswith("A000000001"), "Only RBC needs a routing record.")  # default setup != RBC
+
+        bank_sudo = self.journal.bank_account_id.sudo()
+        bank_sudo.write(
+            {
+                "clearing_label_id": self.env.ref("base.clearing_label_ca").id,
+                "clearing_number": "000312345",  # digits [1:4] == '003', it's RBC
+                "l10n_ca_financial_institution_number": False,  # it would win over the clearing number
+            }
+        )
+        generated = batch._generate_cpa005_file().splitlines()
+        self.assertEqual(len(generated), len(payments) + 3, "Routing record + header + one D record per payment + footer.")
+        self.assertEqual(generated[0], "$$AA01CPA1464[PROD[NL$$")
+        self.assertTrue(generated[1].startswith("A000000001"), "The routing record is not a logical record.")
+        self.assertTrue(generated[2].startswith("D000000002"))
+        self.assertTrue(generated[-1].startswith("Z000000004"), "The routing record is not a logical record.")
+
+        self.env['ir.config_parameter'].sudo().set_str('l10n_ca_payment_cpa005.rbc_file_routing_header', "$$AA01CPA1464[TEST[NL$$")
+        self.assertTrue(batch._generate_cpa005_file().startswith("$$AA01CPA1464[TEST[NL$$\r\nA000000001"))
+
+        bank_sudo.clearing_number = "022233333"  # not RBC
+        self.assertTrue(batch._generate_cpa005_file().startswith("A000000001"), "The parameter only overrides RBC's routing record.")
+
     def test_cpa005_pad_fcn_sequence_independent(self):
         """The inbound (PAD) FCN sequence is separate from the outbound one."""
         self.journal.l10n_ca_cpa005_fcn_number_next = 50

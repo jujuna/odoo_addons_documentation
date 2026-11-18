@@ -604,8 +604,6 @@ class PlanningSlot(models.Model):
             })
         self.write(vals)
         self._send_geolocation()
-        if not self._can_sign_report():
-            self._send_intervention_rating_mail()
 
     def action_sign_in(self):
         self.ensure_one()
@@ -639,6 +637,8 @@ class PlanningSlot(models.Model):
             if self.partner_id:
                 self.action_send_report()
             return
+        if not self._can_sign_report():
+            self._send_intervention_rating_mail()
 
     def action_preview_worksheet(self):
         self.ensure_one()

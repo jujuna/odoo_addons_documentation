@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import contextlib
-import json
 import math
 import requests
 import time
@@ -64,7 +63,7 @@ class UrbanPiperConnector:
             return {'errors': {'timeout': _('Cannot reach the server. Please try again later.')}}
         except requests.exceptions.HTTPError as error:
             message = error.args[0] if len(error.args) > 0 else f"HTTP {response.status_code} Error"
-            with contextlib.suppress(json.decoder.JSONDecodeError):
+            with contextlib.suppress(requests.exceptions.JSONDecodeError):
                 message = response.json().get("message")
             log_urbanpiper(f'HTTPError: {message or error}', 'Urbanpiper HTTPError', func='make_request')
             return {'errors': {'HTTPError': message or str(error)}}
@@ -75,7 +74,7 @@ class UrbanPiperConnector:
         try:
             response_json = response.json()
             log_urbanpiper(f'UrbanPiper {method} Request to {endpoint} succeeded with response: {response_json}', 'Urbanpiper Response', 'info', log_xml=False)
-        except json.decoder.JSONDecodeError as error:
+        except requests.exceptions.JSONDecodeError as error:
             log_urbanpiper(f'JSONDecodeError: {error}', 'Urbanpiper JSONDecodeError', func='make_request')
             return {'errors': {'JSONDecodeError': _('Failed to parse server response.')}}
         return response_json

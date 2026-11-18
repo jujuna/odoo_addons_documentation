@@ -11,6 +11,7 @@
         <field name="city">Eghezee</field>
         <field name="vat">BE0897223670</field>
         <field name="phone">061928374</field>
+        <field name="resource_calendar_id" ref="l10n_be_hr_payroll.resource_calendar_std_38h"/>
     </record>
     <function model="payroll.config.settings" name="write">
         <value model='payroll.config.settings' eval="obj().search([('company_id', '=', ref('base.demo_company_be'))]).ids"/>
@@ -24,7 +25,6 @@
     </function>
 
     <record id="resource_calendar_std_38h" model="resource.calendar">
-        <field name="name">Standard 38 hours/week</field>
         <field name="company_id" ref="base.demo_company_be"/>
         <field name="hours_per_day">7.6</field>
         <field name="attendance_ids"
@@ -37,10 +37,6 @@
             ]"
         />
         <field name="full_time_required_hours">38</field>
-    </record>
-
-    <record id="base.demo_company_be" model="res.company" forcecreate="1">
-        <field name="resource_calendar_id" ref="l10n_be_hr_payroll.resource_calendar_std_38h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -78,6 +74,7 @@
         <field name="ip_wage_rate">0.25</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="company_id" ref="base.demo_company_be"/>
+        <field name="meal_voucher_employee_share">1.09</field>
         <field name="resource_calendar_id" ref="l10n_be_hr_payroll.resource_calendar_std_38h"/>
     </record>
 

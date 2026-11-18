@@ -15,7 +15,8 @@ patch(MessagingMenu.prototype, {
         super.setup(...arguments);
         this.aiChatTab = fields.One("MessagingMenuTab", {
             compute() {
-                if (!user.isInternalUser) {
+                // A light user has no AI chat, as for the AI systray action.
+                if (!user.isRegularUser) {
                     return;
                 }
                 return {

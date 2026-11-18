@@ -7,6 +7,7 @@ from odoo import models
 from odoo.exceptions import UserError
 from odoo.http import request
 from odoo.tools import float_compare
+from odoo.tools.date_utils import localized
 
 from odoo.addons.sale_renting.const import SECONDS_IN_PERIODICITY
 
@@ -80,8 +81,8 @@ class ProductTemplate(models.Model):
             "minimum_rental_qty": minimum_rental_qty,
             "rental_duration": duration,
             "rental_unit": self._get_rent_periodicity_label(duration),
-            "default_start_date": start_date,
-            "default_end_date": end_date,
+            "default_start_date": localized(start_date),
+            "default_end_date": localized(end_date),
             #  Disable base unit prices logic for rental products
             "base_unit_price": 0,
             "base_unit_name": False,

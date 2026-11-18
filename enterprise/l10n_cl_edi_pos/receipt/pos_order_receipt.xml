@@ -4,7 +4,7 @@
         <template id="l10n_cl_edi_pos.pos_order_receipt_header" inherit_id="point_of_sale.pos_order_receipt_header">
             <div name="cashier_name" position="after">
                 <t t-set="state_match" t-value="order['state'] == 'paid' or order['state'] == 'done'" />
-                <div t-if="conditions.get('code_cl') and state_match" class="w-100 text-bold mt-2 mb-2 text-center">
+                <div t-if="conditions.get('code_cl') and state_match and extra_data['l10n_latam_document_type_name']" class="w-100 text-bold mt-2 mb-2 text-center">
                     <span>RUT: <t t-out="company['vat']"/></span><br/>
                     <span t-out="extra_data['l10n_latam_document_type_name']" /><br/>
                     <span>Nº: <t t-out="extra_data['l10n_latam_document_number']"/></span><br/>
@@ -33,7 +33,7 @@
                 </div>
 
                 <t t-set="state_match" t-value="order['state'] == 'paid' or order['state'] == 'done'" />
-                <div t-if="conditions.get('code_cl') and state_match and extra_data['formatted_l10n_cl_dte_resolution_date']" class="text_center mb-2 text-small">
+                <div t-if="conditions.get('code_cl') and state_match and extra_data['formatted_l10n_cl_dte_resolution_date'] and extra_data['l10n_latam_document_type_name']" class="text_center mb-2 text-small">
                     <img t-if="image.get('l10n_cl_sii_barcode_image')" class="mw-100" t-att-src="'data:image/png;base64,' + image['l10n_cl_sii_barcode_image']" /><br/>
                     <span>Timbre Electrónico SII</span><br/>
                     <span>Resolución Nº: <t t-out="company['l10n_cl_dte_resolution_number']"/></span><br />

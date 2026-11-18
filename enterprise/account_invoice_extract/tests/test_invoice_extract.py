@@ -733,6 +733,9 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             self.assertEqual(inv.extract_state, 'waiting_extraction')
             self.assertEqual(inv.extract_document_uuid, 'some_token')
             self.assertEqual(inv.message_main_attachment_id, att)
+            # OCR has its own reload flow: no source attachment must be written on the bill, otherwise
+            # that write stays pending across the import commits and can conflict with the OCR callback
+            self.assertFalse(inv.import_source_attachment_id)
 
     def test_automatic_sending_customer_invoice_upload(self):
         # test that a customer invoice is automatically sent to the OCR server when uploaded and the option is enabled

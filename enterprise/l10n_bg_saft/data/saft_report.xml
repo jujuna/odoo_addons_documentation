@@ -245,9 +245,11 @@
             <AccountID t-out="account_vals['account'].l10n_bg_saft_account_code" />
         </xpath>
 
-        <xpath expr="//MasterFiles/GeneralLedgerAccounts/Account/StandardAccountID"
-            position="replace">
-            <TaxpayerAccountID t-out="account.code" />
+        <xpath expr="//StandardAccountID" position="replace">
+            <t t-if="company.account_fiscal_country_id.code != 'BG'">$0</t>
+            <t t-else="">
+                <TaxpayerAccountID t-out="account.code" />
+            </t>
         </xpath>
 
 

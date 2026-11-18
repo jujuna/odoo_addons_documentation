@@ -13,3 +13,4 @@ from . import res_config_settings
 from . import res_partner_bank
 from . import hr_payroll_warning
 from . import hr_work_entry_type
+from . import hr_employee_departure

@@ -167,7 +167,7 @@ class PurchaseOrder(models.Model):
         quantity = line.product_id and line.uom_id._compute_quantity(line.product_qty, line.product_id.uom_id) or line.product_qty
         price = line.product_id and line.uom_id._compute_price(price, line.product_id.uom_id) or price
         product_no_variant_attribute_value_ids = line.product_no_variant_attribute_value_ids
-        return {
+        vals = {
             'name': line.name,
             'product_uom_qty': quantity,
             'product_id': line.product_id and line.product_id.id or False,
@@ -180,6 +180,17 @@ class PurchaseOrder(models.Model):
             'product_no_variant_attribute_value_ids': [Command.set(product_no_variant_attribute_value_ids.ids)],
             'auto_purchase_order_line_id': [Command.link(line.id)],
         }
+        analytic = self.env['account.move.line']._inter_company_get_analytic_distribution(
+            line.analytic_distribution,
+            line.distribution_analytic_account_ids,
+            line.product_id.id,
+            line.product_id.categ_id.id,
+            line.order_id.company_id.partner_id,
+            company,
+        )
+        if analytic:
+            vals['analytic_distribution'] = analytic
+        return vals
 
     def _set_pcavs_from_order(self, so_lines):
         pass

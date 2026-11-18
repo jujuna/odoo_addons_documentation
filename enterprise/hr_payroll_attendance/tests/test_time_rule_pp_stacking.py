@@ -6,7 +6,7 @@ from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
-@tagged('-at_install', 'post_install', 'work_entry_pipeline')
+@tagged('-at_install', 'post_install', 'work_entry_pipeline', 'time_rule_pipeline')
 class TestTimeRulePpStacking(TransactionCase):
     """Verify that premium pay (pp) frozensets stack correctly across overlapping rules.
 

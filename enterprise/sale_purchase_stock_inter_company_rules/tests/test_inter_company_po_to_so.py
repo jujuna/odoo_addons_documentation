@@ -577,3 +577,62 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         # Lot should be preset from Company A
         self.assertEqual(purchase_from_a.picking_ids.move_ids.lot_ids, lot)
         self.assertEqual(purchase_from_a.picking_ids.location_id, interco_location)
+
+    def test_10_dropship_chain_middle_company_delivered_qty(self):
+        """ Vendor -> C -> B -> A -> Customer, dropshipped at each step: B's transit to transit
+        dropship delivers its sale order, returning it brings the delivered quantity back to 0 and
+        returning that return delivers it again.
+        """
+        try:
+            dropship_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        except ValueError:
+            self.skipTest('This test requires the following module: stock_dropshipping')
+
+        company_c = self.setup_other_company(name='Test company 3')['company']
+        (self.company_b | company_c).write({
+            'intercompany_generate_sales_orders': True,
+            'intercompany_sync_delivery_receipt': True,
+        })
+        self.company_a.intercompany_sync_delivery_receipt = False
+        vendor, customer = self.env['res.partner'].create([{'name': name} for name in ['Vendor', 'Customer']])
+        product = self.env['product.product'].create({
+            'name': 'Chain Product',
+            'is_storable': True,
+            'route_ids': [Command.link(dropship_route.id)],
+            'seller_ids': [
+                Command.create({'partner_id': self.company_b.partner_id.id, 'company_id': self.company_a.id}),
+                Command.create({'partner_id': company_c.partner_id.id, 'company_id': self.company_b.id}),
+                Command.create({'partner_id': vendor.id, 'company_id': company_c.id}),
+            ],
+        })
+
+        sale_to_customer = self.env['sale.order'].with_company(self.company_a).create({
+            'partner_id': customer.id,
+            'order_line': [Command.create({'product_id': product.id})],
+        })
+        sale_to_customer.action_confirm()
+        purchase_from_b = self.env['purchase.order'].search([('order_line.product_id', '=', product.id), ('company_id', '=', self.company_a.id)])
+        purchase_from_b.button_confirm()
+        sale_to_a = self.env['sale.order'].with_company(self.company_b).search([('auto_purchase_order_id', '=', purchase_from_b.id)])
+        sale_to_a.action_confirm()
+        purchase_from_c = self.env['purchase.order'].search([('order_line.product_id', '=', product.id), ('company_id', '=', self.company_b.id)])
+        purchase_from_c.button_confirm()
+        sale_to_b = self.env['sale.order'].with_company(company_c).search([('auto_purchase_order_id', '=', purchase_from_c.id)])
+        sale_to_b.action_confirm()
+        purchase_from_vendor = self.env['purchase.order'].search([('order_line.product_id', '=', product.id), ('company_id', '=', company_c.id)])
+        purchase_from_vendor.button_confirm()
+        purchase_from_vendor.picking_ids.button_validate()
+
+        dropship_b = purchase_from_c.picking_ids
+        dropship_b.button_validate()
+        self.assertEqual(sale_to_a.order_line.qty_delivered, 1)
+
+        return_picking = self.env['stock.picking'].browse(dropship_b.action_return()['res_id'])
+        return_picking.action_return_all()
+        return_picking.button_validate()
+        self.assertEqual(sale_to_a.order_line.qty_delivered, 0)
+
+        return_of_return = self.env['stock.picking'].browse(return_picking.action_return()['res_id'])
+        return_of_return.action_return_all()
+        return_of_return.button_validate()
+        self.assertEqual(sale_to_a.order_line.qty_delivered, 1)

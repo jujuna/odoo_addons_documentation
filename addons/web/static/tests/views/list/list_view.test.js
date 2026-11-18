@@ -2750,6 +2750,23 @@ test(`basic grouped list rendering with groupby m2m field`, async () => {
     ]);
 });
 
+test(`group aggregate cells have the same widget class as record cells`, async () => {
+    await mountView({
+        resModel: "foo",
+        type: "list",
+        arch: `
+            <list>
+                <field name="amount" widget="monetary" sum="Total"/>
+            </list>
+        `,
+        groupBy: ["bar"],
+    });
+
+    expect(".o_group_header td.o_monetary_cell").toHaveCount(2);
+    await contains(".o_group_name").click();
+    expect(".o_data_row td.o_monetary_cell").toHaveCount(1);
+});
+
 test(`grouped list rendering with groupby m2o and m2m field`, async () => {
     await mountView({
         resModel: "foo",
@@ -11235,6 +11252,31 @@ test(`list with handle widget`, async () => {
     });
 });
 
+test(`list with handle widget on a readonly field`, async () => {
+    Foo._fields.int_field = fields.Integer({ readonly: true });
+    onRpc("web_resequence", () => {
+        expect.step("web_resequence");
+    });
+
+    await mountView({
+        resModel: "foo",
+        type: "list",
+        arch: `
+            <list>
+                <field name="int_field" widget="handle"/>
+                <field name="amount" widget="float" digits="[5,0]"/>
+            </list>
+        `,
+    });
+    expect(`.o_row_draggable`).toHaveCount(0);
+    expect(`.o_field_handle:first span`).not.toBeEnabled();
+    expect(queryAllTexts(`.o_data_cell[name='amount']`)).toEqual(["0", "500", "1,200", "300"]);
+
+    await contains(`tbody tr:eq(3) .o_handle_cell`).dragAndDrop(queryFirst(`tbody tr:eq(1)`));
+    expect.verifySteps([]);
+    expect(queryAllTexts(`.o_data_cell[name='amount']`)).toEqual(["0", "500", "1,200", "300"]);
+});
+
 test.tags("desktop");
 test(`list with handle widget: drag and drop multiple selected records`, async () => {
     Foo._records = [
@@ -18476,10 +18518,6 @@ test(`list view with default_group_by`, async () => {
     });
     expect(`.o_list_renderer table`).toHaveClass("o_list_table_grouped");
     expect(`.o_group_header`).toHaveCount(2);
-    // open search bar in mobile
-    if (isSmall()) {
-        await contains(".o_control_panel_navigation > button").click();
-    }
     expect(`.o_searchview_facet`).toHaveCount(1);
     expect(`.o_searchview_facet`).toHaveText("Bar");
     expect.verifySteps(["web_read_group1"]);
@@ -18530,10 +18568,6 @@ test(`list view with multi-fields default_group_by`, async () => {
     });
     expect(`.o_list_renderer table`).toHaveClass("o_list_table_grouped");
     expect(`.o_group_header`).toHaveCount(3);
-    // open search bar in mobile
-    if (isSmall()) {
-        await contains(".o_control_panel_navigation > button").click();
-    }
     expect(`.o_searchview_facet`).toHaveCount(1);
     expect(`.o_searchview_facet`).toHaveText("Foo\n>\nBar");
     expect.verifySteps(["web_read_group1"]);
@@ -20965,10 +20999,6 @@ test(`cache web_read_group: do not send opening_info if not necessary`, async ()
     expect(`.o_group_header`).toHaveCount(1);
 
     // Do not follow the same steps as earlier, directly remove the filter
-    if (isSmall()) {
-        // Toggle searchbar in mobile
-        await contains(`.o_control_panel_navigation [data-icon='search']`).click();
-    }
     await contains(".o_searchview_facet [data-icon='close']").click();
     expect(`.o_group_header`).toHaveCount(4);
 
@@ -21993,6 +22023,35 @@ test(`column tag: optional attribute on sub-fields shows/hides individual sub-fi
     expect(
         `tbody tr:eq(0) td:not(.o_list_record_selector):eq(1) .o_column_group_field`
     ).toHaveCount(2);
+});
+
+test(`column tag: column is hidden when all its fields are optional and disabled`, async () => {
+    await mountView({
+        resModel: "foo",
+        type: "list",
+        arch: `
+            <list>
+                <field name="foo"/>
+                <column>
+                    <field name="int_field" optional="show"/>
+                    <field name="date" optional="hide"/>
+                </column>
+            </list>
+        `,
+    });
+
+    // Disable int_field: no sub-field is left, so the whole column disappears
+    await contains(`table .o_optional_columns .dropdown-toggle`).click();
+    await contains(`.o-dropdown-item:eq(0)`).click();
+    expect(`thead th:not(.o_list_record_selector)`).toHaveCount(2);
+    expect(`tbody tr:eq(0) td:not(.o_list_record_selector)`).toHaveCount(2);
+
+    // Enable date: the column is back, with date only
+    await contains(`.o-dropdown-item:eq(1)`).click();
+    expect(`thead th:not(.o_list_record_selector)`).toHaveCount(3);
+    expect(
+        `tbody tr:eq(0) td:not(.o_list_record_selector):eq(1) .o_column_group_field`
+    ).toHaveCount(1);
 });
 
 test(`column tag: aggregate computed for first aggregatable stacked field`, async () => {

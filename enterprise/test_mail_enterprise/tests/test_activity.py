@@ -214,7 +214,7 @@ class TestActivity(SMSCommon, TestSMSRecipients, HttpCase):
         # call_b's message body should be updated with recording icon and edited timestamp
         self.assertMessageFields(call_b.activity_mail_message_id, {
             'body': f'''<div>
-     <p class="o_mail_activity_title mb-1">
+    <p class="o_mail_activity_title mb-1">
         <span class="oi oi-fw oi-filled" data-icon="phone"></span>
                     <a href="#" class="o_label_info text-primary fw-bold" data-oe-model="voip.call" data-oe-id="{call_b.id}">
                         Call done (0s)
@@ -226,7 +226,7 @@ class TestActivity(SMSCommon, TestSMSRecipients, HttpCase):
     <div class="o_mail_activity_note pb-2">
         <div class="fst-italic">{self.phonecall_activity.default_note}</div>
     </div>
-<span class="o-mail-Message-edited" data-o-datetime="{frozen_datetime}"></span></div>''',
+ <span class="o-mail-Message-edited" data-o-datetime="{frozen_datetime}"></span></div>''',
         })
 
         # Other calls should remain unchanged (same body as before)

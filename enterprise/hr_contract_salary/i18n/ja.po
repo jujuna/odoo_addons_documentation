@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-10-06 03:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
@@ -113,10 +113,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -133,43 +133,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>おめでとうございます!</h2>\n"
-"                以下のリンクをクリックして、給与パッケージを設定することがで"
-"きます。<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    有効期限: <t t-out=\"ctx.get('validity_end')\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        パッケージを設定する\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -188,7 +167,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -215,7 +194,8 @@ msgstr "<i class=\"oi oi-filled\" data-icon=\"chat_bubble\"/> フィードバッ
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_sidebar
 msgid ""
 "<i class=\"oi\" data-icon=\"check\"/> Your message was successfully sent!"
-msgstr "<i class=\"oi\" data-icon=\"check\"/> メッセージが正常に送信されました!"
+msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/> メッセージが正常に送信されました!"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -614,8 +594,8 @@ msgid ""
 "conclude the process."
 msgstr ""
 "活動がいつ作成されるかを選択して下さい:\n"
-"- 従業員が契約書に署名: 従業員が契約書に署名すると同時に活動が開始されます"
-"。\n"
+"- 従業員が契約書に署名: 従業員が契約書に署名すると同時に活動が開始されま"
+"す。\n"
 "- 契約書が副署された: 人事担当者が契約書に署名し、プロセスを終了します。"
 
 #. module: hr_contract_salary
@@ -913,15 +893,16 @@ msgid ""
 "Default document that the applicant will have to sign to accept a contract "
 "offer."
 msgstr ""
-"契約オファーを承諾するために応募者が署名しなければならないデフォルトの"
-"ドキュメント。"
+"契約オファーを承諾するために応募者が署名しなければならないデフォルトのドキュ"
+"メント。"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_employee__contract_update_template_id
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_version__contract_update_template_id
 msgid ""
 "Default document that the employee will have to sign to update his contract."
-msgstr "契約を更新するために従業員が署名しなければならないデフォルトのドキュメント。"
+msgstr ""
+"契約を更新するために従業員が署名しなければならないデフォルトのドキュメント。"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__activity_creation_type
@@ -1353,8 +1334,8 @@ msgid ""
 "HR Responsible %s should have a valid email address when New Contract "
 "Document Template is specified"
 msgstr ""
-"人事責任者%sは、新規契約書テンプレートが定義される際には、有効なE"
-"メールアドレスを持っている必要があります。"
+"人事責任者%sは、新規契約書テンプレートが定義される際には、有効なEメールアドレ"
+"スを持っている必要があります。"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_sidebar
@@ -1505,9 +1486,9 @@ msgid ""
 "annual time off (legal leaves)."
 msgstr ""
 "法定休暇に加え、最大30日の追加休暇を選ぶことができます。\n"
-"年次有給休暇(法定休暇)の取得日数は、前年の勤務スケジュールによって異なります"
-"。前年の12か月間、フルタイムで勤務した場合、年間休日(法定休暇)は20日となりま"
-"す。"
+"年次有給休暇(法定休暇)の取得日数は、前年の勤務スケジュールによって異なりま"
+"す。前年の12か月間、フルタイムで勤務した場合、年間休日(法定休暇)は20日となり"
+"ます。"
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.personal.info.type,name:hr_contract_salary.hr_contract_salary_personal_info_type_emergency
@@ -1596,6 +1577,11 @@ msgstr "職位"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__job_title
 msgid "Job Title"
 msgstr "役職"
+
+#. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
@@ -1707,7 +1693,8 @@ msgstr "メッセージ"
 msgid ""
 "Mismatch between res_field_id %(field)s and model %(model)s for info %"
 "(personal_info)s"
-msgstr "res_field_id %(field)s とモデル %(model)s の不一致、情報%(personal_info)s用"
+msgstr ""
+"res_field_id %(field)s とモデル %(model)s の不一致、情報%(personal_info)s用"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2040,8 +2027,8 @@ msgid ""
 "<br><br>"
 msgstr ""
 "オファーは、事前に定義されたデータ選択と共に従業員に送信されます。\n"
-"                これにより、提案について検討し、議論することが可能となります"
-"。<br><br>"
+"                これにより、提案について検討し、議論することが可能となりま"
+"す。<br><br>"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2221,8 +2208,8 @@ msgid ""
 "Please note that this information may be inaccurate and should be used for "
 "reference only."
 msgstr ""
-"この情報は不正確である可能性がありますので、あくまでも参考としてご利用下さい"
-"。"
+"この情報は不正確である可能性がありますので、あくまでも参考としてご利用下さ"
+"い。"
 
 #. module: hr_contract_salary
 #. odoo-javascript
@@ -2555,9 +2542,8 @@ msgid ""
 "Select a contract template to auto-fill the contract form with predefined "
 "values. You can still edit the fields as needed after applying the template."
 msgstr ""
-"契約テンプレートを選択すると、契約フォームに既定の値が自動入力されます。"
-"テンプレートを適用した後でも、必要に応じてフィールドを編集することができます"
-"。"
+"契約テンプレートを選択すると、契約フォームに既定の値が自動入力されます。テン"
+"プレートを適用した後でも、必要に応じてフィールドを編集することができます。"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2835,8 +2821,8 @@ msgstr "給与体系タイプ"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
-msgstr "合計"
+msgid "Sum of Benefits Values"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.resume,name:hr_contract_salary.hr_contract_salary_payroll_resume_gross_worker
@@ -2865,6 +2851,12 @@ msgstr "テンプレート"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "テキスト"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -2919,8 +2911,8 @@ msgstr ""
 msgid ""
 "The field here needs to be set for this benefit to be folded by default."
 msgstr ""
-"この福利厚生をデフォルトで折畳むには、このフィールドを設定する必要があります"
-"。"
+"この福利厚生をデフォルトで折畳むには、このフィールドを設定する必要がありま"
+"す。"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2957,14 +2949,16 @@ msgstr "元のオファー"
 #. module: hr_contract_salary
 #: model:ir.model.constraint,message:hr_contract_salary.constraint_res_config_settings_check_employee_salary_simulator_li_c7aaf08c
 msgid "The salary configurator link validity should be positive."
-msgstr "給与コンフィギュレーターのリンクの有効期限は正の値でなければなりません。"
+msgstr ""
+"給与コンフィギュレーターのリンクの有効期限は正の値でなければなりません。"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__activity_type_id
 msgid ""
 "The type of activity that will be created automatically on the contract if "
 "this benefit is chosen by the employee."
-msgstr "この福利厚生を従業員が選択した場合、契約書に自動的に作成される活動のタイプ。"
+msgstr ""
+"この福利厚生を従業員が選択した場合、契約書に自動的に作成される活動のタイプ。"
 
 #. module: hr_contract_salary
 #. odoo-javascript
@@ -2972,7 +2966,8 @@ msgstr "この福利厚生を従業員が選択した場合、契約書に自動
 msgid ""
 "There is no defined payroll structure for your contract. Please contact a "
 "responsible for more information."
-msgstr "ご契約の給与体系に決まりはありません。詳しくは担当者にお問い合わせ下さい。"
+msgstr ""
+"ご契約の給与体系に決まりはありません。詳しくは担当者にお問い合わせ下さい。"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_diff_email_template
@@ -2984,7 +2979,8 @@ msgstr "前契約書からの変更はありません。"
 msgid ""
 "They will review your contract.<br/> Feel free to contact them if you have "
 "any questions."
-msgstr "契約内容を確認してくれます。<br/>ご不明な点はお気軽にお問い合わせ下さい。"
+msgstr ""
+"契約内容を確認してくれます。<br/>ご不明な点はお気軽にお問い合わせ下さい。"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_view_employee_form_readonly
@@ -3192,7 +3188,8 @@ msgstr "はい"
 msgid ""
 "You cannot have multiple person responsible for the same role on contract "
 "signature template."
-msgstr "契約署名テンプレートでは、同じ役割に複数の担当者を設定することはできません。"
+msgstr ""
+"契約署名テンプレートでは、同じ役割に複数の担当者を設定することはできません。"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3252,6 +3249,11 @@ msgid "id"
 msgstr "ID"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3269,13 +3271,64 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: 採用通知 - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: 採用通知 - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr "{{ object.company_id.name }}: 求人情報 - {{ object.employee_id.name }}"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>おめでとうございます!</h2>\n"
+#~ "                以下のリンクをクリックして、給与パッケージを設定することが"
+#~ "できます。<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    有効期限: <t t-out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        パッケージを設定する\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid "Sum"
+#~ msgstr "合計"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

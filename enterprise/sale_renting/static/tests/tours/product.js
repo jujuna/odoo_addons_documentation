@@ -1,14 +1,11 @@
 import { registry } from '@web/core/registry';
 import { stepUtils } from '@web_tour/tour_utils';
+import * as tourUtils from '@sale/js/tours/tour_utils';
 
 registry.category('web_tour.tours').add('sale_renting_product_display', {
     steps: () => [
         ...stepUtils.goToAppSteps('sale_renting.rental_menu_root', "Open the rental app"),
-        {
-            content: "Create a new SO",
-            trigger: '.o_list_button_add',
-            run: 'click',
-        },
+        ...tourUtils.createNewSalesOrder(),
         {
             content: "Add a product",
             trigger: '.o_field_sol_o2m .o_field_x2many_list_row_add button:first',
@@ -46,11 +43,7 @@ registry.category('web_tour.tours').add('sale_renting_product_display', {
 registry.category('web_tour.tours').add('sale_product_display', {
     steps: () => [
         ...stepUtils.goToAppSteps('sale.sale_menu_root', "Open the sale app"),
-        {
-            content: "Create a new SO",
-            trigger: '.o_list_button_add',
-            run: 'click',
-        },
+        ...tourUtils.createNewSalesOrder(),
         {
             content: "Add a product",
             trigger: '.o_field_sol_o2m .o_field_x2many_list_row_add button:first',

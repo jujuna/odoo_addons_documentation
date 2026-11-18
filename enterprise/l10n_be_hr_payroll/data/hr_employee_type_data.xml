@@ -49,5 +49,13 @@
             <field name="name">Seasonal</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <!-- A worker under an employment contract who also has a paid mandate of director in the company: an
+             employee for the social security, a company director for the withholding tax (274.20, 281.20). With an
+             unpaid mandate, the remunerations stay declared on the 281.10: use the type Employee. -->
+        <record id="l10n_be_contract_type_director_employment_contract" model="hr.employee.type">
+            <field name="name">Company Director (Employment Contract, Paid Mandate)</field>
+            <field name="l10n_be_dimona_category">oth</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
     </data>
 </odoo>

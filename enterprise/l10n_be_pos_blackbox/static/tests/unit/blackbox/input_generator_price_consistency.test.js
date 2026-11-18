@@ -3,6 +3,7 @@ import { setupPosEnv } from "@point_of_sale/../tests/unit/utils";
 import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_model_definitions";
 import {
     getComboOrder,
+    getMultiQtyComboOrder,
     expectGeneralProperties,
     expectTransactionTotals,
 } from "@l10n_be_pos_blackbox/../tests/unit/utils";
@@ -570,5 +571,51 @@ describe("input generator price consistency", () => {
             inszOrBisNumber: "1234567890",
         }).generateSignSaleInput();
         expect(inputAfter.transaction.transactionLines[0].mainProduct.vats[0].label).toBe("A");
+    });
+
+    test("[case 21] rounding adaptation with float cents (0.14 * 100 = 14.000000000000002)", async () => {
+        const store = await setupPosEnv({ setupCashier: false });
+        const product = store.models["product.template"].get(5); // 21% tax
+
+        for (const diff of [0.14, 0.56]) {
+            const order = store.addNewOrder();
+            await store.addLineToOrder({ product_tmpl_id: product, qty: 1 }, order);
+            // A tip amount without tip line makes transactionTotal lower than the line total
+            order.tip_amount = diff;
+
+            const { transaction } = new InputGenerator({
+                models: order.models,
+                order: order,
+                inszOrBisNumber: "1234567890",
+            }).generateSignSaleInput();
+
+            expectTransactionTotals(transaction, order.currency);
+            const priceChanges = transaction.transactionLines[0].mainProduct.vats[0].priceChanges;
+            expect(priceChanges.map((pc) => [pc.name, pc.amount])).toEqual([
+                ["ROUNDING_ADAPTATION", -diff],
+            ]);
+        }
+    });
+
+    test("[case 22] combo with sub-product qty > 1 has the right lineTotal", async () => {
+        const store = await setupPosEnv({ setupCashier: false });
+        const order = getMultiQtyComboOrder(store); // 1 menu of 58.0: 2 starters, 3 wines, 1 main
+        // Another line, otherwise a wrong combo lineTotal is hidden by the total adjustment
+        const product = store.models["product.template"].get(5);
+        await store.addLineToOrder({ product_tmpl_id: product, qty: 1 }, order);
+
+        const { transaction } = new InputGenerator({
+            models: order.models,
+            order: order,
+            inszOrBisNumber: "1234567890",
+        }).generateSignSaleInput();
+
+        expectTransactionTotals(transaction, order.currency);
+        const comboLine = transaction.transactionLines[0];
+        expect(comboLine.lineTotal).toBe(58.0);
+        const priceChanges = comboLine.subProducts.flatMap((sp) =>
+            sp.vats.flatMap((vat) => vat.priceChanges)
+        );
+        expect(priceChanges.some((pc) => pc.name === "ROUNDING_ADAPTATION")).toBe(false);
     });
 });

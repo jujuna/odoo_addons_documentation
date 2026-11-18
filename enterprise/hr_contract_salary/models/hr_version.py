@@ -140,11 +140,17 @@ class HrVersion(models.Model):
         }
 
     def action_generate_offer(self):
+        """Create an offer for the employee of the version and open it.
+
+        The offer is created from :meth:`_get_offer_values`, with ``offer_end_date`` set from
+        the ``hr_contract_salary.employee_salary_simulator_link_validity`` parameter (30 by default).
+        """
 
         offer_validity_period = self.env['ir.config_parameter'].sudo().get_int(
             'hr_contract_salary.employee_salary_simulator_link_validity') or 30
         offer_values = self._get_offer_values()
-        offer_values['validity_days_count'] = offer_validity_period
+        # the validity of the offer is its expiration date (validity_days_count is computed from it)
+        offer_values['offer_end_date'] = fields.Date.add(fields.Date.context_today(self), days=offer_validity_period)
         offer = self.env['hr.contract.salary.offer'].with_context(
             default_contract_template_id=self.id).create(offer_values)
 
@@ -167,6 +173,13 @@ class HrVersion(models.Model):
         }
 
     def _get_offer_values(self):
+        """Return the values of the offer created by :meth:`action_generate_offer`.
+
+        The version is both the contract template and the employee version of the offer, and
+        its ``final_yearly_costs`` is the initial yearly employer budget.
+
+        :rtype: dict
+        """
         self.ensure_one()
         return {
             'company_id': self.company_id.id,
@@ -181,10 +194,17 @@ class HrVersion(models.Model):
         }
 
     def _get_values_dict(self):
+        """Return the values of all the fields of the version, as ``read(load=None)``.
+
+        Relational fields are ids (many2one) or lists of ids (x2many).
+
+        :rtype: dict
+        """
         self.ensure_one()
         return self.read(load=None)[0]
 
     def send_offer(self):
+        """Open the mail composer to send the ``/salary_package/contract/<version id>`` link."""
         self.ensure_one()
         try:
             template_id = self.env.ref('hr_contract_salary.mail_template_send_offer').id
@@ -216,6 +236,20 @@ class HrVersion(models.Model):
 
     @requires_hr_version_context()
     def _generate_salary_simulation_payslip(self):
+        """Create a payslip of the current period simulating the salary of the version.
+
+        Must be called within ``hr_version_context()``: the payslip and its worked days line
+        (default work entry type, days and hours of the working schedule, without time off)
+        are rolled back. Read its lines with ``_get_payslip_lines()`` (not computed nor stored).
+
+        With the ``simulation_working_schedule`` context key (``'100'``, ``'90'``, ``'80'``,
+        ``'60'``, ``'50'``, ``'40'`` or ``'20'``), the wage and the company working schedule are
+        reduced accordingly on the version. The returned payslip has the ``salary_simulation``,
+        ``salary_simulation_full_time``, ``salary_simulation_full_time_yearly_cost`` and
+        ``origin_version_id`` context keys, which salary rules can test.
+
+        :rtype: hr.payslip
+        """
         self.ensure_one()
         payslip = self.env['hr.payslip'].sudo().create({
             'employee_id': self.employee_id.id,

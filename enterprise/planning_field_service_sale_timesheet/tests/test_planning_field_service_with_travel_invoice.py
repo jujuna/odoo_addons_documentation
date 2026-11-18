@@ -1,4 +1,5 @@
 from .common import TestPlanningFieldServiceSaleTimesheetCommon
+from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 from unittest.mock import patch
@@ -24,6 +25,26 @@ class TestFsSaleWithTravelInoice(TestPlanningFieldServiceSaleTimesheetCommon):
             ).product_uom_qty,
             1,
         )
+
+    def test_planning_fixed_fee_uses_pricelist(self):
+        travel_product = self.env.company.travel_time_invoicing_product_id.product_variant_id
+        travel_product.list_price = 50.0
+        pricelist = self.env['product.pricelist'].create({
+            'name': 'Travel Fee Pricelist',
+            'item_ids': [Command.create({
+                'applied_on': '0_product_variant',
+                'product_id': travel_product.id,
+                'compute_price': 'fixed',
+                'fixed_price': 30.0,
+            })],
+        })
+        self.intervention.partner_id.property_product_pricelist = pricelist
+        self.intervention.action_complete()
+        self.assertEqual(self.intervention.sale_order_id.pricelist_id, pricelist)
+        travel_line = self.intervention.sale_order_id.order_line.filtered(
+            lambda line: line.product_id == travel_product
+        )
+        self.assertEqual(travel_line.price_unit, 30.0)
 
     def test_planning_without_fixed_fee(self):
         self.env.company.field_service_travel_fees = False

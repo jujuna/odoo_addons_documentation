@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<odoo>
+    <data>
+        <template id="dte_subtemplate" inherit_id="l10n_cl_edi_stock.dte_subtemplate">
+            <xpath expr="//Transporte" position="inside">
+                <t t-set="departure" t-value="picking._l10n_cl_edi_get_departure_datetime()"/>
+                <FchSalida t-out="departure.date()"/>
+                <HraSalida t-out="departure.time()"/>
+                <FchLlegada t-out="picking.l10n_cl_edi_arrival_date"/>
+            </xpath>
+
+            <xpath expr="//Transporte/DirDest" position="before">
+                <Patente t-out="format_length(picking.l10n_cl_edi_transport_id.license_plate, 8) or 'Sin Dato'"/>
+                <PatenteCarro t-out="format_length(picking.l10n_cl_edi_transport_id.trailer_license_plate, 8) or 'Sin Dato'"/>
+                <RUTTrans t-out="format_vat(picking.l10n_cl_edi_transport_id.transport_company_id.vat)"/>
+                <Chofer>
+                    <RUTChofer t-out="format_vat(picking.l10n_cl_edi_driver_id.vat)"/>
+                    <NombreChofer t-out="format_length(picking.l10n_cl_edi_driver_id.name, 30) or 'Sin Dato'"/>
+                </Chofer>
+            </xpath>
+
+            <DirDest position="replace">
+                <DirDest t-out="format_length(('%s %s' % (picking.partner_id.street or '', picking.partner_id.street2 or '')).strip(), 70) or 'Sin Dato'"/>
+            </DirDest>
+            <CmnaDest position="replace">
+                <CmnaDest t-out="format_length(picking._l10n_cl_get_comuna_recep(), 20) or 'Sin Dato'"/>
+            </CmnaDest>
+            <CiudadDest position="replace"/>
+        </template>
+    </data>
+</odoo>

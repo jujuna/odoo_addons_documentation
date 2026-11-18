@@ -285,11 +285,18 @@ class PayrollConfigSettings(models.Model):
         # the employees are usually created after the payroll, default the size when configuring
         if not self.parent_id and not self.onss_importance_code and self.company_id.country_code == 'BE':
             self.onss_importance_code = self._get_onss_importance_code_from_employees()
+        return self._get_hr_payroll_localization_form_action()
+
+    def _get_hr_payroll_localization_form_action(self):
+        # Without side effect: the payroll warnings build it while computing (read only access is enough)
+        self.ensure_one()
         return {
             'name': self.env._('Payroll Localization'),
             'type': 'ir.actions.act_window',
             'res_model': 'payroll.config.settings',
             'view_mode': 'form',
+            # Needed when the dict goes straight to doAction (warning buttons) and skips clean_action
+            'views': [[False, 'form']],
             'res_id': self.id,
             'target': 'current',
             'path': 'company-data',

@@ -4,14 +4,6 @@
         <field name="l10n_ca_cpa005_short_name">CACPNY</field>
     </record>
 
-    <record id="l10n_ca.demo_ca_company_bank" model="res.partner.bank">
-        <field name="l10n_ca_financial_institution_number">000412345</field>
-    </record>
-
-    <record id="l10n_ca.bank_account_ca_customer" model="res.partner.bank">
-        <field name="l10n_ca_financial_institution_number">000305432</field>
-    </record>
-
     <function model="account.journal" name="write">
         <value model="account.journal" eval="obj().search([('company_id', '=', ref('base.demo_company_ca')), ('type', '=', 'bank')], limit=1).ids"/>
         <value eval="{

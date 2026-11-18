@@ -161,6 +161,8 @@ test("auto resize list columns", async () => {
 
 test("hover field sync highlights matching list formulas", async () => {
     const { model, env } = await mountSaleOrderSpreadsheetAction();
+    // wait a tick to resize the viewport (starts as 0x0) to display the highlight
+    await animationFrame();
     const hoverStore = env.getStore(DelayedHoveredCellStore);
     const highlightStore = env.getStore(HighlightStore);
     addFieldSync(model, "B1", "product_uom_qty", 0);

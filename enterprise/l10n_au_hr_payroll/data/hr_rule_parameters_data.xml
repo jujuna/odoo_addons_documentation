@@ -895,7 +895,7 @@
         <field name="code">l10n_au_extra_withholding</field>
         <field name="country_id" ref="base.au"/>
     </record>
-    <!-- ( from weekly earning, to weekly earning, additional withholding amount) -->
+    <!-- ( from earning, to earning, additional withholding amount), earnings being in the pay schedule's own period -->
     <record id="rule_parameter_extra_withholding_2023" model="hr.rule.parameter.value">
         <field name="rule_parameter_id" ref="rule_parameter_extra_withholding"/>
         <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
@@ -1189,7 +1189,7 @@
                 "promotional": {
                     "underage": {
                         "weekly": 250,
-                        "fornightly": 700,
+                        "bi-weekly": 700,
                         "monthly": 1517,
                     },
                     "tfn": 20,
@@ -1235,7 +1235,7 @@
                 "promotional": {
                     "underage": {
                         "weekly": 250,
-                        "fornightly": 700,
+                        "bi-weekly": 700,
                         "monthly": 1517,
                     },
                     "tfn": 20,
@@ -1281,7 +1281,7 @@
                 "promotional": {
                     "underage": {
                         "weekly": 250,
-                        "fornightly": 700,
+                        "bi-weekly": 700,
                         "monthly": 1517,
                     },
                     "tfn": 20,
@@ -1327,7 +1327,7 @@
                 "promotional": {
                     "underage": {
                         "weekly": 350,
-                        "fornightly": 700,
+                        "bi-weekly": 700,
                         "monthly": 1517,
                     },
                     "tfn": 20,

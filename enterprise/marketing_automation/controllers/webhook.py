@@ -32,6 +32,10 @@ class MarketingCampaignController(http.Controller):
         try:
             campaign._process_webhook_payload(search_domain or {}, create_values or {}, webhook_test=True)
         except ValidationError:
+            # rollback to cancel potential record creation
+            self.env.cr.rollback()
             return request.make_json_response({'status': 'error'}, status=500)
         except UserError as e:
+            # rollback to cancel record creation
+            self.env.cr.rollback()
             return request.make_json_response({'status': 'ok', 'msg': e.args[0]}, status=200)

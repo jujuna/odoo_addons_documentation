@@ -308,3 +308,32 @@ class TestWhatsappSchedule(EventCase, WhatsAppCommon):
         self.assertTrue(registration.exists(), "Registration record should exist after creation.")
         sub_scheduler = self.test_event.event_mail_ids.filtered(lambda s: s.interval_type == "after_sub")
         self.assertEqual(sub_scheduler.mail_count_done, 0)
+
+    @users('user_eventuser')
+    def test_event_employe_no_access_error_unapproved_whatsapp_template(self):
+        """Ensure employee can read event WA's communication when WA's template is not approved."""
+        self.whatsapp_template_rem.sudo().button_reset_to_draft()
+        self.env.cr.flush()
+
+        specification = {
+            'event_mail_ids': {
+                'fields': {
+                    'template_ref': {
+                        'context': {
+                            'default_model': 'event.registration',
+                            'filter_template_on_event': True,
+                        },
+                        'fields': {
+                            'display_name': {},
+                        }
+                    }
+                },
+            }
+        }
+
+        # need to clear the records cache to ensure fetch() will
+        # effectively try reading the `display_name` dependant fields
+        # to trigger the initial issue.
+        self.env.transaction.clear()
+        test_event_as_event_user = self.test_event.with_user(self.env.user)
+        test_event_as_event_user.web_read(specification)  # should not raise AccessError

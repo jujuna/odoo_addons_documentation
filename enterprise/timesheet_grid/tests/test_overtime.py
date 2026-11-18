@@ -1,18 +1,18 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import HttpCase, tagged
+from odoo.tests import TransactionCase, tagged
 
 
 @tagged('-at_install', 'post_install')
-class TestOvertime(HttpCase):
+class TestOvertime(TransactionCase):
     def test_flexible_overtime_positive_utc_offset(self):
         """ Overtime for flexible schedules must not be inflated by timezone offset """
         calendar = self.env['resource.calendar'].create({
             'name': 'Flexible 20h',
-            'attendance_ids': [
-                (0, 0, {'dayofweek': day, 'hour_from': 8.0, 'hour_to': 12.0})
-                for day in ['0', '1', '2', '3', '4']
-            ],
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 20,
+            'hours_per_day': 4,
         })
 
         employee = self.env['hr.employee'].create({

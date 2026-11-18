@@ -16,8 +16,7 @@ payslips_without_journal = self.env['hr.payslip'].search([
     ('company_id', 'in', self.env.companies.ids),
     ('state', '!=', 'paid'),
     ('struct_id', '!=', False),
-    ('journal_id', '=', False),
-])
+]).filtered(lambda payslip: not payslip.with_company(payslip.company_id).journal_id)
 warning_details = defaultdict(list)
 warning_records = payslips_without_journal
 for payslip in payslips_without_journal:

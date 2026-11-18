@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
-"PO-Revision-Date: 2026-09-17 23:12+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-30 17:48+0000\n"
+"PO-Revision-Date: 2026-11-12 02:33+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "stock_barcode/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -33,12 +33,14 @@ msgid ""
 "This module enables the barcode scanning feature for the warehouse "
 "management system.\n"
 msgstr ""
+"\n"
+"このモジュールで、倉庫管理システムのバーコードスキャン機能を利用できます。\n"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "%(nbr_of_picking)s pickings"
-msgstr ""
+msgstr "%(nbr_of_picking)s件のピッキング"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -48,6 +50,8 @@ msgid ""
 "%(product)s was not expected for this receipt but can be found in other "
 "waiting receipts "
 msgstr ""
+"%(product)s はこの入荷では予定されていませんが、他の待機中の入荷に含まれてい"
+"ます"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -59,7 +63,7 @@ msgstr "%sは棚卸できません。在庫可能品のみ棚卸することが�
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "(optional)"
-msgstr ""
+msgstr "（任意）"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -79,6 +83,8 @@ msgid ""
 "<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"barcode\" title=\"Serial/Lot "
 "Number\"/>"
 msgstr ""
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"barcode\" title=\"シリアル/"
+"ロット番号\"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -126,7 +132,7 @@ msgstr "<i class=\"oi oi-lg me-2\" data-icon=\"person\" title=\"Owner\"/>"
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_view_form_barcode_from_batch
 msgid "<i class=\"oi oi-lg\" data-icon=\"local_shipping\" title=\"Transfer\"/>"
-msgstr ""
+msgstr "<i class=\"oi oi-lg\" data-icon=\"local_shipping\" title=\"移動\"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.res_config_settings_view_form
@@ -153,6 +159,8 @@ msgid ""
 "<span class=\"oi ms-1\" data-icon=\"open_in_new\" title=\"Open Batch "
 "Picking\"/>"
 msgstr ""
+"<span class=\"oi ms-1\" data-icon=\"open_in_new\" title=\"バッチピッキングを"
+"開く\"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -183,7 +191,7 @@ msgstr ""
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "アクセスグループ"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -217,10 +225,10 @@ msgstr "プロダクトのグループの後に"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__all
 msgid "All"
-msgstr ""
+msgstr "すべて"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -258,7 +266,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Alternative:"
-msgstr ""
+msgstr "代替:"
 
 #. module: stock_barcode
 #. odoo-python
@@ -267,6 +275,8 @@ msgid ""
 "An error occurred during parsing of element_string: AI code %(ai_code)s is "
 "missing for scheme %(scheme_name)s"
 msgstr ""
+"element_string の解析中にエラーが発生しました:AIコード %(ai_code)s(スキーム %"
+"(scheme_name)s)が見つかりません"
 
 #. module: stock_barcode
 #. odoo-python
@@ -281,6 +291,8 @@ msgid ""
 "An error occurred with field '%(field_name)s': the corresponding AI '%"
 "(ai_code)s' was not found in the element_string"
 msgstr ""
+"フィールド '%(field_name)s' でエラーが発生しました: 対応するAI '%(ai_code)s' "
+"がelement_string内に見つかりませんでした"
 
 #. module: stock_barcode
 #. odoo-python
@@ -305,6 +317,8 @@ msgid ""
 "An error occurred: value of company_prefix_length (%"
 "(company_prefix_length)s) must be between 6 and 12 inclusive."
 msgstr ""
+"エラーが発生しました: company_prefix_length の値(%(company_prefix_length)s)は"
+"6から12の間(両端を含む)である必要があります。"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -364,7 +378,7 @@ msgstr "バーコードアプリ"
 #. module: stock_barcode
 #: model:ir.actions.client,name:stock_barcode.stock_barcode_picking_batch_client_action
 msgid "Barcode Batch Picking Client Action"
-msgstr ""
+msgstr "バーコードバッチピッキングクライアントアクション"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_location__barcode_img
@@ -410,36 +424,36 @@ msgstr "バーコードが利用できません。"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/suggest_batch_dialog.js:0
 msgid "Batch Receipts"
-msgstr ""
+msgstr "バッチ入荷"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Batch Receipts from %(partner)s?"
-msgstr ""
+msgstr "%(partner)s からのバッチ入荷ですか?"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_picking_batch
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_id
 msgid "Batch Transfer"
-msgstr ""
+msgstr "バッチ移動"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_name
 msgid "Batch Transfer Name"
-msgstr ""
+msgstr "バッチ移動名"
 
 #. module: stock_barcode
 #: model:ir.actions.act_window,name:stock_barcode.stock_barcode_batch_picking_action_kanban
 msgid "Batch Transfers"
-msgstr ""
+msgstr "バッチ移動"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
 msgid "Batches"
-msgstr ""
+msgstr "バッチ"
 
 #. module: stock_barcode
 #. odoo-python
@@ -655,7 +669,7 @@ msgstr "バーコードをスキャンしている間、効果音を無効にし
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/apply_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Discard"
@@ -826,13 +840,13 @@ msgstr "最終検証"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Lot Number"
 msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Serial Number"
 msgstr ""
 
@@ -905,13 +919,13 @@ msgstr "フォーマット済プロダクトバーコード"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Lot numbers"
 msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Serial numbers"
 msgstr ""
 
@@ -1125,13 +1139,13 @@ msgstr "処理された場所"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 msgid "Logout"
-msgstr ""
+msgstr "ログアウト"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Lot Number"
-msgstr ""
+msgstr "ロット番号"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_lot
@@ -1212,7 +1226,7 @@ msgstr "バーコードなし"
 #. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_barcode_batch_picking_action_kanban
 msgid "No batch transfer found"
-msgstr ""
+msgstr "バッチ移動が見つかりません"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1224,7 +1238,7 @@ msgstr "内部オペレーションタイプはありません。倉庫設定で
 #. odoo-python
 #: code:addons/stock_barcode/controllers/stock_barcode.py:0
 msgid "No pending transfer for %(partner)s"
-msgstr ""
+msgstr "%(partner)sの保留中の移動はありません"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1313,16 +1327,16 @@ msgstr "予測されたスキャンではありません"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Number of SN"
-msgstr ""
+msgstr "シリアル番号の数"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__only_one
 msgid "Only One"
-msgstr ""
+msgstr "1つのみ"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1344,7 +1358,7 @@ msgstr "ロットを開く"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_batch.py:0
 msgid "Open picking batch form"
-msgstr ""
+msgstr "ピッキングバッチフォームを開く"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1489,7 +1503,7 @@ msgstr "印刷"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "Print Batch Transfer"
-msgstr ""
+msgstr "バッチ移動を印刷"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1507,7 +1521,7 @@ msgstr "在庫の印刷"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Print Labels"
-msgstr ""
+msgstr "ラベル印刷"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1525,13 +1539,13 @@ msgstr "ピッキングオペレーションを印刷"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "Print Product Labels"
-msgstr ""
+msgstr "プロダクトラベルを印刷"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/line.xml:0
 msgid "Print Reservation"
-msgstr ""
+msgstr "引当を印刷"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1632,9 +1646,9 @@ msgstr "完了済数量"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity Received"
-msgstr ""
+msgstr "入荷数量"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
@@ -1648,9 +1662,9 @@ msgstr "パッケージング単位あたりの数量"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity per Lot"
-msgstr ""
+msgstr "ロット毎数量"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__barcode_rfid_batch_time
@@ -1773,7 +1787,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)scontact%(bold_e)s to see their pending transfers"
-msgstr ""
+msgstr "保留中の移動を表示するには%(bold_s)s連絡先%(bold_e)sをスキャンしてください"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1841,7 +1855,7 @@ msgstr "ロット番号、次に移動先をスキャン"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan a lot/serial number if product is tracked"
-msgstr ""
+msgstr "プロダクトが追跡対象の場合は、ロット/シリアル番号をスキャンしてください"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1861,7 +1875,7 @@ msgstr "梱包をスキャンまたは梱包する"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan a package or put in pack if desired"
-msgstr ""
+msgstr "梱包をスキャンするか、必要に応じて梱包してください"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2015,7 +2029,7 @@ msgstr "シリアル番号をスキャン、次に移動先ロケーションを
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan a source location"
-msgstr ""
+msgstr "移動元ロケーションをスキャンしてください"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2027,7 +2041,7 @@ msgstr "%(bold_s)s操作タイプ%(bold_e)s をスキャンして開始"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan an existing package to move"
-msgstr ""
+msgstr "既存の梱包をスキャンして移動"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2039,7 +2053,7 @@ msgstr "他のシリアル番号をスキャン"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan another source location"
-msgstr ""
+msgstr "別の移動元ロケーションをスキャンしてください"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2057,7 +2071,7 @@ msgstr "追加でロット番号または梱包をスキャン"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Scan more lot/serial numbers"
-msgstr ""
+msgstr "さらにロット/シリアル番号をスキャン"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2078,6 +2092,8 @@ msgid ""
 "Scan more quantities or scan a lot number to apply the scanned quantity to "
 "it."
 msgstr ""
+"さらに数量をスキャンするか、ロット番号をスキャンしてスキャンした数量を適用し"
+"てください。"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2137,7 +2153,7 @@ msgstr "廃棄ロケーション"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "See Allocation"
-msgstr ""
+msgstr "割当を表示"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
@@ -2151,9 +2167,9 @@ msgstr "プロダクトをどこからピッキングするかを選択して下
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Serial Number"
-msgstr ""
+msgstr "シリアル番号"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -2226,7 +2242,7 @@ msgstr "在庫移動"
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_request_count
 msgid "Stock Request an Inventory Count for barcode"
-msgstr ""
+msgstr "バーコードによる棚卸を要求"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_package_type
@@ -2248,6 +2264,8 @@ msgid ""
 "Technical field to mark the quant count request to make it non-removable for "
 "the barcode user"
 msgstr ""
+"バーコードユーザが棚卸カウント要求を削除できないようにマークする技術"
+"フィールド"
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__show_barcode_validation
@@ -2262,7 +2280,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "The Batch Transfer has been validated"
-msgstr ""
+msgstr "バッチ移動が最終確定されました"
 
 #. module: stock_barcode
 #: model:ir.model.constraint,message:stock_barcode.constraint_res_config_settings_check_barcode_rfid_batch_time
@@ -2273,7 +2291,7 @@ msgstr "RFIDタイマーは正の値であるべきです。"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "The batch picking has been cancelled"
-msgstr ""
+msgstr "バッチピッキングがキャンセルされました"
 
 #. module: stock_barcode
 #. odoo-python
@@ -2292,6 +2310,10 @@ msgid ""
 "            help the timing management of operations (tasks to be done at "
 "1pm)."
 msgstr ""
+"バッチ移動の目的は、同時に実行可能な(実行すべき)作業を\n"
+"まとめて効率を高めることです。\n"
+"また、作業の割り当て(1人＝1バッチ)や、\n"
+"作業のタイミング管理(13時に実行するタスクなど)にも役立ちます。"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2337,7 +2359,7 @@ msgstr "スキャンしたシリアル番号%sはすでに使用されていま�
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_move_line__picking_id
 msgid "The stock operation where the packing has been made"
-msgstr ""
+msgstr "梱包が行われた在庫オペレーション"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2367,13 +2389,13 @@ msgstr "このページで印刷するものはありません。"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "This batch is already cancelled"
-msgstr ""
+msgstr "このバッチはすでにキャンセルされています"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "This batch is already done"
-msgstr ""
+msgstr "このバッチはすでに完了済です"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2382,6 +2404,8 @@ msgid ""
 "This batch transfer is still in draft, scans are disabled until the batch is "
 "confirmed"
 msgstr ""
+"このバッチ移動はまだ下書き状態のため、バッチが確定されるまでスキャンは無効で"
+"す"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2474,7 +2498,7 @@ msgstr "転送名"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
 msgid "Transfers"
-msgstr ""
+msgstr "移動"
 
 #. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_picking_action_kanban
@@ -2484,12 +2508,12 @@ msgstr "転送を使用すると、プロダクトをある場所から別の場
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_batch__picking_type_code
 msgid "Type of Operation"
-msgstr ""
+msgstr "オペレーションタイプ"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
 msgid "Unbatch Transfer"
-msgstr ""
+msgstr "移動のバッチ解除"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2516,17 +2540,17 @@ msgstr "測定単位"
 #. module: stock_barcode
 #: model:ir.module.module,summary:base.module_stock_barcode
 msgid "Use barcode scanners to process logistics operations"
-msgstr ""
+msgstr "バーコードスキャナーを使用して物流業務を処理"
 
 #. module: stock_barcode
 #: model:res.groups,name:stock_barcode.group_barcode_user
 msgid "User"
-msgstr ""
+msgstr "ユーザ"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Validate"
 msgstr "確認"
@@ -2535,7 +2559,7 @@ msgstr "確認"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_type.py:0
 msgid "Validate or scan another product"
-msgstr ""
+msgstr "最終確定または別のプロダクトをスキャン"
 
 #. module: stock_barcode
 #. odoo-python
@@ -2591,6 +2615,8 @@ msgid ""
 "You already scanned %(packaging_name)s, please scan a lot before scanning "
 "another type of packaging."
 msgstr ""
+"すでに %(packaging_name)sをスキャン済みです。別の梱包タイプをスキャンする前に"
+"、ロットをスキャンしてください。"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2684,7 +2710,7 @@ msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "e.g. LOT-PR-00012"
 msgstr ""
 

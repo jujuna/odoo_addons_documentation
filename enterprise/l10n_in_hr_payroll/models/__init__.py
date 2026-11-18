@@ -3,6 +3,7 @@
 from . import hr_employee
 from . import hr_employee_departure
 from . import hr_version
+from . import hr_work_entry_type
 from . import hr_payslip
 from . import hr_payslip_run
 from . import l10n_in_payroll_form_138

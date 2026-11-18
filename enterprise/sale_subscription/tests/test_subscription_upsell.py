@@ -603,14 +603,14 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
         self.assertEqual(self.subscription.order_line.mapped('price_subtotal'), [1.6, 32], "Discount of parent sub should remains (with new quantity)")
 
     def test_upsell_descriptions(self):
-        """ On invoicing upsells, only subscription-based items should display a duration. """
+        """ On invoicing upsells, only subscription-based items should display a duration and deferred dates. """
         with freeze_time("2022-10-31"):
             self.subscription.action_confirm()
             self.env['sale.order']._cron_recurring_create_invoice()
 
             action = self.subscription.prepare_upsell_order()
             upsell_so = self.env['sale.order'].browse(action['res_id'])
-            upsell_so.order_line = [Command.create({'product_id': self.product_a.id})]
+            upsell_so.order_line = [Command.create({'product_id': self.product_tmpl_5.product_variant_id.id})]
             upsell_so.order_line.filtered('product_id').product_uom_qty = 1
             upsell_so.action_confirm()
             invoice = upsell_so._create_invoices()
@@ -621,8 +621,10 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
                 sol_name = line.sale_line_ids.name
                 if line.sale_line_ids.recurring_invoice:
                     self.assertIn("1 Month", name, "Sub lines require duration")
+                    self.assertTrue(line.deferred_start_date and line.deferred_end_date)
                 else:
                     self.assertEqual(name, sol_name, "Non-sub lines shouldn't add duration")
+                    self.assertFalse(line.deferred_start_date or line.deferred_end_date)
 
     def test_upsell_line_note_update(self):
         """"

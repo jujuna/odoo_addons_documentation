@@ -565,6 +565,8 @@ class SaleOrder(models.Model):
             return self.env.ref('sale_subscription.subtype_state_change')
         if self.is_subscription and 'next_invoice_date' in track_init_values and self.env.context.get('subscription_pause'):
             return self.env.ref('sale_subscription.subtype_resume_and_pause_subscription')
+        if 'end_date' in track_init_values:
+            return self.env.ref('mail.mt_comment')
         return super()._track_log_get_default_subtype(track_init_values)
 
     @api.depends('sale_order_template_id')
@@ -719,7 +721,17 @@ class SaleOrder(models.Model):
 
     def get_future_next_invoice_date(self):
         self.ensure_one()
-        return self.next_invoice_date + self.plan_id.billing_period - relativedelta(days=1)
+        plan = self.plan_id
+        next_period_start = self.next_invoice_date + plan.billing_period
+        # When aligned to period start, the period ends at the end of the month/year
+        if plan.billing_first_day and plan.billing_period_unit == 'month':
+            next_period_start += relativedelta(day=1)
+        elif plan.billing_first_day and plan.billing_period_unit == 'year':
+            next_period_start += relativedelta(month=1, day=1)
+        # The subscription can't be extended beyond its end date
+        if self.end_date and self.end_date < next_period_start:
+            return self.end_date
+        return next_period_start - relativedelta(days=1)
 
     ###########
     # Actions #

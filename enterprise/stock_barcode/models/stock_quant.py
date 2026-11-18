@@ -165,6 +165,11 @@ class StockQuant(models.Model):
             'has_count_requested',
         ]
 
+    @api.model
+    def _get_inventory_user_groups(self):
+        # Barcode users count inventory without being Inventory users.
+        return super()._get_inventory_user_groups() | self.env.ref('stock_barcode.group_barcode_user')
+
     def _get_inventory_fields_write(self):
         return ['dummy_id'] + super()._get_inventory_fields_write()
 

@@ -350,3 +350,102 @@ class TestRoSaftReport(TestSaftReport):
             self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options()),
             'saft_report_reverse_charge.xml'
         )
+
+    def test_saft_report_direct_payment(self):
+        """Test that a payment posted directly to the journal's default account
+        (without bank statement matching) appears in the <Payments> section of the SAF-T XML.
+        """
+        # Configure the bank journal's inbound payment method to post directly
+        # to the journal's default account instead of an outstanding account.
+        bank_journal = self.company_data['default_journal_bank']
+        bank_journal.inbound_payment_method_line_ids.payment_account_id = bank_journal.default_account_id
+
+        payment = self.env['account.payment'].create({
+            'date': '2023-10-15',
+            'amount': 500.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'journal_id': bank_journal.id,
+        })
+        payment.action_post()
+
+        report = self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options())
+        report_xml = self.get_xml_tree_from_string(report['file_content'])
+
+        payments = report_xml.xpath('//*[local-name()="Payments"]/*[local-name()="Payment"]')
+        self.assertEqual(len(payments), 1)
+
+        payment_elem = payments[0]
+        self.assertEqual(payment_elem.findtext('{*}PaymentRefNo'), payment.move_id.name)
+        self.assertEqual(payment_elem.findtext('{*}PaymentMethod'), '03')
+        self.assertEqual(payment_elem.findtext('{*}SystemID'), str(payment.move_id.id))
+        self.assertEqual(float(payment_elem.findtext('{*}PaymentLine/{*}PaymentLineAmount/{*}Amount')), 500.0)
+
+    def test_saft_report_payment_and_statement_line_reconciliation(self):
+        """Test that in a flow where a payment is registered using an outstanding
+        account (move A) and subsequently matched with a bank statement line (move B),
+        only move B (linked to the statement line) is included in the <Payments> section,
+        avoiding double counting.
+        """
+        bank_journal = self.company_data['default_journal_bank']
+
+        # 1. Register a payment posting to the outstanding receipts account (move A)
+        payment = self.env['account.payment'].create({
+            'date': '2023-10-15',
+            'amount': 500.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'journal_id': bank_journal.id,
+        })
+        payment.action_post()
+        move_a = payment.move_id
+
+        # 2. Create bank statement line (move B)
+        st_line = self.env['account.bank.statement.line'].create({
+            'date': '2023-10-15',
+            'payment_ref': 'Statement line matching payment',
+            'partner_id': self.partner_a.id,
+            'journal_id': bank_journal.id,
+            'amount': 500.0,
+        })
+        move_b = st_line.move_id
+
+        # 3. Reconcile the statement line with the payment using bank.rec.widget
+        payment_line = move_a.line_ids.filtered(lambda l: l.account_id == payment.payment_method_line_id.payment_account_id)
+        # wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        # wizard._action_add_new_amls(payment_line, allow_partial=False)
+        # wizard._action_validate()
+        suspense_line = move_b.line_ids.filtered(lambda l: l.account_id == bank_journal.suspense_account_id)
+        suspense_line.account_id = payment_line.account_id
+        (payment_line + suspense_line).reconcile()
+
+        report = self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options())
+        report_xml = self.get_xml_tree_from_string(report['file_content'])
+
+        payments = report_xml.xpath('//*[local-name()="Payments"]/*[local-name()="Payment"]')
+        # Only the statement line move (move B) should be present; move A should not be counted.
+        self.assertEqual(len(payments), 1)
+
+        payment_elem = payments[0]
+        self.assertEqual(payment_elem.findtext('{*}SystemID'), str(move_b.id))
+        self.assertEqual(payment_elem.findtext('{*}PaymentRefNo'), move_b.name)
+        self.assertEqual(float(payment_elem.findtext('{*}PaymentLine/{*}PaymentLineAmount/{*}Amount')), 500.0)
+
+    def test_saft_customer_and_supplier_partner(self):
+        """ An invoice must carry exactly one of CustomerInfo / SupplierInfo (xs:choice),
+        based on the document type, even if the partner is both customer and supplier. """
+        self._create_invoice('out_invoice', '2023-10-01', partner_id=self.partner_a, post=True)
+        self._create_invoice('in_invoice', '2023-10-02', partner_id=self.partner_a, post=True)
+
+        report = self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options())
+        report_xml = self.get_xml_tree_from_string(report['file_content'])
+
+        sales_invoice = report_xml.find('.//{*}SalesInvoices/{*}Invoice')
+        self.assertEqual(len(sales_invoice.findall('{*}CustomerInfo')), 1)
+        self.assertEqual(len(sales_invoice.findall('{*}SupplierInfo')), 0)
+
+        purchase_invoice = report_xml.find('.//{*}PurchaseInvoices/{*}Invoice')
+        self.assertEqual(len(purchase_invoice.findall('{*}SupplierInfo')), 1)
+        self.assertEqual(len(purchase_invoice.findall('{*}CustomerInfo')), 0)

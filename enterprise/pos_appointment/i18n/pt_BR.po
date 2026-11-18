@@ -4,17 +4,19 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 02:22+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-30 17:49+0000\n"
+"PO-Revision-Date: 2026-11-02 22:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/pos_appointment/pt_BR/>\n"
+"20/pos_appointment/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,17 +45,18 @@ msgstr "17h - 00h"
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi oi-filled\" data-icon=\"group\" title=\"People\"/>"
-msgstr ""
+msgstr "<i class=\"oi oi-filled\" data-icon=\"map\" title=\"Location\"/>"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi oi-filled\" data-icon=\"person\" title=\"Customer\"/>"
-msgstr ""
+msgstr "<i class=\"oi oi-filled\" data-icon=\"map\" title=\"Location\"/>"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi oi-filled\" data-icon=\"phone\" title=\"Phone\"/>"
 msgstr ""
+"<i class=\"oi oi-fw oi-filled me-1\" data-icon=\"phone\" title=\"Phone\"/>"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
@@ -74,7 +77,7 @@ msgstr "Tarde:"
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
 msgid "Amount of guests"
-msgstr ""
+msgstr "Número de pessoas"
 
 #. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__appointment_status
@@ -113,6 +116,12 @@ msgstr "Reservas"
 
 #. module: pos_appointment
 #. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
+msgid "Booking Unavailable"
+msgstr "Agendamento indisponível"
+
+#. module: pos_appointment
+#. odoo-javascript
 #. odoo-python
 #: code:addons/pos_appointment/models/calendar_event.py:0
 #: code:addons/pos_appointment/static/src/override/web/control_panel.xml:0
@@ -146,8 +155,8 @@ msgstr "Configurações"
 #. module: pos_appointment
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
-msgid "Create"
-msgstr ""
+msgid "Create Booking"
+msgstr "Criar reserva"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
@@ -172,8 +181,8 @@ msgstr "Nome exibido"
 #. module: pos_appointment
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
-msgid "Edit"
-msgstr "Editar"
+msgid "Edit Booking"
+msgstr "Editar reserva"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
@@ -249,7 +258,7 @@ msgstr "Não compareceu"
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
 msgid "Notes"
-msgstr ""
+msgstr "Anotações"
 
 #. module: pos_appointment
 #. odoo-javascript
@@ -265,9 +274,16 @@ msgid "Phone number"
 msgstr "Número de telefone"
 
 #. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
+msgid "Please set an appointment type in the PoS Configuration."
+msgstr "Por favor, defina um tipo de agendamento na Configuração do PDV."
+
+#. module: pos_appointment
 #: model:ir.module.module,shortdesc:base.module_pos_appointment
+#, fuzzy
 msgid "Point of Sale Appointment"
-msgstr ""
+msgstr "Ponto de Venda - Compromissos"
 
 #. module: pos_appointment
 #: model:ir.model,name:pos_appointment.model_pos_config
@@ -282,8 +298,9 @@ msgstr "Sessão do ponto de venda"
 #. module: pos_appointment
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
+#, fuzzy
 msgid "Q&A answer"
-msgstr ""
+msgstr "Resposta de P&R"
 
 #. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__answers
@@ -326,8 +343,9 @@ msgstr "Status"
 
 #. module: pos_appointment
 #: model:ir.module.module,summary:base.module_pos_appointment
+#, fuzzy
 msgid "This module lets you manage online reservations for PoS"
-msgstr ""
+msgstr "Esse módulo permite que você gerencie reservas on-line para o PDV"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
@@ -362,12 +380,18 @@ msgstr "Capacidade da lista de espera"
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
 msgid "guests"
-msgstr ""
+msgstr "convidados"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_kanban
 msgid "p"
 msgstr "p"
+
+#~ msgid "Create"
+#~ msgstr "Criar"
+
+#~ msgid "Edit"
+#~ msgstr "Editar"
 
 #~ msgid ""
 #~ "<i class=\"oi oi-filled\" data-icon=\"sticky_note_2\" title=\"Notes\"/>"
@@ -401,17 +425,11 @@ msgstr "p"
 #~ msgid "Cancel"
 #~ msgstr "Cancelar"
 
-#~ msgid "Create Booking"
-#~ msgstr "Criar reserva"
-
 #~ msgid "Delete"
 #~ msgstr "Excluir"
 
 #~ msgid "Duration"
 #~ msgstr "Duração"
-
-#~ msgid "Edit Booking"
-#~ msgstr "Editar reserva"
 
 #~ msgid "Extra Comments..."
 #~ msgstr "Comentários extra…"

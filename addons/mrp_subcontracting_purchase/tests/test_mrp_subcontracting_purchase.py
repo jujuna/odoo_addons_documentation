@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from odoo import Command
 from odoo.fields import Date
-from odoo.tests import Form, tagged
+from odoo.tests import Form, tagged, new_test_user
 
 from odoo.addons.mrp_subcontracting_account.tests.test_subcontracting_account import TestAccountSubcontractingFlows
 
@@ -93,6 +93,12 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
                 'product_qty': 1,
             })],
         })
+        self.stock_price_diff_acc_id = self.env['account.account'].sudo().create({
+            'name': 'default_account_stock_price_diff',
+            'code': 'STOCKDIFF',
+            'account_type': 'asset_current',
+            })
+        self.category_standard_auto.property_price_difference_account_id = self.stock_price_diff_acc_id
 
     def test_bom_overview_availability(self):
         # Create routes for components and the main product
@@ -302,6 +308,44 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
         self.assertEqual(receipt.state, 'done')
         self.assertEqual(sub_mos.state, 'done')
 
+    def test_multilevel_subcontracting_manufacturing_chain(self):
+        """ Check that the resupply pickings of different subcontractors sharing the same reference don't merge.
+        Finished (Subcontracting - subcontractor_partner1)
+            --> Comp 1
+            --> Comp 2 (MTO, Subcontracting - vendor)
+                    -> Comp2comp
+        """
+        self.warehouse.route_ids = [Command.link(self.env.ref('mrp_subcontracting.route_resupply_subcontractor_mto').id)]
+        self.comp2_bom.write({
+            'type': 'subcontract',
+            'subcontractor_ids': [Command.set(self.vendor.ids)],
+        })
+        mto_route = self.env.ref('stock.route_warehouse0_mto')
+        mto_route.active = True
+        self.comp2.write({
+            'route_ids': [Command.link(mto_route.id)],
+            'seller_ids': [Command.create({'partner_id': self.vendor.id})],
+        })
+        po = self.env['purchase.order'].create({
+            'partner_id': self.subcontractor_partner1.id,
+            'order_line': [Command.create({'product_id': self.finished.id, 'product_qty': 1.0})],
+        })
+
+        po.button_confirm()
+        resupply_finished = po._get_subcontracting_resupplies()
+        self.assertRecordValues(resupply_finished, [{'partner_id': self.subcontractor_partner1.commercial_partner_id.id}])
+        self.assertEqual(resupply_finished.move_ids.product_id, self.comp1 | self.comp2)
+
+        comp2_po = self.env['purchase.order'].search([('partner_id', '=', self.vendor.id)])
+        self.assertEqual(comp2_po.order_line.product_id, self.comp2)
+
+        comp2_po.button_confirm()
+        resupply_comp2 = comp2_po._get_subcontracting_resupplies()
+        self.assertRecordValues(resupply_finished, [{'partner_id': self.subcontractor_partner1.commercial_partner_id.id}])
+        self.assertEqual(resupply_finished.move_ids.product_id, self.comp1 | self.comp2)
+        self.assertRecordValues(resupply_comp2, [{'partner_id': self.vendor.id}])
+        self.assertEqual(resupply_comp2.move_ids.product_id, self.comp2comp)
+
     def test_purchase_and_return01(self):
         """
         The user buys 10 x a subcontracted product P. He receives the 10
@@ -497,12 +541,7 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
         """
         (self.comp1 | self.comp2 | self.finished).categ_id = self.category_standard_auto
 
-        stock_price_diff_acc_id = self.env['account.account'].sudo().create({
-            'name': 'default_account_stock_price_diff',
-            'code': 'STOCKDIFF',
-            'account_type': 'asset_current',
-        })
-        self.finished.categ_id.property_price_difference_account_id = stock_price_diff_acc_id
+        self.finished.categ_id.property_price_difference_account_id = self.stock_price_diff_acc_id
 
         self.comp1.standard_price = 10.0
         self.comp2.standard_price = 20.0
@@ -537,7 +576,7 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
         invoice.action_post()
 
         # price diff line should be 50 - 100 + 10 + 20
-        price_diff_line = invoice.line_ids.filtered(lambda m: m.account_id == stock_price_diff_acc_id)
+        price_diff_line = invoice.line_ids.filtered(lambda m: m.account_id == self.stock_price_diff_acc_id)
         self.assertEqual(price_diff_line.credit, 20)
 
     def test_subcontracting_multi_currency_price_diff(self):
@@ -553,12 +592,7 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
         product_category_all.property_valuation = 'real_time'
         self._setup_category_stock_journals()
 
-        stock_price_diff_acc_id = self.env['account.account'].create({
-            'name': 'default_account_stock_price_diff',
-            'code': 'STOCKDIFF',
-            'account_type': 'asset_current',
-        })
-        product_category_all.property_price_difference_account_id = stock_price_diff_acc_id
+        product_category_all.property_price_difference_account_id = self.stock_price_diff_acc_id
 
         self.comp1.standard_price = 10.0
         self.comp2.standard_price = 20.0
@@ -602,7 +636,43 @@ class MrpSubcontractingPurchaseTest(TestAccountSubcontractingFlows):
         invoice.action_post()
 
         # price diff line should be 100 - 60 - 10 - 20
-        price_diff_line = invoice.line_ids.filtered(lambda m: m.account_id == stock_price_diff_acc_id)
+        price_diff_line = invoice.line_ids.filtered(lambda m: m.account_id == self.stock_price_diff_acc_id)
+        self.assertEqual(price_diff_line.credit, 10)
+
+    def test_subcontracting_price_diff_billing_user(self):
+        """ Ensure a user with billing rights only can post the bill of a subcontracted
+            product using the standard cost method
+        """
+        self.finished.categ_id.property_price_difference_account_id = self.stock_price_diff_acc_id
+        self.comp1.standard_price = 10.0
+        self.comp2.standard_price = 20.0
+        self.finished.standard_price = 100
+        self.finished.categ_id = self.category_standard_auto
+
+        po_form = Form(self.env['purchase.order'])
+        po_form.partner_id = self.subcontractor_partner1
+        with po_form.order_line.new() as po_line:
+            po_line.product_id = self.finished
+            po_line.product_qty = 1
+            po_line.price_unit = 60
+        po = po_form.save()
+        po.button_confirm()
+
+        action = po.action_view_picking()
+        final_picking = self.env[action['res_model']].browse(action['res_id'])
+        final_picking.move_ids.quantity = 1
+        final_picking.move_ids.picked = True
+        final_picking.button_validate()
+
+        action = po.action_create_invoice()
+        invoice = self.env['account.move'].browse(action['res_id'])
+        invoice.invoice_date = Date.today()
+
+        billing_user = new_test_user(self.env, login='billing_user', groups='base.group_user,account.group_account_invoice')
+        invoice.with_user(billing_user).action_post()
+
+        # price diff line should be 100 - 60 - 10 - 20
+        price_diff_line = invoice.line_ids.filtered(lambda m: m.account_id == self.stock_price_diff_acc_id)
         self.assertEqual(price_diff_line.credit, 10)
 
     def test_subcontract_product_price_change(self):

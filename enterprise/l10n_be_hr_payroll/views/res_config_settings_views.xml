@@ -67,7 +67,7 @@
                             <div class="row mb-2 align-items-center">
                                 <div class="col-lg-5 d-flex align-items-center">
                                     <label for="l10n_be_dimona_environment"/>
-                                    <div class="oi" data-icon="help" title="Choose whether to communicate with the production server or the test server for Dimona declarations"/>
+                                    <div class="oi" data-icon="help" title="Choose whether to communicate with the production server or the test server of the ONSS for Dimona declarations, or to use a sandbox where the declarations are imported from JSON files"/>
                                 </div>
                                 <div class="col-lg-7">
                                     <field name="l10n_be_dimona_environment"
@@ -130,6 +130,10 @@
                             </div>
                         </div>
                         <button name="action_open_hr_payroll_localization" type="object" string="Configure" class="btn-secondary ps-2 w-100"/>
+                    </setting>
+                    <setting id="l10n_be_loss_on_commission_pto" string="Loss on Commission for Paid Time Off"
+                             help="Loss on commission for paid time off should be compensated (JC 200, all the companies):">
+                        <field name="l10n_be_loss_on_commission_pto" widget="radio" class="o_light_label"/>
                     </setting>
                 </block>
             </xpath>

@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:46+0000\n"
-"PO-Revision-Date: 2026-10-06 10:33+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 07:54+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "sale_subscription/id/>\n"
@@ -52,6 +52,13 @@ msgid ""
 "    - Modify subscriptions with sales orders\n"
 "    - Generate invoice automatically at fixed intervals\n"
 msgstr ""
+"\n"
+"Modul ini memungkinkan pengelolaan langganan.\n"
+"\n"
+"Fitur:\n"
+"    - Buat & edit langganan\n"
+"    - Modifikasi langganan dengan order penjualan\n"
+"    - Hasilkan faktur secara otomatis pada interval tetap\n"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -140,7 +147,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
-msgstr ""
+msgstr "- Sampai"
 
 #. module: sale_subscription
 #. odoo-python
@@ -155,6 +162,9 @@ msgid ""
 "             Any new delivered quantity during this period for the following "
 "product(s) may never be invoiced:"
 msgstr ""
+".\n"
+"             Kuantitas baru appa pun yang dikirim selama periode ini untuk "
+"produk berikut mungkin tidak pernah difaktur:"
 
 #. module: sale_subscription
 #. odoo-python
@@ -182,7 +192,7 @@ msgstr "6 Bulan"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
-msgstr ""
+msgstr "<b>Langganan</b><br/>"
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -190,14 +200,14 @@ msgid ""
 "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
 "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
 "            <t t-set=\"access_token\" t-"
-"value=\"object._rating_get_access_token()\"/>\n"
+"value=\"object._rating_get_access_token()\"></t>\n"
 "                <table style=\"width:600px;margin:5px auto;\">\n"
 "                    <tbody>\n"
 "                        <tr><td t-if=\"not "
 "object.company_id.uses_default_logo\">\n"
 "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
 "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
+"width:100px;\"></a>\n"
 "                        </td><td style=\"text-align:right;vertical-"
 "align:middle;\">\n"
 "                                Satisfaction Survey\n"
@@ -241,21 +251,21 @@ msgid ""
 "                                                    <a t-attf-href=\"/rate/"
 "{{ access_token }}/5\">\n"
 "                                                        <img alt=\"Happy\" "
-"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                                <td>\n"
 "                                                    <a t-attf-href=\"/rate/"
 "{{ access_token }}/3\">\n"
 "                                                        <img alt=\"Neutral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                                <td>\n"
 "                                                    <a t-attf-href=\"/rate/"
 "{{ access_token }}/1\">\n"
 "                                                        <img alt=\"Unhappy\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                            </tr>\n"
@@ -266,7 +276,7 @@ msgid ""
 "                        </td></tr>\n"
 "                        <tr data-o-mail-quote-container=\"1\"><td "
 "style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
+"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\">Mitchell Admin</"
 "td></tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
@@ -291,14 +301,14 @@ msgstr ""
 "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
 "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
 "            <t t-set=\"access_token\" t-"
-"value=\"object._rating_get_access_token()\"/>\n"
+"value=\"object._rating_get_access_token()\"></t>\n"
 "                <table style=\"width:600px;margin:5px auto;\">\n"
 "                    <tbody>\n"
 "                        <tr><td t-if=\"not "
 "object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
+"                            <a href=\"/\"><img t-attf-src=\"/"
+"logo.png?company={{ object.company_id.id }}\" style=\"vertical-"
+"align:baseline;max-width:100px;\"></a>\n"
 "                        </td><td style=\"text-align:right;vertical-"
 "align:middle;\">\n"
 "                                Survei Kepuasan\n"
@@ -310,14 +320,14 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
 "                            <p>Halo,</p>\n"
-"                            <p>Silakan ambil sedikit waktu untuk menilai "
-"layanan kami terkait langganan Anda \"<strong t-out=\"object.name or "
-"''\">Cleaning Service Kantor\"</strong>\"\n"
-"                               yang ditugaskan ke <strong t-"
-"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.</"
-"p>\n"
-"                            <p>Kami mengapresiasi feedback Anda. Feedback "
-"Anda membantu kami terus berkembang.</p>\n"
+"                            <p>Mohon luangkan waktu sejenak untuk menilai "
+"layanan kami terkait langganan Anda \"<strong t-out=\"object.name or ''\">"
+"Office Cleaning Service\"</strong>\"\n"
+"                               yang ditugaskan kepada <strong t-"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.</p>"
+"\n"
+"                            <p>Masukan Anda akan sangat berarti bagi kami "
+"untuk terus meningkatkan layanan.</p>\n"
 "                        </td></tr>\n"
 "                        <tr><td style=\"padding:10px 20px\">\n"
 "                            <table summary=\"o_mail_notification\" "
@@ -326,11 +336,11 @@ msgstr ""
 "                                    <td style=\"text-align:center;\">\n"
 "                                        <h2 style=\"font-weight:300;font-"
 "size:18px;\">\n"
-"                                            Beritahu kami apa perasaan Anda "
-"mengenai mengenai layanan kami.\n"
+"                                            Beri tahu kami pendapat Anda "
+"mengenai layanan kami:\n"
 "                                        </h2>\n"
-"                                        <div style=\"text-color: "
-"#888888\">(klik salah satu emoji)</div>\n"
+"                                        <div style=\"text-color: #888888\">"
+"(klik salah satu emoji berikut)</div>\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                                <tr>\n"
@@ -339,24 +349,24 @@ msgstr ""
 "align:center;\">\n"
 "                                            <tr>\n"
 "                                                <td>\n"
-"                                                    <a t-attf-href=\"/rate/"
-"{{ access_token }}/5\">\n"
-"                                                        <img alt=\"Happy\" "
-"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+"                                                    <a t-attf-href=\"/rate/{"
+"{ access_token }}/5\">\n"
+"                                                        <img alt=\"Puas\" "
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Puas\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                                <td>\n"
-"                                                    <a t-attf-href=\"/rate/"
-"{{ access_token }}/3\">\n"
-"                                                        <img alt=\"Neutral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"                                                    <a t-attf-href=\"/rate/{"
+"{ access_token }}/3\">\n"
+"                                                        <img alt=\"Netral\" "
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Netral\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                                <td>\n"
-"                                                    <a t-attf-href=\"/rate/"
-"{{ access_token }}/1\">\n"
-"                                                        <img alt=\"Unhappy\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+"                                                    <a t-attf-href=\"/rate/{"
+"{ access_token }}/1\">\n"
+"                                                        <img alt=\"Tidak "
+"Puas\" src=\"/rating/static/src/img/rating_1.png\" title=\"Tidak Puas\">\n"
 "                                                    </a>\n"
 "                                                </td>\n"
 "                                            </tr>\n"
@@ -367,7 +377,7 @@ msgstr ""
 "                        </td></tr>\n"
 "                        <tr data-o-mail-quote-container=\"1\"><td "
 "style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
+"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\">Mitchell Admin</"
 "td></tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
@@ -375,14 +385,14 @@ msgstr ""
 "align:center;font-size:12px;\">\n"
 "                    <tbody>\n"
 "                        <tr><td style=\"padding-top:10px;color:#afafaf;\">\n"
-"                            <p>Email otomatis dikirim oleh <a "
+"                            <p>Email dikirim secara otomatis oleh <a "
 "target=\"_blank\" href=\"https://www.odoo.com/app/subscriptions\" t-attf-"
 "style=\"color: {{object.company_id.email_secondary_color or '#875A7B'}}; "
 "text-decoration:none;\">Langganan Odoo</a> untuk <a t-att-"
-"href=\"object.company_id.website\" t-attf-style=\"color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
-"decoration:none;\" t-out=\"object.company_id.name or ''\">PerusahaanAnda</"
-"a></p>\n"
+"href=\"object.company_id.website\" t-attf-style=\"color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+"decoration:none;\" t-out=\"object.company_id.name or ''\">YourCompany</a></p>"
+"\n"
 "                        </td></tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
@@ -402,7 +412,7 @@ msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Kembali ke langganan Anda"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
-msgstr ""
+msgstr "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> Harus Diperpanjang"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -447,7 +457,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<small class=\"text-muted\">Plan</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">Paket</small>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -546,7 +556,7 @@ msgstr "<span class=\"text-muted\">Billing Berikutnya</span>"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<span class=\"text-muted\">→</span>"
-msgstr ""
+msgstr "<span class=\"text-muted\">→</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -574,22 +584,22 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "<span>·</span>"
-msgstr ""
+msgstr "<span>·</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">Faktur</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">Periode</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">Paket</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -615,18 +625,29 @@ msgid ""
 "<p>We invite you to renew it by clicking on the following link.</p>\n"
 "<p>Kind regards.</p>\n"
 "<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
-"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"data-o-mail-quote=\"1\">Mitchell Admin</p>\n"
 "        </t>"
 msgstr ""
+"<t>\n"
+"<p>Kepada <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>"
+"\n"
+"<p>Langganan Anda <strong t-out=\"object.name or ''\">Office Cleaning "
+"Service\"</strong> perlu diperhatikan.</p>\n"
+"<p>Kami mengundang Anda untuk memperbaruinya dengan mengeklik link berikut.</"
+"p>\n"
+"<p>Salam hormat,</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\">Mitchell Admin</p>\n"
+"        </t>"
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_close
 msgid ""
 "<t>\n"
 "<t t-set=\"company\" t-value=\"object.company_id or "
-"object.user_id.company_id or user.company_id\"/>\n"
-"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"object.user_id.company_id or user.company_id\"></t>\n"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,"
+"<br><br>\n"
 "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
 "    Our final attempt to process a payment for your subscription using your "
 "payment method\n"
@@ -635,23 +656,23 @@ msgid ""
 "out=\"ctx.get('currency') or ''\">$</t> failed.\n"
 "    <t t-if=\"ctx.get('error')\">\n"
 "        Your bank or credit institution gave the following details about the "
-"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"issue: <pre t-out=\"ctx['error'] or ''\"></pre>.\n"
 "    </t>\n"
 "</t>\n"
 "<t t-else=\"\">\n"
 "    Our final attempt to process a payment for your subscription failed "
 "because we have no payment method recorded for you.\n"
 "</t>\n"
-"<br/><br/>\n"
+"<br><br>\n"
 "As your payment should have been made <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
 "subscription has been terminated.\n"
-"Should you wish to resolve this issue, do not hesitate to contact us.<br/"
-"><br/>\n"
+"Should you wish to resolve this issue, do not hesitate to contact us."
+"<br><br>\n"
 "Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
 "<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"    <br/><br/>\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <br><br>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</div>\n"
 "</t>\n"
@@ -659,9 +680,9 @@ msgid ""
 msgstr ""
 "<t>\n"
 "<t t-set=\"company\" t-value=\"object.company_id or "
-"object.user_id.company_id or user.company_id\"/>\n"
-"Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"object.user_id.company_id or user.company_id\"></t>\n"
+"Halo, <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>.<br><br>"
+"\n"
 "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
 "    Upaya terakhir kami untuk memproses pembayaran langganan Anda "
 "menggunakan metode pembayaran\n"
@@ -669,24 +690,23 @@ msgstr ""
 "    sebesar <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
 "out=\"ctx.get('currency') or ''\">$</t> gagal.\n"
 "    <t t-if=\"ctx.get('error')\">\n"
-"        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
-"masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"        Bank atau institusi kredit Anda memberikan detail berikut terkait "
+"masalah ini: <pre t-out=\"ctx['error'] or ''\"></pre>.\n"
 "    </t>\n"
 "</t>\n"
 "<t t-else=\"\">\n"
 "    Upaya terakhir kami untuk memproses pembayaran langganan Anda gagal "
-"karena kami tidak memiliki catatan terkait metode pembayaran Anda.\n"
+"karena kami tidak memiliki metode pembayaran yang tercatat untuk Anda.\n"
 "</t>\n"
-"<br/><br/>\n"
-"Karena pembayaran seharusnya dilakukan <strong><t t-"
-"out=\"ctx.get('auto_close_limit') or ''\">5</t> hari lalu</strong>, "
-"langganan Anda telah diakhiri.\n"
-"Jika Anda ingin menyelesaikan masalah ini, silakan hubungi kami.<br/><br/>\n"
-"Terima kasih telah memilih <t t-out=\"company.name or ''\">PerusahaanAnda</"
-"t>!\n"
+"<br><br>\n"
+"Karena pembayaran Anda seharusnya sudah dilakukan <strong><t t-out=\"ctx.get"
+"('auto_close_limit') or ''\">5</t> hari yang lalu</strong>, langganan Anda "
+"telah dihentikan.\n"
+"Jika ingin menyelesaikan masalah ini, silakan hubungi kami.<br><br>\n"
+"Terima kasih telah memilih <t t-out=\"company.name or ''\">YourCompany</t>!\n"
 "<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"    <br/><br/>\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <br><br>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</div>\n"
 "</t>\n"
@@ -697,9 +717,9 @@ msgstr ""
 msgid ""
 "<t>\n"
 "<t t-set=\"company\" t-value=\"object.company_id or "
-"object.user_id.company_id or user.company_id\"/>\n"
-"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"object.user_id.company_id or user.company_id\"></t>\n"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,"
+"<br><br>\n"
 "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
 "    We were unable to process a payment for your subscription using your "
 "payment method\n"
@@ -708,7 +728,7 @@ msgid ""
 "out=\"ctx.get('currency_name') or ''\">$</t>.\n"
 "    <t t-if=\"ctx.get('error')\">\n"
 "        Your bank or credit institution gave the following details about the "
-"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"issue: <pre t-out=\"ctx['error'] or ''\"></pre>.\n"
 "    </t>\n"
 "</t>\n"
 "<t t-else=\"\">\n"
@@ -716,12 +736,12 @@ msgid ""
 "due for renewal but we haven’t received your payment yet. To keep your "
 "subscription active, please make your payment as soon as possible.\n"
 "</t>\n"
-"<br/><br/>\n"
+"<br><br>\n"
 "Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> will "
 "be <strong>suspended</strong>\n"
 "<t t-out=\"(ctx.get('date_close') and ('on ' + "
 "format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
-"if payment is not received.<br/>\n"
+"if payment is not received.<br>\n"
 "<div style=\"margin: 16px 0px; text-align: center;\">\n"
 "    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
 "\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
@@ -731,13 +751,13 @@ msgid ""
 "        Pay Now\n"
 "    </a>\n"
 "</div>\n"
-"<br/>\n"
-"If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+"<br>\n"
+"If you have any questions, do not hesitate to contact us.<br><br>\n"
 "Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
 "<div>\n"
 "<t t-if=\"user.signature\">\n"
-"    <br/><br/>\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <br><br>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "</div>\n"
@@ -746,31 +766,30 @@ msgid ""
 msgstr ""
 "<t>\n"
 "<t t-set=\"company\" t-value=\"object.company_id or "
-"object.user_id.company_id or user.company_id\"/>\n"
-"Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"object.user_id.company_id or user.company_id\"></t>\n"
+"Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br><br>\n"
 "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
-"    Kami tidak dapat memproses pembayaran langganan Anda menggunakan metode "
-"pembayaran Anda\n"
+"    Kami tidak dapat memproses pembayaran untuk langganan Anda menggunakan "
+"metode pembayaran Anda\n"
 "    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"    sejumlah <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"    sebesar <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
 "out=\"ctx.get('currency_name') or ''\">$</t>.\n"
 "    <t t-if=\"ctx.get('error')\">\n"
-"        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
-"masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"        Bank atau institusi kredit Anda memberikan detail berikut mengenai "
+"masalah tersebut: <pre t-out=\"ctx['error'] or ''\"></pre>.\n"
 "    </t>\n"
 "</t>\n"
 "<t t-else=\"\">\n"
-"    Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> sudah "
-"harus diperpanjang, tetapi kami belum menerima pembayarannya. Agar langganan "
-"tetap aktif, mohon untuk melakukan pembayaran sesegera mungkin.\n"
+"Langganan Anda <t t-out=\"object.client_order_ref or ''\">CODE</t> sudah "
+"harus diperbaru, tetapi kami belum menerima pembayarannya. Agar langganan "
+"Anda tetap aktif, mohon lakukan pembayaran sesegera mungkin.\n"
 "</t>\n"
-"<br/><br/>\n"
-"Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> akan "
+"<br><br>\n"
+"Langganan Anda <t t-out=\"object.client_order_ref or ''\">CODE</t> akan "
 "<strong>ditangguhkan</strong>\n"
-"<t t-out=\"(ctx.get('date_close') and ('on ' + "
-"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
-"jika kami tidak menerima pembayaran.<br/>\n"
+"<t t-out=\"(ctx.get('date_close') and ('pada ' + format_date(ctx.get"
+"('date_close')))) or 'segera'\">05/05/2021</t>\n"
+"jika pembayaran tidak diterima.<br>\n"
 "<div style=\"margin: 16px 0px; text-align: center;\">\n"
 "    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
 "\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
@@ -780,14 +799,13 @@ msgstr ""
 "        Bayar Sekarang\n"
 "    </a>\n"
 "</div>\n"
-"<br/>\n"
-"Jika ada yang ingin ditanyakan, silakan hubungi kami.<br/><br/>\n"
-"Terima kasih sudah memilih <t t-out=\"company.name or ''\">PerusahaanAnda</"
-"t>!\n"
+"<br>\n"
+"Jika ada yang ingin ditanyakan, silakan hubungi kami.<br><br>\n"
+"Terima kasih telah memilih <t t-out=\"company.name or ''\">YourCompany</t>!\n"
 "<div>\n"
 "<t t-if=\"user.signature\">\n"
-"    <br/><br/>\n"
-"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"    <br><br>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "</t>\n"
 "</div>\n"
@@ -1011,7 +1029,7 @@ msgstr "Hitungan Lampiran"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
 msgid "Attributes"
-msgstr ""
+msgstr "Atribut"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1261,7 +1279,7 @@ msgstr "Pilih nama produk.<br/><i>(contoh Akses eLearning)</i>"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Choose a reason..."
-msgstr ""
+msgstr "Pilih alasan..."
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -1310,7 +1328,7 @@ msgstr "Tutup"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
 msgid "Close Date"
-msgstr ""
+msgstr "Tanggal Penutupan"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
@@ -1338,7 +1356,7 @@ msgstr "Tutup Langganan"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Close the recurring plan dropdown."
-msgstr ""
+msgstr "Tutup menu drop-down paket berulang."
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1374,6 +1392,9 @@ msgid ""
 "0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
 "with no saved payment token."
 msgstr ""
+"Daftar offset hari yang dipisahkan koma relatif terhadap tanggal faktur "
+"berikutnya (mis. 0,1,2,7,14,-2,-7,-14) untuk pengiriman pengingat pembayaran "
+"bagi Langganan yang tidak memiliki token pembayaran tersimpan."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
@@ -1382,6 +1403,9 @@ msgid ""
 "0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
 "saved payment token."
 msgstr ""
+"Daftar offset hari yang dipisahkan koma relatif terhadap tanggal faktur "
+"berikutnya (mis. 0,1,2,7,14,-2,-7,-14) untuk pengiriman pengingat bagi "
+"Langganan yang tidak memiliki token pembayaran tersimpan."
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
@@ -1389,6 +1413,9 @@ msgid ""
 "Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
 "reminder email is sent when an automatic payment with a saved token fails."
 msgstr ""
+"Daftar hari yang dipisahkan koma setelah tanggal faktur (mis. 2,7,14) untuk "
+"pengiriman email pengingat saat pembayaran otomatis dengan token tersimpan "
+"gagal."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
@@ -1396,6 +1423,8 @@ msgid ""
 "Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
 "reminder is sent when an automatic payment fails."
 msgstr ""
+"Daftar hari yang dipisahkan koma setelah tanggal faktur (mis. 2,7,14) untuk "
+"pengiriman pengingat saat pembayaran otomatis gagal."
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -1666,37 +1695,37 @@ msgstr "Definisikan bila produk langganan dapat juga dibeli satu-kali saja."
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s months"
-msgstr ""
+msgstr "Kirim setiap %s bulan"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s weeks"
-msgstr ""
+msgstr "Kirim setiap %s minggu"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s years"
-msgstr ""
+msgstr "Kirim setiap %s tahun"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every month"
-msgstr ""
+msgstr "Kirim setiap bulan"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every week"
-msgstr ""
+msgstr "Kirim setiap minggu"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every year"
-msgstr ""
+msgstr "Kirim setiap tahun"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
@@ -1706,7 +1735,7 @@ msgstr "Alamat Tujuan"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
 msgid "Delivery Period Display"
-msgstr ""
+msgstr "Tampilan Periode Pengiriman"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
@@ -1716,7 +1745,7 @@ msgstr "Perincian"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Discard"
-msgstr ""
+msgstr "Buang"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -1778,7 +1807,7 @@ msgstr "Tampilkan Harga"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__display_type
 msgid "Display Type"
-msgstr "Display Type"
+msgstr "Tipe Tampilan"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -1802,7 +1831,7 @@ msgstr "Draft"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Due"
-msgstr ""
+msgstr "Jatuh Tempo"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
@@ -1865,7 +1894,7 @@ msgstr "Akhir periode"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
-msgstr ""
+msgstr "Kesalahan saat pembaruan kontrak %(order_ids)s %(order_refs)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -1895,12 +1924,12 @@ msgstr "Ekspansi"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
 msgid "Expected Cost"
-msgstr ""
+msgstr "Perkiraan Biaya"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Extend Until"
-msgstr ""
+msgstr "Perpanjang Hingga"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
@@ -1944,7 +1973,7 @@ msgstr "Follower (Mitra)"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "For"
-msgstr ""
+msgstr "Untuk"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -1970,7 +1999,7 @@ msgstr "Buat Link Pembayaran Penjualan"
 #. module: sale_subscription
 #: model:ir.module.module,summary:base.module_sale_subscription
 msgid "Generate recurring invoices and manage renewals"
-msgstr ""
+msgstr "Buat faktur rutin dan kelola perpanjangan"
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2115,6 +2144,7 @@ msgid ""
 "If you change the pricelist, the prices of all order lines will be updated "
 "accordingly."
 msgstr ""
+"Jika Anda mengubah daftar harga, harga semua baris order akan menyesuaikan."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2122,6 +2152,8 @@ msgid ""
 "If you wish to reopen it, you can pay your invoice for the current invoicing "
 "period"
 msgstr ""
+"Jika ingin membukanya kembali, Anda dapat membayar faktur untuk periode "
+"faktur saat ini"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -2450,7 +2482,7 @@ msgstr "Margin"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
 msgid "Margin (%)"
-msgstr ""
+msgstr "Margin (%)"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2496,7 +2528,7 @@ msgstr "Bulanan"
 #. module: sale_subscription
 #: model:sale.order.template,name:sale_subscription.monthly_template
 msgid "Monthly Cleaning"
-msgstr ""
+msgstr "Pembersihan Bulanan"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
@@ -2513,7 +2545,7 @@ msgstr "Pendapatan Berulang Bulanan (MRR)"
 #. module: sale_subscription
 #: model:product.template,description_sale:sale_subscription.product_car_leasing_product_template
 msgid "Monthly lease for city or business driving"
-msgstr ""
+msgstr "Sewa bulanan untuk berkendara dalam kota atau untuk keperluan bisnis"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_template__duration_unit__month
@@ -2644,7 +2676,7 @@ msgstr "Tidak ada Metode Pembayaran valid"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
 msgid "No-token payment reminder days"
-msgstr ""
+msgstr "Hari pengingat pembayaran tanpa token"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2722,6 +2754,8 @@ msgid ""
 "Onboarding example showing how the app tracks customer subscriptions and "
 "visualizes MRR growth."
 msgstr ""
+"Contoh onboarding yang menunjukkan cara aplikasi melacak langganan pelanggan "
+"dan memvisualisasikan pertumbuhan MRR."
 
 #. module: sale_subscription
 #. odoo-python
@@ -2758,7 +2792,7 @@ msgstr "Status Faktur Order"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
 msgid "Order Line Name"
-msgstr ""
+msgstr "Nama Baris Order"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
@@ -2773,7 +2807,7 @@ msgstr "Status Order"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_order_template
 msgid "Order Templates"
-msgstr ""
+msgstr "Template Order"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -2897,7 +2931,7 @@ msgstr "Transaksi Tagihan"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
 msgid "Payment failure reminder days"
-msgstr ""
+msgstr "Hari pengingat gagal bayar"
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -2938,7 +2972,7 @@ msgstr "Rencana"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/product/product.xml:0
 msgid "Plan not available"
-msgstr ""
+msgstr "Paket tidak tersedia"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2961,6 +2995,7 @@ msgstr "Silakan tambahkan produk rutin di langganan atau hapus paket rutin."
 msgid ""
 "Please contact your sales manager if you want to reopen this subscription."
 msgstr ""
+"Silakan hubungi manajer sales Anda bila ingin membuka ulang langganan ini."
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -3059,7 +3094,7 @@ msgstr "Produk"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Prorated"
-msgstr ""
+msgstr "Prorata"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3207,7 +3242,7 @@ msgstr "Jumlah Berulang"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 msgid "Recurring Invoice"
-msgstr ""
+msgstr "Faktur Rutin"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3263,6 +3298,12 @@ msgid ""
 msgstr ""
 "Periode berulang harus merupakan angka positif. Mohon pastikan input adalah "
 "nilai numerik positif yang valid."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/account_move.py:0
+msgid "Refund on subscription. Next Invoice date to check"
+msgstr "Pengembalian dana langganan. Tanggal faktur berikutnya untuk diperiksa"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__cancel
@@ -3486,7 +3527,7 @@ msgstr "Simpan"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Save your subscription."
-msgstr ""
+msgstr "Simpan langganan Anda."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
@@ -3508,13 +3549,13 @@ msgstr "Pilih produk berulang"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this product."
-msgstr ""
+msgstr "Pilih produk ini."
 
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this recurring plan."
-msgstr ""
+msgstr "Pilih paket rutin ini."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3579,7 +3620,7 @@ msgstr "Pengaturan"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_account_move_send
 msgid "Shared Send Invoice Wizard Functions"
-msgstr ""
+msgstr "Fungsi Wizard Kirim Faktur Bersama"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
@@ -3612,7 +3653,7 @@ msgstr "Tanggal Mulai:"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Started"
-msgstr ""
+msgstr "Dimulai"
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
@@ -4051,6 +4092,8 @@ msgid ""
 "The payment method you selected can only pay amounts starting from %s. "
 "Please create or select another one."
 msgstr ""
+"Metode pembayaran yang Anda pilih hanya dapat membayar jumlah mulai dari %s. "
+"Silakan buat atau pilih metode lain."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4103,6 +4146,10 @@ msgid ""
 "You should first invoice the original subscription, use an earlier start "
 "date for the upsell or create a renewal quotation."
 msgstr ""
+"Tanggal mulai upselling tidak boleh lebih besar atau sama dengan tanggal "
+"faktur berikutnya dari langganan %s.\n"
+"Anda harus menagih langganan asli terlebih dahulu, menggunakan tanggal mulai "
+"yang lebih awal untuk upselling, atau membuat penawaran perpanjangan."
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4168,6 +4215,9 @@ msgid ""
 "the\n"
 "                following active subscriptions:"
 msgstr ""
+"Metode pembayaran ini tidak dapat dihapus, karena saat ini sudah dihubungkan "
+"dengan\n"
+"                langganan berikut yang aktif:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4180,6 +4230,8 @@ msgid ""
 "This subscription is overdue and exceeds the auto-close limit of the "
 "recurring plan. It will be closed soon by the system."
 msgstr ""
+"Langganan ini telah jatuh tempo dan melebihi batas penutupan otomatis dari "
+"paket rutin. Langganan ini akan segera ditutup oleh sistem."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4266,7 +4318,7 @@ msgstr "Tipe acara"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "Referensi UTM"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -4302,7 +4354,7 @@ msgstr "Langganan tidak dibayar"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
 msgid "Untaxed Amount Delivered"
-msgstr ""
+msgstr "Jumlah yang Dikirim Sebelum Pajak"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
@@ -4393,7 +4445,7 @@ msgstr "User Pause Mulai"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Valid until"
-msgstr ""
+msgstr "Berlaku sampai"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4475,7 +4527,7 @@ msgstr "Minggu"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
 msgid "When"
-msgstr ""
+msgstr "Kapan"
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4490,7 +4542,7 @@ msgstr "Tahunan"
 #. module: sale_subscription
 #: model:sale.order.template,name:sale_subscription.yearly_template
 msgid "Yearly Cleaning"
-msgstr ""
+msgstr "Pembersihan Tahunan"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4511,11 +4563,15 @@ msgid ""
 "                Any new delivered quantity during that period may never be "
 "invoiced."
 msgstr ""
+"Anda akan menagih periode langganan pada masa mendatang untuk produk dengan "
+"kebijakan faktur berdasarkan kuantitas yang dikirim.\n"
+"                Setiap kuantitas baru yang dikirim selama periode tersebut "
+"mungkin tidak akan pernah ditagih."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.invoice_warning_message
 msgid "You are about to invoice the subscription until the"
-msgstr ""
+msgstr "Anda akan menagih langganan sampai dengan"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_portal_templates_warnings
@@ -4533,6 +4589,8 @@ msgid ""
 "You can not change the recurring property of this product because it has "
 "been sold already (%s)"
 msgstr ""
+"Anda tidak dapat mengubah properti berulang produk ini karena sudah dijual "
+"(%s)"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4787,7 +4845,7 @@ msgstr "tersedia untuk langganan ini, mohon konfirmasi atau tolak."
 #. odoo-python
 #: code:addons/sale_subscription/models/res_partner.py:0
 msgid "id"
-msgstr ""
+msgstr "id"
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,retention_button_link:sale_subscription.close_reason_1
@@ -4902,6 +4960,390 @@ msgstr ""
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_rating
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Permintaan Rating Layanan"
+
+#~ msgid ""
+#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
+#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
+#~ "            <t t-set=\"access_token\" t-"
+#~ "value=\"object._rating_get_access_token()\"/>\n"
+#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td t-if=\"not "
+#~ "object.company_id.uses_default_logo\">\n"
+#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
+#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
+#~ "width:100px;\"/></a>\n"
+#~ "                        </td><td style=\"text-align:right;vertical-"
+#~ "align:middle;\">\n"
+#~ "                                Satisfaction Survey\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "                <table style=\"width:600px;margin:0px "
+#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
+#~ "                            <p>Hello,</p>\n"
+#~ "                            <p>Please take a moment to rate our services "
+#~ "related to your subscription \"<strong t-out=\"object.name or ''\">Office "
+#~ "Cleaning Service\"</strong>\"\n"
+#~ "                               assigned to <strong t-"
+#~ "out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>."
+#~ "</p>\n"
+#~ "                            <p>We appreciate your feedback. It helps us "
+#~ "to improve continuously.</p>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td style=\"padding:10px 20px\">\n"
+#~ "                            <table summary=\"o_mail_notification\" "
+#~ "style=\"width:100%;border-top:1px solid #e1e1e1;\">\n"
+#~ "                                <tr>\n"
+#~ "                                    <td style=\"text-align:center;\">\n"
+#~ "                                        <h2 style=\"font-weight:300;font-"
+#~ "size:18px;\">\n"
+#~ "                                            Tell us how you feel about "
+#~ "our services:\n"
+#~ "                                        </h2>\n"
+#~ "                                        <div style=\"text-color: "
+#~ "#888888\">(click on one of these smileys)</div>\n"
+#~ "                                    </td>\n"
+#~ "                                </tr>\n"
+#~ "                                <tr>\n"
+#~ "                                    <td style=\"padding:10px 10px;\">\n"
+#~ "                                        <table style=\"width:100%;text-"
+#~ "align:center;\">\n"
+#~ "                                            <tr>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/5\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Happy\" src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/"
+#~ ">\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/3\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Neutral\" src=\"/rating/static/src/img/rating_3.png\" "
+#~ "title=\"Neutral\"/>\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/1\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Unhappy\" src=\"/rating/static/src/img/rating_1.png\" "
+#~ "title=\"Unhappy\"/>\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                            </tr>\n"
+#~ "                                        </table>\n"
+#~ "                                    </td>\n"
+#~ "                                </tr>\n"
+#~ "                            </table>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr data-o-mail-quote-container=\"1\"><td "
+#~ "style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature "
+#~ "or ''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell "
+#~ "Admin</td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "                <table style=\"width:600px;margin:auto;text-"
+#~ "align:center;font-size:12px;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td style=\"padding-top:10px;color:#afafaf;"
+#~ "\">\n"
+#~ "                            <p>Email automatically sent by <a "
+#~ "target=\"_blank\" href=\"https://www.odoo.com/app/subscriptions\" t-attf-"
+#~ "style=\"color: {{object.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "text-decoration:none;\">Odoo Subscription</a> for <a t-att-"
+#~ "href=\"object.company_id.website\" t-attf-style=\"color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration:none;\" t-out=\"object.company_id.name or ''\">YourCompany</"
+#~ "a></p>\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
+#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
+#~ "            <t t-set=\"access_token\" t-"
+#~ "value=\"object._rating_get_access_token()\"/>\n"
+#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td t-if=\"not "
+#~ "object.company_id.uses_default_logo\">\n"
+#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
+#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
+#~ "width:100px;\"/></a>\n"
+#~ "                        </td><td style=\"text-align:right;vertical-"
+#~ "align:middle;\">\n"
+#~ "                                Survei Kepuasan\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "                <table style=\"width:600px;margin:0px "
+#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
+#~ "                            <p>Halo,</p>\n"
+#~ "                            <p>Silakan ambil sedikit waktu untuk menilai "
+#~ "layanan kami terkait langganan Anda \"<strong t-out=\"object.name or "
+#~ "''\">Cleaning Service Kantor\"</strong>\"\n"
+#~ "                               yang ditugaskan ke <strong t-"
+#~ "out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>."
+#~ "</p>\n"
+#~ "                            <p>Kami mengapresiasi feedback Anda. Feedback "
+#~ "Anda membantu kami terus berkembang.</p>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td style=\"padding:10px 20px\">\n"
+#~ "                            <table summary=\"o_mail_notification\" "
+#~ "style=\"width:100%;border-top:1px solid #e1e1e1;\">\n"
+#~ "                                <tr>\n"
+#~ "                                    <td style=\"text-align:center;\">\n"
+#~ "                                        <h2 style=\"font-weight:300;font-"
+#~ "size:18px;\">\n"
+#~ "                                            Beritahu kami apa perasaan "
+#~ "Anda mengenai mengenai layanan kami.\n"
+#~ "                                        </h2>\n"
+#~ "                                        <div style=\"text-color: "
+#~ "#888888\">(klik salah satu emoji)</div>\n"
+#~ "                                    </td>\n"
+#~ "                                </tr>\n"
+#~ "                                <tr>\n"
+#~ "                                    <td style=\"padding:10px 10px;\">\n"
+#~ "                                        <table style=\"width:100%;text-"
+#~ "align:center;\">\n"
+#~ "                                            <tr>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/5\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Happy\" src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/"
+#~ ">\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/3\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Neutral\" src=\"/rating/static/src/img/rating_3.png\" "
+#~ "title=\"Neutral\"/>\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                                <td>\n"
+#~ "                                                    <a t-attf-href=\"/"
+#~ "rate/{{ access_token }}/1\">\n"
+#~ "                                                        <img "
+#~ "alt=\"Unhappy\" src=\"/rating/static/src/img/rating_1.png\" "
+#~ "title=\"Unhappy\"/>\n"
+#~ "                                                    </a>\n"
+#~ "                                                </td>\n"
+#~ "                                            </tr>\n"
+#~ "                                        </table>\n"
+#~ "                                    </td>\n"
+#~ "                                </tr>\n"
+#~ "                            </table>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr data-o-mail-quote-container=\"1\"><td "
+#~ "style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature "
+#~ "or ''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell "
+#~ "Admin</td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "                <table style=\"width:600px;margin:auto;text-"
+#~ "align:center;font-size:12px;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td style=\"padding-top:10px;color:#afafaf;"
+#~ "\">\n"
+#~ "                            <p>Email otomatis dikirim oleh <a "
+#~ "target=\"_blank\" href=\"https://www.odoo.com/app/subscriptions\" t-attf-"
+#~ "style=\"color: {{object.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "text-decoration:none;\">Langganan Odoo</a> untuk <a t-att-"
+#~ "href=\"object.company_id.website\" t-attf-style=\"color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration:none;\" t-out=\"object.company_id.name or ''\">PerusahaanAnda</"
+#~ "a></p>\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id or "
+#~ "object.user_id.company_id or user.company_id\"/>\n"
+#~ "Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+#~ "    Our final attempt to process a payment for your subscription using "
+#~ "your payment method\n"
+#~ "    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+#~ "    for <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+#~ "out=\"ctx.get('currency') or ''\">$</t> failed.\n"
+#~ "    <t t-if=\"ctx.get('error')\">\n"
+#~ "        Your bank or credit institution gave the following details about "
+#~ "the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+#~ "    </t>\n"
+#~ "</t>\n"
+#~ "<t t-else=\"\">\n"
+#~ "    Our final attempt to process a payment for your subscription failed "
+#~ "because we have no payment method recorded for you.\n"
+#~ "</t>\n"
+#~ "<br/><br/>\n"
+#~ "As your payment should have been made <strong><t t-"
+#~ "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
+#~ "subscription has been terminated.\n"
+#~ "Should you wish to resolve this issue, do not hesitate to contact us.<br/"
+#~ "><br/>\n"
+#~ "Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+#~ "<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+#~ "    <br/><br/>\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</div>\n"
+#~ "</t>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id or "
+#~ "object.user_id.company_id or user.company_id\"/>\n"
+#~ "Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+#~ "    Upaya terakhir kami untuk memproses pembayaran langganan Anda "
+#~ "menggunakan metode pembayaran\n"
+#~ "    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+#~ "    sebesar <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+#~ "out=\"ctx.get('currency') or ''\">$</t> gagal.\n"
+#~ "    <t t-if=\"ctx.get('error')\">\n"
+#~ "        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
+#~ "masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+#~ "    </t>\n"
+#~ "</t>\n"
+#~ "<t t-else=\"\">\n"
+#~ "    Upaya terakhir kami untuk memproses pembayaran langganan Anda gagal "
+#~ "karena kami tidak memiliki catatan terkait metode pembayaran Anda.\n"
+#~ "</t>\n"
+#~ "<br/><br/>\n"
+#~ "Karena pembayaran seharusnya dilakukan <strong><t t-"
+#~ "out=\"ctx.get('auto_close_limit') or ''\">5</t> hari lalu</strong>, "
+#~ "langganan Anda telah diakhiri.\n"
+#~ "Jika Anda ingin menyelesaikan masalah ini, silakan hubungi kami.<br/><br/"
+#~ ">\n"
+#~ "Terima kasih telah memilih <t t-out=\"company.name or "
+#~ "''\">PerusahaanAnda</t>!\n"
+#~ "<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+#~ "    <br/><br/>\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</div>\n"
+#~ "</t>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id or "
+#~ "object.user_id.company_id or user.company_id\"/>\n"
+#~ "Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+#~ "    We were unable to process a payment for your subscription using your "
+#~ "payment method\n"
+#~ "    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+#~ "    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+#~ "out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+#~ "    <t t-if=\"ctx.get('error')\">\n"
+#~ "        Your bank or credit institution gave the following details about "
+#~ "the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+#~ "    </t>\n"
+#~ "</t>\n"
+#~ "<t t-else=\"\">\n"
+#~ "    Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> "
+#~ "is due for renewal but we haven’t received your payment yet. To keep your "
+#~ "subscription active, please make your payment as soon as possible.\n"
+#~ "</t>\n"
+#~ "<br/><br/>\n"
+#~ "Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> "
+#~ "will be <strong>suspended</strong>\n"
+#~ "<t t-out=\"(ctx.get('date_close') and ('on ' + "
+#~ "format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+#~ "if payment is not received.<br/>\n"
+#~ "<div style=\"margin: 16px 0px; text-align: center;\">\n"
+#~ "    <a t-attf-href=\"{{ ctx.get('payment_link', "
+#~ "object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; "
+#~ "padding: 10px 30px; text-decoration: none; background-color: "
+#~ "{{company.email_secondary_color or '#875A7B'}}; color: "
+#~ "{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
+#~ "        Pay Now\n"
+#~ "    </a>\n"
+#~ "</div>\n"
+#~ "<br/>\n"
+#~ "If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+#~ "Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+#~ "<div>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <br/><br/>\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "</div>\n"
+#~ "</t>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id or "
+#~ "object.user_id.company_id or user.company_id\"/>\n"
+#~ "Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+#~ "    Kami tidak dapat memproses pembayaran langganan Anda menggunakan "
+#~ "metode pembayaran Anda\n"
+#~ "    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+#~ "    sejumlah <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+#~ "out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+#~ "    <t t-if=\"ctx.get('error')\">\n"
+#~ "        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
+#~ "masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+#~ "    </t>\n"
+#~ "</t>\n"
+#~ "<t t-else=\"\">\n"
+#~ "    Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> "
+#~ "sudah harus diperpanjang, tetapi kami belum menerima pembayarannya. Agar "
+#~ "langganan tetap aktif, mohon untuk melakukan pembayaran sesegera "
+#~ "mungkin.\n"
+#~ "</t>\n"
+#~ "<br/><br/>\n"
+#~ "Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> akan "
+#~ "<strong>ditangguhkan</strong>\n"
+#~ "<t t-out=\"(ctx.get('date_close') and ('on ' + "
+#~ "format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+#~ "jika kami tidak menerima pembayaran.<br/>\n"
+#~ "<div style=\"margin: 16px 0px; text-align: center;\">\n"
+#~ "    <a t-attf-href=\"{{ ctx.get('payment_link', "
+#~ "object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; "
+#~ "padding: 10px 30px; text-decoration: none; background-color: "
+#~ "{{company.email_secondary_color or '#875A7B'}}; color: "
+#~ "{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
+#~ "        Bayar Sekarang\n"
+#~ "    </a>\n"
+#~ "</div>\n"
+#~ "<br/>\n"
+#~ "Jika ada yang ingin ditanyakan, silakan hubungi kami.<br/><br/>\n"
+#~ "Terima kasih sudah memilih <t t-out=\"company.name or "
+#~ "''\">PerusahaanAnda</t>!\n"
+#~ "<div>\n"
+#~ "<t t-if=\"user.signature\">\n"
+#~ "    <br/><br/>\n"
+#~ "    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "</t>\n"
+#~ "</div>\n"
+#~ "</t>\n"
+#~ "        "
 
 #~ msgid "is_subscription"
 #~ msgstr "is_subscription"

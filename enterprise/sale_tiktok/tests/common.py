@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from odoo.tests import TransactionCase
+from odoo.addons.base.tests.common import BaseCommon
 
 ORDER_ID_MOCK = "580193230867958565"
+PACKAGE_ID_MOCK = "1153132168123859245"
 
 BUYER_ADDRESS_MOCK = {
     "address_detail": "Su***************",
@@ -110,11 +111,61 @@ ORDER_MOCK = {
             "user_id": "7496200873847458597",
             "warehouse_id": "7498560733279340293",
             "line_items": [ORDER_ITEM_MOCK],
+            "packages": [{"id": PACKAGE_ID_MOCK}],
             "payment": PAYMENT_MOCK,
             "recipient_address": BUYER_ADDRESS_MOCK,
         }
     ],
 }
+
+
+def build_order_mock(
+    order_id=ORDER_ID_MOCK, items=None, shipping_fee=1, shipping_fee_tax=0, currency="IDR"
+):
+    """Build a TikTok Shop order-detail payload for tests.
+
+    ``sub_total`` is the sum of the item sale prices, as TikTok Shop allocates every discount down
+    to the line items. Prices exclude tax, so ``product_tax`` is summed from the items'
+    ``item_tax`` and ``total_amount`` adds the taxes on top: ``sub_total`` + ``shipping_fee`` +
+    ``tax``.
+
+    :param str order_id: TikTok Shop order reference.
+    :param list items: List of dicts compatible with the ORDER_ITEM_MOCK shape. One entry is one
+                       unit, as TikTok Shop line items carry no quantity.
+    :param float shipping_fee: Buyer-paid shipping fee, tax excluded.
+    :param float shipping_fee_tax: Tax TikTok Shop charged the buyer on the shipping fee.
+    :param str currency: Currency code.
+    :return: An order-detail payload dict.
+    :rtype: dict
+    """
+    if items is None:
+        items = [ORDER_ITEM_MOCK]
+    sub_total = sum(float(item["sale_price"]) for item in items)
+    product_tax = sum(
+        float(tax_data.get("tax_amount") or 0)
+        for item in items
+        for tax_data in item.get("item_tax") or []
+    )
+    tax = product_tax + shipping_fee_tax
+    payment = {
+        **PAYMENT_MOCK,
+        "currency": currency,
+        "original_total_product_price": str(sub_total),
+        "sub_total": str(sub_total),
+        "original_shipping_fee": str(shipping_fee),
+        "shipping_fee": str(shipping_fee),
+        "product_tax": str(product_tax),
+        "shipping_fee_tax": str(shipping_fee_tax),
+        "tax": str(tax),
+        "total_amount": str(sub_total + shipping_fee + tax),
+    }
+    order = {
+        **ORDER_MOCK["orders"][0],
+        "id": order_id,
+        "line_items": items,
+        "payment": payment,
+    }
+    return {"next_page_token": False, "orders": [order]}
 
 
 GET_ACCESS_TOKEN_RESPONSE_MOCK = {
@@ -221,7 +272,17 @@ OPERATIONS_RESPONSES_MAP = {
 
 
 # Test class for common TikTok Shop-related functionality
-class TestTikTokShopCommon(TransactionCase):
+class TestTikTokShopCommon(BaseCommon):
+
+    _test_user_groups = (
+        "sales_team.group_sale_manager",
+        "product.group_product_manager",
+        "account.group_account_manager",
+        "stock.group_stock_user",
+        "base.group_erp_manager",
+    )
+    _test_user_name = "Test TikTok Shop Manager"
+
     def setUp(self):
         super().setUp()
         self.initial_sync_date = datetime(2020, 1, 1)
@@ -248,6 +309,30 @@ class TestTikTokShopCommon(TransactionCase):
             "list_price": 0.0,
             "taxes_id": None,
             "is_storable": True,
+        })
+
+        tax_group = self.env["account.tax.group"].create({
+            "name": "TikTok Test Tax Group",
+        })
+        self.tax_price_include_7 = self.env["account.tax"].create({
+            "name": "TikTok Test Tax 7% Included",
+            "amount": 7.0,
+            "price_include_override": "tax_included",
+            "tax_group_id": tax_group.id,
+        })
+        self.tax_price_exclude_7 = self.env["account.tax"].create({
+            "name": "TikTok Test Tax 7% Excluded",
+            "amount": 7.0,
+            "price_include_override": "tax_excluded",
+            "tax_group_id": tax_group.id,
+        })
+        self.tax_fixed_1 = self.env["account.tax"].create({
+            "name": "TikTok Test Tax 1.00 Fixed",
+            "amount_type": "fixed",
+            "amount": 1.0,
+            "price_include_override": "tax_excluded",
+            "sequence": 0,
+            "tax_group_id": tax_group.id,
         })
 
         # Create a TikTok Shop item linked to the product

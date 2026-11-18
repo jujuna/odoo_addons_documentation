@@ -42,6 +42,15 @@ class TestPayrollBIK(TestPayrollCommon):
                             benefit_in_kind,
                             "The taxed benefit in kind should be appended to the description")
 
+    def test_bik_amounts_since_2018(self):
+        # The flat amounts of the devices apply since 1 January 2018: a payslip of an earlier year (a recomputation,
+        # the reference year of the holiday pays) finds them
+        for parameter_code in BIK_RULE_PARAMETERS.values():
+            with self.subTest(parameter_code=parameter_code):
+                self.assertEqual(
+                    self.env['hr.rule.parameter']._get_parameter_from_code(parameter_code, date(2024, 1, 31)),
+                    self.env['hr.rule.parameter']._get_parameter_from_code(parameter_code, date(2026, 1, 31)))
+
     def test_bik_lines_in_payslip(self):
         with freeze_time('2026-01-20'):
             date_from = date(2026, 1, 1)
@@ -143,7 +152,10 @@ class TestPayrollBIK(TestPayrollCommon):
             employer_cost_8 = slip.employer_cost
             self.assertNotEqual(employer_cost_8, employer_cost_7, "Employer cost haven't changed")
 
-            version.write({'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id})
+            version.write({
+                'employee_type_id': self.env.ref("hr.contract_type_company_executive").id,
+                'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
+            })
             slip.compute_sheet()
             employer_cost_baseline_cp999 = slip.employer_cost
 
@@ -154,6 +166,17 @@ class TestPayrollBIK(TestPayrollCommon):
             self.assertTrue(line_rent)
             self.assertEqual(line_rent.total, 450.0)
             self.assertEqual(slip.employer_cost, employer_cost_baseline_cp999, "Employer cost should not change for CP999")
+
+            # Payslip input overrides the amount of the version
+            slip._set_input_value('ATN_RENT', 300.0)
+            slip.compute_sheet()
+            self._assert_number_bik_lines(slip, 12)
+            line_rent = slip.line_ids.filtered(lambda l: l.code == 'ATN_RENT')
+            self.assertEqual(line_rent.total, 300.0)
+            slip._set_input_value('ATN_RENT', 0.0)
+            slip.compute_sheet()
+            line_rent = slip.line_ids.filtered(lambda l: l.code == 'ATN_RENT')
+            self.assertEqual(line_rent.total, 450.0)
 
             employee.write({'pension_amount': 150.0})
             slip.compute_sheet()
@@ -169,6 +192,42 @@ class TestPayrollBIK(TestPayrollCommon):
             line1 = slip.line_ids.filtered(lambda l: l.code == 'ATN_MISC')
             self.assertTrue(line1)
             self.assertEqual(line1[0]['total'], 20)
+
+    def test_bik_extra_devices(self):
+        # The input of a benefit in kind counts the devices beyond the one of the contract
+        with freeze_time('2026-01-20'):
+            employee = self.create_employee({
+                'name': 'BIK devices employee',
+                'date_version': date(2025, 1, 1),
+                'contract_date_start': date(2025, 1, 1),
+                'contract_date_end': False,
+                'internet': 40.0,
+                'mobile': 20.0,
+                'laptop': 100.0,
+                'tablet': 100.0,
+                'mobile_amount': 50.0,
+            })
+            slip = self.env['hr.payslip'].create({
+                'employee_id': employee.id,
+                'company_id': employee.company_id.id,
+                'version_id': employee.version_id.id,
+                'date_from': date(2026, 1, 1),
+                'date_to': date(2026, 1, 31),
+            })
+            extra_devices = {'ATN.INT': 1, 'ATN.MOB': 2, 'ATN.LAP': 1, 'ATN.TAB': 3, 'ATN.PHONE_AMT': 1}
+            slip._set_input_values(extra_devices)
+            slip.compute_sheet()
+            for code, parameter in [
+                ('ATN.INT', 'bik_internet_amount'),
+                ('ATN.MOB', 'bik_phone_sub_amount'),
+                ('ATN.LAP', 'bik_laptop_amount'),
+                ('ATN.TAB', 'bik_tablet_amount'),
+                ('ATN.PHONE_AMT', 'bik_phone_amount'),
+            ]:
+                with self.subTest(code=code):
+                    line = slip.line_ids.filtered(lambda l: l.code == code)
+                    self.assertEqual(line.quantity, 1 + extra_devices[code])
+                    self.assertAlmostEqual(line.total, (1 + extra_devices[code]) * slip._rule_parameter(parameter), 2)
 
     def test_student_miscellaneous_benefit(self):
         employee = self.create_employee({
@@ -194,3 +253,68 @@ class TestPayrollBIK(TestPayrollCommon):
         # The benefit is already outside cash remuneration: showing ATN_DED must
         # not deduct it twice. Only the solidarity contribution reduces net pay.
         self.assertAlmostEqual(values['NET'][payslip.id]['total'], baseline_net - 0.54, places=2)
+
+    def test_bik_miscellaneous_without_onss(self):
+        # A benefit in kind subject to the withholding tax only (e.g. the share of the worker in the meal vouchers
+        # taken over by the employer): no ONSS, more withholding tax, out of the net (benefit in kind)
+        employee = self.create_employee({
+            'name': 'BIK without ONSS',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'wage': 3000,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'date_from': date(2025, 4, 1),
+            'date_to': date(2025, 4, 30),
+        })
+        payslip.compute_sheet()
+        before = payslip._get_line_values(['ONSS', 'PPTOTAL', 'NET'])
+        payslip._set_input_value('ATN_MISC_NO_ONSS', 30)
+        payslip.compute_sheet()
+        after = payslip._get_line_values(['ATN_MISC_NO_ONSS', 'ATN_DED', 'ONSS', 'PPTOTAL', 'NET'])
+        self.assertAlmostEqual(after['ATN_MISC_NO_ONSS'][payslip.id]['total'], 30, places=2)
+        self.assertAlmostEqual(after['ATN_DED'][payslip.id]['total'], -30, places=2)
+        self.assertAlmostEqual(after['ONSS'][payslip.id]['total'], before['ONSS'][payslip.id]['total'], places=2)
+        self.assertGreater(after['PPTOTAL'][payslip.id]['total'], before['PPTOTAL'][payslip.id]['total'])
+        self.assertAlmostEqual(
+            after['NET'][payslip.id]['total'],
+            before['NET'][payslip.id]['total'] - (after['PPTOTAL'][payslip.id]['total'] - before['PPTOTAL'][payslip.id]['total']),
+            places=2)
+
+    def test_bik_version_created_after_computation(self):
+        # A version giving a laptop from mid-month, created after the payslip of the month was computed once, is
+        # taken into account when the payslip is computed again
+        employee = self.create_employee({
+            'name': 'Laptop employee',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'laptop': 0.0,
+        })
+        first_version = employee.version_id
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': first_version.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+        })
+        payslip.compute_sheet()
+        self.assertEqual(payslip._get_period_contracts(), first_version.ids)
+        self.assertFalse(payslip.line_ids.filtered(lambda l: l.code == 'ATN.LAP'))
+
+        laptop_version = employee.create_version({'date_version': date(2026, 1, 16), 'laptop': 100.0})
+        payslip.version_id = laptop_version
+        payslip.compute_sheet()
+        self.assertEqual(payslip._get_period_contracts(), (first_version + laptop_version).ids)
+        self._check_bik_line_in_payslip(payslip, 'ATN.LAP', 'bik_laptop_amount')
+
+    def test_bik_rules_always_follow_pay_period(self):
+        """ A benefit in kind is attributed to the period it is granted for: every
+        standard rule of the BIK category always follows the pay period. """
+        bik_rules = self.env['hr.salary.rule'].with_context(active_test=False).search([
+            ('category_ids', 'in', self.env.ref('l10n_be_hr_payroll.BIK').ids),
+        ])
+        bik_rules = bik_rules.filtered(lambda rule: rule.get_external_id()[rule.id].startswith('l10n_be_hr_payroll.'))
+        self.assertTrue(bik_rules)
+        wrong_rules = bik_rules.filtered(lambda rule: rule.l10n_be_follow_pay_period != 'always')
+        self.assertFalse(wrong_rules, "These benefit in kind rules don't always follow the pay period: %s" % ', '.join(wrong_rules.mapped('code')))

@@ -4,6 +4,7 @@ import { getActiveHotkey } from "@web/core/hotkeys/hotkey_utils";
 /**
  * @param {{
  *  inputRef: import("@odoo/owl").Signal<HTMLInputElement | null>
+ *  cell: import("@odoo/owl").Signal<import("../views/grid_model").GridCell | null>;
  *  invalid: import("@odoo/owl").Signal<boolean>;
  *  value: import("@odoo/owl").Signal<string>;
  *  discard: () => any;
@@ -127,8 +128,11 @@ export function useInputHook(params) {
      * If the user was typing a new value (isDirty) or the field is still invalid,
      * we need to do nothing.
      * If it is not such a case, we update the field with the new value.
+     * The same input can be reused to edit another cell, so the effect also needs
+     * to run again when the cell changes, to reset the last committed value.
      */
     useEffect(() => {
+        params.cell();
         const isInvalid = untrack(params.invalid) ?? false;
         const value = untrack(params.value);
         if (inputRef() && !isDirty && !isInvalid) {

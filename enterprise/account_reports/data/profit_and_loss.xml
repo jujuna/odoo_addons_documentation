@@ -137,7 +137,7 @@
                     <record id="account_financial_report_allocations_withdrawals0_balance" model="account.report.expression">
                         <field name="label">balance</field>
                         <field name="engine">domain</field>
-                        <field name="formula" eval="[('account_id.account_type', '=', 'equity_unaffected')]"/>
+                        <field name="formula" eval="[('account_id.account_type', 'in', ['equity_unaffected', 'equity_retained'])]"/>
                         <field name="subformula">sum</field>
                     </record>
                 </field>

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:51+0000\n"
-"PO-Revision-Date: 2026-10-22 12:00+0000\n"
+"PO-Revision-Date: 2026-11-13 13:49+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/ai/de/>\n"
 "Language: de\n"
@@ -330,6 +330,10 @@ msgid ""
 "any record.\n"
 "        "
 msgstr ""
+"\n"
+"            Lesen Sie den Inhalt von Anhängen, Bildern oder beliebigen "
+"binären Feldern für jeden Datensatz.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_graph
@@ -495,6 +499,15 @@ msgid ""
 "more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
+"\n"
+"            Nach Datensätzen und deren Werten in der Datenbank suchen.\n"
+"            Ideal für „Habe ich …“, „Gibt es …“, „Wie ist der Name von …“, "
+"Suche nach Beziehungen, …\n"
+"            Gibt {records, total_count} und einen Paginierungshinweis "
+"zurück, wenn weitere Zeilen vorhanden sind. Standardmäßig wird nur "
+"display_name abgerufen (`fields` für mehr angeben) und es werden maximal 50 "
+"Zeilen (maximal 200) zurückgegeben.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
@@ -609,6 +622,115 @@ msgid ""
 "is genuinely still missing.\n"
 "        "
 msgstr ""
+"\n"
+"            Verwenden Sie dieses Tool, wenn der Benutzer eine Richtung oder "
+"Aktion wählen soll, deren Auswahl Ihr weiteres Vorgehen bestimmt. Dies "
+"beinhaltet\n"
+"            das Präsentieren von Ideen, Vorschlägen, Empfehlungen, "
+"Alternativen, Verbesserungen oder nächsten Schritten, die der Benutzer "
+"auswählen kann. Es werden anklickbare Optionen statt\n"
+"            einer Auflistung von Auswahlmöglichkeiten in Prosaform "
+"präsentiert. Wenn Sie Verbesserungen empfehlen, machen Sie JEDE Empfehlung "
+"IMMER zu einer wählbaren Aktion mit diesem Tool. Geben Sie keine Liste in "
+"Prosaform an, um anschließend deren Anwendung anzubieten.\n"
+"            ## REGELN\n"
+"            - Stellen Sie eine fokussierte Frage, die eine Entscheidung "
+"klärt, mit 2-4 Optionen.\n"
+"            - Jede Option muss eine direkte Antwort oder eine Aktion auf "
+"diese Frage sein. Wenn Sie mehrere unabhängige Informationen benötigen,\n"
+"            stellen Sie pro Information eine Frage, statt die Fragen in "
+"einer einzigen Optionsliste zu kombinieren.\n"
+"            - Die Frage selbst muss eine vollständige, eigenständige Frage "
+"sein – ein vollständiger Fragesatz, der für sich allein verständlich ist, "
+"ohne sich auf den\n"
+"            vorhergehenden Text hinsichtlich Grammatik oder Bedeutung zu "
+"stützen. Kein Fragment und keine Bezeichnung (z. B. „Welchen "
+"Beleuchtungsstil sollte die Szene verwenden?“ statt „Beleuchtungsstil:“).\n"
+"            - Jede Option muss als eigenständige Aktion formuliert sein, "
+"verständlich und ausführbar, ohne die Frage erneut lesen zu müssen (z. B. „"
+"Warme\n"
+"            Umgebungsbeleuchtung verwenden“, nicht „Beleuchtungsatmosphäre“ "
+"oder „Ja“). Optionen müssen sich gegenseitig ausschließen, es sei denn, eine "
+"Kombination ist sinnvoll,\n"
+"            in diesem Fall setzen Sie multi_select auf true, damit Benutzer "
+"mehr als eine auswählen können, fügen Sie aber niemals eine Sammel- oder "
+"Auffangoption hinzu (z. B. „Alle der\n"
+"            genannten“, „Keine“, „Kombination aus diesen“, „Mix aus Optionen"
+"“), da multi_select es den Benutzern bereits ermöglicht, jede Option einzeln "
+"auszuwählen.\n"
+"            - Ergänzen Sie die Liste niemals mit einer Keine-Option-Auswahl "
+"(„Überspringen“, „Nicht jetzt“, „Vielleicht später“): Der Benutzer kann die "
+"Frage überspringen und kann\n"
+"            eine nicht gelistete Antwort eingeben, wenn allow_free_text auf "
+"true gesetzt ist.\n"
+"            - Die Optionen sind die Antwort selbst, keine Bezeichnungen für "
+"eine Antwort, die Sie anschließend ausführen. Wenn Sie nach der\n"
+"            Auswahl des Benutzers ohnehin den Inhalt hinter jeder "
+"Bezeichnung ausschreiben würden, stellen Sie keine Frage – schreiben Sie "
+"einfach die Antwort.\n"
+"            - Fügen Sie niemals eine Auswahl von „Andere“ / „Etwas anderes"
+"“ / „Benutzerdefiniert“ hinzu – eine Freitext-Alternative wird automatisch "
+"angeboten, wenn\n"
+"            allow_free_text auf true gesetzt ist (siehe unten), und keine "
+"wird angeboten, wenn es false ist.\n"
+"            - Verwenden Sie eine direkte Antwort oder Aktion, wenn die "
+"Antwort bereits aus dem Kontext bekannt ist, ein sinnvoller Standardwert "
+"klar ist oder ein anderes Tool\n"
+"            bereits seinen eigenen Bestätigungsablauf handhabt. Fragen Sie "
+"im Klartext, wenn weniger als zwei sinnvolle Optionen vorliegen.\n"
+"            - Fragen Sie nicht nach unwichtigen Feldentscheidungen beim "
+"Erstellen oder Aktualisieren von Datensätzen. Verwenden Sie einen sinnvollen "
+"Standardwert, sofern dies nicht das betrifft, nach dem der Benutzer gefragt "
+"hat.\n"
+"            - Stellen Sie niemals eine Frage, die die letzte Nachricht des "
+"Benutzers bereits beantwortet hat. Wenn nach einer bestimmten Anzahl von "
+"Ideen, Optionen oder\n"
+"            Strategien gefragt wird, liefern Sie genau diese Anzahl. "
+"Verwenden Sie dieses Tool nur, wenn der Benutzer eine oder mehrere davon "
+"auswählen oder anwenden muss; andernfalls antworten Sie direkt.\n"
+"            ## MULTISELECT\n"
+"            - Setzen Sie multi_select nur dann auf true, wenn der Benutzer "
+"mehr als eine Antwort/Aktion auf diese eine Frage wählen kann und jede "
+"Option für sich genommen sinnvoll ist.\n"
+"            - Eine Option, die mehrere unabhängig anwendbare Aktionen "
+"bündelt (z. B. „Kopie- und Layout-Verbesserungen anwenden“), ist ein Zeichen "
+"dafür, dass Sie\n"
+"            Entscheidungen zusammengefasst haben, die getrennt sein sollten: "
+"Teilen Sie jede unabhängige Aktion in eine eigene Option auf und setzen Sie "
+"multi_select auf true, anstatt\n"
+"            eine Alles-oder-Nichts-Auswahl zu erzwingen.\n"
+"            - multi_select ist ein Flag für die gesamte Liste: Setzen Sie es "
+"nur dann auf true, wenn jede Option unabhängig auswählbar ist. Wenn "
+"irgendeine\n"
+"            Option sich mit den anderen ausschließt, lassen Sie es auf "
+"false.\n"
+"            - Jede Kombination von Optionen muss kohärent bleiben: Wenn die "
+"gemeinsame Auswahl von zwei dieser Optionen zu Konflikten führen würde oder "
+"keinen\n"
+"            Sinn ergeben würde, gehören sie nicht in dieselbe Liste.\n"
+"            ## ALLOW_FREE_TEXT\n"
+"            - Setzen Sie allow_free_text in den meisten Tool-Aufrufen "
+"explizit auf true, damit der Benutzer eine nicht gelistete Antwort geben "
+"kann.\n"
+"            - Setzen Sie es nur für einen vollständigen, festen Satz "
+"gültiger Antworten auf false – z. B. eine einfache Ja/Nein-Frage,\n"
+"            Auswahl eines Datensatzes aus einem festen Satz von Such-/"
+"Nachschlageergebnissen oder aus einer fortlaufenden Aufzählung, in der "
+"jeder\n"
+"            gültige Wert bereits aufgelistet ist. In diesen Fällen ist "
+"nichts außerhalb der gelisteten Auswahlen eine gültige Antwort.\n"
+"            ## BENUTZERANTWORT\n"
+"            - Die Antwort des Benutzers ist die Bestätigung, mit dem "
+"fortzufahren, was Sie gerade tun. Wenn die Frage hauptsächlich gestellt "
+"wurde, um Informationen für die Ausführung einer Aktion zu erhalten,\n"
+"            handeln Sie sofort nach der Antwort; wiederholen Sie nicht nur "
+"die Auswahl und warten Sie auf eine separate Nachricht wie „anwenden“, „"
+"ausführen“ oder „bestätigen“.\n"
+"            - Ihr nächster Schritt muss durch die Auswahl eingeschränkt "
+"sein, fahren Sie nur mit dem fort, was ausgewählt wurde.\n"
+"            - Stellen Sie nur dann eine Folgeaktion, wenn *eine neue* "
+"Information wirklich noch fehlt.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_generate_image
@@ -709,11 +831,14 @@ msgstr "<span>mit Argumenten</span>"
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
 msgid "A rule with this Action and Model combination already exists."
 msgstr ""
+"Eine Regel mit dieser Kombination aus Aktion und Modell existiert bereits."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_child_wait
 msgid "A session waiting for a child must retain its pending tool call."
 msgstr ""
+"Eine Sitzung, die auf ein untergeordnetes Element wartet, muss ihren "
+"ausstehenden Tool-Aufruf beibehalten."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent__skill_ids
@@ -721,18 +846,18 @@ msgid ""
 "A skill includes instructions and tools that guide Odoo AI in helping the "
 "user complete their tasks."
 msgstr ""
-"Eine Kompetenz umfasst Anweisungen und Werkzeuge, die die Odoo-KI dabei "
+"Eine Fähigkeit umfasst Anweisungen und Tools, die die Odoo-KI dabei "
 "unterstützen, dem Benutzer bei der Erledigung seiner Aufgaben zu helfen."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_interaction_wait
 msgid "A waiting AI interaction must retain its continuation data."
-msgstr ""
+msgstr "Eine wartende KI-Interaktion muss ihre Fortsetzungsdaten beibehalten."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_web_page_url_uniq
 msgid "A web page for this URL already exists."
-msgstr ""
+msgstr "Eine Webseite für diese URL existiert bereits."
 
 #. module: ai
 #. odoo-javascript
@@ -767,7 +892,7 @@ msgstr "Quelle des KI-Agenten"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__ai_sources_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__ai_sources_ids
 msgid "AI Agent Sources"
-msgstr ""
+msgstr "Quelle des KI-Agenten"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_discuss_channel_ai_channel_type_check
@@ -779,17 +904,17 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "AI Chat Settings"
-msgstr ""
+msgstr "KI-Chat-Einstellungen"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_embedding_mixin
 msgid "AI Embedding Mixin"
-msgstr ""
+msgstr "Mixin für KI-Einbettungen"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_embed_records_ir_actions_server
 msgid "AI Embedding: Create records embedding"
-msgstr ""
+msgstr "KI-Einbettung: Datensatz-Einbettungen erstellen"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_generate_embedding_ir_actions_server
@@ -799,7 +924,7 @@ msgstr "KI-Einbettung: Einbettungen generieren"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_update_deprecated_embedding_models_ir_actions_server
 msgid "AI Embedding: Update deprecated embedding models"
-msgstr ""
+msgstr "KI-Einbettung: Veraltete Einbettungsmodelle aktualisieren"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_attachment_vacuum
@@ -871,7 +996,7 @@ msgstr "KI-Tool: Kennzahlen des Berichts berechnen"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_continue_session
 msgid "AI Tool: Continue Session"
-msgstr ""
+msgstr "KI-Tool: Sitzung fortsetzen"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_create_records
@@ -906,7 +1031,7 @@ msgstr "KI-Tool: Modelle abrufen"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_load_skills
 msgid "AI Tool: Load Skills"
-msgstr "KI-Tool: Kompetenzen laden"
+msgstr "KI-Tool: Fähigkeiten laden"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_open_menu_graph
@@ -936,7 +1061,7 @@ msgstr "KI-Tool: Vorschau der Datensätze vorbereiten"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_binary_content
 msgid "AI Tool: Read Binary Content"
-msgstr ""
+msgstr "KI-Tool: Binärinhalt lesen"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_group
@@ -956,7 +1081,7 @@ msgstr "KI-Tool: Suche"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_start_session
 msgid "AI Tool: Start Session"
-msgstr ""
+msgstr "KI-Tool: Sitzung starten"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_update_records
@@ -978,17 +1103,17 @@ msgstr "KI-Tools"
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_page
 msgid "AI Web Page"
-msgstr ""
+msgstr "KI-Webseite"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_scraper_batch
 msgid "AI Web Scraper Batch"
-msgstr ""
+msgstr "KI-Web-Scraper-Stapelverarbeitung"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_run_web_scraper_ir_actions_server
 msgid "AI Web Scraper: Run Batches"
-msgstr ""
+msgstr "KI-Web-Scraper: Stapelverarbeitungen ausführen"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__discuss_channel__channel_type__ai_chat
@@ -1006,6 +1131,8 @@ msgstr "Die KI hört zu …"
 #: model:ir.model,name:ai.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
 msgstr ""
+"Konfigurationen des KI-Modells (Standardeingabeaufforderung) für den Entwurf "
+"von Texten."
 
 #. module: ai
 #. odoo-python
@@ -1028,7 +1155,7 @@ msgstr ""
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_ask_user_question
 msgid "AI: Ask User Question"
-msgstr ""
+msgstr "KI: Benutzerfrage stellen"
 
 #. module: ai
 #. odoo-javascript
@@ -1105,7 +1232,7 @@ msgstr "Name des Agenten"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Aggregated records in %s"
-msgstr ""
+msgstr "Aggregierte Datensätze in %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__ai_agent_id
@@ -1144,12 +1271,14 @@ msgstr "KI-Tool: Warnung anzeigen"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__allowed_agent_ids
 msgid "Allowed Agents"
-msgstr ""
+msgstr "Zulässige Agenten"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_request_data
 msgid "An active AI exchange must retain its complete model request data."
 msgstr ""
+"Ein aktiver KI-Austausch muss seine vollständigen Modellanfragedaten "
+"behalten."
 
 #. module: ai
 #. odoo-javascript
@@ -1203,6 +1332,8 @@ msgstr "Analysemodell"
 #: code:addons/ai/models/ai_session.py:0
 msgid "Approved automatically because auto-approval is enabled for this chat."
 msgstr ""
+"Automatisch genehmigt, da die automatische Genehmigung für diesen Chat "
+"aktiviert ist."
 
 #. module: ai
 #. odoo-javascript
@@ -1243,12 +1374,12 @@ msgstr "Einbettung von Datenblöcken von Anhängen"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Auto-Approve Actions"
-msgstr ""
+msgstr "Aktionen automatisch genehmigen"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__auto_confirm
 msgid "Automatically confirm tool calls for the session"
-msgstr ""
+msgstr "Tool-Aufrufe für die Sitzung automatisch bestätigen"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__available_prompt_ids
@@ -1278,7 +1409,7 @@ msgstr "Basismodul für KI-Funktionen"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__uuid
 msgid "Batch UUID"
-msgstr ""
+msgstr "Stapel-UUID"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_template__body_html
@@ -1291,11 +1422,15 @@ msgid ""
 "Built-in agents ship with a sequence below 10 to be listed first; custom "
 "agents default after them."
 msgstr ""
+"Integrierte Agenten werden mit einer Sequenz unter 10 ausgeliefert, um "
+"zuerst aufgeführt zu werden. Benutzerdefinierte Agenten werden standardmäßig "
+"danach einsortiert."
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_skill__is_native_skill
 msgid "Built-in skill with fixed behavior that cannot be edited."
 msgstr ""
+"Integrierte Fähigkeit mit festem Verhalten, die nicht bearbeitet werden kann."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_date
@@ -1315,19 +1450,19 @@ msgstr "Mixin zur Anruftranskription"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__callback_model
 msgid "Callback Model"
-msgstr ""
+msgstr "Rückrufmodell"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Can not enable %(key1)s and %(key2)s at the same time"
-msgstr ""
+msgstr "Es ist nicht möglich, %(key1)s und %(key2)s gleichzeitig zu aktivieren"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_patch.xml:0
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #. module: ai
 #. odoo-javascript
@@ -1343,13 +1478,13 @@ msgstr "Kanal"
 #. module: ai
 #: model:ir.model,name:ai.model_discuss_channel_member
 msgid "Channel Member"
-msgstr ""
+msgstr "Kanalmitglied"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_discuss_channel__channel_type
@@ -1364,7 +1499,7 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__checksum
 msgid "Checksum"
-msgstr ""
+msgstr "Prüfsumme"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__child_ids
@@ -1391,13 +1526,13 @@ msgstr "Verfasser"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Computed a date range for %s"
-msgstr ""
+msgstr "Einen Datumsbereich berechnet für %s"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Confirm"
-msgstr ""
+msgstr "Bestätigen"
 
 #. module: ai
 #: model:ir.model,name:ai.model_res_partner
@@ -1407,7 +1542,7 @@ msgstr "Kontakt"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__content
 msgid "Content"
-msgstr ""
+msgstr "Inhalt"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_compose_message__body
@@ -1422,8 +1557,9 @@ msgstr "Kontext"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_continue_session
+#, fuzzy
 msgid "Continuing an agent"
-msgstr ""
+msgstr "Einen Agenten fortsetzen"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__channel_type
@@ -1482,6 +1618,17 @@ msgid ""
 "link (used in multiple records creation only)\n"
 "            - values: the list of records to create with their fields values."
 msgstr ""
+"Datensätze erstellen\n"
+"        Dieses Tool wird verwendet, um neue Datensätze in der Datenbank zu "
+"erstellen. Es macht drei Hauptparameter verfügbar:\n"
+"            - explanation: Eine Nachricht zur Erläuterung des Tool-Aufrufs "
+"mit einer Frage, die den Benutzer um BESTÄTIGUNG bittet.\n"
+"            - model_name: der technische Name des Modells, für das "
+"Datensätze erstellt werden sollen\n"
+"            - preview_menu_id: die ID eines Menüs, das zum Generieren eines "
+"Links verwendet wird (nur bei der Erstellung mehrerer Datensätze)\n"
+"            - values: die Liste der zu erstellenden Datensätze mit den "
+"Werten ihrer Felder."
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__create_uid
@@ -1517,7 +1664,7 @@ msgstr "Erstellt am"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Created records in %s"
-msgstr ""
+msgstr "Datensätze erstellt in %s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_create_records
@@ -1527,7 +1674,7 @@ msgstr "Erstellung einiger Datensätze"
 #. module: ai
 #: model:iap.service,unit_name:ai.iap_service_odoo_ai
 msgid "Credits"
-msgstr ""
+msgstr "Guthaben"
 
 #. module: ai
 #. odoo-python
@@ -1548,6 +1695,8 @@ msgid ""
 "Declined by the user. Do not attempt to run this sub-agent again unless "
 "explicitly instructed."
 msgstr ""
+"Vom Benutzer abgelehnt. Versuchen Sie nicht, diesen Unteragenten erneut "
+"auszuführen, es sei denn, dies wurde ausdrücklich angewiesen."
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_prompt_button
@@ -1555,6 +1704,9 @@ msgid ""
 "Default action prompt that can be attached to AI UI rules for quick access "
 "by the user."
 msgstr ""
+"Standardaktionsaufforderung, die an KI-Regeln für die Benutzeroberfläche "
+"angehängt werden kann, um einen schnellen Zugriff durch den Benutzer zu "
+"ermöglichen."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_start_session
@@ -1562,6 +1714,8 @@ msgid ""
 "Delegate a focused task to an allowed agent. Returns its final answer and "
 "session ID."
 msgstr ""
+"Delegieren Sie eine fokussierte Aufgabe an einen zugelassenen Agenten. Gibt "
+"dessen endgültige Antwort und Sitzungs-ID zurück."
 
 #. module: ai
 #. odoo-javascript
@@ -1591,7 +1745,7 @@ msgstr "Text diktieren oder Meeting aufzeichnen"
 #: model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__dirty
 #: model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__dirty
 msgid "Dirty"
-msgstr ""
+msgstr "Änderung ungespeichert"
 
 #. module: ai
 #. odoo-javascript
@@ -1646,7 +1800,7 @@ msgstr "Anzeigename"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__done
 msgid "Done"
-msgstr ""
+msgstr "Erledigt"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__done
@@ -1663,7 +1817,7 @@ msgstr "Bearbeiten"
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
 msgid "Edit Prompt"
-msgstr ""
+msgstr "Eingabeaufforderung bearbeiten"
 
 #. module: ai
 #. odoo-javascript
@@ -1692,7 +1846,7 @@ msgstr "Modell einbetten"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_status
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_status
 msgid "Embedding Status"
-msgstr ""
+msgstr "Einbettungsstatus"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_vector
@@ -1702,39 +1856,39 @@ msgstr "Einbettungsvektor"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_error
 msgid "Embedding error"
-msgstr ""
+msgstr "Einbettungsfehler"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_resources_only
 msgid "Enable resource restriction for the session"
-msgstr ""
+msgstr "Ressourcenbeschränkung für die Sitzung aktivieren"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_think_longer
 msgid "Enable think longer option for the session"
-msgstr ""
+msgstr "Option „Länger nachdenken“ für diese Sitzung aktivieren"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_web_search
 msgid "Enable web search capability for the session"
-msgstr ""
+msgstr "Websuchfunktion für diese Sitzung aktivieren"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skill %s"
-msgstr ""
+msgstr "Aktivierte Fähigkeit %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skills %s"
-msgstr ""
+msgstr "Aktivierte Fähigkeiten %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__error
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__error_details
@@ -1770,25 +1924,27 @@ msgid ""
 "Failed to extract content from the attachment. Content must be at least 10 "
 "character long."
 msgstr ""
+"Inhalt konnte nicht aus dem Anhang extrahiert werden. Der Inhalt muss "
+"mindestens 10 Zeichen lang sein."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to fetch the content of this URL."
-msgstr ""
+msgstr "Inhalt dieser URL konnte nicht abgerufen werden."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process the content of this URL."
-msgstr ""
+msgstr "Der Inhalt dieser URL konnte nicht verarbeitet werden."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process this URL."
-msgstr ""
+msgstr "Diese URL konnte nicht verarbeitet werden."
 
 #. module: ai
 #. odoo-python
@@ -1797,12 +1953,14 @@ msgid ""
 "Failed to retrieve web page content. Content must be at least 10 characters "
 "long."
 msgstr ""
+"Webseiteninhalt konnte nicht abgerufen werden. Der Inhalt muss mindestens 10 "
+"Zeichen lang sein."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to submit this URL for processing."
-msgstr ""
+msgstr "Diese URL konnte nicht zur Verarbeitung eingereicht werden."
 
 #. module: ai
 #: model:ir.model,name:ai.model_ir_model_fields
@@ -1841,7 +1999,7 @@ msgstr "Dateigröße"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "Filters"
-msgstr ""
+msgstr "Filter"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menu_details
@@ -1869,7 +2027,7 @@ msgstr "Inhalt mit KI generieren und transformieren"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Generated image %s"
-msgstr ""
+msgstr "Generiertes Bild %s"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_customer_new_jersey
@@ -1909,12 +2067,12 @@ msgstr "Ist die Einbettungsgenerierung fehlgeschlagen"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__has_media_output
 msgid "Has Media Output"
-msgstr ""
+msgstr "Hat Medienausgabe"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_call_history__has_transcript
 msgid "Has Transcript"
-msgstr ""
+msgstr "Hat Transkript"
 
 #. module: ai
 #. odoo-javascript
@@ -2079,7 +2237,7 @@ msgstr "Ungültiger Datensatz"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_skill__is_native_skill
 msgid "Is Native Skill"
-msgstr ""
+msgstr "Ist native Fähigkeit"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__is_stt
@@ -2174,12 +2332,12 @@ msgstr "Als Notiz hinterlassen"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Looked up fields on %s"
-msgstr ""
+msgstr "In %s konsultierte Felder"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__loop_state
 msgid "Loop State"
-msgstr ""
+msgstr "Schleifenstatus"
 
 #. module: ai
 #: model:ir.model,name:ai.model_mail_composer_mixin
@@ -2205,7 +2363,7 @@ msgstr "Nachricht"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__message_body_suffix
 msgid "Message Body Suffix"
-msgstr ""
+msgstr "Suffix des Nachrichtentexts"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__mimetype
@@ -2228,7 +2386,7 @@ msgstr "Modell"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "My Recent Chats"
-msgstr ""
+msgstr "Meine aktuellen Chats"
 
 #. module: ai
 #. odoo-javascript
@@ -2241,19 +2399,19 @@ msgstr "Name"
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be created."
-msgstr ""
+msgstr "Native Fähigkeiten können nicht erstellt werden."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be deleted."
-msgstr ""
+msgstr "Native Fähigkeiten können nicht gelöscht werden."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be modified."
-msgstr ""
+msgstr "Native Fähigkeiten können nicht geändert werden."
 
 #. module: ai
 #. odoo-javascript
@@ -2265,7 +2423,7 @@ msgstr "Neuer Chat gestartet."
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No AI Chats yet."
-msgstr ""
+msgstr "Noch keine KI-Chats."
 
 #. module: ai
 #. odoo-python
@@ -2283,7 +2441,7 @@ msgstr "Für diesen Quellordner wurden keine angehängten Quellen gefunden."
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "No text content could be extracted from this URL."
-msgstr ""
+msgstr "Von dieser URL konnte kein Textinhalt extrahiert werden."
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ai_log_action
@@ -2294,7 +2452,7 @@ msgstr "Es wurde kein Tool ausgeführt."
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "No, I want something else"
-msgstr ""
+msgstr "Nein, ich möchte etwas anderes"
 
 #. module: ai
 #. odoo-python
@@ -2306,13 +2464,13 @@ msgstr "Keine"
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0 code:addons/ai/utils/ai_utils.py:0
 msgid "Not enough credits to use Odoo AI"
-msgstr ""
+msgstr "Nicht genügend Guthaben, um Odoo KI zu nutzen"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Not enough credits to use Odoo AI."
-msgstr ""
+msgstr "Nicht genügend Guthaben, um Odoo KI zu nutzen."
 
 #. module: ai
 #. odoo-javascript
@@ -2327,6 +2485,8 @@ msgid ""
 "Notifications collected during a turn, that will be shown after the final "
 "response"
 msgstr ""
+"Während eines Durchgangs gesammelte Benachrichtigungen, die nach der "
+"endgültigen Antwort angezeigt werden"
 
 #. module: ai
 #. odoo-python
@@ -2342,19 +2502,20 @@ msgstr ""
 #: model:iap.service,description:ai.iap_service_odoo_ai
 #: model:iap.service,name:ai.iap_service_odoo_ai
 msgid "Odoo AI"
-msgstr ""
+msgstr "Odoo KI"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Odoo AI failed to index this source."
-msgstr ""
+msgstr "Odoo KI konnte diese Quelle nicht indizieren."
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Odoo AI is currently unreachable. Please try again later."
 msgstr ""
+"Odoo KI ist momentan nicht erreichbar. Bitte versuchen Sie es später erneut."
 
 #. module: ai
 #. odoo-python
@@ -2366,7 +2527,7 @@ msgstr "Nur Administratoren können Quellen aus URL erstellen."
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Only internal users can view tool parameters."
-msgstr ""
+msgstr "Nur interne Benutzer können Tool-Parameter anzeigen."
 
 #. module: ai
 #. odoo-javascript
@@ -2419,31 +2580,31 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened %s"
-msgstr ""
+msgstr "%s geöffnet"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the graph view for %s"
-msgstr ""
+msgstr "Grafikansicht geöffnet für %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the kanban view for %s"
-msgstr ""
+msgstr "Kanban-Ansicht geöffnet für %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the list view for %s"
-msgstr ""
+msgstr "Listenansicht geöffnet für %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the pivot view for %s"
-msgstr ""
+msgstr "Pivot-Ansicht geöffnet für %s"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__lang
@@ -2467,7 +2628,7 @@ msgstr "Übergeordneter Pfad"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__parent_session_id
 msgid "Parent Session"
-msgstr ""
+msgstr "Hauptsitzung"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_id
@@ -2554,12 +2715,12 @@ msgstr "Eingabeaufforderung von „KI“-Aktion verwendet"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_read_binary_content
 msgid "Reading binary content"
-msgstr ""
+msgstr "Binärinhalt wird gelesen"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__ready
 msgid "Ready"
-msgstr ""
+msgstr "Bereit"
 
 #. module: ai
 #. odoo-javascript
@@ -2572,7 +2733,7 @@ msgstr "Datensatz"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_ids
 msgid "Record embedding ids"
-msgstr ""
+msgstr "Datensatz-Einbettungs-IDs"
 
 #. module: ai
 #. odoo-javascript
@@ -2584,7 +2745,7 @@ msgstr "Auswahltool für Datensätze"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Refined the search on %s"
-msgstr ""
+msgstr "Suche zu %s verfeinert"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_adjust_search
@@ -2683,12 +2844,12 @@ msgstr "Alle durch %(new_relations)s ersetzen"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_context
 msgid "Request Context"
-msgstr ""
+msgstr "Anfragenkontext"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_guest_id
 msgid "Request Guest"
-msgstr ""
+msgstr "Anfragenteilnehmer"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_payload
@@ -3480,7 +3641,7 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__url
 msgid "Url"
-msgstr ""
+msgstr "URL"
 
 #. module: ai
 #. odoo-javascript

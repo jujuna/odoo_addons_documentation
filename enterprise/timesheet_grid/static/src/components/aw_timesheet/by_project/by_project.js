@@ -12,7 +12,9 @@ export class TimesheetsAssistantByProject extends Component {
     static template = "timesheet_grid.TimesheetsAssistantByProject";
     props = useProps({
         model: t.object(),
+        grouped: t.object(),
         selectedRowsSize: t.number(),
+        highlight: t.function(),
         isSelected: t.function(),
         getSelectionClass: t.function(),
         onMouseDown: t.function(),

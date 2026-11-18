@@ -193,6 +193,13 @@ class TestTRNilveraMockedRequests(TestUBLTRCommon):
         self.assertTrue(invoice.is_move_sent)
         self.assertEqual(invoice.l10n_tr_nilvera_send_status, 'sent')
 
+    def test_check_nilvera_customer_production_alias(self):
+        self.env.company.l10n_tr_nilvera_use_test_env = False
+        # Avoid the commit inside _check_nilvera_customer
+        with patch.object(self.env.cr, 'commit', autospec=True):
+            self.einvoice_partner._check_nilvera_customer()
+        self.assertEqual(self.einvoice_partner.l10n_tr_nilvera_customer_alias_id.name, 'urn:mail:salt@bae.com')
+
     def test_submit_earchive(self):
         xml, invoice = self._generate_invoice_xml(self.earchive_partner, include_invoice=True)
         wrapped_xml = BytesIO(xml)

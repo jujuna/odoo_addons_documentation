@@ -119,15 +119,25 @@ class L10nUsW2(models.Model):
     def _get_box17_state_income_tax(self, line_values):
         return abs(sum(line_values[code]['sum']['total'] for code in STATE_INCOME_TAX_CODES))
 
-    def _get_box18_local_wage(self, state, line_values):
-        if state == 'CO':
-            return abs(line_values['TAXABLE']['sum']['total'])
-        return ""
-
-    def _get_box19_local_income_tax(self, state, line_values):
+    def _get_local_income_tax_codes(self, state):
         local_income_tax_codes = list(LOCAL_INCOME_TAX_CODES.get(state, {}).values())
         if state in ADDRESS_LOCAL_INCOME_TAX_CODES:
             local_income_tax_codes.append(ADDRESS_LOCAL_INCOME_TAX_CODES[state])
+        return local_income_tax_codes
+
+    def _get_box18_local_wage(self, state, line_values):
+        local_payslip_ids = {
+            payslip_id
+            for code in self._get_local_income_tax_codes(state)
+            for payslip_id, values in line_values[code].items()
+            if payslip_id != 'sum' and values['total']
+        }
+        if local_payslip_ids:
+            return abs(sum(line_values['TAXABLE'][payslip_id]['total'] for payslip_id in local_payslip_ids))
+        return ""
+
+    def _get_box19_local_income_tax(self, state, line_values):
+        local_income_tax_codes = self._get_local_income_tax_codes(state)
         if local_income_tax_codes:
             return abs(sum(line_values[code]['sum']['total'] for code in local_income_tax_codes))
         return ""

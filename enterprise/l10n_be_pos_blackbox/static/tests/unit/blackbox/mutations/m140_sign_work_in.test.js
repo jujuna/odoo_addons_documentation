@@ -2,11 +2,12 @@ import { test, expect, describe } from "@odoo/hoot";
 import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_model_definitions";
 import {
     setupPosBlackboxEnv,
+    fdmErrorResponse,
     waitForDelayedCalls,
     waitForUnawaitedCalls,
     expectGeneralProperties,
 } from "@l10n_be_pos_blackbox/../tests/unit/utils";
-import { mountWithCleanup, getMockEnv } from "@web/../tests/web_test_helpers";
+import { mountWithCleanup, getMockEnv, patchTranslations } from "@web/../tests/web_test_helpers";
 import { OpeningControlPopup } from "@point_of_sale/app/components/popups/opening_control_popup/opening_control_popup";
 
 definePosModels();
@@ -74,5 +75,45 @@ describe("sign_work_in", () => {
         store.setCashier(user); // Setting same user again (work in)
         await waitForUnawaitedCalls(() => expect(workInCalls).toBe(2));
         await waitForUnawaitedCalls(() => expect(workOutCalls).toBe(1));
+    });
+    test("failed at opening keeps the cashier logged in", async () => {
+        patchTranslations();
+        let workInCalls = 0;
+        let fdmError = true;
+        const store = await setupPosBlackboxEnv(
+            async (mockRequest) => {
+                const body = await mockRequest.json();
+                if (body.operationName === "M140_signWorkIn") {
+                    workInCalls++;
+                    if (fdmError) {
+                        return fdmErrorResponse();
+                    }
+                }
+            },
+            { setupCashier: false }
+        );
+        store.data.write("pos.config", [store.session.config_id.id], { module_pos_hr: false });
+        store.session.state = "opening_control";
+        store.setCashier(store.user);
+
+        const env = getMockEnv();
+        const comp = await mountWithCleanup(OpeningControlPopup, {
+            props: { close: () => {} },
+            env: {
+                ...env,
+                dialogData: { close: () => {}, isActive: true, scrollToOrigin: () => {} },
+            },
+        });
+        await comp.confirm();
+
+        expect(workInCalls).toBe(1);
+        expect(store.accessRight.loggedCashier).toBe(store.user);
+        expect(store.isCashierClockedIn()).toBe(false);
+
+        // FDM is back: the next sign event clocks the cashier in first
+        fdmError = false;
+        await store.blackbox.signDrawerOpen.sign(store.models, store.l10nBeSigningInsz);
+        expect(workInCalls).toBe(2);
+        expect(store.isCashierClockedIn()).toBe(true);
     });
 });

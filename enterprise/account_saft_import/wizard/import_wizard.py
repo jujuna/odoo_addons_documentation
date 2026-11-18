@@ -49,6 +49,14 @@ class AccountSaftImportWizard(models.TransientModel):
         del nsmap[nsmap_key]
         return nsmap
 
+    def _get_saft_version(self, tree):
+        """ Returns the AuditFileVersion string from the SAF-T document root (e.g. '1.0', '2.0').
+        Must be called with the full document root, not a subtree.
+        """
+        nsmap = self._get_cleaned_namespace(tree)
+        node = tree.find('.//saft:AuditFileVersion', namespaces=nsmap)
+        return (node.text or '').strip() if node is not None else '1.0'
+
     # ------------------------------------
     # Reading
     # ------------------------------------
@@ -206,7 +214,6 @@ class AccountSaftImportWizard(models.TransientModel):
                 last_name = contact_node.find('.//saft:LastName', namespaces=nsmap)
                 telephone = contact_node.find('.//saft:Telephone', namespaces=nsmap)
                 email = contact_node.find('.//saft:Email', namespaces=nsmap)
-                mobile = contact_node.find('.//saft:MobilePhone', namespaces=nsmap)
 
                 child_partner_name = last_name.text if last_name is not None else ''
                 if first_name is not None and first_name.text != 'NotUsed':
@@ -218,7 +225,6 @@ class AccountSaftImportWizard(models.TransientModel):
                         'type': 'contact',
                         **({'phone': telephone.text} if telephone is not None else {}),
                         **({'email': email.text} if email is not None else {}),
-                        **({'mobile': mobile.text} if mobile is not None else {}),
                         'company_id': self.company_id.id,
                     })
                 )
@@ -389,9 +395,11 @@ class AccountSaftImportWizard(models.TransientModel):
                 line_name = line_node.find('saft:Description', namespaces=nsmap)
                 line_debit = line_node.find('saft:DebitAmount', namespaces=nsmap)
                 line_credit = line_node.find('saft:CreditAmount', namespaces=nsmap)
-                line_amount = line_node.find('.//saft:Amount', namespaces=nsmap)
-                line_currency_code = line_node.find('.//saft:CurrencyCode', namespaces=nsmap)
-                line_currency_amount = line_node.find('.//saft:CurrencyAmount', namespaces=nsmap)
+                # Read from the DebitAmount/CreditAmount node: other children (e.g. Analysis) may also hold an Amount
+                line_amount_node = line_debit if line_debit is not None else line_credit
+                line_amount = line_amount_node.find('saft:Amount', namespaces=nsmap)
+                line_currency_code = line_amount_node.find('saft:CurrencyCode', namespaces=nsmap)
+                line_currency_amount = line_amount_node.find('saft:CurrencyAmount', namespaces=nsmap)
                 debit = float(line_amount.text) if line_debit is not None else 0
                 credit = float(line_amount.text) if line_credit is not None else 0
                 sign = 1 if debit - credit > 0 else -1

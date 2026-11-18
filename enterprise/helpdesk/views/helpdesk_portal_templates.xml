@@ -130,7 +130,10 @@
                                             <p>We hope to have addressed your request satisfactorily. If you no longer need our assistance, please close this ticket. Thank you for your collaboration.</p>
                                         </div>
                                         <div class="modal-footer">
-                                            <a role="button" class="btn btn-primary" t-att-href="'/my/ticket/close/%s/%s' % (ticket.id, ticket.access_token)">Close Ticket</a>
+                                            <form t-att-action="'/my/ticket/close/%s/%s' % (ticket.id, ticket.access_token)" method="post">
+                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                <button type="submit" class="btn btn-primary">Close Ticket</button>
+                                            </form>
                                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Discard</button>
                                         </div>
                                     </div>

@@ -6,7 +6,7 @@ from werkzeug.urls import url_join
 
 from odoo import _, fields, models, tools, modules
 from odoo.addons.account_edi_proxy_client.models.account_edi_proxy_user import AccountEdiProxyError
-from odoo.exceptions import UserError, LockError
+from odoo.exceptions import UserError, LockError, RedirectWarning
 from ..exceptions import _l10n_au_raise_user_error
 
 _logger = logging.getLogger(__name__)
@@ -140,6 +140,14 @@ class AccountEdiProxyClientUser(models.Model):
             with self.env.registry.cursor() as new_cr:
                 registration = registration.with_env(self.env(cr=new_cr))
                 registration.sudo().status = "expired"
+            if "error" in response:
+                if not self.env.user._is_system():
+                    raise UserError(_("%s\nPlease contact your administrator to re-register the company.", response["error"]))
+                raise RedirectWarning(
+                    message=response["error"],
+                    action=self.env.ref("hr_payroll.action_hr_payroll_configuration").id,
+                    button_text=_("Payroll Settings"),
+                )
 
         if handle_errors and "error" in response:
             raise UserError(response["error"])

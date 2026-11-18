@@ -35,7 +35,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-20 12:15+0000\n"
+"PO-Revision-Date: 2026-11-10 12:12+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_asset/tr/>\n"
@@ -56,30 +56,36 @@ msgid ""
 "Keeps track of depreciations, and creates corresponding journal entries.\n"
 "\n"
 msgstr ""
+"\n"
+"Varlık yönetimi\n"
+"=================\n"
+"Bir şirkete veya kişiye ait varlıkların yönetilmesini sağlar.\n"
+"Amortismanları takip eder ve ilgili yevmiye kayıtlarını oluşturur.\n"
+"\n"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants cancelled."
-msgstr ""
+msgstr " Tüm varyantlar iptal edildi."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants reopened."
-msgstr ""
+msgstr " Tüm varyantlar yeniden açıldı."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants set to draft."
-msgstr ""
+msgstr " Tüm varyantlar taslak olarak ayarlandı."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid " in journal %s"
-msgstr ""
+msgstr " yevmiye defterinde %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -105,6 +111,8 @@ msgstr "# Onaylanan Amortisman Kayıtları"
 msgid ""
 "%(asset)s does not depreciate, so no ledger depreciation can be based on it."
 msgstr ""
+"%(asset)s değer kaybına uğramaz, bu nedenle buna dayalı bir defter değer "
+"düşüklüğü hesaplanamaz."
 
 #. module: account_asset
 #. odoo-python
@@ -122,13 +130,13 @@ msgstr "%(asset)s: Satış"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(asset_name)s - %(journal_name)s"
-msgstr ""
+msgstr "%(asset_name)s - %(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(pause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(pause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
@@ -137,24 +145,26 @@ msgid ""
 "%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
 "(journal_name)s"
 msgstr ""
+"%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
+"(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(unpause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(unpause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant)s confirmed with %(model)s%(journal_message)s"
-msgstr ""
+msgstr "%(variant)s, %(model)s ile onaylandı%(journal_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant_name)s Cancellation:"
-msgstr ""
+msgstr "%(variant_name)s iptali:"
 
 #. module: account_asset
 #. odoo-python
@@ -176,19 +186,19 @@ msgstr "%s: Amortisman"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "(Choose Account)"
-msgstr ""
+msgstr "(Hesap Seç)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Asset Group)"
-msgstr ""
+msgstr "(Varlık Grubu Yok)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Root)"
-msgstr ""
+msgstr "(Kök Yok)"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -199,18 +209,18 @@ msgstr "(dahil."
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid ", %(percent)g%% salvage "
-msgstr ""
+msgstr ", %(percent)g%% kurtarma"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "- %(model)s%(journal_message)s"
-msgstr ""
+msgstr "- %(model)s%(journal_message)s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "<span invisible=\"method_mode != 'rate'\"> per</span>"
-msgstr ""
+msgstr "<span invisible=\"method_mode != 'rate'\"> / </span>"
 
 #. module: account_asset
 #. odoo-python
@@ -450,19 +460,19 @@ msgstr "Muhasebe İadesi"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__depreciation_account_id
 msgid "Accumulated Account"
-msgstr ""
+msgstr "Birikmiş Hesap"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_depreciation_id
 msgid "Accumulated Depreciation"
-msgstr ""
+msgstr "Birikmiş Amortisman"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Accumulated Depreciation Account"
-msgstr ""
+msgstr "Birikmiş Amortisman Hesabı"
 
 #. module: account_asset
 #. odoo-python
@@ -488,25 +498,25 @@ msgstr "Aksiyon Gerekiyor"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "Activate"
-msgstr ""
+msgstr "Etkinleştir"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation"
-msgstr ""
+msgstr "Amortismanı Etkinleştir"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation for: %(asset)s"
-msgstr ""
+msgstr "Amortismanı etkinleştir: %(asset)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation: %(asset)s"
-msgstr ""
+msgstr "Amortismanı Etkinleştir: %(asset)s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__active
@@ -519,7 +529,7 @@ msgstr "Etkin"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Active Asset"
-msgstr ""
+msgstr "Aktif Varlık"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_ids
@@ -537,7 +547,7 @@ msgstr "Etkinlik İstisna Dekorasyonu"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_plans_ids
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Aktivite Planları"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_state
@@ -559,7 +569,7 @@ msgstr "Dahili bir not ekle"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "All companies"
-msgstr ""
+msgstr "Tüm şirketler"
 
 #. module: account_asset
 #. odoo-python
@@ -585,13 +595,13 @@ msgstr "Tüm satırlar onaylanmalıdır"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "Also closed: %(sub_assets)s. %(message)s"
-msgstr ""
+msgstr "Ayrıca kapatıldı: %(sub_assets)s. %(message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "An asset cannot have two variants linked to the same ledger"
-msgstr ""
+msgstr "Bir varlık, aynı deftere bağlı iki varyanta sahip olamaz"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__main_variant_parent_id
@@ -606,7 +616,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "An asset has been created for this move: %(link)s"
-msgstr ""
+msgstr "Bu hareket için bir varlık oluşturuldu: %(link)s"
 
 #. module: account_asset
 #. odoo-python
@@ -617,7 +627,7 @@ msgstr "Varlığın değer artışı için yeni bir varlık oluşturulacaktır. 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Analytic"
-msgstr ""
+msgstr "Analitik"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__analytic_distribution
@@ -634,7 +644,7 @@ msgstr "Analitik Hassasiyet"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 msgid "Apply"
-msgstr ""
+msgstr "Uygula"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -669,7 +679,7 @@ msgstr "Varlık Hesabı"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_properties_definition
 msgid "Asset Account Properties"
-msgstr ""
+msgstr "Varlık Hesabı Özellikleri"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_asset_counterpart_id
@@ -680,7 +690,7 @@ msgstr "Varlık Karşı Hesabı"
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_depreciation_expense_id
 msgid "Asset Expense Account"
-msgstr ""
+msgstr "Varlık Gider Hesabı"
 
 #. module: account_asset
 #. odoo-python
@@ -725,7 +735,7 @@ msgstr "Varlık Durdurulan Gün Sayısı"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__original_value
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__original_value
 msgid "Asset Value"
-msgstr ""
+msgstr "Varlık Değeri"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_bank_statement_line__asset_value_change
@@ -743,7 +753,7 @@ msgstr "Varlık Değerleri"
 #: code:addons/account_asset/models/account_asset.py:0
 #: model:ir.model,name:account_asset.model_account_asset_variant
 msgid "Asset Variant"
-msgstr ""
+msgstr "Varlık Varyantı"
 
 #. module: account_asset
 #. odoo-python
@@ -752,19 +762,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ids
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_variant_tree
 msgid "Asset Variants"
-msgstr ""
+msgstr "Varlık Varyantları"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset cancelled.%(variant_message)s"
-msgstr ""
+msgstr "Varlık iptal edildi.%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset confirmed with:"
-msgstr ""
+msgstr "Varlık şununla onaylandı:"
 
 #. module: account_asset
 #. odoo-python
@@ -776,13 +786,13 @@ msgstr "Varlık oluşturuldu"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "Asset created from invoice: <b>%s</b>"
-msgstr ""
+msgstr "Faturadan oluşturulan varlık: <b>%s</b>"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset disposed. %(message)s"
-msgstr ""
+msgstr "Varlık elden çıkarıldı. %(message)s"
 
 #. module: account_asset
 #: model:account.return.check.template,name:account_asset.account_return_check_template_asset_movement_and_accounting_treatment
@@ -793,43 +803,43 @@ msgstr "Varlık hareketleri ve muhasebe işlemleri"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset paused. "
-msgstr ""
+msgstr "Varlık duraklatıldı. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset reset to draft.%(variant_message)s"
-msgstr ""
+msgstr "Varlık taslak olarak sıfırlandı.%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset set to running.%(variant_message)s"
-msgstr ""
+msgstr "Varlık çalışır duruma getirildi.%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset sold. %(message)s See %(invoice_links)s"
-msgstr ""
+msgstr "Varlık satıldı. %(message)s Bkz. %(invoice_links)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset sold: %s"
-msgstr ""
+msgstr "Varlık satıldı. %s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset unpaused. "
-msgstr ""
+msgstr "Varlık devam ettirildi. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "Asset updated from invoice: %s"
-msgstr ""
+msgstr "Faturadan güncellenen varlık: %s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
@@ -858,7 +868,7 @@ msgstr "Varlıklar"
 #. module: account_asset
 #: model:ir.module.module,shortdesc:base.module_account_asset
 msgid "Assets Management"
-msgstr ""
+msgstr "Sabit Kıymet Yönetimi"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_asset_report_handler
@@ -909,7 +919,7 @@ msgstr "Ek Sayısı"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Based On"
-msgstr ""
+msgstr "Temel Alınan"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset_variant__prorata_computation_type__daily_computation
@@ -933,12 +943,12 @@ msgstr "Defter Değeri"
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_mode__duration
 msgid "By Duration"
-msgstr ""
+msgstr "Süreye Göre"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_mode__rate
 msgid "By Rate"
-msgstr ""
+msgstr "Orana Göre"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__can_create_asset
@@ -948,7 +958,7 @@ msgstr "Varlık Oluşturabilir"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
 msgid "Can Edit Asset Accounts"
-msgstr ""
+msgstr "Varlık Hesaplarını Düzenleyebilir"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -958,7 +968,7 @@ msgstr "Varlığı İptal Et"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Assets"
-msgstr ""
+msgstr "Varlıkları İptal Et"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__cancelled
@@ -970,7 +980,7 @@ msgstr "İptal Edildi"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Cannot confirm current asset while main asset is not running"
-msgstr ""
+msgstr "Ana varlık çalışmıyorken mevcut varlık onaylanamaz"
 
 #. module: account_asset
 #. odoo-python
@@ -987,6 +997,7 @@ msgstr ""
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Cannot update a depreciation model being used by another company."
 msgstr ""
+"Başka bir şirket tarafından kullanılan bir amortisman modeli güncellenemez."
 
 #. module: account_asset
 #. odoo-python
@@ -995,6 +1006,8 @@ msgid ""
 "Cannot update a depreciation model that has non-draft or non-cancelled "
 "assets."
 msgstr ""
+"Taslak veya iptal edilmemiş varlıklar içeren bir amortisman modelini "
+"güncelleyemezsiniz."
 
 #. module: account_asset
 #. odoo-python
@@ -1044,6 +1057,8 @@ msgid ""
 "Choose whether the straight-line depreciation is driven by a duration or an "
 "annual rate."
 msgstr ""
+"Düz çizgi amortismanının süreye mi yoksa yıllık orana mı dayalı olacağını "
+"seçin."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__close
@@ -1123,7 +1138,7 @@ msgstr "Varlık Oluştur"
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_depreciation_model_form
 msgid "Create new depreciation model"
-msgstr ""
+msgstr "Yeni amortisman modeli oluşturun"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__create_uid
@@ -1166,7 +1181,7 @@ msgstr "Güncel Değer"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__current_selected_variant_id
 msgid "Current Selected Variant"
-msgstr ""
+msgstr "Mevcut Seçili Varyant"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -1182,7 +1197,7 @@ msgstr "Müşteri Faturası"
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Daily Computation"
-msgstr ""
+msgstr "Günlük Hesaplama"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__acquisition_date
@@ -1220,13 +1235,13 @@ msgstr "Azalan Oran"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_kanban
 msgid "Declining factor"
-msgstr ""
+msgstr "Azalan Oran"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Declining then Linear"
-msgstr ""
+msgstr "Eğilimli, ardından Doğrusal"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__degressive_then_linear
@@ -1244,13 +1259,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Demo Asset"
-msgstr ""
+msgstr "Demo Varlığı"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Demo Depreciation Model"
-msgstr ""
+msgstr "Demo Amortisman Modeli"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__value_residual
@@ -1277,7 +1292,7 @@ msgstr "Depreciated Amount"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid "Depreciated at import"
-msgstr ""
+msgstr "İçe aktarımda kullanımdan kaldırıldı"
 
 #. module: account_asset
 #. odoo-python
@@ -1310,7 +1325,7 @@ msgstr "Amortisman Tarihi"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Depreciation Expense Account"
-msgstr ""
+msgstr "Amortisman Gider Hesabı"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__depreciation_move_ids
@@ -1342,29 +1357,29 @@ msgstr "Amortisman Yöntemi"
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_tree
 msgid "Depreciation Model"
-msgstr ""
+msgstr "Amortisman Modeli"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Depreciation Model name"
-msgstr ""
+msgstr "Amortisman Modeli adı"
 
 #. module: account_asset
 #: model:ir.actions.act_window,name:account_asset.action_account_depreciation_model_form
 #: model:ir.ui.menu,name:account_asset.menu_action_account_depreciation_model_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_tree
 msgid "Depreciation Models"
-msgstr ""
+msgstr "Amortisman Modelleri"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_depreciation_model
 msgid "Depreciation Models for Assets"
-msgstr ""
+msgstr "Varlıklar için Amortisman Modelleri"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__method_rate
 msgid "Depreciation Rate"
-msgstr ""
+msgstr "Amortisman Oranı"
 
 #. module: account_asset
 #: model:account.report,name:account_asset.assets_report
@@ -1374,13 +1389,13 @@ msgstr ""
 #: model:ir.actions.client,name:account_asset.action_account_report_assets
 #: model:ir.ui.menu,name:account_asset.menu_action_account_report_assets
 msgid "Depreciation Schedule"
-msgstr "Depreciation Schedule"
+msgstr "Amortisman Tablosu"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Depreciation activated from asset: %s"
-msgstr ""
+msgstr "Varlık üzerinden amortisman etkinleştirildi: %s"
 
 #. module: account_asset
 #. odoo-python
@@ -1389,6 +1404,8 @@ msgid ""
 "Depreciation activated. Asset value transferred from %(old_account)s to %"
 "(new_account)s."
 msgstr ""
+"Amortisman etkinleştirildi. Varlık değeri %(old_account)s hesabından %"
+"(new_account)s hesabına aktarıldı."
 
 #. module: account_asset
 #. odoo-python
@@ -1413,22 +1430,22 @@ msgstr "Amortisman kaydı %(name)s geri alındı (%(value)s)"
 #: code:addons/account_asset/models/account.py:0
 msgid ""
 "Depreciation model must contain journals that belong to an explicit ledger."
-msgstr ""
+msgstr "Amortisman modeli, belirli bir deftere ait yevmiyeler içermelidir."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__derived_asset_ids
 msgid "Derived Assets"
-msgstr ""
+msgstr "Türetilmiş Sabit Kıymetler"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__display_asset_accounts
 msgid "Display Asset Accounts"
-msgstr ""
+msgstr "Varlık Hesaplarını Görüntüle"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_move_line__display_depreciation_model
 msgid "Display Depreciation Model"
-msgstr ""
+msgstr "Amortisman Modeli Görüntüleme"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__display_name
@@ -1517,18 +1534,23 @@ msgid ""
 "align with tax requirements (e.g. linear depreciation, pro rata temporis "
 "application, no double declining for tax purposes)."
 msgstr ""
+"Amortismanla ilgili yerel vergi kurallarına uyulduğundan emin olun.\n"
+"Amortisman yöntemlerinin, amortisman süresinin ve başlangıç tarihlerinin "
+"vergi gereklilikleriyle uyumlu olduğunu doğrulayın (örn. doğrusal "
+"amortisman, pro rata temporis uygulaması, vergi amaçlı çift azalan "
+"amortisman uygulanmaması)."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Entries cancelled: %(cancelled_move_count)s"
-msgstr ""
+msgstr "İptal edilen girişler: %(cancelled_move_count)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Entries reversed: %(reversed_move_count)s"
-msgstr ""
+msgstr "Girişler tersine çevrildi: %(reversed_move_count)s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
@@ -1541,7 +1563,7 @@ msgstr "Gider Hesabı"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
 msgid "Financial instruments"
-msgstr ""
+msgstr "Finansal enstrümanlar"
 
 #. module: account_asset
 #. odoo-python
@@ -1562,6 +1584,8 @@ msgstr "Duran Varlıklar"
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Fixed asset account selected is not configured to create an asset."
 msgstr ""
+"Seçilen sabit kıymet hesabı, bir varlık oluşturacak şekilde "
+"yapılandırılmamış."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_follower_ids
@@ -1605,7 +1629,7 @@ msgstr "Kazanç Değeri"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
-msgstr ""
+msgstr "Hesaba git"
 
 #. module: account_asset
 #. odoo-python
@@ -1628,22 +1652,22 @@ msgstr "Brüt Artış Değeri"
 #. module: account_asset
 #: model:account.report,name:account_asset.account_grouped_assets_report
 msgid "Group by: Account"
-msgstr ""
+msgstr "Hesaba Göre Grupla"
 
 #. module: account_asset
 #: model:account.report,name:account_asset.asset_grouped_assets_report
 msgid "Group by: Asset Group"
-msgstr ""
+msgstr "Varlık Grubuna Göre Grupla"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_multi_ledger_company
 msgid "Has Ledger"
-msgstr ""
+msgstr "Defteri Var"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__has_locking_assets
 msgid "Has Locking Assets"
-msgstr ""
+msgstr "Kilitleme Varlıkları Var"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__has_message
@@ -1707,12 +1731,12 @@ msgstr "İşaretliyse, bazı mesajlar gönderi hatası içermektedir."
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_id
 msgid "Import Account Depreciation"
-msgstr ""
+msgstr "Hesap Amortismanını İçe Aktar"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_expense_id
 msgid "Import Account Depreciation Expense"
-msgstr ""
+msgstr "Hesap Amortisman Giderini İçe Aktar"
 
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_asset_form
@@ -1743,7 +1767,7 @@ msgstr "Bilgilendirme Metni"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
 msgid "Intangible assets"
-msgstr ""
+msgstr "Maddi olmayan duran varlıklar"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1759,24 +1783,24 @@ msgstr "Takipçi mi"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_ledger_journal
 msgid "Is Ledger Journal"
-msgstr ""
+msgstr "Defter Yevmiyesi"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_ledger_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_ledger_variant
 msgid "Is Ledger Variant"
-msgstr ""
+msgstr "Defter Varyantı"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_main_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_main_variant
 msgid "Is Main Variant"
-msgstr ""
+msgstr "Ana Varyant"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_name_custom
 msgid "Is Name Custom"
-msgstr ""
+msgstr "Adı Özel Mi"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__salvage_value
@@ -1827,12 +1851,15 @@ msgid ""
 "Journal used for asset creation. The value is stored per company, so a model "
 "shared across companies posts to the journal of the company using it."
 msgstr ""
+"Varlık oluşturmak için kullanılan günlük. Değer şirket bazında saklanır; bu "
+"nedenle, şirketler arasında paylaşılan bir model, onu kullanan şirketin "
+"günlüğüne kaydedilir."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Journals"
-msgstr ""
+msgstr "Yevmiyeler"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__write_uid
@@ -1862,27 +1889,27 @@ msgstr "Geciken Aktiviteler"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger"
-msgstr ""
+msgstr "defter"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__ledger_depreciation_model_ids
 msgid "Ledger Depreciation Model"
-msgstr ""
+msgstr "Defter Amortisman Modeli"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__ledger_group_ids
 msgid "Ledger Group"
-msgstr ""
+msgstr "Defter Gurubu"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger Journal"
-msgstr ""
+msgstr "Defter Yevmiyesi"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__journal_group_name
 msgid "Ledger group"
-msgstr ""
+msgstr "Defter grubu"
 
 #. module: account_asset
 #. odoo-python
@@ -1913,17 +1940,17 @@ msgstr "Zarar Hesabı"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Main Asset"
-msgstr ""
+msgstr "Ana Demirbaş"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_model_name
 msgid "Main Asset Model Name"
-msgstr ""
+msgstr "Ana Varlık Model Adı"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_parent_id
 msgid "Main Variant Parent"
-msgstr ""
+msgstr "Ana Varyant Üst Öğesi"
 
 #. module: account_asset
 #. odoo-python
@@ -1935,7 +1962,7 @@ msgstr "Zorunlu sütun. Bu, varlığın adıdır."
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_type_icon
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Malzeme Sembolleri simgesi, örn. kontrol listesi"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_has_error
@@ -1966,13 +1993,13 @@ msgstr "Yöntem"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__method_mode
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__method_mode
 msgid "Method Mode"
-msgstr ""
+msgstr "Yöntem Modu"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Miscellaneous Operations"
-msgstr ""
+msgstr "Diğer İşlemler"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_kanban
@@ -2000,18 +2027,18 @@ msgstr "Amortismanı Düzenle"
 #. module: account_asset
 #: model:account.return.check.template,name:account_asset.account_return_check_template_monitoring_of_depreciation
 msgid "Monitoring of Depreciation "
-msgstr ""
+msgstr "Amortisman Takibi "
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__1
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__1
 msgid "Month"
-msgstr ""
+msgstr "Ay"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_form_asset_inherit
 msgid "Multi-Ledgers"
-msgstr ""
+msgstr "Çoklu Defterler"
 
 #. module: account_asset
 #. odoo-python
@@ -2056,6 +2083,8 @@ msgstr ""
 #: code:addons/account_asset/wizard/depreciation_ledger_wizard.py:0
 msgid "Need to set depreciation model to create new asset depreciation."
 msgstr ""
+"Yeni varlık amortismanı oluşturmak için amortisman modelinin ayarlanması "
+"gerekir."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__negative_revaluation
@@ -2076,12 +2105,12 @@ msgstr "Bir varlığın satışından elde edilen net kar veya zarar tutarı"
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "New Depreciation"
-msgstr ""
+msgstr "Yeni Amortisman"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__new_account_asset_id
 msgid "New Fixed Asset Account"
-msgstr ""
+msgstr "Yeni Duran Varlık Hesabı"
 
 #. module: account_asset
 #. odoo-python
@@ -2146,7 +2175,7 @@ msgstr "Orantısız"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
-msgstr ""
+msgstr "Aşınma yok"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__non_deductible_tax_value
@@ -2158,7 +2187,7 @@ msgstr "İndirilemeyen Vergi Tutarı"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__salvage_value_percent
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__salvage_value_percent
 msgid "Not Depreciable"
-msgstr ""
+msgstr "Amortismana tabi değil"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__salvage_value
@@ -2182,7 +2211,7 @@ msgstr "Not"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Note: %s"
-msgstr ""
+msgstr "Not: %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_needaction_counter
@@ -2237,7 +2266,7 @@ msgstr "Teslimat hatası olan mesaj adedi"
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Odoo Office"
-msgstr ""
+msgstr "Odoo Office"
 
 #. module: account_asset
 #. odoo-python
@@ -2277,12 +2306,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__origin_asset_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Original Asset"
-msgstr ""
+msgstr "Orijinal Sabit Kıymet"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__original_move_lines_count
 msgid "Original Move Lines Count"
-msgstr ""
+msgstr "Orijinal Hareket Satır Sayısı"
 
 #. module: account_asset
 #. odoo-python
@@ -2319,7 +2348,7 @@ msgstr "Durdurma Oranlama Tarihi"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 msgid "Period"
-msgstr ""
+msgstr "Dönem"
 
 #. module: account_asset
 #. odoo-python
@@ -2343,22 +2372,22 @@ msgstr "Onaylanan Kayıtlar"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
 msgid "Proceeds from financial instruments"
-msgstr ""
+msgstr "Finansal enstrümanlardan elde edilen gelirler"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
 msgid "Proceeds from sale of intangible assets"
-msgstr ""
+msgstr "Maddi olmayan duran varlık satışından elde edilen gelirler"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
 msgid "Proceeds from sale of property, plant and equipment"
-msgstr ""
+msgstr "Maddi duran varlık satışından elde edilen gelirler"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
 msgid "Proceeds from sale of right-of-use assets"
-msgstr ""
+msgstr "Kullanım hakkı varlıklarının satışından elde edilen gelirler"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
@@ -2369,7 +2398,7 @@ msgstr "Özellikler"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
 msgid "Property plant and equipment"
-msgstr ""
+msgstr "Maddi duran varlıklar"
 
 #. module: account_asset
 #. odoo-python
@@ -2387,17 +2416,17 @@ msgstr "Satın Alma"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
 msgid "Purchase of financial instruments"
-msgstr ""
+msgstr "Finansal enstrümannların satın alınması"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
 msgid "Purchase of intangible assets"
-msgstr ""
+msgstr "Maddi olmayan duran varlık satınalımı"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
 msgid "Purchase of property, plant and equipment"
-msgstr ""
+msgstr "Maddi duran varlık satınalımı"
 
 #. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
@@ -2407,7 +2436,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_mode__rate
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Rate"
-msgstr ""
+msgstr "Oran"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__rating_ids
@@ -2426,7 +2455,7 @@ msgstr "Yeniden Değerlendir"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_recovery_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__recovery_account_id
 msgid "Recovery Account"
-msgstr ""
+msgstr "Kurtarma Hesabı"
 
 #. module: account_asset
 #. odoo-python
@@ -2440,7 +2469,7 @@ msgstr "İlgili Varlıklar"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Related Items"
-msgstr ""
+msgstr "İlgili Ögeler"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__related_purchase_value
@@ -2506,13 +2535,13 @@ msgstr "Satış"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Same as the asset"
-msgstr ""
+msgstr "Varlık ile aynı"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "See new asset created: <b>%s</b>"
-msgstr ""
+msgstr "Oluşturulan yeni varlığı görüntüle: <b>%s</b>"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__select_invoice_line_id
@@ -2538,7 +2567,7 @@ msgstr "Sat"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Set All to Draft"
-msgstr ""
+msgstr "Tümünü Taslağa Ayarla"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -2562,13 +2591,13 @@ msgstr ""
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__show_duration
 msgid "Show Duration"
-msgstr ""
+msgstr "Süreyi Göster"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Show Gross Increases"
-msgstr ""
+msgstr "Brüt Artışları Göster"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
@@ -2629,7 +2658,7 @@ msgstr "Straight Line"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Sub-Assets"
-msgstr ""
+msgstr "Alt Varlıklar"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__book_value
@@ -2676,7 +2705,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "The activation date cannot be before the asset's acquisition date."
-msgstr ""
+msgstr "Etkinleştirme tarihi, varlığın edinme tarihinden önce olamaz."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_period
@@ -2717,6 +2746,10 @@ msgid ""
 "Assets\" type with depreciation model, accumulated depreciation, and "
 "depreciation expense account set."
 msgstr ""
+"Varlığın kendisinin bilanço hesabı (örn., \"151000 Sabit Varlık\"). Odoo'da "
+"mevcut olmalı ve amortisman modeli, birikmiş amortisman ve amortisman gider "
+"hesabı ayarlanmış \"Sabit Varlık\" veya \"Duran Varlıklar\" türünde "
+"olmalıdır."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__children_ids
@@ -2728,7 +2761,7 @@ msgstr "Alt varlıklar bu varlığın değerinde kazançlardır"
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid ""
 "The depreciated value on the last depreciation line for variant must be 0"
-msgstr ""
+msgstr "Varyant için son amortisman satırındaki amortisman değeri 0 olmalıdır"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__invoice_ids
@@ -2766,7 +2799,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
 msgid "The fixed asset account differs from the account on the bill. Click"
-msgstr ""
+msgstr "Duran varlık hesabı faturadaki hesaptan farklı. Tıklayın"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
@@ -2774,6 +2807,8 @@ msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
 msgstr ""
+"Bu varlığın aktarılacağı sabit kıymet hesabı. Bu hesabın amortisman "
+"parametreleri yeni varlığa uygulanacaktır."
 
 #. module: account_asset
 #. odoo-python
@@ -2785,7 +2820,7 @@ msgstr "Son amortisman satırında kalan değer 0 olmalıdır"
 #. odoo-python
 #: code:addons/account_asset/models/account.py:0
 msgid "The same ledger cannot be linked multiple times on the same account."
-msgstr ""
+msgstr "Aynı defter, aynı hesap üzerinde birden fazla kez bağlanamaz."
 
 #. module: account_asset
 #. odoo-python
@@ -2850,58 +2885,58 @@ msgstr "Value increase for: %(asset)s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Value transferred from %(old_account)s to %(new_account)s."
-msgstr ""
+msgstr "Değer %(old_account)s hesabından %(new_account)s hesabına aktarıldı."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Variant"
-msgstr ""
+msgstr "Varyant"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s cancelled."
-msgstr ""
+msgstr "Varyant %(variant_name)s iptal edildi."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s reset to draft."
-msgstr ""
+msgstr "Varyant %(variant_name)s taslak olarak sıfırlandı."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s set to running."
-msgstr ""
+msgstr "Varyant %(variant_name)s çalışır duruma getirildi."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_count
 msgid "Variant Count"
-msgstr ""
+msgstr "Varyant Sayısı"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ledger_names
 msgid "Variant Ledger Names"
-msgstr ""
+msgstr "Varyant Defter Adları"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__state
 msgid "Variant Status"
-msgstr ""
+msgstr "Varyant Durumu"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants paused: %s. "
-msgstr ""
+msgstr "Varyantlar duraklatıldı: %s. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants resumed: %s. "
-msgstr ""
+msgstr "Varyantlar devam ettirildi: %s. "
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
@@ -2916,13 +2951,13 @@ msgstr "Uyarı: Varlık Sayısı"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__warning_sub_assets
 msgid "Warning Sub Assets"
-msgstr ""
+msgstr "Alt Varlık Uyarısı"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Warning for modifying bills for asset %s"
-msgstr ""
+msgstr "Varlık faturalarını değiştirme uyarısı %s"
 
 #. module: account_asset
 #. odoo-python
@@ -2948,12 +2983,13 @@ msgstr "Şablonumuz ile"
 #: model:ir.model,name:account_asset.model_depreciation_ledger_wizard
 msgid "Wizard used to apply depreciations models on ledger assets"
 msgstr ""
+"Muhasebe varlıklarına amortisman modelleri uygulamak için kullanılan sihirbaz"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__12
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__12
 msgid "Year"
-msgstr ""
+msgstr "Yıl"
 
 #. module: account_asset
 #. odoo-javascript
@@ -2974,7 +3010,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can't activate depreciation before the lock date."
-msgstr ""
+msgstr "Kilit tarihinden önce amortismanı etkinleştiremezsiniz."
 
 #. module: account_asset
 #. odoo-python
@@ -3031,7 +3067,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "You cannot change the state of an archived asset"
-msgstr ""
+msgstr "Arşivlenmiş bir varlığın durumunu değiştiremezsiniz"
 
 #. module: account_asset
 #. odoo-python
@@ -3071,7 +3107,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "You cannot dispose of a sub-asset before the lock date."
-msgstr ""
+msgstr "Alt varlığı kilitlenme tarihinden önce elden çıkaramazsınız."
 
 #. module: account_asset
 #. odoo-python
@@ -3130,7 +3166,7 @@ msgstr "acquisition_date"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "activate_depreciation"
-msgstr ""
+msgstr "activate_depreciation"
 
 #. module: account_asset
 #. odoo-python
@@ -3231,7 +3267,7 @@ msgstr "kazanç/zarar"
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
 msgid "here"
-msgstr ""
+msgstr "burada"
 
 #. module: account_asset
 #. odoo-python
@@ -3243,7 +3279,7 @@ msgstr "zarar"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "model_id"
-msgstr ""
+msgstr "model_id"
 
 #. module: account_asset
 #. odoo-python
@@ -3266,13 +3302,13 @@ msgstr "duraklat"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "per"
-msgstr ""
+msgstr "per"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_kanban
 msgid "per year"
-msgstr ""
+msgstr "yılda bir"
 
 #. module: account_asset
 #. odoo-python
@@ -3301,13 +3337,13 @@ msgstr "sat"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "tax excl.)"
-msgstr ""
+msgstr "vergi hariç)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
-msgstr ""
+msgstr "variant_ids.model_id"
 
 #~ msgid ""
 #~ "Journal Items of %(account)s should have a label in order to generate an "

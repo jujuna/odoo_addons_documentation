@@ -1,3 +1,4 @@
+from odoo import Command
 from odoo.tests.common import tagged
 
 from . import common
@@ -33,6 +34,23 @@ class TestStockPickingManual(common.TestUyEdiStock):
 
         # Check XML content
         self._check_cfe(picking, "10_delivery_guide_basic")
+
+    def test_15_delivery_guide_product_codes(self):
+        """The internal reference and the barcode are reported in their own <CodItem>
+        nodes and the item name does not include the internal reference prefix"""
+        product = self.env["product.product"].create({
+            "name": "Coded delivery product",
+            "default_code": "CODE123",
+            "barcode": "7730912350032",
+        })
+        picking = self._create_stock_picking(move_ids=[Command.create({
+            "product_id": product.id,
+            "product_uom_qty": 1.0,
+            "location_id": self.stock_location.id,
+            "location_dest_id": self.customer_location.id,
+        })])
+        self._validate_and_create_delivery_guide(picking)
+        self._check_cfe(picking, "15_delivery_guide_product_codes")
 
     def test_20_delivery_guide_internal_transfer(self):
         """Test delivery guide for internal transfer operation"""

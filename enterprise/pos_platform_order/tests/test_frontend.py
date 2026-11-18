@@ -82,3 +82,10 @@ class TestFrontend(TestPoSPlatformOrderCommon):
         with patch.object(PosOrder, '_send_reject_order_request', return_value=True), \
              patch.object(PosOrder, 'mark_platform_prep_order_as_printed', mark_platform_prep_order_as_printed_patch):
             self.start_pos_tour("test_platform_order_reject_flow")
+
+    def test_platform_order_tracking_number(self):
+        self.pos_config.with_user(self.pos_user).open_ui()
+        order_1 = self._create_platform_order("Platform Order #001")
+        order_2 = self._create_platform_order("Platform Order #002")
+        self.assertTrue(order_1.tracking_number.isdigit())
+        self.assertEqual(int(order_2.tracking_number), int(order_1.tracking_number) + 1)

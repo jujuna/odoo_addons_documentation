@@ -229,6 +229,36 @@ minus the contributions paid in the two previous months.
         })
         self._test_special_cotisation_all_months(employee, 2025, 'single')
 
+    def test_worker_employer_category_036_csss_base(self):
+        """ The CSSS base is the remuneration subject to the ONSS: no 108% uplift for a worker in the
+        employer categories 036 and 320, where the holiday pay is not paid by the holiday fund """
+        employee = self.env['hr.employee'].create({
+            'name': 'Printing Worker',
+            'contract_date_start': date(2024, 1, 1),
+            'contract_date_end': False,
+            'wage_type': 'hourly',
+            'wage': 20,
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'resource_calendar_id': self.resource_calendar_40.id,
+            'l10n_be_worker_code_id': self.ordinary_worker_code.id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2025, 2, 1),
+            'date_to': date(2025, 2, 28),
+            'struct_id': self.cp200_struct.id,
+        })
+        payslip.compute_sheet()
+        gross = payslip._get_line_values(['SALARY'])['SALARY'][payslip.id]['total']
+        no_payslips = self.env['hr.payslip']
+        result_rules = {code: {'total': 0} for code in ('SALARY', 'BONUS_SALARY', 'CP302THIRTEEN', 'WARRANT_SALARY')}
+        result_rules['SALARY']['total'] = gross
+        uplift = payslip._rule_parameter('worker_onss_calculation_basis_uplift')
+        self.assertAlmostEqual(payslip._l10n_be_csss_get_gross_onss_wage(result_rules, no_payslips), gross * uplift)
+        payslip.payroll_config_id.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00036')
+        self.assertAlmostEqual(payslip._l10n_be_csss_get_gross_onss_wage(result_rules, no_payslips), gross)
+
     def test_worker_stops_january(self):
         """
         If a worker stops working on the first month, he should pay the
@@ -843,6 +873,14 @@ Special Social Contribtion (CSSS), but, the amount must be split per quarter of
 the unprestated notice and the CSSS tax must then be applied on each quarter.
         """)
 
+        # The employee worked until his dismissal (12/11), so the partial November payslip
+        # must exist before the holiday attest can be generated. Generate it now (after the
+        # termination-fees assertion above, which only sees October) and validate it.
+        november_payslip = departure._generate_termination_last_payslip()
+        november_payslip.action_validate()
+        november_gross = self._get_payslips_gross_onss_wage(november_payslip)
+        november_csss = -self._get_payslips_csss(november_payslip)
+
         # let's test if the temrination holidays deduce the IRC as well
         # again, payslips must be validated/computed one by one
         holidays_salary = 0
@@ -852,14 +890,14 @@ the unprestated notice and the CSSS tax must then be applied on each quarter.
             termination_holidays_payslip.action_validate()
             holidays_salary += termination_holidays_payslip.line_ids.filtered_domain([['code', '=', 'PAY_SIMPLE']]).total
         total_wanted_csss = self._get_owed_csss(
-            (employee.wage + irc_q4) * uplift + holidays_salary,
+            (employee.wage + november_gross + irc_q4) * uplift + holidays_salary,
             termination_fees_payslip.date_to,
             "single", "quarterly",
         )
         total_wanted_csss += self._get_owed_csss(irc_q1 * uplift, termination_fees_payslip.date_to, "single", "quarterly")
         termination_holidays_csss = -sum(termination_holidays_payslips.line_ids.filtered_domain([['code', '=', 'M.ONSS']]).mapped('total'))
         self.assertAlmostEqual(
-            total_wanted_csss - october_csss - termination_fees_csss,
+            total_wanted_csss - october_csss - november_csss - termination_fees_csss,
             termination_holidays_csss,
             msg="""
 When computing the special social contribution of the temrination holidays, they
@@ -908,6 +946,14 @@ must deduce the CSSS of validated payslips/termination fees of the current quart
         termination_fees_payslip.action_validate()
         irc_total_amount = termination_fees_payslip.line_ids.filtered_domain([['code', '=', 'TERM_SALARY']]).total
 
+        # The employee works part of his notice, up to 18/12, so November (full, via the
+        # normal pay run) and the partial December payslip must exist before the holiday
+        # attest can be generated.
+        november_payslip = self._generate_monthly_payslips_range(date(2025, 11, 1), date(2025, 11, 30), employee)[0]
+        december_payslip = departure._generate_termination_last_payslip()
+        december_payslip.action_validate()
+        worked_notice_gross = self._get_payslips_gross_onss_wage(november_payslip | december_payslip)
+
         # same for here, payslips must be validated/computed one by one
         holidays_salary = 0
         termination_holidays_payslips = self.env['hr.payslip'].search(employee.action_generate_termination_holidays()['domain'])
@@ -937,14 +983,15 @@ must deduce the CSSS of validated payslips/termination fees of the current quart
         # CSSS of termination fees is:
         # CSSS(gross revenue of q4) + (CSSS(gross revenue of quarter) for each next quarter of the notice period)
         total_wanted_csss = self._get_owed_csss(
-            # payslip october + simple holiday pay + temrination fees irc
-            employee.wage + holidays_salary + irc_q4,
+            # October + worked notice (November + partial December) + simple holiday pay
+            # + termination fees irc
+            employee.wage + worked_notice_gross + holidays_salary + irc_q4,
             termination_fees_payslip.date_to,
             "single", "quarterly",
         )
         total_wanted_csss += self._get_owed_csss(irc_q1, termination_fees_payslip.date_to, "single", "quarterly")
 
-        total_csss = -sum((payslip_october | termination_fees_payslip | termination_holidays_payslips).line_ids.filtered_domain([['code', '=', 'M.ONSS']]).mapped('total'))
+        total_csss = -sum((payslip_october | november_payslip | december_payslip | termination_fees_payslip | termination_holidays_payslips).line_ids.filtered_domain([['code', '=', 'M.ONSS']]).mapped('total'))
         self.assertAlmostEqual(total_wanted_csss, total_csss, msg="""
 If the employee does not fully work during his notice period, then his IRC
 (i.e.: TERM_SALARY line of his termination fees) should also be subject to the
@@ -1180,3 +1227,32 @@ The payslip for december (Joint Committee 302) should be computed based on the
 total gross onss wage of the quarter (in this case october + november
 + 13th month + december), minus the CSSS already paid in october + november
         ''')
+
+    def test_no_special_social_contribution_without_onss(self):
+        """
+        The special social contribution is due by the workers subject to the social security: none for an intern
+        without ONSS (or another Dimona category without ONSS)
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Intern',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': False,
+            'wage_type': 'monthly',
+            'wage': 2500,
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'resource_calendar_id': self.resource_calendar_40.id,
+            'l10n_be_worker_code_id': self.ordinary_employee_code.id,
+            'l10n_be_dimona_category': 'stg',
+        })
+        self.assertTrue(employee.version_id.no_onss)
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Intern January 2026',
+            'employee_id': employee.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+        })
+        payslip.compute_sheet()
+        values = payslip._get_line_values(['ONSS', 'M.ONSS'])
+        self.assertFalse(values['ONSS'][payslip.id]['total'])
+        self.assertFalse(values['M.ONSS'][payslip.id]['total'])

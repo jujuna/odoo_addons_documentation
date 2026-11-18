@@ -7,6 +7,10 @@ class AccountBalanceSheetReportHandler(models.AbstractModel):
     _inherit = ['account.report.custom.handler']
     _description = "Balance Sheet Custom Handler"
 
+    def _custom_options_initializer(self, report, options, previous_options):
+        super()._custom_options_initializer(report, options, previous_options=previous_options)
+        options['show_deferred_account_warning'] = True
+
     def _customize_warnings(self, report, options, all_column_groups_expression_totals, warnings):
         companies = self.env['res.company'].browse(report.get_report_company_ids(options))
         has_cta_expr = any(
@@ -23,7 +27,8 @@ class AccountBalanceSheetReportHandler(models.AbstractModel):
 
         action = report.action_audit_cell(options, params)
 
-        date_from, date_to = report._get_date_bounds_info(options, 'strict_range')
+        column_group_options = report._get_column_group_options(options, params['column_group_index'])
+        date_from, date_to = report._get_date_bounds_info(column_group_options, 'strict_range')
         action['context'].update({
             'currency_translation': report.currency_translation,
             'date_from': date_from,
@@ -34,11 +39,10 @@ class AccountBalanceSheetReportHandler(models.AbstractModel):
             action['views'] = [(self.env.ref('account_reports.view_multi_currency_report_audit').id, 'list')]
 
         if report_line.code in ('CTA', 'OCI'):
-            column_group_options = report._get_column_group_options(options, params.get('column_group_index'))
             action['views'] = [(self.env.ref('account_reports.view_cumulative_translation_adjustment_audit_tree').id, 'list')]
             action['domain'] = Domain.AND([
                 report._get_options_domain(column_group_options, 'strict_range'),
-                Domain('account_type', 'in', ['equity', 'equity_unaffected', 'income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other']),
+                Domain('account_type', 'in', ['equity', 'equity_unaffected', 'equity_retained', 'income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other']),
             ])
             action['context'].update({
                 'group_by': ['account_type', 'account_id']

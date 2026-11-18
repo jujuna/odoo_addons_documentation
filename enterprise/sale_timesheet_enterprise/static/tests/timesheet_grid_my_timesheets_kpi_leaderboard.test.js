@@ -316,20 +316,20 @@ test("hr.timesheet (grid)(kpi)(leaderboard): Check that tip is visible when lead
     expect.verifySteps(["get_timesheet_ranking_data"]);
     expect(".modal-content:contains('March 2017')").toHaveCount(1);
     expect(".modal-content .o_timesheet_leaderboard_tip").toHaveCount(1);
-    expect(queryAllTexts(".modal-content .o_timesheet_leaderboard_tip span")).toEqual([
-        "TIP OF THE DAY",
-        "March productivity tip!",
-    ]);
+    expect(queryAllTexts(".modal-content .o_timesheet_leaderboard_tip span")).toEqual(
+        ["TIP OF THE DAY", "Great work this month!"],
+        { message: "the tip of the day should not change when browsing another month" }
+    );
     await contains(queryOne(".modal-content [data-icon='chevron_forward']").parentNode).click();
     expect.verifySteps(["get_timesheet_ranking_data"]);
     await contains(queryOne(".modal-content [data-icon='chevron_forward']").parentNode).click();
     expect.verifySteps(["get_timesheet_ranking_data"]);
     expect(".modal-content:contains('May 2017')").toHaveCount(1);
     expect(".modal-content .o_timesheet_leaderboard_tip").toHaveCount(1);
-    expect(queryAllTexts(".modal-content .o_timesheet_leaderboard_tip span")).toEqual([
-        "TIP OF THE DAY",
-        "May excellence tip!",
-    ]);
+    expect(queryAllTexts(".modal-content .o_timesheet_leaderboard_tip span")).toEqual(
+        ["TIP OF THE DAY", "Great work this month!"],
+        { message: "the tip of the day should not change when browsing another month" }
+    );
 });
 
 test("hr.timesheet (grid)(kpi)(leaderboard): Check that the indicators are replaced by text if current employee's billing rate <= 0.", async () => {

@@ -37,6 +37,7 @@ class ShopeeItem(models.Model):
 
     # === ACTION METHODS === #
 
+    # TODO: Remove this method as it is unused by the model.
     def action_sync_inventory(self):
         self._sync_inventory()
 

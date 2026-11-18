@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+import uuid
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
@@ -64,6 +65,55 @@ class TestSelfOrderController(SelfOrderCommonTest):
         order.state = 'paid'
         data = attempt()
         self.assertIn('already been paid', data['error']['data']['message'])
+
+    def _setup_service_fee(self, **values):
+        """Configure a 10% service fee on the preset used by _create_order_data."""
+        fee_product = self.env['product.product'].create({
+            'name': 'Service Fee',
+            'type': 'service',
+            'list_price': 0.0,
+            'taxes_id': False,
+            'available_in_pos': True,
+        })
+        self.in_preset.write({
+            'service_fee': True,
+            'service_fee_product_id': fee_product.id,
+            'service_fee_type': 'percent',
+            'service_fee_amount': 0.1,
+            **values,
+        })
+        return fee_product
+
+    def _self_order_line(self, product, qty=1, **values):
+        price_unit = values.pop('price_unit', product.lst_price)
+        return [0, 0, {
+            'uuid': uuid.uuid4().hex,
+            'product_id': product.id,
+            'qty': qty,
+            'price_unit': price_unit,
+            'price_subtotal': price_unit * qty,
+            'price_subtotal_incl': price_unit * qty,
+            **values,
+        }]
+
+    def _process_service_fee_order(self, extra_lines=()):
+        """Send a cola + fanta order through the mobile route and return it."""
+        self.pos_config.self_ordering_mode = 'mobile'
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.pos_config.current_session_id.set_opening_control(0, '')
+
+        order_data = self._create_order_data(
+            state='draft',
+            product=self.cola,
+            qty=1,
+            price_unit=self.cola.lst_price,
+            price_subtotal_incl=self.cola.lst_price,
+        )
+        order_data['order']['lines'].append(self._self_order_line(self.fanta))
+        order_data['order']['lines'].extend(extra_lines)
+
+        data = self.make_request_to_controller('/pos-self-order/process-order/mobile', order_data)
+        return self.env['pos.order'].browse(data['pos.order'][0]['id'])
 
     def test_get_orders_by_access_token(self):
         self.cola.taxes_id = False
@@ -350,6 +400,32 @@ class TestSelfOrderController(SelfOrderCommonTest):
         self.assertIn('error', data)
         self.assertEqual(data['error']['type'], 'delivery')
 
+    def test_process_order_email_and_mobile_kept_only_in_kiosk(self):
+        """Kiosk generates its preparation ticket client-side from the order data returned
+        by process-order, so email/mobile must not be stripped there. Mobile still has them
+        stripped: several devices can share the same order there, and shouldn't see each
+        other's contact info."""
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.pos_config.current_session_id.set_opening_control(0, '')
+
+        self.pos_config.self_ordering_mode = 'kiosk'
+        order_data = self._create_order_data(
+            state='draft', product=self.cola, qty=1, price_unit=1.0, price_subtotal_incl=1.0,
+            device_type='kiosk', email='kiosk.customer@example.com', mobile='+32444444444',
+        )
+        data = self.make_request_to_controller('/pos-self-order/process-order/kiosk', order_data)
+        self.assertEqual(data['pos.order'][0]['email'], 'kiosk.customer@example.com')
+        self.assertEqual(data['pos.order'][0]['mobile'], '+32444444444')
+
+        self.pos_config.self_ordering_mode = 'mobile'
+        order_data = self._create_order_data(
+            state='draft', product=self.cola, qty=1, price_unit=1.0, price_subtotal_incl=1.0,
+            device_type='mobile', email='mobile.customer@example.com', mobile='+32444444445',
+        )
+        data = self.make_request_to_controller('/pos-self-order/process-order/mobile', order_data)
+        self.assertNotIn('email', data['pos.order'][0])
+        self.assertNotIn('mobile', data['pos.order'][0])
+
     def test_free_delivery_threshold_edge_cases(self):
         """Test free delivery threshold at exactly the minimum, below, and above"""
         self.pos_config.self_ordering_mode = 'mobile'
@@ -420,6 +496,165 @@ class TestSelfOrderController(SelfOrderCommonTest):
         )
         self.assertTrue(delivery_lines, "Delivery fee line should be added to the order")
         self.assertAlmostEqual(delivery_lines[0].price_unit, 5.0)
+
+    def test_service_fee_is_added_when_missing(self):
+        """The fee is mandated by the preset: a payload that drops its line must not escape it."""
+        (self.cola | self.fanta).taxes_id = False
+        fee_product = self._setup_service_fee()
+
+        order = self._process_service_fee_order()
+        fee_lines = order.lines.filtered(lambda l: l.product_id == fee_product)
+
+        self.assertEqual(len(fee_lines), 1)
+        # 10% of the whole cart (2.2 + 2.2), not of its first line only.
+        self.assertAlmostEqual(fee_lines.price_unit, 0.44, places=2)
+        self.assertAlmostEqual(order.amount_total, 4.84, places=2)
+
+    def test_service_fee_line_is_repriced(self):
+        """None of the values the payload puts on a fee line is kept."""
+        (self.cola | self.fanta).taxes_id = False
+        fee_product = self._setup_service_fee()
+
+        order = self._process_service_fee_order(extra_lines=[self._self_order_line(
+            fee_product,
+            qty=9,
+            price_unit=0.01,
+            price_type='manual',
+        )])
+        fee_lines = order.lines.filtered(lambda l: l.product_id == fee_product)
+
+        self.assertEqual(len(fee_lines), 1)
+        self.assertEqual(fee_lines.qty, 1)
+        self.assertEqual(fee_lines.price_type, 'automatic')
+        self.assertAlmostEqual(fee_lines.price_unit, 0.44, places=2)
+        self.assertAlmostEqual(order.amount_total, 4.84, places=2)
+
+    def test_service_fee_product_line_without_service_fee(self):
+        """A preset keeps a fee product when its fee is off: a line of it must not survive."""
+        (self.cola | self.fanta).taxes_id = False
+        fee_product = self.in_preset.service_fee_product_id
+
+        self.assertFalse(self.in_preset.service_fee)
+        self.assertTrue(fee_product, "the fee product has a default, the fee itself does not")
+
+        order = self._process_service_fee_order(extra_lines=[self._self_order_line(
+            fee_product,
+            price_unit=-100.0,
+        )])
+
+        self.assertFalse(order.lines.filtered(lambda l: l.product_id == fee_product))
+        self.assertAlmostEqual(order.amount_total, 4.4, places=2)
+
+    def test_service_fee_with_mixed_taxes(self):
+        """One fee line per tax group, as in the POS, each carrying its share of the fee."""
+        tax_10 = self.env['account.tax'].create({
+            'name': 'Service Fee Test 10%',
+            'amount': 10,
+            'amount_type': 'percent',
+        })
+        self.cola.taxes_id = False
+        self.fanta.taxes_id = tax_10
+        self.ketchup.taxes_id = tax_10
+        fee_product = self._setup_service_fee()
+
+        order = self._process_service_fee_order(extra_lines=[self._self_order_line(self.ketchup)])
+        fee_lines = order.lines.filtered(lambda l: l.product_id == fee_product)
+
+        # Cart of 2.2 untaxed + 2.42 taxed, so a fee of 0.46 split over the two tax groups.
+        self.assertEqual(len(fee_lines), 2)
+        self.assertEqual(fee_lines.tax_ids, tax_10)
+        self.assertAlmostEqual(sum(fee_lines.mapped('price_subtotal_incl')), 0.46, places=2)
+        self.assertAlmostEqual(order.amount_total, 5.08, places=2)
+
+    def _create_combo_order(self, fee_product, items, menu_price, menu_taxes, nb_fee_lines):
+        """Create a draft order holding one combo, made of (product, extra_price) items."""
+        combos = self.env['product.combo'].create([{
+            'name': product.name,
+            'combo_item_ids': [Command.create({'product_id': product.id, 'extra_price': extra_price})],
+        } for product, extra_price in items])
+        menu = self.env['product.product'].create({
+            'name': 'Menu',
+            'type': 'combo',
+            'list_price': menu_price,
+            'available_in_pos': True,
+            'taxes_id': [Command.set(menu_taxes.ids)],
+            'combo_ids': [Command.set(combos.ids)],
+        })
+        self.pos_config.self_ordering_mode = 'mobile'
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.pos_config.current_session_id.set_opening_control(0, '')
+        order = self.env['pos.order'].create({
+            'session_id': self.pos_config.current_session_id.id,
+            'preset_id': self.in_preset.id,
+            'amount_total': 0.0,
+            'amount_tax': 0.0,
+            'amount_return': 0.0,
+            'amount_paid': 0.0,
+        })
+
+        def create_line(product, **values):
+            return self.env['pos.order.line'].create({
+                'order_id': order.id,
+                'product_id': product.id,
+                'qty': 1,
+                'price_unit': 0.0,
+                'price_subtotal': 0.0,
+                'price_subtotal_incl': 0.0,
+                'uuid': uuid.uuid4().hex,
+                'full_product_name': product.name,
+                **values,
+            })
+
+        parent = create_line(menu)
+        children = self.env['pos.order.line']
+        for combo in combos:
+            item = combo.combo_item_ids
+            children |= create_line(
+                item.product_id,
+                tax_ids=item.product_id.taxes_id.ids,
+                combo_parent_id=parent.id,
+                combo_item_id=item.id,
+            )
+        fee_uuids = {create_line(fee_product).uuid for _index in range(nb_fee_lines)}
+        return order, children, fee_uuids
+
+    def test_service_fee_is_computed_on_combo_items(self):
+        """The combo price is carried by its items: their fee lines must be kept and priced."""
+        tax_10 = self.env['account.tax'].create({'name': 'Fee Combo 10%', 'amount': 10})
+        tax_21 = self.env['account.tax'].create({'name': 'Fee Combo 21%', 'amount': 21})
+        fee_product = self._setup_service_fee()
+        self.cola.taxes_id = tax_10
+        self.fanta.taxes_id = tax_21
+
+        order, children, fee_uuids = self._create_combo_order(
+            fee_product, [(self.cola, 0.0), (self.fanta, 0.0)], 10.0, tax_10, 2,
+        )
+        order.recompute_prices()
+
+        fee_lines = order.lines.filtered(lambda line: line.product_id == fee_product)
+        self.assertEqual(set(fee_lines.mapped('uuid')), fee_uuids)
+        items_total = sum(children.mapped('price_subtotal_incl'))
+        self.assertGreater(items_total, 0)
+        self.assertAlmostEqual(sum(fee_lines.mapped('price_subtotal_incl')), items_total * 0.1, delta=0.01)
+        self.assertAlmostEqual(order.amount_total, items_total * 1.1, delta=0.01)
+
+    def test_service_fee_percent_on_combo_price(self):
+        """A percentage fee applies to what the customer pays for the combo, extras included."""
+        fee_product = self._setup_service_fee()
+        burger, drink = self.env['product.product'].create([
+            {'name': 'Fee Burger', 'list_price': 8.0, 'taxes_id': False, 'available_in_pos': True},
+            {'name': 'Fee Drink', 'list_price': 12.0, 'taxes_id': False, 'available_in_pos': True},
+        ])
+
+        order, _children, _fee_uuids = self._create_combo_order(
+            fee_product, [(burger, 0.0), (drink, 3.0)], 20.0, self.env['account.tax'], 1,
+        )
+        order.recompute_prices()
+
+        fee_line = order.lines.filtered(lambda line: line.product_id == fee_product)
+        self.assertEqual(len(fee_line), 1)
+        self.assertAlmostEqual(fee_line.price_subtotal_incl, 2.3, places=2)
+        self.assertAlmostEqual(order.amount_total, 25.3, places=2)
 
     def test_preparation_categories_are_loaded(self):
         """
@@ -618,3 +853,76 @@ class TestSelfOrderController(SelfOrderCommonTest):
         self.assertFalse(data['lines'])
         self.assertEqual(victim_line.qty, 3)
         self.assertEqual(victim_line.order_id, victim_order)
+
+    def _open_self_order_session(self, **config_values):
+        self.pos_config.write(config_values)
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.pos_config.current_session_id.set_opening_control(0, '')
+
+    def test_self_order_tracking_number_kiosk(self):
+        self._open_self_order_session(self_ordering_mode='kiosk', self_ordering_service_mode='counter')
+        lines = [{'product': self.cola, 'qty': 1}]
+
+        order_1 = self.process_self_order(lines)
+        order_2 = self.process_self_order(lines, table_stand_number='12')
+
+        self.assertTrue(order_1.tracking_number.isdigit())
+        self.assertEqual(int(order_2.tracking_number), int(order_1.tracking_number) + 1)
+        self.assertEqual(order_1.floating_order_name, f"Kiosk Order {order_1.tracking_number}")
+        self.assertEqual(order_2.floating_order_name, "Table tracker 12")
+        self.assertEqual(order_2.table_stand_number, '12')
+
+    def test_self_order_tracking_number_mobile(self):
+        self._open_self_order_session(self_ordering_mode='mobile', self_ordering_service_mode='counter')
+        lines = [{'product': self.cola, 'qty': 1}]
+
+        order_1 = self.process_self_order(lines)
+        order_2 = self.process_self_order(lines, floating_order_name='Bob')
+
+        self.assertTrue(order_1.tracking_number.isdigit())
+        self.assertEqual(int(order_2.tracking_number), int(order_1.tracking_number) + 1)
+        self.assertEqual(order_1.floating_order_name, f"Self-Order {order_1.tracking_number}")
+        self.assertEqual(order_2.floating_order_name, "Bob")
+
+    def test_self_order_tracking_number_dynamic_qr(self):
+        self._open_self_order_session(self_ordering_mode='mobile', self_ordering_service_mode='dynamic_qr')
+        staff_order = self.env['pos.order'].create({
+            'session_id': self.pos_config.current_session_id.id,
+            'amount_total': 0.0,
+            'amount_tax': 0.0,
+            'amount_return': 0.0,
+            'amount_paid': 0.0,
+            'table_id': self.pos_table_1.id,
+        })
+
+        order = self.process_self_order(
+            [{'product': self.cola, 'qty': 1}],
+            uuid=staff_order.uuid,
+            access_token=staff_order.access_token,
+        )
+
+        self.assertEqual(order, staff_order)
+
+        self.assertTrue(order.tracking_number.isdigit())
+        self.assertEqual(order.floating_order_name, f"T {self.pos_table_1.table_number} - {order.tracking_number}")
+
+    def test_self_order_tracking_number_kept_on_update(self):
+        self._open_self_order_session(
+            self_ordering_mode='mobile',
+            self_ordering_service_mode='counter',
+            self_ordering_pay_after='meal',
+        )
+        order = self.process_self_order([{'product': self.cola, 'qty': 1}])
+        tracking_number, floating_order_name, pos_reference = order.tracking_number, order.floating_order_name, order.pos_reference
+
+        updated = self.process_self_order(
+            [{'product': self.fanta, 'qty': 1}],
+            id=order.id,
+            uuid=order.uuid,
+            access_token=order.access_token,
+        )
+
+        self.assertEqual(updated, order)
+        self.assertEqual(order.tracking_number, tracking_number)
+        self.assertEqual(order.floating_order_name, floating_order_name)
+        self.assertEqual(order.pos_reference, pos_reference)

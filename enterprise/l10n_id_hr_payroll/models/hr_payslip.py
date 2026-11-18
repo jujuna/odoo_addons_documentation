@@ -2,7 +2,7 @@
 
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
-from datetime import date
+from datetime import date, timedelta
 
 KODE_PTKP_MAPPING = {
     'tk0': 'a',
@@ -22,18 +22,27 @@ class HrPayslip(models.Model):
     l10n_id_include_pkp_ptkp = fields.Boolean(
         compute="_compute_l10n_id_include_pkp_ptkp", store=True, readonly=False)  # include the PTKP/PKP computation
 
+    def _l10n_id_get_historical_payslips(self):
+        """ Get the validated payslips of the employee within the year, before the current payslip"""
+        date_start = date(self.date_to.year, 1, 1)
+        return self.env['hr.payslip'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('date_to', '>=', date_start),
+            ('date_to', '<', self.date_to),
+            ('state', 'in', ['validated', 'paid'])
+        ])
+
     def _l10n_id_get_historical_categorical_total(self, codes):
         """ Get the total amount of specific category among the contract's taxes history that has been validated
         within a certain year"""
-        date_start = date(self.date_to.year, 1, 1)
-        payslips = self.env['hr.payslip'].search([
-            ('date_to', '>', date_start),
-            ('date_to', '<', self.date_to),
-            ('state', 'in', ['validated', 'paid']),
-            ('employee_id', '=', self.employee_id.id)
-        ])
+        payslips = self._l10n_id_get_historical_payslips()
         vals = payslips._get_line_values(codes, compute_sum=True)
         return sum(vals[code]['sum']['total'] for code in codes)
+
+    def _l10n_id_get_months_count(self):
+        """ Get the number of months of the year with a payslip, including the current payslip"""
+        payslips = self._l10n_id_get_historical_payslips()
+        return len({slip.date_to.month for slip in payslips} | {self.date_to.month})
 
     def _l10n_id_get_pph21_amount(self, amount):
         """ Find the right percentage to apply depending on the GROSS amount of the payslip"""
@@ -51,14 +60,8 @@ class HrPayslip(models.Model):
         return self._l10n_id_get_historical_categorical_total(['PPH21'])
 
     def _l10n_id_get_gross_accumulated(self):
-        # gross_lines = self._l10n_id_get_historical_categorical_total_lines(['GROSS'])
-        date_start = date(self.date_to.year, 1, 1)
-        payslips = self.env['hr.payslip'].search([
-            ('date_to', '>', date_start),
-            ('date_to', '<', self.date_to),
-            ('state', 'in', ['validated', 'paid']),
-            ('employee_id', '=', self.employee_id.id)
-        ])
+        # deprecated, not used anymore, TODO: remove in master
+        payslips = self._l10n_id_get_historical_payslips()
         vals = payslips._get_line_values(['GROSS'])['GROSS']
         gross_lines = [vals[i]['total'] for i in payslips.ids]
 
@@ -94,7 +97,7 @@ class HrPayslip(models.Model):
         )
 
     def _l10n_id_get_bpjs_kesehatan_arrears_base(self):
-        """Return the previous payslip's capped BASIC wage for BPJS arrears, or 0.0."""
+        """Return the previous payslip's capped BASIC + FIXED_ALW wage for BPJS arrears, or 0.0."""
         self.ensure_one()
         previous_payslip = self.env['hr.payslip'].search([
             ('employee_id', '=', self.employee_id.id),
@@ -104,8 +107,9 @@ class HrPayslip(models.Model):
         ], order='date_to desc', limit=1)
         if not previous_payslip or not previous_payslip._l10n_id_is_bpjs_kesehatan_deferred():
             return 0.0
-        basic = previous_payslip._get_line_values(['BASIC'])['BASIC'][previous_payslip.id]['total']
-        return min(basic, self._rule_parameter('l10n_id_bpjs_salary_threshold'))
+        line_values = previous_payslip._get_line_values(['BASIC', 'FIXED_ALW'])
+        wage = sum(line_values[code][previous_payslip.id]['total'] for code in ('BASIC', 'FIXED_ALW'))
+        return min(wage, self._rule_parameter('l10n_id_bpjs_salary_threshold'))
 
     def _get_localdict(self, work_entries=None):
         """ Cache the BPJS Kesehatan deferral data, as the salary rules need it multiple times. """
@@ -119,17 +123,19 @@ class HrPayslip(models.Model):
 
     @api.depends('date_from', 'date_to', 'version_id.contract_date_start', 'version_id.contract_date_end')
     def _compute_l10n_id_include_pkp_ptkp(self):
-        """ by default, if it's end of year/end of contract, set to True"""
+        """ by default, set to True on the last payslip of the year/contract only:
+        - end of year: the next payslip, of the same duration, would end in the next year
+        - end of contract: the end date of the contract is within the payslip period
+        """
         for slip in self:
+            if not slip.date_from or not slip.date_to:
+                slip.l10n_id_include_pkp_ptkp = False
+                continue
+            next_date_to = slip.date_to + (slip.date_to - slip.date_from) + timedelta(days=1)
+            date_end = slip.version_id.contract_date_end
             slip.l10n_id_include_pkp_ptkp = (
-                slip.date_to and (
-                    (slip.date_to.month == 12) or
-                    (
-                        slip.version_id.contract_date_end and
-                        slip.version_id.contract_date_end.month == slip.date_to.month and
-                        slip.version_id.contract_date_end.year == slip.date_to.year
-                    )
-                )
+                next_date_to.year > slip.date_to.year or
+                bool(date_end and slip.date_from <= date_end <= slip.date_to)
             )
 
     def _get_data_files_to_update(self):

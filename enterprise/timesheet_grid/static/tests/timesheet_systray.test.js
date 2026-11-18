@@ -846,6 +846,42 @@ test("Timesheet is no longer prefilled once the last visited task was reset away
 });
 
 test.tags("desktop");
+test("Timesheet discards a pre-filled task that no longer exists", async () => {
+    setPreFilledFormTimesheet({ task_id: 999 });
+    onRpc("account.analytic.line", "onchange", ({ kwargs }) => {
+        expect.step(`onchange ${JSON.stringify(kwargs.context.timesheet_systray_prefill)}`);
+    });
+
+    await mountWithCleanup(WebClient);
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div[name='ts_checkin_btn'] > button").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect.verifySteps(['onchange {"task_id":999}'], {
+        message: "The server should be told the task comes from the systray prefill",
+    });
+
+    expect("div[name='task_id'] input").toHaveValue("", {
+        message: "A deleted task should not be used to prefill the form",
+    });
+    expect("div[name='project_id'] input").toHaveValue("", {
+        message: "The project of the deleted task should not be prefilled either",
+    });
+    expect(localStorage.getItem("timesheet.preFilledForm")).toBe(null, {
+        message: "The stale pointer should be dropped from local storage",
+    });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect("div[name='task_id'] input").toHaveValue("", {
+        message: "Reopening the timer systray should not resurrect the deleted task",
+    });
+    expect.verifySteps([], {
+        message: "Without a pre-filled task, the empty form needs no onchange",
+    });
+});
+
+test.tags("desktop");
 test("Timesheet is prefilled with project and tasks", async () => {
     onRpc("web_save", ({ args }) => {
         expect(args[1].name).toBe(false);

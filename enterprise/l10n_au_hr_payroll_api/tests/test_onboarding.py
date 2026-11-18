@@ -1,10 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from unittest.mock import Mock, patch
 
 from odoo.exceptions import UserError, ValidationError, RedirectWarning
-from odoo.tests import tagged, Form
+from odoo.tests import tagged, Form, new_test_user
 from odoo.addons.l10n_au_hr_payroll_account.tests.common import L10nPayrollAccountCommon
+from odoo.addons.l10n_au_hr_payroll_api.models import account_edi_proxy_user
 from .common import TestL10nAUPayrollAPICommon
 
 
@@ -107,3 +109,22 @@ class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICom
         self.assertEqual(registration.status, "registered")
         self.assertEqual(self.company.l10n_au_stp_responsible_id, self.employee_1)
         self.assertEqual(self.company.l10n_au_hr_super_responsible_id, self.employee_1)
+
+    def test_expired_registration(self):
+        """ Only admins are redirected to the settings when the registration has expired. """
+        self._register_company()
+        payroll_manager = new_test_user(
+            self.env, login="au_payroll_manager", company_id=self.company.id,
+            groups="hr_payroll.group_hr_payroll_manager,account.group_account_invoice",
+        )
+        expired_response = {"error": "The current BMS registration has expired.", "expired": True}
+        # Requests to the payroll service are blocked during tests: lift that block, only the answer is mocked
+        with patch.object(account_edi_proxy_user, "tools", Mock(config={"test_enable": False})), \
+             patch.object(account_edi_proxy_user, "modules", Mock(module=Mock(current_test=None))), \
+             patch.object(self.registry["account_edi_proxy_client.user"], "_make_request", return_value=expired_response), \
+             self.enter_registry_test_mode():
+            with self.assertRaises(RedirectWarning) as admin_error:
+                self.proxy_user._l10n_au_payroll_request("/superchoice/authenticateCredential")
+            with self.assertRaisesRegex(UserError, "Please contact your administrator to re-register the company"):
+                self.proxy_user.with_user(payroll_manager)._l10n_au_payroll_request("/superchoice/authenticateCredential")
+        self.assertEqual(admin_error.exception.args[1], self.env.ref("hr_payroll.action_hr_payroll_configuration").id)

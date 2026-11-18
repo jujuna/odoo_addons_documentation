@@ -216,6 +216,37 @@ class TestUblExportBis3BE(TestUblBis3Common, TestUblCiiBECommon):
         self._generate_invoice_ubl_file(invoice)
         self._assert_invoice_ubl_file(invoice, 'test_invoice_PEPPOL_EN16931_R120_line_extension_amount_huge_number_of_decimals')
 
+    def test_invoice_PEPPOL_EN16931_R040_allowance_amount_base_amount_percentage(self):
+        """ [PEPPOL-EN16931-R040] Allowance/charge amount must equal base amount * percentage/100 if base amount and percentage exist. """
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        tax_6 = self.percent_tax(6.0, price_include_override='tax_included')
+        tax_21 = self.percent_tax(21.0, price_include_override='tax_included')
+        lines_data = [
+            (10.0, 17.95, tax_6), (10.0, 9.95, tax_6), (10.0, 9.95, tax_6), (10.0, 9.95, tax_6), (10.0, 9.95, tax_6),
+            (10.0, 9.95, tax_6), (10.0, 18.95, tax_21), (10.0, 19.95, tax_6), (10.0, 15.95, tax_6), (10.0, 15.95, tax_6),
+            (10.0, 12.50, tax_6), (10.0, 12.50, tax_6), (10.0, 15.95, tax_6), (1.0, 15.95, tax_6), (10.0, 15.95, tax_6),
+            (10.0, 15.95, tax_6), (6.0, 14.95, tax_6), (10.0, 15.95, tax_6), (10.0, 19.95, tax_6), (6.0, 15.95, tax_6),
+            (10.0, 7.95, tax_6), (10.0, 7.95, tax_6), (10.0, 7.95, tax_6), (10.0, 6.95, tax_6), (10.0, 6.95, tax_6),
+            (10.0, 15.95, tax_6), (10.0, 8.95, tax_6),
+        ]
+        invoice = self._create_invoice(
+            partner_id=self.partner_be,
+            invoice_line_ids=[
+                self._prepare_invoice_line(product_id=self.product_a, quantity=quantity, price_unit=price_unit, discount=52.3, tax_ids=tax)
+                for quantity, price_unit, tax in lines_data
+            ],
+            post=True,
+        )
+
+        self._generate_invoice_ubl_file(invoice)
+        xml_tree = etree.fromstring(invoice.ubl_cii_xml_id.raw.content)
+        for line_node in xml_tree.findall('./{*}InvoiceLine'):
+            allowance_node = line_node.find('./{*}AllowanceCharge')
+            base_amount = float(allowance_node.findtext('./{*}BaseAmount'))
+            percentage = float(allowance_node.findtext('./{*}MultiplierFactorNumeric'))
+            amount = float(allowance_node.findtext('./{*}Amount'))
+            self.assertLessEqual(abs(base_amount * percentage / 100.0 - amount), 0.02, f"R040 failed on line {line_node.findtext('./{*}ID')}")
+
     def test_invoice_price_amount_rounding_precision_with_price_included_taxes(self):
         tax_21 = self.percent_tax(21.0, price_include_override='tax_included')
         product = self._create_product(lst_price=1039.99, taxes_id=tax_21)
@@ -1090,6 +1121,25 @@ class TestUblExportBis3BE(TestUblBis3Common, TestUblCiiBECommon):
         self._generate_invoice_ubl_file(invoice)
         self._assert_invoice_ubl_file(invoice, 'test_invoice_with_vehicle_license_plate')
 
+    def test_export_collapsed_sections_amounts(self):
+        """ Test that the amounts of collapsed sections are correctly exported. """
+        tax_21 = self.percent_tax(21.0)
+        for rounding_method, sections in (
+            ('round_globally', [[(10.03, tax_21)], [(10.03, tax_21)]]),
+            ('round_per_line', [[(10.03, tax_21), (10.03, tax_21)]]),
+        ):
+            self.env.company.tax_calculation_rounding_method = rounding_method
+            invoice_line_ids = []
+            for index, lines in enumerate(sections):
+                invoice_line_ids.append(self._prepare_invoice_line(name=f"Section {index}", display_type='line_section', collapse_composition=True, price_unit=0.0))
+                invoice_line_ids += [self._prepare_invoice_line(product_id=self.product_a, price_unit=price_unit, tax_ids=tax) for price_unit, tax in lines]
+            invoice = self._create_invoice(partner_id=self.partner_be, invoice_line_ids=invoice_line_ids, post=True)
+
+            xml_tree = etree.fromstring(self.env['account.edi.xml.ubl_bis3']._export_invoice(invoice)[0])
+            self.assertEqual(float(xml_tree.findtext('./{*}TaxTotal/{*}TaxAmount')), invoice.amount_tax)
+            self.assertEqual(float(xml_tree.findtext('./{*}LegalMonetaryTotal/{*}TaxExclusiveAmount')), invoice.amount_untaxed)
+            self.assertEqual(float(xml_tree.findtext('./{*}LegalMonetaryTotal/{*}TaxInclusiveAmount')), invoice.amount_total)
+
     def test_invoice_tax_subtotal_exempt_amount(self):
         """ Test that the taxable amount for exempt taxes is correctly computed,
         regardless of the tax calculation rounding method.
@@ -1126,6 +1176,32 @@ class TestUblExportBis3BE(TestUblBis3Common, TestUblCiiBECommon):
         )
         self._generate_invoice_ubl_file(invoice)
         self._assert_invoice_ubl_file(invoice, 'test_invoice_tax_out_of_scope')
+
+    def test_invoice_export_sections_with_price_included_taxes(self):
+        """
+        When a section is collapsed ('Hide composition' / collapse_composition=True)
+        and its lines use price-included taxes, the generated collapsed line should
+        not double-strip the tax amount.
+        """
+        tax_21_included = self.percent_tax(21.0, price_include_override='tax_included')
+        tax_21_excluded = self.percent_tax(21.0)
+
+        product_1 = self._create_product(lst_price=100.0, name="product_included_1")
+        product_2 = self._create_product(lst_price=50.0, name="product_included_2")
+        product_3 = self._create_product(lst_price=80.0, name="product_excluded_1")
+
+        invoice = self._create_invoice(
+            partner_id=self.partner_be,
+            invoice_line_ids=[
+                self._prepare_invoice_line(name="Collapsed Mixed Section", display_type='line_section', collapse_composition=True, price_unit=0.0),
+                self._prepare_invoice_line(product_id=product_1, price_unit=100.0, tax_ids=[tax_21_included.id]),
+                self._prepare_invoice_line(product_id=product_2, price_unit=50.0, tax_ids=[tax_21_included.id]),
+                self._prepare_invoice_line(product_id=product_3, price_unit=80.0, tax_ids=[tax_21_excluded.id]),
+            ],
+            post=True,
+        )
+        self._generate_invoice_ubl_file(invoice)
+        self._assert_invoice_ubl_file(invoice, 'test_invoice_export_sections_with_price_included_taxes')
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')

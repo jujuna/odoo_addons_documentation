@@ -221,7 +221,7 @@ class SocialAccount(models.Model):
             'Authorization': 'Bearer %s' % linkedin_access_token,
             'cache-control': 'no-cache',
             'X-Restli-Protocol-Version': '2.0.0',
-            'LinkedIn-Version': '202511',
+            'LinkedIn-Version': '202609',
         }
 
     def _get_linkedin_accounts(self, linkedin_access_token, link_personal=False):

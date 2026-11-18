@@ -3,18 +3,17 @@
 import datetime
 
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestPayslipNoAccountingCommon
 from odoo.tools.float_utils import float_compare
 from odoo.tests import tagged, freeze_time
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 
 
 @tagged('post_install', '-at_install', 'credit_time')
-class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestCreditTime(TestPayslipNoAccountingCommon, TestBelgiumCommon):
 
     _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.group_ids |= cls.env.ref('hr_payroll.group_hr_payroll_user') \
@@ -22,10 +21,10 @@ class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
         cls.env.company.partner_id.tz = "Europe/Brussels"
         cls.env.user.tz = "Europe/Brussels"
 
-        cls.company_data['company'].write({
+        cls.env.company.write({
             'country_id': cls.env.ref('base.be').id,
         })
-        cls.company_data['company'].current_payroll_config_id.write({
+        cls.env.company.current_payroll_config_id.write({
             'onss_importance_code': '1',
             'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
         })
@@ -68,6 +67,7 @@ class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
                 'acquisition_date': '2020-01-01',
                 'contract_date_start': '2020-01-01',
                 'co2': 88,
+                'fuel_type': 'diesel',
                 'driver_id': cls.partner.id,
                 'car_value': 38000,
                 'company_id': cls.env.company.id,
@@ -91,6 +91,7 @@ class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
             'transport_mode_car': True,
             'car_id': cls.car.id,
             'bus_transport_employee_amount': 34,
+            'bus_transport_employee_kilometer': 5,
             'distance_home_work': 30,
             'internet': 38,
             'mobile': 30,

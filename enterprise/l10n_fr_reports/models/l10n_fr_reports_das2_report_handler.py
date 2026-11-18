@@ -234,6 +234,9 @@ class L10nFrDAS2ReportHandler(models.AbstractModel):
         button_label = ""
         action = {}
 
+        if errors['partner']['errors'] and not errors['partner']['records']:
+            raise UserError(self.env._("DAS2 cannot be generated: %s", errors['partner']['errors'][0]))
+
         if error_messages := errors['partner']['errors']:
             required_field_view_list = self.env.ref('l10n_fr_reports.view_partner_das2_required_partner_fields')
             required_field_view_form = self.env.ref('l10n_fr_reports.view_partner_form_inherit_das2_required_partner_fields')
@@ -308,6 +311,12 @@ class L10nFrDAS2ReportHandler(models.AbstractModel):
                 contact_person_errors.append(self.env._("point of contact phone number is not set"))
 
         partner_errors = []
+        if not partners:
+            partner_errors.append(self.env._(
+                "no vendor reaches the DAS2 reporting threshold of %s€, there is nothing to declare",
+                THRESHOLD_DAS2_REPORT,
+            ))
+
         invalid_partners = self.env['res.partner']
         for partner in partners:
             errors = self._get_partner_missing_fields(partner)

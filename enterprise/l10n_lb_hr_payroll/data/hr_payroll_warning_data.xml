@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="hr_payroll_warning_work_entry_type_change_lb" model="hr.payroll.warning">
+            <field name="name">Sick Leave Split (Time Off - LB)</field>
+            <field name="description">The sick leave will be split into full pay, half pay and unpaid sick leave.</field>
+            <field name="warning_color_class">warning</field>
+            <field name="country_id" ref="base.lb"/>
+            <field name="display_on_model" eval="True"/>
+            <field name="display_on_dashboard" eval="False"/>
+            <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+            <field name="warning_type">python</field>
+            <field name="evaluation_code">
+leaves = records.filtered(lambda leave: leave._l10n_lb_is_sick_leave_to_split())
+warning_records = self.env['hr.leave']
+warning_details = defaultdict(list)
+for leave in leaves:
+    message = leave._get_work_entry_type_change_warning(leave._get_l10n_lb_sick_leave_split())
+    if message:
+        warning_records |= leave
+        warning_details[leave].append({'message': message, 'level': 'warning'})
+            </field>
+        </record>
+
+        <record id="hr_payroll_warning_minimum_wage_employee_lb" model="hr.payroll.warning">
+            <field name="name">Employee Under Minimum Wage (LB)</field>
+            <field name="description">Wage below the official minimum wage.</field>
+            <field name="warning_color_class">danger</field>
+            <field name="country_id" ref="base.lb"/>
+            <field name="display_on_model" eval="True"/>
+            <field name="display_on_dashboard" eval="False"/>
+            <field name="model_id" ref="hr.model_hr_version"/>
+            <field name="warning_type">python</field>
+            <field name="evaluation_code">
+lb_companies = self.env.companies.filtered(lambda c: c.country_id.code == 'LB')
+versions = self.env['hr.version'].search([
+    ('id', 'in', active_ids),
+    ('company_id', 'in', lb_companies.ids),
+    ('structure_type_id.country_id.code', '=', 'LB'),
+    ('contract_date_start', '!=', False),
+])
+warning_records = self.env['hr.version']
+warning_details = defaultdict(list)
+for version in versions:
+    message = version._l10n_lb_get_minimum_wage_warning()
+    if message:
+        warning_records |= version
+        warning_details[version].append({'message': message, 'level': 'danger'})
+            </field>
+        </record>
+    </data>
+</odoo>

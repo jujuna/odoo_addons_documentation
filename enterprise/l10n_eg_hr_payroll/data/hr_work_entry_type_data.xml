@@ -12,15 +12,19 @@
         </record>
         <record id="hr_work_entry.eg_work_entry_type_leave" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="round_days_type">DOWN</field>
         </record>
         <record id="hr_work_entry.eg_work_entry_type_compensatory" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="round_days_type">DOWN</field>
         </record>
         <record id="hr_work_entry.eg_work_entry_type_home_working" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="round_days_type">DOWN</field>
         </record>
         <record id="hr_work_entry.eg_work_entry_type_legal_leave" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="round_days_type">DOWN</field>
         </record>
         <record id="hr_work_entry.eg_work_entry_type_public_holiday" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
@@ -70,5 +74,14 @@
         <record id="hr_work_entry.l10n_eg_work_entry_type_weekend" model="hr.work.entry.type">
             <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
         </record>
+
+        <record id="hr_work_entry.eg_hr_work_entry_type_out_of_contract" model="hr.work.entry.type">
+            <field name="round_days_type">HALF-UP</field>
+        </record>
+
+        <record id="hr_work_entry.eg_work_entry_type_unpaid_leave" model="hr.work.entry.type">
+            <field name="round_days_type">DOWN</field>
+        </record>
+
     </data>
 </odoo>

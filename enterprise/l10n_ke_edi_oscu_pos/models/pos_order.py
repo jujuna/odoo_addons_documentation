@@ -53,14 +53,23 @@ class PosOrder(models.Model):
     ###################################################
 
     def post_order_to_etims(self):
+        # Lock the order so a concurrent write (e.g. a reloaded PoS) cannot make saving the
+        # eTIMS answer fail after eTIMS has accepted the sale
+        self.env['res.company']._with_locked_records(self)
+        if self.l10n_ke_oscu_order_number:
+            # Already accepted by eTIMS: a retried request must not file the sale a second time
+            return {"content": self.l10n_ke_order_json, "error": {}}
+
         company = self.company_id
         content = self._l10n_ke_oscu_json_from_pos_order()
 
-        if not (sequence := self.env['ir.sequence'].search([
+        # Cashiers send orders too, but only administrators may write sequences
+        Sequence = self.env['ir.sequence'].sudo()
+        if not (sequence := Sequence.search([
             ('code', '=', 'l10n.ke.oscu.sale.sequence'),
             ('company_id', '=', company.id),
         ])):
-            sequence = self.env['ir.sequence'].create({
+            sequence = Sequence.create({
                 'name': 'eTIMS Customer Invoice Number',
                 'implementation': 'no_gap',
                 'company_id': company.id,
@@ -70,11 +79,7 @@ class PosOrder(models.Model):
         # If a previous attempt failed, the invcNo that was sent to eTIMS is stored in
         # l10n_ke_order_json. Fetch from eTIMS first to idempotently recover without sending
         # a duplicate, which would cause eTIMS error 924 (Invoice number already exists).
-        pending_invc_no = None
-        if not self.l10n_ke_oscu_order_number:
-            invc_no = (self.l10n_ke_order_json or {}).get('invcNo')
-            if invc_no:
-                pending_invc_no = int(invc_no)
+        pending_invc_no = int((self.l10n_ke_order_json or {}).get('invcNo') or 0)
 
         error = data = None
         fresh_sequence_consumed = False
@@ -96,22 +101,19 @@ class PosOrder(models.Model):
             elif fetch_error and fetch_error['code'] in ('TIM', 'CON'):
                 # Can't determine whether eTIMS has the order; don't retry blindly.
                 return {"content": content, "error": fetch_error}
-            else:
-                # eTIMS confirmed it doesn't have this invoice (e.g. error '001' - not found).
-                # Safe to resend with the same invcNo.
-                content['invcNo'] = pending_invc_no
-        else:
-            content['invcNo'] = int(sequence.next_by_id())
-            fresh_sequence_consumed = True
 
         if data is None:
-            if not self.failed_pickings:
-                error, data, _dt = company._l10n_ke_call_etims('saveTrnsSalesOsdc', content)
-            else:
+            content['invcNo'] = pending_invc_no or ''
+            if self.failed_pickings:
                 error = {
                     'code': 'Out of stock',
                     'message': _('One or more product(s) are out of stock.')
                 }
+            else:
+                if not pending_invc_no:
+                    content['invcNo'] = int(sequence.next_by_id())
+                    fresh_sequence_consumed = True
+                error, data, _dt = company._l10n_ke_call_etims('saveTrnsSalesOsdc', content)
 
         if not error:
             # Advance the sequence past this invcNo in case it was rolled back for a prior error
@@ -126,18 +128,27 @@ class PosOrder(models.Model):
                 'l10n_ke_control_unit': company.l10n_ke_control_unit,
                 'l10n_ke_order_json': content,
             })
+            # Sending the stock moves commits, stamp the invoice before that
+            if self.is_singly_invoiced and self.account_move:
+                self._copy_etims_vals_from_pos_order_to_invoice(self.account_move)
             for pick in self.picking_ids:
                 pick.move_ids._l10n_ke_oscu_process_moves()
             if self.is_singly_invoiced and self.account_move:
-                self._copy_etims_vals_from_pos_order_to_invoice(self.account_move)
                 template = self.env.ref('account.email_template_edi_invoice')
                 self.account_move.with_context(skip_invoice_sync=True)._generate_and_send(template)
         else:
-            self.write({'l10n_ke_order_json': content})
-            if fresh_sequence_consumed and error['code'] not in ('TIM', 'CON'):
+            if error['code'] == '924':
+                # eTIMS already holds this number: giving it back would hand it to the next
+                # sale, which would fail the same way
+                if sequence.number_next <= content['invcNo']:
+                    sequence.number_next = content['invcNo'] + 1
+                content['invcNo'] = ''
+            elif fresh_sequence_consumed and error['code'] not in ('TIM', 'CON'):
                 # Non-timeout error with a fresh sequence number: eTIMS never received this
                 # invoice, so roll back to reuse the number and avoid gaps in the sequence.
                 sequence.number_next -= 1
+                content['invcNo'] = ''
+            self.write({'l10n_ke_order_json': content})
             # For timeout errors: don't decrement. The invcNo is preserved in l10n_ke_order_json
             # and the fetch-first logic above will recover it idempotently on the next retry.
             if self._can_commit():

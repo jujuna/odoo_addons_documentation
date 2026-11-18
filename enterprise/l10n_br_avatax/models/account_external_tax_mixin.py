@@ -665,14 +665,21 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         goods = {}
         if params['is_export_goods']:
-            goods = {
-                'idDest': 3,
-            }
-            if params['shipping_state_id'] and params['incoterm_location']:
-                goods['exportInfo'] = {
-                    'shippingState': params['shipping_state_id'].code,
-                    'place': params['incoterm_location'][:60],
+            # foreign customer, but goods don't leave the country.
+            # idDest = 1 so avatax return with a CFOP of 5XXXX. Applying the right taxes for domestic sales.
+            if params['partner_shipping'].country_code == 'BR':
+                goods = {
+                    'idDest': 1,
                 }
+            else:
+                goods = {
+                    'idDest': 3,
+                }
+                if params['shipping_state_id'] and params['incoterm_location']:
+                    goods['exportInfo'] = {
+                        'shippingState': params['shipping_state_id'].code,
+                        'place': params['incoterm_location'][:60],
+                    }
 
         return self._l10n_br_deep_clean_dict({
             'header': {

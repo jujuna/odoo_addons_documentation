@@ -25,6 +25,12 @@
                     <div class="alert alert-warning text-center" role="alert" invisible="not extra_hours_cap_warning">
                         <field name="extra_hours_cap_warning" nolabel="1"/>
                     </div>
+                    <div class="alert alert-warning text-center" role="alert" invisible="not l10n_be_complementary_indemnity_warning">
+                        <field name="l10n_be_complementary_indemnity_warning" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not l10n_be_negative_amounts_warning">
+                        <field name="l10n_be_negative_amounts_warning" nolabel="1"/>
+                    </div>
                     <group colspan="2">
                         <group>
                             <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}" readonly="state != 'draft'"/>
@@ -68,7 +74,7 @@
                                     <field name="capped_amount_34" string="Bachelors" options="{'currency_field': 'currency_id'}"/>
                                     <field name="deducted_amount_33" string="Masters" options="{'currency_field': 'currency_id'}"/>
                                     <field name="deducted_amount_32" string="Doctors / Civil Engineers" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="deducted_amount_62" string="Staterjob" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="deducted_amount_62" string="Starterjob" options="{'currency_field': 'currency_id'}"/>
                                     <field name="deducted_amount_74" string="(Continuous) Team Shifts" options="{'currency_field': 'currency_id'}"/>
                                     <field name="deducted_amount_75" string="Night Shifts" options="{'currency_field': 'currency_id'}"/>
                                     <field name="deducted_amount_81" string="Aid Zone" options="{'currency_field': 'currency_id'}"/>
@@ -98,7 +104,7 @@
                             <field name="line_274_20_ids"
                                 context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
-                        <page string="Company Executives (274.30)" invisible="not line_274_30_ids">
+                        <page string="Presence Tokens (274.30)" invisible="not line_274_30_ids">
                             <field name="line_274_30_ids"
                                 context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
@@ -133,8 +139,8 @@
                             </div>
                             <group string="Exempted amounts" invisible="is_cbe_expired">
                                 <group>
-                                    <field name="taxable_amount_10" string="Taxable Amount" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="pp_amount_10" string="Withholding Taxes" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="startup_taxable_amount" string="Taxable Amount" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="startup_withholding_amount" string="Withholding Taxes" options="{'currency_field': 'currency_id'}"/>
                                     <field name="startup_exempted_amount" string="Exempted Amount" options="{'currency_field': 'currency_id'}"/>
                                     <field name="startup_amount_to_pay" string="Amount to Pay" options="{'currency_field': 'currency_id'}"/>
                                 </group>
@@ -178,7 +184,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Extra Hours">
+                        <page string="Extra Hours" invisible="not line_274_extra_hours_ids">
                             <field name="line_274_extra_hours_ids">
                                 <list string="Extra Hours" editable="bottom" create="false">
                                     <field name="employee_id" widget="many2one_avatar_employee"/>
@@ -194,7 +200,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Payslips">
+                        <page string="Payslips" invisible="not payslip_ids">
                             <field name="payslip_ids">
                                 <list string="Payslips" create="0" edit="0" delete="0">
                                     <field name="employee_id" widget="many2one_avatar_employee_payroll" width="300" readonly="state != 'draft'"/>

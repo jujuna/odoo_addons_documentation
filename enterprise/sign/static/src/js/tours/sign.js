@@ -1,7 +1,6 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
-import { searchOrCreateMany2X } from "@web_tour/tour_scenarios";
 import tourUtils from "@sign/js/tours/tour_utils";
 
 import { markup } from "@odoo/owl";
@@ -64,12 +63,16 @@ registry.category("web_tour.tours").add("sign_tour", {
             tooltipPosition: "bottom",
             run: "click",
         },
-        ...searchOrCreateMany2X({
+        {
             trigger: ".o_field_signer_x2many .o-autocomplete--input",
-            label: "signer",
-            searchText: "admin",
-            selectExisting: true,
-        }),
+            run: "edit admin",
+        },
+        {
+            trigger:
+                ".o-autocomplete--dropdown-item:contains('Administrator'), " +
+                ".o-autocomplete--dropdown-item:contains('Mitchell Admin')",
+            run: "click",
+        },
         {
             trigger: ".o_field_signer_x2many .o-autocomplete--input",
             run: "click",

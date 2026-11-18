@@ -482,7 +482,7 @@ class HrPayslip(models.Model):
         and use it for the computation.
 
         :param amount: The amount paid in the period.
-        :param period: The pay schedule in use (weekly, fortnightly or monthly)
+        :param period: The pay schedule in use (weekly, bi-weekly or monthly)
         :return: the weekly earnings subject to withholding
         """
         if period == "monthly" and round(amount % 1, 2) == 0.33:
@@ -506,7 +506,7 @@ class HrPayslip(models.Model):
         Compute the withholding amount for the given period.
 
         :param period_earning: The gross earning (after allowances subjects to withholding)
-        :param period: The type of pay schedule (weekly, fortnightly, or monthly)
+        :param period: The type of pay schedule (weekly, bi-weekly, or monthly)
         :param coefficients: The scale that should be applied to this employee. It will depend on their schedule.
         """
         self.ensure_one()
@@ -1063,9 +1063,9 @@ class HrPayslip(models.Model):
                         raise ValidationError(_("In order to process this payslip, a birth date should be set on the private information tab of the employee's form view."))
                     # if age less than 18, use underage
                     if employee._get_age(self.date_from) < 18:
-                        if self.version_id.schedule_pay not in ["weekly", "fortnightly", "monthly"]:
+                        if self.version_id.schedule_pay not in ["weekly", "bi-weekly", "monthly"]:
                             raise ValidationError(_("The pay schedule for this employee is not supported for underage actors."))
-                        return rates["promotional"]["underage"][self.version_id.schedule_pay]
+                        return rates["promotional"]["underage"].get(self.version_id.schedule_pay, 0)
                     # if age greater than 18
                     tfn_status = 'tfn' if version.l10n_au_tfn_declaration != "000000000" else 'no-tfn'
                     return rates["promotional"][tfn_status]

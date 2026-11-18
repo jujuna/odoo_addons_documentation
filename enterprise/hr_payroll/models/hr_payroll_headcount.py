@@ -38,6 +38,11 @@ class HrPayrollHeadcount(models.Model):
                 headcount.is_name_custom = False
 
     def get_default_name(self):
+        """
+        Return the default name, built from the company and the dates.
+
+        :rtype: str
+        """
         self.ensure_one()
         if self.date_from == self.date_to or not self.date_to:
             return _(
@@ -51,6 +56,12 @@ class HrPayrollHeadcount(models.Model):
             date_to=self.date_to)
 
     def action_populate(self):
+        """
+        Rebuild the lines: one per employee having a version of the company under contract
+        during the period (``date_to`` defaults to ``date_from``). The line points to the most
+        recent of these versions and lists the weekly hours of all of them as
+        ``hr.payroll.headcount.working.rate`` (created if missing).
+        """
         self.ensure_one()
         if not self.date_to:
             self.date_to = self.date_from

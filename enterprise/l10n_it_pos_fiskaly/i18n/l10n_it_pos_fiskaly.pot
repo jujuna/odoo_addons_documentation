@@ -1,0 +1,831 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_it_pos_fiskaly
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 18:26+0000\n"
+"PO-Revision-Date: 2026-11-06 18:26+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.module.module,description:base.module_l10n_it_pos_fiskaly
+msgid ""
+"\n"
+"Software fiscalization for the Italian Point of Sale (fiskaly SIGN IT).\n"
+"Records every commercial document with fiskaly, which transmits it to the Agenzia delle Entrate.\n"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "%(code)s is not a fiskaly VAT exemption of %(register)s."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+msgid ""
+"%(company)s is not registered with fiskaly yet: open the company form and "
+"complete the fiskaly registration before registering %(register)s."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"%(orders)s: the original receipt has no fiskaly record, this transaction was not transmitted to the Agenzia delle Entrate.\n"
+"\n"
+"The return or the cancellation is to be done manually from the \"Fatture e Corrispettivi\" portal with Fisconline credentials: section \"Corrispettivi\" → \"Documento Commerciale Online\" → \"Genera il tuo documento\" → \"Tipo operazione\" (\"Reso\" or \"Annullo\") → \"Prosegui\" under \"Documento commerciale non recuperabile\"."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"%(orders)s: there has been an issue with SIGN IT, this transaction could not be transmitted to the Agenzia delle Entrate.\n"
+"\n"
+"Please ensure compliance by issuing an electronic invoice through the SdI within 12 days of the transaction.\n"
+"\n"
+"%(url)s"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid ""
+"%(original)s has no fiskaly record: the return %(order)s cannot be recorded."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"%(product)s cannot be added: %(tax)s does not match any VAT rate accepted by"
+" the Agenzia delle Entrate."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid ""
+"%(tax)s is not mapped to a fiskaly VAT rate, %(order)s cannot be fiscalized."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "%s has no fiskaly record."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_config_settings.py:0
+msgid "%s is registered as a fiscal device with fiskaly."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+msgid ""
+"A rounding method set to 0.05 and \"Nearest\" must be enabled to accept cash"
+" payments."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "API Credentials"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "API Key"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "API Secret"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_config__l10n_it_fiskaly_system_state__acquired
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_location_state__acquired
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_taxpayer_state__acquired
+msgid "Acquired"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Authenticate Keys"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+msgid "Cash Rounding 0.05"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "City"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,help:l10n_it_pos_fiskaly.field_res_company__l10n_it_fisconline_tax_id
+msgid ""
+"Codice fiscale of the Fisconline user allowed to access the services of the "
+"Agenzia delle Entrate"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Commission"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_config__l10n_it_fiskaly_system_state__commissioned
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_location_state__commissioned
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_taxpayer_state__commissioned
+msgid "Commissioned"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_res_company
+msgid "Company"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Company Name"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Could not read a street number from the address of %s."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Country"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Create Location"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Create Organization"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Create Subject"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Create Taxpayer"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_config__l10n_it_fiskaly_system_state__decommissioned
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_location_state__decommissioned
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__res_company__l10n_it_fiskaly_taxpayer_state__decommissioned
+msgid "Decommissioned"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_account_tax__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_config__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order_line__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_account_tax
+msgid "ETA tax codes mixin"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__cause_2
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__cause_2
+msgid "Exclusive Art. 15"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__cause_1
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__cause_1
+msgid "Exempt (Esenti)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/utils/debug/debug_widget.xml:0
+msgid "Fetch the fiskaly record of a paid order"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.res_config_settings_view_form_inherit_l10n_it_pos_fiskaly
+msgid "Fiscalization"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Fisconline Credentials"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fisconline_pin
+msgid "Fisconline PIN"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fisconline_password
+msgid "Fisconline Password"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fisconline_tax_id
+msgid "Fisconline Tax ID Number"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Fiskaly"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_api_key
+msgid "Fiskaly API Key (ITA)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_api_secret
+msgid "Fiskaly API Secret (ITA)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order__l10n_it_fiskaly_intention_id
+msgid "Fiskaly Intention"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_location_id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__l10n_it_fiskaly_location_id
+msgid "Fiskaly Location"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_location_state
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__l10n_it_fiskaly_location_state
+msgid "Fiskaly Location State"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_organization_id
+msgid "Fiskaly Organization"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/utils/debug/debug_widget.xml:0
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order__l10n_it_fiskaly_record_id
+msgid "Fiskaly Record"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/utils/order_payment_validation.js:0
+msgid "Fiskaly SIGN IT"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_subject_id
+msgid "Fiskaly Subject"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_subject_api_key
+msgid "Fiskaly Subject API Key"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_subject_api_secret
+msgid "Fiskaly Subject API Secret"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_config__l10n_it_fiskaly_system_id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__pos_l10n_it_fiskaly_system_id
+msgid "Fiskaly System"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_config__l10n_it_fiskaly_system_state
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__pos_l10n_it_fiskaly_system_state
+msgid "Fiskaly System State"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_taxpayer_id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__l10n_it_fiskaly_taxpayer_id
+msgid "Fiskaly Taxpayer"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_taxpayer_state
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__l10n_it_fiskaly_taxpayer_state
+msgid "Fiskaly Taxpayer State"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_account_tax__l10n_it_fiskaly_vat_exemption
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order_line__l10n_it_fiskaly_vat_exemption
+msgid "Fiskaly VAT Exemption"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order__l10n_it_fiskaly_compliance_number
+msgid "Fiskaly compliance number"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Fiskaly did not return a location identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "Fiskaly did not return a record compliance number"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "Fiskaly did not return a record identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Fiskaly did not return a subject identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+msgid "Fiskaly did not return a system identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Fiskaly did not return a taxpayer identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Fiskaly did not return an organization identifier."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_pos_pos_form
+msgid "Fiskaly information"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid ""
+"Fiskaly refused the API key and secret of %s. Check them in the Fiskaly tab "
+"of the company, then click \"Authenticate Keys\"."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid ""
+"Fiskaly refused the subject credentials of %s. Make sure the subject still "
+"exists in the fiskaly dashboard, then try again. If it was deleted, contact "
+"the fiskaly support."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "Fiskaly returned an error: %s"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "Fiskaly returned an invalid response, please try again later."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "Fiskaly returned the state %(state)s: %(logs)s"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "Fiskaly schema validation error, %s"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_account_tax__id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_config__id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order__id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_pos_order_line__id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.module.module,shortdesc:base.module_l10n_it_pos_fiskaly
+msgid "Italy - Point of Sale Sign IT"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.res_config_settings_view_form_inherit_l10n_it_pos_fiskaly
+msgid "Italy Fiskaly"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__cause_3
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__cause_3
+msgid "Marginal scheme (Regime del margine)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "No tax"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__not_subject
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__not_subject
+msgid "Not subject (Non soggette)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__not_taxable
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__not_taxable
+msgid "Not taxable (Non imponibili)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_access_token
+msgid "Organization Access Token"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__account_tax__l10n_it_fiskaly_vat_exemption__cause_4
+#: model:ir.model.fields.selection,name:l10n_it_pos_fiskaly.selection__pos_order_line__l10n_it_fiskaly_vat_exemption__cause_4
+msgid "Other (Altre non IVA)"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Please create the fiskaly location of %s first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Please create the fiskaly organization of %s first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "Please create the fiskaly subject of %s first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Please create the fiskaly taxpayer of %s first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "Please register %s with fiskaly first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "Please set the fiskaly API key and secret of %s first."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_pos_order
+msgid "Point of Sale Order"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model,name:l10n_it_pos_fiskaly.model_pos_order_line
+msgid "Point of Sale Order Line"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "RSSMRA85M01H501Z"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.pos_order_receipt_footer
+msgid "Refund of"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.res_config_settings_view_form_inherit_l10n_it_pos_fiskaly
+msgid "Register this Register"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.res_config_settings_view_form_inherit_l10n_it_pos_fiskaly
+msgid ""
+"Register this point of sale with fiskaly SIGN IT to transmit its receipts to"
+" the Agenzia delle Entrate"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_pos_config_kanban
+msgid "Registered POS"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Registration"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_config.py:0
+msgid ""
+"Return presets cannot be used with fiskaly SIGN IT: a return must be made "
+"from the original order. Remove %(presets)s from the presets of "
+"%(register)s."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid "Select a VAT exemption"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.module.module,summary:base.module_l10n_it_pos_fiskaly
+msgid "Software fiscalization for the Italian Point of Sale"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Street"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Street Number"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_subject_access_token
+msgid "Subject Access Token"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Tax ID"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model:ir.model.fields,field_description:l10n_it_pos_fiskaly.field_res_company__l10n_it_fiskaly_test_mode
+msgid "Test Sign IT"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "The Fisconline Tax ID Number of %s must be exactly 16 characters long."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/utils/order_payment_validation.js:0
+msgid ""
+"The Point of Sale is offline: this transaction will be transmitted to the "
+"Agenzia delle Entrate once the order is synchronized with the server."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"The amount of the order must be positive for a sale and negative for a "
+"refund. Negative quantities and prices are only allowed on refunds."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/fiskaly_client.py:0
+msgid "The fiskaly server is not available, please try again later."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid ""
+"The fiskaly system of %(register)s is %(state)s: it must be commissioned "
+"before it can record transactions."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"The fiskaly taxpayer of this company is %s: receipts cannot be transmitted "
+"to the Agenzia delle Entrate. Please check the fiskaly hub for more "
+"information."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid ""
+"The following information is required to register %(company)s with fiskaly: "
+"%(fields)s"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-javascript
+#: code:addons/l10n_it_pos_fiskaly/static/src/app/services/pos_store.js:0
+msgid ""
+"The following products have no VAT rate and no VAT exemption: %s. Remove "
+"them and add them again to select a VAT exemption."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid ""
+"The name and address of this company will be sent to the Agenzia delle "
+"Entrate through fiskaly. The location is suspended while the update is "
+"applied."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid ""
+"The name, address, VAT and tax number of this company will be sent to the "
+"Agenzia delle Entrate through fiskaly. Make sure they are correct."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid ""
+"The name, address, VAT and tax number of this company will be sent to the "
+"Agenzia delle Entrate through fiskaly. The taxpayer is suspended while the "
+"update is applied."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid ""
+"The taxpayer will be suspended while the Fisconline password is sent to "
+"fiskaly. Make sure the password has already been changed on the Agenzia "
+"delle Entrate portal."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid ""
+"The zip of %(company)s must be a 5-digit Italian postal code, %(zip)s is "
+"not."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.res_config_settings_view_form_inherit_l10n_it_pos_fiskaly
+msgid ""
+"Those settings are used to comply with legal requirements in specific "
+"countries."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Update AdE Password"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Update Location"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid "Update Taxpayer"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "VAT"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#: model_terms:ir.ui.view,arch_db:l10n_it_pos_fiskaly.view_company_form
+msgid ""
+"Your fiskaly credentials are configured, but you are not authenticated. Save"
+" the company first, then click \"Authenticate Keys\" to start the "
+"registration."
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/res_company.py:0
+msgid "Zip"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "no retry"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "not available"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "not registered"
+msgstr ""
+
+#. module: l10n_it_pos_fiskaly
+#. odoo-python
+#: code:addons/l10n_it_pos_fiskaly/models/pos_order.py:0
+msgid "retried, still failing"
+msgstr ""

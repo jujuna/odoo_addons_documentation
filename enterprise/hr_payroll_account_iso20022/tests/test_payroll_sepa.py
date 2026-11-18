@@ -179,7 +179,7 @@ class TestPayrollSEPACreditTransfer(TestPayrollSEPACreditTransferCommon):
 
         self.payslip_run._generate_payslips()
         self.payslip_run.action_validate()
-        file = self.env['hr.payroll.payment.report.wizard'].create({
+        file, _ = self.env['hr.payroll.payment.report.wizard'].create({
             'payslip_ids': self.payslip_run.slip_ids.ids,
             'payslip_run_id': self.payslip_run.id,
             'export_format': 'sepa',
@@ -208,7 +208,7 @@ class TestPayrollSEPACreditTransferXmlValidity(TestPayrollSEPACreditTransferComm
         """ Checking the process of payslip when you create a SEPA payment. """
 
         self.hr_payslip_richard.action_payslip_done()
-        file = self.env['hr.payroll.payment.report.wizard'].create({
+        file, _ = self.env['hr.payroll.payment.report.wizard'].create({
             'payslip_ids': self.hr_payslip_richard.ids,
             'payslip_run_id': self.hr_payslip_richard.payslip_run_id.id,
             'export_format': 'sepa',
@@ -223,7 +223,7 @@ class TestPayrollSEPACreditTransferXmlValidity(TestPayrollSEPACreditTransferComm
 
         self.payslip_run._generate_payslips()
         self.payslip_run.action_validate()
-        file = self.env['hr.payroll.payment.report.wizard'].create({
+        file, _ = self.env['hr.payroll.payment.report.wizard'].create({
             'payslip_ids': self.payslip_run.slip_ids.ids,
             'payslip_run_id': self.payslip_run.id,
             'export_format': 'sepa',

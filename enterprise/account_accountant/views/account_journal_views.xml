@@ -11,4 +11,15 @@
             </list>
         </field>
     </record>
+
+    <record id="account_journal_view_kanban_inherit_accountant" model="ir.ui.view">
+        <field name="name">account.journal.kanban.inherit.accountant</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.account_journal_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="on_create">account_accountant.action_journal_create_wizard</attribute>
+            </xpath>
+        </field>
+    </record>
 </odoo>

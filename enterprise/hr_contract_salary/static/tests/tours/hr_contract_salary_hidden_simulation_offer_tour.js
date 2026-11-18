@@ -30,7 +30,8 @@ registry.category("web_tour.tours").add("hr_contract_salary_hidden_simulation_of
         {
             content: "Enter salary amount",
             trigger: "div[name='salary_amount'] input",
-            run: "edit 120000",
+            run: "edit 120000 && click body",
+            tooltipPosition: "bottom",
         },
         {
             content: "Wait for the backend computation to finish",

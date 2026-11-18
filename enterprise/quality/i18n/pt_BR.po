@@ -9,16 +9,18 @@
 # Layna Nascimento, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 22:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-30 16:18+0000\n"
+"Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/quality/pt_BR/>\n"
+"20/quality/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,6 +31,7 @@ msgstr ""
 
 #. module: quality
 #: model:ir.module.module,description:base.module_quality
+#, fuzzy
 msgid ""
 "\n"
 "Quality Base\n"
@@ -40,6 +43,16 @@ msgid ""
 "tolerance\n"
 "* Define your stages for the quality alerts\n"
 msgstr ""
+"\n"
+"Base de qualidade\n"
+"===============\n"
+"* Defina pontos de qualidade que gerarão verificações de qualidade em "
+"separações, ordens de produção ou ordens de trabalho (quality_mrp)\n"
+"* Alertas de qualidade podem ser criados independentemente ou relacionados a "
+"verificações de qualidade\n"
+"* Possibilidade de adicionar uma medida à verificação de qualidade com uma "
+"tolerância mínima/máxima\n"
+"* Defina seus estágios para os alertas de qualidade\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -64,7 +77,7 @@ msgstr ""
 #. module: quality
 #: model:ir.model,name:quality.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Grupos de acesso"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -192,17 +205,18 @@ msgstr "Modelo de alias"
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Categories"
-msgstr ""
+msgstr "Categorias"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Products"
-msgstr ""
+msgstr "Produtos"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
+#, fuzzy
 msgid "Apply to"
-msgstr ""
+msgstr "Aplicar a"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -219,24 +233,25 @@ msgstr "Total de anexos"
 
 #. module: quality
 #: model:ir.module.module,summary:base.module_quality
+#, fuzzy
 msgid "Basic Feature for Quality"
-msgstr ""
+msgstr "Funcionalidade básica para Qualidade"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Transferência em Lote"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_check__batch_id
 msgid "Batch associated to this transfer"
-msgstr ""
+msgstr "Lote associado a esta transferência"
 
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Categories"
-msgstr ""
+msgstr "Categorias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -591,7 +606,7 @@ msgstr "Baixa"
 #: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
 #: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ícone de símbolos de material, por exemplo, lista de verificação"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -668,7 +683,7 @@ msgstr "Tipo da próxima atividade"
 #. module: quality
 #: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #. module: quality
 #. odoo-python
@@ -869,8 +884,9 @@ msgstr "Equipe de alerta de qualidade"
 
 #. module: quality
 #: model:ir.module.module,shortdesc:base.module_quality
+#, fuzzy
 msgid "Quality Base"
-msgstr ""
+msgstr "Qualidade - Base"
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -1043,6 +1059,8 @@ msgid ""
 "Technical field holding the tracking method. False on a storable product "
 "means it's tracked by quantity only."
 msgstr ""
+"Campo técnico que contém o método de rastreamento. False em um produto "
+"armazenável significa que ele é rastreado apenas por quantidade."
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
@@ -1106,7 +1124,7 @@ msgstr "Atividades de hoje"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
 msgid "Tracking Method"
-msgstr ""
+msgstr "Método de Rastreamento"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -1157,13 +1175,15 @@ msgstr "ativo"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+#, fuzzy
 msgid "e.g. Check Dimensions"
-msgstr ""
+msgstr "ex. Verificar dimensões"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+#, fuzzy
 msgid "e.g. Quarantine, Second Inspection"
-msgstr ""
+msgstr "ex. Quarentena, Segunda inspeção"
 
 #~ msgid "Lot"
 #~ msgstr "Lote"

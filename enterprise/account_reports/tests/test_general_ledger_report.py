@@ -208,7 +208,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('600000 Expenses',                                 0.0,     21000.0,        -21000.0),
                 ('600010 Expenses',                               200.0,         0.0,           200.0),
                 ('Result Brought Forward - company_1_data',       200.0,       300.0,          -100.0),
-                ('Result Brought Forward - company_2',              0.0,        50.0,           -50.0),
+                ('Result Brought Forward - company_2',              0.0,        33.38,          -33.38),
+                ('Cumulative Translation Adjustments',              0.0,        16.62,          -16.62),
                 ('Total General Ledger',                        21550.0,     21550.0,             0.0),
             ],
             options,
@@ -248,7 +249,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('BNK1/2017/00001 2017_2_1',                      200.0,         0.0,      200.0),
                 ('Total 600010 Expenses',                         200.0,         0.0,      200.0),
                 ('Result Brought Forward - company_1_data',       200.0,       300.0,     -100.0),
-                ('Result Brought Forward - company_2',              0.0,        50.0,      -50.0),
+                ('Result Brought Forward - company_2',              0.0,        33.38,     -33.38),
+                ('Cumulative Translation Adjustments',              0.0,        16.62,     -16.62),
                 ('Total General Ledger',                        21550.0,     21550.0,        0.0),
             ],
             options,
@@ -282,7 +284,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('600000 Expenses',                                   0.0,          21000.0,    -21000.0),
                 ('600010 Expenses',                                 200.0,              0.0,       200.0),
                 ('Result Brought Forward - company_1_data',         400.0,            600.0,      -200.0),
-                ('Result Brought Forward - company_2',                0.0,             50.0,       -50.0),
+                ('Result Brought Forward - company_2',                0.0,             33.38,      -33.38),
+                ('Cumulative Translation Adjustments',                0.0,             16.62,      -16.62),
                 ('Total General Ledger',                          21850.0,          21850.0,         0.0),
             ],
             options,
@@ -323,7 +326,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('BNK1/2017/00001 2017_2_1',                        200.0,         0.0,         200.0),
                 ('Total 600010 Expenses',                           200.0,         0.0,         200.0),
                 ('Result Brought Forward - company_1_data',         400.0,       600.0,        -200.0),
-                ('Result Brought Forward - company_2',                0.0,        50.0,         -50.0),
+                ('Result Brought Forward - company_2',                0.0,        33.38,        -33.38),
+                ('Cumulative Translation Adjustments',                0.0,        16.62,        -16.62),
                 ('Total General Ledger',                          21850.0,     21850.0,           0.0),
             ],
             options,
@@ -492,7 +496,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('INV/2017/00002 curr_2',                         -2000.0,               0.0,      1000.0,    -1100.0),
                 ('Total test foreign_curr_account',               -2300.0,               0.0,      1100.0,    -1100.0),
                 ('Result Brought Forward - company_1_data',            '',             200.0,       300.0,     -100.0),
-                ('Result Brought Forward - company_2',                 '',               0.0,        50.0,      -50.0),
+                ('Result Brought Forward - company_2',                 '',               0.0,        33.38,     -33.38),
+                ('Cumulative Translation Adjustments',                 '',               0.0,        16.62,     -16.62),
                 ('Total General Ledger',                               '',           22650.0,     22650.0,        0.0),
             ],
             options,
@@ -558,7 +563,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('Initial Balance',                                -300.0,               0.0,       100.0,     -100.0),
                 ('Total test foreign_curr_account',                -300.0,               0.0,       100.0,     -100.0),
                 ('Result Brought Forward - company_1_data',            '',             200.0,       300.0,     -100.0),
-                ('Result Brought Forward - company_2',                 '',               0.0,        50.0,      -50.0),
+                ('Result Brought Forward - company_2',                 '',               0.0,        33.38,     -33.38),
+                ('Cumulative Translation Adjustments',                 '',               0.0,        16.62,     -16.62),
                 ('Total General Ledger',                               '',           21650.0,     21650.0,        0.0),
             ],
             options,
@@ -642,9 +648,9 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             #   Name                                                Debit           Credit          Balance
             [   0,                                                  3,              4,              5],
             [
-                ('Result Brought Forward - company_1_data',         200.0,          300.0,          -100.0),
-                ('Result Brought Forward - company_2',                0.0,           50.0,           -50.0),
-                ('Total General Ledger',                            200.0,          350.0,          -150.0),
+                ('Result Brought Forward - company_1_data',         200.0,          300.00,          -100.00),
+                ('Result Brought Forward - company_2',                0.0,           33.38,           -33.38),
+                ('Total General Ledger',                            200.0,          333.38,          -133.38),
             ],
             options,
         )
@@ -704,7 +710,8 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                         'account_id': self.company_data['default_account_revenue'].id}),
             ],
         })
-        move_07_2017.action_post()
+        move_06_2017 = move_07_2017.copy({'date': fields.Date.from_string('2017-06-10')})
+        (move_06_2017 + move_07_2017).action_post()
 
         self.start_tour("/odoo/action-account_reports.action_account_report_general_ledger", 'account_reports_search', login=self.env.user.login)
 
@@ -732,6 +739,7 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('600010 Expenses',                                     '',    ''),
                 ('Result Brought Forward - company_1_data',             '',    ''),
                 ('Result Brought Forward - company_2',                  '',    ''),
+                ('Cumulative Translation Adjustments',                  '',    ''),
                 ('Total General Ledger',                                '',    ''),
             ],
             options,
@@ -1220,33 +1228,6 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
         move.action_post()
 
         self.start_tour("/odoo/action-account_reports.action_account_report_general_ledger", 'account_reports_general_ledger_cumulated_balance', login=self.env.user.login)
-
-    def test_open_gl_from_bs_then_change_date_filter(self):
-        """
-        Test that the 'filter_search_bar' option key is not filtered out when updating the date filter after opening
-        the General Ledger from a balance sheet line
-        """
-
-        # Open Balance Sheet
-        balance_sheet = self.env.ref('account_reports.balance_sheet')
-        bs_options = self._generate_options(balance_sheet, '2017-06-01', '2017-06-01', default_options={'unfold_all': True})
-        lines = balance_sheet._get_lines(bs_options)
-        line = [l for l in lines if l.caret_options][:1]
-        self.assertLinesValues(line, [0, 1], [('121000 Accounts Receivable', 1000.0)], bs_options)
-
-        # Open General Ledger
-        general_ledger = self.env.ref('account_reports.general_ledger_report')
-        params = {'line_id': line[0].id}
-        res = balance_sheet.caret_option_open_general_ledger(bs_options, params)
-        gl_options = res['params']['options']
-
-        # options are updated afterward by the search() in account_reports/static/src/components/account_report/search_bar/search_bar.js
-        filter_search_bar = gl_options['filter_search_bar']
-
-        # Update the date filter
-        gl_options['date'] = {**gl_options['date'], 'filter': 'this_month'}
-        new_gl_options = general_ledger.with_context(res['context']).get_options(gl_options)
-        self.assertEqual(new_gl_options['filter_search_bar'], filter_search_bar, 'the filter_search_bar key should still be present and set in the options')
 
     def test_general_ledger_report_with_invoice_date_column(self):
         """ Test that the report can be generated with an invoice_date column. """

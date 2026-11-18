@@ -9,3 +9,4 @@ from . import test_tax_closing
 from . import test_tax_report_rounding
 from . import test_fiscal_declaration
 from . import test_profit_loss
+from . import test_2033_rounding

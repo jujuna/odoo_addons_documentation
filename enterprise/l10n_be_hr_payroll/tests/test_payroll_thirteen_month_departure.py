@@ -53,6 +53,16 @@ class TestPayrollThirteenMonthDeparture(TestPayrollCommon):
         self.assertTrue(departure.l10n_be_thirteen_month_eligible,
             "6 months of seniority should be enough for a fired employee to be eligible.")
 
+    def test_fired_serious_misconduct_is_not_eligible(self):
+        employee = self.create_employee({
+            'name': '13th Month Fired Serious Misconduct',
+            'contract_date_start': date(2020, 1, 1),
+        })
+        departure = self._create_departure(
+            employee, date(2025, 8, 1), self.env.ref('l10n_be_hr_payroll.departure_fired_serious_misconduct'))
+        self.assertFalse(departure.l10n_be_thirteen_month_eligible,
+            "An employee fired for a serious misconduct is excluded from the year-end bonus, whatever the seniority.")
+
     def test_resigned_meets_seniority_is_eligible(self):
         employee = self.create_employee({
             'name': '13th Month Resigned Eligible',

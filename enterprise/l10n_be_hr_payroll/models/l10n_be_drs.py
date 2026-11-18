@@ -10,7 +10,7 @@ from lxml import etree
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import date_utils, email_normalize, float_round, format_date
+from odoo.tools import clean_context, date_utils, email_normalize, float_round, format_date
 
 from odoo.addons.l10n_be_hr_payroll.models.utils import format_amount, xml_str_to_dict
 
@@ -195,12 +195,67 @@ class L10nBeDrs(models.Model):
         ('12', 'December')
     ], default=lambda self: str(fields.Date.context_today(self).month))
     year = fields.Integer(default=lambda self: fields.Date.context_today(self).year)
+    earliest_filling_date = fields.Date(string="Earliest Filling Date", compute='_compute_filling_dates',
+        help="First day the declaration can be filed, from the instructions of the social security (empty when not defined)")
+    latest_filling_date = fields.Date(string="Latest Filling Date", compute='_compute_filling_dates',
+        help="Legal deadline to file the declaration, from the instructions of the social security (empty when not defined)")
 
     # ZIMA006 Specifics
     origin_drs_id = fields.Many2one('l10n.be.drs', string="Origin DRS", compute='_compute_work_recovery',
         help="The declaration of the risk ended by the return to work")
     work_recovery_date = fields.Date(string="Work Recovery Date", compute='_compute_work_recovery',
         help="First day of work after the risk")
+
+    @api.model
+    def _get_first_working_day_from(self, day):
+        """ The day itself, or the next Monday for a Sunday: a "jour ouvrable" goes from Monday to Saturday
+        (public holidays are not considered) """
+        return day + timedelta(days=1) if day.weekday() == 6 else day
+
+    @api.depends('identification', 'month', 'year', 'employee_id', 'work_recovery_date')
+    def _compute_filling_dates(self):
+        """ Period during which the declaration can be filed, from the DRS administrative instructions of
+            the social security (https://www.socialsecurity.be/employer/instructions/drs/fr/latest/instructions/,
+            "Quand" page of each scenario). Left empty when the instructions define no bound. """
+        for drs in self:
+            earliest = latest = False
+            month_start, month_end = drs._get_first_last_day_of_month()
+            identification = drs.identification
+            if identification == 'WECH001':
+                # onemrva/scenario_01/when.html: "au plus tard le dernier jour de travail"
+                latest = drs._get_wech001_end_date() if month_start else False
+            elif identification == 'WECH002':
+                # https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/obligations/obligations_branches/unemployment.html:
+                # "au plus tard le premier jour de chômage effectif"
+                latest = drs.unemployment_start_date
+            elif identification in ('WECH005', 'WECH006', 'WECH008') and month_end:
+                # onemrva/scenario_05, 06 and 08/when.html: after the end of the month ("après la fin du mois",
+                # "à l'issue de chaque mois"), no deadline
+                earliest = month_end + timedelta(days=1)
+            elif identification == 'WECH007' and month_end:
+                # onemrva/scenario_07/when.html: "A la fin de chaque mois", no deadline
+                earliest = month_end
+            elif identification == 'ZIMA001' and drs.risk_start_date:
+                # inamiriziv/scenario_01/when.html: "au plus tard le premier jour ouvrable du mois suivant le mois
+                # au cours duquel débute le risque social"
+                latest = drs._get_first_working_day_from(drs.risk_start_date + relativedelta(months=1, day=1))
+            elif identification == 'ZIMA002' and month_end:
+                # inamiriziv/scenario_02/when.html: "au plus tard à l'expiration du mois concerné"
+                latest = month_end
+            elif identification == 'ZIMA006' and drs.work_recovery_date:
+                # inamiriziv/scenario_06/when.html: "au plus tard le premier jour ouvrable du deuxième mois civil
+                # qui suit le mois civil durant lequel le travail a été repris", not before the return to work
+                earliest = drs.work_recovery_date
+                latest = drs._get_first_working_day_from(drs.work_recovery_date + relativedelta(months=2, day=1))
+            drs.earliest_filling_date = earliest
+            drs.latest_filling_date = latest
+
+    def _compute_state(self):
+        # A declaration filed manually on the portal of the social security is marked as done without
+        # being posted: it stays done. Once posted, the answer of the ONSS gives the state (e.g. refused).
+        manually_done = self.filtered(lambda drs: drs.id and drs.state == 'done' and not drs.onss_declaration_ids)
+        super()._compute_state()
+        manually_done.state = 'done'
 
     @api.depends('risk_id', 'employee_id')
     def _compute_name(self):
@@ -268,7 +323,10 @@ class L10nBeDrs(models.Model):
     def _compute_departure_id(self):
         for drs in self:
             date_from, date_to = drs._get_first_last_day_of_month()
-            drs.departure_id = drs.employee_id and date_from and self.env['hr.employee.departure'].search([
+            if not drs.employee_id or not date_from:
+                drs.departure_id = False
+                continue
+            drs.departure_id = self.env['hr.employee.departure'].search([
                 ('employee_id', '=', drs.employee_id.id),
                 ('departure_date', '>=', date_from),
                 ('departure_date', '<=', date_to),
@@ -277,7 +335,7 @@ class L10nBeDrs(models.Model):
     @api.depends('employee_id', 'month', 'year')
     def _compute_version_id(self):
         for drs in self:
-            drs.version_id = drs.employee_id and drs.year and drs.month and drs._get_period_version()
+            drs.version_id = drs._get_period_version() if drs.employee_id and drs.year and drs.month else False
 
     @api.depends('employee_id', 'risk_id', 'month', 'year')
     def _compute_unemployment_data(self):
@@ -299,7 +357,10 @@ class L10nBeDrs(models.Model):
     def _compute_payslip_id(self):
         for drs in self:
             date_from, date_to = drs._get_first_last_day_of_month()
-            drs.payslip_id = date_from and drs.employee_id and self.env['hr.payslip'].search([
+            if not drs.employee_id or not date_from:
+                drs.payslip_id = False
+                continue
+            drs.payslip_id = self.env['hr.payslip'].search([
                 ('employee_id', '=', drs.employee_id.id),
                 ('state', 'in', ('validated', 'paid')),
                 ('date_from', '>=', date_from),
@@ -405,6 +466,15 @@ class L10nBeDrs(models.Model):
     # ACTIONS
     # =======================================
 
+    @api.model
+    def action_list_view(self):
+        """ Open the DRS, showing their sending state when the company sends them to the ONSS (certificate) """
+        action = self.env['ir.actions.act_window']._for_xml_id('l10n_be_hr_payroll.action_drs')
+        action['context'] = {
+            'onss_certificate_id': bool(self.env.company.root_id.onss_certificate_id),
+        }
+        return action
+
     def action_modify_declaration(self):
         """ Replace the declaration accepted by the ONSS by a new one, generated with the current data """
         self.ensure_one()
@@ -469,7 +539,8 @@ class L10nBeDrs(models.Model):
                 continue
             existing_keys.add(key)
             vals_to_create.append(dict(vals, month=str(vals['month']), is_automatically_created=True))
-        return self.create(vals_to_create)
+        # Created by the flows of other records (payslips, time off): their default values don't apply
+        return self.with_context(clean_context(self.env.context)).create(vals_to_create)
 
     def _is_necessary(self):
         """ Whether the data of the employee still require the declaration, e.g. after the cancellation of a time off """
@@ -675,7 +746,7 @@ class L10nBeDrs(models.Model):
             'onss_registration_number': format_amount(self.company_onss_number or 0, width=9, hundredth=False),
             'l10n_be_company_number': format_amount(self.payroll_config_id.l10n_be_company_number or 0, width=10, hundredth=False),
             'inss': self.employee_id.niss,
-            'employer_class': self.payroll_config_id.l10n_be_employer_category_id.dmfa_code,
+            'employer_class': version._l10n_be_get_employer_category_dmfa_code(self.payroll_config_id.l10n_be_employer_category_id),
             'worker_code': version.l10n_be_worker_code_id.dmfa_code,
             'occupation': self._get_occupation_values(version),
             'occupation_features': False,
@@ -1879,7 +1950,7 @@ class L10nBeDrs(models.Model):
             reference_period = (self.risk_start_date, self._get_zima001_reference_end_date())
         else:
             reference_period = day_list and (day_list[0]['day'], day_list[-1]['day'])
-        car_atn = version.car_atn if version.transport_mode_car else 0
+        car_atn = version.car_atn if version.car_id else 0
         return {
             'quarter': f'{quarter_start.year}{date_utils.get_quarter_number(quarter_start)}',
             'quarter_start': quarter_start.strftime('%Y-%m-%d'),

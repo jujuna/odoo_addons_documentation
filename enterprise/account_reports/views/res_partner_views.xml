@@ -13,6 +13,17 @@
         </field>
     </record>
 
+    <record id="view_partner_tree_inherit_account_reports" model="ir.ui.view">
+        <field name="name">res.partner.list.inherit.account.reports</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="complete_name" position="after">
+                <widget name="set_as_main_partner"/>
+            </field>
+        </field>
+    </record>
+
     <record id="duplicate_vat_partner_tree_view" model="ir.ui.view">
         <field name="name">duplicate.vat.res.partner.list</field>
         <field name="model">res.partner</field>

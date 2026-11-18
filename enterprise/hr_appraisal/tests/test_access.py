@@ -1,8 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo.exceptions import AccessError
 from odoo.tests.common import tagged, TransactionCase
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.tests import users
+
+from markupsafe import Markup
 
 
 @tagged('at_install', '-post_install')  # LEGACY at_install
@@ -87,3 +90,85 @@ class TestAppraisalPublicAccess(TransactionCase):
         appraisal.assessment_note = self.assessment_note
         # A manager without hr right should be able to mark as done an appraisal of one of his subordinate
         appraisal.action_done()
+
+    def test_prevent_officer_access_to_own_appraisal_feedback(self):
+        """
+        Checks that an officer who has high access rights doesn't have access to the manager feedbacj of his own
+        appraisal before it's published.
+        """
+        user_manager = mail_new_test_user(
+            self.env,
+            name='user_manager',
+            login='user_manager',
+            email='user_manager@example.com',
+            groups='base.group_user,hr_appraisal.group_hr_appraisal_manager,base.group_allow_export',
+            notification_type='email',
+            company_id=self.company.id,
+        )
+        manager = self.env['hr.employee'].create({
+            'name': 'Silver hand',
+            'user_id': user_manager.id,
+            'company_id': self.company.id,
+        })
+        appraisal = self.env['hr.appraisal'].create({
+            'employee_id': manager.id,
+            'manager_ids': [self.employee_a.id],
+            'manager_feedback': Markup("<span>This is a manager feedback!!</span>")
+        })
+        self.env = self.env(user=user_manager)
+        with self.assertRaises(AccessError):
+            appraisal.with_user(user_manager).export_data(['id', 'manager_feedback'])
+
+    def test_officer_own_appraisal_feedback_among_others(self):
+        """
+        An officer sees the manager feedback of the other appraisals, but not the one of their own appraisal before it
+        is published, also when read or exported together: the feedback is only accessible through
+        accessible_manager_feedback.
+        """
+        user_officer = mail_new_test_user(
+            self.env,
+            name='user_officer',
+            login='user_officer',
+            email='user_officer@example.com',
+            groups='base.group_user,hr_appraisal.group_hr_appraisal_manager,base.group_allow_export',
+            notification_type='email',
+            company_id=self.company.id,
+        )
+        officer = self.env['hr.employee'].create({
+            'name': 'Silver hand',
+            'user_id': user_officer.id,
+            'company_id': self.company.id,
+        })
+        own_appraisal, other_appraisal = self.env['hr.appraisal'].create([{
+            'employee_id': officer.id,
+            'manager_ids': [self.employee_a.id],
+            'state': '2_pending',
+            'manager_feedback': Markup("<span>Own feedback</span>"),
+        }, {
+            'employee_id': self.employee_b.id,
+            'manager_ids': [self.employee_a.id],
+            'state': '2_pending',
+            'manager_feedback': Markup("<span>Other feedback</span>"),
+        }])
+        appraisals = (other_appraisal | own_appraisal).with_user(user_officer)
+
+        # several appraisals are fetched at once
+        self.env.invalidate_all()
+        self.assertEqual(appraisals.mapped('state'), ['2_pending', '2_pending'])
+
+        self.assertEqual(appraisals.mapped('accessible_manager_feedback'), [
+            Markup("<span>Other feedback</span>"),
+            Markup("<p>Unpublished</p>"),
+        ])
+        self.assertEqual(appraisals.export_data(['accessible_manager_feedback'])['datas'], [
+            [Markup("<span>Other feedback</span>")],
+            [Markup("<p>Unpublished</p>")],
+        ])
+
+        # the raw feedback is not accessible, whatever the appraisal
+        with self.assertRaises(AccessError):
+            appraisals.read(['manager_feedback'])
+        with self.assertRaises(AccessError):
+            other_appraisal.with_user(user_officer).export_data(['manager_feedback'])
+        with self.assertRaises(AccessError):
+            own_appraisal.with_user(user_officer).accessible_manager_feedback = Markup("<span>Changed</span>")

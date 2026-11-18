@@ -40,8 +40,8 @@ class HrVersion(models.Model):
     )
 
     _l10n_ae_hr_payroll_dews_emp_contribution_constraint = models.Constraint(
-        "CHECK(l10n_ae_dews_emp_contribution >= 0.0 AND l10n_ae_dews_emp_contribution <= 0.10)",
-        "The employee contribution must be greater than or equal to 0 and less than or equal to 10.",
+        "CHECK(l10n_ae_dews_emp_contribution >= 0.0 AND l10n_ae_dews_emp_contribution <= 0.25)",
+        "The employee contribution must be greater than or equal to 0 and less than or equal to 25.",
     )
 
     def _l10n_ae_is_below_min_wage(self):

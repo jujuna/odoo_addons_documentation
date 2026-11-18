@@ -209,3 +209,17 @@ test("no content helper from action when no data and sample mode", async () => {
     expect(SELECTORS.noContentHelper).toHaveCount(1);
     expect(`${SELECTORS.noContentHelper} p.hello:contains(add a partner)`).toHaveCount(1);
 });
+
+test("show side panel for side-panel records which are in 'to schedule' state", async () => {
+    Tasks._records = [Tasks._records[0]];
+    Tasks._records[0].start = false;
+    Tasks._records[0].stop = false;
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1" sample="1"/>`,
+        groupBy: ["project_id"],
+    });
+    expect(SELECTORS.sidePanel).toHaveCount(1);
+    expect(SELECTORS.sidePanel).toHaveText("1 to schedule\nTask 1");
+    expect(SELECTORS.noContentHelper).toHaveCount(0);
+});

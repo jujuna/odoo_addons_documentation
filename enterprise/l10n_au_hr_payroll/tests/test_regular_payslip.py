@@ -227,9 +227,8 @@ class TestRegularPayslip(TestPayrollCommon):
             'wage': 1250,
             'casual_loading': 0,
             'extra_pay': True,
-            'l10n_au_training_loan': False})
-        payslip_date = date(2023, 7, 3)
-        payslip_end_date = date(2023, 7, 9)
+            'l10n_au_training_loan': False,
+        })
         self._test_payslip(
             employee,
             contract,
@@ -251,8 +250,50 @@ class TestRegularPayslip(TestPayrollCommon):
                 ('SUPER.CONTRIBUTION', 100),
                 ('SUPER', 137.5),
             ],
-            payslip_date_from=payslip_date,
-            payslip_date_to=payslip_end_date,
+            payslip_date_from=date(2023, 7, 3),
+            payslip_date_to=date(2023, 7, 9),
+        )
+
+    def test_regular_payslip_bi_weekly_withholding_extra(self):
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Employee',
+            'employment_basis_code': 'F',
+            'leave_loading': 'regular',
+            'leave_loading_rate': 17.5,
+            'workplace_giving_employee': 0,
+            'workplace_giving_employer': 0,
+            'salary_sacrifice_superannuation': 100,
+            'salary_sacrifice_other': 100,
+            'wage_type': 'monthly',
+            'schedule_pay': 'bi-weekly',
+            'wage': 2200,
+            'casual_loading': 0,
+            'extra_pay': True,
+            'l10n_au_training_loan': False,
+        })
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
+                (self.work_entry_types['002.00'].id, 10, 76, 2200),
+            ],
+            expected_lines=[
+                # (code, total)
+                ('BASIC', 2200),
+                ('OTE', 2200),
+                ('SALARY.SACRIFICE.TOTAL', -200),
+                ('SALARY.SACRIFICE.OTHER', -100),
+                ('GROSS', 2000),
+                ('WITHHOLD', -566),
+                ('EXTRA.WITHHOLD', -13),
+                ('WITHHOLD.TOTAL', -579),
+                ('NET', 1421),
+                ('SUPER.CONTRIBUTION', 100),
+                ('SUPER', 242),
+            ],
+            payslip_date_from=date(2023, 7, 3),
+            payslip_date_to=date(2023, 7, 16),
         )
 
     def test_regular_payslip_7(self):

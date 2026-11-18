@@ -5,7 +5,7 @@ from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install_l10n', 'post_install', '-at_install', 'time_rule_pp_attendance')
+@tagged('post_install_l10n', 'post_install', '-at_install', 'time_rule_pp_attendance', 'time_rule_pipeline')
 class TestTimeRulePPAttendance(TransactionCase):
     @classmethod
     def setUpClass(cls):

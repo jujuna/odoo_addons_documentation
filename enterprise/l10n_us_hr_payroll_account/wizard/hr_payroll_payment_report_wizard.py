@@ -201,11 +201,11 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         payslip_payments = self._convert_payslips_to_payments()
         offset_payments = self.env["account.payment"]
         # There is only one batch generated for all the payslips.
-        batch_nr = 0
+        batch_nr = 1
         number_of_batches = 1
         entries.append(self._generate_nacha_batch_header_record(self.effective_date, batch_nr))
 
-        for payment_nr, payment in enumerate(payslip_payments):
+        for payment_nr, payment in enumerate(payslip_payments, start=1):
             self._validate_bank_for_nacha(payment)
             entries.append(self._generate_nacha_entry_detail(payment_nr, payment, is_offset=False))
 
@@ -222,7 +222,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
             })
             self._validate_bank_for_nacha(offset_payment)
             offset_payments |= offset_payment
-            entries.append(self._generate_nacha_entry_detail(len(payslip_payments), offset_payment, is_offset=True))
+            entries.append(self._generate_nacha_entry_detail(len(payslip_payments) + 1, offset_payment, is_offset=True))
 
         batch_contrl_record = self._generate_nacha_batch_control_record(payslip_payments, offset_payment, batch_nr)
         file_control_record = self._generate_nacha_file_control_record(number_of_batches, payslip_payments, offset_payments)

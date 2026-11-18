@@ -103,7 +103,7 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
             tracked_create_vals['lastname'] = ' '.join(private_last_name)
 
             tracked_create_vals['email'] = employee_sudo.email
-            tracked_create_vals['phone_number'] = employee_sudo.work_phone
+            tracked_create_vals['phone_number'] = employee_sudo.mobile_phone
             tracked_create_vals['birthday'] = employee_sudo.birthday and employee_sudo.birthday.isoformat()  # VERY IMPORTANT, the ORM will convert it but not the JSON
 
             work_address = employee_sudo.address_id

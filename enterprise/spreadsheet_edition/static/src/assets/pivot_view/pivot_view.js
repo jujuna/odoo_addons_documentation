@@ -14,16 +14,20 @@ import { session } from "@web/session";
  * This const is defined in o-spreadsheet library, but has to be redefined here
  * because o-spreadsheet is lazy loaded in another bundle than this file is.
  */
-const ALL_PERIODS = {
+export const ALL_PERIODS = {
+    year: _t("Year"),
     quarter: _t("Quarter & Year"),
     month: _t("Month & Year"),
     week: _t("Week & Year"),
     day: _t("Day"),
-    year: _t("Year"),
     quarter_number: _t("Quarter"),
     month_number: _t("Month"),
     iso_week_number: _t("Week"),
     day_of_month: _t("Day of Month"),
+    day_of_week: _t("Day of Week"),
+    hour_number: _t("Hour"),
+    minute_number: _t("Minute"),
+    second_number: _t("Second"),
 };
 
 patch(PivotRenderer.prototype, {
@@ -103,16 +107,39 @@ patch(PivotRenderer.prototype, {
         );
     },
 
+    /**
+     * Returns the first groupby using a granularity which is not supported by
+     * the spreadsheet pivot (e.g. "date:hour"), if any.
+     */
+    getUnsupportedGroupby() {
+        const { fullColGroupBys, fullRowGroupBys } = this.model.metaData;
+        return [...fullColGroupBys, ...fullRowGroupBys].find((groupBy) => {
+            const granularity = groupBy.split(":")[1];
+            return granularity && !(granularity in ALL_PERIODS);
+        });
+    },
+
     isInsertButtonDisabled() {
         return (
             !this.model.hasData() ||
             this.model.metaData.activeMeasures.length === 0 ||
             this.model.useSampleModel ||
-            this.hasDuplicatedGroupbys()
+            this.hasDuplicatedGroupbys() ||
+            !!this.getUnsupportedGroupby()
         );
     },
 
     getInsertButtonTooltip() {
-        return this.hasDuplicatedGroupbys() ? _t("Pivot contains duplicate groupbys") : undefined;
+        if (this.hasDuplicatedGroupbys()) {
+            return _t("Pivot contains duplicate groupbys");
+        }
+        const groupBy = this.getUnsupportedGroupby();
+        if (groupBy) {
+            const [fieldName] = groupBy.split(":");
+            return _t('The grouping period used on "%(field)s" is not supported', {
+                field: this.model.metaData.fields[fieldName]?.string || fieldName,
+            });
+        }
+        return undefined;
     },
 });

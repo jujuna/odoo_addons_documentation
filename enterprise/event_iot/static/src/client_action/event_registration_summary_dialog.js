@@ -105,28 +105,33 @@ patch(EventRegistrationSummaryDialog.prototype, {
             reportName = "event.event_registration_report_template_badge";
         }
 
-        const [{ id: reportId }] = await this.orm.searchRead(
-            "ir.actions.report",
-            [["report_name", "=", reportName]],
-            ["id"]
-        );
         const ticketType = this.registration.ticket_name ? this.registration.ticket_name : "";
+        const [jobs] = await this.orm.call("ir.actions.report", "get_print_jobs", [
+            reportName,
+            [this.registration.id],
+            null,
+        ]);
 
-        this.notification.add(
-            _t("'%(name)s' %(type)s badge sent to printer '%(printer)s'", {
-                name: this.registration.name,
-                type: ticketType,
-                printer: this.selectedPrinter.name,
-            }),
-            { type: "info" }
-        );
-        const [{ iotBoxId, document }] = await this.orm.call(
-            "ir.actions.report",
-            "render_document",
-            [reportId, [this.selectedPrinter.id], [this.registration.id], null]
-        );
-        this.iotHttpService.action(iotBoxId, this.selectedPrinter.identifier, {
-            document,
-        });
+        if (jobs?.type === "iot") {
+            this.notification.add(
+                _t("'%(name)s' %(type)s badge sent to printer '%(printer)s'", {
+                    name: this.registration.name,
+                    type: ticketType,
+                    printer: this.selectedPrinter.name,
+                }),
+                { type: "info" }
+            );
+
+            this.iotHttpService.action(
+                this.selectedPrinter.iotBoxId,
+                this.selectedPrinter.identifier,
+                { data: jobs?.report }
+            );
+        } else {
+            this.notification.add(
+                _t("Failed to print badge: No printer is configured for this report."),
+                { type: "warning" }
+            );
+        }
     },
 });

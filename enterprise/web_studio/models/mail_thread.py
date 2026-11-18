@@ -11,3 +11,9 @@ class MailThread(models.AbstractModel):
         if field and field.type == 'many2one' and field.comodel_name == 'res.partner':
             fields.append('x_studio_partner_id')
         return fields
+
+    def _track_get_fields(self):
+        # `_track_get_fields` shouldn't call `fields_get` as superuser.
+        if self.env.context.get('studio'):
+            return super(MailThread, self.with_context(studio=False))._track_get_fields()
+        return super()._track_get_fields()

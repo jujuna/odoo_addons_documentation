@@ -74,16 +74,23 @@ class HelpdeskTeam(models.Model):
 
     def _check_timesheet_group(self):
         timesheet_teams = self.filtered('use_helpdesk_timesheet')
-        use_helpdesk_timesheet_group = self.env.user.has_group('helpdesk_timesheet.group_use_helpdesk_timesheet')
         helpdesk_timesheet_group = self.env.ref('helpdesk_timesheet.group_use_helpdesk_timesheet')
-        enabled_timesheet_team = lambda: self.env['helpdesk.team'].search([('use_helpdesk_timesheet', '=', True)], limit=1)
-        if timesheet_teams and not use_helpdesk_timesheet_group:
-            (self._get_helpdesk_user_group() + self._get_timesheet_user_group())\
-                .write({'implied_ids': [Command.link(helpdesk_timesheet_group.id)]})
-        elif self - timesheet_teams and use_helpdesk_timesheet_group and not enabled_timesheet_team():
-            (self._get_helpdesk_user_group() + self._get_timesheet_user_group())\
-                .write({'implied_ids': [Command.unlink(helpdesk_timesheet_group.id)]})
-            helpdesk_timesheet_group.write({'user_ids': [Command.clear()]})
+        user_groups = self._get_helpdesk_user_group() + self._get_timesheet_user_group()
+        groups_with_timesheet = user_groups.filtered(lambda group: helpdesk_timesheet_group in group.implied_ids)
+        # Enabling
+        if timesheet_teams:
+            if groups_to_enable := user_groups - groups_with_timesheet:
+                groups_to_enable.write({'implied_ids': [Command.link(helpdesk_timesheet_group.id)]})
+        # Disabling
+        elif (
+            self - timesheet_teams
+            and (groups_with_timesheet or helpdesk_timesheet_group.user_ids)
+            and not self.env['helpdesk.team'].search_count([('use_helpdesk_timesheet', '=', True)], limit=1)
+        ):
+            if groups_with_timesheet:
+                groups_with_timesheet.write({'implied_ids': [Command.unlink(helpdesk_timesheet_group.id)]})
+            if helpdesk_timesheet_group.user_ids:
+                helpdesk_timesheet_group.write({'user_ids': [Command.clear()]})
 
     def action_view_timesheets(self):
         self.ensure_one()

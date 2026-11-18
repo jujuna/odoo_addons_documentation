@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-09-29 04:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
@@ -77,20 +77,16 @@ msgid "Attendances ZKTeco BioTime"
 msgstr ""
 
 #. module: hr_attendance_zkteco
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
 msgid "BioTime"
 msgstr "BioTime"
 
 #. module: hr_attendance_zkteco
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
-msgid "Biotime"
-msgstr "Biotime"
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
-msgid "Biotime ID"
-msgstr "Biotime ID"
+msgid "BioTime ID"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
@@ -238,11 +234,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid ""
-"Employee is not linked, make sure to set the Zkteco ID on the related "
-"employees."
+"Employee is not linked, make sure to set the ZKTeco Employee ID on the "
+"related employees."
 msgstr ""
-"従業員が紐付けられていません。関連する従業員に Zkteco ID が設定されていること"
-"を確認してください。"
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -339,7 +333,7 @@ msgstr "有効にすると、一部のメッセージに配信エラーが発生
 
 #. module: hr_attendance_zkteco
 #: model:ir.module.module,summary:base.module_hr_attendance_zkteco
-msgid "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API"
+msgid "Integrate ZKTeco BioPro with attendances app via BioTime 8.5 & 9.0 API"
 msgstr ""
 
 #. module: hr_attendance_zkteco
@@ -511,7 +505,8 @@ msgstr ""
 msgid ""
 "Only attendance managers can re-fetch transactions from the ZKTeco BioTime "
 "server."
-msgstr "ZKTeco BioTimeサーバから打刻データを取得できるのは、勤怠マネジャーのみです。"
+msgstr ""
+"ZKTeco BioTimeサーバから打刻データを取得できるのは、勤怠マネジャーのみです。"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_attendance__out_mode
@@ -684,20 +679,20 @@ msgstr "接続テスト"
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_attendance__terminal_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
-msgid "The Biotime terminal in which the record is created from"
-msgstr "レコードが作成されるBiotime端末"
+msgid "The BioTime terminal in which the record is created from"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
-msgid "The ID of the Location that is defined in the Biotime server"
-msgstr "Biotimeサーバで定義されているロケーションのID"
+msgid "The ID of the Location that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_zkteco_terminal__terminal_sn
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_terminal_view_form
-msgid "The ID of the terminal that is defined in the Biotime server"
-msgstr "Biotimeサーバで定義されている端末のID"
+msgid "The ID of the terminal that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -816,8 +811,8 @@ msgid ""
 "ZKTeco BioTime company settings are incomplete. Please configure the "
 "following fields:\n"
 msgstr ""
-"ZKTeco BioTimeの会社管理設定が不完全です。以下のフィールドを設定してください"
-"：\n"
+"ZKTeco BioTimeの会社管理設定が不完全です。以下のフィールドを設定してくださ"
+"い：\n"
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -832,6 +827,11 @@ msgstr ""
 msgid ""
 "ZKTeco BioTime is not set up for %s yet. Configure the BioTime credentials "
 "in Settings to start syncing."
+msgstr ""
+
+#. module: hr_attendance_zkteco
+#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
+msgid "ZKTeco BioTime: Fetch Transactions"
 msgstr ""
 
 #. module: hr_attendance_zkteco
@@ -865,6 +865,12 @@ msgid "ZKTeco Terminal"
 msgstr "ZKTeco端末"
 
 #. module: hr_attendance_zkteco
+#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
+#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
+msgid "ZKTeco Terminals"
+msgstr ""
+
+#. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_form
 msgid "ZKTeco Transaction"
 msgstr "ZKTeco 打刻データ"
@@ -877,11 +883,6 @@ msgstr "ZKTeco 打刻データ"
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_search
 msgid "ZKTeco Transactions"
 msgstr "ZKTeco 打刻データ"
-
-#. module: hr_attendance_zkteco
-#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
-msgid "ZkTeco Biotime: Fetch Transactions"
-msgstr "ZkTeco Biotime: 打刻データを取得"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_attendance__zkteco_checkin_transaction_id
@@ -934,12 +935,6 @@ msgid "Zkteco Server Url"
 msgstr "ZktecoサーバURL"
 
 #. module: hr_attendance_zkteco
-#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
-#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
-msgid "Zkteco Terminals"
-msgstr ""
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__zkteco_transaction_id
 msgid "Zkteco Transaction"
 msgstr "Zkteco打刻データ"
@@ -959,3 +954,28 @@ msgstr "admin@example.com"
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.res_config_settings_view_form
 msgid "https://biotime.example.com"
 msgstr "https://biotime.example.com"
+
+#~ msgid "Biotime"
+#~ msgstr "Biotime"
+
+#~ msgid "Biotime ID"
+#~ msgstr "Biotime ID"
+
+#~ msgid ""
+#~ "Employee is not linked, make sure to set the Zkteco ID on the related "
+#~ "employees."
+#~ msgstr ""
+#~ "従業員が紐付けられていません。関連する従業員に Zkteco ID が設定されている"
+#~ "ことを確認してください。"
+
+#~ msgid "The Biotime terminal in which the record is created from"
+#~ msgstr "レコードが作成されるBiotime端末"
+
+#~ msgid "The ID of the Location that is defined in the Biotime server"
+#~ msgstr "Biotimeサーバで定義されているロケーションのID"
+
+#~ msgid "The ID of the terminal that is defined in the Biotime server"
+#~ msgstr "Biotimeサーバで定義されている端末のID"
+
+#~ msgid "ZkTeco Biotime: Fetch Transactions"
+#~ msgstr "ZkTeco Biotime: 打刻データを取得"

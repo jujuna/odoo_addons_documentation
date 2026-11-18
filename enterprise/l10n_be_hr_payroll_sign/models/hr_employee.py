@@ -1,8 +1,16 @@
-from pdfminer.high_level import extract_pages
-from pdfminer.layout import LTTextBox
 import io
+import logging
 
 from odoo import models, Command
+
+_logger = logging.getLogger(__name__)
+
+try:
+    from pdfminer.high_level import extract_pages
+    from pdfminer.layout import LTTextBox
+except ImportError:
+    _logger.warning("pdfminer.six is not installed: employment certificate signature flow is disabled.")
+    extract_pages = LTTextBox = None
 
 
 class HrEmployee(models.Model):
@@ -13,8 +21,9 @@ class HrEmployee(models.Model):
 
         # The report engine can be configured to only render the document as HTML
         # (e.g. no PDF engine available on the system like runbot tests).
-        # In that case, the signature flow cannot be set up on a non-PDF document
-        if not attachment.raw.content.startswith(b'%PDF'):
+        # In that case, the signature flow cannot be set up on a non-PDF document.
+        # The document is also considered non-PDF if pdfminer is not installed.
+        if not extract_pages or not attachment.raw.content.startswith(b'%PDF'):
             return attachment
 
         template_id, _name = self.env['sign.template'].create_sign_template_from_ir_attachment_data(

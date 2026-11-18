@@ -2,6 +2,8 @@
 
 import logging
 
+from markupsafe import escape
+
 from odoo import api, Command, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import format_date, html_sanitize, is_html_empty
@@ -86,8 +88,9 @@ class RequestAppraisal(models.TransientModel):
                     wrong_template_name=template.display_name,
                 ))
 
-    @api.depends('employee_id')
+    @api.depends('appraisal_id', 'employee_id', 'template_id')
     def _compute_subject(self):
+        self._check_template_id()
         for wizard_su in self.filtered(lambda w: w.employee_id and w.template_id).sudo():
             wizard_su.subject = wizard_su.template_id._render_template(
                 wizard_su.template_id.subject,
@@ -97,30 +100,41 @@ class RequestAppraisal(models.TransientModel):
                 options={'post_process': True}
             )[self.env.user.id]
 
-    @api.depends('template_id', 'recipient_ids', 'user_body')
+    @api.depends('appraisal_id', 'template_id', 'recipient_ids', 'user_body')
     def _compute_body(self):
+        self._check_template_id()
         for wizard in self:
             user_body = wizard.user_body
             user_body = user_body if not is_html_empty(html_sanitize(user_body, strip_style=True, strip_classes=True)) else False
             if wizard.template_id:
+                appraisal = wizard.appraisal_id
+                url = f'{appraisal.get_base_url()}/mail/view?model=hr.appraisal&res_id={appraisal.id}'
                 ctx = {
                     'employee_to_name': ', '.join(wizard.recipient_ids.sorted('name').mapped('name')),
                     'author_name': wizard.author_id.name,
                     'author_mail': wizard.author_id.email,
                     'date_close': format_date(self.env, wizard.appraisal_id.date_close),
                     'recipient_users': wizard.recipient_ids.mapped('user_ids'),
-                    'url': "ctx['url']",
+                    'url': url,
                     'user_body': user_body,
                     'author_signature': wizard.author_id.user_id.signature,
                     'manager_names': ', '.join(wizard.appraisal_id.manager_ids.mapped('name')),
                 }
-                wizard.body = self.with_context(ctx).sudo()._render_template(
+                body = wizard.with_context(ctx).sudo()._render_template(
                     wizard.template_id.body_html,
                     'res.users',
                     self.env.user.ids,
                     engine='qweb',
                     options={'post_process': False}
                 )[self.env.user.id]
+                # templates will escape their t-attf-href output, which was originally expected to be the string "ctx['url']"
+                # as there's no way to evaluate that we can just do a find-and-replace here for simple expected cases
+                BodyClass = body.__class__  # should normally be markup, but don't force it if it isn't...
+                for url_to_replace in (escape("ctx.get('url')"), escape("ctx['url']")):
+                    body = body.replace(
+                        BodyClass('href="{}"').format(url_to_replace), BodyClass('href="{}"').format(url),
+                    )
+                wizard.body = body
             elif not wizard.body:
                 wizard.body = ''
 
@@ -145,7 +159,6 @@ class RequestAppraisal(models.TransientModel):
         }
         context_self = self.with_context(ctx)
         subject = context_self._render_field('subject', appraisal.ids)[appraisal.id]
-        context_self.sudo().body = context_self.body.replace('href', 't-att-href')
         body = context_self._render_field('body', appraisal.ids)[appraisal.id]
 
         appraisal.message_post(

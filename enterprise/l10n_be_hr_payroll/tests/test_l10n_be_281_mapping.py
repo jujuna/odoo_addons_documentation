@@ -465,6 +465,25 @@ class TestL10nBe281Mapping(TestPayrollCommon):
         sheet_values = sheet.with_context(round_281=True)._get_rendering_data(self.employee_a)['employees_data'][0]
         self.assertEqual(sheet_values['f45_2070_paidamount52'], 4000)
 
+    def test_281_45_pdf_year(self):
+        self.employee_a.ip_wage_rate = 0.25
+        self.create_and_validate_payslips(employees=self.employee_a, year=2026, months=[1])
+        sheet = self._create_declaration().l10n_be_281_45_ids[:1]
+        sheet.action_generate_declarations()
+        report_data = sheet._post_process_rendering_data_pdf(sheet._get_rendering_data(self.employee_a))[self.employee_a]
+        html = self.env['ir.actions.report']._render_qweb_html(
+            sheet._get_pdf_report().id, self.employee_a.ids, data={
+                'report_data': report_data,
+                'employee': self.employee_a,
+                'company_id': self.employee_a.company_id,
+                'payroll_config_id': self.employee_a.company_id.current_payroll_config_id,
+            },
+        )[0].decode()
+        html = ' '.join(html.split())
+        self.assertEqual(html.count('Amount recognized as an expense in <span>2026</span> if'), 2)
+        # the text of the page only: the logo, the asset urls... could contain the digits
+        self.assertNotIn('2025', etree.fromstring(html, etree.HTMLParser()).xpath('string(//body)'))
+
     def test_281_45_python_income_uses_unmapped_archived_rule(self):
         self.employee_a.ip_wage_rate = 0
         extra_rule = self._create_salary_rule('PYTHON_INCOME', amount_fix=40.0, sequence=2310)
@@ -515,7 +534,7 @@ class TestL10nBe281Mapping(TestPayrollCommon):
         self.assertIsNotNone(fiche, "The 281.45 fiche must be present in the rendered XML")
         self.assertEqual(fiche.findtext('f2008_typefiche'), '28145')
         self.assertEqual(
-            fiche.findtext('f45_2069_paidamount51'), str(int(round(income, 2) * 100)),
+            fiche.findtext('f45_2069_paidamount51'), str(round(income * 100)),
         )
 
         expected_order = [
@@ -530,8 +549,8 @@ class TestL10nBe281Mapping(TestPayrollCommon):
         sheet = declaration.l10n_be_281_45_ids[:1]
         self.assertIn(self.employee_a, sheet.line_ids.employee_id)
         sheet_values = sheet.with_context(round_281=True)._get_rendering_data(self.employee_a)['employees_data'][0]
-        self.assertEqual(sheet_values['f45_2069_paidamount51'], int(round(income, 2) * 100))
-        self.assertEqual(sheet_values['f45_2063_roerendevoorheffing'], int(round(-withholding, 2) * 100))
+        self.assertEqual(sheet_values['f45_2069_paidamount51'], round(income * 100))
+        self.assertEqual(sheet_values['f45_2063_roerendevoorheffing'], round(-withholding * 100))
         self.assertEqual(
             sheet_values['f45_2059_totaalcontrole'],
             sum(sheet_values[field] for field in (
@@ -583,8 +602,9 @@ class TestL10nBe281Mapping(TestPayrollCommon):
         old_payslip.unlink()
 
         new_rule = self._create_salary_rule('BRAND_NEW_RULE', amount_fix=250.0, sequence=2313)
-        self.env.ref('l10n_be_hr_payroll.l10n_be_281_mapping_274_10_withholding').write({
-            'salary_rule_ids': [Command.link(new_rule.id)],
+        withholding_mapping = self.env.ref('l10n_be_hr_payroll.l10n_be_281_mapping_274_10_withholding')
+        withholding_mapping.write({
+            'evaluation_value': withholding_mapping.evaluation_value.strip() + " + mapped_total['BRAND_NEW_RULE']",
         })
         self.env.ref('l10n_be_hr_payroll.l10n_be_281_mapping_281_10_2115').write({
             'salary_rule_ids': [Command.link(new_rule.id)],

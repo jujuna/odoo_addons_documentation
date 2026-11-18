@@ -2,17 +2,18 @@
 # This file contains the translation of the following modules:
 # * sign_emsigner
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:56+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-10-30 17:55+0000\n"
+"PO-Revision-Date: 2026-11-09 16:34+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "sign_emsigner/tr/>\n"
 "Language: tr\n"
@@ -41,12 +42,21 @@ msgstr ""
 "                        İşlem Numarası:"
 
 #. module: sign_emsigner
+#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
+msgid ""
+"<small>The signatory has provided this identity through emSigner</small>"
+msgstr ""
+"<small>İmza sahibi bu kimliği emSigner aracılığıyla sağlamıştır</small>"
+
+#. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/models/sign_request.py:0
 msgid ""
 "A signer using Aadhaar cannot be part of a request that is signed with a "
 "qualified signature."
 msgstr ""
+"Aadhaar kullanan bir imzalayan, nitelikli imza ile imzalanmış bir talebin "
+"parçası olamaz."
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -63,12 +73,16 @@ msgstr ""
 #: code:addons/sign_emsigner/models/sign_item_role.py:0
 msgid "Aadhaar sign authentication is available only for companies in India."
 msgstr ""
+"Aadhaar imza kimlik doğrulama, yalnızca Hindistan'daki şirketler için "
+"kullanılabilir."
 
 #. module: sign_emsigner
 #: model:ir.module.module,description:base.module_sign_emsigner
 msgid ""
 "Add support for emSigner identification when signing documents (Indian only)"
 msgstr ""
+"Belgeleri imzalarken emSigner kimliği için destek ekleyin (yalnızca "
+"Hindistan)"
 
 #. module: sign_emsigner
 #: model:iap.service,description:sign_emsigner.iap_service_emsigner_proxy
@@ -87,9 +101,14 @@ msgstr ""
 "kullanılabilir."
 
 #. module: sign_emsigner
+#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
+msgid "Authenticated with emSigner"
+msgstr "emSigner ile doğrulandı"
+
+#. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__auth_method
 msgid "Authentication"
-msgstr ""
+msgstr "Kimlik Doğrulama"
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -186,12 +205,12 @@ msgstr "Aadhaar eSign işlemini tamamlamak için yeniden yönlendirme."
 #. module: sign_emsigner
 #: model:ir.module.module,summary:base.module_sign_emsigner
 msgid "Sign documents with emSigner"
-msgstr ""
+msgstr "emSigner ile belgeleri imzalayın"
 
 #. module: sign_emsigner
 #: model:ir.module.module,shortdesc:base.module_sign_emsigner
 msgid "Sign emSigner"
-msgstr ""
+msgstr "İmzala emSigner"
 
 #. module: sign_emsigner
 #. odoo-python
@@ -222,7 +241,7 @@ msgstr "İmza İsteği Kalemi"
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_template
 msgid "Signature Template"
-msgstr ""
+msgstr "İmza Şablonu"
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -263,7 +282,7 @@ msgstr "emSigner IAP hizmeti bulunamadı."
 #. module: sign_emsigner
 #: model:iap.service,name:sign_emsigner.iap_service_emsigner_proxy
 msgid "emSigner Proxy"
-msgstr ""
+msgstr "emSigner Vekili"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_reference_number
@@ -284,14 +303,6 @@ msgstr "emSigner İşlem Numarası"
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_return_value
 msgid "emSigner Values"
 msgstr "emSigner Değerleri"
-
-#~ msgid ""
-#~ "<small>The signatory has provided this identity through emSigner</small>"
-#~ msgstr ""
-#~ "<small>İmza sahibi bu kimliği emSigner aracılığıyla sağlamıştır</small>"
-
-#~ msgid "Authenticated with emSigner"
-#~ msgstr "emSigner ile doğrulandı"
 
 #~ msgid "Extra Authentication Step"
 #~ msgstr "Ekstra Kimlik Doğrulama Adımı"

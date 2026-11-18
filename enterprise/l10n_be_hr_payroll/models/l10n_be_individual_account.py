@@ -34,7 +34,8 @@ class L10n_BeIndividualAccount(models.Model):
                 ('date_to', '<=', datetime.date(int(sheet.year), 12, 31)),
                 ('date_from', '>=', datetime.date(int(sheet.year), 1, 1)),
                 ('state', 'in', ['validated', 'paid']),
-                ('company_id', '=', sheet.company_id.id),
+                # the company and its branches
+                ('company_id', 'child_of', sheet.company_id.id),
             ])
             all_employees = all_payslips.mapped('employee_id')
             sheet.write({

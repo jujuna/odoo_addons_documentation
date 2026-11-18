@@ -141,6 +141,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             'asset_prepayments': 'TT',
             'equity': 'NK',
             'equity_unaffected': 'NK',
+            'equity_retained': 'NK',
             'liability_payable': 'I',
             'liability_credit_card': 'I',
             'liability_current': 'I',

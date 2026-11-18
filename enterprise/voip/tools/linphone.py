@@ -5,7 +5,6 @@ from markupsafe import escape
 
 from odoo.tools import hmac
 
-PROVISIONING_URI_SCHEME = "linphone-config:"
 PROVISIONING_TOKEN_SCOPE = "voip_linphone_provisioning"
 PROVISIONING_KEY_SCOPE = "voip_linphone_provisioning_key"
 PROVISIONING_TOKEN_EXPIRATION_HOURS = 1

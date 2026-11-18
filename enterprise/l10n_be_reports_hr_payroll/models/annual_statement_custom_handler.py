@@ -11,7 +11,7 @@ class AnnualStatementReportHandler(models.AbstractModel):
         sbs_data = self.env['l10n.be.social.balance.sheet'].create({
             'date_from': options['xbrl_current_fiscal_date']['date_from'],
             'date_to': options['xbrl_current_fiscal_date']['date_to'],
-        })._get_report_data().get('social_balance_sheet')
+        })._get_report_data()
 
         if not sbs_data:
             return super_data

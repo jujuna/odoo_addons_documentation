@@ -279,8 +279,8 @@ class L10n_EsVATBooksReportHandler(models.AbstractModel):
             'base_amount': amount,
             'tax_rate': 0,
             'taxed_amount': 0,
-            'surcharge_type': 0,
-            'surcharge_fee': 0,
+            'surcharge_type': '',
+            'surcharge_fee': '',
             'withholding_type': 0,
             'withholding_amount': 0,
         }
@@ -535,9 +535,11 @@ class L10n_EsVATBooksReportHandler(models.AbstractModel):
             tax_key = tuple(taxes)
             ignore_line = True
             regular_tax = False
+            surcharge_tax = False
             for tax in taxes:
                 # a tax of type "recargo" should be associated to a tax having a specific amount
                 if tax.l10n_es_type == 'recargo':
+                    surcharge_tax = tax
                     linked_tax = taxes.filtered(
                         lambda t: t.l10n_es_type not in ('recargo', 'retencion', 'ignore')
                             and t.amount in SURCHARGE_TAX_EQUIVALENT[tax.amount]
@@ -560,6 +562,8 @@ class L10n_EsVATBooksReportHandler(models.AbstractModel):
                 self._l10n_es_libros_merge_base_line(sheet_line_vals[move_key][tax_key], line)
             else:
                 sheet_line_vals[move_key][tax_key] = create_line_vals(line, regular_tax)
+                if surcharge_tax:
+                    sheet_line_vals[move_key][tax_key].update(surcharge_type=abs(surcharge_tax.amount), surcharge_fee=0)
 
         # loop on each tax line and compute the tax amount for each line based on the ratio
         # of the base amount

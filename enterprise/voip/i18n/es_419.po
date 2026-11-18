@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
-"PO-Revision-Date: 2026-10-23 01:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-13 21:31+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
 "odoo-20/voip/es_419/>\n"
@@ -225,7 +225,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 #: model_terms:ir.ui.view,arch_db:voip.voip_res_users_settings_view_form
 msgid "1234 or +14155550123"
-msgstr ""
+msgstr "1234 o +14155550123"
 
 #. module: voip
 #. odoo-javascript
@@ -243,16 +243,16 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> has requested a phone "
-"number.\n"
-"                    <br/><br/>\n"
+"                    Dear <t t-out=\"ctx.get('recipient_name')\"></t>,\n"
+"                    <br><br>\n"
+"                    <strong t-out=\"user.name\"></strong> has requested a "
+"phone number.\n"
+"                    <br><br>\n"
 "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
 "                        <span>They added the following comment:</span>\n"
 "                        <div style=\"border-left: 4px solid #dee2e6; "
 "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
+"                            <t t-out=\"object.body_html\"></t>\n"
 "                        </div>\n"
 "                    </t>\n"
 "                    <a t-attf-style=\"background-color: "
@@ -268,16 +268,16 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Apreciable <t t-out=\"ctx.get('recipient_name')\"/>:\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> solicitó un número de "
-"teléfono.\n"
-"                    <br/><br/>\n"
+"                    Apreciable <t t-out=\"ctx.get('recipient_name')\"></t>:\n"
+"                    <br><br>\n"
+"                    <strong t-out=\"user.name\"></strong> has solicitó un "
+"número de teléfono.\n"
+"                    <br><br>\n"
 "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
 "                        <span>Adjuntó el siguiente comentario:</span>\n"
 "                        <div style=\"border-left: 4px solid #dee2e6; "
 "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
+"                            <t t-out=\"object.body_html\"></t>\n"
 "                        </div>\n"
 "                    </t>\n"
 "                    <a t-attf-style=\"background-color: "
@@ -296,22 +296,22 @@ msgstr ""
 msgid ""
 "<div>\n"
 "                <p>A new mailbox message was left in <t t-"
-"out=\"object.voicemail_id.name\"/>.</p>\n"
+"out=\"object.voicemail_id.name\"></t>.</p>\n"
 "                <ul>\n"
 "                    <li>\n"
 "                        <strong>Caller:</strong>\n"
 "                        <t t-if=\"object.caller_id_name or "
 "object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
+"object.caller_id_num\"></t>\n"
 "                        <t t-else=\"\">Unknown caller</t>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.caller_id_name and "
 "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
+"out=\"object.caller_id_num\"></t></li>\n"
 "                    <li><strong>Received on:</strong> <t t-"
-"out=\"format_datetime(object.occurred_at)\"/></li>\n"
+"out=\"format_datetime(object.occurred_at)\"></t></li>\n"
 "                    <li><strong>Duration:</strong> <t t-"
-"out=\"format_duration(object.duration / 3600)\"/></li>\n"
+"out=\"format_duration(object.duration / 3600)\"></t></li>\n"
 "                </ul>\n"
 "                <p>The recording is attached to this email.</p>\n"
 "            </div>\n"
@@ -319,22 +319,22 @@ msgid ""
 msgstr ""
 "<div>\n"
 "                <p>Tienes un nuevo mensaje en el buzón de voz de <t t-"
-"out=\"object.voicemail_id.name\"/>.</p>\n"
+"out=\"object.voicemail_id.name\"></t>.</p>\n"
 "                <ul>\n"
 "                    <li>\n"
 "                        <strong>Llamante:</strong>\n"
 "                        <t t-if=\"object.caller_id_name or "
 "object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
+"object.caller_id_num\"></t>\n"
 "                        <t t-else=\"\">Llamante desconocido</t>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.caller_id_name and "
 "object.caller_id_num\"><strong>Número de teléfono:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
+"out=\"object.caller_id_num\"></t></li>\n"
 "                    <li><strong>Recibido el:</strong> <t t-"
-"out=\"format_datetime(object.occurred_at)\"/></li>\n"
-"                    <li><strong>Duración:</strong> <t t-out=\"format_duration"
-"(object.duration / 3600)\"/></li>\n"
+"out=\"format_datetime(object.occurred_at)\"></t></li>\n"
+"                    <li><strong>Duración:</strong> <t t-"
+"out=\"format_duration(object.duration / 3600)\"></t></li>\n"
 "                </ul>\n"
 "                <p>La grabación está adjunta a este correo electrónico.</p>\n"
 "            </div>\n"
@@ -617,6 +617,15 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/voip_ivr.py:0
+msgid ""
+"A \"Play Audio\" node is still used as a destination:\n"
+"%(references)s\n"
+"Reassign those destinations first."
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "A Call Flow connection uses a saturated port."
 msgstr ""
@@ -729,6 +738,15 @@ msgstr ""
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_phone_service_event_unique_event_id
 msgid "A phone service event is processed only once."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid ""
+"A sound used by a Menu cannot be deleted. Delete the Menu first, or remove "
+"the node from its Call Flow. It is used by:\n"
+"%(usages)s"
 msgstr ""
 
 #. module: voip
@@ -1762,7 +1780,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_city
 msgid "City"
-msgstr ""
+msgstr "Ciudad"
 
 #. module: voip
 #. odoo-javascript
@@ -1801,7 +1819,7 @@ msgstr "Cerrar resumen de llamada"
 #: code:addons/voip/static/src/flow_editor/node_types/time_condition.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition_period__mode__closed
 msgid "Closed"
-msgstr ""
+msgstr "Cerrado"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__closed_destination_ref
@@ -1855,7 +1873,7 @@ msgstr "Empresa"
 #: code:addons/voip/static/src/core/common/call_model.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_call__state__terminated
 msgid "Completed"
-msgstr ""
+msgstr "Completada"
 
 #. module: voip
 #. odoo-javascript
@@ -2162,6 +2180,9 @@ msgid ""
 "                A good practice is at least to create an extension for all "
 "users who will make or receive calls."
 msgstr ""
+"Crea una extensión para llamar a un usuario, grupo o cola de forma interna.\n"
+"                               Como buena práctica, crea al menos una "
+"extensión para todos los usuarios que hagan o reciban llamadas."
 
 #. module: voip
 #. odoo-javascript
@@ -2359,6 +2380,11 @@ msgid ""
 "links use Odoo Phone when the provider and current user are configured for "
 "calling. Otherwise, they open the device's calling app through a tel: link."
 msgstr ""
+"Demostración: Las llamadas son simuladas y ningún dispositivo suena. "
+"Producción: Los enlaces a números de teléfono usan Teléfono de Odoo cuando "
+"el proveedor y el usuario actual tienen la configuración necesaria para "
+"realizar llamadas. De lo contrario, abren la aplicación de llamadas del "
+"dispositivo mediante un enlace."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__description
@@ -2383,7 +2409,7 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Destinations"
-msgstr ""
+msgstr "Destinos"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_queue__agent_connect_code
@@ -2445,7 +2471,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_queue_status__disconnected
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__logged_out
 msgid "Disconnected"
-msgstr ""
+msgstr "Desconectado"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_destination_type
@@ -2468,6 +2494,7 @@ msgid "Disconnected Internal Destination"
 msgstr ""
 
 #. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_http__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__display_name
@@ -3367,6 +3394,12 @@ msgid "I have updated the proof of address with a more recent bill..."
 msgstr ""
 
 #. module: voip
+#: model:ir.model,name:voip.model_iap_account
+msgid "IAP Account"
+msgstr ""
+
+#. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__id
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:voip.field_ir_http__id
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__id
@@ -3541,7 +3574,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_list
 msgid "Inputs"
-msgstr ""
+msgstr "Entradas"
 
 #. module: voip
 #. odoo-python
@@ -3638,7 +3671,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Invalid"
-msgstr ""
+msgstr "No válido"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__invalid_destination_ref
@@ -3739,7 +3772,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "January"
-msgstr ""
+msgstr "Enero"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
@@ -3763,7 +3796,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "June"
-msgstr ""
+msgstr "Junio"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_linphone_provisioning_key_hashes
@@ -3784,7 +3817,7 @@ msgstr "Teclado"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_voice_selection/tts_voice_selection_field.js:0
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_search
@@ -3887,7 +3920,7 @@ msgstr "Menos reciente"
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_kanban
 msgid "Leave"
-msgstr ""
+msgstr "Salir"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__leg_ids
@@ -3974,6 +4007,13 @@ msgid ""
 "communication cost.\n"
 "        "
 msgstr ""
+"Local: El número contiene dígitos que corresponden a una zona geográfica.\n"
+"        Celular: El formato del número corresponde a un teléfono celular.\n"
+"        Nacional: El número no contiene dígitos que correspondan a una zona "
+"geográfica.\n"
+"        Gratuito: Un número especial en el que paga quien recibe la "
+"llamada.\n"
+"        "
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__location
@@ -4426,7 +4466,7 @@ msgstr ""
 #. module: voip
 #: model:res.groups.privilege,placeholder:voip.res_groups_privilege_voip
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. module: voip
 #. odoo-javascript
@@ -4790,6 +4830,10 @@ msgid ""
 "replaying the menu, redirecting the call to the timeout destination (if set) "
 "or aborting the call (if the maximum number of tries has been reached)."
 msgstr ""
+"Número de segundos que debes esperar después de reproducir el sonido del "
+"menú antes de volver a reproducirlo, redirigir la llamada al destino por "
+"tiempo de espera (si se configuró) o finalizar la llamada (si ya se alcanzó "
+"el número máximo de intentos)."
 
 #. module: voip
 #. odoo-python
@@ -5658,7 +5702,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__quantity
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__number_request_quantity
 msgid "Quantity"
-msgstr ""
+msgstr "Cantidad"
 
 #. module: voip
 #. odoo-javascript
@@ -6103,6 +6147,10 @@ msgid ""
 "outgoing one), a participant was reached by it, a routing leg only relayed "
 "it."
 msgstr ""
+"Función del extremo de esta llamada dentro de la conversación: el origen la "
+"inició (el interlocutor externo en una llamada entrante o el propio usuario "
+"en una llamada saliente), se estableció contacto con un participante o una "
+"llamada de enrutamiento solo la retransmitió."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__activity_user_id
@@ -6952,7 +7000,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_sound__tts_text
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__textual
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__text_value
@@ -6974,7 +7022,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_sound__source_type__tts
 msgid "Text-to-speech"
-msgstr ""
+msgstr "Texto a voz"
 
 #. module: voip
 #. odoo-python
@@ -7419,6 +7467,9 @@ msgid ""
 "review. The documents you have submitted are being evaluated. You will be "
 "notified if we need more information to complete the order."
 msgstr ""
+"Recibimos tu solicitud para obtener el número de teléfono %(number)s y está "
+"en proceso de revisión. Estamos evaluando los documentos que enviaste. Te "
+"avisaremos si necesitamos más información para completar la solicitud."
 
 #. module: voip
 #. odoo-python
@@ -7851,7 +7902,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__timezone
 msgid "Timezone"
-msgstr ""
+msgstr "Zona horaria"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
@@ -8460,7 +8511,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__tts_voice
 #: model:ir.model.fields,field_description:voip.field_voip_sound__tts_voice
 msgid "Voice"
-msgstr ""
+msgstr "Voz"
 
 #. module: voip
 #. odoo-javascript
@@ -8654,7 +8705,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_result_line__wizard_id
 msgid "Wizard"
-msgstr ""
+msgstr "Asistente"
 
 #. module: voip
 #. odoo-python
@@ -8952,6 +9003,18 @@ msgid "Zoom out"
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of an archived Call Flow"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of the Call Flow \"%(call_flow)s\""
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "add_shopping_cart"
@@ -9069,7 +9132,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "error"
-msgstr ""
+msgstr "error"
 
 #. module: voip
 #. odoo-javascript
@@ -9087,7 +9150,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "mail"
-msgstr ""
+msgstr "correo"
 
 #. module: voip
 #. odoo-python
@@ -9099,7 +9162,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "or"
-msgstr ""
+msgstr "o"
 
 #. module: voip
 #. odoo-javascript
@@ -9111,7 +9174,114 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
+msgstr "phone_disabled"
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "the Menu \"%(menu)s\""
 msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> has requested a phone "
+#~ "number.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>They added the following comment:</span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        Buy Number\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    Apreciable <t t-out=\"ctx.get('recipient_name')\"/>:\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> solicitó un número de "
+#~ "teléfono.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>Adjuntó el siguiente comentario:</span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        Comprar número\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                <p>A new mailbox message was left in <t t-"
+#~ "out=\"object.voicemail_id.name\"/>.</p>\n"
+#~ "                <ul>\n"
+#~ "                    <li>\n"
+#~ "                        <strong>Caller:</strong>\n"
+#~ "                        <t t-if=\"object.caller_id_name or "
+#~ "object.caller_id_num\" t-out=\"object.caller_id_name or "
+#~ "object.caller_id_num\"/>\n"
+#~ "                        <t t-else=\"\">Unknown caller</t>\n"
+#~ "                    </li>\n"
+#~ "                    <li t-if=\"object.caller_id_name and "
+#~ "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
+#~ "out=\"object.caller_id_num\"/></li>\n"
+#~ "                    <li><strong>Received on:</strong> <t t-"
+#~ "out=\"format_datetime(object.occurred_at)\"/></li>\n"
+#~ "                    <li><strong>Duration:</strong> <t t-"
+#~ "out=\"format_duration(object.duration / 3600)\"/></li>\n"
+#~ "                </ul>\n"
+#~ "                <p>The recording is attached to this email.</p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                <p>Tienes un nuevo mensaje en el buzón de voz de <t t-"
+#~ "out=\"object.voicemail_id.name\"/>.</p>\n"
+#~ "                <ul>\n"
+#~ "                    <li>\n"
+#~ "                        <strong>Llamante:</strong>\n"
+#~ "                        <t t-if=\"object.caller_id_name or "
+#~ "object.caller_id_num\" t-out=\"object.caller_id_name or "
+#~ "object.caller_id_num\"/>\n"
+#~ "                        <t t-else=\"\">Llamante desconocido</t>\n"
+#~ "                    </li>\n"
+#~ "                    <li t-if=\"object.caller_id_name and "
+#~ "object.caller_id_num\"><strong>Número de teléfono:</strong> <t t-"
+#~ "out=\"object.caller_id_num\"/></li>\n"
+#~ "                    <li><strong>Recibido el:</strong> <t t-"
+#~ "out=\"format_datetime(object.occurred_at)\"/></li>\n"
+#~ "                    <li><strong>Duración:</strong> <t t-"
+#~ "out=\"format_duration(object.duration / 3600)\"/></li>\n"
+#~ "                </ul>\n"
+#~ "                <p>La grabación está adjunta a este correo electrónico.</"
+#~ "p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "VoIP"
 #~ msgstr "VoIP"

@@ -44,7 +44,7 @@ export class Orderline extends Component {
                     acc[attributeId].value += `, ${value}`;
                 } else {
                     acc[attributeId] = {
-                        id: attr,
+                        id: attributeId,
                         name: attr.attribute_id?.name,
                         value,
                     };

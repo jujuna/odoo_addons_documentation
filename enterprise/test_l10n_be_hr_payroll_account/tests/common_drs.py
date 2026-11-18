@@ -3,10 +3,10 @@
 from datetime import date
 from unittest.mock import patch
 
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
 from odoo.addons.l10n_be_hr_payroll.models.certificate import CertificateCertificate
 from odoo.addons.l10n_be_hr_payroll.models.utils import xml_str_to_dict
 from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.addons.test_l10n_be_hr_payroll_account.tests.common import TestPayslipNoAccountingCommon
 
 DRS_IGNORE_KEYS = (
     'FormCreationDate',
@@ -16,16 +16,15 @@ DRS_IGNORE_KEYS = (
 )
 
 
-class TestDRSCommon(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestDRSCommon(TestPayslipNoAccountingCommon, TestBelgiumCommon):
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
         cls.startClassPatcher(patch.object(
             CertificateCertificate, '_decode_certificate_for_be_onss_xml', lambda certificate, xml_str: b'dummy\r\nsignature\r\n'))
 
-        cls.belgian_company = cls.company_data['company']
+        cls.belgian_company = cls.env.company
         cls.belgian_company.write({
             'vat': 'BE0897223670',
             'phone': '0471098765',
@@ -84,7 +83,6 @@ class TestDRSCommon(TestPayslipValidationCommon, TestBelgiumCommon):
             'competence': 'wa',
             'bce_code': '2123456791',
         })
-        cls.env['hr.work.entry.type']._update_payroll_related_fields(country_code='BE')
         cls.niss_sequence = 0
 
     @classmethod

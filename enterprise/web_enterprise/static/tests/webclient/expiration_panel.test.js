@@ -46,6 +46,28 @@ test("Expiration Panel one app installed", async () => {
     expect(".database_expiration_panel").toHaveCount(0);
 });
 
+test("Expiration Panel one app installed, 31 days left", async () => {
+    mockDate("2019-10-10T12:00:00");
+
+    patchWithCleanup(session, {
+        expiration_date: "2019-11-10 12:00:00",
+        expiration_reason: "trial",
+        storeData: true, // used by subscription service to know whether mail is installed
+        warning: "admin",
+    });
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+    await getService("action").doAction("menu");
+
+    expect(".oe_instance_register_show").toHaveCount(1, {
+        message: "Part 'Register your subscription'",
+    });
+    expect(".oe_instance_buy").toHaveCount(1, { message: "Part 'buy a subscription'" });
+    expect(".oe_instance_register").toHaveText(
+        "This database will expire in 1 month. Register your subscription or buy a subscription."
+    );
+});
+
 test("Expiration Panel one app installed, buy subscription", async () => {
     expect.assertions(6);
 

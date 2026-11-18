@@ -297,6 +297,17 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
         self.assertTrue(statement_line.is_reconciled)
 
+    def test_reconciliation_with_overlapping_payment_references(self):
+        """Overlapping references are ambiguous and must not be used to reconcile."""
+        inv_lines = self.env['account.move.line']
+        for ref in ('pay_AretqwwXerereE', 'PAY_ARETQWWXEREREE', 'Pay_aretqwwxereree'):
+            inv_lines += self._create_invoice_one_line_reco(ref=ref, price_unit=100.0)
+        statement_line = self._create_st_line(amount=100, payment_ref="pay_AretqwwXerereE", update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+
+        self.assertFalse(statement_line.is_reconciled)
+        self.assertFalse(inv_lines.filtered('reconciled'))
+
     def test_reconciliation_with_unique_label_memo_match_and_negative_amounts(self):
         """Make sure the behaviour is the same if the statement line is encoded with negative amounts."""
         payment = self._create_and_post_payment(amount=100, memo="pay_AretqwwXerereE")
@@ -3084,6 +3095,20 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'balance': 50.0,       'reconciled': False},
         ])
 
+        # editing only the analytic distribution should also work.
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'analytic_account',
+            'plan_id': self.env['account.analytic.plan'].create({'name': 'Plan Test'}).id,
+        })
+        st_line.edit_reconcile_line(st_line.line_ids[1].id, {'analytic_distribution': {str(analytic_account.id): 100}})
+        self.assertEqual(invoice_line.move_id.status_in_payment, 'paid')
+        self.assertRecordValues(st_line.line_ids, [
+            {'balance': 950.0,      'reconciled': False},
+            {'balance': -1000.0,    'reconciled': True},
+            {'balance': 50.0,       'reconciled': False},
+        ])
+        self.assertEqual(st_line.line_ids[1].analytic_distribution, {str(analytic_account.id): 100})
+
     def test_line_computation_on_edit_line(self):
         """ When editing a statement line, only the edited line, the suspense and
             the not reconciled lines should be modified.
@@ -4196,3 +4221,73 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertTrue(statement_line.is_reconciled)
         self.assertEqual(statement_line.line_ids.reconciled_lines_ids, move_line_1 + move_line_2)
         self.assertFalse(move_line_3.reconciled)
+
+    def test_rounding_difference_multiple_lines_without_exchange_diff(self):
+        """Ensure multiple bills paid at their own rate don't leave a company
+        currency rounding difference on the suspense account.
+        """
+        foreign_curr = self.setup_other_currency('CHF', rates=[('2017-01-01', 3.0)])
+        journal = self.env['account.journal'].create({
+            'name': 'test',
+            'code': 'TBNK',
+            'type': 'bank',
+            'currency_id': foreign_curr.id,
+        })
+
+        # 3.33 + 3.33 + 4.33 = 10.99 while 33 CHF = 11.00 USD.
+        inv_line_1, inv_line_2, inv_line_3 = (
+            self._create_invoice_one_line_reco(
+                move_type='in_invoice',
+                currency_id=foreign_curr.id,
+                invoice_date='2017-01-01',
+                price_unit=price_unit,
+            )
+            for price_unit in (10.0, 10.0, 13.0)
+        )
+        st_line = self._create_st_line(-33.0, date='2017-01-01', journal_id=journal.id, update_create_date=False)
+
+        st_line.set_line_bank_statement_line((inv_line_1 + inv_line_2 + inv_line_3).ids)
+
+        self.assertRecordValues(st_line.line_ids.sorted('balance'), [
+            {'account_id': journal.default_account_id.id, 'amount_currency': -33.0, 'currency_id': foreign_curr.id, 'balance': -11.0},
+            {'account_id': inv_line_1.account_id.id,      'amount_currency': 10.0,  'currency_id': foreign_curr.id, 'balance': 3.33},
+            {'account_id': inv_line_2.account_id.id,      'amount_currency': 10.0,  'currency_id': foreign_curr.id, 'balance': 3.33},
+            {'account_id': inv_line_3.account_id.id,      'amount_currency': 13.0,  'currency_id': foreign_curr.id, 'balance': 4.34},
+        ])
+        self.assertRecordValues(inv_line_3.matched_debit_ids.exchange_move_id.line_ids, [
+            {'account_id': inv_line_3.account_id.id, 'balance': -0.01, 'currency_id': foreign_curr.id},
+            {'account_id': self.env.company.expense_currency_exchange_account_id.id, 'balance': 0.01, 'currency_id': foreign_curr.id},
+        ])
+
+    def test_rounding_difference_multiple_lines_early_payment_discount(self):
+        """Ensure multiple invoices paid with an early payment discount don't
+        leave a company currency rounding difference on the suspense account.
+        """
+        foreign_curr = self.setup_other_currency('CHF', rates=[('2017-01-01', 3.0)])
+        journal = self.env['account.journal'].create({
+            'name': 'test',
+            'code': 'TBNK',
+            'type': 'bank',
+            'currency_id': foreign_curr.id,
+        })
+        self.early_payment_term.discount_percentage = 50
+
+        inv_line_1, inv_line_2, inv_line_3 = (
+            self._create_invoice_one_line_reco(
+                move_type='out_invoice',
+                currency_id=foreign_curr.id,
+                invoice_date='2017-01-01',
+                invoice_payment_term_id=self.early_payment_term.id,
+                price_unit=price_unit,
+            )
+            for price_unit in (20.0, 20.0, 26.0)
+        )
+        st_line = self._create_st_line(33.0, date='2017-01-01', journal_id=journal.id, update_create_date=False)
+
+        st_line.set_line_bank_statement_line((inv_line_1 + inv_line_2 + inv_line_3).ids)
+
+        self.assertFalse(st_line.line_ids.filtered(lambda line: line.account_id == journal.suspense_account_id))
+        self.assertRecordValues(inv_line_3.matched_credit_ids.exchange_move_id.line_ids, [
+            {'account_id': inv_line_3.account_id.id, 'balance': -0.02, 'currency_id': foreign_curr.id},
+            {'account_id': self.env.company.expense_currency_exchange_account_id.id, 'balance': 0.02, 'currency_id': foreign_curr.id},
+        ])

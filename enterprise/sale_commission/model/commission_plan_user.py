@@ -15,7 +15,10 @@ class SaleCommissionPlanUser(models.Model):
 
     plan_id = fields.Many2one('sale.commission.plan', required=True, index=True, ondelete='cascade')
     user_type = fields.Selection(related='plan_id.user_type')
-    user_id = fields.Many2one('res.users', "Salesperson", required=True, domain="[('share', '=', False)]", index=True)
+    user_id = fields.Many2one(
+        'res.users', "Salesperson", required=True, index=True,
+        domain=lambda self: [('all_group_ids', 'in', self.env.ref('sales_team.group_sale_salesman').id)],
+    )
     user_ids = fields.Many2many(
         string="Sum of achievements",
         comodel_name='res.users',

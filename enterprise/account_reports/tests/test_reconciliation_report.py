@@ -1,6 +1,6 @@
 # pylint: disable=C0326
 from .common import TestAccountReportsCommon
-from odoo import Command
+from odoo import Command, fields
 from odoo.tests import tagged
 
 
@@ -784,3 +784,18 @@ class TestReconciliationReport(TestAccountReportsCommon):
             ],
             options,
         )
+
+    def test_reconciliation_report_action_bank_statement(self):
+        """ This test will ensure that the action, action_redirect_to_bank_statement_widget, returns default_journal_id
+        """
+        report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
+            active_id=self.company_data['default_journal_bank'].id,
+            active_model='account.journal'
+        )
+        custom_handler = self.env[report.custom_handler_model_name].browse(report.custom_handler_model_id.id)
+        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-12'))
+        journal = self.env['account.journal'].browse(options['bank_reconciliation_report_journal_id'])
+        _bank_balance, st_line_ids = custom_handler._get_bank_balance_and_last_statement_lines(options, journal, 'to_beginning_of_period')
+        params = {'st_line_ids': st_line_ids}
+        action = self.env['account.bank.reconciliation.report.handler'].action_redirect_to_bank_statement_widget(options, params)
+        self.assertIsNotNone(action['context'].get('default_journal_id'))

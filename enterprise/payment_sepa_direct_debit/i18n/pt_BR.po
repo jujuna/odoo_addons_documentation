@@ -7,16 +7,17 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:54+0000\n"
-"PO-Revision-Date: 2026-09-17 23:56+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:58+0000\n"
+"PO-Revision-Date: 2026-11-09 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/payment_sepa_direct_debit/pt_BR/>\n"
+"20/payment_sepa_direct_debit/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,9 +64,9 @@ msgstr "<strong>Rótulo: </strong>"
 #: model:mail.template,body_html:payment_sepa_direct_debit.mail_template_sepa_notify_validation
 msgid ""
 "<t>\n"
-"<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
-"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"<t t-set=\"company\" t-value=\"object.company_id\"></t>\n"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,"
+"<br><br>\n"
 "\n"
 "<p>A SEPA Direct Debit Mandate authorization has just been validated for use "
 "with <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
@@ -77,23 +78,23 @@ msgid ""
 "            </t>"
 msgstr ""
 "<t>\n"
-"<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
-"Olá, <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
-">\n"
+"<t t-set=\"company\" t-value=\"object.company_id\"></t>\n"
+"Olá <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br><br>\n"
 "\n"
-"<p>Uma autorização de débito direto SEPA acaba de ser validada para uso com "
-"<t t-out=\"company.name or ''\">SuaEmpresa</t>.</p>\n"
+"<p>Uma autorização de mandato de débito direto SEPA acaba de ser validada "
+"para uso com <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
 "\n"
-"<p>Você encontrará uma cópia da validação da autorização anexada a este e-"
+"<p>Você encontrará uma cópia da validação do mandato em anexo a este e-"
 "mail.</p>\n"
 "\n"
-"<p>Não hesite em entrar em contato conosco se tiver alguma dúvida.</p>\n"
+"<p>Não hesite em nos contatar caso tenha alguma dúvida.</p>\n"
 "            </t>"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.module.module,summary:base.module_payment_sepa_direct_debit
+#, fuzzy
 msgid "A payment provider for enabling Sepa Direct Debit in the EU."
-msgstr ""
+msgstr "Um provedor de pagamento para habilitar o débito direto SEPA na UE."
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
@@ -103,7 +104,7 @@ msgstr "Extrato Bancário"
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Transação bancária"
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
@@ -134,7 +135,7 @@ msgstr "Modo personalizado"
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_account_direct_debit_mandate
 msgid "Direct Debit Mandate"
-msgstr ""
+msgstr "Autorização de débito direto"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_bank_statement_line__display_name
@@ -201,8 +202,9 @@ msgstr "Provedor de serviços de pagamento"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.module.module,shortdesc:base.module_payment_sepa_direct_debit
+#, fuzzy
 msgid "Payment Provider: Sepa Direct Debit"
-msgstr ""
+msgstr "Provedor de pagamento: Sepa Direct Debit"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_payment_token
@@ -354,6 +356,35 @@ msgstr ""
 "para enviar instruções\n"
 "ao banco para debitar sua conta e (B) seu banco para debitar sua conta\n"
 "de acordo com as instruções de"
+
+#~ msgid ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+#~ "Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "\n"
+#~ "<p>A SEPA Direct Debit Mandate authorization has just been validated for "
+#~ "use with <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
+#~ "\n"
+#~ "<p>You will find a copy of the mandate validation attached to this email."
+#~ "</p>\n"
+#~ "\n"
+#~ "<p>Do not hesitate to contact us if you have any question.</p>\n"
+#~ "            </t>"
+#~ msgstr ""
+#~ "<t>\n"
+#~ "<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+#~ "Olá, <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+#~ "><br/>\n"
+#~ "\n"
+#~ "<p>Uma autorização de débito direto SEPA acaba de ser validada para uso "
+#~ "com <t t-out=\"company.name or ''\">SuaEmpresa</t>.</p>\n"
+#~ "\n"
+#~ "<p>Você encontrará uma cópia da validação da autorização anexada a este e-"
+#~ "mail.</p>\n"
+#~ "\n"
+#~ "<p>Não hesite em entrar em contato conosco se tiver alguma dúvida.</p>\n"
+#~ "            </t>"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Linha de extrato bancário"

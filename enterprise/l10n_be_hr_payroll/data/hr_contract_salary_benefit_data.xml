@@ -309,8 +309,8 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_yearly_cash"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_commission')])]"/>
-        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_public_holiday'),
-                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_sickness')])]"/>
+        <!-- Only used for the employer cost, the loss on commission doesn't depend on it -->
+        <field name="salary_rule_ids" eval="[(5, 0, 0)]"/>
     </record>
 
     <record id="l10n_be_child_bonus" model="hr.contract.salary.benefit">
@@ -916,6 +916,33 @@
                                 ref('l10n_be_hr_payroll.l10n_be_cafeteria_plan_net_contribution'),
                                 ])]"/>
         <field name="active" eval="False"/>
+    </record>
+</data>
+
+<!-- The way of compensating the loss on commission on paid time off in JC 200 is chosen by archiving one of these
+     mutually exclusive benefits: noupdate to keep the choice on update.
+     Default: with the double holiday pay (SIMPLE_VARIABLE), the behaviour before their introduction.
+     The new databases compensate it monthly (COM_LOSS_PTO), see the post init hook.
+     SIMPLE_VARIABLE is not held by the double holiday pay benefit: it also pays the other joint committees, it is
+     skipped by its condition in JC 200 when compensated monthly (hr.payslip._l10n_be_is_loss_on_commission_pto_monthly). -->
+<data noupdate="1">
+    <record id="l10n_be_loss_on_commission_pto_monthly" model="hr.contract.salary.benefit">
+        <field name="name">Loss on Commission on Paid Time Off (Monthly)</field>
+        <field name="sequence">53</field>
+        <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_cash"/>
+        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
+        <field name="description">The loss on commission during paid time off is compensated on the monthly payslip. Switching to it after a double holiday pay that already compensated the paid time off of the year pays these days twice.</field>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_pto')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Mutually exclusive with l10n_be_loss_on_commission_pto_monthly -->
+    <record id="l10n_be_loss_on_commission_pto_double_holiday" model="hr.contract.salary.benefit">
+        <field name="name">Loss on Commission on Paid Time Off (With Double Holiday Pay)</field>
+        <field name="sequence">53</field>
+        <field name="benefit_type_id" ref="hr_payroll.l10n_be_yearly_cash"/>
+        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
+        <field name="description">The loss on commission during paid time off is compensated yearly with the double holiday pay.</field>
     </record>
 </data>
 </odoo>

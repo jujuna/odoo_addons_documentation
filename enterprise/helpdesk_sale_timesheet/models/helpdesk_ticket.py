@@ -7,8 +7,6 @@ from odoo.exceptions import ValidationError
 from odoo.fields import Domain
 from odoo.tools.misc import unquote
 
-from odoo.addons.sale_timesheet_enterprise.models.sale_order_line import DEFAULT_INVOICED_TIMESHEET
-
 
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
@@ -240,10 +238,10 @@ class HelpdeskTicket(models.Model):
         if not (timesheet_tickets := self.filtered('team_id.use_helpdesk_sale_timesheet')):
             return 0.0
         return self.env['account.analytic.line'].sudo()._read_group(
-            [
-                ('helpdesk_ticket_id', 'in', timesheet_tickets.ids),
-                ('validated', 'in', [True, (self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET) == 'approved']),
-            ],
+            Domain.AND([
+                [('helpdesk_ticket_id', 'in', timesheet_tickets.ids)],
+                self.env['account.analytic.line']._get_invoiced_timesheet_domain(),
+            ]),
             [],
             ['unit_amount:sum']
         )[0][0] or 0.0

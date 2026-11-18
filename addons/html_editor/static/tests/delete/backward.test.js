@@ -1822,6 +1822,17 @@ describe("Selection not collapsed", () => {
         });
     });
 
+    test("should convert space to nbsp", async () => {
+        await testEditor({
+            contentBefore: "<div>a<span> [b]</span></div>",
+            stepFunction: async (editor) => {
+                deleteBackward(editor);
+                await insertText(editor, "x");
+            },
+            contentAfter: "<div>a<span>&nbsp;x[]</span></div>",
+        });
+    });
+
     test("should merge node correctly (1)", async () => {
         await testEditor({
             contentBefore: '<div>a<span class="a">b[c</span><p>d]e</p>f<br>g</div>',
@@ -2713,5 +2724,21 @@ describe("Selection not collapsed", () => {
                 `)
             );
         });
+    });
+});
+
+test("should remove character before unremovable", async () => {
+    await testEditor({
+        contentBefore: `<p>a<span class="oe_unremovable">[]x</span>b</p>`,
+        stepFunction: deleteBackward,
+        contentAfter: `<p><span class="oe_unremovable">[]x</span>b</p>`,
+    });
+});
+
+test("should remove character before unremovable (2)", async () => {
+    await testEditor({
+        contentBefore: `<p>aa<span class="oe_unremovable">[]x</span>b</p>`,
+        stepFunction: deleteBackward,
+        contentAfter: `<p>a[]<span class="oe_unremovable">x</span>b</p>`,
     });
 });

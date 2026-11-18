@@ -12,5 +12,5 @@ def _l10n_hk_hr_payroll_post_install(env):
 
 def _l10n_hk_hr_payroll_uninstall_hook(env):
     env['hr.payroll.payment.report.wizard'].sudo().search([
-        ('export_format', 'in', ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_boc_non_payment', 'l10n_hk_bea_csv'))
+        ('export_format', 'in', ('l10n_hk_mri', 'l10n_hk_boc', 'l10n_hk_boc_non_payment', 'l10n_hk_bea_csv', 'l10n_hk_citi_autopay', 'l10n_hk_citi_autopay_payroll'))
     ]).export_format = 'csv'

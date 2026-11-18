@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"POT-Creation-Date: 2026-11-13 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 03:28+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Catalan <https://translate.odoo.com/projects/odoo-master/"
@@ -68,25 +68,15 @@ msgstr "22 d'octubre de 2024 14:20:10"
 msgid ""
 "<div>\n"
 "                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
-"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
-"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
-"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
-"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
-"know you'll be there shortly.\n"
+"out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> "
+"<t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let "
+"them know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
-"<div>\n"
-"                    <p>Hola, <t t-if=\"ctx.get('host_name')\"><t t-"
-"out=\"ctx.get('host_name')\"/>: </t><b><t t-out=\"object.name\"/></b> <t t-"
-"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
-"if=\"object.company\">, de <t t-out=\"object.company\"/></t> vol reunir-se "
-"amb tu a <t t-out=\"object.station_id.name\"/>. Si us plau, fes-li saber que "
-"hi seràs de seguida.\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
 
 #. module: frontdesk
 #: model_terms:web_tour.tour,rainbow_man_message:frontdesk.frontdesk_tour
@@ -272,6 +262,7 @@ msgstr "Tancar"
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Company"
 msgstr "Empresa"
 
@@ -505,7 +496,8 @@ msgstr "ID"
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr "Si està marcat, hi ha nous missatges que requereixen la vostra atenció."
+msgstr ""
+"Si està marcat, hi ha nous missatges que requereixen la vostra atenció."
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error
@@ -649,11 +641,6 @@ msgid "No visitors yet. Let's add one!"
 msgstr ""
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify by Email"
-msgstr ""
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
 msgid "Notify by discuss"
 msgstr ""
@@ -701,11 +688,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Open Kiosk"
 msgstr "Obrir el quiosc"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
-msgid "Organization"
-msgstr "Organització"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -788,7 +770,9 @@ msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid "Responsibles are notified if no host is selected."
+msgid ""
+"Responsibles are notified in Discuss of every check-in at this station, "
+"whether a host is selected or not."
 msgstr ""
 
 #. module: frontdesk
@@ -935,6 +919,7 @@ msgid "Visitor"
 msgstr "Visitant"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company
 msgid "Visitor Company"
 msgstr ""
@@ -1048,6 +1033,12 @@ msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "e.g. +1 123 456 789"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr ""
@@ -1069,6 +1060,32 @@ msgstr ""
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
 msgstr ""
+
+#~ msgid "Organization"
+#~ msgstr "Organització"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+#~ "out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t "
+#~ "t-if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+#~ "if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+#~ "asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let "
+#~ "them know you'll be there shortly.\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p>Hola, <t t-if=\"ctx.get('host_name')\"><t t-"
+#~ "out=\"ctx.get('host_name')\"/>: </t><b><t t-out=\"object.name\"/></b> <t "
+#~ "t-if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+#~ "if=\"object.company\">, de <t t-out=\"object.company\"/></t> vol reunir-"
+#~ "se amb tu a <t t-out=\"object.station_id.name\"/>. Si us plau, fes-li "
+#~ "saber que hi seràs de seguida.\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
 
 #~ msgid "Cancelled"
 #~ msgstr "Cancel·lat"

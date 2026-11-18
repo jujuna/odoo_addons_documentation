@@ -643,6 +643,20 @@ test(`button box rendering on big screen`, async () => {
     }
 });
 
+test.tags("desktop");
+test(`button box is not pushed out by a long record name`, async () => {
+    Partner._records[0].name = "A very long record name ".repeat(20);
+    await mountView({
+        resModel: "partner",
+        type: "form",
+        arch: `<form><sheet><div name="button_box"><button class="oe_stat_button" id="btn1">My Button</button></div></sheet></form>`,
+        resId: 1,
+    });
+    const buttonBoxRect = queryFirst(`.o-form-buttonbox`).getBoundingClientRect();
+    const controlPanelRect = queryFirst(`.o_control_panel_main`).getBoundingClientRect();
+    expect(buttonBoxRect.right).toBeLessThan(controlPanelRect.right);
+});
+
 test(`button box rendering invisible`, async () => {
     await mountView({
         resModel: "partner",
@@ -6650,6 +6664,40 @@ test("empty required fields in an existing record are highlighted", async () => 
     expect(".o_field_widget[name=foo]").not.toHaveClass("o_field_invalid");
     expect(".o_form_status_indicator_buttons").not.toHaveClass("invisible");
     expect(queryAllTexts`.o_column_sortable div span`).toEqual(["Name"]);
+});
+
+test("empty required field is cleared when switching to another record", async () => {
+    Partner._fields.foo = fields.Char({ required: true });
+    Partner._records[0].name = "info@example.com";
+    Partner._records[2].foo = false;
+    Partner._records[2].name = false;
+
+    await mountView({
+        resModel: "partner",
+        type: "form",
+        arch: `
+            <form>
+                <field name="foo"/>
+                <field name="name" widget="email" required="1"/>
+            </form>
+        `,
+        resIds: [1, 4],
+        resId: 1,
+    });
+    expect(".o_field_widget[name=foo] input").toHaveValue("yop");
+    expect(".o_field_widget[name=name] input").toHaveValue("info@example.com");
+    expect(".o_field_invalid").toHaveCount(0);
+
+    await contains(".o_pager_next").click();
+    expect(".o_field_widget[name=foo] input").toHaveValue("");
+    expect(".o_field_widget[name=foo]").toHaveClass("o_field_invalid");
+    expect(".o_field_widget[name=name] input").toHaveValue("");
+    expect(".o_field_widget[name=name]").toHaveClass("o_field_invalid");
+
+    await contains(".o_pager_previous").click();
+    expect(".o_field_widget[name=foo] input").toHaveValue("yop");
+    expect(".o_field_widget[name=name] input").toHaveValue("info@example.com");
+    expect(".o_field_invalid").toHaveCount(0);
 });
 
 test(`display a dialog if onchange result is a warning`, async () => {

@@ -343,9 +343,19 @@ class Envia:
         contents = ", ".join(commodity.product_id.name for commodity in package.commodities)
 
         # Envia limits to 35 characters, if it's too long use categories instead.
+        # If categories are not set, shorten the product names.
         if len(contents) > ENVIA_CONTENT_LENGTH_LIMIT:
-            categories = [comm.product_id.categ_id.name for comm in package.commodities]
-            contents = shorten(", ".join(categories), ENVIA_CONTENT_LENGTH_LIMIT, placeholder="...")
+            categories = [
+                comm.product_id.categ_id.name
+                for comm in package.commodities
+                if comm.product_id.categ_id.name
+            ]
+            contents = shorten(
+                ", ".join(categories) if categories else contents,
+                ENVIA_CONTENT_LENGTH_LIMIT,
+                placeholder="...",
+            )
+
         # Store the total price of all items in this package as a insurance value
         sum_price = sum(original_prices)
         declared_value = self._convert_currency(sum_price, picking=picking, from_envia=False)

@@ -6,12 +6,13 @@ from io import BytesIO
 from dateutil.relativedelta import relativedelta
 from odoo import Command
 from freezegun import freeze_time
-from odoo.tests import HttpCase, tagged, new_test_user
+from odoo.tests import HttpCase, TransactionCase, tagged, new_test_user
 from odoo.addons.hr_payroll.tests.common import TestPayslipBase
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.exceptions import UserError
 from odoo.tests import tagged, Form
 from odoo.tools.pdf import PdfReader
+from odoo.tools.misc import file_path
 
 
 @tagged('at_install', '-post_install')  # LEGACY at_install
@@ -821,12 +822,104 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
         self.assertFalse(richard_payslip.payslip_run_id)
         self.assertFalse(jules_payslip.payslip_run_id)
 
+    def test_payslip_name_january_iso_year(self):
+        """
+        Test that January 2027 payslip name uses calendar year (2027) rather than ISO week year (2026).
+        """
+        self.env.user.lang = 'en_US'
+        payslip = self.env['hr.payslip'].create({
+            'name': 'TEMP',
+            'employee_id': self.richard_emp.id,
+            'date_from': datetime.date(2027, 1, 1),
+            'date_to': datetime.date(2027, 1, 31),
+        })
+
+        payslip._compute_name()
+
+        self.assertIn("January 2027", payslip.name)
+        self.assertNotIn("2026", payslip.name)
+
+    def test_payslip_name_bimonthly_december_iso_year(self):
+        """
+        Test that a bi-monthly payslip ending on December 31, 2024 uses calendar year (2024) instead of ISO week year (2025).
+        """
+        self.env.user.lang = 'en_US'
+
+        bimonthly_structure_type = self.env['hr.payroll.structure.type'].create({
+            'name': 'Bi-monthly Structure Type',
+            'default_schedule_pay': 'bi-monthly',
+        })
+        bimonthly_structure = self.env['hr.payroll.structure'].create({
+            'name': 'Bi-monthly Structure',
+            'type_id': bimonthly_structure_type.id,
+            'payslip_name': 'Salary Slip',
+        })
+
+        version = self.richard_contract
+        version.write({
+            'structure_type_id': bimonthly_structure_type.id,
+            'schedule_pay': 'bi-monthly',
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'name': 'TEMP',
+            'employee_id': self.richard_emp.id,
+            'version_id': version.id,
+            'struct_id': bimonthly_structure.id,
+            'date_from': datetime.date(2024, 11, 1),
+            'date_to': datetime.date(2024, 12, 31),
+        })
+
+        payslip._compute_name()
+
+        period_name = payslip._get_period_name(cache={})
+        self.assertEqual(period_name, "November 2024 and December 2024")
+
+        self.assertIn("December 2024", payslip.name)
+        self.assertNotIn("2025", payslip.name)
+
 
 @tagged('-at_install', 'post_install')
 class TestPayslipUi(HttpCase):
     def test_tour_date_input(self):
         """Test payslip form date input."""
         self.start_tour("/odoo", 'hr_payroll_form_view_date_input_tour', login='admin')
+
+    def test_tour_new_time_off_from_payslip_gantt(self):
+        """A time off created from the payslip's gantt goes to the payslip's employee."""
+        self.env['hr.work.entry.type'].create({
+            'name': 'Tour Time Off',
+            'code': 'TOURTO',
+            'count_as': 'absence',
+            'requires_allocation': False,
+        })
+        structure_type = self.env['hr.payroll.structure.type'].create({
+            'name': 'Tour Structure Type',
+            'wage_type': 'monthly',
+        })
+        structure = self.env['hr.payroll.structure'].create({
+            'name': 'Tour Structure',
+            'type_id': structure_type.id,
+        })
+        employee = self.env['hr.employee'].create({
+            'name': 'Tour Employee',
+            'structure_type_id': structure_type.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'wage': 3000,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'struct_id': structure.id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2025, 1, 31),
+        })
+        self.start_tour(
+            f"/odoo/action-hr_payroll.action_view_hr_payslip_month_form/{payslip.id}",
+            'hr_payroll_payslip_new_time_off_tour',
+            login='admin',
+        )
+        leave = self.env['hr.leave'].search([('employee_id', '=', employee.id)])
+        self.assertEqual(leave.work_entry_type_id.name, 'Tour Time Off')
 
 
 @tagged('post_install_l10n')
@@ -852,3 +945,16 @@ class TestPayslipLocalizations(HttpCase):
             f"The following localization modules must be included in '_get_data_files_to_update()':\n"
             f"{', '.join(missing_override)}"
         )
+
+
+@tagged('post_install', '-at_install')
+class TestPayrollDataFilesToUpdate(TransactionCase):
+
+    def test_payroll_data_files_to_update_exist(self):
+        """ The files reloaded by "Payroll: Update data" (weekly cron, reset of the rules, parameters and time
+        types) must exist, or the whole update crashes. """
+        for model in ('hr.payslip', 'hr.work.entry.type'):
+            for module_name, files_to_update in self.env[model]._get_data_files_to_update():
+                for file_to_update in files_to_update:
+                    with self.subTest(model=model, module=module_name, file=file_to_update):
+                        file_path(f'{module_name}/{file_to_update}')

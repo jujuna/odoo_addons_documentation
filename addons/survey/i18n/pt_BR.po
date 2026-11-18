@@ -12,15 +12,17 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:42+0000\n"
-"PO-Revision-Date: 2026-08-31 19:53+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:38+0000\n"
+"PO-Revision-Date: 2026-11-09 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"s19-4/survey/pt_BR/>\n"
+"20/survey/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,6 +46,16 @@ msgid ""
 "answers of question and according to that survey is done. Partners are also\n"
 "sent mails with personal token for the invitation of the survey.\n"
 msgstr ""
+"\n"
+"Crie pesquisas bonitas e visualize as respostas\n"
+"==============================================\n"
+"\n"
+"Isso depende das respostas ou avaliações de algumas perguntas por diferentes "
+"usuários. Uma pesquisa pode ter várias páginas. Cada página pode conter "
+"várias perguntas e cada pergunta pode ter várias respostas. Usuários "
+"diferentes podem dar respostas diferentes para a mesma pergunta e, de acordo "
+"com isso, a pesquisa é realizada. Parceiros também recebem e-mails com um "
+"token pessoal para o convite da pesquisa.\n"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_survey__question_count
@@ -162,7 +174,7 @@ msgid ""
 "                <a href=\"/\"><img t-if=\"not "
 "object.survey_id.create_uid.company_id.uses_default_logo\" t-attf-src=\"/"
 "logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" "
-"style=\"vertical-align:baseline;max-width:100px;\"/></a>\n"
+"style=\"vertical-align:baseline;max-width:100px;\"></a>\n"
 "            </td><td style=\"text-align:right;vertical-align:middle;\">\n"
 "                    Certification: <t t-out=\"object.survey_id.display_name "
 "or ''\">Feedback Form</t>\n"
@@ -182,7 +194,7 @@ msgid ""
 "                    certification\n"
 "                </p>\n"
 "                <p>Congratulations for passing the test with a score of "
-"<strong t-out=\"object.scoring_percentage\"/>%!</p>\n"
+"<strong t-out=\"object.scoring_percentage\"></strong>%!</p>\n"
 "            </td></tr>\n"
 "        </tbody>\n"
 "    </table>\n"
@@ -194,15 +206,15 @@ msgstr ""
 "    <table style=\"width:600px;margin:5px auto;\">\n"
 "        <tbody>\n"
 "            <tr><td>\n"
-"                <!-- Usamos o logo da empresa que criou a pesquisa (para "
-"lidar com casos multiempresa) -->\n"
+"                <!-- We use the logo of the company that created the survey "
+"(to handle multi company cases) -->\n"
 "                <a href=\"/\"><img t-if=\"not "
 "object.survey_id.create_uid.company_id.uses_default_logo\" t-attf-src=\"/"
 "logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" "
-"style=\"vertical-align:baseline;max-width:100px;\"/></a>\n"
+"style=\"vertical-align:baseline;max-width:100px;\"></a>\n"
 "            </td><td style=\"text-align:right;vertical-align:middle;\">\n"
-"                    Certificado: <t t-out=\"object.survey_id.display_name or "
-"''\">Formulário de feedback</t>\n"
+"                    Certificação: <t t-out=\"object.survey_id.display_name "
+"or ''\">Formulário de Feedback</t>\n"
 "            </td></tr>\n"
 "        </tbody>\n"
 "    </table>\n"
@@ -210,16 +222,15 @@ msgstr ""
 "solid #e1e1e1;\">\n"
 "        <tbody>\n"
 "            <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                <p>Prezado <span t-out=\"object.partner_id.name or "
+"                <p>Prezado(a) <span t-out=\"object.partner_id.name or "
 "'participant'\">participante</span></p>\n"
 "                <p>\n"
-"                    Segue em anexo o seu certificado de\n"
+"                    Segue em anexo sua certificação\n"
 "                        <strong t-out=\"object.survey_id.display_name or "
-"''\">Construção de móveis</strong>\n"
-"                    \n"
+"''\">Criação de Móveis</strong>\n"
 "                </p>\n"
-"                <p> Parabéns por ser aprovado no teste com pontuação de "
-"<strong t-out=\"object.scoring_percentage\"/>%!</p>\n"
+"                <p>Parabéns por ter passado no teste com uma pontuação de "
+"<strong t-out=\"object.scoring_percentage\"></strong>%!</p>\n"
 "            </td></tr>\n"
 "        </tbody>\n"
 "    </table>\n"
@@ -232,7 +243,7 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
 "        Dear <t t-out=\"object.partner_id.name or "
-"'participant'\">participant</t><br/><br/>\n"
+"'participant'\">participant</t><br><br>\n"
 "        <t t-if=\"object.survey_id.certification\">\n"
 "            You have been invited to take a new certification.\n"
 "        </t>\n"
@@ -256,7 +267,7 @@ msgid ""
 "        </div>\n"
 "        <t t-if=\"object.deadline\">\n"
 "            Please answer the survey for <t t-"
-"out=\"format_date(object.deadline) or ''\">05/05/2021</t>.<br/><br/>\n"
+"out=\"format_date(object.deadline) or ''\">05/05/2021</t>.<br><br>\n"
 "        </t>\n"
 "        <t t-if=\"object.survey_id.certification\">\n"
 "            We wish you good luck!\n"
@@ -270,23 +281,23 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Prezado <t t-out=\"object.partner_id.name or "
-"'participant'\">participante</t><br/><br/>\n"
+"        Prezado(a) <t t-out=\"object.partner_id.name or 'participant'\">"
+"participante</t><br><br>\n"
 "        <t t-if=\"object.survey_id.certification\">\n"
-"            Você foi convidado a prestar outra prova de certificação.\n"
+"            Você foi convidado para uma nova certificação.\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            Estamos realizando uma pesquisa e sua resposta será de grande "
-"valor.\n"
+"            Estamos realizando uma pesquisa e agradeceríamos a sua "
+"resposta.\n"
 "        </t>\n"
 "        </p><div style=\"margin: 16px 0px 16px 0px;\">\n"
 "            <a t-att-href=\"(object.get_start_url())\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
 "                <t t-if=\"object.survey_id.certification\">\n"
-"                     Iniciar certificação\n"
+"                    Iniciar certificação\n"
 "                </t>\n"
 "                <t t-else=\"\">\n"
 "                    Iniciar pesquisa\n"
@@ -294,14 +305,14 @@ msgstr ""
 "            </a>\n"
 "        </div>\n"
 "        <t t-if=\"object.deadline\">\n"
-"            Responda a pesquisa até <t t-out=\"format_date(object.deadline) "
-"or ''\">05/05/2021</t>.<br/><br/>\n"
+"            Por favor, responda à pesquisa até <t t-out=\"format_date"
+"(object.deadline) or ''\">05/05/2021</t>.<br><br>\n"
 "        </t>\n"
 "        <t t-if=\"object.survey_id.certification\">\n"
-"            Boa sorte!\n"
+"            Desejamos boa sorte!\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            Agradecemos desde já por sua participação.\n"
+"            Agradecemos antecipadamente pela sua participação.\n"
 "        </t>\n"
 "    \n"
 "</div>\n"
@@ -335,6 +346,7 @@ msgstr ""
 msgid ""
 "<i class=\"oi oi-filled\" data-icon=\"share\" role=\"img\" title=\"Share\"/>"
 msgstr ""
+"<i class=\"oi oi-filled mt-1\" data-icon=\"schedule\" title=\"Dates\"/>"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_fill_form_done
@@ -599,7 +611,7 @@ msgstr "<span>%</span>"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_kanban
 msgid "<span>-</span>"
-msgstr ""
+msgstr "<span> - </span>"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_results_filters
@@ -614,7 +626,7 @@ msgstr "<span>Pesquisas concluídas</span>"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_kanban
 msgid "<span>Completed</span>"
-msgstr ""
+msgstr "<span>Concluído</span>"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_results_filters
@@ -639,7 +651,7 @@ msgstr "<span>Somente aprovações</span>"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_kanban
 msgid "<span>Registered</span>"
-msgstr ""
+msgstr "<span>Registrado</span>"
 
 #. module: survey
 #. odoo-python
@@ -901,7 +913,7 @@ msgstr ""
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_manage_content
 msgid "Answered:"
-msgstr ""
+msgstr "Respondido:"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_question__user_input_line_ids
@@ -993,7 +1005,7 @@ msgstr "Total de tentativas"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_button_retake
 msgid "Attempts left:"
-msgstr ""
+msgstr "Tentativas restantes:"
 
 #. module: survey
 #: model:ir.model.fields,help:survey.field_survey_user_input__nickname
@@ -1156,12 +1168,12 @@ msgstr ""
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Certificate of achievement"
-msgstr ""
+msgstr "Certificado de conquista"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Certificate of achievement for"
-msgstr ""
+msgstr "Certificado de conquista para"
 
 #. module: survey
 #. odoo-python
@@ -1192,7 +1204,7 @@ msgstr ""
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Certification failed"
-msgstr ""
+msgstr "Certificação falhou"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_survey__certification_report_layout
@@ -1202,12 +1214,12 @@ msgstr "Modelo de certificado"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Certification:"
-msgstr ""
+msgstr "Certificação:"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Certification: n°"
-msgstr ""
+msgstr "Certificação:"
 
 #. module: survey
 #: model:mail.template,subject:survey.mail_template_certification
@@ -1257,7 +1269,7 @@ msgstr "Proteção de piso para cadeiras"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_page_statistics_question
 msgid "Charts"
-msgstr ""
+msgstr "Gráficos"
 
 #. module: survey
 #. odoo-python
@@ -1301,22 +1313,22 @@ msgstr "Escolha sua refeição"
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__classic-1_company
 msgid "Classic #1"
-msgstr ""
+msgstr "Clássico #1"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__classic-1_black
 msgid "Classic #1 Black"
-msgstr ""
+msgstr "Clássico #1 Preto"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__classic-2_company
 msgid "Classic #2"
-msgstr ""
+msgstr "Clássico #2"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__classic-2_black
 msgid "Classic #2 Black"
-msgstr ""
+msgstr "Clássico #2 Preto"
 
 #. module: survey
 #. odoo-javascript
@@ -1484,7 +1496,7 @@ msgstr "Copiado."
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_open
 msgid "Copy session link"
-msgstr ""
+msgstr "Copiar link da sessão"
 
 #. module: survey
 #: model:survey.question.answer,value:survey.vendor_certification_page_2_question_2_choice_1
@@ -1666,7 +1678,7 @@ msgstr "Resposta em data"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Date:"
-msgstr ""
+msgstr "Data"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_question__question_type__datetime
@@ -1711,7 +1723,7 @@ msgstr "Excluir"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "Demo certified name"
-msgstr ""
+msgstr "Nome de demonstração certificado"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_question__description
@@ -1833,7 +1845,7 @@ msgstr "Fim da pesquisa"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_manage_content
 msgid "End the Session"
-msgstr ""
+msgstr "Encerrar a sessão"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_session_code
@@ -1936,7 +1948,7 @@ msgstr "Para esta pergunta, você só pode selecionar uma resposta."
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_form
 msgid "Free Navigation"
-msgstr ""
+msgstr "Navegação livre"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_user_input_line__answer_type__text_box
@@ -1988,7 +2000,7 @@ msgstr "Dar medalhas"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_navigation
 msgid "Go to previous question"
-msgstr ""
+msgstr "Ir para a pergunta anterior"
 
 #. module: survey
 #. odoo-python
@@ -2250,7 +2262,7 @@ msgstr "Se marcado, os usuários podem voltar para páginas anteriores."
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_form
 msgid "If checked, users can navigate back and forth between questions."
-msgstr ""
+msgstr "Se marcado, os usuários podem navegar entre as perguntas."
 
 #. module: survey
 #: model:ir.model.fields,help:survey.field_survey_invite__survey_users_login_required
@@ -2723,7 +2735,7 @@ msgstr "Resposta obrigatória"
 #: model:ir.model.fields,help:survey.field_survey_survey__activity_type_icon
 #: model:ir.model.fields,help:survey.field_survey_user_input__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Icone de Símbolos de Material, ex: checklist"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_question__question_type__matrix
@@ -2828,12 +2840,12 @@ msgstr "Limites mín/máx"
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__minimal_company
 msgid "Minimal"
-msgstr ""
+msgstr "Minimalista"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__minimal_black
 msgid "Minimal Black"
-msgstr ""
+msgstr "Minimalista Preto"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_page_statistics_question
@@ -2864,12 +2876,12 @@ msgstr "Valor mínimo"
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__modern_company
 msgid "Modern"
-msgstr ""
+msgstr "Modo"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__modern_black
 msgid "Modern Black"
-msgstr ""
+msgstr "Moderno Preto"
 
 #. module: survey
 #: model:survey.question.answer,value:survey.survey_demo_burger_quiz_p2_q3_sug4
@@ -2985,7 +2997,7 @@ msgstr "Tipo da próxima atividade"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_manage_content
 msgid "Next Question"
-msgstr ""
+msgstr "Próxima pergunta"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_user_input__nickname
@@ -3450,7 +3462,7 @@ msgstr "Escolha um modelo…"
 #. odoo-javascript
 #: code:addons/survey/static/src/views/components/survey_survey_action_helper/survey_survey_action_helper.xml:0
 msgid "Pick a sample or"
-msgstr ""
+msgstr "Escolha um exemplo ou"
 
 #. module: survey
 #: model:survey.question,title:survey.survey_demo_burger_quiz_p1_q1
@@ -3498,6 +3510,8 @@ msgid ""
 "Please make sure you have at least one question in your survey. You also "
 "need at least one section to use the \"Page per section\" layout."
 msgstr ""
+"Certifique-se de ter pelo menos uma pergunta em sua pesquisa. Você também "
+"precisa de pelo menos uma seção para usar o layout \"Página por seção\"."
 
 #. module: survey
 #: model:survey.question,title:survey.vendor_certification_page_3
@@ -3528,7 +3542,7 @@ msgstr "Visualizar"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_manage_content
 msgid "Previous Question"
-msgstr ""
+msgstr "Pergunta anterior"
 
 #. module: survey
 #: model:survey.question,title:survey.vendor_certification_page_2
@@ -3752,7 +3766,7 @@ msgstr "Restrito a"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_kanban
 msgid "Results"
-msgstr ""
+msgstr "Resultado"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_button_retake
@@ -3844,7 +3858,7 @@ msgstr "Valor da escala"
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_invite__scheduled_date
 msgid "Scheduled Date"
-msgstr ""
+msgstr "Data agendada"
 
 #. module: survey
 #: model:survey.question,title:survey.survey_demo_burger_quiz_p4
@@ -3991,7 +4005,7 @@ msgstr "Enviar por e-mail"
 #. module: survey
 #: model:ir.module.module,summary:base.module_survey
 msgid "Send your surveys or share them live."
-msgstr ""
+msgstr "Envie suas pesquisas ou compartilhe-as em tempo real"
 
 #. module: survey
 #: model:mail.template,description:survey.mail_template_certification
@@ -4202,7 +4216,7 @@ msgstr "Começar do zero"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_page_statistics_question
 msgid "Stats"
-msgstr ""
+msgstr "Estado"
 
 #. module: survey
 #: model:ir.model.fields,field_description:survey.field_survey_user_input__state
@@ -4530,6 +4544,7 @@ msgstr ""
 #: code:addons/survey/wizard/survey_invite.py:0
 msgid "The answer deadline should be after the email schedule date."
 msgstr ""
+"O prazo de resposta deve ser posterior à data de agendamento do e-mail."
 
 #. module: survey
 #. odoo-python
@@ -4604,7 +4619,7 @@ msgstr ""
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_invite_view_form
 msgid "The interview link will expire after the deadline."
-msgstr ""
+msgstr "O link da entrevista expirará após o prazo."
 
 #. module: survey
 #: model:survey.question.answer,value:survey.survey_feedback_p2_q2_row1
@@ -4719,7 +4734,7 @@ msgstr "Essa resposta deve ser um endereço de e-mail."
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "This certificate is presented to"
-msgstr ""
+msgstr "Este certificado é apresentado a"
 
 #. module: survey
 #: model:ir.model.fields,help:survey.field_survey_survey__session_code
@@ -4844,7 +4859,7 @@ msgstr "Título"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_invite_view_form
 msgid "To"
-msgstr ""
+msgstr "Para:"
 
 #. module: survey
 #. odoo-javascript
@@ -5408,7 +5423,7 @@ msgstr "tentativas"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "by"
-msgstr ""
+msgstr "por"
 
 #. module: survey
 #. odoo-javascript
@@ -5456,12 +5471,12 @@ msgstr "ex.: Pesquisa de satisfação"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "for successfully completing"
-msgstr ""
+msgstr "por concluir com êxito"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "for successfully completing this certification."
-msgstr ""
+msgstr "por concluir com êxito esta certificação."
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_auth_required
@@ -5471,7 +5486,7 @@ msgstr "entrar"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "n°"
-msgstr ""
+msgstr "nº"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_progression
@@ -5504,7 +5519,7 @@ msgstr "páginas"
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_general
 msgid "presented to"
-msgstr ""
+msgstr "apresentado a"
 
 #. module: survey
 #: model:ir.model.fields,help:survey.field_survey_invite__scheduled_date
@@ -5512,6 +5527,8 @@ msgid ""
 "send emails after that date. This date is considered as being in UTC "
 "timezone."
 msgstr ""
+"enviar e-mails após essa data. Esta data é considerada como estando no fuso "
+"horário UTC."
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_closed_expired
@@ -5541,6 +5558,160 @@ msgid ""
 msgstr ""
 "⚠️ Esta pergunta está posicionada antes de algum ou de todos seus acionadores "
 "e pode ser ignorada."
+
+#~ msgid ""
+#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
+#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
+#~ "    <table style=\"width:600px;margin:5px auto;\">\n"
+#~ "        <tbody>\n"
+#~ "            <tr><td>\n"
+#~ "                <!-- We use the logo of the company that created the "
+#~ "survey (to handle multi company cases) -->\n"
+#~ "                <a href=\"/\"><img t-if=\"not "
+#~ "object.survey_id.create_uid.company_id.uses_default_logo\" t-attf-src=\"/"
+#~ "logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" "
+#~ "style=\"vertical-align:baseline;max-width:100px;\"/></a>\n"
+#~ "            </td><td style=\"text-align:right;vertical-align:middle;\">\n"
+#~ "                    Certification: <t t-"
+#~ "out=\"object.survey_id.display_name or ''\">Feedback Form</t>\n"
+#~ "            </td></tr>\n"
+#~ "        </tbody>\n"
+#~ "    </table>\n"
+#~ "    <table style=\"width:600px;margin:0px "
+#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
+#~ "        <tbody>\n"
+#~ "            <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
+#~ "                <p>Dear <span t-out=\"object.partner_id.name or "
+#~ "'participant'\">participant</span></p>\n"
+#~ "                <p>\n"
+#~ "                    Please find attached your\n"
+#~ "                        <strong t-out=\"object.survey_id.display_name or "
+#~ "''\">Furniture Creation</strong>\n"
+#~ "                    certification\n"
+#~ "                </p>\n"
+#~ "                <p>Congratulations for passing the test with a score of "
+#~ "<strong t-out=\"object.scoring_percentage\"/>%!</p>\n"
+#~ "            </td></tr>\n"
+#~ "        </tbody>\n"
+#~ "    </table>\n"
+#~ "</div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
+#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
+#~ "    <table style=\"width:600px;margin:5px auto;\">\n"
+#~ "        <tbody>\n"
+#~ "            <tr><td>\n"
+#~ "                <!-- Usamos o logo da empresa que criou a pesquisa (para "
+#~ "lidar com casos multiempresa) -->\n"
+#~ "                <a href=\"/\"><img t-if=\"not "
+#~ "object.survey_id.create_uid.company_id.uses_default_logo\" t-attf-src=\"/"
+#~ "logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" "
+#~ "style=\"vertical-align:baseline;max-width:100px;\"/></a>\n"
+#~ "            </td><td style=\"text-align:right;vertical-align:middle;\">\n"
+#~ "                    Certificado: <t t-out=\"object.survey_id.display_name "
+#~ "or ''\">Formulário de feedback</t>\n"
+#~ "            </td></tr>\n"
+#~ "        </tbody>\n"
+#~ "    </table>\n"
+#~ "    <table style=\"width:600px;margin:0px "
+#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
+#~ "        <tbody>\n"
+#~ "            <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
+#~ "                <p>Prezado <span t-out=\"object.partner_id.name or "
+#~ "'participant'\">participante</span></p>\n"
+#~ "                <p>\n"
+#~ "                    Segue em anexo o seu certificado de\n"
+#~ "                        <strong t-out=\"object.survey_id.display_name or "
+#~ "''\">Construção de móveis</strong>\n"
+#~ "                    \n"
+#~ "                </p>\n"
+#~ "                <p> Parabéns por ser aprovado no teste com pontuação de "
+#~ "<strong t-out=\"object.scoring_percentage\"/>%!</p>\n"
+#~ "            </td></tr>\n"
+#~ "        </tbody>\n"
+#~ "    </table>\n"
+#~ "</div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        Dear <t t-out=\"object.partner_id.name or "
+#~ "'participant'\">participant</t><br/><br/>\n"
+#~ "        <t t-if=\"object.survey_id.certification\">\n"
+#~ "            You have been invited to take a new certification.\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            We are conducting a survey and your response would be "
+#~ "appreciated.\n"
+#~ "        </t>\n"
+#~ "        </p><div style=\"margin: 16px 0px 16px 0px;\">\n"
+#~ "            <a t-att-href=\"(object.get_start_url())\" t-attf-"
+#~ "style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                <t t-if=\"object.survey_id.certification\">\n"
+#~ "                    Start Certification\n"
+#~ "                </t>\n"
+#~ "                <t t-else=\"\">\n"
+#~ "                    Start Survey\n"
+#~ "                </t>\n"
+#~ "            </a>\n"
+#~ "        </div>\n"
+#~ "        <t t-if=\"object.deadline\">\n"
+#~ "            Please answer the survey for <t t-"
+#~ "out=\"format_date(object.deadline) or ''\">05/05/2021</t>.<br/><br/>\n"
+#~ "        </t>\n"
+#~ "        <t t-if=\"object.survey_id.certification\">\n"
+#~ "            We wish you good luck!\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Thank you in advance for your participation.\n"
+#~ "        </t>\n"
+#~ "    \n"
+#~ "</div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        Prezado <t t-out=\"object.partner_id.name or "
+#~ "'participant'\">participante</t><br/><br/>\n"
+#~ "        <t t-if=\"object.survey_id.certification\">\n"
+#~ "            Você foi convidado a prestar outra prova de certificação.\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Estamos realizando uma pesquisa e sua resposta será de grande "
+#~ "valor.\n"
+#~ "        </t>\n"
+#~ "        </p><div style=\"margin: 16px 0px 16px 0px;\">\n"
+#~ "            <a t-att-href=\"(object.get_start_url())\" t-attf-"
+#~ "style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                <t t-if=\"object.survey_id.certification\">\n"
+#~ "                     Iniciar certificação\n"
+#~ "                </t>\n"
+#~ "                <t t-else=\"\">\n"
+#~ "                    Iniciar pesquisa\n"
+#~ "                </t>\n"
+#~ "            </a>\n"
+#~ "        </div>\n"
+#~ "        <t t-if=\"object.deadline\">\n"
+#~ "            Responda a pesquisa até <t t-"
+#~ "out=\"format_date(object.deadline) or ''\">05/05/2021</t>.<br/><br/>\n"
+#~ "        </t>\n"
+#~ "        <t t-if=\"object.survey_id.certification\">\n"
+#~ "            Boa sorte!\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Agradecemos desde já por sua participação.\n"
+#~ "        </t>\n"
+#~ "    \n"
+#~ "</div>\n"
+#~ "            "
 
 #~ msgid ""
 #~ "<br/>\n"

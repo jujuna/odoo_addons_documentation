@@ -197,6 +197,61 @@ class TestPayslipComputation(TestPayslipContractBase):
         self.richard_payslip2.compute_sheet()
         self.assertEqual(3010.13, self.richard_payslip2.line_ids.filtered(lambda x: x.code == 'SUMALW').total)
 
+    def test_category_shared_ancestor_counted_once(self):
+        """An ancestor category shared by several categories of a rule (or of a work entry type)
+        is credited once by the rule total (or the worked days amount), in the rules computation
+        as in ``_sum_category``."""
+        Category = self.env['hr.salary.rule.category']
+        parent, wd_parent = Category.create([
+            {'name': 'Shared Parent', 'code': 'TEST_PARENT', 'country_id': False},
+            {'name': 'Shared Worked Days Parent', 'code': 'TEST_WD_PARENT', 'country_id': False},
+        ])
+        child_a, child_b, wd_child_a, wd_child_b = Category.create([
+            {'name': 'Child A', 'code': 'TEST_CHILD_A', 'parent_id': parent.id, 'country_id': False},
+            {'name': 'Child B', 'code': 'TEST_CHILD_B', 'parent_id': parent.id, 'country_id': False},
+            {'name': 'Worked Days Child A', 'code': 'TEST_WD_CHILD_A', 'parent_id': wd_parent.id, 'country_id': False},
+            {'name': 'Worked Days Child B', 'code': 'TEST_WD_CHILD_B', 'parent_id': wd_parent.id, 'country_id': False},
+        ])
+        self.env['hr.salary.rule'].create([{
+            'name': 'Two Children Rule',
+            'sequence': 1,
+            'amount_select': 'fix',
+            'amount_fix': 100.0,
+            'code': 'TEST_TWO_CHILDREN',
+            'category_ids': [Command.set((child_a + child_b).ids)],
+            'struct_ids': [Command.link(self.developer_pay_structure.id)],
+        }, {
+            'name': 'Shared Parent Total',
+            'sequence': 2,
+            'amount_select': 'code',
+            'amount_python_compute': "result = categories['TEST_PARENT']",
+            'code': 'TEST_PARENT_TOTAL',
+            'struct_ids': [Command.link(self.developer_pay_structure.id)],
+        }, {
+            'name': 'Shared Worked Days Parent Total',
+            'sequence': 2,
+            'amount_select': 'code',
+            'amount_python_compute': "result = categories['TEST_WD_PARENT']",
+            'code': 'TEST_WD_PARENT_TOTAL',
+            'struct_ids': [Command.link(self.developer_pay_structure.id)],
+        }])
+        worked_days = self.richard_payslip.worked_days_line_ids
+        worked_days.work_entry_type_id.write({'category_ids': [Command.set((wd_child_a + wd_child_b).ids)]})
+
+        self.richard_payslip.compute_sheet()
+        lines = self.richard_payslip.line_ids
+        self.assertEqual(lines.filtered(lambda line: line.code == 'TEST_PARENT_TOTAL').total, 100.0)
+        self.assertAlmostEqual(
+            lines.filtered(lambda line: line.code == 'TEST_WD_PARENT_TOTAL').total,
+            sum(worked_days.mapped('amount')),
+            places=2,
+        )
+        self.assertTrue(sum(worked_days.mapped('amount')))
+
+        self.richard_payslip.action_payslip_done()
+        self.assertEqual(self.richard_payslip._sum_category('TEST_PARENT', date(2016, 1, 1), include_children=True), 100.0)
+        self.assertEqual(self.richard_payslip._sum_category('TEST_CHILD_A', date(2016, 1, 1)), 100.0)
+
     def test_payslip_generation_with_extra_work(self):
         # /!\ this is in the weekend (Sunday) => no calendar attendance at this time
         start = datetime(2015, 11, 1, 10, 0, 0)
@@ -476,16 +531,9 @@ class TestPayslipComputation(TestPayslipContractBase):
             'date_to': date(2016, 1, 31),
         })
 
-        with Form(payslip) as payslip_form:
-            payslip_form.input_line_ids.remove(0)  # remove merged input of attachments and use 2 inputs instead
-            with payslip_form.input_line_ids.new() as line:
-                line.salary_rule_id = self.attach_salary_rule
-                line.amount = 100
-            with payslip_form.input_line_ids.new() as line:
-                line.salary_rule_id = self.attach_salary_rule
-                line.amount = 200
-
         payslip.compute_sheet()
+        self.assertEqual(len(payslip.input_line_ids), 2)
+        self.assertEqual(len(payslip.line_ids.filtered(lambda line: line.code == self.attach_salary_rule.code)), 2)
         payslip.action_payslip_done()
         payslip.action_payslip_paid()
 
@@ -501,6 +549,24 @@ class TestPayslipComputation(TestPayslipContractBase):
             'date_to': date(2015, 11, 30)
         })
         payslip.compute_sheet()
+
+    def test_same_type_input_lines_missing_code(self):
+        # A missing code in same_type_input_lines is an empty recordset, and accessing it from a
+        # rule does not prevent the rule with that code from being computed
+        self.hra_rule.write({
+            'amount_select': 'code',
+            'amount_python_compute': "result = 0 if same_type_input_lines['CA'] else version.wage * 0.4",
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.richard_emp.id,
+            'version_id': self.contract_cdi.id,
+            'struct_id': self.developer_pay_structure.id,
+            'date_from': date(2016, 1, 1),
+            'date_to': date(2016, 1, 31),
+        })
+        payslip.compute_sheet()
+        self.assertAlmostEqual(payslip.line_ids.filtered(lambda line: line.code == 'HRA').total, self.contract_cdi.wage * 0.4, places=2)
+        self.assertEqual(payslip.line_ids.filtered(lambda line: line.code == 'CA').total, 800)
 
     def test_payslip_warning_message_without_duration_dates(self):
         self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
@@ -691,6 +757,19 @@ class TestPayslipComputation(TestPayslipContractBase):
             line = payslip.worked_days_line_ids.filtered(lambda l: l.code == out_of_contract_code)
             self.assertAlmostEqual(line.number_of_days, exp_days, places=2, msg=f"Wrong days for {payslip.name}")
             self.assertAlmostEqual(line.number_of_hours, exp_hours, places=2, msg=f"Wrong hours for {payslip.name}")
+
+    def test_worked_days_amount_code_part_of_out_of_contract_code(self):
+        # Only the out-of-contract code 000.00 gives a 0 amount, not the codes contained in it
+        self.work_entry_type.code = '00'
+        worked_days = self.env['hr.payslip.worked_days'].create({
+            'payslip_id': self.richard_payslip.id,
+            'work_entry_type_id': self.work_entry_type.id,
+            'version_id': self.contract_cdi.id,
+            'number_of_days': 1,
+            'number_of_hours': 8,
+        })
+        self.assertTrue(worked_days.is_paid)
+        self.assertGreater(worked_days.amount, 0)
 
     def test_payslip_fully_flexible_employee_without_calendar(self):
         """

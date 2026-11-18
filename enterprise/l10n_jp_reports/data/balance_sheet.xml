@@ -239,7 +239,7 @@
                                             <record id="account_financial_report_jp_bs_jp_unallocated_earnings_current_year_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
                                                 <field name="engine">domain</field>
-                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected'])]"/>
+                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected', 'equity_retained'])]"/>
                                                 <field name="subformula">-sum</field>
                                                 <field name="date_scope">from_fiscalyear</field>
                                             </record>
@@ -256,7 +256,7 @@
                                             <record id="account_financial_report_jp_bs_jp_unallocated_earnings_previous_years_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
                                                 <field name="engine">domain</field>
-                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected'])]"/>
+                                                <field name="formula" eval="[('account_id.account_type', 'in', ['income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other', 'equity_unaffected', 'equity_retained'])]"/>
                                                 <field name="subformula">-sum</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>

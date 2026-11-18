@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_parameter_lb_minimum_wage_monthly" model="hr.rule.parameter">
+            <field name="name">LB: Official Minimum Wage (Monthly)</field>
+            <field name="code">l10n_lb_minimum_wage_monthly</field>
+            <field name="description">Official minimum monthly wage in LBP (Labour Code, art. 44; Law No. 36/67, art. 6): LBP 9,000,000 from 26 April 2023 (Decree No. 11226 of 2023), 18,000,000 from 1 April 2024 (Decree No. 13164 of 2024, retroactive), 28,000,000 from 1 August 2025 (Decree No. 699 of 18 July 2025). Compared with the basic salary, the cost-of-living increases and the regular allowances of the contract by a payroll warning.</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_monthly_2023_04_26" model="hr.rule.parameter.value">
+            <field name="parameter_value">9000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_monthly"/>
+            <field name="date_from" eval="datetime(2023, 4, 26).date()"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_monthly_2024_04" model="hr.rule.parameter.value">
+            <field name="parameter_value">18000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_monthly"/>
+            <field name="date_from" eval="datetime(2024, 4, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_monthly_2025_08" model="hr.rule.parameter.value">
+            <field name="parameter_value">28000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_monthly"/>
+            <field name="date_from" eval="datetime(2025, 8, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_minimum_wage_daily" model="hr.rule.parameter">
+            <field name="name">LB: Official Minimum Wage (Daily)</field>
+            <field name="code">l10n_lb_minimum_wage_daily</field>
+            <field name="description">Official minimum daily wage in LBP of a daily or hourly worker, set with the monthly amount by the same decrees: LBP 410,000, 820,000 and 1,300,000 from 1 August 2025. Compared with the hourly wage of a day of the working schedule by a payroll warning.</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_daily_2023_04_26" model="hr.rule.parameter.value">
+            <field name="parameter_value">410000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_daily"/>
+            <field name="date_from" eval="datetime(2023, 4, 26).date()"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_daily_2024_04" model="hr.rule.parameter.value">
+            <field name="parameter_value">820000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_daily"/>
+            <field name="date_from" eval="datetime(2024, 4, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_minimum_wage_daily_2025_08" model="hr.rule.parameter.value">
+            <field name="parameter_value">1300000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_minimum_wage_daily"/>
+            <field name="date_from" eval="datetime(2025, 8, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_nssf_rates" model="hr.rule.parameter">
+            <field name="name">LB: NSSF Contribution Rates (%)</field>
+            <field name="code">l10n_lb_nssf_rates</field>
+            <field name="description">Rates of the National Social Security Fund: sickness and maternity 3% employee and 8% employer (9% normal rate and 2% of the retirees' scheme of Law No. 27 of 2017, shared equally), family allowances 6% employer, end-of-service indemnity 8.5% employer (Social Security Code, art. 73; forms CNSS 190A and 386). The work injury branch was never put into force.</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_rates_2017_10" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'sm_employee': 3, 'sm_employer': 8, 'fa_employer': 6, 'eos_employer': 8.5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_rates"/>
+            <field name="date_from" eval="datetime(2017, 10, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_nssf_sm_ceiling" model="hr.rule.parameter">
+            <field name="name">LB: NSSF Sickness and Maternity Ceiling</field>
+            <field name="code">l10n_lb_nssf_sm_ceiling</field>
+            <field name="description">Monthly ceiling in LBP of the earnings bearing the sickness and maternity contributions (Social Security Code, art. 68 §2): LBP 5,000,000 from 1 July 2022 (Decree No. 9415), 18,000,000 from 1 September 2023 (Decree No. 11928), 45,000,000 from 1 March 2024 and 90,000,000 from 1 April 2024 (5 times the minimum wage, Decree No. 12962), 120,000,000 from 1 August 2025 (Decree No. 887 of 2025).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_sm_ceiling_2022_07" model="hr.rule.parameter.value">
+            <field name="parameter_value">5000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_sm_ceiling"/>
+            <field name="date_from" eval="datetime(2022, 7, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_sm_ceiling_2023_09" model="hr.rule.parameter.value">
+            <field name="parameter_value">18000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_sm_ceiling"/>
+            <field name="date_from" eval="datetime(2023, 9, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_sm_ceiling_2024_03" model="hr.rule.parameter.value">
+            <field name="parameter_value">45000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_sm_ceiling"/>
+            <field name="date_from" eval="datetime(2024, 3, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_sm_ceiling_2024_04" model="hr.rule.parameter.value">
+            <field name="parameter_value">90000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_sm_ceiling"/>
+            <field name="date_from" eval="datetime(2024, 4, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_sm_ceiling_2025_08" model="hr.rule.parameter.value">
+            <field name="parameter_value">120000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_sm_ceiling"/>
+            <field name="date_from" eval="datetime(2025, 8, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_nssf_fa_ceiling" model="hr.rule.parameter">
+            <field name="name">LB: NSSF Family Allowances Ceiling</field>
+            <field name="code">l10n_lb_nssf_fa_ceiling</field>
+            <field name="description">Monthly ceiling in LBP of the earnings bearing the family allowances contribution: LBP 12,000,000 from 1 January 2024 (Decree No. 12772 of 2023), 18,000,000 from 1 July 2025 (Decree No. 422 of 2025), 28,000,000 from 1 May 2026 (Decree No. 2923 of 2026).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_fa_ceiling_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">12000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_fa_ceiling"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_fa_ceiling_2025_07" model="hr.rule.parameter.value">
+            <field name="parameter_value">18000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_fa_ceiling"/>
+            <field name="date_from" eval="datetime(2025, 7, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_fa_ceiling_2026_05" model="hr.rule.parameter.value">
+            <field name="parameter_value">28000000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_fa_ceiling"/>
+            <field name="date_from" eval="datetime(2026, 5, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_nssf_family_allowance" model="hr.rule.parameter">
+            <field name="name">LB: NSSF Family Allowances</field>
+            <field name="code">l10n_lb_nssf_family_allowance</field>
+            <field name="description">Monthly family allowances in LBP paid by the employer for the Fund (Social Security Code, art. 46 to 48): for the spouse without paid work nor pension and for each dependent child up to 5: LBP 600,000 and 330,000 from 1 January 2024 (Decree No. 12599 of 2023), 1,200,000 and 660,000 from 1 July 2025 (Decree No. 422 of 2025), 2,100,000 and 1,155,000 from 1 May 2026 (Decree No. 2923 of 2026).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_family_allowance_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'spouse': 600000, 'child': 330000, 'max_children': 5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_family_allowance"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_family_allowance_2025_07" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'spouse': 1200000, 'child': 660000, 'max_children': 5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_family_allowance"/>
+            <field name="date_from" eval="datetime(2025, 7, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_family_allowance_2026_05" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'spouse': 2100000, 'child': 1155000, 'max_children': 5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_family_allowance"/>
+            <field name="date_from" eval="datetime(2026, 5, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_nssf_eos_age" model="hr.rule.parameter">
+            <field name="name">LB: NSSF End-of-Service Age</field>
+            <field name="code">l10n_lb_nssf_eos_age</field>
+            <field name="description">The employer stops paying the end-of-service contribution when the employee reaches 64 complete, the indemnity being liquidated (Social Security Code, art. 50 and 73 §1; Labour Code, art. 55).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_nssf_eos_age_1987" model="hr.rule.parameter.value">
+            <field name="parameter_value">64</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_nssf_eos_age"/>
+            <field name="date_from" eval="datetime(1987, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_its_family_deduction" model="hr.rule.parameter">
+            <field name="name">LB: Income Tax Family Deduction</field>
+            <field name="code">l10n_lb_its_family_deduction</field>
+            <field name="description">Yearly family deduction in LBP (Income Tax Law, art. 31 and 56): the taxpayer, added for a married taxpayer whose spouse has no taxable activity, and for each dependent child up to 5. LBP 37,500,000, 12,500,000 and 2,500,000 from 1 January 2022 (Law No. 10 of 2022, art. 27), 450,000,000, 225,000,000 and 45,000,000 from 1 January 2024 (Law No. 324 of 2024, art. 49), unchanged by the budgets of 2025 and 2026.</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_its_family_deduction_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'single': 37500000, 'married': 12500000, 'child': 2500000, 'max_children': 5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_family_deduction"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_its_family_deduction_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'single': 450000000, 'married': 225000000, 'child': 45000000, 'max_children': 5}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_family_deduction"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_its_daily_deduction" model="hr.rule.parameter">
+            <field name="name">LB: Income Tax Daily Deduction</field>
+            <field name="code">l10n_lb_its_daily_deduction</field>
+            <field name="description">Deduction in LBP for each day paid to a daily or hourly worker, whatever the family situation (Income Tax Law, art. 59): LBP 125,000 from 15 November 2022 (Law No. 10 of 2022, art. 34), 1,500,000 from 1 January 2024 (Law No. 324 of 2024, art. 48).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_its_daily_deduction_2022_11_15" model="hr.rule.parameter.value">
+            <field name="parameter_value">125000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_daily_deduction"/>
+            <field name="date_from" eval="datetime(2022, 11, 15).date()"/>
+        </record>
+        <record id="rule_parameter_lb_its_daily_deduction_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">1500000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_daily_deduction"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_its_bands" model="hr.rule.parameter">
+            <field name="name">LB: Income Tax Bands</field>
+            <field name="code">l10n_lb_its_bands</field>
+            <field name="description">Yearly bands in LBP of the tax on salaries and wages, after the family deduction (Income Tax Law, art. 58): 2%, 4%, 7%, 11%, 15%, 20% and 25%, up to 18, 45, 90, 180, 360 and 675 million from 1 January 2022 (Law No. 10 of 2022, art. 33), up to 360, 900, 1,800, 3,600, 7,200 and 13,500 million from 1 January 2024 (Law No. 324 of 2024, art. 47). They are split by the days of work, a month counting 30 days (art. 59).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_its_bands_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">[(18000000, 2), (45000000, 4), (90000000, 7), (180000000, 11), (360000000, 15), (675000000, 20), (None, 25)]</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_bands"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_its_bands_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">[(360000000, 2), (900000000, 4), (1800000000, 7), (3600000000, 11), (7200000000, 15), (13500000000, 20), (None, 25)]</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_bands"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_lb_its_rounding" model="hr.rule.parameter">
+            <field name="name">LB: Income Tax Rounding</field>
+            <field name="code">l10n_lb_its_rounding</field>
+            <field name="description">The fractions of LBP 10,000 of the taxes, the salaries and wages included, are rounded up in favour of the Treasury (Tax Procedures Law, art. 154, as amended by Law No. 324 of 2024, art. 76).</field>
+            <field name="country_id" ref="base.lb"/>
+        </record>
+        <record id="rule_parameter_lb_its_rounding_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">1</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_rounding"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_lb_its_rounding_2024_02_15" model="hr.rule.parameter.value">
+            <field name="parameter_value">10000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_lb_its_rounding"/>
+            <field name="date_from" eval="datetime(2024, 2, 15).date()"/>
+        </record>
+    </data>
+</odoo>

@@ -21,7 +21,7 @@
                         <field name="request_date_from_period" invisible="1" required="work_entry_type_request_unit == 'half_day'"/> <!-- Needed -->
                         <field name="request_date_to_period" invisible="1" required="work_entry_type_request_unit == 'half_day'"/> <!-- Needed -->
                         <div class="o_form_label">
-                            <i class="oi oi-lg align-self-center" data-icon="label" title="Time Off Type" name="work_entry_type_id"/>
+                            <i class="oi oi-lg align-self-center" data-icon="label" title="Time Type" name="work_entry_type_id"/>
                             <label for="work_entry_type_id" string=""/>
                         </div>
                         <div>
@@ -72,8 +72,8 @@
                                 />
                                 <span> day(s)</span>
                             </div>
-                            <div invisible="not allocation_display_warning">
-                                <field class="text-danger fw-bold" name="allocation_display_warning" nolabel="1"/>
+                            <div class="alert alert-danger" role="status" invisible="not allocation_display_warning">
+                                <field name="allocation_display_warning" nolabel="1"/>
                             </div>
                         </div>
                         <field name="employee_id" invisible="1"/> <!-- Needed -->
@@ -103,6 +103,7 @@
             <field name="arch" type="xml">
                 <gantt
                        js_class="hr_holidays_gantt_manager_hr_leave"
+                       form_view_id="%(hr_holidays.hr_leave_view_form_dashboard_manager_new_time_off)d"
                        date_start="request_date_hour_from"
                        date_stop="request_date_hour_to"
                        string="Days"
@@ -152,6 +153,18 @@
 
         <record id="hr_holidays.hr_leave_action_action_approve_department" model="ir.actions.act_window">
             <field name="view_mode">list,kanban,gantt,form,calendar,activity</field>
+        </record>
+
+        <record id="action_hr_holidays_overview" model="ir.actions.server">
+            <field name="name">Overview</field>
+            <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+            <field name="group_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+            <field name="state">code</field>
+            <field name="code">action = model._get_time_off_overview_action()</field>
+        </record>
+
+        <record id="hr_holidays.menu_hr_holidays_dashboard" model="ir.ui.menu">
+            <field name="action" ref="action_hr_holidays_overview"/>
         </record>
 
     <record id="hr_leave_gantt_view_payroll" model="ir.ui.view">

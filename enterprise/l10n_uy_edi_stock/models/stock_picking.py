@@ -486,10 +486,14 @@ class StockPicking(models.Model):
         res = []
 
         for k, line in enumerate(self.move_line_ids, start=1):
+            # The internal reference is not part of the item name: it is reported in
+            # its own <CodItem> node instead (see product._l10n_uy_edi_get_cod_items)
+            nom_item = line.product_id.with_context(display_default_code=False).display_name or line.display_name
             temp = {
                 "NroLinDet": k,  # B1
+                "CodItem": line.product_id._l10n_uy_edi_get_cod_items(),  # B2 - B3
                 "IndFact": 8 if self.l10n_uy_edi_reference else None,  # B4
-                "NomItem": line.display_name,  # B7
+                "NomItem": nom_item[:80],  # B7
                 "DscItem": line.description_picking
                 if line.description_picking and line.description_picking != line.display_name
                 else None,  # B8

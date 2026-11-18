@@ -47,7 +47,7 @@ class DepreciationLedgerWizard(models.TransientModel):
     @api.depends('depreciation_model_id')
     def _compute_accounts(self):
         for wizard in self:
-            model = wizard.depreciation_model_id
+            model = wizard.depreciation_model_id.with_company(wizard.company_id)
             # A model that names no accounts of its own posts where the asset already does.
             main_variant = wizard.asset_id.main_variant_id
             wizard.depreciation_account_id = model.ledger_depreciation_account_id or main_variant.account_depreciation_id

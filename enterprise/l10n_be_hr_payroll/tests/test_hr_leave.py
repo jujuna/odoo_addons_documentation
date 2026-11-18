@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 from .common import TestPayrollCommon
 
@@ -243,6 +244,129 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         self.assertEqual(after_30_days['work_entry_type_id'], unpaid_work_accident_type)
         self.assertEqual(after_30_days['leave_ids'], unpaid_leave)
 
+    def test_force_majeure_time_off_public_holiday_14_days(self):
+        """
+        During a temporary unemployment for force majeure, the public holidays of the 14 first days of the suspension
+        are paid by the employer, the next ones are days of temporary unemployment for force majeure: from 1 April,
+        Easter Monday (6 April) stays paid, 1 May is not.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee',
+            'date_version': '2026-01-01',
+            'contract_date_start': '2026-01-01',
+            'wage': 3000,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495').id,
+        })
+        public_holiday_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday')
+        force_majeure_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_force_majeure')
+        if force_majeure_type.requires_allocation:
+            self.env['hr.leave.allocation'].create({
+                'employee_id': employee.id,
+                'work_entry_type_id': force_majeure_type.id,
+                'number_of_days': 61,
+                'date_from': date(2026, 1, 1),
+            }).action_approve()
+        leave = self._create_employee_leave(employee, force_majeure_type, date(2026, 4, 1), date(2026, 5, 31))
+        if leave.state != 'validate':
+            leave.action_approve()
+        self.assertEqual(leave.state, 'validate')
+
+        tz = ZoneInfo(employee.tz)
+        for day in (date(2026, 4, 6), date(2026, 5, 1)):
+            self.env['resource.calendar.leaves'].create({
+                'name': 'Public Holiday',
+                'date_from': datetime.combine(day, time.min, tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'date_to': datetime.combine(day, time(23, 59, 59), tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'calendar_id': employee.resource_calendar_id.id,
+                'work_entry_type_id': public_holiday_type.id,
+                'count_as': 'absence',
+            })
+
+        work_entries_vals = employee.generate_work_entries(date(2026, 4, 1), date(2026, 5, 31))
+        within_14_days = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 4, 6))
+        after_14_days = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 5, 1))
+        self.assertEqual(within_14_days['work_entry_type_id'], public_holiday_type)
+        self.assertEqual(after_14_days['work_entry_type_id'], force_majeure_type)
+
+    def test_voluntary_overtime_threshold_all_joint_committees(self):
+        """
+        The voluntary overtime is a legal regime: the caps of the CP 200 (100 hours in 2025) apply to the employers of
+        all the joint committees but the hotel industry.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee CP 220',
+            'date_version': '2025-01-01',
+            'contract_date_start': '2025-01-01',
+            'wage': 3000,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_220').id,
+        })
+        voluntary_overtime = self.env.ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_150')
+        days = [day for day in (date(2025, 3, 3) + timedelta(days=offset) for offset in range(40)) if day.weekday() < 5]
+        # 25 evenings of 4 hours: 100 hours
+        self.env['hr.leave'].create([{
+            'employee_id': employee.id,
+            'request_date_from': day,
+            'request_date_to': day,
+            'request_hour_from': 19,
+            'request_hour_to': 23,
+            'work_entry_type_id': voluntary_overtime.id,
+        } for day in days[:25]])
+        with self.assertRaisesRegex(ValidationError, 'Voluntary Threshold Exceeded'):
+            self.env['hr.leave'].create({
+                'employee_id': employee.id,
+                'request_date_from': days[25],
+                'request_date_to': days[25],
+                'request_hour_from': 19,
+                'request_hour_to': 23,
+                'work_entry_type_id': voluntary_overtime.id,
+            })
+
+    def test_work_accident_time_off_public_holiday_30th_day(self):
+        """
+        The public holidays are paid during the first 30 days of the suspension, its first day included (AR 18 April
+        1974, art. 12): after a work accident on 12 October, a holiday on 10 November (day 30, still in the paid part
+        of the split) stays paid, although the employee was absent on every day since the start. A holiday on
+        11 November (day 31, the unpaid part: 110.00) is not paid.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee',
+            'date_version': '2026-01-01',
+            'contract_date_start': '2026-01-01',
+            'wage': 3000,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495').id,
+        })
+        public_holiday_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday')
+        unpaid_work_accident_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
+        self.env['hr.leave'].create({
+            'name': 'Work accident',
+            'employee_id': employee.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week').id,
+            'request_date_from': date(2026, 10, 12),
+            'request_date_to': date(2026, 11, 30),
+        })
+        unpaid_leave = self.env['hr.leave'].search([
+            ('employee_id', '=', employee.id),
+            ('work_entry_type_id', '=', unpaid_work_accident_type.id),
+        ])
+        self.assertEqual(unpaid_leave.request_date_from, date(2026, 11, 11))
+
+        tz = ZoneInfo(employee.tz)
+        for day in (date(2026, 11, 10), date(2026, 11, 11)):
+            self.env['resource.calendar.leaves'].create({
+                'name': 'Public Holiday',
+                'date_from': datetime.combine(day, time.min, tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'date_to': datetime.combine(day, time(23, 59, 59), tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'calendar_id': employee.resource_calendar_id.id,
+                'work_entry_type_id': public_holiday_type.id,
+                'count_as': 'absence',
+            })
+
+        work_entries_vals = employee.generate_work_entries(date(2026, 11, 1), date(2026, 11, 30))
+        thirtieth_day = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 11, 10))
+        thirty_first_day = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 11, 11))
+        self.assertEqual(thirtieth_day['work_entry_type_id'], public_holiday_type)
+        self.assertEqual(thirty_first_day['work_entry_type_id'], unpaid_work_accident_type)
+
     def test_worker_sick_time_off_public_holiday(self):
         """
         The validation splits a worker's sickness into 010.00, 082.00, 072.00 (up to day 30) and 122.00.
@@ -324,6 +448,37 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         })
         # Public holiday should be counted in the leave days.
         self.assertEqual(unpaid_leave.number_of_days, 5.0)
+
+    def test_progressive_resumption_zima002_from_pay_run_grouped_by_state(self):
+        """ The validation of a pay run opened from a view grouped by state (default_state of the pay run in the
+        context) creates the ZIMA002 declaration of the adapted work """
+        payrun = self.env['hr.payslip.run'].create({
+            'name': 'Pay Run September',
+            'date_start': date(2025, 9, 1),
+            'date_end': date(2025, 9, 30),
+            'company_id': self.progressive_employee.company_id.id,
+            'structure_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+        })
+        payrun._generate_payslips(versions=self.progressive_employee.version_id)
+        self.assertEqual(payrun.slip_ids.employee_id, self.progressive_employee)
+        payrun.with_context(default_state='01_ready').action_validate()
+        declaration = self.env['l10n.be.drs'].search([
+            ('employee_id', '=', self.progressive_employee.id),
+            ('risk_id', '=', self.env.ref('l10n_be_hr_payroll.drs_risk_zima002_001').id),
+        ])
+        self.assertEqual(len(declaration), 1)
+        self.assertEqual(declaration.state, 'draft')
+        self.assertEqual((declaration.month, declaration.year), ('9', 2025))
+
+        # Same for the declarations created by other flows (e.g. the approval of a time off from a grouped view)
+        october = self.env['l10n.be.drs'].with_context(default_state='validate')._create_missing_declarations([{
+            'employee_id': self.progressive_employee.id,
+            'sector': 'compensation',
+            'risk_id': declaration.risk_id.id,
+            'month': 10,
+            'year': 2025,
+        }])
+        self.assertEqual(october.state, 'draft')
 
     def test_progressive_resumption_140_days_boundary(self):
         progressive_resumption_start = date(2025, 8, 1)
@@ -760,6 +915,148 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         self.assertTrue(flagged, "A 3rd day without certificate should block the payslips")
         self.assertEqual(flagged[0]['warning_records'], leaves, "Every day contributing to the excess is flagged")
 
+    def _get_without_certificate_cards(self, warning_name):
+        cards = self.env['hr.payroll.warning'].get_payroll_dashboard_warning_cards([], block_payslips=True, include_model_warnings=True)
+        return [card for card in cards if card['name'] == warning_name]
+
+    @freeze_time('2026-06-15')
+    def test_without_certificate_refused_leaves(self):
+        """ Refused or cancelled requests are not taken without certificate. """
+        option = self.env.ref('l10n_be_hr_payroll.MISSING_CERTIFICATE')
+        employee = self.create_employee({
+            'name': 'Employee Refused Without Certificate',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+        })
+
+        refused_leave = self._create_employee_leave(employee, self.sick_leave_type, date(2026, 3, 2), date(2026, 3, 3))
+        refused_leave.category_options_ids = option
+        refused_leave.action_refuse()
+        self.assertEqual(refused_leave.state, 'refuse')
+        self.assertFalse(
+            [card for card in self._get_without_certificate_cards('Wrong usage of option "Without certificate"')
+             if refused_leave in card['warning_records']],
+            "A refused request doesn't block the payslips")
+
+        for month in (2, 4, 5):
+            leave = self._create_employee_leave(employee, self.sick_leave_type, date(2026, month, 5), date(2026, month, 5))
+            leave.category_options_ids = option
+        leave.action_refuse()
+        self.assertFalse(
+            [card for card in self._get_without_certificate_cards('Too many days without certificate')
+             if card['warning_records'] & employee.leave_ids],
+            "Only 2 days were taken without certificate")
+
+    @freeze_time('2027-01-10')
+    def test_without_certificate_yearly_limit_previous_year(self):
+        """ The days without certificate are counted per calendar year of the time off, the days
+        of last year are still checked at the beginning of the year (December payslips). """
+        option = self.env.ref('l10n_be_hr_payroll.MISSING_CERTIFICATE')
+        warning_name = 'Too many days without certificate'
+        employee = self.create_employee({
+            'name': 'Employee Previous Year Without Certificate',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+        })
+
+        leaves = self.env['hr.leave']
+        for leave_date in (date(2026, 11, 4), date(2026, 12, 2), date(2027, 1, 6)):
+            leave = self._create_employee_leave(employee, self.sick_leave_type, leave_date, leave_date)
+            leave.category_options_ids = option
+            leaves |= leave
+        self.assertFalse(
+            [card for card in self._get_without_certificate_cards(warning_name) if card['warning_records'] & leaves],
+            "2 days in 2026 and 1 day in 2027 are allowed")
+
+        leave = self._create_employee_leave(employee, self.sick_leave_type, date(2026, 12, 9), date(2026, 12, 9))
+        leave.category_options_ids = option
+        leaves |= leave
+        flagged = [card for card in self._get_without_certificate_cards(warning_name) if card['warning_records'] & leaves]
+        self.assertTrue(flagged, "A 3rd day without certificate in 2026 should be flagged")
+        self.assertEqual(flagged[0]['warning_records'] & leaves, leaves.filtered(lambda l: l.date_from.year == 2026))
+
+    @freeze_time('2026-01-10')
+    def test_without_certificate_yearly_limit_until_2025(self):
+        """ 3 days per calendar year could be taken without certificate until 2025, 2 days from 2026. """
+        option = self.env.ref('l10n_be_hr_payroll.MISSING_CERTIFICATE')
+        warning_name = 'Too many days without certificate'
+        employee = self.create_employee({
+            'name': 'Employee Without Certificate In 2025',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+        })
+
+        leaves = self.env['hr.leave']
+        for leave_date in (date(2025, 3, 4), date(2025, 6, 3), date(2025, 9, 2)):
+            leave = self._create_employee_leave(employee, self.sick_leave_type, leave_date, leave_date)
+            leave.category_options_ids = option
+            leaves |= leave
+        self.assertFalse(
+            [card for card in self._get_without_certificate_cards(warning_name) if card['warning_records'] & leaves],
+            "3 days without certificate are allowed in 2025")
+
+        leave = self._create_employee_leave(employee, self.sick_leave_type, date(2025, 12, 2), date(2025, 12, 2))
+        leave.category_options_ids = option
+        leaves |= leave
+        flagged = [card for card in self._get_without_certificate_cards(warning_name) if card['warning_records'] & leaves]
+        self.assertTrue(flagged, "A 4th day without certificate in 2025 should be flagged")
+        self.assertEqual(flagged[0]['warning_records'] & leaves, leaves)
+
+    def test_without_certificate_blocks_from_another_company(self):
+        """ The blocking warnings of the country of the payslips apply, whatever the current
+        company of the user validating them. """
+        option = self.env.ref('l10n_be_hr_payroll.MISSING_CERTIFICATE')
+        employee = self.create_employee({
+            'name': 'Employee Validated From France',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+        })
+        leave = self._create_employee_leave(employee, self.sick_leave_type, date(2026, 3, 2), date(2026, 3, 4))
+        leave.category_options_ids = option
+        payslip = self.env['hr.payslip'].create({
+            'name': 'March Payslip',
+            'employee_id': employee.id,
+            'company_id': employee.company_id.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2026, 3, 1),
+            'date_to': date(2026, 3, 31),
+        })
+        payslip.compute_sheet()
+
+        french_company = self.env['res.company'].create({
+            'name': 'French Company',
+            'country_id': self.env.ref('base.fr').id,
+        })
+        self.env.user.company_ids |= french_company
+        payslip = payslip.with_context(allowed_company_ids=(french_company + self.belgian_company).ids)
+        self.assertEqual(payslip.env.company, french_company)
+        with self.assertRaisesRegex(ValidationError, 'Wrong usage of option "Without certificate"'):
+            payslip.action_payslip_done()
+
+    def test_without_certificate_blocks_payslips_of_the_period(self):
+        """ A wrong time off only blocks the payslips of its period. """
+        option = self.env.ref('l10n_be_hr_payroll.MISSING_CERTIFICATE')
+        employee = self.create_employee({
+            'name': 'Employee Blocked In March',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+        })
+        leave = self._create_employee_leave(employee, self.sick_leave_type, date(2026, 3, 2), date(2026, 3, 4))
+        leave.category_options_ids = option
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}',
+            'employee_id': employee.id,
+            'company_id': employee.company_id.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+        } for month in (1, 3)])
+        payslips.compute_sheet()
+        payslips[0].action_payslip_done()
+        self.assertEqual(payslips[0].state, 'validated')
+        with self.assertRaisesRegex(ValidationError, 'Wrong usage of option "Without certificate"'):
+            payslips[1].action_payslip_done()
+
     def _create_employee_leave(self, employee, work_entry_type, date_from, date_to, name=None, context=None):
         if name is None:
             name = 'Employee leave ' + uuid.uuid4().hex
@@ -869,7 +1166,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         })
         self.assertTrue(any('This time off will be entirely replaced with' in val['message'] for _, val in leave.issues.items()))
         self.assertTrue(any('010.00' in val['message'] for _, val in leave.issues.items()))
-        self.assertTrue(any('Guaranted weekly wage illness' in val['message'] for _, val in leave.issues.items()))
+        self.assertTrue(any('weekly wage illness' in val['message'] for _, val in leave.issues.items()))
 
     def test_no_warning_for_non_eligible_work_entry_type(self):
         """ The warning only applies to specific work entry types (sick leave, work accident,

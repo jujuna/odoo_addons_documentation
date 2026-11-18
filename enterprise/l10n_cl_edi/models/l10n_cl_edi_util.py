@@ -185,7 +185,7 @@ class L10n_ClEdiUtil(models.AbstractModel):
         try:
             response = requests.post(REST_SERVER_URL[mode]['SEND'], headers=headers, data=content, timeout=TIMEOUT_REST)
         except (requests.exceptions.Timeout, requests.exceptions.RequestException) as error:
-            self._report_connection_err(MSG_ERROR['send'] % error)
+            self._report_connection_err(str(MSG_ERROR['send']) % error)
             return None
 
         if response.status_code == 401:
@@ -195,7 +195,7 @@ class L10n_ClEdiUtil(models.AbstractModel):
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as error:
-            self._report_connection_err(MSG_ERROR['send'] % error)
+            self._report_connection_err(str(MSG_ERROR['send']) % error)
             return None
         return response.json()
 
@@ -210,7 +210,7 @@ class L10n_ClEdiUtil(models.AbstractModel):
         try:
             response = requests.get(url, headers={'Cookie': f'TOKEN={token}'}, timeout=TIMEOUT_REST)
         except (requests.exceptions.Timeout, requests.exceptions.RequestException) as error:
-            self._report_connection_err(MSG_ERROR['status'] % error)
+            self._report_connection_err(str(MSG_ERROR['status']) % error)
             return None
 
         if response.status_code == 401:
@@ -220,7 +220,7 @@ class L10n_ClEdiUtil(models.AbstractModel):
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as error:
-            self._report_connection_err(MSG_ERROR['status'] % error)
+            self._report_connection_err(str(MSG_ERROR['status']) % error)
             return None
         if not response.content:
             self._report_connection_err(_('Empty response when checking DTE status.'))

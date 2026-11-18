@@ -1,8 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import ast
+import re
 from datetime import date
+from unittest.mock import patch
+
 from freezegun import freeze_time
 
+from odoo import Command
 from odoo.tests import tagged, TransactionCase
 
 
@@ -251,12 +256,11 @@ class TestPayrollWarning(TransactionCase):
         employee_type = self.env.ref('hr.contract_type_employee')
         employee_type.payroll_closing_date = False
         self.will_byers.employee_type_id = employee_type.id
-        self.assertFalse(_has_warning('Start Pay run - Feb 2025 (Employee)', date(2025, 2, 25)))
-        self.assertTrue(_has_warning('Payrun: Feb 2025', date(2025, 2, 25)))
+        self.assertTrue(_has_warning('Payrun: Jan 2025', date(2025, 1, 25)))
 
         # 2. Employee type with payroll closing date
-        employee_type.payroll_closing_date = 31
-        self.assertTrue(_has_warning('Start Pay run - Feb 2025 (Employee)', date(2025, 2, 28)))
+        employee_type.payroll_closing_date = 28
+        self.assertTrue(_has_warning('Start Pay run - Jan 2025 (Employee)', date(2025, 1, 28)))
 
     @freeze_time('2025-11-14')
     def test_payroll_dashboard_with_falsy_schedule_pay(self):
@@ -365,3 +369,212 @@ for emp in self.env['hr.employee'].browse(active_ids):
             {'search_default_my_filter': 1, 'from_warning': True, 'shared_key': 'warning'},
             "The warning additional context should be merged into the button action context, taking precedence on conflicts",
         )
+
+    # -------------------------------------------------------------------------
+    # Untrusted bank accounts warning
+    # -------------------------------------------------------------------------
+
+    def _create_bank_account(self, employee, number='BE68539007547034', trusted=False):
+        account = self.env['res.partner.bank'].create({
+            'account_number': number,
+            'partner_id': employee.work_contact_id.id,
+            'company_id': employee.company_id.id,
+            'allow_out_payment': trusted,
+        })
+        # just to make sure the fixture is what the test expects
+        self.assertEqual(account.allow_out_payment, trusted, "The trust flag should be kept at creation")
+        employee.bank_account_ids = [Command.link(account.id)]
+        return account
+
+    def _create_unpaid_bank_account(self, employee, paid_account, number='BE71096123456769'):
+        """
+        Create a second untrusted bank account that receives 0% of the salary, the whole salary being allocated to `paid_account`.
+        """
+        unpaid_account = self._create_bank_account(employee, number=number)
+        employee.salary_distribution = {
+            str(paid_account.id): {'amount': 100.0, 'amount_is_percentage': True, 'sequence': 1},
+            str(unpaid_account.id): {'amount': 0.0, 'amount_is_percentage': True, 'sequence': 2},
+        }
+        return unpaid_account
+
+    def _get_untrusted_bank_account_ids(self, companies=None):
+        """
+        Return the untrusted bank account ids, as seen by a user who only
+        selected `companies` (the test company by default) in the company switcher.
+        """
+        companies = companies or self.test_company
+        self.env.flush_all()
+        return set(self.env['hr.employee'].with_context(allowed_company_ids=companies.ids)._get_untrusted_bank_account_ids())
+
+    def test_untrusted_account_with_salary_is_counted(self):
+        """
+        An untrusted account that receives the salary must be reported.
+        """
+        account = self._create_bank_account(self.will_byers)
+
+        # a single account automatically receives 100% of the salary
+        self.assertEqual(account.employee_salary_amount, 100)
+        self.assertFalse(account.allow_out_payment)
+        self.assertIn(account.id, self._get_untrusted_bank_account_ids())
+
+    def test_trusted_account_is_not_counted(self):
+        """
+        A trusted account must never be reported.
+        """
+        account = self._create_bank_account(self.will_byers, trusted=True)
+
+        self.assertEqual(account.employee_salary_amount, 100)
+        self.assertNotIn(account.id, self._get_untrusted_bank_account_ids())
+
+    def test_untrusted_account_without_salary_allocation_is_not_counted(self):
+        """
+        An untrusted account that is not used to pay a salary (employee_salary_amount == 0) must not be reported.
+        """
+        paid_account = self._create_bank_account(self.will_byers)
+        unpaid_account = self._create_unpaid_bank_account(self.will_byers, paid_account)
+
+        self.assertEqual(paid_account.employee_salary_amount, 100)
+        self.assertEqual(unpaid_account.employee_salary_amount, 0)
+
+        untrusted_ids = self._get_untrusted_bank_account_ids()
+        self.assertIn(paid_account.id, untrusted_ids)
+        self.assertNotIn(unpaid_account.id, untrusted_ids)
+
+    def test_archived_account_is_not_counted(self):
+        """
+        An archived bank account must not be reported.
+        """
+        account = self._create_bank_account(self.will_byers)
+        self.assertIn(account.id, self._get_untrusted_bank_account_ids())
+
+        account.action_archive()
+
+        self.assertNotIn(account.id, self._get_untrusted_bank_account_ids())
+
+    def test_account_of_archived_employee_is_not_counted(self):
+        """
+        The bank accounts of an archived employee must not be reported.
+        """
+        account = self._create_bank_account(self.will_byers)
+        self.assertIn(account.id, self._get_untrusted_bank_account_ids())
+
+        self.will_byers.write({'active': False})
+
+        self.assertNotIn(account.id, self._get_untrusted_bank_account_ids())
+
+    def test_account_of_unselected_company_is_not_counted(self):
+        """
+        The bank accounts of a company the user did not select (or has no access to) must not be reported.
+        """
+        other_company = self.env['res.company'].create({'name': 'Other Company'})
+        self.env.user.company_ids |= other_company
+        other_employee = self.env['hr.employee'].create({
+            'name': 'Mike Wheeler',
+            'company_id': other_company.id,
+        })
+        account = self._create_bank_account(other_employee)
+
+        # if test company is selected the account is not visible
+        self.assertNotIn(account.id, self._get_untrusted_bank_account_ids(self.test_company))
+        # if other company is selected the account is reported
+        self.assertIn(account.id, self._get_untrusted_bank_account_ids(other_company))
+
+    @freeze_time('2025-11-14')
+    def test_untrusted_bank_accounts_warning(self):
+        """
+        Only the untrusted account that receives the salary must be listed in the warning,
+        the one with a 0% allocation must be ignored.
+        """
+        counted_account = self._create_bank_account(self.will_byers)
+
+        eleven = self.env['hr.employee'].create({
+            'name': 'Eleven',
+            'company_id': self.test_company.id,
+        })
+        paid_account = self._create_bank_account(eleven, number='BE62510007547061', trusted=True)
+        ignored_account = self._create_unpaid_bank_account(eleven, paid_account)
+
+        self.env.flush_all()
+        warning = self.env.ref('hr_payroll.hr_payroll_warning_untrusted_bank_accounts')
+        results = self.Warning.with_context(allowed_company_ids=self.test_company.ids)._get_applicable_payroll_warnings(self.test_company)
+
+        records = self.env['res.partner.bank']
+        for result in results:
+            if result['warning'] == warning:
+                records |= result['records']
+
+        self.assertIn(counted_account, records, "The account used to pay a salary should be reported")
+        self.assertNotIn(ignored_account, records, "An account without salary allocation should be ignored")
+        self.assertNotIn(paid_account, records, "A trusted account should be ignored")
+
+    @freeze_time('2025-11-14')
+    def test_email_alert_targets_flagged_employees(self):
+        """The 'employee' and 'employee_manager' email alerts are sent to the employees (or
+        managers) of the records flagged by the warning only, also for python warnings on another
+        model than hr.employee."""
+        manager = self.env['hr.employee'].create({
+            'name': 'Joyce Byers',
+            'company_id': self.test_company.id,
+            'work_email': 'joyce@example.com',
+        })
+        self.will_byers.write({'work_email': 'will@example.com', 'parent_id': manager.id})
+        self.env['hr.employee'].create({
+            'name': 'Mike Wheeler',
+            'company_id': self.test_company.id,
+            'work_email': 'mike@example.com',
+            'parent_id': manager.id,
+        })
+        warning_vals = {
+            'warning_type': 'python',
+            'model_id': self.env.ref('hr.model_hr_version').id,
+            'country_id': False,
+            'evaluation_code': f"warning_records = model.browse({self.will_byers.version_id.id})",
+            'closing_on': 'next_payslip',
+            # closing date 2025-11-25, warning date 2025-11-10, overdue by 4 days today
+            'warning_offset_days': -15,
+            'email_alert_days': 4,
+            'email_message': '<p>Please check</p>',
+        }
+        self.Warning.create([{
+            **warning_vals,
+            'name': 'Employee Email Warning',
+            'email_visibility_type_id': 'employee',
+        }, {
+            **warning_vals,
+            'name': 'Manager Email Warning',
+            'email_visibility_type_id': 'employee_manager',
+        }])
+        MailMail = self.env.registry['mail.mail']
+        with patch.object(MailMail, 'send', lambda self, *args, **kwargs: None):
+            self.Warning._cron_payroll_warning_email_alert()
+        mails = self.env['mail.mail'].search([('subject', 'like', 'Email Warning')])
+        self.assertEqual(
+            set(mails.filtered(lambda m: m.subject == 'Warning Alert: Employee Email Warning').mapped('email_to')),
+            {'will@example.com'},
+        )
+        self.assertEqual(
+            set(mails.filtered(lambda m: m.subject == 'Warning Alert: Manager Email Warning').mapped('email_to')),
+            {'joyce@example.com'},
+        )
+
+
+@tagged('-at_install', 'post_install')
+class TestPayrollWarningTranslations(TransactionCase):
+
+    def test_warning_texts_are_translated(self):
+        """ The texts given to _get_payroll_translation in the code of the payroll warnings must be listed in
+        _get_payroll_translation, to be exported in the translation files. """
+        warning_model = self.env['hr.payroll.warning']
+        texts = set()
+        for code in warning_model.with_context(active_test=False).search([('evaluation_code', '!=', False)]).mapped('evaluation_code'):
+            for node in ast.walk(ast.parse(code)):
+                if not isinstance(node, ast.Call):
+                    continue
+                func = node.func
+                func_name = func.id if isinstance(func, ast.Name) else func.attr if isinstance(func, ast.Attribute) else None
+                if func_name == '_get_payroll_translation' and node.args \
+                        and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+                    texts.add(node.args[0].value)
+        for text in texts:
+            with self.subTest(text=text), self.assertNoLogs('odoo.addons.hr_payroll.models.hr_payroll_warning', level='WARNING'):
+                warning_model._get_payroll_translation(text, **dict.fromkeys(re.findall(r'%\((\w+)\)', text), 1))

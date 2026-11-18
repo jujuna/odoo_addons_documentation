@@ -3,15 +3,18 @@
 # * planning_field_service
 #
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 00:00+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/planning_field_service/pt_BR/>\n"
+"20/planning_field_service/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +37,9 @@ msgstr "%(display_name)s (%(partner_city)s)"
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "%(employee)s requested a replacement for this shift."
-msgstr ""
+msgstr "%(employee)s solicitou uma substituição para este turno."
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -105,10 +109,13 @@ msgstr ""
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
+#, fuzzy
 msgid ""
 "<b>Start onsite</b><br/><i>Start the shift when you arrive at the customer "
 "location.</i>"
 msgstr ""
+"<b>Iniciar no local</b><br/><i>Inicie o turno quando chegar ao local do "
+"cliente.</i>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_details
@@ -116,18 +123,18 @@ msgid ""
 "<div>\n"
 "    <t t-set=\"date_begin\" t-value=\"format_datetime(object.start_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
+"\"></t>\n"
 "    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
+"\"></t>\n"
 "    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\"></t>,<br><br>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
 "        <t t-if=\"object.start_datetime.date() == object.end_datetime.date()"
 "\">\n"
@@ -144,11 +151,11 @@ msgid ""
 "    <t t-else=\"\">\n"
 "        Your intervention is scheduled.\n"
 "    </t>\n"
-"    <br/><br/>\n"
+"    <br><br>\n"
 "    Best regards,\n"
 "    <t t-if=\"user.signature\">\n"
-"        <br/>\n"
-"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"        <br>\n"
+"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
 "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
 "    </t>\n"
 "</div>\n"
@@ -157,50 +164,54 @@ msgstr ""
 "<div>\n"
 "    <t t-set=\"date_begin\" t-value=\"format_datetime(object.start_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/>\n"
-"   <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+"\"></t>\n"
+"    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/>\n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
 "dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
-"\"/> \n"
-"   <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+"\"></t>\n"
+"    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
 "time_format='short', tz=object.partner_id.tz, "
-"lang_code=object.partner_id.lang)\"/> \n"
+"lang_code=object.partner_id.lang)\"></t>\n"
 "\n"
-"    Prezado(a) <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/"
-">\n"
-"   <t t-if=\"date_begin and date_end\">\n"
+"    Prezado(a) <t t-out=\"object.partner_id.name or 'cliente'\"></t>,<br><br>"
+"\n"
+"    <t t-if=\"date_begin and date_end\">\n"
 "        <t t-if=\"object.start_datetime.date() == object.end_datetime.date()"
-"\"> \n"
-"            Sua intervenção está agendada para <t t-out=\"date_begin or "
-"''\">17 de novembro</t> de <t t-out=\"time_begin or ''\">8h</t> a <t t-"
-"out=\"time_end or ''\">10h</t>.\n"
-"       </t>\n"
-"        <t t-else=\"\"> \n"
-"            Sua intervenção está agendada de <t t-out=\"date_begin or "
-"''\">17 de novembro</t> às <t t-out=\"time_begin or ''\">8h</t> a <t t-"
-"out=\"date_end or ''\">18 de novembro</t> às <t t-out=\"time_end or "
-"''\">10h</t>.\n"
-"       </t>\n"
-"    </t> \n"
-"   <t t-else=\"\"> \n"
+"\">\n"
+"            Sua intervenção está agendada para <t t-out=\"date_begin or ''\">"
+"Nov 17</t> das <t t-out=\"time_begin or ''\">8 AM</t> às <t t-out=\"time_end "
+"or ''\">10 AM</t>.\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Sua intervenção está agendada de <t t-out=\"date_begin or ''\">"
+"Nov 17</t> às <t t-out=\"time_begin or ''\">8 AM</t> até <t t-out=\"date_end "
+"or ''\">Nov 18</t> às <t t-out=\"time_end or ''\">10 AM</t>.\n"
+"        </t>\n"
+"    </t>\n"
+"    <t t-else=\"\">\n"
 "        Sua intervenção está agendada.\n"
-"   </t>\n"
-"    <br/> <br/> \n"
-"    Atenciosamente, <t t-if=\"user.signature\">\n"
-"        <br/> <div data-o-mail-quote=\"1\"> --<br data-o-mail-quote=\"1\"/"
-"><t t-out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
-"   </t>\n"
-"</div> \n"
+"    </t>\n"
+"    <br><br>\n"
+"    Atenciosamente,\n"
+"    <t t-if=\"user.signature\">\n"
+"        <br>\n"
+"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"    </t>\n"
+"</div>\n"
 "        "
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
+#, fuzzy
 msgid ""
 "<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
 "                                Back to Shift"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
+"                                Voltar ao turno"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
@@ -247,22 +258,25 @@ msgstr ""
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\"/>,<br/"
-"><br/>\n"
+"                Dear <t t-out=\"object.partner_id.name or 'Customer'\"></t>,"
+"<br><br>\n"
 "                Please find attached the field service report for the recent "
-"intervention. <br/><br/>\n"
+"intervention. <br><br>\n"
 "                If you have any questions, please don't hesitate to contact "
-"us.<br/><br/>\n"
-"                Best regards,<br/><br/>\n"
+"us.<br><br>\n"
+"                Best regards,<br><br>\n"
 "            </p>\n"
 "        "
 msgstr ""
 "<p>\n"
-"                Prezado(a) <t t-out=\"object.partner_id.name or 'Customer'\"/"
-">,<br/><br/>Encontra em anexo o relatório de Serviços de Campo referente à "
-"recente intervenção. <br/><br/>Caso tenha alguma dúvida, não hesite em "
-"entrar em contato conosco.<br/><br/>Atenciosamente,<br/><br/>\n"
-"           </p> \n"
+"                Prezado(a) <t t-out=\"object.partner_id.name or 'Cliente'\">"
+"</t>,<br><br>\n"
+"                Segue em anexo o relatório de serviço de campo da "
+"intervenção recente. <br><br>\n"
+"                Em caso de dúvidas, não hesite em entrar em contato "
+"conosco.<br><br>\n"
+"                Atenciosamente,<br><br>\n"
+"            </p>\n"
 "        "
 
 #. module: planning_field_service
@@ -337,21 +351,23 @@ msgstr "<strong>Técnico: </strong>"
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.rating_shift_request_email_template
 msgid ""
-"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>\n"
-"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"></"
+"t>\n"
+"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></"
+"t>\n"
 "            <t t-set=\"date_start\" t-"
 "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
+"tz=partner.tz, lang_code=partner.lang)\"></t>\n"
 "            <t t-set=\"date_end\" t-"
 "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
+"tz=partner.tz, lang_code=partner.lang)\"></t>\n"
 "            <div>\n"
 "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "                    <tbody>\n"
 "                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "                            Hello <t t-out=\"partner.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
+"Freeman</t>,<br><br>\n"
 "                            Please take a moment to rate your experience "
 "with the field service intervention on <t t-out=\"date_end or date_start or "
 "''\">Nov 25</t>.\n"
@@ -363,7 +379,7 @@ msgid ""
 "                                <tr><td style=\"font-size: 14px; text-"
 "align:center;\">\n"
 "                                    <strong>How satisfied were you with the "
-"intervention?</strong><br/>\n"
+"intervention?</strong><br>\n"
 "                                    <span style=\"text-color: "
 "#888888\">(click one of the smileys below to let us know)</span>\n"
 "                                </td></tr>\n"
@@ -376,7 +392,7 @@ msgid ""
 "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Happy\" "
-"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                            <td>\n"
@@ -384,7 +400,7 @@ msgid ""
 "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Neutral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                            <td>\n"
@@ -392,7 +408,7 @@ msgid ""
 "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\">\n"
 "                                                    <img alt=\"Unhappy\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\">\n"
 "                                                </a>\n"
 "                                            </td>\n"
 "                                        </tr>\n"
@@ -409,78 +425,79 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>\n"
-"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
-"           <t t-set=\"date_start\" t-"
-"value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/>\n"
-"            <t t-set=\"date_end\" t-"
-"value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
-"tz=partner.tz, lang_code=partner.lang)\"/> \n"
-"           <div>\n"
+"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"></t>"
+"\n"
+"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></"
+"t>\n"
+"            <t t-set=\"date_start\" t-value=\"format_datetime"
+"(object.start_datetime, dt_format='MMM d', tz=partner.tz, "
+"lang_code=partner.lang)\"></t>\n"
+"            <t t-set=\"date_end\" t-value=\"format_datetime"
+"(object.end_datetime, dt_format='MMM d', tz=partner.tz, "
+"lang_code=partner.lang)\"></t>\n"
+"            <div>\n"
 "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"style=\"width:100%; margin:0;\"> \n"
-"                   <tbody>\n"
-"                        <tr> <td valign=\"top\" style=\"font-size: 14px;"
-"\"> \n"
-"                            Olá, <t t-out=\"partner.name or ''\">Brandon "
-"Freeman</t><br/><br/>\n"
-"                          Reserve um momento para avaliar sua experiência "
-"com a intervenção de Serviços de Campo em <t t-out=\"date_end or date_start "
-"or ''\">25 de novembro</t>.\n"
-"                       </td></tr> \n"
-"                       <tr><td style=\"text-align: center;\"> \n"
-"                           <table border=\"0\" cellpadding=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
+"                    <tbody>\n"
+"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"                            Olá <t t-out=\"partner.name or ''\">Brandon "
+"Freeman</t>,<br><br>\n"
+"                            Por favor, tire um momento para avaliar sua "
+"experiência com a intervenção de serviço de campo em <t t-out=\"date_end or "
+"date_start or ''\">Nov 25</t>.\n"
+"                        </td></tr>\n"
+"                        <tr><td style=\"text-align: center;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
 "cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
 "inline-table;\">\n"
-"                                <tr> <td style=\"font-size: 14px; text-"
+"                                <tr><td style=\"font-size: 14px; text-"
 "align:center;\">\n"
-"                                    <strong> Qual foi o seu nível de "
-"satisfação com a intervenção?</strong><br/>\n"
-"                                   <span style=\"text-color: #888888\"> "
-"(clique em um dos smileys abaixo para nos informar)</span>\n"
+"                                    <strong>Quão satisfeito você ficou com a "
+"intervenção?</strong><br>\n"
+"                                    <span style=\"text-color: #888888\">"
+"(clique em um dos emojis abaixo para nos informar)</span>\n"
 "                                </td></tr>\n"
-"                                <tr> <td style=\"font-size: 14px;\">\n"
+"                                <tr><td style=\"font-size: 14px;\">\n"
 "                                    <table style=\"width:100%;text-"
-"align:center;margin-top:2rem;\"> \n"
-"                                       <tr>\n"
-"                                            <td> \n"
-"                                               <a t-attf-href=\"/rate/"
-"{{ access_token }}/5\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\">\n"
-"                                                    <img alt=\"Happy\" "
-"src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/> \n"
-"                                               </a>\n"
-"                                            </td> \n"
-"                                           <td>\n"
-"                                                <a t-attf-href=\"/rate/"
-"{{ access_token }}/3\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\"> \n"
-"                                                   <img alt=\"Neutral\" "
-"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
-"                                                </a> \n"
-"                                           </td>\n"
-"                                            <td> \n"
-"                                               <a t-attf-href=\"/rate/"
-"{{ access_token }}/1\" t-att-class=\"'pe-none' if "
-"object._rating_get_operator() else ''\">\n"
-"                                                    <img alt=\"Unhappy\" "
-"src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/> \n"
-"                                               </a>\n"
-"                                            </td> \n"
-"                                       </tr>\n"
-"                                    </table> \n"
-"                               </td></tr> \n"
-"                           </table>\n"
-"                        </td> </tr>\n"
-"                        <tr> <td valign=\"top\" style=\"font-size: 14px;"
-"\"> \n"
+"align:center;margin-top:2rem;\">\n"
+"                                        <tr>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/5\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img alt=\"Satisfeito\" "
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Satisfeito\">\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/3\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img alt=\"Neutro\" "
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutro\">\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/1\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img "
+"alt=\"Insatisfeito\" src=\"/rating/static/src/img/rating_1.png\" "
+"title=\"Insatisfeito\">\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                        </tr>\n"
+"                                    </table>\n"
+"                                </td></tr>\n"
+"                            </table>\n"
+"                        </td></tr>\n"
+"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "                            Agradecemos seu feedback. Ele nos ajuda a "
 "melhorar continuamente.\n"
-"                       </td></tr> \n"
-"                   </tbody>\n"
-"                </table> \n"
-"           </div> \n"
+"                        </td></tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            </div>\n"
 "        "
 
 #. module: planning_field_service
@@ -544,7 +561,7 @@ msgstr "Adicionar/Remover seguidores"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_address
 msgid "Address (without name)"
-msgstr ""
+msgstr "Endereço (sem nome)"
 
 #. module: planning_field_service
 #. odoo-python
@@ -647,7 +664,7 @@ msgstr "Configurações"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_email
 msgid "Confirmation Email"
-msgstr ""
+msgstr "E-mail de confirmação"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_partner
@@ -668,7 +685,7 @@ msgstr "Criar um cliente"
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "Criar um turno"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
@@ -716,7 +733,7 @@ msgstr "Data"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Debug"
-msgstr ""
+msgstr "Depurar"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_decorator
@@ -737,8 +754,9 @@ msgstr ""
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
+#, fuzzy
 msgid "Depart at"
-msgstr ""
+msgstr "Partida em"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_base_document_layout__display_name
@@ -761,23 +779,25 @@ msgstr "Nome de exibição"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Distance"
-msgstr ""
+msgstr "Distância"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_in
+#, fuzzy
 msgid "Distance from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "Distância do turno anterior (ou local de trabalho) para este turno."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_out
+#, fuzzy
 msgid "Distance from this shift to the next (or work location)."
-msgstr ""
+msgstr "Distância deste turno para o próximo (ou local de trabalho)."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Duration"
-msgstr ""
+msgstr "Duração"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_electrician
@@ -800,7 +820,7 @@ msgstr "E-mail enviado quando o turno é concluído."
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Employee"
-msgstr ""
+msgstr "Funcionário"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__end_datetime
@@ -818,23 +838,29 @@ msgstr "Serviço de Campo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_email
+#, fuzzy
 msgid "Field Service Confirmation Email"
-msgstr ""
+msgstr "E-mail de confirmação de Serviço de Campo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_mail_template_id
+#, fuzzy
 msgid "Field Service Confirmation Email Template"
-msgstr ""
+msgstr "Modelo de e-mail de confirmação de Serviço de Campo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_mail_template_id
+#, fuzzy
 msgid "Field Service Confirmation Mail Template"
-msgstr ""
+msgstr "Modelo de e-mail de confirmação de Serviço de Campo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__rating_shift_request_mail_template_id
+#, fuzzy
 msgid "Field Service Intervention Customer Rating Mail Template"
 msgstr ""
+"Modelo de e-mail de avaliação do cliente sobre intervenção de Serviço de "
+"Campo"
 
 #. module: planning_field_service
 #. odoo-python
@@ -870,13 +896,15 @@ msgstr "Serviços de Campo: Relatório"
 
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.rating_shift_request_email_template
+#, fuzzy
 msgid "Field Service: Shift Rating Request"
-msgstr ""
+msgstr "Serviço de Campo: Solicitação de avaliação de turno"
 
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.mail_template_data_intervention_details
+#, fuzzy
 msgid "Field Service: Shift Scheduled"
-msgstr ""
+msgstr "Serviço de Campo: Turno agendado"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_my_map
@@ -900,7 +928,7 @@ msgstr "Seguidores (parceiros)"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Future Activities"
-msgstr ""
+msgstr "Atividades futuras"
 
 #. module: planning_field_service
 #. odoo-python
@@ -912,7 +940,7 @@ msgstr "Coordenadas GPS: %(localisation_start)s (%(latitude)s, %(longitude)s)"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Generate Sample Data"
-msgstr ""
+msgstr "Gerar dados de amostra"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__has_message
@@ -921,8 +949,9 @@ msgstr "Tem mensagens"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_heating_engineer
+#, fuzzy
 msgid "Heating Engineer"
-msgstr ""
+msgstr "Técnico de Aquecimento"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__2
@@ -930,7 +959,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "High"
-msgstr ""
+msgstr "Alta"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -1026,39 +1055,45 @@ msgstr "Jane Smith"
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
+#, fuzzy
 msgid "Just now"
-msgstr ""
+msgstr "Agora mesmo"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_landscaper
+#, fuzzy
 msgid "Landscaper"
-msgstr ""
+msgstr "Paisagista"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Late Activities"
-msgstr ""
+msgstr "Atividades atrasadas"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
+#, fuzzy
 msgid "Live Latitude"
-msgstr ""
+msgstr "Latitude ao vivo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_location_last_update
+#, fuzzy
 msgid "Live Location Last Update"
-msgstr ""
+msgstr "Última atualização da localização ao vivo"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_longitude
+#, fuzzy
 msgid "Live Longitude"
-msgstr ""
+msgstr "Longitude ao vivo"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_live_map
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_live_map
+#, fuzzy
 msgid "Live Map"
-msgstr ""
+msgstr "Mapa ao vivo"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1074,8 +1109,9 @@ msgstr "Erro de localização: %s"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_locksmith
+#, fuzzy
 msgid "Locksmith"
-msgstr ""
+msgstr "Chaveiro"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__0
@@ -1083,7 +1119,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Low"
-msgstr ""
+msgstr "Baixa"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_my_map
@@ -1094,19 +1130,21 @@ msgstr "Mapa"
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "MapBox servers unreachable"
-msgstr ""
+msgstr "Servidores do MapBox inacessíveis"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "Mapbox could not be reached."
-msgstr ""
+msgstr "O Mapbox não pôde ser acessado."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "Mapbox could not compute the route."
-msgstr ""
+msgstr "O Mapbox não pôde calcular a rota."
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_by_resource
@@ -1122,14 +1160,17 @@ msgstr "Marc Demo"
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ícone de símbolos de material, por exemplo, lista de verificação"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
+#, fuzzy
 msgid ""
 "Measure your customer satisfaction by sending rating requests when "
 "interventions are done."
 msgstr ""
+"Meça a satisfação do seu cliente enviando solicitações de avaliação quando "
+"as intervenções forem concluídas."
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__1
@@ -1137,12 +1178,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Medium"
-msgstr ""
+msgstr "Meio"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error
@@ -1157,12 +1198,12 @@ msgstr "Mensagens"
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
 msgid "My"
-msgstr ""
+msgstr "Meu"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "My Activities"
-msgstr ""
+msgstr "Minhas atividades"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__my_activity_date_deadline
@@ -1178,12 +1219,12 @@ msgstr "Meu mapa"
 #. odoo-python
 #: code:addons/planning_field_service/__init__.py:0
 msgid "My Planning"
-msgstr ""
+msgstr "Meu planejamento"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_name
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1191,7 +1232,7 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_calendar/common/planning_calendar_common_popover.xml:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "Navigate"
-msgstr ""
+msgstr "Navegar"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_calendar_event_id
@@ -1221,7 +1262,7 @@ msgstr "Nenhum tipo de atividade foi encontrado. Vamos criar um!"
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
 msgid "No customer ratings yet"
-msgstr ""
+msgstr "Ainda sem avaliações de clientes"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_by_resource
@@ -1253,8 +1294,9 @@ msgstr "Número de mensagens com erro de entrega"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
+#, fuzzy
 msgid "Open Map"
-msgstr ""
+msgstr "Abrir mapa"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_phone
@@ -1269,13 +1311,14 @@ msgstr "Telefone:"
 
 #. module: planning_field_service
 #: model:ir.module.module,summary:base.module_planning_field_service
+#, fuzzy
 msgid "Plan intervention in planning"
-msgstr ""
+msgstr "Planejar intervenção no planejamento"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_my_planning_internal_user
 msgid "Planning"
-msgstr ""
+msgstr "Planejamento"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_analysis_report
@@ -1284,8 +1327,11 @@ msgstr "Relatório de análise do planejamento"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.ir_cron_remove_outdated_technician_live_location_ir_actions_server
+#, fuzzy
 msgid "Planning Field Service: remove technicians' location older than one day"
 msgstr ""
+"Planejamento de Serviço de Campo: remover a localização dos técnicos com "
+"mais de um dia"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_slot
@@ -1295,7 +1341,7 @@ msgstr "Planejamento de escala"
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_plumber
 msgid "Plumber"
-msgstr ""
+msgstr "Encanador"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__access_url
@@ -1313,15 +1359,18 @@ msgstr "Imprimir"
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Priority"
-msgstr ""
+msgstr "Prioridade"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
+#, fuzzy
 msgid ""
 "Privacy first: Location is recorded only after sign-in and with your "
 "permission."
 msgstr ""
+"Privacidade em primeiro lugar: A localização é registrada apenas após o "
+"login e com sua permissão."
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_action_schedule_by_resource_view_graph_inherit_planning
@@ -1329,42 +1378,42 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_graph_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_pivot_planning_field_service
 msgid "Rating (1-5)"
-msgstr ""
+msgstr "Avaliação (1-5)"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_avg_text
 msgid "Rating Avg Text"
-msgstr ""
+msgstr "Texto da média de avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr ""
+msgstr "Último feedback da avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_image
 msgid "Rating Last Image"
-msgstr ""
+msgstr "Última imagem da avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_value
 msgid "Rating Last Value"
-msgstr ""
+msgstr "Último valor da avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_percentage_satisfaction
 msgid "Rating Satisfaction"
-msgstr ""
+msgstr "Satisfação da avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_text
 msgid "Rating Text"
-msgstr ""
+msgstr "Texto da avaliação"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_count
 msgid "Rating count"
-msgstr ""
+msgstr "Número de avaliações"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_ids
@@ -1374,8 +1423,9 @@ msgstr "Avaliações"
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_replacement_requested
 #: model:mail.message.subtype,name:planning_field_service.mt_replacement_requested
+#, fuzzy
 msgid "Replacement Requested"
-msgstr ""
+msgstr "Substituição Solicitada"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_actions_report
@@ -1385,7 +1435,7 @@ msgstr "Reportar Ação"
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_resource_resource
 msgid "Resource"
-msgstr ""
+msgstr "Recurso"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__resource_ids
@@ -1416,8 +1466,9 @@ msgstr "Erro de entrega de SMS"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_safety
+#, fuzzy
 msgid "Safety Technician"
-msgstr ""
+msgstr "Técnico de segurança"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_by_resource
@@ -1448,7 +1499,7 @@ msgstr "Enviar relatório de serviço de campo"
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_send
 msgid "Send Planning"
-msgstr ""
+msgstr "Enviar planejamento"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.action_intervention_send_report
@@ -1457,49 +1508,58 @@ msgstr "Enviar relatório"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.res_config_settings_view_form
+#, fuzzy
 msgid "Send a confirmation email to the customer when a shift is published"
 msgstr ""
+"Enviar um e-mail de confirmação ao cliente quando um turno for publicado"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.rating_shift_request_email_template
+#, fuzzy
 msgid "Sent to customers to collect ratings after a shift is completed"
 msgstr ""
+"Enviado aos clientes para coletar avaliações após a conclusão de um turno"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.mail_template_data_intervention_details
+#, fuzzy
 msgid "Sent to customers when a shift is published"
-msgstr ""
+msgstr "Enviado aos clientes quando um turno é publicado"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_form_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Shift"
-msgstr ""
+msgstr "Turno"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_assigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_assigned
+#, fuzzy
 msgid "Shift Assigned"
-msgstr ""
+msgstr "Turno Atribuído"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_reassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_reassigned
+#, fuzzy
 msgid "Shift Re-assigned"
-msgstr ""
+msgstr "Turno Reatribuído"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_rescheduled
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_rescheduled
+#, fuzzy
 msgid "Shift Rescheduled"
-msgstr ""
+msgstr "Turno reagendado"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_unassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_unassigned
+#, fuzzy
 msgid "Shift Unassigned"
-msgstr ""
+msgstr "Turno Não Atribuído"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1507,19 +1567,21 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map/planning_field_service_map_renderer.js:0
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 #: code:addons/planning_field_service/static/src/views/planning_kanban/planning_slot_kanban_button.js:0
+#, fuzzy
 msgid "Shift started"
-msgstr ""
+msgstr "Turno iniciado"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_model.js:0
+#, fuzzy
 msgid "Shifts to Schedule"
-msgstr ""
+msgstr "Turnos a Agendar"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Show all records whose next activity date is past"
-msgstr ""
+msgstr "Mostrar todos os registros cuja data da próxima atividade já passou"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -1561,7 +1623,7 @@ msgstr "Assinado por"
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Some routing points are too far apart"
-msgstr ""
+msgstr "Alguns pontos da rota estão distantes demais"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1571,7 +1633,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form_in_gantt
 msgid "Start"
-msgstr ""
+msgstr "Iniciar"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__start_datetime
@@ -1628,8 +1690,9 @@ msgstr "Técnicos"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_telecom
+#, fuzzy
 msgid "Telecom Installer"
-msgstr ""
+msgstr "Instalador de telecomunicações"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1664,29 +1727,35 @@ msgstr "Não há relatórios a serem enviados."
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/mail_template.py:0
+#, fuzzy
 msgid ""
 "This email template can’t be deleted because it’s required to collect "
 "customer ratings for shifts. Choose another template or disable the feature "
 "in Planning settings."
 msgstr ""
+"Este modelo de e-mail não pode ser excluído porque é necessário para coletar "
+"avaliações de clientes sobre os turnos. Escolha outro modelo ou desative o "
+"recurso nas configurações de Planejamento."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This method must take two slots in argument."
-msgstr ""
+msgstr "Esse método deve receber dois slots como argumento."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "This shift is already completed."
-msgstr ""
+msgstr "Este turno já foi concluído."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "This shift is already in progress."
-msgstr ""
+msgstr "Este turno já está em andamento."
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
@@ -1701,7 +1770,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_map_timeline
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_map_timeline
 msgid "Timeline"
-msgstr ""
+msgstr "Linha do tempo"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1713,85 +1782,103 @@ msgstr "A revisar"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
 msgid "Today Activities"
-msgstr ""
+msgstr "Atividades de hoje"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Token invalid"
-msgstr ""
+msgstr "Token inválido"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Too many requests, try again in a few minutes"
-msgstr ""
+msgstr "Muitas solicitações. Tente novamente em alguns minutos."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
+#, fuzzy
 msgid "Track technicians’ locations and shifts in progress."
-msgstr ""
+msgstr "Acompanhe as localizações dos técnicos e os turnos em andamento."
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_live_map
+#, fuzzy
 msgid ""
 "Track technicians’ locations and shifts in progress. Privacy first: Location "
 "is recorded only after sign-in and with your permission."
 msgstr ""
+"Acompanhe as localizações dos técnicos e os turnos em andamento. Privacidade "
+"em primeiro lugar: a localização só é registrada após o login e com sua "
+"permissão."
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_in
+#, fuzzy
 msgid "Travel Distance In"
-msgstr ""
+msgstr "Distância de deslocamento de ida"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_out
+#, fuzzy
 msgid "Travel Distance Out"
-msgstr ""
+msgstr "Distância de deslocamento de volta"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_in
+#, fuzzy
 msgid "Travel Time In"
-msgstr ""
+msgstr "Tempo de deslocamento de ida"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_out
+#, fuzzy
 msgid "Travel Time Out"
-msgstr ""
+msgstr "Tempo de deslocamento de volta"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.xml:0
+#, fuzzy
 msgid "Travel Times"
-msgstr ""
+msgstr "Tempos de deslocamento"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_times_up_to_date
+#, fuzzy
 msgid "Travel Times Up To Date"
-msgstr ""
+msgstr "Tempos de deslocamento atualizados"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
+#, fuzzy
 msgid "Travel time"
-msgstr ""
+msgstr "Tempo de deslocamento"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_in
+#, fuzzy
 msgid "Travel time from previous shift (or work location) to this shift."
 msgstr ""
+"Tempo de deslocamento do turno anterior (ou local de trabalho) para este "
+"turno."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_out
+#, fuzzy
 msgid "Travel time from this shift to the next (or work location)."
 msgstr ""
+"Tempo de deslocamento deste turno para o próximo (ou local de trabalho)."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_model.js:0
+#, fuzzy
 msgid "Travel times updated"
-msgstr ""
+msgstr "Tempos de deslocamento atualizados"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_decoration
@@ -1802,19 +1889,20 @@ msgstr "Tipo da atividade de exceção registrada."
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Unauthorized connection"
-msgstr ""
+msgstr "Conexão não autorizada"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_controller.js:0
 msgid "Untitled"
-msgstr ""
+msgstr "Sem título"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.js:0
+#, fuzzy
 msgid "Update travel times as they are out-of-date"
-msgstr ""
+msgstr "Atualizar tempos de deslocamento pois estão desatualizados"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__3
@@ -1822,30 +1910,33 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Urgent"
-msgstr ""
+msgstr "Urgente"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_users
 msgid "User"
-msgstr ""
+msgstr "Usuário"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "View Intervention"
-msgstr ""
+msgstr "Ver intervenção"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid "View Report"
-msgstr ""
+msgstr "Ver relatório"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
+#, fuzzy
 msgid "View location"
-msgstr ""
+msgstr "Ver local"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1856,18 +1947,24 @@ msgstr "Ver no mapa"
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid ""
 "You can't move this shift to draft because it is already in progress or "
 "completed."
 msgstr ""
+"Você não pode definir este turno como rascunho porque ele já está em "
+"andamento ou foi concluído."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
+#, fuzzy
 msgid ""
 "You can't unschedule this shift because it's already in progress or "
 "completed."
 msgstr ""
+"Você não pode cancelar o agendamento deste turno porque ele já está em "
+"andamento ou foi concluído."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1894,10 +1991,271 @@ msgstr "object._get_report_base_filename()"
 
 #. module: planning_field_service
 #: model:mail.template,subject:planning_field_service.rating_shift_request_email_template
+#, fuzzy
 msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Service "
 "Rating Request"
 msgstr ""
+"{{ object.company_id.name or object.user_id.company_id.name }}: Solicitação "
+"de avaliação de serviço"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "    <t t-set=\"date_begin\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
+#~ "dt_format='MMM d', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "\n"
+#~ "    Dear <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/><br/>\n"
+#~ "    <t t-if=\"date_begin and date_end\">\n"
+#~ "        <t t-if=\"object.start_datetime.date() == "
+#~ "object.end_datetime.date()\">\n"
+#~ "            Your intervention is scheduled for <t t-out=\"date_begin or "
+#~ "''\">Nov 17</t> from <t t-out=\"time_begin or ''\">8 AM</t> to <t t-"
+#~ "out=\"time_end or ''\">10 AM</t>.\n"
+#~ "        </t>\n"
+#~ "        <t t-else=\"\">\n"
+#~ "            Your intervention is scheduled from <t t-out=\"date_begin or "
+#~ "''\">Nov 17</t> at <t t-out=\"time_begin or ''\">8 AM</t> to <t t-"
+#~ "out=\"date_end or ''\">Nov 18</t> at <t t-out=\"time_end or ''\">10 AM</"
+#~ "t>.\n"
+#~ "        </t>\n"
+#~ "    </t>\n"
+#~ "    <t t-else=\"\">\n"
+#~ "        Your intervention is scheduled.\n"
+#~ "    </t>\n"
+#~ "    <br/><br/>\n"
+#~ "    Best regards,\n"
+#~ "    <t t-if=\"user.signature\">\n"
+#~ "        <br/>\n"
+#~ "        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+#~ "out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "    </t>\n"
+#~ "</div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "    <t t-set=\"date_begin\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
+#~ "   <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/>\n"
+#~ "    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
+#~ "dt_format='MMM d', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/> \n"
+#~ "   <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+#~ "time_format='short', tz=object.partner_id.tz, "
+#~ "lang_code=object.partner_id.lang)\"/> \n"
+#~ "\n"
+#~ "    Prezado(a) <t t-out=\"object.partner_id.name or 'customer'\"/>,<br/"
+#~ "><br/>\n"
+#~ "   <t t-if=\"date_begin and date_end\">\n"
+#~ "        <t t-if=\"object.start_datetime.date() == "
+#~ "object.end_datetime.date()\"> \n"
+#~ "            Sua intervenção está agendada para <t t-out=\"date_begin or "
+#~ "''\">17 de novembro</t> de <t t-out=\"time_begin or ''\">8h</t> a <t t-"
+#~ "out=\"time_end or ''\">10h</t>.\n"
+#~ "       </t>\n"
+#~ "        <t t-else=\"\"> \n"
+#~ "            Sua intervenção está agendada de <t t-out=\"date_begin or "
+#~ "''\">17 de novembro</t> às <t t-out=\"time_begin or ''\">8h</t> a <t t-"
+#~ "out=\"date_end or ''\">18 de novembro</t> às <t t-out=\"time_end or "
+#~ "''\">10h</t>.\n"
+#~ "       </t>\n"
+#~ "    </t> \n"
+#~ "   <t t-else=\"\"> \n"
+#~ "        Sua intervenção está agendada.\n"
+#~ "   </t>\n"
+#~ "    <br/> <br/> \n"
+#~ "    Atenciosamente, <t t-if=\"user.signature\">\n"
+#~ "        <br/> <div data-o-mail-quote=\"1\"> --<br data-o-mail-quote=\"1\"/"
+#~ "><t t-out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+#~ "   </t>\n"
+#~ "</div> \n"
+#~ "        "
+
+#~ msgid ""
+#~ "<p>\n"
+#~ "                Dear <t t-out=\"object.partner_id.name or 'Customer'\"/>,"
+#~ "<br/><br/>\n"
+#~ "                Please find attached the field service report for the "
+#~ "recent intervention. <br/><br/>\n"
+#~ "                If you have any questions, please don't hesitate to "
+#~ "contact us.<br/><br/>\n"
+#~ "                Best regards,<br/><br/>\n"
+#~ "            </p>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<p>\n"
+#~ "                Prezado(a) <t t-out=\"object.partner_id.name or "
+#~ "'Customer'\"/>,<br/><br/>Encontra em anexo o relatório de Serviços de "
+#~ "Campo referente à recente intervenção. <br/><br/>Caso tenha alguma "
+#~ "dúvida, não hesite em entrar em contato conosco.<br/><br/>Atenciosamente,"
+#~ "<br/><br/>\n"
+#~ "           </p> \n"
+#~ "        "
+
+#~ msgid ""
+#~ "<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"date_start\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <t t-set=\"date_end\" t-"
+#~ "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <div>\n"
+#~ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\">\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            Hello <t t-out=\"partner.name or ''\">Brandon "
+#~ "Freeman</t>,<br/><br/>\n"
+#~ "                            Please take a moment to rate your experience "
+#~ "with the field service intervention on <t t-out=\"date_end or date_start "
+#~ "or ''\">Nov 25</t>.\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td style=\"text-align: center;\">\n"
+#~ "                            <table border=\"0\" cellpadding=\"0\" "
+#~ "cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
+#~ "inline-table;\">\n"
+#~ "                                <tr><td style=\"font-size: 14px; text-"
+#~ "align:center;\">\n"
+#~ "                                    <strong>How satisfied were you with "
+#~ "the intervention?</strong><br/>\n"
+#~ "                                    <span style=\"text-color: "
+#~ "#888888\">(click one of the smileys below to let us know)</span>\n"
+#~ "                                </td></tr>\n"
+#~ "                                <tr><td style=\"font-size: 14px;\">\n"
+#~ "                                    <table style=\"width:100%;text-"
+#~ "align:center;margin-top:2rem;\">\n"
+#~ "                                        <tr>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Happy\" "
+#~ "src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Neutral\" "
+#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                            <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Unhappy\" "
+#~ "src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/>\n"
+#~ "                                                </a>\n"
+#~ "                                            </td>\n"
+#~ "                                        </tr>\n"
+#~ "                                    </table>\n"
+#~ "                                </td></tr>\n"
+#~ "                            </table>\n"
+#~ "                        </td></tr>\n"
+#~ "                        <tr><td valign=\"top\" style=\"font-size: 14px;"
+#~ "\">\n"
+#~ "                            We appreciate your feedback. It helps us "
+#~ "continuously improve.\n"
+#~ "                        </td></tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+#~ ">\n"
+#~ "            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/"
+#~ ">\n"
+#~ "           <t t-set=\"date_start\" t-"
+#~ "value=\"format_datetime(object.start_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/>\n"
+#~ "            <t t-set=\"date_end\" t-"
+#~ "value=\"format_datetime(object.end_datetime, dt_format='MMM d', "
+#~ "tz=partner.tz, lang_code=partner.lang)\"/> \n"
+#~ "           <div>\n"
+#~ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+#~ "style=\"width:100%; margin:0;\"> \n"
+#~ "                   <tbody>\n"
+#~ "                        <tr> <td valign=\"top\" style=\"font-size: 14px;"
+#~ "\"> \n"
+#~ "                            Olá, <t t-out=\"partner.name or ''\">Brandon "
+#~ "Freeman</t><br/><br/>\n"
+#~ "                          Reserve um momento para avaliar sua experiência "
+#~ "com a intervenção de Serviços de Campo em <t t-out=\"date_end or "
+#~ "date_start or ''\">25 de novembro</t>.\n"
+#~ "                       </td></tr> \n"
+#~ "                       <tr><td style=\"text-align: center;\"> \n"
+#~ "                           <table border=\"0\" cellpadding=\"0\" "
+#~ "cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
+#~ "inline-table;\">\n"
+#~ "                                <tr> <td style=\"font-size: 14px; text-"
+#~ "align:center;\">\n"
+#~ "                                    <strong> Qual foi o seu nível de "
+#~ "satisfação com a intervenção?</strong><br/>\n"
+#~ "                                   <span style=\"text-color: #888888\"> "
+#~ "(clique em um dos smileys abaixo para nos informar)</span>\n"
+#~ "                                </td></tr>\n"
+#~ "                                <tr> <td style=\"font-size: 14px;\">\n"
+#~ "                                    <table style=\"width:100%;text-"
+#~ "align:center;margin-top:2rem;\"> \n"
+#~ "                                       <tr>\n"
+#~ "                                            <td> \n"
+#~ "                                               <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/5\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Happy\" "
+#~ "src=\"/rating/static/src/img/rating_5.png\" title=\"Happy\"/> \n"
+#~ "                                               </a>\n"
+#~ "                                            </td> \n"
+#~ "                                           <td>\n"
+#~ "                                                <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/3\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\"> \n"
+#~ "                                                   <img alt=\"Neutral\" "
+#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Neutral\"/>\n"
+#~ "                                                </a> \n"
+#~ "                                           </td>\n"
+#~ "                                            <td> \n"
+#~ "                                               <a t-attf-href=\"/rate/"
+#~ "{{ access_token }}/1\" t-att-class=\"'pe-none' if "
+#~ "object._rating_get_operator() else ''\">\n"
+#~ "                                                    <img alt=\"Unhappy\" "
+#~ "src=\"/rating/static/src/img/rating_1.png\" title=\"Unhappy\"/> \n"
+#~ "                                               </a>\n"
+#~ "                                            </td> \n"
+#~ "                                       </tr>\n"
+#~ "                                    </table> \n"
+#~ "                               </td></tr> \n"
+#~ "                           </table>\n"
+#~ "                        </td> </tr>\n"
+#~ "                        <tr> <td valign=\"top\" style=\"font-size: 14px;"
+#~ "\"> \n"
+#~ "                            Agradecemos seu feedback. Ele nos ajuda a "
+#~ "melhorar continuamente.\n"
+#~ "                       </td></tr> \n"
+#~ "                   </tbody>\n"
+#~ "                </table> \n"
+#~ "           </div> \n"
+#~ "        "
 
 #~ msgid ""
 #~ "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "

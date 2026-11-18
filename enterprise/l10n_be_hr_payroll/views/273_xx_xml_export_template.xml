@@ -31,13 +31,13 @@
                                         <ns0:belgianCompany t-att="{'ns0:companyNumber': identification['identification']}"/>
                                     </t>
                                 </ns0:identification>
-                                <ns0:taxableAmount><t t-out="to_eurocent(beneficiary['gross_amount'])"/></ns0:taxableAmount>
+                                <ns0:taxableAmount><t t-out="to_eurocent(beneficiary['taxable_amount'])"/></ns0:taxableAmount>
                                 <ns0:taxAmount><t t-out="to_eurocent(-beneficiary['tax_amount'])"/></ns0:taxAmount>
-                                <t t-if="beneficiary['deductable_costs']['fixed'] >= 0">
-                                    <ns0:fixedCost><t t-out="to_eurocent(beneficiary['deductable_costs']['fixed'])"/></ns0:fixedCost>
+                                <t t-if="beneficiary['deductable_costs']['actual']">
+                                    <ns0:actualCost><t t-out="to_eurocent(beneficiary['deductable_costs']['actual'])"/></ns0:actualCost>
                                 </t>
                                 <t t-else="">
-                                    <ns0:actualCost><t t-out="to_eurocent(beneficiary['deductable_costs']['actual'])"/></ns0:actualCost>
+                                    <ns0:fixedCost><t t-out="to_eurocent(beneficiary['deductable_costs']['fixed'])"/></ns0:fixedCost>
                                 </t>
                                 <ns0:amountPayed><t t-out="to_eurocent(-beneficiary['tax_amount'])"/></ns0:amountPayed>
                             </ns0:beneficiary>

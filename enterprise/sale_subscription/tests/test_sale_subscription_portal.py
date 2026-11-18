@@ -1,8 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import datetime
+
+from freezegun import freeze_time
+
 from odoo.fields import Command
 from odoo.tests import HttpCase, tagged
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
+
 
 @tagged('post_install', '-at_install')
 class TestSubscription(TestSubscriptionCommon, HttpCase):
@@ -129,3 +134,16 @@ class TestSubscription(TestSubscriptionCommon, HttpCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'o_sale_sale_order_portal_template', response.content)
+
+    def test_portal_extend_until_date_with_billing_first_day(self):
+        """ Extend Until date should stop at the end of the month when billing is aligned """
+        with freeze_time('2026-01-15'):
+            self.plan_month.billing_first_day = True
+            self.subscription.action_confirm()
+            self.assertEqual(self.subscription.next_invoice_date, datetime.date(2026, 1, 15))
+            self.assertEqual(self.subscription.get_future_next_invoice_date(), datetime.date(2026, 1, 31),
+                            "The future next invoice date should be the end of the month when billing is aligned")
+            # The future next invoice date should not go beyond the end date of the subscription.
+            self.subscription.end_date = datetime.date(2026, 1, 20)
+            self.assertEqual(self.subscription.get_future_next_invoice_date(), datetime.date(2026, 1, 20),
+                            "The future next invoice date should not go beyond the end date")

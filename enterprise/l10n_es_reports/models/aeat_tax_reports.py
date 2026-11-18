@@ -520,7 +520,7 @@ class L10n_EsMod111TaxReportHandler(models.AbstractModel):
             ]
         return {
             'file_name': report.get_default_report_filename(options, 'txt'),
-            'file_content': ''.join(boe_content).encode(),
+            'file_content': ''.join(boe_content).encode('iso-8859-1'),
             'file_type': 'txt',
         }
 
@@ -562,7 +562,7 @@ class L10n_EsMod115TaxReportHandler(models.AbstractModel):
 
         return {
             'file_name': report.get_default_report_filename(options, 'txt'),
-            'file_content': ''.join(boe_content).encode(),
+            'file_content': ''.join(boe_content).encode('iso-8859-1'),
             'file_type': 'txt',
         }
 
@@ -612,7 +612,7 @@ class L10n_EsMod130TaxReportHandler(models.AbstractModel):
 
         return {
             'file_name': report.get_default_report_filename(options, 'txt'),
-            'file_content': rslt.encode(),
+            'file_content': rslt.encode('iso-8859-1'),
             'file_type': 'txt',
         }
 
@@ -652,7 +652,7 @@ class L10n_EsMod303TaxReportHandler(models.AbstractModel):
 
         return {
             'file_name': report.get_default_report_filename(options, 'txt'),
-            'file_content': ''.join(boe_content).encode(),
+            'file_content': ''.join(boe_content).encode('iso-8859-1'),
             'file_type': 'txt',
         }
 
@@ -1256,12 +1256,19 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
         return rslt
 
     def export_boe(self, options):
+        report = self.env['account.report'].browse(options['report_id'])
+        return {
+            'file_name': report.get_default_report_filename(options, 'txt'),
+            'file_content': self._get_boe_content(options).encode('iso-8859-1'),
+            'file_type': 'txt',
+        }
+
+    def _get_boe_content(self, options):
         self.env.flush_all()
         boe_wizard = self._retrieve_boe_manual_wizard(options, 347)
         _period, year = self._get_mod_period_and_year(options)
         year = str(boe_wizard.return_id.date_from.year)
         current_company = self.env.company
-        report = self.env['account.report'].browse(options['report_id'])
 
         # Report options to use to retrieve data for the BOE
         boe_report_options = self._build_boe_report_options(options, year)
@@ -1306,11 +1313,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
             required_ids_set=otras_required_b
         )
 
-        return {
-            'file_name': report.get_default_report_filename(options, 'txt'),
-            'file_content': rslt.encode(),
-            'file_type': 'txt',
-        }
+        return rslt
 
     def action_audit_cell(self, options, params):
         report_line = self.env['account.report.line'].browse(params['report_line_id'])
@@ -1788,7 +1791,7 @@ class L10n_EsMod349TaxReportHandler(models.AbstractModel):
 
         return {
             'file_name': self.env['account.report'].browse(options['report_id']).get_default_report_filename(options, 'txt'),
-            'file_content': rslt.encode(),
+            'file_content': rslt.encode('iso-8859-1'),
             'file_type': 'txt',
         }
 
@@ -1869,7 +1872,7 @@ class L10n_EsMod390TaxReportHandler(models.AbstractModel):
 
         return {
             'file_name': self.env['account.report'].browse(options['report_id']).get_default_report_filename(options, 'txt'),
-            'file_content': rslt.encode(),
+            'file_content': rslt.encode('iso-8859-1'),
             'file_type': 'txt',
         }
 

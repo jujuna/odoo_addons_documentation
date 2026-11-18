@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="l10n_ge_salary_rule_section_contractual" model="hr.salary.rule.section">
+        <field name="name">Contractual Allowances</field>
+        <field name="sequence">1</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_ge_salary_rule_section_allowances" model="hr.salary.rule.section">
+        <field name="name">Other Allowances and Benefits</field>
+        <field name="sequence">2</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_ge_salary_rule_section_payments" model="hr.salary.rule.section">
+        <field name="name">Bonuses and Other Payments</field>
+        <field name="sequence">3</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_ge_salary_rule_section_termination" model="hr.salary.rule.section">
+        <field name="name">Termination Payments</field>
+        <field name="sequence">4</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary'))]"/>
+    </record>
+
+    <record id="l10n_ge_salary_rule_section_deductions" model="hr.salary.rule.section">
+        <field name="name">Deductions</field>
+        <field name="sequence">5</field>
+        <field name="struct_ids" eval="[(4, ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary'))]"/>
+    </record>
+
+    <!-- Basic salary: the paid time types feed the remuneration and the taxable salary, the rule only displays the
+         remuneration base before any other rule. -->
+    <record id="l10n_ge_rule_basic" model="hr.salary.rule">
+        <field name="name">Basic Salary</field>
+        <field name="code">BASIC</field>
+        <field name="sequence">1</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['GE_REMUNERATION_BASE']
+        </field>
+        <field name="note">Pay of the paid time of the period: work, remote work, annual and additional leave, public holidays, sick leave paid by the employer (Labour Code, art. 36 and 41; MoH Order No. 87/ნ of 2009). Salary income (Tax Code, art. 101) and base of the funded pension.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Allowances: salary income (Tax Code, art. 101) bearing the pension contributions -->
+    <record id="l10n_ge_rule_regular_allowance" model="hr.salary.rule">
+        <field name="name">Regular Allowance</field>
+        <field name="code">REGULAR_ALW</field>
+        <field name="sequence">10</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+            ref('l10n_ge_hr_payroll.GE_FIXED_PAY'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_contractual"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Fixed allowance of the contract paid every month (function, seniority, responsibility): part of the month of remuneration of the severance and of the annual leave. Salary income and pension base.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_commission" model="hr.salary.rule">
+        <field name="name">Commission</field>
+        <field name="code">COMMISSION</field>
+        <field name="sequence">11</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_contractual"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Commissions and sales incentives: salary income and pension base.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_housing_allowance" model="hr.salary.rule">
+        <field name="name">Housing Allowance</field>
+        <field name="code">HOUSING_ALW</field>
+        <field name="sequence">20</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Housing allowance paid in cash: salary income and pension base. The housing provided because of the nature of the work and not part of the contractual pay is not salary (Tax Code, art. 101(3)(f)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_other_allowance" model="hr.salary.rule">
+        <field name="name">Other Allowance</field>
+        <field name="code">OTHER_ALW</field>
+        <field name="sequence">21</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Meal, phone, transport or other cash allowance, and the per diem above the norms of the Minister of Finance: salary income (Tax Code, art. 101(2)(f)) and pension base.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_benefit_in_kind" model="hr.salary.rule">
+        <field name="name">Benefit in Kind</field>
+        <field name="code">BENEFIT_IN_KIND</field>
+        <field name="sequence">22</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.GE_TAXABLE')])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="True"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Value of the benefits provided by the employer, less what the employee pays for them: goods and services at market price, housing at the market rent, education, insurance premiums, loans below the rate of the Minister of Finance, contributions to a voluntary private pension scheme (Tax Code, art. 101(2)). Salary income and pension base, not paid in cash.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_per_diem" model="hr.salary.rule">
+        <field name="name">Per Diem</field>
+        <field name="code">PER_DIEM</field>
+        <field name="sequence">23</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Per diem and travel costs of the business trips within the norms of the Minister of Finance: GEL 30 a day in Georgia, the norms of each country abroad (MoF Order No. 220 of 2005). Not salary income (Tax Code, art. 101(3)(a)); the excess goes to the other allowances.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_reimbursement" model="hr.salary.rule">
+        <field name="name">Expense Reimbursement</field>
+        <field name="code">REIMBURSEMENT</field>
+        <field name="sequence">24</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+        ])]"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_allowances"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Refund of the expenses incurred for the employer on receipts: not income of the employee. The refund of the employee's own expenses is a benefit (Tax Code, art. 101(2)): use the other allowances.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Net salary basis: income tax and pension grossed up, iterated in hr.payslip._get_payslip_lines() -->
+    <record id="l10n_ge_rule_gross_up" model="hr.salary.rule">
+        <field name="name">Tax and Pension Borne by the Employer</field>
+        <field name="code">GROSS_UP</field>
+        <field name="sequence">45</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('hr_payroll.ALW'),
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.l10n_ge_net_salary</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = l10n_ge_gross_up
+        </field>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="note">Income tax and employee pension contribution paid by the employer for the employee under a net salary agreement: salary income itself (Tax Code, art. 73(4)), grossed up. It bears the pension contributions.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Bonuses: taxed when paid -->
+    <record id="l10n_ge_rule_bonus" model="hr.salary.rule">
+        <field name="name">Bonus</field>
+        <field name="code">BONUS</field>
+        <field name="sequence">50</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'BONUS' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['BONUS'].amount
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_payments"/>
+        <field name="note">Bonus or incentive of the contract or of the internal regulations: no statutory bonus exists. Salary income of the month of payment and pension base.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Termination payments: salary income bearing the pension contributions -->
+    <record id="l10n_ge_rule_severance" model="hr.salary.rule">
+        <field name="name">Severance Pay</field>
+        <field name="code">SEVERANCE</field>
+        <field name="sequence">60</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_ge_get_severance_months()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._l10n_ge_get_monthly_pay(categories['GE_FIXED_PAY'])
+result_qty = payslip._l10n_ge_get_severance_months()
+        </field>
+        <field name="note">Severance of an employer termination on economic or organisational grounds, unsuitability, long incapacity or another objective ground (departure reasons with a severance pay), on the payslip of the departure date: 1 month of the wage and the regular allowances with a notice of at least 30 days, 2 months with a shorter notice (Labour Code, art. 48(1) and (2)). Salary income, no exemption (Tax Code, art. 101(1)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_leave_in_lieu" model="hr.salary.rule">
+        <field name="name">Unused Annual Leave</field>
+        <field name="code">LEAVE_IN_LIEU</field>
+        <field name="sequence">62</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_ge_get_unused_leave_days()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._l10n_ge_get_leave_daily_wage(categories['GE_FIXED_PAY'])
+result_qty = payslip._l10n_ge_get_unused_leave_days()
+        </field>
+        <field name="note">Days of annual leave allocated and neither taken nor expired on the departure date, for the time-off type of the annual leave of the payroll settings, paid on the payslip of the departure date (Labour Code, art. 31(5)): the total wage of the previous month divided by its working days for each day (art. 36). Salary income and pension base.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_other_termination_payment" model="hr.salary.rule">
+        <field name="name">Other Termination Payment</field>
+        <field name="code">TERMINATION_OTHER</field>
+        <field name="sequence">63</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('l10n_ge_hr_payroll.GE_TAXABLE'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'TERMINATION_OTHER' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = inputs['TERMINATION_OTHER'].amount
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_termination"/>
+        <field name="note">Other payment on the termination (agreed compensation, lost earnings after a court decision): salary income (Tax Code, art. 101(1)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Gross: everything paid to the employee so far, the deductions come after -->
+    <record id="l10n_ge_rule_gross" model="hr.salary.rule">
+        <field name="name">Gross Salary</field>
+        <field name="code">GROSS</field>
+        <field name="sequence">80</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['GE_REMUNERATION_BASE']
+        </field>
+        <field name="note">Every amount paid to the employee before the pension contribution, the income tax and the deductions.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Funded pension: 2% withheld and 2% paid by the employer on the taxable salary, without ceiling -->
+    <record id="l10n_ge_rule_taxable" model="hr.salary.rule">
+        <field name="name">Taxable Salary</field>
+        <field name="code">TAXABLE</field>
+        <field name="sequence">90</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['GE_TAXABLE']
+        </field>
+        <field name="display_in_pdf_extra_info" eval="True"/>
+        <field name="note">Salary income paid in the period, in cash or in kind (Tax Code, art. 101): column 7 of the declaration of tax withheld at source and base of the funded pension contributions.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_pension_employee" model="hr.salary.rule">
+        <field name="name">Funded Pension (Employee)</field>
+        <field name="code">PENSION_EE</field>
+        <field name="sequence">91</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_ge_is_pension_due()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = result_rules['TAXABLE']['total']
+result_rate = -payslip._rule_parameter('l10n_ge_pension_rates')['employee']
+        </field>
+        <field name="note">2% of the taxable salary paid, withheld for the participants of the funded pension scheme (Law on Funded Pensions, art. 3(6)(b)), without ceiling: column 8 of the declaration of tax withheld at source. Exempt from the income tax (Tax Code, art. 82(1)(b3)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_pension_employer" model="hr.salary.rule">
+        <field name="name">Funded Pension (Employer)</field>
+        <field name="code">PENSION_ER</field>
+        <field name="sequence">92</field>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_ge_is_pension_due()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = result_rules['TAXABLE']['total']
+result_rate = payslip._rule_parameter('l10n_ge_pension_rates')['employer']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">2% of the taxable salary paid by the employer for the participants (Law on Funded Pensions, art. 3(6)(a)). Not salary income (Tax Code, art. 101(3)(d)). Paid with the employee share on the account of the Pension Fund by the 15th of the following month.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_state_pension" model="hr.salary.rule">
+        <field name="name">Funded Pension (State)</field>
+        <field name="code">PENSION_STATE</field>
+        <field name="sequence">93</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._l10n_ge_is_pension_due()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._l10n_ge_compute_state_pension(result_rules['TAXABLE']['total'])
+        </field>
+        <field name="appears_on_payslip">never</field>
+        <field name="display_in_pdf_extra_info" eval="True"/>
+        <field name="note">Contribution of the State, for information: 2% of the first GEL 24,000 of the salary of the year and 1% up to GEL 60,000 (Law on Funded Pensions, art. 3(6)(e) and (f)), computed on the salary paid by this employer. Not paid by the employer.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_income_tax" model="hr.salary.rule">
+        <field name="name">Income Tax</field>
+        <field name="code">PIT</field>
+        <field name="sequence">110</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._l10n_ge_get_pit_taxable_base(result_rules['TAXABLE']['total'], -result_rules['PENSION_EE']['total'])
+result_rate = -payslip._l10n_ge_get_pit_rate()
+        </field>
+        <field name="note">Tax withheld at source on the payment (Tax Code, art. 154), at the rate of the income tax regime of the company (payroll settings): 20% (art. 81), 5% for an international or R&amp;D service company, the innovative start-up rates, nothing in a Free Industrial Zone. The base is the taxable salary less the employee pension contribution and less the part of the annual privilege of GEL 3,000 or 6,000 of the employee (art. 82(2)) used by the period, applied cumulatively from 1 January on the certificate of the Revenue Service (Instruction on Tax Administration, art. 38(7)). Declared with the form II-06 and paid by the 15th of the following month.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <!-- Deductions, within the net pay left -->
+    <record id="l10n_ge_rule_attachment_of_salary" model="hr.salary.rule">
+        <field name="name">Court Order</field>
+        <field name="code">ATTACH_SALARY</field>
+        <field name="sequence">149</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'ATTACH_SALARY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -min(inputs['ATTACH_SALARY'].amount, max(categories['GE_REMUNERATION_BASE'], 0))
+result_name = inputs['ATTACH_SALARY'].name
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_deductions"/>
+        <field name="note">Retention under an order of a court or of the enforcement bureau.</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_advance_recovery" model="hr.salary.rule">
+        <field name="name">Salary Advance Recovery</field>
+        <field name="code">ADVANCE_RECOVERY</field>
+        <field name="sequence">150</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'ADVANCE_RECOVERY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+amount = inputs['ADVANCE_RECOVERY'].amount
+result = -min(amount, payslip._l10n_ge_get_deduction_room('ADVANCE_RECOVERY', categories, result_rules))
+result_name = inputs['ADVANCE_RECOVERY'].name
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_deductions"/>
+        <field name="note">Advance of salary paid during the month. With the other recoveries of sums owed by the employee, within 50% of the net pay (Labour Code, art. 43).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_loan_recovery" model="hr.salary.rule">
+        <field name="name">Loan Recovery</field>
+        <field name="code">LOAN_RECOVERY</field>
+        <field name="sequence">151</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'LOAN_RECOVERY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+amount = inputs['LOAN_RECOVERY'].amount
+result = -min(amount, payslip._l10n_ge_get_deduction_room('LOAN_RECOVERY', categories, result_rules))
+result_name = inputs['LOAN_RECOVERY'].name
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_deductions"/>
+        <field name="note">Instalment of a loan granted by the employer, within 50% of the net pay with the other recoveries (Labour Code, art. 43). A loan below the rate of the Minister of Finance gives a benefit in kind (Tax Code, art. 101(2)(b)).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_damage_recovery" model="hr.salary.rule">
+        <field name="name">Recovery of Damages</field>
+        <field name="code">DAMAGE_RECOVERY</field>
+        <field name="sequence">152</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'DAMAGE_RECOVERY' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+amount = inputs['DAMAGE_RECOVERY'].amount
+result = -min(amount, payslip._l10n_ge_get_deduction_room('DAMAGE_RECOVERY', categories, result_rules))
+result_name = inputs['DAMAGE_RECOVERY'].name
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_deductions"/>
+        <field name="note">Damage caused by the employee, within 50% of the net pay with the other recoveries (Labour Code, art. 43).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_deduction" model="hr.salary.rule">
+        <field name="name">Other Deduction</field>
+        <field name="code">DEDUCTION</field>
+        <field name="sequence">160</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_ge_hr_payroll.GE_REMUNERATION_BASE'),
+            ref('hr_payroll.DED'),
+        ])]"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'DEDUCTION' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+amount = inputs['DEDUCTION'].amount
+result = -min(amount, payslip._l10n_ge_get_deduction_room('DEDUCTION', categories, result_rules))
+result_name = inputs['DEDUCTION'].name
+        </field>
+        <field name="input_section" ref="l10n_ge_hr_payroll.l10n_ge_salary_rule_section_deductions"/>
+        <field name="note">Overpayment or other sum owed by the employee under the labour relation, within 50% of the net pay with the other recoveries (Labour Code, art. 43).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+
+    <record id="l10n_ge_rule_net" model="hr.salary.rule">
+        <field name="name">Net Salary</field>
+        <field name="code">NET</field>
+        <field name="sequence">200</field>
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['GE_REMUNERATION_BASE']
+        </field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="note">Paid at least once a month (Labour Code, art. 41(3)), at the latest 7 days after the end of the contract (art. 44).</field>
+        <field name="struct_ids" eval="[(6, 0, [ref('l10n_ge_hr_payroll.hr_payroll_structure_ge_employee_salary')])]"/>
+        <field name="country_id" ref="base.ge"/>
+    </record>
+    </data>
+</odoo>

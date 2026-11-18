@@ -5,7 +5,7 @@ from datetime import date
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install', 'time_rule_payslip')
+@tagged('post_install', '-at_install', 'time_rule_payslip', 'time_rule_pipeline')
 class TestTimeRulePayslip(TransactionCase):
     """Payslip worked-days rounding for leaves cut by the time rule pipeline.
 

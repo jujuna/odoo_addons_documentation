@@ -39,8 +39,10 @@ export class GridCell extends Component {
     setup() {
         useNumpadDecimal(this.inputRef);
         useEffect(() => {
-            this.props.cell(); // subscribe to cell value
-            this.discardChanges = false;
+            // subscribe to cell value
+            if (this.cell()) {
+                this.discardChanges = false;
+            }
             const inputEl = this.inputRef();
             if (inputEl) {
                 inputEl.value = this.formattedValue();
@@ -60,6 +62,7 @@ export class GridCell extends Component {
         });
         useInputHook({
             inputRef: this.inputRef,
+            cell: this.cell,
             invalid: this.invalid,
             value: this.formattedValue,
             discard: this.discard.bind(this),

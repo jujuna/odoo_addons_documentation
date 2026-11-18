@@ -23,6 +23,14 @@
         </xpath>
     </t>
 
+    <t t-name="hr_holidays_gantt.MultiCreatePopover" t-inherit="web.MultiCreatePopover" t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('popover-footer')]/button[hasclass('btn-primary')]" position="replace">
+            <button t-if="this.ganttAllocationState.canGrant and this.ganttAllocationState.isOfficer"
+                    class="btn btn-sm btn-primary" t-on-click="() => this.onAllocateAndAdd()">Allocate and Add</button>
+            <button t-else="" class="btn btn-sm btn-primary" t-on-click="() => this.onAdd()">Add</button>
+        </xpath>
+    </t>
+
     <t t-name="hr_holidays_gantt.QuickAddButton">
         <button class="btn rounded-1 d-flex flex-column align-items-center justify-content-center text-center o_hr_holidays_gantt_quick_add_btn"
                 t-attf-class="o_gantt_color_#{workEntryType.color}"

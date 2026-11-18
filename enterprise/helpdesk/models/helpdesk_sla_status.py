@@ -4,6 +4,7 @@ import math
 
 from odoo import fields, models, api
 from odoo.fields import Domain
+from odoo.tools import SQL
 
 
 class HelpdeskSlaStatus(models.Model):
@@ -83,9 +84,12 @@ class HelpdeskSlaStatus(models.Model):
         datetime_now = fields.Datetime.now()
         domains = []
         if 'failed' in value:
-            domains.append(['|', '&', ('reached_datetime', '=', True), ('deadline', '<=', 'reached_datetime'), '&', ('reached_datetime', '=', False), ('deadline', '<=', datetime_now)])
+            domains.append(
+                Domain.custom(to_sql=lambda table: SQL("%s <= %s", table.deadline, table.reached_datetime))
+                | (Domain('reached_datetime', '=', False) & Domain('deadline', '<=', datetime_now))
+            )
         if 'reached' in value:
-            domains.append(['&', ('reached_datetime', '=', True), ('reached_datetime', '<', 'deadline')])
+            domains.append(Domain.custom(to_sql=lambda table: SQL("%s < %s", table.reached_datetime, table.deadline)))
         if 'ongoing' in value:
             domains.append(['|', ('deadline', '=', False), '&', ('reached_datetime', '=', False), ('deadline', '>', datetime_now)])
         return Domain.OR(domains)

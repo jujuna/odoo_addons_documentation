@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:51+0000\n"
-"PO-Revision-Date: 2026-10-15 13:35+0000\n"
+"PO-Revision-Date: 2026-11-12 10:38+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "planning_field_service_sale_stock/fi/>\n"
@@ -26,16 +26,19 @@ msgid ""
 "Validate stock moves for Field Service\n"
 "======================================\n"
 msgstr ""
+"\n"
+"Vahvista varastosiirrot Kenttähuoltoa varten\n"
+"======================================\n"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.planning_view_form
 msgid "<span>Deliveries</span>"
-msgstr ""
+msgstr "<span>Toimitukset</span>"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.planning_view_form
 msgid "<span>Done</span>"
-msgstr ""
+msgstr "<span>Valmis</span>"
 
 #. module: planning_field_service_sale_stock
 #. odoo-python
@@ -45,6 +48,9 @@ msgid ""
 "\n"
 "The following users are assigned to multiple vehicles: %s"
 msgstr ""
+"Käyttäjälle voi määrittää vain yhden ajoneuvon per yritys.\n"
+"\n"
+"Seuraaville käyttäjille on määritetty useita ajoneuvoja: %s"
 
 #. module: planning_field_service_sale_stock
 #. odoo-python
@@ -54,31 +60,34 @@ msgid ""
 "Your current access rights do not allow you to perform these actions. Please "
 "contact your administrator to request the necessary permissions."
 msgstr ""
+"Tämän tuotteen lisääminen tai päivittäminen on rajoitettu sen tilaseurannan "
+"vuoksi. Nykyiset käyttöoikeutesi eivät salli näiden toimintojen "
+"suorittamista. Ota yhteyttä ylläpitäjään ja pyydä tarvittavia oikeuksia."
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.field_service_stock_tracking_line_view_form
 msgid "Already Delivered"
-msgstr ""
+msgstr "Jo toimitettu"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.actions.act_window,help:planning_field_service_sale_stock.action_planning_vehicle_warehouse
 msgid "Assign vehicles to technicians to track stock usage"
-msgstr ""
+msgstr "Määritä ajoneuvot teknikoille varaston käytön seuraamiseksi"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_planning_vehicle_warehouse__user_ids
 msgid "Assigned to"
-msgstr ""
+msgstr "Vastuuhenkilö"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_planning_vehicle_warehouse__company_id
 msgid "Company"
-msgstr ""
+msgstr "Yritys"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,website_form_label:planning_field_service_sale_stock.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "Luo vuoro"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__create_uid
@@ -98,12 +107,12 @@ msgstr "Luotu"
 #. odoo-python
 #: code:addons/planning_field_service_sale_stock/models/planning_slot.py:0
 msgid "Deliveries"
-msgstr ""
+msgstr "Toimitukset"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_planning_slot__deliveries_done
 msgid "Deliveries Done"
-msgstr ""
+msgstr "Valmiit toimitukset"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_planning_slot__deliveries_total
@@ -129,17 +138,17 @@ msgstr "Näyttönimi"
 #. odoo-python
 #: code:addons/planning_field_service_sale_stock/wizard/field_service_stock_tracking.py:0
 msgid "Each line needs a Lot/Serial Number"
-msgstr ""
+msgstr "Jokaisella rivillä on oltava erä- tai sarjanumero"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.module.module,shortdesc:base.module_planning_field_service_sale_stock
 msgid "Field Service Stock"
-msgstr ""
+msgstr "Kenttähuollon varasto"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_sale_order_line__fsm_lot_id
 msgid "Fsm Lot"
-msgstr ""
+msgstr "Kenttähuollon hallinnan erä"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__id
@@ -154,7 +163,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_stock_move__id
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_stock_warehouse__id
 msgid "ID"
-msgstr ""
+msgstr "Tunnus"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__write_uid
@@ -173,38 +182,38 @@ msgstr "Viimeksi päivitetty"
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_field_service_stock_tracking_line
 msgid "Lines for Field Service Stock Tracking"
-msgstr ""
+msgstr "Kenttähuollon varastoseurannan rivit"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking_line__lot_id
 msgid "Lot/Serial Number"
-msgstr ""
+msgstr "Erä-/sarjanumero"
 
 #. module: planning_field_service_sale_stock
 #. odoo-javascript
 #: code:addons/planning_field_service_sale_stock/static/src/product_catalog/sale_order_line/sale_order_line.xml:0
 msgid "Lot/Serial number"
-msgstr ""
+msgstr "Erä-/sarjanumero"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.actions.act_window,help:planning_field_service_sale_stock.action_planning_vehicle_warehouse
 msgid "No vehicle warehouses found. Let’s create one!"
-msgstr ""
+msgstr "Ajoneuvojen varastoja ei löytynyt. Luodaan sellainen!"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_planning_slot
 msgid "Planning Shift"
-msgstr ""
+msgstr "Vuorosuunnittelu"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__planning_slot_id
 msgid "Planning Slot"
-msgstr ""
+msgstr "Suunniteltu aikavaraus"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__product_id
 msgid "Product"
-msgstr ""
+msgstr "Tuote"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_product_product
@@ -214,52 +223,52 @@ msgstr "Tuotevariantti"
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.planning_view_form
 msgid "Products"
-msgstr ""
+msgstr "Tuotteet"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_project_project
 msgid "Project"
-msgstr ""
+msgstr "Projekti"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking_line__quantity
 msgid "Quantity"
-msgstr ""
+msgstr "Määrä"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.view_move_kanban_picking_redirect
 msgid "Quantity:"
-msgstr ""
+msgstr "Määrä:"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "Myyntitilaus"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_sale_order_line
 msgid "Sales Order Line"
-msgstr ""
+msgstr "Myyntitilausrivi"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.res_config_settings_view_form_inherit_vehicle
 msgid "Set up vehicle warehouses"
-msgstr ""
+msgstr "Määritä ajoneuvojen varastot"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.view_move_kanban_picking_redirect
 msgid "Source Location:"
-msgstr ""
+msgstr "Lähdesijainti:"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Varastosiirto"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.res_config_settings_view_form_inherit_vehicle
 msgid "Stock by Vehicle"
-msgstr ""
+msgstr "Varasto ajoneuvoittain"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,help:planning_field_service_sale_stock.field_field_service_stock_tracking__tracking
@@ -267,11 +276,13 @@ msgid ""
 "Technical field holding the tracking method. False on a storable product "
 "means it's tracked by quantity only."
 msgstr ""
+"Tekninen kenttä, joka sisältää seurantamenetelmän. 'False' varastoitavassa "
+"tuotteessa tarkoittaa, että sitä seurataan vain määrän perusteella."
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,help:planning_field_service_sale_stock.field_planning_vehicle_warehouse__company_id
 msgid "The company is automatically set from your user preferences."
-msgstr ""
+msgstr "Yritys määritetään automaattisesti käyttäjän asetuksista."
 
 #. module: planning_field_service_sale_stock
 #. odoo-python
@@ -280,44 +291,46 @@ msgid ""
 "The ordered quantity cannot be decreased below the amount already delivered. "
 "Instead, create a return in your inventory."
 msgstr ""
+"Tilattua määrää ei voi vähentää jo toimitettua määrää pienemmäksi. Luo sen "
+"sijaan palautus varastointi-sovelluksessa."
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.constraint,message:planning_field_service_sale_stock.constraint_planning_vehicle_warehouse_check_warehouse_uniq
 msgid "This warehouse is already configured as a vehicle."
-msgstr ""
+msgstr "Tämä varasto on jo määritetty ajoneuvoksi."
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_field_service_stock_tracking
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.field_service_stock_tracking_line_line_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.field_service_stock_tracking_line_view_form
 msgid "Track Stock"
-msgstr ""
+msgstr "Seuraa varastoa"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.res_config_settings_view_form_inherit_vehicle
 msgid "Track inventory stored in technicians' vehicles"
-msgstr ""
+msgstr "Seuraa teknikon ajoneuvoissa säilytettävää varastoa"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_field_service_stock_tracking__tracking
 msgid "Tracking Method"
-msgstr ""
+msgstr "Seurantamenetelmä"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_res_users
 msgid "User"
-msgstr ""
+msgstr "Käyttäjä"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.field_service_stock_tracking_line_view_form
 msgid "Validate"
-msgstr ""
+msgstr "Vahvista"
 
 #. module: planning_field_service_sale_stock
 #. odoo-python
 #: code:addons/planning_field_service_sale_stock/models/product_product.py:0
 msgid "Validate Lot/Serial Number"
-msgstr ""
+msgstr "Vahvista erä-/sarjanumero"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.module.module,summary:base.module_planning_field_service_sale_stock
@@ -325,43 +338,45 @@ msgid ""
 "Validate stock moves for product added on sales orders through an "
 "intervention planned"
 msgstr ""
+"Vahvista myyntitilauksiin lisättyjen tuotteiden varastosiirrot suunnitellun "
+"toimenpiteen avulla"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_stock_warehouse__vehicle_mapping_ids
 msgid "Vehicle Mappings"
-msgstr ""
+msgstr "Ajoneuvojen kartoitukset"
 
 #. module: planning_field_service_sale_stock
 #: model_terms:ir.ui.view,arch_db:planning_field_service_sale_stock.view_planning_vehicle_warehouse_form
 msgid "Vehicle Warehouse"
-msgstr ""
+msgstr "Ajoneuvovarasto"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_planning_vehicle_warehouse
 msgid "Vehicle Warehouse Mapping"
-msgstr ""
+msgstr "Ajoneuvovaraston kartoitus"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.actions.act_window,name:planning_field_service_sale_stock.action_planning_vehicle_warehouse
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_res_users__vehicle_warehouse_ids
 msgid "Vehicle Warehouses"
-msgstr ""
+msgstr "Ajoneuvovarastot"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model,name:planning_field_service_sale_stock.model_stock_warehouse
 msgid "Warehouse"
-msgstr ""
+msgstr "Varasto"
 
 #. module: planning_field_service_sale_stock
 #: model:ir.model.fields,field_description:planning_field_service_sale_stock.field_planning_vehicle_warehouse__warehouse_id
 msgid "Warehouse (Vehicle)"
-msgstr ""
+msgstr "Varasto (ajoneuvo)"
 
 #. module: planning_field_service_sale_stock
 #. odoo-python
 #: code:addons/planning_field_service_sale_stock/models/planning_slot.py:0
 msgid "id"
-msgstr ""
+msgstr "tunnus"
 
 #~ msgid "Ensure the traceability of a storable product in your warehouse."
 #~ msgstr "Varmista varastoitavan tuotteen jäljitettävyys varastossasi."

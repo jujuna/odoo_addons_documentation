@@ -22,6 +22,7 @@ test("getDeliveryProviderName, isFutureOrder, isDirectSale, deliveryOrderType, g
     expect(changes[0].extra_data).toEqual({
         company_country_name: "United States",
         company_state_name: "",
+        customer: false,
         delivery_otp: "123456",
         delivery_provider_name: "DoorDash",
         employee_name: "Administrator",

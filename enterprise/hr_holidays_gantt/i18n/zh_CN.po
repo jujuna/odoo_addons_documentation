@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.5+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:49+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-10-11 12:33+0000\n"
 "Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
@@ -67,11 +67,9 @@ msgstr "%s小时"
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time Off "
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
 "Type\" name=\"work_entry_type_id\"/>"
 msgstr ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"休假类"
-"型\" name=\"work_entry_type_id\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -79,8 +77,8 @@ msgid ""
 "<i class=\"oi oi-lg align-self-center\" data-icon=\"schedule\" "
 "title=\"Dates\" name=\"date\"/>"
 msgstr ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"schedule\" title=\"日"
-"期\" name=\"date\"/>"
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"schedule\" title=\"日期"
+"\" name=\"date\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -102,8 +100,8 @@ msgid ""
 "<span class=\"text-muted text-nowrap\" invisible=\"not "
 "context.get('is_multi_day_selection', False)\">per day</span>"
 msgstr ""
-"<span class=\"text-muted text-nowrap\" invisible=\"not context.get"
-"('is_multi_day_selection', False)\">每日</span>"
+"<span class=\"text-muted text-nowrap\" invisible=\"not "
+"context.get('is_multi_day_selection', False)\">每日</span>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -115,6 +113,12 @@ msgstr "<span> 天</span>"
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
 msgid "Add"
 msgstr "添加"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
+msgid "Allocate and Add"
+msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -198,14 +202,31 @@ msgstr "ID"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.xml:0
+msgid "New"
+msgstr ""
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.xml:0
 msgid "New Employee Record"
 msgstr "新员工记录"
 
 #. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "New Time Off"
+msgstr ""
+
+#. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid "Optional Description..."
 msgstr "可选说明..."
+
+#. module: hr_holidays_gantt
+#: model:ir.actions.server,name:hr_holidays_gantt.action_hr_holidays_overview
+msgid "Overview"
+msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -235,6 +256,14 @@ msgstr "保存"
 msgid ""
 "This code can be changed, it is only for a display purpose (3 letters max)"
 msgstr "此代码可以更改，仅用于显示用途（最多 3 个字母）"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid ""
+"This operation is not allowed as you are not linked to an employee in the "
+"current company."
+msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -280,6 +309,12 @@ msgid "Undo"
 msgstr "取消"
 
 #. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "UserError"
+msgstr ""
+
+#. module: hr_holidays_gantt
 #. odoo-python
 #: code:addons/hr_holidays_gantt/models/hr_employee.py:0
 msgid "days"
@@ -314,6 +349,13 @@ msgstr "于 %(start_date)s"
 #: code:addons/hr_holidays_gantt/models/hr_leave.py:0
 msgid "on %(start_date)s from %(start_time)s to %(end_time)s"
 msgstr "于 %(start_date)s 由 %(start_time)s 至 %(end_time)s"
+
+#~ msgid ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
+#~ "Off Type\" name=\"work_entry_type_id\"/>"
+#~ msgstr ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"休假类"
+#~ "型\" name=\"work_entry_type_id\"/>"
 
 #~ msgid "Deferred to next payslip"
 #~ msgstr "推迟至下一张工资单"

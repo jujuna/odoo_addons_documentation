@@ -39,12 +39,16 @@ export class FrequencyViewerLocalConfig {
         localStorage.setItem(this.freqKey, JSON.stringify(matches));
     }
 
+    /**
+     * @returns {Object} the added matching, to be able to forget it (see `removeMatchings`)
+     */
     addMatching(suggestion, data) {
-        this.matches.push({
+        const match = {
             suggestion,
             data,
             datetime: new Date().toISOString(),
-        });
+        };
+        this.matches.push(match);
 
         const normalizedSuggestion = (suggestion || "").trim().toLowerCase();
 
@@ -55,6 +59,17 @@ export class FrequencyViewerLocalConfig {
         const key = JSON.stringify(data);
         this.scores[normalizedSuggestion][key] = (this.scores[normalizedSuggestion][key] || 0) + 1;
 
+        this.saveMatching(this.matches);
+        return match;
+    }
+
+    /**
+     * Forget the given matchings (e.g. when undoing the merge that added them), the scores are
+     * computed again without them.
+     */
+    removeMatchings(matches) {
+        this.matches = this.matches.filter((match) => !matches.includes(match));
+        this._scores = null;
         this.saveMatching(this.matches);
     }
 

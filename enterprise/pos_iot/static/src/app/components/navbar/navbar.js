@@ -5,11 +5,7 @@ import { proxy } from "@odoo/owl";
 patch(Navbar.prototype, {
     openCustomerDisplay() {
         if (this.pos.config.iot_display_id) {
-            const { iot_id, identifier } = this.pos.config.iot_display_id;
-            this.pos.iotHttp.action(iot_id, identifier, {
-                action: "update_url",
-                url: this.pos.customerDisplayUrl,
-            });
+            this.pos.openIotCustomerDisplay();
         } else {
             super.openCustomerDisplay();
         }

@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
-"PO-Revision-Date: 2026-10-21 12:33+0000\n"
+"POT-Creation-Date: 2026-10-30 17:48+0000\n"
+"PO-Revision-Date: 2026-11-06 14:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "stock_barcode/de/>\n"
@@ -234,7 +234,7 @@ msgstr "Nach Gruppe von Produkten"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__all
 msgid "All"
 msgstr "Alle"
@@ -437,36 +437,36 @@ msgstr "Barcodes sind nicht verfügbar."
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/suggest_batch_dialog.js:0
 msgid "Batch Receipts"
-msgstr ""
+msgstr "Wareneingänge in Stapel aufnehmen"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Batch Receipts from %(partner)s?"
-msgstr ""
+msgstr "Wareneingänge von %(partner)s in Stapeln aufnehmen?"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_picking_batch
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_id
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Stapeltransfer"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_name
 msgid "Batch Transfer Name"
-msgstr ""
+msgstr "Name des Stapeltransfers"
 
 #. module: stock_barcode
 #: model:ir.actions.act_window,name:stock_barcode.stock_barcode_batch_picking_action_kanban
 msgid "Batch Transfers"
-msgstr ""
+msgstr "Stapeltransfers"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
 msgid "Batches"
-msgstr ""
+msgstr "Stapel"
 
 #. module: stock_barcode
 #. odoo-python
@@ -491,7 +491,7 @@ msgstr "Abbrechen"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "Cancel Batch Transfer"
-msgstr ""
+msgstr "Stapeltransfer abbrechen"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_barcode_cancel_operation
@@ -513,7 +513,7 @@ msgstr "Vorgang abbrechen"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_batch.py:0
 msgid "Cancel this batch transfer?"
-msgstr ""
+msgstr "Diesen Stapeltransfer abbrechen?"
 
 #. module: stock_barcode
 #. odoo-python
@@ -651,7 +651,7 @@ msgstr "Demodaten aktiv"
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
@@ -686,7 +686,7 @@ msgstr "Deaktivieren Sie den Ton beim Scannen eine Barcodes."
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/apply_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Discard"
@@ -695,7 +695,7 @@ msgstr "Verwerfen"
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking__display_batch_button
 msgid "Display Batch Button"
-msgstr ""
+msgstr "Stapel-Schaltfläche anzeigen"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__display_name
@@ -859,15 +859,15 @@ msgstr "Endgültige Validierung"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Lot Number"
-msgstr ""
+msgstr "Erste Losnummer"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "First Serial Number"
-msgstr ""
+msgstr "Erste Seriennummer"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -940,25 +940,25 @@ msgstr "Formatierter Produktbarcode"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Lot numbers"
-msgstr ""
+msgstr "Losnummern generieren"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.js:0
 msgid "Generate Serial numbers"
-msgstr ""
+msgstr "Seriennummern generieren"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__barcode_default_snln_generation
 msgid "Generation Mode"
-msgstr ""
+msgstr "Generierungsmodus"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__group_lines_by_product
 msgid "Group batch lines"
-msgstr ""
+msgstr "Stapelzeilen gruppieren"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__has_image
@@ -1047,7 +1047,7 @@ msgstr "Unvollständiger Transfer"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 msgid "Install Barcode PWA"
-msgstr ""
+msgstr "Barcode-PWA installieren"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__instructions_preview
@@ -1129,7 +1129,7 @@ msgstr "Länge muss eine positive Ganzzahl sein"
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_kanban
 msgid "Lines"
-msgstr ""
+msgstr "Zeilen"
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__group_lines_by_product
@@ -1137,6 +1137,8 @@ msgid ""
 "Lines of same product at same location appear grouped. Not to use for "
 "cluster picking"
 msgstr ""
+"Zeilen mit demselben Produkt am selben Ort erscheinen gruppiert. Nicht für "
+"die Cluster-Kommissionierung verwenden"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_product_uom
@@ -1163,13 +1165,13 @@ msgstr "Lagerort verarbeitet"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 msgid "Logout"
-msgstr ""
+msgstr "Abmelden"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Lot Number"
-msgstr ""
+msgstr "Losnummer"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_lot
@@ -1250,7 +1252,7 @@ msgstr "Kein Barcode"
 #. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_barcode_batch_picking_action_kanban
 msgid "No batch transfer found"
-msgstr ""
+msgstr "Kein Stapeltransfer gefunden"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1263,7 +1265,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_barcode/controllers/stock_barcode.py:0
 msgid "No pending transfer for %(partner)s"
-msgstr ""
+msgstr "Kein ausstehender Transfer für %(partner)s"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1350,16 +1352,16 @@ msgstr "NIcht der erwartete Scan"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Number of SN"
-msgstr ""
+msgstr "Anzahl Seriennummern"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__only_one
 msgid "Only One"
-msgstr ""
+msgstr "Nur eine"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1381,7 +1383,7 @@ msgstr "Los öffnen"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking_batch.py:0
 msgid "Open picking batch form"
-msgstr ""
+msgstr "Formular für Kommissionierstapel öffnen"
 
 #. module: stock_barcode
 #. odoo-python
@@ -1524,7 +1526,7 @@ msgstr "Drucken"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "Print Batch Transfer"
-msgstr ""
+msgstr "Stapeltransfer drucken"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1542,7 +1544,7 @@ msgstr "Bestand drucken"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Print Labels"
-msgstr ""
+msgstr "Etiketten drucken"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1560,7 +1562,7 @@ msgstr "Kommissioniervorgänge drucken"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "Print Product Labels"
-msgstr ""
+msgstr "Produktetiketten drucken"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1667,9 +1669,9 @@ msgstr "Erledigte Menge"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity Received"
-msgstr ""
+msgstr "Erhaltene Menge"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
@@ -1683,9 +1685,9 @@ msgstr "Menge in der Verpackungseinheit"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Quantity per Lot"
-msgstr ""
+msgstr "Menge pro Los"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__barcode_rfid_batch_time
@@ -1809,6 +1811,8 @@ msgstr ""
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)scontact%(bold_e)s to see their pending transfers"
 msgstr ""
+"Scannen Sie einen %(bold_s)sKontakt%(bold_e)s, um deren ausstehende "
+"Transfers zu sehen"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2119,6 +2123,8 @@ msgid ""
 "Scan more quantities or scan a lot number to apply the scanned quantity to "
 "it."
 msgstr ""
+"Scannen Sie weitere Mengen oder scannen Sie eine Losnnummer, um die "
+"gescannte Menge dieser zuzuordnen."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2178,7 +2184,7 @@ msgstr "Lagerort für Ausschuss"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "See Allocation"
-msgstr ""
+msgstr "Zuweisung anzeigen"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
@@ -2192,9 +2198,9 @@ msgstr "Auswählen, wo das Produkt sonst entnommen werden soll"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "Serial Number"
-msgstr ""
+msgstr "Seriennummer"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -2310,7 +2316,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "The Batch Transfer has been validated"
-msgstr ""
+msgstr "Der Stapeltransfer wurde validiert"
 
 #. module: stock_barcode
 #: model:ir.model.constraint,message:stock_barcode.constraint_res_config_settings_check_barcode_rfid_batch_time
@@ -2321,7 +2327,7 @@ msgstr "Der RFID-Timer sollte positiv sein."
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "The batch picking has been cancelled"
-msgstr ""
+msgstr "Die Stapelkommissionierung wurde abgebrochen"
 
 #. module: stock_barcode
 #. odoo-python
@@ -2340,6 +2346,12 @@ msgid ""
 "            help the timing management of operations (tasks to be done at "
 "1pm)."
 msgstr ""
+"Ziel des Stapeltransfers ist es, Vorgänge zu gruppieren, die zusammen "
+"ausgeführt werden können (oder müssen), um ihre Effizienz zu erhöhen.\n"
+"Er kann auch nützlich sein, um Aufgaben zuzuweisen (eine Person = ein "
+"Stapel) oder\n"
+"die zeitliche Steuerung von Vorgängen zu erleichtern (Aufgaben, die um 13 "
+"Uhr erledigt werden sollen)."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2385,7 +2397,7 @@ msgstr "Die gescannte Seriennummer %s wird bereits verwendet."
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_move_line__picking_id
 msgid "The stock operation where the packing has been made"
-msgstr ""
+msgstr "Der Vorgang, durch den die Waren verpackt wurden"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2415,13 +2427,13 @@ msgstr "Auf dieser Seite gibt es nichts zu drucken."
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "This batch is already cancelled"
-msgstr ""
+msgstr "Dieser Stapel wurde bereits abgebrochen"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 msgid "This batch is already done"
-msgstr ""
+msgstr "Dieser Stapel ist bereits erledigt"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2430,6 +2442,8 @@ msgid ""
 "This batch transfer is still in draft, scans are disabled until the batch is "
 "confirmed"
 msgstr ""
+"Dieser Stapeltransfer befindet sich noch im Entwurf, Scans sind deaktiviert, "
+"bis der Stapel bestätigt ist"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2523,7 +2537,7 @@ msgstr "Transfername"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
 msgid "Transfers"
-msgstr ""
+msgstr "Transfers"
 
 #. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_picking_action_kanban
@@ -2535,12 +2549,12 @@ msgstr ""
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_batch__picking_type_code
 msgid "Type of Operation"
-msgstr ""
+msgstr "Vorgangsart"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
 msgid "Unbatch Transfer"
-msgstr ""
+msgstr "Transfer aus Stapel entfernen"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2567,17 +2581,17 @@ msgstr "Maßeinheit"
 #. module: stock_barcode
 #: model:ir.module.module,summary:base.module_stock_barcode
 msgid "Use barcode scanners to process logistics operations"
-msgstr ""
+msgstr "Verwendung von Barcode-Scannern zur Abwicklung von Logistikvorgängen"
 
 #. module: stock_barcode
 #: model:res.groups,name:stock_barcode.group_barcode_user
 msgid "User"
-msgstr ""
+msgstr "Benutzer"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Validate"
 msgstr "Validieren"
@@ -2642,6 +2656,8 @@ msgid ""
 "You already scanned %(packaging_name)s, please scan a lot before scanning "
 "another type of packaging."
 msgstr ""
+"Sie haben bereits %(packaging_name)s gescannt. Bitte scannen Sie diese "
+"Verpackung mehrfach, bevor Sie eine andere Verpackungsart scannen."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2694,6 +2710,10 @@ msgid ""
 "can use the info button on the top right corner of your screen to remove the "
 "transfer in question from the batch."
 msgstr ""
+"Sie können einen Transfer nicht validieren, wenn keine Mengen reserviert "
+"oder erledigt wurden. Über die Info-Schaltfläche in der oberen rechten Ecke "
+"Ihres Bildschirms können Sie den betreffenden Transfer aus dem Stapel "
+"entfernen."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2726,7 +2746,7 @@ msgstr "Sie müssen ein Produkt scannen"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "You scanned"
-msgstr ""
+msgstr "Gescannt wurde(n)"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2735,18 +2755,20 @@ msgid ""
 "You still have unassigned quantities for product %(product)s. Scan a lot to "
 "assign them before scanning another product."
 msgstr ""
+"Sie haben noch nicht zugewiesene Mengen für das Produkt %(product)s. Scannen "
+"Sie ein Los, um dieses zuzuweisen, bevor Sie ein weiteres Produkt scannen."
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_lot_dialog.xml:0
 msgid "e.g. LOT-PR-00012"
-msgstr ""
+msgstr "z. B. LOT-PR-00012"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "of"
-msgstr ""
+msgstr "von"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.view_backorder_confirmation

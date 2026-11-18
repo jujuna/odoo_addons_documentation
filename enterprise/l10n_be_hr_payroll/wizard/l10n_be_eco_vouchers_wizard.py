@@ -69,6 +69,7 @@ class L10nBeEcoVouchersWizard(models.TransientModel):
                 payrun = self.env['hr.payslip.run'].browse(payrun_id)
                 payslip_lines_domain += [
                     ('slip_id', 'in', payrun.slip_ids.ids),
+                    ('slip_id.state', '!=', 'cancel'),
                 ]
             else:
                 payslip_lines_domain += [
@@ -78,13 +79,17 @@ class L10nBeEcoVouchersWizard(models.TransientModel):
                     ('slip_id.state', 'in', ['validated', 'paid']),
                 ]
 
-            payslip_lines = self.env['hr.payslip.line'].search(payslip_lines_domain)
+            # One line per employee: the refunds cancel the refunded eco vouchers
+            amount_by_employee = self.env['hr.payslip.line']._read_group(
+                payslip_lines_domain, ['employee_id'], ['total:sum'])
 
             result = [(5, 0, 0)]
-            for line in payslip_lines:
+            for employee, amount in amount_by_employee:
+                if wizard.currency_id.compare_amounts(amount, 0) <= 0:
+                    continue
                 result.append((0, 0, {
-                    'employee_id': line.employee_id.id,
-                    'amount': line.total,
+                    'employee_id': employee.id,
+                    'amount': amount,
                     'wizard_id': wizard.id,
                 }))
             wizard.line_ids = result

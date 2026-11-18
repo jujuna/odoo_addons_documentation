@@ -189,7 +189,11 @@ class TestEOSBenefitReport(TestPayslipContractBase):
         10000. This employee will receive 45000 EOSB for being in service for 5 years.
         """
         employee_1 = self._create_employee("Employee 1", date(2020, 1, 1), date(2020, 1, 1), contract_date_end=date(2026, 7, 1))
-        self.env["hr.employee.departure"].create({"employee_id": employee_1.id, "departure_date": date(2026, 7, 1)})
+        self.env["hr.employee.departure"].create({
+            "employee_id": employee_1.id,
+            "departure_date": date(2026, 7, 1),
+            "departure_reason_id": self.env.ref("l10n_ae_hr_payroll.departure_contract_expires_not_renewed").id,
+        })
         employee_2 = self._create_employee("Employee 2", date(2020, 1, 1), date(2020, 1, 1))
         report = self._create_report(employee_ids=[employee_1.id, employee_2.id])
         report_data = report._get_report_data()

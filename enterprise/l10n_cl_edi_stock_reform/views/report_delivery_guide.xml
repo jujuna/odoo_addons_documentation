@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="stock_informations" inherit_id="l10n_cl_edi_stock.stock_informations">
+            <xpath expr="//div[@id='informations']" position="after">
+                <div id="reform_info" class="mb-8">
+                    <div class="row mt-8 mb-8">
+                        <div class="col-3">
+                            <strong>Departure Date:</strong><br/>
+                            <span t-out="o.l10n_cl_edi_departure_date and o._l10n_cl_edi_get_departure_datetime().date()" data-oe-demo="2026-01-01"/>
+                        </div>
+                        <div class="col-3">
+                            <strong>Reason of the Transfer:</strong><br/>
+                            <span t-field="o.l10n_cl_delivery_guide_reason" data-oe-demo="1. Operation is Sale"/>
+                        </div>
+                        <div class="col-3">
+                            <strong>Transport Company:</strong><br/>
+                            <span t-field="o.l10n_cl_edi_transport_id.transport_company_id" data-oe-demo="Azure Interior">Sin Dato</span>
+                        </div>
+                        <div class="col-3">
+                            <strong>Transport Company RUT:</strong><br/>
+                            <span t-out="o._l10n_cl_format_vat(o.l10n_cl_edi_transport_id.transport_company_id.vat)" data-oe-demo="76086428-5"/>
+                        </div>
+                    </div>
+                    <div class="row mt-8 mb-8">
+                        <div class="col-3">
+                            <strong>License Plate:</strong><br/>
+                            <span t-field="o.l10n_cl_edi_transport_id.license_plate" data-oe-demo="123456">Sin Dato</span>
+                        </div>
+                        <div class="col-3">
+                            <strong>Trailer License Plate:</strong><br/>
+                            <span t-field="o.l10n_cl_edi_transport_id.trailer_license_plate" data-oe-demo="ABC123">Sin Dato</span>
+                        </div>
+                        <div class="col-3">
+                            <strong>Driver:</strong><br/>
+                            <span t-field="o.l10n_cl_edi_driver_id" data-oe-demo="Marc Demo">Sin Dato</span>
+                        </div>
+                        <div class="col-3">
+                            <strong>Driver RUT:</strong><br/>
+                            <span t-out="o._l10n_cl_format_vat(o.l10n_cl_edi_driver_id.vat)" data-oe-demo="76086428-5"/>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+            </xpath>
+        </template>
+    </data>
+</odoo>

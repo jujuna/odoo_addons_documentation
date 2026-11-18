@@ -251,6 +251,32 @@
         <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
 
+    <record id="l10n_mx_rule_parameter_min_wage_days_per_month" model="hr.rule.parameter">
+        <field name="name">Mexico: Minimum Wage Days Per Month</field>
+        <field name="code">l10n_mx_min_wage_days_per_month</field>
+        <field name="country_id" ref="base.mx"/>
+        <field name="description" type="html">
+<p>The number of days per month used only to determine whether an employee is a minimum wage
+earner for the ISR and IMSS exemptions. It does not affect the Integrated Daily Wage (SBC),
+absences, vacations or bonuses, which always use the Schedule Table.</p>
+
+<p>Set it to <strong>30.4167</strong> for the 365-day year convention (15.2083 days per fortnight),
+as published by CONASAMI, or to <strong>30</strong> for the 360-day year convention (15 days per
+fortnight) used until now.</p>
+
+<h3 class="mt-5">Source</h3>
+<a href="#" target="_blank">#</a>
+
+<h3 class="mt-5">Data Format</h3>
+<pre><em>Value</em> -> <strong>Float</strong></pre>
+        </field>
+    </record>
+    <record id="l10n_mx_rule_parameter_min_wage_days_per_month_2000" model="hr.rule.parameter.value">
+        <field name="parameter_value">30.4167</field>
+        <field name="rule_parameter_id" ref="l10n_mx_rule_parameter_min_wage_days_per_month"/>
+        <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+    </record>
+
     <!-- EXEMPTIONS -->
     <record id="l10n_mx_rule_parameter_exemption_saving_fund_salary" model="hr.rule.parameter">
         <field name="name">Mexico: Exemption for Savings Fund (Salary)</field>

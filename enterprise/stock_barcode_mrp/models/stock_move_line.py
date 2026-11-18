@@ -50,9 +50,14 @@ class StockMoveLine(models.Model):
     def _compute_qty_done(self):
         # Show quantity only when qty_producing > 0 or when explicitly picked but not for
         # uncompletd splitted move_lines (i.e. line is not picked but move is picked)
+        # Nor for move_lines where component or lot/serial number scanning is mandatory.
         raw_lines = self.filtered(lambda l: l.production_id and not l.move_id.production_id)
         for line in raw_lines:
-            if line.picked or (line.production_id.qty_producing and not line.move_id.picked):
+            if line.picked or (
+                line.production_id.qty_producing
+                and not line.move_id.picked
+                and not line.move_id.with_context(barcode_view=True)._should_bypass_set_qty_producing()
+            ):
                 line.qty_done = line.quantity
             else:
                 line.qty_done = 0

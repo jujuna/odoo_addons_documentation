@@ -249,6 +249,24 @@ test("Can insert in spreadsheet when group by the same date fields with differen
     expect("button.o_pivot_add_spreadsheet").toHaveProperty("disabled", false);
 });
 
+test("Insert in spreadsheet is disabled when a groupby uses an unsupported granularity", async () => {
+    await mountView({
+        type: "pivot",
+        resModel: "partner",
+        arch: /*xml*/ `
+                <pivot>
+                    <field name="probability" type="measure"/>
+                </pivot>`,
+        context: { pivot_column_groupby: ["create_date:hour"] },
+    });
+
+    const insertButton = getFixture().querySelector("button.o_pivot_add_spreadsheet");
+    expect(insertButton).toHaveProperty("disabled", true);
+    expect(insertButton.parentElement.dataset.tooltip).toBe(
+        'The grouping period used on "Creation Date" is not supported'
+    );
+});
+
 test("groupby date field without interval defaults to month", async () => {
     const { model, pivotId } = await createSpreadsheetFromPivotView({
         serverData: {

@@ -464,7 +464,7 @@ class L10n_AuSuperStreamLine(models.Model):
             sex,
             fields.Date.to_string(self.employee_id.birthday) or "",
             # contains "PO box", "P.O. Box", "PObox" ...
-            "POS" if "pobox" in re.sub(r'\W+', '', self.employee_id.private_street.lower()) else "RES",
+            "POS" if "pobox" in re.sub(r'\W+', '', (self.employee_id.private_street or "").lower()) else "RES",
             self.employee_id.private_street or "",
             self.employee_id.private_street2 or "",
             "", "",

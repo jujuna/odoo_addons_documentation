@@ -87,12 +87,13 @@ class TestPayrollEconomicUnemployment(TestPayrollBase, TestBelgiumCommon):
         # ONEM pays the allowances), the monthly wage is reduced by these hours at the hourly rate.
         self._generate_leave(self.employee, date(2025, 2, 10), date(2025, 2, 14), self.economic_unemployment)
         payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
-        # 3000 * (1 - 3 / (13 * 38) * 38) = 2307.69
+        # every day at the hourly rate rounded to 4 decimals, rounded to the cent:
+        # 3000 - 5 * round(7.6 * round(3000 * 3 / (13 * 38), 4), 2) = 3000 - 5 * 138.46 = 2307.70
         self._validate_worked_days(payslip, {
-            '002.00': (15.0, 114.0, 2307.69),
+            '002.00': (15.0, 114.0, 2307.70),
             '137.20': (5.0, 38.0, 0.0),
         })
-        self.assertAlmostEqual(payslip.line_ids.filtered(lambda l: l.code == 'BASIC').total, 2307.69, places=2)
+        self.assertAlmostEqual(payslip.line_ids.filtered(lambda l: l.code == 'BASIC').total, 2307.70, places=2)
 
     def test_economic_unemployment_compensation_cp302_partial_days(self):
         # CP 302: the employer pays 0.5187 EUR per hour of the schedule for each day of economic unemployment, at
@@ -131,6 +132,90 @@ class TestPayrollEconomicUnemployment(TestPayrollBase, TestBelgiumCommon):
             payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
             self.assertTrue(payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '157.00'))
             self.assertFalse(payslip.line_ids.filtered(lambda l: l.code == 'EUC').total)
+
+    def test_economic_unemployment_days_without_complement(self):
+        # No complement for the days of temporary unemployment paid by the employer as salary (refused by the ONEM:
+        # 020.49, public holiday: 006.11). The supplement of the ONEM allowances (EUB) is due for a collective closure
+        # (157.00), the complement of the economic unemployment (EUC) is not
+        refused = self.env.ref('hr_work_entry.l10n_be_work_entry_type_economic_unemployment_refused_by_administration')
+        public_holiday = self.env.ref('hr_work_entry.l10n_be_work_entry_type_public_holiday_temporary_unemployment')
+        collective_closure = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_collective_closure')
+        self.assertTrue((refused | public_holiday | collective_closure).mapped('l10n_be_economic_unemployment'))
+        week_types = {'0': self.economic_unemployment, '1': refused, '2': public_holiday, '3': collective_closure}
+        self._set_week_schedule([
+            (dayofweek, hour_from, hour_to, week_types.get(dayofweek))
+            for dayofweek in '01234' for hour_from, hour_to in [(8.0, 12.0), (13.0, 16.6)]
+        ])
+        payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        self.assertEqual(len(payslip.worked_days_line_ids.filtered(lambda wd: wd.code in ('020.49', '006.11', '157.00'))), 3)
+        # 4 Mondays and 4 Thursdays of 7.6 hours: 60.8 * 6 / 38 = 9.6 allocations, rounded to the half day
+        eub = payslip.line_ids.filtered(lambda l: l.code == 'EUB')
+        self.assertEqual(eub.quantity, 9.5)
+        self.assertAlmostEqual(eub.total, 9.5 * 5.2, places=2)
+
+        # 2 EUR per day of economic unemployment of a worker (joint committee 100), the 4 Mondays only
+        self.version.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_100')
+        week_types['0'] = self.worker_economic_unemployment
+        self._set_week_schedule([
+            (dayofweek, hour_from, hour_to, week_types.get(dayofweek))
+            for dayofweek in '01234' for hour_from, hour_to in [(8.0, 12.0), (13.0, 16.6)]
+        ])
+        payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        euc = payslip.line_ids.filtered(lambda l: l.code == 'EUC')
+        self.assertEqual(euc.quantity, 4.0)
+        self.assertAlmostEqual(euc.total, 8.0, places=2)
+
+    def test_economic_unemployment_bonus_force_majeure(self):
+        # The additional supplement concerns all the kinds of temporary unemployment except the force majeure
+        force_majeure = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_force_majeure')
+        self._generate_leave(self.employee, date(2025, 2, 3), date(2025, 2, 7), force_majeure)
+        self._generate_leave(self.employee, date(2025, 2, 10), date(2025, 2, 14), self.economic_unemployment)
+        payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        self.assertTrue(payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '156.50'))
+        # the week of economic unemployment only: 38 hours = 6 allocations
+        eub = payslip.line_ids.filtered(lambda l: l.code == 'EUB')
+        self.assertEqual(eub.quantity, 6.0)
+        self.assertAlmostEqual(eub.total, 6 * 5.2, places=2)
+
+    def test_economic_unemployment_bonus_from_27th_allowance(self):
+        # Above the wage threshold, the supplement is due from the 27th day covered by an allowance of the year:
+        # the days of the 6 days week paid by the ONEM, not the days of temporary unemployment of the calendar
+        self.version.wage = 5000.0
+        self._generate_leave(self.employee, date(2025, 1, 6), date(2025, 1, 24), self.economic_unemployment)
+        january = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        # 15 days of 7.6 hours: 114 * 6 / 38 = 18 allocations, all within the first 26 days
+        eub = january.line_ids.filtered(lambda l: l.code == 'EUB')
+        self.assertEqual(eub.quantity, 0.0)
+        january.action_payslip_done()
+
+        self._generate_leave(self.employee, date(2025, 2, 3), date(2025, 2, 12), self.economic_unemployment)
+        february = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        # 8 days of 7.6 hours: 60.8 * 6 / 38 = 9.6 -> 9.5 allocations, the last 1.5 beyond the 26 first ones
+        eub = february.line_ids.filtered(lambda l: l.code == 'EUB')
+        self.assertEqual(eub.quantity, 1.5)
+        self.assertAlmostEqual(eub.total, 1.5 * 5.2, places=2)
+
+    def test_economic_unemployment_compensation_reasons(self):
+        # The 2 EUR a day are due for the temporary unemployment for economic reasons, bad weather or technical
+        # reasons: not for the force majeure nor the strike, and not to the apprentices
+        self.version.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_100')
+        force_majeure = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_force_majeure')
+        strike = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_strike')
+        week_types = {'0': self.worker_economic_unemployment, '1': force_majeure, '2': strike}
+        self._set_week_schedule([
+            (dayofweek, hour_from, hour_to, week_types.get(dayofweek))
+            for dayofweek in '01234' for hour_from, hour_to in [(8.0, 12.0), (13.0, 16.6)]
+        ])
+        payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        self.assertEqual(len(payslip.worked_days_line_ids.filtered(lambda wd: wd.code in ('156.50', '141.00'))), 2)
+        # the 4 Mondays of economic unemployment only
+        euc = payslip.line_ids.filtered(lambda l: l.code == 'EUC')
+        self.assertEqual(euc.quantity, 4.0)
+        self.assertAlmostEqual(euc.total, 8.0, places=2)
+
+        self.version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00035')
+        payslip = self._generate_payslip(date(2025, 2, 1), date(2025, 2, 28))
+        self.assertFalse(payslip.line_ids.filtered(lambda l: l.code == 'EUC').total)
 
     def test_economic_unemployment_bonus_registered_hours(self):
         # The supplement is due per allocation of the ONEM, which converts the hours of temporary unemployment

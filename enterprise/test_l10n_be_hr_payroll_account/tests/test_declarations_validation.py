@@ -146,6 +146,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'contract_date_start': datetime.date(2018, 12, 31),
             'date_version': datetime.date(2018, 12, 31),
             'wage': 5000,
+            'employee_type_id': cls.env.ref("hr.contract_type_company_executive").id,
             'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
             'lang': 'fr_BE',
         }])
@@ -500,13 +501,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
         declaration_results = {
-            'pp_amount_10': 5749.45,
+            'pp_amount_10': 5749.46,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
-            'pp_amount_33': 5749.45,
+            'pp_amount_33': 5749.46,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -520,9 +521,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 4599.55,
+            'deducted_amount': 4599.56,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 4599.55,
+            'deducted_amount_33': 4599.56,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -530,20 +531,76 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         }
         self.validate_results(declaration, declaration_results)
 
+    def test_274_declaration_account_entries(self):
+        # The withholding tax exemptions booked by the payslips (their exemption total rule has accounts) are not
+        # booked again by the declaration, which books what the payslips could not
+        declaration = self.env['l10n_be.274_xx'].create({'year': 2021, 'month': '1'})
+        exemption_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_274_exemption_total')
+        withholding_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')
+        withholding_account = self.env['account.account'].create({
+            'name': 'Taxes Withheld', 'code': '453999', 'account_type': 'liability_current'})
+        exemption_account = self.env['account.account'].create({
+            'name': 'Withholding Taxes Exemptions', 'code': '620299', 'account_type': 'expense'})
+        withholding_rule.account_credit = withholding_account
+        self.env.company.exemption_journal_id = self.journal
+        self.journal.default_account_id = exemption_account
+
+        # Payslips without accounts on their exemptions: the declaration books all of them (on the default account of
+        # its journal), against the withholding taxes the payslips credited in full
+        exemption_rule.write({'account_debit': False, 'account_credit': False})
+        self.assertEqual(declaration._get_exemptions_to_book(), {'274.33': 4599.56})
+        declaration.action_post_account_entries()
+        move_lines = declaration.move_id.line_ids
+        self.assertEqual(sum(move_lines.filtered(lambda l: l.account_id == withholding_account).mapped('balance')), 4599.56)
+        self.assertEqual(sum(move_lines.filtered(lambda l: l.account_id == exemption_account).mapped('balance')), -4599.56)
+
+        # Payslips booking their exemptions (debit of the withholding taxes, credit of the exemptions): nothing left
+        exemption_rule.write({'account_debit': withholding_account.id, 'account_credit': exemption_account.id})
+        self.assertEqual(declaration._get_exemptions_to_book(), {})
+        payslip = self.january_2021[0].copy()
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        payslip.move_id.action_post()
+        exemption = payslip.line_ids.filtered(lambda l: l.code == 'WITHHOLDING_TAX_EX_TOT').total
+        self.assertTrue(exemption)
+        payslip_lines = payslip.move_id.line_ids
+        self.assertAlmostEqual(sum(payslip_lines.filtered(lambda l: l.account_id == exemption_account).mapped('balance')), -exemption)
+
+    def test_274_56_base_without_cct90_bonus(self):
+        # The CCT 90 bonus is exempted from the withholding tax: neither it nor its ONSS is in the base of the 0.12 %
+        # exemption (274.56)
+        employee = self.employees[0]
+        payslip = self.env['hr.payslip'].create({
+            'name': 'CCT90',
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90').id,
+            'date_from': datetime.date(2025, 5, 1),
+            'date_to': datetime.date(2025, 5, 31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+        payslip._set_input_value('CCT90BONUSPLAN', 3496)
+        payslip.compute_sheet()
+        self.assertTrue(payslip.line_ids.filtered(lambda line: line.code == 'BONUS_SALARY').total)
+        declaration = self.env['l10n_be.274_xx'].create({'year': 2025, 'month': '5'})
+        taxable, exemption = declaration._get_274_56_values(payslip)[employee]
+        self.assertEqual((taxable, exemption), (0.0, 0.0))
+
     def test_274_declaration_warrant(self):
-        # Check warrants are included
+        # Check warrants are included, in the research exemption too
         declaration = self.env['l10n_be.274_xx'].create({
             'year': 2021,
             'month': '4',
         })
         declaration_results = {
-            'pp_amount_10': 2412.88,
+            'pp_amount_10': 2412.92,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
-            'pp_amount_33': 1576.98,
+            'pp_amount_33': 2412.92,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -553,13 +610,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_20': 0.0,
             'taxable_amount_30': 0.0,
             'taxable_amount_32': 0.0,
-            'taxable_amount_33': 10072.12,
+            'taxable_amount_33': 11872.12,
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 1261.58,
+            'deducted_amount': 1930.34,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 1261.58,
+            'deducted_amount_33': 1930.34,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -575,13 +632,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
         declaration_results = {
-            'pp_amount_10': 5749.45,
+            'pp_amount_10': 5749.46,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
-            'pp_amount_33': 2393.67,
+            'pp_amount_33': 2393.68,
             'pp_amount_34': 3355.78,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -595,13 +652,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 11078.33,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 2393.66,
+            'deducted_amount': 2393.68,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 1914.93,
+            'deducted_amount_33': 1914.94,
             'deducted_amount_34': 2684.62,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
-            'capped_amount_34': 478.73,
+            'capped_amount_34': 478.74,
         }
         self.validate_results(declaration, declaration_results)
 
@@ -612,13 +669,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '12',
         })
         declaration_results = {
-            'pp_amount_10': 7825.57,
+            'pp_amount_10': 7825.62,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
-            'pp_amount_33': 7825.57,
+            'pp_amount_33': 7825.62,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -632,9 +689,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 6260.46,
+            'deducted_amount': 6260.51,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 6260.46,
+            'deducted_amount_33': 6260.51,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -864,13 +921,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         })
 
         expected_declaration_results = {
-            'pp_amount_10': 2478.2,
+            'pp_amount_10': 2478.24,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
-            'pp_amount_33': 2478.2,
+            'pp_amount_33': 2478.24,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -884,9 +941,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 1681.82,
+            'deducted_amount': 1681.86,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 1681.82,
+            'deducted_amount_33': 1681.86,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -927,7 +984,8 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             ('employee_id', '=', emp_rd.id),
             ('struct_id', '=', structure.id),
         ])
-        self.assertAlmostEqual(emp_rd._get_average_rd_percentage(structure.code, datetime.date(2022, 9, 1)), 0.719, 3)
+        # the twelve months before the departure (02/09/2021 - 01/09/2022)
+        self.assertAlmostEqual(emp_rd._get_average_rd_percentage(structure.code, datetime.date(2022, 9, 1)), 0.718, 3)
 
         term_payslip.compute_sheet()
         term_payslip.action_payslip_done()
@@ -958,9 +1016,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 763.3,
+            'deducted_amount': 762.48,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 763.3,
+            'deducted_amount_33': 762.48,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -968,6 +1026,31 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         }
 
         self.validate_results(declaration, expected_declaration_results)
+
+    def test_274_56_base_with_termination_fees(self):
+        # The base of the 0.12 % exemption holds the termination indemnities: the gross amounts of the termination
+        # fees payslip, without the ONSS
+        employee = self.employees[0]
+        departure = self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'dismissal_date': datetime.datetime(2022, 9, 1),
+            'l10n_be_notice_respect': 'without'
+        })
+        departure._generate_termination_payslip()
+        structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees')
+        term_payslip = self.env['hr.payslip'].search([('employee_id', '=', employee.id), ('struct_id', '=', structure.id)])
+        term_payslip.compute_sheet()
+        term_payslip.action_payslip_done()
+        indemnities = term_payslip.line_ids.filtered(
+            lambda line: 'TERMINATION_WITHHOLDING_BASE' in line.salary_rule_id.category_ids.mapped('code')
+            and line.code != 'ONSS_TERM')
+        self.assertTrue(indemnities.filtered(lambda line: line.code == 'TOTALFEES').total)
+
+        declaration = self.env['l10n_be.274_xx'].create({'year': 2022, 'month': '9'})
+        self.assertEqual(declaration.payslip_ids, term_payslip)
+        line_274_56 = declaration.line_274_56_ids.filtered(lambda line: line.employee_id == employee)
+        self.assertAlmostEqual(line_274_56.taxable_amount, sum(indemnities.mapped('total')), places=2)
 
     def test_274_declaration_export(self):
         # Check exported data are the same than the computed fields
@@ -982,13 +1065,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
         declaration_results = {
-            'pp_amount_10': 5749.45,
+            'pp_amount_10': 5749.46,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
             'pp_amount_30': 0.0,
             'pp_amount_32': 1178.78,
-            'pp_amount_33': 1214.89,
+            'pp_amount_33': 1214.9,
             'pp_amount_34': 3355.78,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -1002,13 +1085,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 11078.33,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 2393.66,
+            'deducted_amount': 2393.68,
             'deducted_amount_32': 943.02,
-            'deducted_amount_33': 971.91,
+            'deducted_amount_33': 971.92,
             'deducted_amount_34': 2684.62,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
-            'capped_amount_34': 478.73,
+            'capped_amount_34': 478.74,
         }
         self.validate_results(declaration, declaration_results)
 
@@ -1021,7 +1104,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             if declaration_type == 56:
                 field_taxable = declaration.sme_taxable_amount
             elif declaration_type in (60, 61):
-                field_taxable = declaration.taxable_amount_10
+                field_taxable = declaration.startup_taxable_amount
             else:
                 field_taxable = declaration['taxable_amount' + suffix]
             self.assertEqual(xml_taxable, _to_eurocent(field_taxable))
@@ -1149,8 +1232,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
 
-        expected_exemption = declaration.pp_amount_10 * 0.10
-        self.assertAlmostEqual(declaration.startup_exempted_amount, expected_exemption, places=2)
+        # an exemption of each worker, rounded to the cent
+        startup_lines = declaration.line_ids.filtered(lambda line: line.nature_code == '274.60')
+        self.assertAlmostEqual(
+            sum(startup_lines.mapped('withholding_amount')), declaration.pp_amount_10 + declaration.pp_amount_18, places=2)
+        for line in startup_lines:
+            self.assertAlmostEqual(line.amount, round(line.withholding_amount * 0.10, 2), places=2)
+        self.assertAlmostEqual(declaration.startup_exempted_amount, sum(startup_lines.mapped('amount')), places=2)
 
         data = declaration._get_rendering_data()
         revenues = [d['revenue_nature'] for d in data['declarations']]
@@ -1166,8 +1254,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
 
-        expected_exemption = declaration.pp_amount_10 * 0.20
-        self.assertAlmostEqual(declaration.startup_exempted_amount, expected_exemption, places=2)
+        # an exemption of each worker, rounded to the cent
+        startup_lines = declaration.line_ids.filtered(lambda line: line.nature_code == '274.61')
+        self.assertAlmostEqual(
+            sum(startup_lines.mapped('withholding_amount')), declaration.pp_amount_10 + declaration.pp_amount_18, places=2)
+        for line in startup_lines:
+            self.assertAlmostEqual(line.amount, round(line.withholding_amount * 0.20, 2), places=2)
+        self.assertAlmostEqual(declaration.startup_exempted_amount, sum(startup_lines.mapped('amount')), places=2)
 
         data = declaration._get_rendering_data()
         revenues = [d['revenue_nature'] for d in data['declarations']]
@@ -1191,6 +1284,41 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         revenues = [d['revenue_nature'] for d in data['declarations']]
         self.assertNotIn(60, revenues)
         self.assertNotIn(61, revenues)
+
+    @freeze_time('2026-11-05')
+    def test_startup_exemption_quarterly_declaration(self):
+        # The 48 months are counted up to the declared quarter, not up to the current month
+        company = self.company_data['company']
+        company.current_payroll_config_id.write({
+            'exemption_sme_status': 'startup',
+            'l10n_be_declaration_frequency': 'quarterly',
+        })
+        company.l10n_be_cbe_inscription = datetime.date(2022, 3, 15)  # Exemption until March 2026
+        declaration = self.env['l10n_be.274_xx'].create({
+            'year': 2026,
+            'quarter': '1',
+        })
+        self.assertEqual(declaration.declaration_frequency, 'quarterly')
+        self.assertEqual(declaration.date_start, datetime.date(2026, 1, 1))
+        self.assertFalse(declaration.is_cbe_expired)
+        declaration.quarter = '2'
+        self.assertTrue(declaration.is_cbe_expired)
+
+    def test_startup_exemption_48_months_from_inscription_month(self):
+        # The 48 months start with the month of the inscription when it is on the 1st, else with the next month
+        company = self.company_data['company']
+        company.current_payroll_config_id.exemption_sme_status = 'startup'
+        for inscription_date, last_month in (
+            (datetime.date(2022, 3, 1), datetime.date(2026, 2, 1)),
+            (datetime.date(2022, 3, 15), datetime.date(2026, 3, 1)),
+        ):
+            with self.subTest(inscription_date=inscription_date):
+                company.l10n_be_cbe_inscription = inscription_date
+                declarations = self.env['l10n_be.274_xx'].create([
+                    {'year': month.year, 'month': str(month.month)}
+                    for month in (last_month, last_month + relativedelta(months=1))
+                ])
+                self.assertEqual(declarations.mapped('is_cbe_expired'), [False, True])
 
     def test_no_exemption_when_no_status_configured(self):
         self.company_data['company'].current_payroll_config_id.exemption_sme_status = False
@@ -1220,7 +1348,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_10': 0.0,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
-            'pp_amount_20': 1209.49,
+            'pp_amount_20': 1209.5,
             'pp_amount_30': 0.0,
             'pp_amount_32': 0.0,
             'pp_amount_33': 0.0,
@@ -1316,7 +1444,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '1',
         })
         declaration_results = {
-            'pp_amount_10': 169.6,
+            'pp_amount_10': 169.61,
             'pp_amount_13': 16.05,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -1458,9 +1586,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         # taxable_amount_44 (274_44 overtime exemption):
         #   VOLOT200: 84h x 30€ = 2520€; 040.00: 84h x 30€ = 2520€
         #   total = 5040€  (168h < 180h annual cap)
-        # deducted_amount_44 = 5040 x 41.25% = 2079.0€
+        # 5040 x 41.25% = 2079.0€, at most the withholding tax of the employee: deducted_amount_44 = 1679.68€
         declaration_results = {
-            'pp_amount_10': 1679.68,
+            'pp_amount_10': 1679.69,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -1468,7 +1596,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_32': 0.0,
             'pp_amount_33': 0.0,
             'pp_amount_34': 0.0,
-            'pp_amount_44': 1679.68,
+            'pp_amount_44': 1679.69,
             'pp_amount_55': 0.0,
             'taxable_amount_10': 10640.23,
             'taxable_amount_13': 0.0,
@@ -1480,11 +1608,11 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 5040.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 2079.0,
+            'deducted_amount': 1679.69,
             'deducted_amount_32': 0.0,
             'deducted_amount_33': 0.0,
             'deducted_amount_34': 0.0,
-            'deducted_amount_44': 2079.0,
+            'deducted_amount_44': 1679.69,
             'deducted_amount_55': 0.0,
             'capped_amount_34': 0.0,
         }
@@ -1555,17 +1683,17 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         # GROSS.Y = 15073.66 x 12 = 180883.92; after forfait (6070): 174813.92€
         # annual tax (Y.P.P) = 86526.00; marital deduction = 2987.98
         # PPTOTAL (before P.P.DEDEH) = (86526.00 - 2987.98) / 12 = 6962.17€
-        # P.P.DEDEH (annual cap=360h; Jan consumed 168h -> 192h remaining):
-        #   VOLOT150 (180h, tier2 57.75%): base = 180 x 30 = 5400€; deduction = 3118.50€
-        #   040.00 (min(180, 12 remaining cap) = 12h, tier2): base = 12 x 30 = 360€; deduction = 207.90€
-        #   total P.P.DEDEH = 3326.40€
-        # pp_amount_10 = PPTOTAL = 6962.17 - 3326.40 = 3635.77€
+        # P.P.DEDEH (annual cap=180h for CP200, as the 274.44 exemption; Jan consumed 168h -> 12h remaining):
+        #   VOLOT150 (min(180, 12 remaining cap) = 12h, tier2 57.75%): base = 12 x 30 = 360€; deduction = 207.90€
+        #   040.00: cap reached
+        #   total P.P.DEDEH = 207.90€
+        # pp_amount_10 = PPTOTAL = 6962.17 - 207.90 = 6754.27€
         #
         # taxable_amount_44: annual cap = 180h; Jan used 84+84=168h -> 12h remain
         #   Feb exempt hours capped at 12h -> 12x30 = 360€
         # deducted_amount_44 = 360 x 41.25% = 148.5€
         declaration_results = {
-            'pp_amount_10': 3635.77,
+            'pp_amount_10': 6754.28,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -1573,7 +1701,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_32': 0.0,
             'pp_amount_33': 0.0,
             'pp_amount_34': 0.0,
-            'pp_amount_44': 3635.77,
+            'pp_amount_44': 6754.28,
             'pp_amount_55': 0.0,
             'taxable_amount_10': 15073.66,
             'taxable_amount_13': 0.0,
@@ -1659,11 +1787,12 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         #   base = 156 x 30 = 4680€; deduction = 4680 x 0.5775 = 2702.70€
         # pp_amount_10 = PPTOTAL = 5187.44 - 2702.70 = 2484.74€
         #
-        # taxable_amount_55 (274_55 overtime exemption):
-        #   040.00 = 156h; cap = 360h for the hotel industry, with or without a white cash register
+        # taxable_amount_44 (274_44 overtime exemption):
+        #   040.00 = 156h; cap = 360h for the hotel industry, with or without a white cash register, the first 180h
+        #   declared under 274.44, the next ones under 274.55
         #   156h x 30€ = 4680€; deducted = 4680 x 41.25% = 1930.5€
         base_results = {
-            'pp_amount_10': 2484.74,
+            'pp_amount_10': 2484.75,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -1671,8 +1800,8 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_32': 0.0,
             'pp_amount_33': 0.0,
             'pp_amount_34': 0.0,
-            'pp_amount_44': 0.0,
-            'pp_amount_55': 2484.74,
+            'pp_amount_44': 2484.75,
+            'pp_amount_55': 0.0,
             'taxable_amount_10': 11756.41,
             'taxable_amount_13': 0.0,
             'taxable_amount_18': 0.0,
@@ -1681,14 +1810,14 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_32': 0.0,
             'taxable_amount_33': 0.0,
             'taxable_amount_34': 0.0,
-            'taxable_amount_44': 0.0,
-            'taxable_amount_55': 4680.0,
+            'taxable_amount_44': 4680.0,
+            'taxable_amount_55': 0.0,
             'deducted_amount': 1930.5,
             'deducted_amount_32': 0.0,
             'deducted_amount_33': 0.0,
             'deducted_amount_34': 0.0,
-            'deducted_amount_44': 0.0,
-            'deducted_amount_55': 1930.5,
+            'deducted_amount_44': 1930.5,
+            'deducted_amount_55': 0.0,
             'capped_amount_34': 0.0,
         }
 
@@ -1699,9 +1828,25 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             self.validate_results(declaration, base_results)
 
         # The payslip's withholding tax (2484.74€) covers the whole exemption
-        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_55', 'WITHHOLDING_TAX_EX_TOT'])
-        for code in ('WITHHOLDING_TAX_EX_274_55', 'WITHHOLDING_TAX_EX_TOT'):
+        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_44', 'WITHHOLDING_TAX_EX_TOT'])
+        for code in ('WITHHOLDING_TAX_EX_274_44', 'WITHHOLDING_TAX_EX_TOT'):
             self.assertAlmostEqual(line_values[code][payslip.id]['total'], 1930.5, 2, code)
+
+        # The hours above the general cap (lowered to 100h here) are declared under 274.55:
+        #   274.44: 100h x 30 = 3000 EUR, deducted 1237.5 EUR; 274.55: 56h x 30 = 1680 EUR, deducted 693 EUR
+        #   the withholding tax shared between them as the taxable amounts: 1592.79 EUR and 891.96 EUR
+        self.env['hr.rule.parameter.value'].create({
+            'rule_parameter_id': self.env.ref('l10n_be_hr_payroll.rule_parameter_l10n_be_overtime_threshold_cp200').id,
+            'date_from': datetime.date(2026, 1, 1),
+            'parameter_value': '100',
+        })
+        declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
+        self.validate_results(declaration, dict(
+            base_results,
+            pp_amount_44=1592.79, pp_amount_55=891.96,
+            taxable_amount_44=3000.0, taxable_amount_55=1680.0,
+            deducted_amount_44=1237.5, deducted_amount_55=693.0,
+        ))
 
     def test_extra_hours_55_CP_302_voluntary(self):
         self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_sunday').sudo().write({'active': False})
@@ -1737,14 +1882,16 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         )
         # 040.27 (timing 0-12h): 12h per day -> 7x12 = 84h, voluntary overtime with its legal 50% premium:
         #   84 x 30 x 1.5 = 3780€; the exemption is on the hours' pay: 84 x 30 = 2520€; 2520 x 41.25% = 1039.5€
+        # within the first 180h: 274.44
         declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
-        self.assertAlmostEqual(declaration.taxable_amount_55, 2520, 2)
-        self.assertAlmostEqual(declaration.deducted_amount_55, 1039.5, 2)
+        self.assertAlmostEqual(declaration.taxable_amount_44, 2520, 2)
+        self.assertAlmostEqual(declaration.deducted_amount_44, 1039.5, 2)
+        self.assertFalse(declaration.taxable_amount_55)
 
         # The payslip's withholding tax (1963€) covers the whole exemption
-        line_values = payslip._get_line_values(['PPTOTAL', 'WITHHOLDING_TAX_EX_274_55'])
+        line_values = payslip._get_line_values(['PPTOTAL', 'WITHHOLDING_TAX_EX_274_44'])
         self.assertAlmostEqual(line_values['PPTOTAL'][payslip.id]['total'], 1963, 2)
-        self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_55'][payslip.id]['total'], 1039.5, 2)
+        self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_44'][payslip.id]['total'], 1039.5, 2)
 
     def test_extra_hours_44_recoverable_payslip(self):
         self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_sunday').sudo().write({'active': False})
@@ -1785,14 +1932,15 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         self.assertAlmostEqual(recoverable_line.number_of_hours, 84, 2)
         self.assertAlmostEqual(recoverable_line.amount, 1260, 2)
 
-        # The exemption is on the whole pay of the hours: 84 x 30 = 2520€; 2520 x 41.25% = 1039.5€
+        # The exemption is on the whole pay of the hours: 84 x 30 = 2520€; 2520 x 41.25% = 1039.5€, at most the
+        # withholding tax of the employee (791.01€ once the employee's overtime tax reduction is applied), as the payslip
         declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
         self.assertAlmostEqual(declaration.taxable_amount_44, 2520, 2)
-        self.assertAlmostEqual(declaration.deducted_amount_44, 1039.5, 2)
+        self.assertAlmostEqual(declaration.deducted_amount_44, 791.01, 2)
 
-        # The payslip keeps at most its own withholding tax (791€ once the employee's overtime tax reduction is applied)
+        # The payslip keeps at most its own withholding tax
         line_values = payslip._get_line_values(['PPTOTAL', 'WITHHOLDING_TAX_EX_274_44', 'WITHHOLDING_TAX_EX_TOT'])
-        for code, amount in [('PPTOTAL', 791), ('WITHHOLDING_TAX_EX_274_44', 791), ('WITHHOLDING_TAX_EX_TOT', 791)]:
+        for code, amount in [('PPTOTAL', 791.01), ('WITHHOLDING_TAX_EX_274_44', 791.01), ('WITHHOLDING_TAX_EX_TOT', 791.01)]:
             self.assertAlmostEqual(line_values[code][payslip.id]['total'], amount, 2, code)
 
     def test_extra_hours_44_part_time_additional_hours_150(self):
@@ -1838,8 +1986,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         self.assertAlmostEqual(additional_line.amount, 630, 2)
 
         # The exemption is on the pay of the hours without the premium: 14 x 30 = 420€; 420 x 41.25% = 173.25€
-        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_44'])
+        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_44', 'P.P.DEDEH'])
         self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_44'][payslip.id]['total'], 173.25, 2)
+        self.assertTrue(line_values['P.P.DEDEH'][payslip.id]['total'])
 
     def test_30_declarations(self):
         employee_tokens = self.employees[0]
@@ -1867,9 +2016,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
-            'pp_amount_30': 860.72,  # the withholding taxes of the presence tokens and of the salary
+            'pp_amount_30': 860.73,  # the withholding taxes of the presence tokens and of the salary
             'pp_amount_32': 0.0,
-            'pp_amount_33': 113.72,
+            'pp_amount_33': 113.73,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -1877,7 +2026,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_13': 0.0,
             'taxable_amount_18': 0.0,
             'taxable_amount_20': 0.0,
-            'taxable_amount_30': 2000.0,
+            'taxable_amount_30': 4070.2,  # the presence tokens and the taxable salary
             'taxable_amount_32': 0.0,
             'taxable_amount_33': 2070.2,
             'taxable_amount_34': 0.0,
@@ -1901,9 +2050,18 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         self.assertIn(self.employees[0].niss, {emp_data['f2011_nationaalnr'] for emp_data in data_281['employees_data']})
         for employee_data in data_281['employees_data']:
             if employee_data['f2011_nationaalnr'] == self.employees[0].niss:
-                self.assertAlmostEqual(employee_data['f30_2063_bedrijfsvoorheffing'], 11140.15, places=2)
-                self.assertAlmostEqual(employee_data['f30_2064_presentiegelden'], 24000.0, places=2)
-                self.assertAlmostEqual(employee_data['f30_2086_bedrag'], 2046.03, places=2)
+                self.assertAlmostEqual(employee_data['f30_2063_bedrijfsvoorheffing'], 11140.27, places=2)
+                # The presence tokens with the taxable salary (benefits in kind included) and the representation fees
+                self.assertAlmostEqual(employee_data['f30_2064_presentiegelden'], 24000.0 + 27394.72 + 1800.0, places=2)
+                # Box 9: the representation fees, not the benefits in kind
+                self.assertAlmostEqual(employee_data['f30_2086_bedrag'], 1800.0, places=2)
+                self.assertEqual(employee_data['f30_2099_aard'], 'divers')
+
+        # A non-resident beneficiary: the same income in box 7f
+        self.employees[0].l10n_be_resident_situation = 'non_resident'
+        employee_data = declaration._get_rendering_data(self.employees[0])['employees_data'][0]
+        self.assertEqual(employee_data['f30_2064_presentiegelden'], 0)
+        self.assertAlmostEqual(employee_data['f30_2081_retributies'], 24000.0 + 27394.72 + 1800.0, places=2)
 
     @freeze_time("2025-12-31")
     def test_281_10_all_fields(self):
@@ -1976,6 +2134,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'l10n_be_lsa_daily_misc_other_amount': 75.0,
             'l10n_be_lsa_monthly_misc_other_amount': 100,
             'bus_transport_employee_amount': 25.0,
+            'bus_transport_employee_kilometer': 5,
         })
 
         departure_notice = self.env['hr.employee.departure'].create({
@@ -2052,7 +2211,8 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         all_payslips = payslip_regular | payslip_arrear | payslip_warrant | payslip_cct90 | termination_fees | holiday_pays
         all_payslips.compute_sheet()
         emp.write({'review_state': '1_reviewed'})
-        all_payslips.action_payslip_done()
+        # The termination payslips are already validated
+        all_payslips.filtered(lambda p: p.state == 'draft').action_payslip_done()
 
         all_payslips.write({'state': 'validated'})
 
@@ -2075,10 +2235,10 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f10_2045_code': 0,
             'f10_2055_datumvanindienstt': '01-01-2025',
             'f10_2056_datumvanvertrek': '30-12-2025',
-            'f10_2060_gewonebezoldiginge': 331679,
+            'f10_2060_gewonebezoldiginge': 337029,
             'f10_2061_bedragoveruren300horeca': 0,
             'f10_2063_vervroegdvakantieg': 0,
-            'f10_2064_afzbelachterstall': 342379,
+            'f10_2064_afzbelachterstall': 530922,
             'f10_2065_opzeggingsreclasseringsverg': 939326,
             'f10_2066_impulsfund': 0,
             'f10_2067_rechtvermindering66_81': 0,
@@ -2089,7 +2249,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f10_2073_tipamount': 0,
             'f10_2074_bedrijfsvoorheffing': 409260,
             'f10_2075_bijzonderbijdrage': 16910,
-            'f10_2076_voordelenaardbedrag': 351703,
+            'f10_2076_voordelenaardbedrag': 171800,
             'f10_2078_compensationamountwithoutstandards': 0,
             'f10_2079_covidovertimeremuneration2023': 0,
             'f10_2081_gewonebijdragenenpremies': 481850,
@@ -2097,9 +2257,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f10_2083_bedrag': 0,
             'f10_2084_mobiliteitsvergoedi': 0,
             'f10_2085_forfbezoldiging': 0,
-            'f10_2086_openbaargemeenschap': 35590,
+            'f10_2086_openbaargemeenschap': 35110,
             'f10_2087_bedrag': 0,
-            'f10_2088_andervervoermiddel': 49000,
+            'f10_2088_andervervoermiddel': 35010,
             'f10_2090_outborderdays': 0,
             'f10_2092_othercode1': 0,
             'f10_2094_othercode2': 0,
@@ -2107,7 +2267,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f10_2096_othercode3': 0,
             'f10_2097_aantaluren': 0,
             'f10_2098_othercode4': 0,
-            'f10_2099_aard': 'BCDFHIJK',
+            'f10_2099_aard': 'BCDHIJK',
             'f10_2102_kas': 0,
             'f10_2103_kasvrijaanvullendpensioen': 0,
             'f10_2106_percentages': '00,00',
@@ -2176,9 +2336,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f10_2226_kmzone2207': 1290,
             'f10_2227_relanceovertimeremuneration2025': 0,
             'f10_2228_relanceovertimehours2025': 0,
-            'f10_2062_totaal': 701382,
-            'f10_2077_totaal': 118990,
-            'f10_2059_totaalcontrole': 3796069,
+            'f10_2062_totaal': 526829,
+            'f10_2077_totaal': 104520,
+            'f10_2059_totaalcontrole': 3606566,
             'f10_2257_employeecontribution': 481800,
         }
         self._validate_281_report(emp_data, EXPECTED_RESULTS)
@@ -2223,6 +2383,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'company_id': self.env.company.id,
             'niss': '91072845880',
             'certificate': 'master',
+            'employee_type_id': self.env.ref("hr.contract_type_company_executive").id,
             'l10n_be_joint_committee_id': jc_999.id,
             'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
             'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
@@ -2321,7 +2482,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f20_2033_optiebuitvennoots': '0',
             'f20_2035_verantwoordingsstukken': 0,
             'f20_2045_rsz': 0,
-            'f20_2055_datumvanindienstt': 0,
+            'f20_2055_datumvanindienstt': '',  # box 2: only for a director under an employment contract
             'f20_2056_datumvanvertrek': '',
             'f20_2060_periodieke': 500000,
             'f20_2061_covidovertimeremuneration2023': 0,
@@ -2373,9 +2534,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f20_2204_repaidsums': 0,
             'f20_2205_recuperation': 0,
             'f20_2206_grossamountremuneration': 0,
-            'f20_2207_travelbicycleorspeedpedelec': 16560,
+            'f20_2207_travelbicycleorspeedpedelec': 18630,
             'f20_2208_benefitprovisionbicycleorspeedpedelec': 0,
-            'f20_2209_totalcontributiontravelexpenses': 16560,
+            'f20_2209_totalcontributiontravelexpenses': 18630,
             'f20_2226_kmzone2207': '690',
             'f20_2227_relanceovertimeremuneration2025': 0,
             'f20_2228_relanceovertimehours2025': 0,
@@ -2460,12 +2621,13 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         EXPECTED_RESULTS = {
             'f30_2030_beneficiarynature': 1,
             'f30_2035_verantwoordingsstukken': 0,
-            'f30_2059_totaalcontrole': 5602375,
+            'f30_2059_totaalcontrole': 9705428,
             'f30_2060_toegekendbedrag': 0,
             'f30_2061_vrijstelling': 0,
             'f30_2062_bedrag': 0,
-            'f30_2063_bedrijfsvoorheffing': 2292778,
-            'f30_2064_presentiegelden': 2400000,
+            'f30_2063_bedrijfsvoorheffing': 2292790,
+            # The presence tokens and the taxable salary, benefits in kind (car, laptop, internet, phone...) included
+            'f30_2064_presentiegelden': 7412638,
             'f30_2065_toegekendbedrag': 0,
             'f30_2066_vrijstelling': 0,
             'f30_2067_bedrag': 0,
@@ -2487,14 +2649,15 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'f30_2083_podiumkunstenaars': 0,
             'f30_2084_winst': 0,
             'f30_2085_art2283': 0,
-            'f30_2086_bedrag': 909597,
+            # Box 9 holds the reimbursed expenses included in the taxable income, not the benefits in kind
+            'f30_2086_bedrag': 0,
             'f30_2087_bedrag': 0,
             'f30_2088_bedrag': 0,
             'f30_2089_numberpeople': 0,
             'f30_2090_numberdays': 0,
             'f30_2095_foreignolympicbonus': 0,
             'f30_2097_totalamount': 0,
-            'f30_2099_aard': 'CDFHIJK',
+            'f30_2099_aard': '',
             'f30_2109_fiscaalidentificat': 0,
             'f30_2113_sportlimitedremuneration': 0,
             'f30_2115_sportunlimitedotherremuneration': 0,

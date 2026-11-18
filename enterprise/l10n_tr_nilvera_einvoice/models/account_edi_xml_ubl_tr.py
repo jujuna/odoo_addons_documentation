@@ -1117,7 +1117,7 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         family_name = self._find_value(f'.//cac:{role}Party/cac:Party/cac:Person/cbc:FamilyName', tree) or ""
         partner_vals['name'] = f"{first_name} {family_name}".strip()
 
-        vat = self._find_value(f'.//cac:{role}Party//cac:PartyIdentification//cbc:ID[string-length(text()) > 5]', tree)
+        vat = self._find_value(f".//cac:{role}Party/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='VKN' or @schemeID='TCKN']", tree)
         if vat:
             partner_vals['vat'] = vat
 
@@ -1139,6 +1139,15 @@ class AccountEdiXmlUblTr(models.AbstractModel):
             return 'refund', qty_factor
 
         return move_type, qty_factor
+
+    def _import_lines(self, record, tree, xpath, document_type=False, tax_type=False, qty_factor=1):
+        # EXTENDS account_edi_common
+        # In UBL-TR (GİB e-Fatura guide), IADE and TEVKIFATIADE refunds are <Invoice> documents with
+        # cac:InvoiceLine lines, see tests/test_files/refund/refund_iade.xml.
+        if xpath == './{*}CreditNoteLine' and etree.QName(tree).localname == 'Invoice':
+            xpath = './{*}InvoiceLine'
+            document_type = {'in_refund': 'in_invoice', 'out_refund': 'out_invoice'}.get(document_type, document_type)
+        return super()._import_lines(record, tree, xpath, document_type=document_type, tax_type=tax_type, qty_factor=qty_factor)
 
     def _l10n_tr_match_refund_reversed_entry(self, invoice, tree):
         if invoice.move_type not in {'in_refund', 'out_refund'}:
@@ -1178,16 +1187,41 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         invoice_type = self._find_value(".//cbc:InvoiceTypeCode", tree)
         if invoice_type not in {key for key, _ in self.env['account.move']._fields['l10n_tr_gib_invoice_type'].selection}:
             invoice_type = False
+        shipping_type = self._find_value(
+            "./cac:InvoiceLine/cac:Delivery/cac:Shipment/cac:ShipmentStage/cbc:TransportModeCode", tree,
+        )
+        if shipping_type not in {key for key, _ in self.env['account.move']._fields['l10n_tr_shipping_type'].selection}:
+            shipping_type = False
 
+        uuid = self._find_value('./cbc:UUID', tree)
         invoice.write({
-            'l10n_tr_nilvera_uuid': self._find_value('./cbc:UUID', tree),
+            'l10n_tr_nilvera_uuid': uuid,
             'l10n_tr_gib_invoice_scenario': scenario,
             'l10n_tr_gib_invoice_type': invoice_type,
+            'l10n_tr_is_export_invoice': self._find_value(".//cbc:ProfileID", tree) == 'IHRACAT',
+            'l10n_tr_shipping_type': shipping_type,
             # The base import also puts document-level notes in the narration; they are
             # imported as note lines instead, so keep only the PaymentTerms notes.
             'narration': self._import_description(tree, xpaths=['./{*}PaymentTerms/{*}Note']),
             'invoice_line_ids': note_lines,
         })
+        if uuid:
+            # Like the documents fetched from Nilvera, an imported document was already issued: never send it again.
+            invoice.l10n_tr_nilvera_send_status = 'succeed'
+
+        exemption_code = self._find_value("./cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReasonCode", tree)
+        if exemption_code and (invoice.l10n_tr_is_export_invoice or invoice.l10n_tr_gib_invoice_type in {'ISTISNA', 'IHRACKAYITLI'}):
+            if code := invoice.l10n_tr_available_exemption_code_ids.filtered(
+                lambda tax_code: str(tax_code.code) == exemption_code,
+            ):
+                invoice.l10n_tr_exemption_code_id = code[:1]
+            else:
+                logs.append(
+                    self.env._(
+                        "The GİB exemption reason %s could not be found.",
+                        exemption_code,
+                    )
+                )
 
         if scenario == 'TICARIFATURA' and invoice.move_type in {'in_invoice', 'out_invoice'}:
             try:

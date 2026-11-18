@@ -15,9 +15,9 @@ import { checkPreparationTicketData } from "@point_of_sale/../tests/pos/tours/ut
 const Chrome = { ...ChromePos, ...ChromeRestaurant };
 const ProductScreen = { ...ProductScreenPos, ...ProductScreenResto };
 
-function clickOrderButton() {
+function clickOrderButton(fakePrint = false) {
     return [
-        ProductScreen.clickOrderButton(),
+        ProductScreen.clickOrderButton(fakePrint),
         Chrome.waitRequest(),
         ProductScreen.orderlinesHaveNoChange(),
     ].flat();
@@ -35,7 +35,7 @@ registry.category("web_tour.tours").add("PreparationDisplayTourResto", {
             ProductScreen.clickDisplayedProduct("Water"),
             ProductScreen.orderlineIsToOrder("Water"),
             ProductScreen.orderlineIsToOrder("Coca-Cola"),
-            clickOrderButton(),
+            clickOrderButton(true),
             FloorScreen.clickTable("5"),
             ProductScreen.orderlinesHaveNoChange(),
             ProductScreen.clickPayButton(),
@@ -96,7 +96,7 @@ registry.category("web_tour.tours").add("PreparationDisplayTourResto2", {
             FloorScreen.clickTable("5"),
             ProductScreen.clickDisplayedProduct("Coca-Cola"),
             ProductScreen.orderlineIsToOrder("Coca-Cola"),
-            clickOrderButton(),
+            clickOrderButton(true),
             FloorScreen.clickTable("5"),
             ProductScreen.orderlinesHaveNoChange(),
             ProductScreen.clickDisplayedProduct("Coca-Cola"),
@@ -116,7 +116,7 @@ registry.category("web_tour.tours").add("PreparationDisplayCancelOrderTour", {
             FloorScreen.clickTable("5"),
             ProductScreen.clickDisplayedProduct("Test Food"),
             ProductScreen.orderlineIsToOrder("Test Food"),
-            clickOrderButton(),
+            clickOrderButton(true),
             FloorScreen.clickTable("5"),
             ProductScreen.orderlinesHaveNoChange(),
             ProductScreen.clickReview(),
@@ -134,7 +134,7 @@ registry.category("web_tour.tours").add("PreparationDisplayPaymentNotCancelDispl
             FloorScreen.clickTable("5"),
             ProductScreen.addOrderline("Coca-Cola", "2"),
             ProductScreen.addInternalNote("To Serve"),
-            clickOrderButton(),
+            clickOrderButton(true),
             FloorScreen.clickTable("5"),
             ProductScreen.addOrderline("Coca-Cola", "2"),
             ProductScreen.addInternalNote("To Serve"),
@@ -166,7 +166,7 @@ registry.category("web_tour.tours").add("test_update_internal_note_of_order", {
             ProductScreen.clickDisplayedProduct("Demo Food"),
             ProductScreen.clickDisplayedProduct("Test Food"),
             ProductScreen.orderlineIsToOrder("Test Food"),
-            clickOrderButton(),
+            clickOrderButton(true),
             FloorScreen.clickTable("5"),
             ProductScreen.clickOrderline("Test Food"),
             ProductScreen.addInternalNote("Test Internal Notes"),
@@ -281,7 +281,7 @@ registry.category("web_tour.tours").add("test_table_merge_with_unsynced_order", 
             FloorScreen.clickTable("4"),
             ProductScreen.addOrderline("Coca-Cola", "3"),
             ProductScreen.addOrderline("Water", "3"),
-            ProductScreen.clickOrderButton(),
+            ProductScreen.clickOrderButton(true),
             // ----- Order 2 (Empty Order) ----- //
             FloorScreen.clickTable("5"),
             ProductScreen.clickControlButton("Guests"),

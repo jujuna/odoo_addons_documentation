@@ -1,6 +1,10 @@
+import json
+from unittest.mock import Mock, patch
+
 from freezegun import freeze_time
 
 from odoo import fields
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 from .common import TestMXEdiStockCommon
 
@@ -195,3 +199,47 @@ class TestCFDIPickingWorkflow(TestMXEdiStockCommon):
             'l10n_mx_edi_cfdi_sat_state': 'cancelled',
             'l10n_mx_edi_cfdi_state': 'cancel',
         }])
+
+    def test_picking_mapbox_coordinates_and_distance(self):
+        self.env['ir.config_parameter'].sudo().set_str('web_map.token_map_box', 'dummy_token')
+        warehouse = self.mx_warehouse
+        picking = self._create_picking(warehouse)
+        mapbox_responses = [
+            self._mapbox_response({'features': [{'geometry': {'coordinates': [-100.3161, 25.6866]}}]}),
+            self._mapbox_response({'features': [{'geometry': {'coordinates': [-99.1332, 19.4326]}}]}),
+            self._mapbox_response({'distances': [[0, 903000]]}),
+        ]
+        with patch.object(self.env.registry['stock.picking'], '_l10n_mx_edi_request_mapbox', side_effect=mapbox_responses) as mapbox:
+            picking.l10n_mx_edi_action_set_partner_coordinates()
+            picking.l10n_mx_edi_action_calculate_distance()
+
+        self.assertEqual(
+            (warehouse.partner_id.partner_latitude, warehouse.partner_id.partner_longitude),
+            (25.6866, -100.3161),
+            "Warehouse partner: Mapbox [lon, lat] must be stored as latitude 25.6866, longitude -100.3161",
+        )
+        self.assertEqual(
+            (picking.partner_id.partner_latitude, picking.partner_id.partner_longitude),
+            (19.4326, -99.1332),
+            "Delivery partner: Mapbox [lon, lat] must be stored as latitude 19.4326, longitude -99.1332",
+        )
+        self.assertEqual(
+            mapbox.call_args_list[2].args[0],
+            'https://api.mapbox.com/directions-matrix/v1/mapbox/driving/-100.3161,25.6866;-99.1332,19.4326',
+            "Distance matrix URL: each coordinate pair must be lon,lat",
+        )
+        self.assertEqual(picking.l10n_mx_edi_distance, 903, "Distance: the matrix distance must be stored in km")
+
+    def test_picking_mapbox_distance_with_outdated_coordinates(self):
+        self.env['ir.config_parameter'].sudo().set_str('web_map.token_map_box', 'dummy_token')
+        warehouse = self.mx_warehouse
+        picking = self._create_picking(warehouse)
+        warehouse.partner_id.write({'partner_latitude': -100.3161, 'partner_longitude': 25.6866})
+        picking.partner_id.write({'partner_latitude': -99.1332, 'partner_longitude': 19.4326})
+        error = self._mapbox_response({'code': 'InvalidInput', 'message': 'Coordinate is invalid'})
+        with patch.object(self.env.registry['stock.picking'], '_l10n_mx_edi_request_mapbox', return_value=error):
+            with self.assertRaisesRegex(UserError, 'Get Coordinates'):
+                picking.l10n_mx_edi_action_calculate_distance()
+
+    def _mapbox_response(self, payload):
+        return Mock(content=json.dumps(payload))

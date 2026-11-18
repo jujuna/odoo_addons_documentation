@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:52+0000\n"
-"PO-Revision-Date: 2026-10-20 16:33+0000\n"
+"PO-Revision-Date: 2026-11-10 15:32+0000\n"
 "Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
 "Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/"
 "appointment_account_payment/sv/>\n"
@@ -25,12 +25,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/appointment_account_payment/models/appointment_type.py:0
 msgid "%(date_start)s at %(time_start)s"
-msgstr ""
+msgstr "%(date_start)s kl %(time_start)s"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-msgstr ""
+msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -46,8 +46,8 @@ msgid ""
 "<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/"
 ">Appointment Scheduled!"
 msgstr ""
-"<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/"
-">Tidsbokning genomförd!"
+"<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/>"
+"Tidsbokning bokad!"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
@@ -61,12 +61,12 @@ msgstr ""
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "<span class=\"fw-bold\">Attendees</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Deltagare</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "<span class=\"fw-bold\">Online</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Online</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
@@ -75,11 +75,14 @@ msgid ""
 "                        <span invisible=\"not manage_capacity\">per seat</"
 "span>"
 msgstr ""
+"<span invisible=\"manage_capacity\">per bokning</span>\n"
+"                        <span invisible=\"not manage_capacity\">per plats</"
+"span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_form
 msgid "<span>Proceed to Payment</span>"
-msgstr ""
+msgstr "<span>Gå vidare till betalning</span>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -114,6 +117,7 @@ msgstr "För att aktivera betalningssteget krävs det en produkt"
 #: model:ir.module.module,description:base.module_appointment_account_payment
 msgid "Add a payment step at the end of appointment and resource bookings"
 msgstr ""
+"Lägg till ett betalningssteg vid slutet av tidsbokningar och resursbokningar"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__allday
@@ -162,6 +166,8 @@ msgid ""
 "Appointment Unavailable! <i class=\"oi oi-filled text-danger me-3\" data-"
 "icon=\"cancel\"/>"
 msgstr ""
+"Tidsbokning otillgänglig! <i class=\"oi oi-filled text-danger me-3\" data-"
+"icon=\"cancel\"/>"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
@@ -169,6 +175,8 @@ msgid ""
 "Appointment waiting for payment <i class=\"oi text-warning me-3\" data-"
 "icon=\"hourglass_bottom\"/>"
 msgstr ""
+"Väntande betalning för tidsbokning <i class=\"oi text-warning me-3\" data-"
+"icon=\"hourglass_bottom\"/>"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__asked_capacity
@@ -263,7 +271,7 @@ msgstr "Visningsnamn"
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__duration
 msgid "Duration"
-msgstr "Tidsperiod"
+msgstr "Tid"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
@@ -352,6 +360,8 @@ msgid ""
 "Oops! Paid appointment cannot be rescheduled or cancelled via our website."
 "<br/>"
 msgstr ""
+"Åh nej! Den betalda tidsbokningen kan inte bokas om eller avbokas genom vår "
+"hemsida.<br/>"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__staff_user_id
@@ -368,7 +378,7 @@ msgstr "Betald konsultation"
 #. odoo-python
 #: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
 msgid "Paid Consultation Booking Fees"
-msgstr ""
+msgstr "Bokningsavgifter för betalda konsulttjänster"
 
 #. module: appointment_account_payment
 #. odoo-python
@@ -380,12 +390,12 @@ msgstr "Betalda platser"
 #. odoo-python
 #: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
 msgid "Paid Seats Booking Fees"
-msgstr ""
+msgstr "Bokningsavgifter för betalda platser"
 
 #. module: appointment_account_payment
 #: model:ir.module.module,shortdesc:base.module_appointment_account_payment
 msgid "Pay to Book"
-msgstr ""
+msgstr "Betala för att boka"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -474,6 +484,9 @@ msgid ""
 "The sale price can be set manually or computed from the product template. "
 "Click on the 'Configure Variants' button to set the extra attribute prices."
 msgstr ""
+"Försäljningspriset kan anges manuellt eller beräknas från produktmallen. "
+"Klicka på knappen 'Konfigurera varianter' för att ange tilläggspriser för "
+"olika attribut."
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -519,7 +532,7 @@ msgstr "Förskottsbetalning"
 #. module: appointment_account_payment
 #: model:ir.module.module,summary:base.module_appointment_account_payment
 msgid "Up-front payment on bookings"
-msgstr ""
+msgstr "Direktbetalning vid bokningar"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking_line__appointment_user_id
@@ -533,11 +546,13 @@ msgid ""
 "With %(user_name)s\n"
 "%(date_start)s at %(time_start)s"
 msgstr ""
+"Med %(user_name)s\n"
+"%(date_start)s kl %(time_start)s"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "Your Details"
-msgstr ""
+msgstr "Din information"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_validated

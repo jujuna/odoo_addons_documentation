@@ -52,6 +52,8 @@ class ProposeChange(models.TransientModel):
         body = self._get_update_step_note(original_title)
         if new_step:
             new_step.note = self.step_id.note
+            if new_step == self.step_id.point_id and self.title:
+                new_step.title = self.title
             # Write reason in chatter for record keeping in case of multiple suggestions before approval
             new_step.message_post(body=body)
         else:

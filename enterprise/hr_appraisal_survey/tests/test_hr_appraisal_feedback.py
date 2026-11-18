@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import date
 from dateutil.relativedelta import relativedelta
+from odoo import Command, fields
+from odoo.exceptions import UserError
 from odoo.tests.common import tagged, TransactionCase
 
 @tagged('-at_install', 'post_install')
@@ -48,17 +49,22 @@ class TestHrAppraisalFeedback(TransactionCase):
             'questions_selection': 'all',
             'access_mode': 'public',
             'survey_type': 'appraisal',
+            'question_and_page_ids': [Command.create({
+                'title': 'How was your collaboration?',
+                'question_type': 'text_box',
+            })],
         })
 
     def test_appraisal_feedback_deadline(self):
+        today = fields.Date.context_today(self.appraisal)
         feedback = self.env['appraisal.ask.feedback'].create({
             'appraisal_id': self.appraisal.id,
             'partner_ids': [self.user_employee.work_contact_id.id],
-            'deadline': date.today(),
+            'deadline': today,
             'survey_template_id': self.appraisal_survey.id,
         })
         feedback.action_send()
-        feedback['deadline'] = date.today() + relativedelta(months=1)
+        feedback['deadline'] = today + relativedelta(months=1)
         feedback.action_send()
 
         survey_input = self.env['survey.user_input'].search([('appraisal_id', '=', self.appraisal.id)])
@@ -67,3 +73,15 @@ class TestHrAppraisalFeedback(TransactionCase):
         # by the way, check that completed_survey_count is computed correctly
         survey_input._mark_done()
         self.assertEqual(self.appraisal.completed_survey_count, 1)
+
+    def test_appraisal_feedback_empty_survey(self):
+        self.appraisal_survey.question_and_page_ids.unlink()
+        feedback = self.env['appraisal.ask.feedback'].create({
+            'appraisal_id': self.appraisal.id,
+            'partner_ids': [self.user_employee.work_contact_id.id],
+            'deadline': fields.Date.context_today(self.appraisal),
+            'survey_template_id': self.appraisal_survey.id,
+        })
+        with self.assertRaises(UserError):
+            feedback.action_send()
+        self.assertFalse(self.env['survey.user_input'].search([('appraisal_id', '=', self.appraisal.id)]))

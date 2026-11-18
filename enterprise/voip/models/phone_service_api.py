@@ -295,9 +295,14 @@ class PhoneServiceAPI:
             )
 
     def sync_webhook_event_url(self):
+        """Also syncs the IAP account token, which phone_service checks the balance of."""
+        iap_account = self.env["iap.account"].sudo().get(PHONE_SERVICE_NAME)
         result = self._call_phone_service(
             "/api/phone_service/1/update_client",
-            {"updates": {"webhook_event_url": self._get_webhook_event_url()}},
+            {"updates": {
+                "webhook_event_url": self._get_webhook_event_url(),
+                "account_token": iap_account.account_token,
+            }},
         )
         self.env["ir.config_parameter"].sudo().set_bool(
             WEBHOOK_EVENT_URL_SYNC_PENDING_PARAM, False
@@ -400,17 +405,54 @@ class PhoneServiceAPI:
         )
         if not meta.get("total_results") or not requirements_data:
             return {}, {}
+        # Some countries (e.g. India) list one requirement set per end user
+        # type and refuse a group created without one. Odoo customers order
+        # numbers as businesses, so "company" is used whenever it is offered.
+        listed_end_user_types = [
+            entry["end_user_type"] for entry in requirements_data if entry.get("end_user_type")
+        ]
+        if "company" in listed_end_user_types:
+            end_user_type = "company"
+        elif listed_end_user_types:
+            end_user_type = listed_end_user_types[0]
+        else:
+            end_user_type = None
+        payload = {
+            "country_code": country_code,
+            "phone_number_type": phone_number_type,
+            "action": "ordering",
+        }
+        if end_user_type:
+            payload["end_user_type"] = end_user_type
         data = self._call_phone_service(
             "/api/phone_service/1/create_requirement_group",
-            {
-                "payload": {
-                    "country_code": country_code,
-                    "phone_number_type": phone_number_type,
-                    "action": "ordering",
-                },
-            },
+            {"payload": payload},
         ).get("data", {})
-        return data, requirements_data[0]
+        return data, self._get_requirement_group_requirements(data, requirements_data)
+
+    def _get_requirement_group_requirements(self, group_data, requirements_data):
+        """Return the requirement types the created group actually asks for.
+
+        A country can list several requirement sets for the same number type
+        (one per end user type, or several unrelated ones). The group's own
+        ``regulatory_requirements`` tell which set applies; the listed sets
+        only provide the name, type and description of each requirement.
+        """
+        types_by_id = {
+            requirement_type["id"]: requirement_type
+            for entry in requirements_data
+            for requirement_type in entry.get("requirement_types", [])
+        }
+        return {
+            "requirement_types": [
+                types_by_id.get(requirement["requirement_id"]) or {
+                    "id": requirement["requirement_id"],
+                    "name": requirement["requirement_id"],
+                    "type": requirement.get("field_type"),
+                }
+                for requirement in group_data.get("regulatory_requirements", [])
+            ],
+        }
 
     def fulfill_requirement_group(self, requirement_group_id, requirements, request_uuid=None):
         params = {

@@ -46,6 +46,7 @@ United Arab Emirates Payroll and End of Service rules.
         'report/report_hr_employee_salary_certificate.xml',
         'views/emiratization_target_views.xml',
         'views/l10n_ae_emiratization_report_views.xml',
+        'data/hr_departure_reason.xml',
         'security/ir.access.csv',
     ],
     'demo': [

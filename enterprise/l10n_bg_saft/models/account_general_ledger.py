@@ -730,6 +730,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             'asset_prepayments': 'Active',
             'equity': 'Passive',
             'equity_unaffected': 'Passive',
+            'equity_retained': 'Passive',
             'liability_payable': 'Passive',
             'liability_credit_card': 'Passive',
             'liability_current': 'Passive',

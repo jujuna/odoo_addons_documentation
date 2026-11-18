@@ -6,7 +6,7 @@ from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install_l10n', 'post_install', '-at_install', 'be_time_rules')
+@tagged('post_install_l10n', 'post_install', '-at_install', 'be_time_rules', 'time_rule_pipeline')
 class TestBeTimeRules(TransactionCase):
     """Verify the Belgian data time rules (night CP302, sunday) tag attendance correctly."""
 

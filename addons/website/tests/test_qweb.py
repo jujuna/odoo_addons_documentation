@@ -8,6 +8,7 @@ from odoo.tests.common import TransactionCase, tagged
 
 from odoo.addons.base.tests.common import TransactionCaseWithUserDemo
 from odoo.addons.http_routing.tests.common import MockRequest
+from odoo.addons.website.tests.common import set_url_code
 
 
 class TestQweb(TransactionCaseWithUserDemo):
@@ -304,6 +305,7 @@ class TestQwebProcessAtt(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        set_url_code(cls.env.ref('base.lang_fr'))
         cls.website = cls.env.ref('base.default_website')
         cls.env['res.lang']._activate_lang('fr_FR')
         cls.website.language_ids = cls.env.ref('base.lang_en') + cls.env.ref('base.lang_fr')
@@ -562,13 +564,19 @@ class TestQwebDataSnippet(TransactionCase):
         # nb_snippets = 156
         first_search = 1  # for key & website
         t_call_snippets = 2  # number of nested t-calls (t-call > view > t-call > other views...)
-        # website blog adds 2 more t-calls
-        if self.env['ir.module.module']._get("website_blog").state == 'installed':
+
+        # website_blog/event/sale add snippets calling s_dynamic_snippet_template
+        # with nested preview data t-calls, which adds 2 levels of nesting.
+        installed_modules = self.env['ir.module.module']._installed()
+        if any(
+            module in installed_modules
+            for module in ('website_blog', 'website_event', 'website_sale')
+        ):
             t_call_snippets += 2
         fetch_snippets = 0  # number of fetches (normally performed with the previous search)
         get_root_view = 1  # determine the root views
-        # website sale adds one more root view
-        if self.env['ir.module.module']._get("website_sale").state == 'installed':
+        # website_sale adds one more root view.
+        if 'website_sale' in installed_modules:
             get_root_view += 1
         combine_views = 3  # Queries performed to execute the read combine
 

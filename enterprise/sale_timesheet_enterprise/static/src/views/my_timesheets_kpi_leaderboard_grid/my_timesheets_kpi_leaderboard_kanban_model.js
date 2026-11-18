@@ -25,13 +25,11 @@ patch(TimesheetGridMyTimesheetsModel.prototype, {
             this.timesheetLeaderboardService.resetLeaderboard();
             return;
         }
-        await this.timesheetKpiService.getKpiData({
-            periodStart: this.navigationInfo.periodStart,
-            kwargs: { context: user.context },
-        });
-        await this.timesheetLeaderboardService.getLeaderboardData({
-            periodStart: this.navigationInfo.periodStart,
-            kwargs: { context: user.context },
-        });
+        const periodStart = this.navigationInfo.periodStart;
+        const kwargs = { context: user.context };
+        await Promise.all([
+            this.timesheetKpiService.getKpiData({ periodStart, kwargs }),
+            this.timesheetLeaderboardService.getLeaderboardData({ periodStart, kwargs }),
+        ]);
     },
 });

@@ -28,6 +28,11 @@
                     }"/>
                 </div>
 
+                <t t-if="this.props.cell.deferral_warning_popup_data?.deferred_accounts_with_warning?.length">
+                    <a type="button" class="px-1" t-on-click="this.showDeferralWarningPopover">
+                        <i class="oi" data-icon="warning"/>
+                    </a>
+                </t>
                 <t t-if="this.props.cell.auditable?.()">
                     <a class="cursor-pointer" t-on-click="() => this.audit()">
                         <t t-component="this.controller.component('AccountReportEllipsis')" t-props="{

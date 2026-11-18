@@ -796,6 +796,31 @@ class TestPlanning(HttpCase, TestCommonPlanning, MockEmail):
         self.assertFalse(open_shift.resource_ids, 'Shift should be back to open state')
         self.assertEqual(open_shift.allocated_hours, 6.0, 'allocated_hours should be preserved at 6.0 after undo')
 
+    def test_auto_plan_open_shifts_with_role_without_resource(self):
+        """
+        Test that a shift whose role nobody has goes to someone with a role, without dropping
+        the resources of the other shifts auto-planned with it.
+        """
+        crane_role, welding_role = self.env['planning.role'].create([{'name': 'Crane'}, {'name': 'Welding'}])
+        crane = self.env['resource.resource'].create({
+            'name': 'Crane',
+            'resource_type': 'material',
+            'role_ids': crane_role.ids,
+        })
+        start, end = datetime(2019, 6, 3, 8, 0), datetime(2019, 6, 3, 10, 0)
+        crane_shift, welding_shift = self.env['planning.slot'].create([
+            {'role_id': role.id, 'start_datetime': start, 'end_datetime': end}
+            for role in (crane_role, welding_role)
+        ])
+
+        self.env['planning.slot'].with_context(
+            default_start_datetime='2019-06-02 22:00:00',
+            default_end_datetime='2019-06-08 22:00:00',
+        ).auto_plan_ids([('id', 'in', (crane_shift + welding_shift).ids)])
+
+        self.assertEqual(crane_shift.resource_ids, crane, 'The material should get the shift of its role')
+        self.assertTrue(welding_shift.resource_ids.role_ids, 'The shift should go to someone with a role')
+
     def test_write_multiple_slots(self):
         """ Test that we can write a resource_ids on multiple slots at once. """
         slots = self.env['planning.slot'].create([
@@ -2303,3 +2328,15 @@ class TestPlanning(HttpCase, TestCommonPlanning, MockEmail):
         self.assertEqual(unscheduled_slot.allocated_hours, 8, 'The slot should be reverted to its previous state with 8 allocated hours after undoing the action')
         self.assertFalse(unscheduled_slot.resource_ids, 'The slot should be reverted to its previous state with no resources assigned')
         self.assertEqual(unscheduled_slot.company_id, self.env.company, 'The slot should be reverted to its previous state with the current company assigned')
+
+    def test_progress_bar_with_different_env_tz(self):
+        self.employee_bert.tz = 'Europe/Brussels'
+        self.employee_bert.resource_calendar_id = self.flexible_calendar_40_8.id
+
+        self.env.user.tz = 'America/New_York'
+
+        planning_hours_info_1st_week = self.env['planning.slot']._gantt_progress_bar(
+            'resource_ids', self.employee_bert.resource_id.ids, datetime(2026, 10, 18), datetime(2026, 10, 25)
+        )
+
+        self.assertEqual(planning_hours_info_1st_week[self.employee_bert.resource_id.id]['max_value'], 40)

@@ -387,16 +387,26 @@ class VoipCallFlow(models.Model):
             return
         sync_context = {"voip_call_flow_sync": True}
         if records._name == "voip.ivr":
-            records.with_context(
-                **sync_context, voip_skip_pbx_sync=True
-            ).write({
-                "callflow_id": False,
-                **dict.fromkeys(output_fields, False),
-            })
-            records.option_ids.with_context(
-                **sync_context, voip_skip_pbx_sync=True
-            ).write({"destination_ref": False})
-            records._sync_pbx()
+            # A "Play Audio" node's Menu has no life of its own outside that
+            # node (see get_or_create_audio_message_wrapper) -- it isn't even
+            # listed under Configuration > Menus -- so removing the node must
+            # delete it, along with its PBX IVR, instead of leaving it
+            # dangling. A real Menu, on the other hand, is meant to become
+            # available for reuse again.
+            audio_messages = records.filtered("is_audio_message")
+            menus = records - audio_messages
+            if menus:
+                menus.with_context(
+                    **sync_context, voip_skip_pbx_sync=True
+                ).write({
+                    "callflow_id": False,
+                    **dict.fromkeys(output_fields, False),
+                })
+                menus.option_ids.with_context(
+                    **sync_context, voip_skip_pbx_sync=True
+                ).write({"destination_ref": False})
+                menus._sync_pbx()
+            audio_messages.with_context(**sync_context).unlink()
         elif records._name == "voip.time.condition":
             records._release_from_call_flow()
         else:
@@ -428,14 +438,17 @@ class VoipCallFlow(models.Model):
             self._release_output_owning_records(records, output_fields)
 
     def _get_graph_output_records(self):
-        """Return records whose PBX output branches are owned by this graph."""
+        """Return records whose PBX output branches are owned by this graph.
+
+        An archived Call Flow releases its records, so they can be used
+        elsewhere -- except its "Play Audio" Menus: those are part of their
+        node, and follow it whatever the state of the Call Flow.
+        """
         self.ensure_one()
         records_by_model = {
             model_name: self.env[model_name]
             for model_name in CALL_FLOW_OUTPUT_NODE_MODELS.values()
         }
-        if not self.active:
-            return records_by_model
         graph_data = self.graph_data or {}
         nodes = graph_data.get("nodes")
         if not isinstance(nodes, list):
@@ -448,6 +461,8 @@ class VoipCallFlow(models.Model):
             ):
                 continue
             model_name = CALL_FLOW_OUTPUT_NODE_MODELS[node["type"]]
+            if not self.active and model_name != "voip.ivr":
+                continue
             record = node.get("record")
             if (
                 not isinstance(record, dict)
@@ -463,6 +478,10 @@ class VoipCallFlow(models.Model):
                 raise ValidationError(self.env._(
                     "A destination used by the Call Flow no longer exists."
                 ))
+            # Older graphs could select a Play Audio wrapper through "Open
+            # a Menu". Its lifetime depends on the record, not the node type.
+            if not self.active and not destination.is_audio_message:
+                continue
             record_key = (model_name, destination.id)
             if record_key in record_keys:
                 raise ValidationError(self.env._(

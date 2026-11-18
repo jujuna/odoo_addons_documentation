@@ -14,7 +14,7 @@ patch(PartnerList.prototype, {
             super.clickPartner(partner);
             return;
         }
-        const order = this.pos.getOrder();
+        const order = this.props.order || this.pos.getOrder();
         if (order.isToInvoice() && !order.l10n_mx_edi_cfdi_to_public) {
             if (!partner) {
                 this.pos.dialog.add(AlertDialog, {

@@ -108,9 +108,10 @@ class L10nBeDimonaDeclaration(models.Model):
                 declaration.employee_name = full_name
                 continue
             if 'worker' in content and not declaration.employee_id:
+                # The Dimona of the employer are for the employees of all its branches
                 declaration.employee_id = self.env['hr.employee'].with_context(active_test=False).search([
                     ('niss', '=', content['worker']['ssin']),
-                    ('company_id', '=', declaration.company_id.id),
+                    ('company_id', 'child_of', declaration.company_id.id),
                 ], order="active DESC", limit=1)
                 if declaration.employee_id:
                     birth_date = declaration.employee_id.birthday

@@ -3,6 +3,7 @@ import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useEnv } from "@web/owl2/utils";
+import { user } from "@web/core/user";
 
 const cogMenuRegistry = registry.category("cogMenu");
 
@@ -27,10 +28,11 @@ export class RefreshAccountReturns extends Component {
 export const refreshAccountReturns = {
     Component: RefreshAccountReturns,
     groupNumber: 5,
-    isDisplayed: ({ config }) => {
+    isDisplayed: async ({ config }) => {
         return config.actionType === "ir.actions.act_window" &&
         ["kanban"].includes(config.viewType) &&
-        ["account_return_kanban"].includes(config.viewSubType);
+        ["account_return_kanban"].includes(config.viewSubType) &&
+        await user.hasGroup("account.group_account_user");
     },
 };
 

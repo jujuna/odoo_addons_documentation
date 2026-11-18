@@ -120,6 +120,7 @@ class TestHrEmployeeDeparture(TestPayrollCommon):
         payslip = self.env['hr.payslip'].search(action['domain'])
         self.assertEqual(len(payslip), 1, "Should create one FNF payslip")
         self.assertEqual(payslip.employee_id, self.rahul_emp)
+        self.assertEqual(payslip.note, '<p>FNF Settlement - February 2026</p>')
 
     def test_fnf_payslip_batch_register(self):
         """Test FNF payslips are created for multiple Indian departures at once"""
@@ -140,3 +141,4 @@ class TestHrEmployeeDeparture(TestPayrollCommon):
         payslips = self.env['hr.payslip'].search(action['domain'])
         self.assertEqual(len(payslips), 2, "Should create two FNF payslips")
         self.assertEqual(payslips.mapped('employee_id'), self.rahul_emp | self.jethalal_emp)
+        self.assertEqual(set(payslips.mapped('note')), {'<p>FNF Settlement - February 2026</p>'})

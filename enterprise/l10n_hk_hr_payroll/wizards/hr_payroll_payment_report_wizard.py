@@ -16,6 +16,8 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
                 ('l10n_hk_boc', 'Bank of China iGTB (KC05 - Payment Type)'),
                 ('l10n_hk_boc_non_payment', 'Bank of China iGTB (KC05 - Non-Payment Type)'),
                 ('l10n_hk_bea_csv', 'Bank Of East Asia (CSV)'),
+                ('l10n_hk_citi_autopay', 'Citibank (Autopay)'),
+                ('l10n_hk_citi_autopay_payroll', 'Citibank (Autopay Payroll)'),
             ])
         return selection
 

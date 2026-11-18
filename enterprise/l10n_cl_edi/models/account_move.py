@@ -1261,7 +1261,10 @@ services reception has been received as well.
         if invoice_date_due is not None:
             vals['invoice_date_due'] = fields.Date.from_string(invoice_date_due)
 
-        currency_name = xml_tree.findtext('.//ns0:Moneda', namespaces=XML_NAMESPACES) or 'CLP'
+        currency_name = (
+            xml_tree.find('.//ns0:Encabezado/ns0:OtraMoneda', namespaces=XML_NAMESPACES) is not None
+            and xml_tree.findtext('.//ns0:Moneda', namespaces=XML_NAMESPACES)
+        ) or 'CLP'
         if currency_name.isnumeric():
             currency_name = CURRENCY_CODES.get(currency_name)
         if currency := self.env['res.currency'].with_context(active_test=False).search([('name', '=', currency_name)]):

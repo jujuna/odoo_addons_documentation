@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t
+        t-name="l10n_be_hr_payroll.PaidTimeOffTooltipField"
+        t-inherit="web.FloatField"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//span" position="attributes">
+            <attribute name="t-on-click">this.onClick</attribute>
+            <attribute name="class" add="text-info" separator=" "/>
+        </xpath>
+    </t>
+
+    <t t-name="l10n_be_hr_payroll.PaidTimeOffPopover">
+      <div class="p-3 small">
+          <t t-set="details" t-value="this.props.details"/>
+
+          <div class="fw-bold">Earned from time worked</div>
+          <div t-out="details.worked"/>
+          <ul class="list-unstyled ms-3 mb-2" t-if="details.periods.length">
+              <li t-foreach="details.periods" t-as="period" t-key="period_index">
+                  <span t-out="period.start"/> - <span t-out="period.end"/>,
+                  <span class="text-muted" t-out="period.calendar"/>:
+                  <span t-out="period.hours"/> hours
+              </li>
+          </ul>
+
+          <t t-if="details.attest">
+              <div class="fw-bold">Holiday attest</div>
+              <div class="mb-2"><t t-out="details.attest"/> days</div>
+          </t>
+
+          <t t-if="details.scheduleChange">
+              <div class="fw-bold">Working schedule change</div>
+              <div class="mb-2">
+                  <t t-out="details.scheduleChange.from"/>
+                  <span class="mx-1" aria-hidden="true">→</span>
+                  <t t-out="details.scheduleChange.to"/>
+              </div>
+              <div class="fw-bold">Allocation proration</div>
+              <div>
+                  <t t-out="details.scheduleChange.before"/>
+                  <span class="mx-1" aria-hidden="true">→</span>
+                  <t t-out="details.scheduleChange.after"/>
+              </div>
+          </t>
+      </div>
+  </t>
+
+</templates>

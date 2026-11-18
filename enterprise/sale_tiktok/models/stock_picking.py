@@ -32,11 +32,13 @@ class StockPicking(models.Model):
 
     def action_tiktok_ship_order(self):
         self.ensure_one()
-        if not (
-            self.tiktok_order_ref
-            and self.tiktok_packing_ref
-            and self.tiktok_delivery_status == "draft"
-        ):
+        if not self.tiktok_order_ref:
+            raise UserError(_("This picking is not linked to a TikTok order."))
+        if not self.tiktok_packing_ref:
+            self._refresh_tiktok_order()
+        if not self.tiktok_packing_ref:
+            raise UserError(_("This order has no TikTok package yet. Please try again later."))
+        if self.tiktok_delivery_status != "draft":
             raise UserError(_("The collection of this order was already scheduled."))
 
         wizard = self.env["tiktok.picking.ship.wizard"].create({"picking_id": self.id})
@@ -114,7 +116,9 @@ class StockPicking(models.Model):
 
             picking_to_label = picking_batch.filtered(
                 lambda p: (
-                    p.tiktok_delivery_status == "confirmed" and not p.tiktok_label_attachment_id
+                    p.tiktok_delivery_status == "confirmed"
+                    and p.tiktok_packing_ref
+                    and not p.tiktok_label_attachment_id
                 )
             )
             for picking in picking_to_label:
@@ -186,6 +190,36 @@ class StockPicking(models.Model):
                     link=label_url,
                 ),
             )
+
+    def _refresh_tiktok_order(self):
+        """Fetch the TikTok order linked to this picking and update its sale order with it.
+
+        :raise UserError: If the order detail could not be fetched from TikTok Shop
+        """
+        self.ensure_one()
+        shop = self.sale_id.tiktok_shop_id
+        if not shop:
+            return
+        try:
+            orders_detail = shop._fetch_orders_detail([self.tiktok_order_ref])
+        except utils.TikTokRateLimitError as error:
+            _logger.info(
+                "Rate limit reached while fetching TikTok order %(ref)s for TikTok Shop with"
+                " id %(shop)s. Operation: %(error_operation)s",
+                {"ref": self.tiktok_order_ref, "shop": shop.id, "error_operation": error.operation},
+            )
+            raise UserError(_("TikTok API rate limit reached. Please try again later."))
+        except utils.TikTokApiError as error:
+            raise UserError(
+                _(
+                    "Failed to fetch the detail of TikTok order %(ref)s: %(error)s",
+                    ref=self.tiktok_order_ref,
+                    error=error,
+                )
+            ) from error
+        for order_detail in orders_detail:
+            if order_detail["id"] == self.tiktok_order_ref:
+                shop._update_order_from_data(self.sale_id, order_detail)
 
     def _ship_tiktok_order(self, time_period):
         self.ensure_one()

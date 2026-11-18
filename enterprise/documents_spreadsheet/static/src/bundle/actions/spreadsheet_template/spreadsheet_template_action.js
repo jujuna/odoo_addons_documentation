@@ -25,7 +25,7 @@ export class SpreadsheetTemplateAction extends AbstractSpreadsheetAction {
         const data = {
             name: _t("Untitled spreadsheet template"),
         };
-        const id = await this.orm.create("spreadsheet.template", [data]);
+        const [id] = await this.orm.create("spreadsheet.template", [data]);
         this._openSpreadsheet(id);
         return id;
     }

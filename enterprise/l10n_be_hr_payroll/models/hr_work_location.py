@@ -66,6 +66,14 @@ class HrWorkLocation(models.Model):
             else:
                 location.payslip_language_domain = "[('code', 'in', ['fr_BE', 'nl_BE', 'de_DE'])]"
 
+    def _l10n_be_get_competence_lang(self):
+        """ The legal language of the payslips of a location without payslip language: the language of its
+        language region, French in Brussels (where the payslips of the employees speaking Dutch are in Dutch,
+        see `hr.payslip._get_payslips_pdf_lang`). Only an active language is returned.
+        """
+        code = {'fl': 'nl_BE', 'wa': 'fr_BE', 'cg': 'de_DE', 'br': 'fr_BE'}.get(self[:1].competence)
+        return code if code and self.env['res.lang']._lang_get(code) else False
+
     @api.onchange('competence')
     def _onchange_competence_set_payslip_language(self):
         for location in self:
@@ -81,7 +89,11 @@ class HrWorkLocation(models.Model):
     @api.onchange('address_id')
     def _onchange_l10n_be_working_address_competence(self):
         for location in self:
-            city = location.address_id.city_id or self.env['res.city'].search([('name', '=', location.address_id.city), ('zipcode', '=', location.address_id.zip)])
+            city = location.address_id.city_id or self.env['res.city'].search([
+                ('name', '=', location.address_id.city),
+                ('zipcode', '=', location.address_id.zip),
+                ('country_id.code', '=', 'BE'),
+            ], limit=1)
             match city.l10n_be_language:
                 case 'N':
                     location.competence = 'fl'
@@ -99,7 +111,8 @@ class HrWorkLocation(models.Model):
         return lang_fr, lang_nl, lang_de
 
     def _get_hr_versions_to_recompute(self):
-        partner_ids = self.address_id.ids
+        dmfa_units = self.filtered(lambda location: location.location_type == 'dmfa_unit')
+        partner_ids = dmfa_units.address_id.ids
         if not partner_ids:
             return self.env['hr.version']
 
@@ -127,22 +140,18 @@ class HrWorkLocation(models.Model):
     def create(self, vals_list):
         locations = super().create(vals_list)
         locations._activate_language()
-        for location in locations:
-            versions = location._get_hr_versions_to_recompute()
-            versions.l10n_be_location_unit = location
-
+        # the location unit is a payroll field, recomputed whoever edits the work locations
+        locations._get_hr_versions_to_recompute().sudo()._compute_l10n_be_location_unit()
         return locations
 
     def write(self, vals):
-        versions_before = self._get_hr_versions_to_recompute()
+        recompute_versions = any(field in vals for field in ('address_id', 'location_type', 'company_id'))
+        if recompute_versions:
+            versions_before = self.env['hr.version'].sudo().search([('l10n_be_location_unit', 'in', self.ids)])
         res = super().write(vals)
         self._activate_language()
-        if 'address_id' in vals:
-            versions_before.l10n_be_location_unit = False
-            for record in self:
-                versions_after = record._get_hr_versions_to_recompute()
-                versions_after.l10n_be_location_unit = record
-
+        if recompute_versions:
+            (versions_before | self._get_hr_versions_to_recompute().sudo())._compute_l10n_be_location_unit()
         return res
 
     def action_view_employees_from_establishment_unit(self):
@@ -160,7 +169,8 @@ class HrWorkLocation(models.Model):
     def _activate_language(self):
         for language in self.payslip_language_id:
             if not language.active:
-                self.env['base.language.install'].create({'lang_ids': [(6, 0, language.ids)]}).lang_install()
+                # only the administrators can install a language, but the payslips of the unit need it
+                self.env['base.language.install'].sudo().create({'lang_ids': [(6, 0, language.ids)]}).lang_install()
 
     def _auto_init(self):
         res = super()._auto_init()

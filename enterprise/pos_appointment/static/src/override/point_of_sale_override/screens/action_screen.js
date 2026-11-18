@@ -10,6 +10,9 @@ patch(ActionScreen.prototype, {
 
         useEffect(() => {
             if (this.props.actionName === "manage-booking") {
+                if (!this.pos.verifyBooking()) {
+                    return;
+                }
                 this.pos.data
                     .call("calendar.event", "action_open_booking_gantt_view", [false], {
                         context: {

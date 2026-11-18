@@ -10,6 +10,7 @@ class OnssPaymentWarning extends Component {
 
     props = useProps({
         action: t.object(),
+        close: t.function(),
     });
 
     setup() {

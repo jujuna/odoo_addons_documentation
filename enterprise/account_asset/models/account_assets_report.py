@@ -476,14 +476,11 @@ class AccountAssetReportHandler(models.AbstractModel):
             case 'linear':
                 multiplier = 12 if asset_method_period == '1' else 1
                 rate = (100.0 * multiplier / asset_method_number) if asset_method_number else 0.0
-                period_suffix = ' p.a.'
             case 'degressive':
                 rate = 100.0 * asset_method_progress_factor
-                period_suffix = ' p.a.'
             case _:
                 rate = 0.0
-                period_suffix = ''
-        return f'{rate:.2f} %{period_suffix}'
+        return f'{rate:.2f} %'
 
     def open_discrepancy_assets(self, options, params=None):
         ''' Open the list of assets whose account do not match with the account of the related move line '''

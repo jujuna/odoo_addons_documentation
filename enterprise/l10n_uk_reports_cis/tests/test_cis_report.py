@@ -1,5 +1,7 @@
+from freezegun import freeze_time
+
 from odoo.tests import tagged
-from odoo.fields import Command
+from odoo.fields import Command, Date
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -396,3 +398,31 @@ class TestCisReport(TestAccountReportsCommon):
             options = self._generate_options(self.report, date_from, date_to)
             self.report._get_lines(options, None, warnings)
             self.assertEqual('l10n_uk_reports_cis.warning_cis_unregistered_partner' in warnings, expect_warning)
+
+    def test_cash_basis_returns_generated_on_the_payment_periods(self):
+        """
+        Test that the CIS returns are generated, and their checks computed, on the periods the bills are paid in.
+        """
+        if 'account_reports_cash_basis' not in self.env['ir.module.module']._installed():
+            self.skipTest("Account Reports Cash Basis module is not installed")
+        partner = self.env['res.partner'].create({
+            'name': 'Lumber Inc',
+            'is_company': True,
+        })
+        invoice = self.create_invoice_and_post(partner, '2009-04-18', [(3000, True)])
+        self.pay_invoice(invoice, '2009-06-10')
+        self.env['ir.config_parameter'].set_bool('l10n_uk_reports_cis.cash_basis', True)
+
+        cis_return_type = self.env.ref('l10n_uk_reports_cis.uk_cis_tax_return_type')
+        bill_period = cis_return_type._get_period_boundaries(self.env.company, Date.to_date('2009-04-18'))
+        payment_period = cis_return_type._get_period_boundaries(self.env.company, Date.to_date('2009-06-10'))
+        with freeze_time('2009-06-15'):
+            self.env['account.return.type']._generate_all_returns('GB', self.env.company)
+        cis_returns = self.env['account.return'].search([('type_id', '=', cis_return_type.id)])
+        self.assertEqual([(r.date_from, r.date_to) for r in cis_returns], [payment_period])
+
+        cis_return_type._try_create_return_for_period(bill_period[0], self.env.company, None)
+        for (date_from, _date_to), expected_result in ((bill_period, 'reviewed'), (payment_period, 'anomaly')):
+            cis_return = self.env['account.return'].search([('type_id', '=', cis_return_type.id), ('date_from', '=', date_from)])
+            checks = {check['code']: check for check in cis_return._run_cis_checks(set())}
+            self.assertEqual(checks['check_cis_unregistered_partners']['result'], expected_result)

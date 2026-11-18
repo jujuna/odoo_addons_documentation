@@ -83,7 +83,7 @@ class L10nBeFetchDimonaSandbox(models.TransientModel):
                         "dimonaIn": {
                             "features": {
                                 "workerType": "OTH",
-                                "jointCommissionNumber": "100"
+                                "jointCommissionNumber": "XXX"
                             },
                             "startDate": "2025-09-26"
                         },
@@ -248,6 +248,3 @@ class L10nBeFetchDimonaSandbox(models.TransientModel):
             counter += 1
 
         return unique_id
-
-    def action_open_fetch_dimona_sandbox(self):
-        return self.env.ref('test_l10n_be_hr_payroll_account.l10n_be_fetch_dimona_sandbox_action').read()[0]

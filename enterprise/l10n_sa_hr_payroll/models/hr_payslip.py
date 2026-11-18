@@ -187,6 +187,7 @@ class HrPayslip(models.Model):
             ('state', '=', 'approved'),
             ('action_type', '=', 'deduction'),
             ('payslip_id', 'in', [False, self.id]),
+            ('date', '<=', self.date_to),
         ])
 
     def _l10n_sa_has_disciplinary_action(self):

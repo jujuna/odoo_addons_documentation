@@ -108,7 +108,6 @@ class AccountMove(models.Model):
     l10n_ec_withhold_type = fields.Selection(related='journal_id.l10n_ec_withhold_type')
     l10n_ec_withhold_date = fields.Date(
         string="Withhold Date",
-        readonly=True,
         copy=False,
     )
     # Technical field to show/hide "ADD WITHHOLD" button
@@ -609,6 +608,7 @@ class AccountMove(models.Model):
             payment_vals = {
                 'payment_code': self.l10n_ec_sri_payment_id.code,
                 'payment_total': abs(line.balance),
+                'payment_total_currency': abs(line.amount_currency),
             }
             payment_vals.update({
                 'payment_term': max(((line.date_maturity or self.invoice_date) - self.invoice_date).days, 0) if self.invoice_date else 0,
@@ -922,7 +922,9 @@ class AccountMove(models.Model):
         emission = '1'  # corresponds to "normal" emission, "contingencia" no longer supported
 
         if not (document_code_sri and company.partner_id.vat and environment
-                and serie and sequential and num_filler and emission):
+                and serie and sequential and num_filler and emission
+                and len(company.partner_id.vat) == 13
+                and company.partner_id.vat.isdecimal()):
             return ''
 
         now_date = (self.l10n_ec_withhold_date if self._l10n_ec_is_withholding() else self.invoice_date).strftime('%d%m%Y')
@@ -1272,6 +1274,7 @@ class AccountMoveLine(models.Model):
         return {
             'price_discount': float_round(results['price_discount'] * currency_rate, precision_digits=6),
             'price_unit': float_round(price_unit * currency_rate, precision_digits=6),
+            'price_unit_currency': float_round(price_unit, precision_digits=6),
         }
 
     def _compute_totals(self):

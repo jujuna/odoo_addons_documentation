@@ -181,7 +181,7 @@ class CustomerPortal(portal.CustomerPortal):
         if not ticket_sudo.team_id.allow_portal_ticket_closing:
             raise UserError(_("The team does not allow ticket closing through portal"))
 
-        if not ticket_sudo.closed_by_partner and request.httprequest.method == 'GET':
+        if not ticket_sudo.closed_by_partner and request.httprequest.method == 'POST':
             closing_stage = ticket_sudo.team_id._get_closing_stage()
             if ticket_sudo.stage_id != closing_stage:
                 ticket_vals = {'stage_id': closing_stage[0].id, 'closed_by_partner': True}
@@ -205,5 +205,6 @@ class CustomerPortal(portal.CustomerPortal):
                 subtype_xmlid='mail.mt_note',
                 author_id=author_id
             )
+            return request.redirect('/my/ticket/%s/%s?ticket_closed=1' % (ticket_id, access_token or ''))
 
-        return request.redirect('/my/ticket/%s/%s?ticket_closed=1' % (ticket_id, access_token or ''))
+        return request.redirect('/my/ticket/%s/%s' % (ticket_id, access_token or ''))

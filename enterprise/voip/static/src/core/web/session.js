@@ -26,6 +26,13 @@ export class Session {
     transferTarget;
     /** @type {?{ countryName: string, flagUrl: string, formatted: string, number: string }} */
     outboundNumber = null;
+    /**
+     * The remote party the PBX last asserted (P-Asserted-Identity), once the
+     * call shows it.
+     *
+     * @type {string|undefined}
+     */
+    _connectedNumber;
     /** @type {boolean} */
     _isMuted = false;
     /** @type {boolean} */
@@ -120,6 +127,7 @@ export class Session {
 
         this.__sipJsSession.delegate = {
             onCancel: (response) => this._onCancel(response),
+            onInvite: (request, response, statusCode) => this._onReinvite(request, statusCode),
             onSessionDescriptionHandler: this._onSessionDescriptionHandler.bind(this),
         };
         this.__sipJsSession.stateChange.addListener((state) => this._onStateChanged(state));
@@ -437,10 +445,49 @@ export class Session {
     }
 
     /**
+     * A re-INVITE may carry a new connected line, e.g. once an attended
+     * transfer bridges this call to the transferred party: the call must then
+     * show that party instead of the transferring colleague.
+     *
+     * Only an accepted re-INVITE (statusCode 200) means the call now goes to
+     * that party. One announcing the same party, such as a hold, changes
+     * nothing.
+     *
+     * @param {SIP.IncomingRequestMessage} request
+     * @param {number} statusCode
+     */
+    async _onReinvite(request, statusCode) {
+        const number = this._getConnectedNumber(request);
+        if (statusCode !== 200 || !number || number === this._connectedNumber) {
+            return;
+        }
+        await this.call.updatePhoneNumber(number);
+        // Only once the server answered: a failed update stays retryable.
+        this._connectedNumber = number;
+    }
+
+    /**
+     * The remote party a request announces: P-Asserted-Identity, or else
+     * Remote-Party-ID, which PBXs configured with send_rpid (e.g. Axivox) send
+     * instead. SIP.js only reads the former (`assertedIdentity`).
+     *
+     * @param {SIP.IncomingRequestMessage|SIP.OutgoingRequestMessage|undefined} request
+     * @returns {string|undefined}
+     */
+    _getConnectedNumber(request) {
+        const header =
+            request?.getHeader("P-Asserted-Identity") || request?.getHeader("Remote-Party-ID");
+        return header ? SIP.Grammar.nameAddrHeaderParse(header)?.uri.user : undefined;
+    }
+
+    /**
      * Triggered when the state of the SIP.js session changes to Established.
      */
     _onSessionEstablished() {
         this._wasEstablished = true;
+        this._connectedNumber =
+            this.__sipJsSession.assertedIdentity?.uri.user ??
+            this._getConnectedNumber(this.__sipJsSession.request);
 
         if (this._isOnHold) {
             this._requestHold(true);

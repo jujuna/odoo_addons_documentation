@@ -183,11 +183,10 @@ class HelpdeskTeam(models.Model):
             team.unassigned_tickets = mapped_data.get(team.id, 0)
 
     def _compute_ticket_closed(self):
-        dt = datetime.datetime.combine(datetime.date.today() - relativedelta.relativedelta(days=6), datetime.time.min)
         ticket_data = self.env['helpdesk.ticket']._read_group([
             ('team_id', 'in', self.ids),
             ('stage_id.fold', '=', True),
-            ('close_date', '>=', dt),
+            ('close_date', '>=', 'today -7d'),
             ('close_date', '<', 'today')],
             ['team_id'], ['__count'])
         mapped_data = {team.id: count for team, count in ticket_data}
@@ -195,11 +194,12 @@ class HelpdeskTeam(models.Model):
             team.ticket_closed = mapped_data.get(team.id, 0)
 
     def _compute_success_rate(self):
-        dt = datetime.datetime.combine(datetime.date.today() - relativedelta.relativedelta(days=6), datetime.time.min)
         sla_teams = self.filtered('use_sla')
         domain = [
             ('team_id', 'in', sla_teams.ids),
-            '&', ('stage_id.fold', '=', True), ('close_date', '>=', dt)
+            ('stage_id.fold', '=', True),
+            ('close_date', '>=', 'today -7d'),
+            ('close_date', '<', 'today'),
         ]
         sla_tickets_and_failed_tickets_per_team = defaultdict(lambda: [0, 0])
         today = fields.Datetime.now()
@@ -748,8 +748,8 @@ class HelpdeskTeam(models.Model):
         """
         Get common parameters for ticket-related actions.
 
-        :param bool is_ticket_closed: If ``True``, include tickets closed in the
-            last 7 days.
+        :param bool is_ticket_closed: If ``True``, restrict to the tickets closed
+            in the 7 days before today.
         :returns: A dictionary of parameters to update in the action.
         :rtype: dict
         """
@@ -761,7 +761,7 @@ class HelpdeskTeam(models.Model):
         }
         view_mode = 'list,kanban,form,activity,pivot,graph,cohort'
         if is_ticket_closed:
-            domain &= Domain('close_date', '>=', self._local_midnight_as_utc() - datetime.timedelta(days=6))
+            domain &= Domain('close_date', '>=', 'today -7d') & Domain('close_date', '<', 'today')
             context.update(search_default_closed_on='custom_closed_on_last_7_days')
         return {
             'domain': domain,

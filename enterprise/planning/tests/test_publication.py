@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from .common import TestCommonPlanning
+from odoo import Command
 from odoo.tests import tagged
 
 from odoo.addons.mail.tests.common import MailCase
@@ -60,3 +61,31 @@ class TestPlanningPublishing(TestCommonPlanning, MailCase):
         self.shift.action_send()
         shift_mails = set(Mails.search([])) ^ set(before_mails)
         self.assertEqual(len(shift_mails), 0, 'no mail should be sent when the employee has no work email')
+
+    def test_send_shift_without_hr_rights(self):
+        self.assertFalse(self.planning_manager_user.has_group("hr.group_hr_user"))
+        with self.mock_mail_gateway():
+            self.shift.with_user(self.planning_manager_user).action_send()
+        self.assertEqual(self._new_mails.mapped("email_to"), ["joseph@a.be"])
+
+    def test_reassign_published_shift_without_hr_rights(self):
+        self.shift.resource_ids |= self.resource_bert
+        self.shift.action_send()
+        self.assertFalse(self.planning_manager_user.has_group('hr.group_hr_user'))
+        with self.mock_mail_gateway():
+            self.shift.with_user(self.planning_manager_user).write({
+                'resource_ids': [Command.set((self.resource_bert | self.resource_janice).ids)],
+            })
+        self.assertEqual(self._new_mails.mapped('email_to'), ['joseph@a.be'])
+        self.assertIn('joseph', self._new_mails.body_html)
+        self.assertIn('janice', self._new_mails.body_html)
+
+    def test_reassign_published_shift_mail_subject(self):
+        self.shift.action_send()
+        with self.mock_mail_gateway():
+            self.shift.resource_ids = self.resource_bert
+        self.assertEqual(len(self._new_mails), 1)
+        self.assertEqual(
+            self._new_mails.subject,
+            "Your shift on 06/06/2019 08:00 AM was re-assigned to bert",
+        )

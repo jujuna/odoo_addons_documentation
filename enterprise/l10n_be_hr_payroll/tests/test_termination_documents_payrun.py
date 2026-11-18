@@ -1,8 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from unittest.mock import patch
 
 from odoo.tests import tagged
+from odoo.addons.l10n_be_hr_payroll.models.hr_employee_departure import HrEmployeeDeparture
 from .common import TestPayrollCommon
 
 
@@ -19,11 +21,11 @@ class TestTerminationDocumentsPayrun(TestPayrollCommon):
             + cls.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays')
         )
 
-    def _create_departure(self, employee, departure_date):
+    def _create_departure(self, employee, departure_date, reason='hr.departure_fired'):
         departure = self.env['hr.employee.departure'].create({
             'employee_id': employee.id,
             'dismissal_date': departure_date,
-            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'departure_reason_id': self.env.ref(reason).id,
             'l10n_be_notice_respect': 'without',
             'departure_description': 'Test',
         })
@@ -73,3 +75,105 @@ class TestTerminationDocumentsPayrun(TestPayrollCommon):
             ]),
             len(generated_payslips),
             "Validating the main payslip afterwards should not regenerate or duplicate the termination documents.")
+
+    def test_no_termination_fees_on_resignation_without_notice(self):
+        """ The notice indemnity is owed by the party ending the contract without notice: an employee who
+        resigns without working his notice doesn't get termination fees from the employer. """
+        employee = self.create_employee({
+            'name': 'Resignation Without Notice',
+            'wage': 3000.0,
+            'contract_date_start': date(2016, 1, 1),
+        })
+        departure = self._create_departure(employee, date(2026, 6, 15), reason='hr.departure_resigned')
+        self.assertTrue(departure.l10n_be_notice_duration_week_after_2014)
+
+        payrun = self.env['hr.payslip.run'].create({
+            'name': 'June 2026',
+            'date_start': date(2026, 6, 1),
+            'date_end': date(2026, 6, 30),
+            'company_id': self.belgian_company.id,
+            'structure_id': self.be_monthly_structure.id,
+            'version_ids': [(6, 0, employee.version_id.ids)],
+        })
+        payrun._generate_payslips()
+
+        self.assertTrue(departure.l10n_be_termination_documents_generated)
+        self.assertFalse(self.env['hr.payslip'].search_count([
+            ('employee_id', '=', employee.id),
+            ('struct_id', '=', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees').id),
+        ]))
+
+    def test_add_missing_employee_to_holiday_attest_payrun(self):
+        """ Adding a missing employee to a holiday attest payrun only generates his payslips,
+        not those of the other employees of the payrun. """
+        employees = self.env['hr.employee']
+        for name in ('Attest Missing', 'Attest Other'):
+            employee = self.create_employee({
+                'name': name,
+                'wage': 3000.0,
+                'contract_date_start': date(2020, 1, 1),
+            })
+            self._create_departure(employee, date(2026, 6, 15))
+            employees |= employee
+        payrun = self.env['hr.payslip.run'].create({
+            'name': 'Holiday Attests',
+            'date_start': date(2026, 6, 1),
+            'date_end': date(2026, 6, 30),
+            'company_id': self.belgian_company.id,
+            'structure_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays').id,
+            'version_ids': [(6, 0, employees.version_id.ids)],
+        })
+
+        generated_for = []
+
+        def _generate_termination_holidays(departures, payrun_id=False):
+            generated_for.append(departures.employee_id)
+            return self.env['hr.payslip']
+
+        with patch.object(HrEmployeeDeparture, '_generate_termination_holidays', _generate_termination_holidays):
+            payrun._generate_payslips(versions=employees[0].version_id)
+        self.assertEqual(generated_for, [employees[0]])
+
+    def test_validating_last_payslip_refreshes_holiday_attest_gross_reference(self):
+        """
+        The holiday attests generated with the payrun are computed while the departure-month
+        payslips are still drafts. Validating those payslips together must add each one's
+        remuneration to the gross reference of its employee's N holiday attest.
+        """
+        employees = self.env["hr.employee"]
+        for name, wage in (("Gross Reference Refresh A", 3000.0), ("Gross Reference Refresh B", 4000.0)):
+            employees |= self.create_employee({
+                "name": name,
+                "wage": wage,
+                "contract_date_start": date(2020, 1, 1),
+            })
+        departures = self._create_departure(employees[0], date(2026, 6, 10)) | self._create_departure(employees[1], date(2026, 6, 19))
+
+        payrun = self.env["hr.payslip.run"].create({
+            "name": "June 2026",
+            "date_start": date(2026, 6, 1),
+            "date_end": date(2026, 6, 30),
+            "company_id": self.belgian_company.id,
+            "structure_id": self.be_monthly_structure.id,
+            "version_ids": [(6, 0, employees.version_id.ids)],
+        })
+        payrun._generate_payslips()
+
+        struct_n = self.env.ref("l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays")
+        holiday_attests = payrun.slip_ids.filtered(lambda p: p.struct_id == struct_n)
+        main_payslips = payrun.slip_ids.filtered(lambda p: p.struct_id == self.be_monthly_structure)
+        self.assertEqual(len(holiday_attests), 2)
+        self.assertEqual(len(main_payslips), 2)
+        gross_ref_before = {attest: attest._get_input_line_amount("GROSS_REF") for attest in holiday_attests}
+
+        main_payslips.action_validate()
+
+        for departure in departures:
+            holiday_attest = holiday_attests.filtered(lambda p: p.employee_id == departure.employee_id)
+            gross_ref_after = holiday_attest._get_input_line_amount("GROSS_REF")
+            self.assertGreater(
+                gross_ref_after,
+                gross_ref_before[holiday_attest],
+                "The departure-month remuneration should be added to the gross reference once validated.",
+            )
+            self.assertAlmostEqual(gross_ref_after, departure.l10n_be_gross_reference_remuneration_n, places=2)

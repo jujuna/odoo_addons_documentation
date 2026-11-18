@@ -320,7 +320,7 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
             ]
         })
         move_2021_03.action_post()
-        fecha_mod_bal = fields.Date.to_date(fields.Date.today())
+        fecha_mod_bal = self.env.cr.now().date()
         expected_sat_xml = (
             """<?xml version='1.0' encoding='utf-8'?>
         <BCE:Balanza xmlns:BCE="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion/BalanzaComprobacion_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" TipoEnvio="C" FechaModBal="%s" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
@@ -368,6 +368,77 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
         options['l10n_mx_sat_ignore_errors'] = True
         with self.assertRaises(RedirectWarning):
             self.env[self.report.custom_handler_model_name].action_l10n_mx_generate_coa_sat_xml(options)
+
+    def test_generate_coa_xml_with_account_without_code(self):
+        """ An account without a code, used as a parent to group accounts, is left out of report
+        """
+        account_without_code = self.env['account.account'].create({
+            'name': 'Wages and Salaries',
+            'account_type': 'expense',
+        })
+        self.company_data['default_account_expense'].parent_id = account_without_code
+        self.assertFalse(account_without_code.l10n_mx_is_sat_exportable)
+
+        options = self._generate_options(self.report, '2021-01-01', '2021-12-31')
+        options['l10n_mx_sat_ignore_errors'] = True
+
+        # 601.84.01 now has the account without code as its only parent, so it becomes a first level account
+        expected_coa_xml = b"""<?xml version='1.0' encoding='utf-8'?>
+        <catalogocuentas:Catalogo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:catalogocuentas="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas/CatalogoCuentas_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
+            <catalogocuentas:Ctas CodAgrup="201" NumCta="201" Desc="Suppliers" Nivel="1" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01" Desc="National suppliers" SubCtaDe="201" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01.01" Desc="National suppliers" SubCtaDe="201.01" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205" NumCta="205" Desc="Short-term sundry creditors" Nivel="1" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06" Desc="Other short-term sundry creditors" SubCtaDe="205" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.01.001" Desc="Extra deep code" SubCtaDe="205.06" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.03" Desc="Dotted name C.V." SubCtaDe="205.06" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="401" NumCta="401" Desc="Income" Nivel="1" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401.01" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84.01" Desc="Other overheads" Nivel="1" Natur="D"/>
+        </catalogocuentas:Catalogo>
+        """
+        with freeze_time(self.frozen_today):
+            coa_report = self.env[self.report.custom_handler_model_name].action_l10n_mx_generate_coa_sat_xml(options)['file_content']
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(coa_report),
+            self.get_xml_tree_from_string(expected_coa_xml),
+        )
+
+    def test_generate_sat_xml_with_account_without_code(self):
+        """ An account without a code, used as a parent to group accounts, is left out of the trial balance report
+        """
+        account_without_code = self.env['account.account'].create({
+            'name': 'Wages and Salaries',
+            'account_type': 'expense',
+        })
+        self.company_data['default_account_expense'].parent_id = account_without_code
+
+        options = self._generate_options(self.report, '2021-01-01', '2021-12-31')
+        options['l10n_mx_sat_ignore_errors'] = True
+
+        # 601 and 601.84 are gone since 601.84.01 now has the account without code as its only parent
+        expected_sat_xml = b"""<?xml version='1.0' encoding='utf-8'?>
+        <BCE:Balanza xmlns:BCE="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion/BalanzaComprobacion_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" TipoEnvio="N" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
+            <BCE:Ctas NumCta="201" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="205" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06.01.001" SaldoIni="0.00" Debe="50.00" Haber="400.00" SaldoFin="350.00"/>
+            <BCE:Ctas NumCta="205.06.03" SaldoIni="0.00" Debe="400.00" Haber="50.00" SaldoFin="-350.00"/>
+            <BCE:Ctas NumCta="401" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="401.01" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="401.01.01" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="601.84.01" SaldoIni="0.00" Debe="250.00" Haber="0.00" SaldoFin="250.00"/>
+        </BCE:Balanza>
+        """
+        with freeze_time(self.frozen_today):
+            sat_report = self.env[self.report.custom_handler_model_name].action_l10n_mx_generate_sat_xml(options)['file_content']
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(sat_report),
+            self.get_xml_tree_from_string(expected_sat_xml),
+        )
 
     def test_mx_trial_balance(self):
         """ This test will test the Mexican Trial Balance (with and without the hierarchy) """

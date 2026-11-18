@@ -141,7 +141,8 @@ class PosOrderReceipt(models.AbstractModel):
             display_price_incl = line.order_id.config_id.iface_tax_included == 'total'
 
             data['qty'] = int(line.qty) if float(line.qty).is_integer() else line.qty
-            data['product_data'] = product_by_id[data['product_id']]
+            product_data = product_by_id[data['product_id']]
+            data['product_data'] = {**product_data, 'display_name': line.full_product_name or product_data['display_name']}
             data['product_uom_name'] = line.product_id.uom_id.name
             display_price = data['price_subtotal_incl'] if display_price_incl else data['price_subtotal']
             data['price_subtotal_incl'] = self._order_receipt_format_currency(display_price)
@@ -297,6 +298,9 @@ class PosOrderReceipt(models.AbstractModel):
                 continue
 
             quantity = orderline.prep_line_ids.quantity - orderline.prep_line_ids.cancelled
+            if self.env.context.get('reprint_preparation_receipt'):
+                quantity = 0
+
             quantity_diff = orderline.qty - quantity
 
             if quantity_diff != 0:
@@ -469,6 +473,7 @@ class PosOrderReceipt(models.AbstractModel):
                     "general_customer_note": _get_str_notes(change.get("general_customer_note")) or False,
                     "employee_name": self.user_id.name,  # PoS HR not needed, this will only be used by self order.
                     "preset_time": self._order_receipt_preset_datetime(),
+                    "customer": self._get_preset_customer_info() if self.preset_id else False,
                 },
                 "conditions": {
                     "module_pos_restaurant": self.config_id.module_pos_restaurant,
@@ -476,6 +481,15 @@ class PosOrderReceipt(models.AbstractModel):
             })
 
         return receipts
+
+    def _get_preset_customer_info(self):
+        partner = self.partner_id
+        info = {
+            "email": self.email or False,
+            "phone": self.mobile or False,
+            "address": partner.contact_address_inline or False,
+        }
+        return info if any(info.values()) else False
 
     def _generate_preparation_output_data(self, line, quantity):
         product = line.product_id

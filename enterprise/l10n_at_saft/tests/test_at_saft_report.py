@@ -25,7 +25,7 @@ class TestAtSaftReportCommon(TestSaftReport):
             'l10n_at_oenace_code': 'OENACE-CODE',
             'l10n_at_profit_assessment_method': 'par_4_abs_1',
         })
-        cls.company_data['company'].partner_id.additional_identifiers = {'AT_EN': 'ATU12345675'}
+        cls.company_data['company'].partner_id.additional_identifiers = {'AT_STEUERNUMMER': '591199013'}
         cls.partner_ceo = cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
             'phone': '+43 512 321 54 00',
@@ -41,8 +41,8 @@ class TestAtSaftReportCommon(TestSaftReport):
             'phone': '+43 01 23 45 11',
         })
 
-        cls.partner_a.additional_identifiers = {'AT_EN': 'ATU10000005'}
-        cls.partner_b.additional_identifiers = {'AT_EN': 'ATU10000014'}
+        cls.partner_a.additional_identifiers = {'AT_EN': 'U12345675'}
+        cls.partner_b.additional_identifiers = {'AT_EN': 'FN345678c', 'AT_STEUERNUMMER': '234567899'}
 
         cls.product_a.default_code = 'PA'
         cls.product_b.default_code = 'PB'

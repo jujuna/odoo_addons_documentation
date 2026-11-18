@@ -60,10 +60,10 @@ const attachmentPatch = {
 
     get documentIcon() {
         return !this.linked_document_id
-            ? "storage"
+            ? "drive_file_move"
             : this.id === this.linked_document_id.attachment_id.id
             ? "link"
-            : "folder";
+            : "folder_check";
     },
 
     get documentHelperText() {

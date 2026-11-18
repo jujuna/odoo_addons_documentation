@@ -1,14 +1,18 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from collections import defaultdict
+from datetime import datetime
 from pprint import pformat
 from random import randrange
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
+from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
+from psycopg2.errors import UniqueViolation
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ConcurrencyError, UserError, ValidationError
 from odoo.fields import Command, Domain
 from odoo.tools import (
     SQL,
@@ -21,6 +25,7 @@ from odoo.tools import (
 )
 
 _logger = logging.getLogger(__name__)
+TRACKING_NUMBER_SEQUENCE_CODE = 'pos.order.tracking.number'
 
 
 class PosOrder(models.Model):
@@ -134,6 +139,25 @@ class PosOrder(models.Model):
 
         self_comp = self.with_company(pos_order.company_id)
         self_comp._process_payment_lines(order, pos_order, pos_session, draft)
+
+        # Lines changed on another device while this one was paying offline: keep the
+        # payments but leave the order draft so the difference can be settled
+        if not draft and existing_order:
+            # The order total comes from the device, it doesn't include the lines added meanwhile by another device
+            total = pos_order.with_context(active_test=False)._get_order_tax_totals()['total_amount_currency']
+            # The frontend and backend may apply the cash rounding differently or drift by a cent
+            tolerance = max(
+                pos_order.config_id.cash_rounding and pos_order.config_id.rounding_method.rounding or 0.0,
+                pos_order.currency_id.rounding,
+            )
+            if pos_order.currency_id.compare_amounts(abs(abs(total) - abs(pos_order.amount_paid)), tolerance) > 0:
+                draft = True
+                pos_order.message_post(body=_(
+                    "The order was validated with a total of %(paid)s, but its lines now amount to %(total)s because they were changed on another device. The order stays open until the difference is settled.",
+                    paid=formatLang(self.env, pos_order.amount_paid, currency_obj=pos_order.currency_id),
+                    total=formatLang(self.env, total, currency_obj=pos_order.currency_id),
+                ))
+
         return pos_order._process_saved_order(draft)
 
     def _process_saved_order(self, draft):
@@ -255,6 +279,51 @@ class PosOrder(models.Model):
             .filtered(lambda m: m.is_valued and m.product_id.valuation == 'real_time' and m.product_id.id == product.id)\
             .sorted(lambda x: x.date)
         return moves._get_price_unit()
+
+    @api.model
+    def _default_tracking_number(self):
+        sequence = self.env['ir.sequence'].sudo().search([
+            ('code', '=', TRACKING_NUMBER_SEQUENCE_CODE),
+            ('company_id', '=', self.env.company.id)
+        ], order='id', limit=1)
+        if not sequence:
+            sequence = self.env['ir.sequence'].sudo().create({
+                'name': 'PoS Order Tracking Number',
+                'implementation': 'standard',
+                'use_date_range': True,
+                'company_id': self.env.company.id,
+                'code': TRACKING_NUMBER_SEQUENCE_CODE,
+            })
+        tz = ZoneInfo(self.env.company.tz or 'UTC')
+        today = datetime.now(tz).date()
+        DateRange = self.env['ir.sequence.date_range'].sudo()
+        in_range = DateRange.search_count([
+            ('sequence_id', '=', sequence.id),
+            ('date_from', '<=', today),
+            ('date_to', '>=', today),
+        ])
+        if not in_range:
+            try:
+                DateRange.create({
+                    'sequence_id': sequence.id,
+                    'date_from': today,
+                    'date_to': today,
+                })
+            except UniqueViolation as e:
+                # Use the retrying mechanism
+                raise ConcurrencyError() from e
+        return sequence._next(sequence_date=today)
+
+    @api.autovacuum
+    def _gc_tracking_number_date_ranges(self):
+        sequence = self.env['ir.sequence'].sudo().search([
+            ('code', '=', TRACKING_NUMBER_SEQUENCE_CODE),
+        ])
+        if sequence.exists():
+            self.env['ir.sequence.date_range'].search([
+                ('sequence_id', 'in', sequence.ids),
+                ('date_to', '<', fields.Date.today() - relativedelta(days=2))
+            ]).unlink()
 
     name = fields.Char(string='Order Ref', required=True, readonly=True, copy=False, default='/')
     date_order = fields.Datetime(string='Date', readonly=True, index=True, default=fields.Datetime.now)
@@ -426,19 +495,18 @@ class PosOrder(models.Model):
 
     def _get_order_tax_totals(self):
         self.ensure_one()
-        self.amount_paid = sum(payment.amount for payment in self.payment_ids)
-        self.amount_return = -sum((payment.amount < 0 and payment.amount) or 0 for payment in self.payment_ids)
         base_lines = self.lines._prepare_base_lines_for_taxes_computation()
         self.env['account.tax']._add_tax_details_in_base_lines(base_lines, self.company_id)
         self.env['account.tax']._round_base_lines_tax_details(base_lines, self.company_id)
 
         cash_rounding = None
-        only_cash = self.config_id.only_round_cash_method
-        available_type = ['cash'] if only_cash else ['cash', 'bank']
+        payment_methods = self.payment_ids
 
-        if self.payment_ids.filtered_domain([
-            ('payment_method_id.type', 'in', available_type),
-        ]):
+        if self.config_id.only_round_cash_method:
+            payment_methods = payment_methods.filtered_domain([
+                ("payment_method_id.type", "in", ["cash"])
+            ])
+        if payment_methods:
             cash_rounding = self.config_id.rounding_method
 
         return self.env['account.tax']._get_tax_totals_summary(
@@ -456,6 +524,8 @@ class PosOrder(models.Model):
             rounding_base_amount_currency = tax_totals.get('cash_rounding_base_amount_currency', 0)
             amount_total = tax_totals['total_amount_currency'] - rounding_base_amount_currency
             refund_factor = -1 if order.is_refund_or_negative() else 1
+            order.amount_paid = sum(payment.amount for payment in order.payment_ids)
+            order.amount_return = -sum((payment.amount < 0 and payment.amount) or 0 for payment in order.payment_ids)
             order.amount_tax = refund_factor * tax_totals['tax_amount_currency']
             order.amount_total = refund_factor * amount_total
             order.amount_difference = order.amount_paid - amount_total
@@ -505,13 +575,14 @@ class PosOrder(models.Model):
         values.setdefault('pricelist_id', session.config_id.pricelist_id.id)
         values.setdefault('fiscal_position_id', session.config_id.default_fiscal_position_id.id)
         values.setdefault('company_id', session.config_id.company_id.id)
+        if 'tracking_number' not in values:
+            values['tracking_number'] = self.with_company(values['company_id'])._default_tracking_number()
         if session.config_id.use_presets and session.config_id.default_preset_id:
             values.setdefault('preset_id', session.config_id.default_preset_id.id)
 
         if not values.get('pos_reference'):
-            reference, tracking_number = session.config_id._get_next_order_refs()
+            reference = session.config_id._get_next_order_refs()[0]
             values['pos_reference'] = reference
-            values['tracking_number'] = tracking_number
 
         if not values.get('sequence_number'):
             self._update_sequence_number(session, values)
@@ -916,7 +987,7 @@ class PosOrder(models.Model):
                 # In theory, this situation is unintended
                 # In practice it can happen when "Tip later" option is used
                 # This will update the order if edited after payent from UI.
-                if existing_order.state == "paid" and not existing_order.nb_print:
+                if existing_order.state == "paid" and not existing_order.nb_print and not existing_order.account_move:
                     self.process_saved_payments(order, existing_order)
                 order_ids.append(existing_order.id)
                 _logger.info("PoS synchronisation #%d order %s sync ignored for existing PoS order %s (state: %s)", sync_token, order_log_name, existing_order, existing_order.state)
@@ -969,7 +1040,7 @@ class PosOrder(models.Model):
 
     def _prepare_refund_values(self, current_session):
         self.ensure_one()
-        pos_reference, tracking_number = current_session.config_id._get_next_order_refs()
+        pos_reference = current_session.config_id._get_next_order_refs()[0]
         return {
             'name': _('%(name)s REFUND', name=self.name),
             'session_id': current_session.id,
@@ -979,7 +1050,6 @@ class PosOrder(models.Model):
             'amount_paid': 0,
             'is_total_cost_computed': False,
             'is_refund': True,
-            'tracking_number': tracking_number,
         }
 
     def _prepare_mail_values(self, email, ticket, basic_ticket):
@@ -1146,10 +1216,9 @@ class PosOrder(models.Model):
                 ('state', '!=', 'draft'),
                 ('is_refund', '=', True),
             ])
-        order_domain = state_domain & Domain(domain) & Domain([
-            ('config_id', 'in', [config_id] + pos_config.trusted_config_ids.ids),
-            ('config_id.currency_id', '=', pos_config.currency_id.id)
-        ])
+        order_domain = state_domain & Domain(domain) & Domain(
+            'config_id.currency_id', '=', pos_config.currency_id.id
+        ) & pos_config._get_paid_orders_config_domain()
         orders = self.search(order_domain, limit=limit, offset=offset, order='create_date desc')
         PosOrderLineModel = self.env['pos.order.line']
         line_queries = [
@@ -1500,6 +1569,14 @@ class PosOrder(models.Model):
             ('display_type', '!=', 'rounding'),
         ])
 
+        # The rounding line computed by account.move on the whole move total must
+        # always be dropped, even when no rounding is needed (e.g. card + cash payments).
+        rounding_line = invoice.line_ids.filtered(
+            lambda line: line.display_type == 'rounding' and not line.tax_line_id,
+        )
+        if rounding_line:
+            line_ids_commands.append(Command.unlink(rounding_line.id))
+
         debit = sum(lines.mapped('debit'))
         credit = sum(lines.mapped('credit'))
         invoice_difference = credit - debit
@@ -1518,12 +1595,6 @@ class PosOrder(models.Model):
         profit = invoice.invoice_cash_rounding_id.loss_account_id
         lost = invoice.invoice_cash_rounding_id.profit_account_id
         account = profit if invoice_difference > 0.0 else lost
-        rounding_line = invoice.line_ids.filtered(
-            lambda line: line.display_type == 'rounding' and not line.tax_line_id,
-        )
-
-        if rounding_line:
-            line_ids_commands.append(Command.unlink(rounding_line.id))
 
         line_ids_commands.append(Command.create({
             'name': invoice.invoice_cash_rounding_id.name,
@@ -1617,6 +1688,8 @@ class PosOrder(models.Model):
     def _generate_pos_order_invoice(self):
         if not self.env['res.company']._with_locked_records(self, allow_raising=False):
             raise UserError(_("Some orders are already being invoiced. Please try again later."))
+        if any(not order.partner_id for order in self):
+            raise UserError(_("A customer is required on the order to create an invoice."))
 
         company = self.company_id
         vals = self._prepare_invoice_vals()
@@ -1666,7 +1739,7 @@ class PosOrder(models.Model):
         # Create rounding line if needed
         data = self._prepare_account_move_line_data_for_rounding(invoice)
         with self.env['account.move']._check_balanced({'records': invoice}):
-            invoice.with_context(linked_to_pos=True).line_ids = data
+            invoice.with_context(linked_to_pos=True, skip_invoice_sync=True).line_ids = data
 
         # Set account_move before _post() so that invoice.pos_order_ids is
         # populated when stock_account computes COGS via _get_cogs_value()

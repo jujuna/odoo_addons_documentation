@@ -8,14 +8,15 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:06+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-04 06:28+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/"
 "account_3way_match/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -50,6 +51,23 @@ msgid ""
 "    - No (The bill cannot be paid, nothing has been delivered yet)\n"
 "    - Exception (Received and invoiced quantities differ)\n"
 msgstr ""
+"\n"
+"จัดการการจับคู่ 3 ทางในใบแจ้งหนี้ของผู้ขาย\n"
+"=====================================\n"
+"\n"
+"ในอุตสาหกรรมการผลิต บุคคลทั่วไปมักได้รับใบแจ้งหนี้จากผู้ขายก่อนที่จะได้รับสินค้าที่สั่งซื้อ แต่พวกเขาไม่ต้"
+"องการจ่ายเงินใบแจ้งหนี้จนกว่าสินค้าจะถูกส่งมอบ\n"
+"\n"
+"วิธีการแก้ไขสถานการณ์นี้คือการสร้างใบแจ้งหนี้ของผู้ขายเมื่อคุณได้รับสินค้าแล้ว (โดยอิงตามปริมาณที่สั่งซื้"
+"อ) แต่จ่ายเงินใบแจ้งหนี้เมื่อปริมาณที่ได้รับ (บน PO lines) ตรงกับใบแจ้งหนี้ของผู้ขายที่บันทึกไว้\n"
+"\n"
+"โมดูลนี้นำเสนอกลไก \"เปิดให้จ่าย\" ซึ่งระบุว่าใบแจ้งหนี้ของแต่ละผู้ขายสามารถจ่ายเงินได้หรือไม่\n"
+"\n"
+"ใบแจ้งหนี้ของแต่ละผู้ขายจะได้รับหนึ่งในสามสถานะต่อไปนี้:\n"
+"\n"
+"    - ใช่ (สามารถจ่ายเงินใบแจ้งหนี้ได้)\n"
+"    - ไม่ (ไม่สามารถจ่ายเงินใบแจ้งหนี้ได้ เนื่องจากยังไม่มีการส่งมอบสินค้า)\n"
+"    - ข้อยกเว้น (ปริมาณที่ได้รับและที่ออกใบแจ้งหนี้แตกต่างกัน)\n"
 
 #. module: account_3way_match
 #: model:ir.model.fields,help:account_3way_match.field_account_bank_statement_line__release_to_pay_manual

@@ -1,4 +1,4 @@
-import { describe, expect, runAllTimers, test } from "@odoo/hoot";
+import { describe, expect, freezeTime, runAllTimers, test } from "@odoo/hoot";
 
 import { Registerer } from "@voip/core/web/registerer";
 import { UserAgent } from "@voip/core/web/user_agent";
@@ -92,6 +92,7 @@ test("register recreates only SIP.js registerers stuck waiting", async () => {
 });
 
 test("attemptReconnection awaits registration rejection before scheduling retry", async () => {
+    freezeTime();
     patchWithCleanup(Math, { random: () => 0 });
     const userAgent = Object.assign(Object.create(UserAgent.prototype), {
         __sipJsUserAgent: {

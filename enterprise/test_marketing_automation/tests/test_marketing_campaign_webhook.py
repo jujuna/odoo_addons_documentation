@@ -1,6 +1,7 @@
 from odoo import Command
 from odoo.exceptions import AccessError
 from odoo.tests import common, tagged, users
+from odoo.tests.common import RecordCapturer
 from odoo.tools import mute_logger
 
 from odoo.addons.test_marketing_automation.tests.common import TestMACommon
@@ -384,17 +385,20 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
             len(target_records),
             'In test mode, no record should be added')
 
-        with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
+        with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'), \
+            RecordCapturer(self.env[self.test_campaign.model_name], []) as record_capture:
             response = self.url_open(self.test_campaign.webhook_url + '/test', json={
                 'create_values': '{"name": "NameName", "description": self.env.user}',
             })
+        self.assertFalse(record_capture.records, "No record should have been created in Test Mode")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('msg'),
             'Create argument is malformed: it should either be a dictionary of values, or a list of dictionaries',
             'In test mode, certain errors should be more explicit')
 
         new_record_name = 'newRecord1'
-        with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
+        with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'), \
+            RecordCapturer(self.env[self.test_campaign.model_name], []) as record_capture:
             response = self.url_open(self.test_campaign.webhook_url + '/test', json={
                 'create_values': {
                     'customer_id': self.user_marketing_automation.partner_id.id,
@@ -403,6 +407,7 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
                     'name': new_record_name,
                 },
             })
+        self.assertFalse(record_capture.records, "No record should have been created in Test Mode")
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get('msg').startswith('Webhook test successful.'))
         self.assertEqual(

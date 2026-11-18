@@ -5,7 +5,8 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="wizard">
                     <t t-call="web.external_layout">
-                        <div class="page">
+                        <t t-set="pdf_sections" t-value="wizard._get_pdf_sections()"/>
+                        <div class="page" t-if="'274.10' in pdf_sections" t-att-style="pdf_sections[0] != '274.10' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -65,7 +66,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="page" style="page-break-before: always">
+                        <div class="page" t-if="'274.13' in pdf_sections" t-att-style="pdf_sections[0] != '274.13' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -125,7 +126,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="page" style="page-break-before: always">
+                        <div class="page" t-if="'274.18' in pdf_sections" t-att-style="pdf_sections[0] != '274.18' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -185,7 +186,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="page" style="page-break-before: always">
+                        <div class="page" t-if="'274.20' in pdf_sections" t-att-style="pdf_sections[0] != '274.20' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -245,7 +246,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="page" style="page-break-before: always">
+                        <div class="page" t-if="'274.30' in pdf_sections" t-att-style="pdf_sections[0] != '274.30' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -316,7 +317,7 @@
                             <t t-set="eh_nature" t-value="eh[0]"/>
                             <t t-set="eh_title" t-value="eh[1]"/>
                             <t t-set="eh_lines" t-value="wizard.line_ids.filtered(lambda l: l.nature_code == eh_nature)"/>
-                            <div class="page" style="page-break-before: always">
+                            <div class="page" t-if="eh_nature in pdf_sections" t-att-style="pdf_sections[0] != eh_nature and 'page-break-before: always'">
                                 <div class="row border">
                                     <div class="col-4 border-end">
                                         <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -397,8 +398,8 @@
                                 </div>
                             </div>
                         </t>
-                        <t t-if="wizard.is_ipa_reduction">
-                        <div class="page" style="page-break-before: always">
+                        <t t-if="'274.56' in pdf_sections">
+                        <div class="page" t-att-style="pdf_sections[0] != '274.56' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -502,8 +503,8 @@
                             </div>
                         </div>
                         </t>
-                        <t t-if="wizard.exemption_sme_status and not wizard.is_cbe_expired">
-                        <div class="page" style="page-break-before: always">
+                        <t t-if="'274.6x' in pdf_sections">
+                        <div class="page" t-att-style="pdf_sections[0] != '274.6x' and 'page-break-before: always'">
                         <div class="row border">
                             <div class="col-4 border-end">
                                 <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -563,7 +564,7 @@
                                     <div class="col-11 offset-1">
                                         <div class="row">
                                             <div class="col-8 fw-bold"></div>
-                                            <div class="col-4 text-end"><span t-out="round(wizard.pp_amount_10, 2)"/></div>
+                                            <div class="col-4 text-end"><span t-out="round(wizard.startup_taxable_amount, 2)"/></div>
                                         </div>
                                     </div>
                                 </div>
@@ -591,8 +592,8 @@
                         </div>
                     </div>
                     </t>
-                    <t t-if="wizard.deducted_amount_62">
-                        <div class="page" style="page-break-before: always">
+                    <t t-if="'274.62' in pdf_sections">
+                        <div class="page" t-att-style="pdf_sections[0] != '274.62' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>
@@ -676,8 +677,8 @@
                             </div>
                         </div>
                     </t>
-                    <t t-if="wizard.deducted_amount_81">
-                        <div class="page" style="page-break-before: always">
+                    <t t-if="'274.81' in pdf_sections">
+                        <div class="page" t-att-style="pdf_sections[0] != '274.81' and 'page-break-before: always'">
                             <div class="row border">
                                 <div class="col-4 border-end">
                                     <strong>Nr.</strong> <span t-out="wizard.id"/>

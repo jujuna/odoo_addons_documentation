@@ -234,7 +234,7 @@ class VoipPhoneServiceEvent(models.Model):
         payload = self.payload
         if not payload.get("user_uuid"):
             return
-        call = self._find_call(payload.get("conversation_id"), payload.get("sip_call_id"))
+        call = self._find_call(payload.get("sip_call_id"))
         if not call or call.state != "ongoing" or self._was_superseded_by("call_updated", ["sip_call_id"]):
             return
         number = payload.get("peer_caller_id_number")
@@ -622,7 +622,7 @@ class VoipPhoneServiceEvent(models.Model):
             # call the device leg tentatively rejected (rejected->ongoing), while
             # start_call on an already-terminated call is a safe no-op.
             return conversation.call_ids
-        return self._find_call(payload.get("conversation_id"), payload.get("sip_call_id"))
+        return self._find_call(payload.get("sip_call_id"))
 
     @api.model
     def _apply_answered(self, calls, occurred_at):
@@ -773,13 +773,17 @@ class VoipPhoneServiceEvent(models.Model):
         ], limit=1))
 
     @api.model
-    def _find_call(self, conversation_id, sip_call_id):
-        if not conversation_id or not sip_call_id:
+    def _find_call(self, sip_call_id):
+        """The call whose leg carries this SIP Call-ID, whatever its conversation.
+
+        An attended transfer moves the target's leg into the customer's
+        conversation, Call-ID unchanged, while the target's call stays in the
+        consultation conversation it was built in: keyed on the conversation
+        too, the leg's later events would no longer reach that call.
+        """
+        if not sip_call_id:
             return self.env["voip.call"]
-        leg = self.env["voip.call.leg"].sudo().search([
-            ("conversation_id.conversation_identifier", "=", conversation_id),
-            ("sip_call_id", "=", sip_call_id),
-        ], limit=1)
+        leg = self.env["voip.call.leg"].sudo().search([("sip_call_id", "=", sip_call_id)], limit=1)
         return leg.voip_call_id
 
     @api.model

@@ -135,7 +135,7 @@ patch(PosStore.prototype, {
             this.env.services.ui.block();
             if (this.isRestaurantCountryGermanyAndFiskaly()) {
                 if (order.uiState.l10n_de_fiskaly_order_tx_uuid && order.isTransactionInactive()) {
-                    await this.fetchTransaction(order);
+                    await this.fetchOrderTransaction(order);
                 }
                 if (order?.uiState?.l10n_de_fiskaly_order_tx_uuid) {
                     await this.cancelOrderTransaction(order);
@@ -149,32 +149,22 @@ patch(PosStore.prototype, {
         }
         return super.handleFiskalyCancellation(order);
     },
-    // fetch transaction from fiskaly in case of multi device to get updated tx_revision
-    async fetchTransaction(order) {
-        const txId = order.uiState.l10n_de_fiskaly_order_tx_uuid;
-        if (!txId) {
-            return;
-        }
-        let token = this.getApiToken();
-        if (!token) {
-            await this._authenticate();
-            token = this.getApiToken();
-        }
-        const response = await fetch(`${this.getApiUrl()}/tss/${this.getTssId()}/tx/${txId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            method: "GET",
-        });
-        if (response.ok) {
-            const result = await response.json();
+    // Fetch the order transaction from Fiskaly in case of multi-device conflict to get the
+    // updated tx_revision.
+    async fetchOrderTransaction(order) {
+        const result = await this._fetchTransaction(order.uiState.l10n_de_fiskaly_order_tx_uuid);
+        if (result) {
             // Sync the revision so subsequent PUT calls use the correct value.
             order.uiState.tx_revision = result.revision + 1;
             if (result.state === "ACTIVE") {
                 order.transactionStarted();
             }
         }
+        return result;
+    },
+    // TODO: remove in master.
+    async fetchTransaction(order) {
+        return this.fetchOrderTransaction(order);
     },
     // update transaction payload to have link with order transaction
     getTransactionPayload(order, state, receiptType = "RECEIPT") {

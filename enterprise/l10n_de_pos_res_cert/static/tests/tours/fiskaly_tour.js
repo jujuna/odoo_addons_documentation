@@ -19,9 +19,7 @@ registry.category("web_tour.tours").add("FiskalyTour", {
             ProductScreen.clickPartnerButton(),
             ProductScreen.clickCustomer("AA Test Partner"),
             ProductScreen.addOrderline("Coca-Cola", "1", "3"),
-            // Each change triggers a request; without waiting, the non-awaitable mutex causes failures.
-            Chrome.waitRequest(),
-            ProductScreen.clickOrderButton(),
+            ProductScreen.clickOrderButton(true),
             Chrome.waitForOrdersSync(),
             FloorScreen.clickTable("5"),
             ProductScreen.orderlinesHaveNoChange(),

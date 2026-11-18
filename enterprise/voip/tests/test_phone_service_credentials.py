@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 from odoo.addons.voip.models.phone_service_api import (
     CLIENT_SECRET_PARAM,
     CLIENT_UUID_PARAM,
+    PHONE_SERVICE_NAME,
     WEBHOOK_EVENT_URL_SYNC_PENDING_PARAM,
     PhoneServiceAPI,
 )
@@ -21,6 +22,9 @@ class TestPhoneServiceCredentials(TransactionCase):
         forbid_phone_service_http(self)
         self.icp = self.env["ir.config_parameter"].sudo()
         self.icp.search([("key", "in", [CLIENT_UUID_PARAM, CLIENT_SECRET_PARAM])]).unlink()
+        # Before current_test is patched: get() would otherwise create the account
+        # in its own committed cursor, invisible to the test transaction.
+        self.iap_account = self.env["iap.account"].get(PHONE_SERVICE_NAME)
 
     def test_generates_and_persists_credentials(self):
         client_uuid, client_secret = self.icp._voip_get_client_credentials()
@@ -50,9 +54,26 @@ class TestPhoneServiceCredentials(TransactionCase):
 
         call_phone_service.assert_called_once_with(
             "/api/phone_service/1/update_client",
-            {"updates": {"webhook_event_url": f"{self.icp.get_base_url()}/voip/api/phone_service/event"}},
+            {"updates": {
+                "webhook_event_url": f"{self.icp.get_base_url()}/voip/api/phone_service/event",
+                "account_token": self.iap_account.account_token,
+            }},
         )
         self.assertFalse(self.icp.get_bool(WEBHOOK_EVENT_URL_SYNC_PENDING_PARAM))
+
+    def test_account_token_change_syncs_client(self):
+        iap_account = self.iap_account
+        with (
+            patch("odoo.addons.voip.models.ir_config_parameter.module.current_test", False),
+            patch.object(PhoneServiceAPI, "sync_webhook_event_url") as sync,
+        ):
+            iap_account.account_token = "token_before_registration"
+            sync.assert_not_called()
+
+            self.icp._voip_get_client_credentials()
+            iap_account.account_token = "new_token"
+            self.env["iap.account"].create({"service_id": iap_account.service_id.id})
+            self.assertEqual(sync.call_count, 2)
 
     @mute_logger("odoo.addons.voip.models.ir_config_parameter")
     def test_failed_webhook_url_sync_schedules_cron(self):

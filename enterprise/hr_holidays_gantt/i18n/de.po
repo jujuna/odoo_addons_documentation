@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.5+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:49+0000\n"
-"PO-Revision-Date: 2026-09-21 11:34+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-02 13:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "hr_holidays_gantt/de/>\n"
@@ -55,7 +55,7 @@ msgstr "%(name)s hat eine Abwesenheit beantragt: %(leaves)s. \n"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.js:0
 msgid "%s h / Week"
-msgstr ""
+msgstr "%s St. / Woche"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -66,11 +66,9 @@ msgstr "%s St."
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time Off "
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
 "Type\" name=\"work_entry_type_id\"/>"
 msgstr ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" "
-"title=\"Abwesenheitsart\" name=\"work_entry_type_id\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -114,6 +112,12 @@ msgstr "<span> Tag(e)</span>"
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
 msgid "Add"
 msgstr "Hinzufügen"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
+msgid "Allocate and Add"
+msgstr "Zuweisen und hinzufügen"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -199,14 +203,31 @@ msgstr "ID"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.xml:0
+msgid "New"
+msgstr ""
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.xml:0
 msgid "New Employee Record"
+msgstr "Neuer Mitarbeiterdatensatz"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "New Time Off"
 msgstr ""
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid "Optional Description..."
 msgstr "Optionale Beschreibung …"
+
+#. module: hr_holidays_gantt
+#: model:ir.actions.server,name:hr_holidays_gantt.action_hr_holidays_overview
+msgid "Overview"
+msgstr "Übersicht"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -241,6 +262,14 @@ msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid ""
+"This operation is not allowed as you are not linked to an employee in the "
+"current company."
+msgstr ""
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.js:0
 #: model:ir.actions.act_window,name:hr_holidays_gantt.action_hr_payroll_time_off_gantt
 #: model:ir.model,name:hr_holidays_gantt.model_hr_leave
@@ -268,7 +297,7 @@ msgstr "Die Abwesenheiten konnten nicht wieder zusammengeführt werden"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Time off divided into two"
-msgstr ""
+msgstr "Abwesenheiten aufgeteilt in zwei"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -281,6 +310,12 @@ msgstr "Abwesenheiten wieder zusammengeführt"
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Undo"
 msgstr "Rückgängig machen"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "UserError"
+msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-python
@@ -317,6 +352,13 @@ msgstr "am %(start_date)s"
 #: code:addons/hr_holidays_gantt/models/hr_leave.py:0
 msgid "on %(start_date)s from %(start_time)s to %(end_time)s"
 msgstr "am %(start_date)s von %(start_time)s bis %(end_time)s"
+
+#~ msgid ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
+#~ "Off Type\" name=\"work_entry_type_id\"/>"
+#~ msgstr ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" "
+#~ "title=\"Abwesenheitsart\" name=\"work_entry_type_id\"/>"
 
 #~ msgid "Set"
 #~ msgstr "Festlegen"

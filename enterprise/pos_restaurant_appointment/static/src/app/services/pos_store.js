@@ -206,7 +206,7 @@ patch(PosStore.prototype, {
     getTotalAvailableCapacity(records) {
         return records?.length > 0
             ? records[0].data?.available_capacity || 0
-            : this.config.appointment_type_id.resource_total_capacity || 0;
+            : this.config.appointment_type_id?.resource_total_capacity || 0;
     },
     async assignResource(recordId, opt = {}) {
         await this.assignResourceToAppointment(recordId, this.manageBookings.bind(this), opt);

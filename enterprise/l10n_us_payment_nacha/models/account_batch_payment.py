@@ -176,13 +176,13 @@ class AccountBatchPayment(models.Model):
         journal = self.journal_id
         header = self._generate_nacha_header()
         entries = []
-        batch_nr = 0
+        batch_nr = 1
 
         offset_payments = self.env["account.payment"]
         for date, payments in sorted(self.payment_ids.grouped("date").items()):
             entries.append(self._generate_nacha_batch_header_record(date, batch_nr))
 
-            for payment_nr, payment in enumerate(payments):
+            for payment_nr, payment in enumerate(payments, start=1):
                 self._validate_bank_for_nacha(payment)
                 entries.append(self._generate_nacha_entry_detail(payment_nr, payment, is_offset=False))
 
@@ -199,13 +199,14 @@ class AccountBatchPayment(models.Model):
                 })
                 self._validate_bank_for_nacha(offset_payment)
                 offset_payments |= offset_payment
-                entries.append(self._generate_nacha_entry_detail(len(payments), offset_payment, is_offset=True))
+                entries.append(self._generate_nacha_entry_detail(len(payments) + 1, offset_payment, is_offset=True))
 
             entries.append(self._generate_nacha_batch_control_record(payments, offset_payment, batch_nr))
             batch_nr += 1
 
-        entries.append(self._generate_nacha_file_control_record(batch_nr, self.payment_ids, offset_payments))
-        entries.extend(self._generate_padding(batch_nr, len(self.payment_ids | offset_payments)))
+        nr_of_batches = batch_nr - 1
+        entries.append(self._generate_nacha_file_control_record(nr_of_batches, self.payment_ids, offset_payments))
+        entries.extend(self._generate_padding(nr_of_batches, len(self.payment_ids | offset_payments)))
 
         return "\r\n".join([header] + entries)
 

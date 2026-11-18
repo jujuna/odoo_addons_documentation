@@ -22,6 +22,19 @@ class AccountAnalyticLine(models.Model):
     # As this model has his own data merge, avoid to enable the generic data_merge on that model.
     _disable_data_merge = True
 
+    @api.model
+    def default_get(self, fields):
+        result = super().default_get(fields)
+        if self.env.context.get('timesheet_systray_prefill'):
+            # The systray prefills the last visited task/ticket, which may have been deleted,
+            # archived or made inaccessible since: drop it instead of failing on it.
+            for fname in self._get_timesheet_systray_pre_filled_form_fields():
+                res_id = result.get(fname)
+                comodel = self.env[self._fields[fname].comodel_name]
+                if res_id and not comodel.search_count([('id', '=', res_id)], limit=1):
+                    del result[fname]
+        return result
+
     # reset amount on copy
     amount = fields.Monetary(copy=False)
     validated = fields.Boolean("Validated line", aggregator="bool_and", store=True, copy=False, readonly=True)
@@ -446,6 +459,10 @@ class AccountAnalyticLine(models.Model):
             'minimum': self.env['ir.config_parameter'].sudo().get_int('timesheet_grid.timesheet_min_duration', 15),
             'rounding': self.env['ir.config_parameter'].sudo().get_int('timesheet_grid.timesheet_rounding', 15),
         }
+
+    @api.model
+    def _get_timesheet_systray_pre_filled_form_fields(self):
+        return ['task_id']
 
     @api.model
     def _get_aw_timesheet_fields_specification(self):

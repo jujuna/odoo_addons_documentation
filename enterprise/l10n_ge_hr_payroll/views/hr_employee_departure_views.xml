@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_departure_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.departure.view.form.inherit.l10n_ge_hr_payroll</field>
+        <field name="model">hr.employee.departure</field>
+        <field name="inherit_id" ref="hr.hr_employee_departure_view_form"/>
+        <field name="arch" type="xml">
+            <field name="dismissal_date" position="after">
+                <label for="l10n_ge_notice_period" invisible="country_code != 'GE'"/>
+                <div class="o_row" invisible="country_code != 'GE'">
+                    <field name="l10n_ge_notice_period" class="oe_inline"/>
+                    <span>Days</span>
+                    <span class="badge text-bg-danger" invisible="not l10n_ge_short_notice">Short Notice</span>
+                </div>
+            </field>
+        </field>
+    </record>
+</odoo>

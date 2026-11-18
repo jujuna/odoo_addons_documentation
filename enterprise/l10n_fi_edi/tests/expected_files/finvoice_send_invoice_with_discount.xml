@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='ISO-8859-15'?>
+<Finvoice Version="3.0">
+    <MessageTransmissionDetails>
+        <MessageSenderDetails>
+            <FromIdentifier>company_1_data</FromIdentifier>
+            <FromIntermediator>company_1_data</FromIntermediator>
+        </MessageSenderDetails>
+        <MessageReceiverDetails>
+            <ToIdentifier>partner_a</ToIdentifier>
+            <ToIntermediator>partner_a</ToIntermediator>
+        </MessageReceiverDetails>
+        <MessageDetails>
+            <MessageIdentifier>INV/2020/00001</MessageIdentifier>
+            <MessageTimeStamp>2020-10-10T00:00:00</MessageTimeStamp>
+        </MessageDetails>
+    </MessageTransmissionDetails>
+    <SellerPartyDetails>
+        <SellerOrganisationName>company_1_data</SellerOrganisationName>
+    </SellerPartyDetails>
+    <BuyerPartyDetails>
+        <BuyerOrganisationName>partner_a</BuyerOrganisationName>
+        <BuyerPostalAddressDetails>
+            <BuyerStreetName>Street skread</BuyerStreetName>
+            <BuyerTownName>Bikini Bottom</BuyerTownName>
+            <BuyerPostCodeIdentifier>667</BuyerPostCodeIdentifier>
+        </BuyerPostalAddressDetails>
+    </BuyerPartyDetails>
+    <DeliveryPartyDetails>
+        <DeliveryOrganisationName>partner_a</DeliveryOrganisationName>
+        <DeliveryPostalAddressDetails>
+            <DeliveryStreetName>Street skread</DeliveryStreetName>
+            <DeliveryTownName>Bikini Bottom</DeliveryTownName>
+            <DeliveryPostCodeIdentifier>667</DeliveryPostCodeIdentifier>
+        </DeliveryPostalAddressDetails>
+    </DeliveryPartyDetails>
+    <InvoiceDetails>
+        <InvoiceTypeCode>INV01</InvoiceTypeCode>
+        <InvoiceTypeText>INVOICE</InvoiceTypeText>
+        <OriginCode>Original</OriginCode>
+        <InvoiceNumber>INV/2020/00001</InvoiceNumber>
+        <InvoiceDate Format="CCYYMMDD">20201010</InvoiceDate>
+        <InvoiceTotalVatIncludedAmount AmountCurrencyIdentifier="EUR">250,00</InvoiceTotalVatIncludedAmount>
+    </InvoiceDetails>
+    <InvoiceRow>
+        <ArticleName>product_a</ArticleName>
+        <OrderedQuantity QuantityUnitCode="Units">2.0</OrderedQuantity>
+        <UnitPriceAmount AmountCurrencyIdentifier="EUR">100,00</UnitPriceAmount>
+        <UnitPriceNetAmount AmountCurrencyIdentifier="EUR">200,00</UnitPriceNetAmount>
+        <UnitPriceVatIncludedAmount AmountCurrencyIdentifier="EUR">200,00</UnitPriceVatIncludedAmount>
+    </InvoiceRow>
+    <InvoiceRow>
+        <ArticleName>product_a</ArticleName>
+        <OrderedQuantity QuantityUnitCode="Units">1.0</OrderedQuantity>
+        <UnitPriceAmount AmountCurrencyIdentifier="EUR">100,00</UnitPriceAmount>
+        <UnitPriceDiscountAmount AmountCurrencyIdentifier="EUR">50,00</UnitPriceDiscountAmount>
+        <UnitPriceNetAmount AmountCurrencyIdentifier="EUR">50,00</UnitPriceNetAmount>
+        <UnitPriceVatIncludedAmount AmountCurrencyIdentifier="EUR">50,00</UnitPriceVatIncludedAmount>
+    </InvoiceRow>
+    <EpiDetails>
+        <EpiIdentificationDetails>
+            <EpiDate Format="CCYYMMDD">20201010</EpiDate>
+            <EpiReference>2020000017</EpiReference>
+        </EpiIdentificationDetails>
+        <EpiPartyDetails>
+            <EpiBfiPartyDetails>
+                <EpiBfiIdentifier IdentificationSchemeName="BIC">SIUUUUUU123</EpiBfiIdentifier>
+                <EpiBfiName>Test Bank</EpiBfiName>
+            </EpiBfiPartyDetails>
+            <EpiBeneficiaryPartyDetails>
+                <EpiAccountID IdentificationSchemeName="BANK">11234567899</EpiAccountID>
+            </EpiBeneficiaryPartyDetails>
+        </EpiPartyDetails>
+        <EpiPaymentInstructionDetails>
+            <EpiInstructedAmount AmountCurrencyIdentifier="EUR">250,00</EpiInstructedAmount>
+            <EpiCharge ChargeOption="SHA"/>
+            <EpiDateOptionDate Format="CCYYMMDD">20201010</EpiDateOptionDate>
+        </EpiPaymentInstructionDetails>
+    </EpiDetails>
+</Finvoice>

@@ -221,6 +221,29 @@ class TestSEPACreditTransfer(TestSEPACreditTransferCommon):
         self.assertEqual(ustrd, "Invoice + Order", "'&' in <Ustrd> must be replaced with '+'")
         self.assertTrue(instr_id.endswith("-Invoice + Order"), "'&' in <InstrId> must be replaced with '+'")
 
+    def test_sepa_bic_without_clearing_number(self):
+        """ Test that the agents of a SEPA credit transfer are only identified by their BIC,
+            even when the bank accounts also have a clearing number.
+        """
+        self.partner_a.bank_ids.clearing_number = '123456'
+        self.bank_journal.bank_account_id.clearing_number = '654321'
+        payment = self.createPayment(self.partner_a, 500)
+        payment.action_post()
+
+        batch = self.env['account.batch.payment'].create({
+            'journal_id': self.bank_journal.id,
+            'payment_ids': [Command.set(payment.ids)],
+            'payment_method_id': self.sepa_ct_method.id,
+            'batch_type': 'outbound',
+        })
+        batch.validate_batch()
+
+        ct_doc = etree.fromstring(bytes(batch.export_file))
+        namespaces = {'ns': 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09'}
+        self.assertEqual(ct_doc.findtext('.//ns:DbtrAgt/ns:FinInstnId/ns:BICFI', namespaces=namespaces), 'BBRUBEBB')
+        self.assertEqual(ct_doc.findtext('.//ns:CdtrAgt/ns:FinInstnId/ns:BICFI', namespaces=namespaces), 'GEBABEBB')
+        self.assertFalse(ct_doc.findall('.//ns:ClrSysMmbId', namespaces=namespaces))
+
     def _check_structured_reference(self, country_code, payment):
         if country_code == 'ch':
             payment.partner_bank_id.sudo().allow_out_payment = False
@@ -313,6 +336,23 @@ class TestSEPACreditTransfer(TestSEPACreditTransferCommon):
         self.partner_a.country_id = self.env.ref('base.no')
         payment = self.createPayment(self.partner_a, 500, '1234567897')
         self._check_structured_reference('no', payment)
+
+    def test_sepa_northern_ireland_country_code(self):
+        """ 'XI' (Northern Ireland) is not an ISO 3166 country code: the postal address must use 'GB' """
+        self.partner_a.write({'city': 'Belfast', 'country_id': self.env.ref('base.xi').id})
+        payment = self.createPayment(self.partner_a, 500)
+        payment.action_post()
+        batch = self.env['account.batch.payment'].create({
+            'journal_id': self.bank_journal.id,
+            'payment_ids': [Command.link(payment.id)],
+            'payment_method_id': self.sepa_ct_method.id,
+            'batch_type': 'outbound',
+        })
+        batch.validate_batch()
+
+        ct_doc = etree.fromstring(bytes(batch.export_file))
+        namespaces = {'ns': 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09'}
+        self.assertEqual(ct_doc.findtext('.//ns:Cdtr/ns:PstlAdr/ns:Ctry', namespaces=namespaces), 'GB')
 
     def test_sepa_trust_check_partner_bank_selection(self):
         """Test untrusted partner bank account warning mechanism in the payment registration wizard."""

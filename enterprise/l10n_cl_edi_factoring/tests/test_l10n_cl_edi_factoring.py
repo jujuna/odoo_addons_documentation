@@ -157,3 +157,52 @@ class TestEdiFactoring(TestL10nClEdiCommon):
         with patch(patch_target, return_value='<STATUS>invalid</STATUS>'):
             move.l10n_cl_send_dte_to_sii()
             self.assertEqual(move.l10n_cl_dte_status, 'rejected')
+
+    def test_l10n_cl_send_aec_to_sii_expired_token(self):
+        """With an expired token, the SII answers the AEC upload with an authentication error page.
+        Ensure the upload is retried with a new token and, if it still fails, that the AEC is not
+        rejected but kept to be sent again"""
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'l10n_cl_aec_attachment_file': BinaryBytes(b'test'),
+            'l10n_cl_dte_status': 'not_sent',
+        })
+        signature = move.company_id._get_digital_signature(user_id=self.env.user.id)
+        move.company_id.l10n_cl_dte_service_provider = 'SIITEST'
+
+        authentication_error_page = (
+            b"<SCRIPT>\nalert('Se produjo un error mientras se validaba la Autenticaci\xf3n, lo redireccionaremos "
+            b"para que vuelva a autenticarse.\\n\\nEl c\xf3digo de este mensaje es 02.350.213.100.304.20.');\n"
+            b"location.replace('/rtc/RTC/RTCMenu.html');\n</SCRIPT>\n"
+        )
+        upload_receipt = (
+            b'<?xml version="1.0"?>'
+            b'<RECEPCIONAEC><STATUS>0</STATUS><TRACKID>00000123</TRACKID></RECEPCIONAEC>'
+        )
+
+        # Retry successful after expired token
+        signature.last_token = 'expired'
+        with mute_logger('odoo.addons.l10n_cl_edi_factoring.models.account_move'), patch.object(
+            self.env.registry['account.move'], '_send_xml_to_sii',
+            side_effect=[authentication_error_page, upload_receipt],
+        ) as send_mock:
+            move.l10n_cl_send_dte_to_sii()
+
+        # 2 calls, one failed due to expired token and retried successfully
+        self.assertEqual(send_mock.call_count, 2)
+        self.assertEqual(move.l10n_cl_dte_status, 'ask_for_status')
+        self.assertEqual(move.l10n_cl_sii_send_ident, '00000123')
+
+        # Retry with 2 errors, but should not be rejected
+        move.l10n_cl_dte_status = 'not_sent'
+        signature.last_token = 'expired'
+        with mute_logger('odoo.addons.l10n_cl_edi_factoring.models.account_move'), patch.object(
+            self.env.registry['account.move'], '_send_xml_to_sii', return_value=authentication_error_page
+        ):
+            move.l10n_cl_send_dte_to_sii()
+        self.assertFalse(signature.last_token)
+        self.assertEqual(move.l10n_cl_dte_status, 'not_sent')
+        self.assertEqual(
+            move.message_ids[0].body,
+            '<p>The SII could not authenticate the request. Please try sending again.</p>',
+        )

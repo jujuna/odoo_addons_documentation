@@ -1244,6 +1244,37 @@ class TestSignRequest(SignRequestCommon, MockEmail):
             self.assertEqual(args[0], -1000)
             self.assertEqual(args[1], -1000)
 
+    def test_scheduled_request_first_reminder_after_period(self):
+        """ The reminder period of a request scheduled in the future must start once the request has been sent. """
+        with self.mock_datetime_and_now("2026-09-10"):
+            wizard = self.env['sign.send.request'].with_context(
+                active_id=self.template_no_item.id, sign_directly_without_mail=False,
+            ).create({
+                'template_id': self.template_no_item.id,
+                'signer_id': self.partner_1.id,
+                'reminder_enabled': True,
+                'reminder': 7,
+                'scheduled_date': '2026-09-21 08:00:00',
+            })
+            sign_request = wizard.create_request()
+        self.assertEqual(sign_request.state, 'scheduled')
+
+        # the state cron is triggered right after the scheduled date
+        with self.mock_datetime_and_now("2026-09-21 08:01:00"), self.mock_mail_gateway():
+            self.env['sign.request']._cron_update_state()
+            self.assertEqual(sign_request.state, 'sent')
+            self.env['sign.request']._cron_reminder()
+            self.assertFalse(self._new_mails, "No reminder should be sent along with the request")
+
+        with self.mock_datetime_and_now("2026-09-25"), self.mock_mail_gateway():
+            self.env['sign.request']._cron_reminder()
+            self.assertFalse(self._new_mails, "No reminder should be sent before 7 days after the request has been sent")
+
+        with self.mock_datetime_and_now("2026-09-28"), self.mock_mail_gateway():
+            self.env['sign.request']._cron_reminder()
+            self.assertTrue(self._new_mails, "The first reminder should be sent 7 days after the request has been sent")
+        self.assertEqual(sign_request.last_reminder, fields.Date.from_string("2026-09-28"))
+
 
 class TestSignRequestHTTP(TestSignRequest, HttpCaseWithUserDemo):
     @classmethod

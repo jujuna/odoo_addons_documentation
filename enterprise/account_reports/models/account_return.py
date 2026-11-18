@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import Command, _, api, fields, models, SUPERUSER_ID
 from odoo.exceptions import AccessError, RedirectWarning, UserError, ValidationError
 from odoo.fields import Domain
-from odoo.tools import SQL, date_utils, html2plaintext
+from odoo.tools import SQL, date_utils, email_normalize_all, html2plaintext
 from odoo.tools.misc import format_date
 from odoo.tools.translate import LazyTranslate, LazyGettext
 from odoo.addons.account.models.account_move import REVIEW_STATE_SELECTION
@@ -465,10 +465,24 @@ class AccountReturnType(models.Model):
 
         returns_to_submit = self.env['account.return'].search([
             ('state', 'not in', ('submitted', 'paid')),
-            ('date_deadline', '=', fields.Date.context_today(self) + relativedelta(days=7)),
+            ('date_deadline', '=', fields.Date.context_today(self) + relativedelta(days=3)),
         ]).filtered('is_tax_return')
         for account_return in returns_to_submit:
-            for user in self.env.ref('account.group_account_manager').user_ids.filtered(lambda user: set(user.company_ids) & set(account_return.company_ids)):
+            domain = [
+                ('company_ids', 'in', account_return.company_ids.ids),
+            ]
+
+            tax_closing_journal = account_return.company_id.account_tax_return_journal_id
+            if emails_to_notify := email_normalize_all(tax_closing_journal.incoming_einvoice_notification_email or ''):
+                domain += [
+                    ('email', 'in', emails_to_notify),
+                    ('all_group_ids', 'in', (self.env.ref('account.group_account_basic') + self.env.ref('account.group_account_readonly')).ids),
+                ]
+            else:
+                domain.append(('all_group_ids', 'in', self.env.ref('account.group_account_manager').id))
+
+            users_to_notify = self.env['res.users'].search(domain)
+            for user in users_to_notify:
                 mail_template.with_context(partner=user.partner_id).send_mail(account_return.id)
 
     @api.model
@@ -1128,6 +1142,8 @@ class AccountReturn(models.Model):
 
     @api.model
     def action_refresh_all_returns(self):
+        if not self.env.user.has_group('account.group_account_user') and not self.env.su:
+            raise AccessError(self.env._("You do not have permission to refresh returns."))
         root_companies = self.env['res.company'].sudo().search([
             ('account_opening_date', '!=', False),
             ('id', 'parent_of', self.env.companies.ids)
@@ -1895,6 +1911,31 @@ class AccountReturn(models.Model):
         name = _("Closing Entries") if len(self.closing_move_ids) > 1 else _("Closing Entry")
         return self.closing_move_ids._get_records_action(name=name)
 
+    def _get_report_open_action(self, line_id=None, section_id=None):
+        self.ensure_one()
+        report = self.type_id.report_id
+        client_action = self._get_report_client_action(report)
+        action = client_action._get_action_dict() if client_action else {
+            'type': 'ir.actions.client',
+            'name': report.display_name,
+            'tag': 'account_report',
+            'context': {},
+        }
+
+        # Force report_id: in case a client action was found, no need to rely on options reroute
+        # Force allowed_company_ids: we only want the companies of the return. The report's controller will use that to set the company selector.
+        action['context'] = {'report_id': report.id, 'allowed_company_ids': (self.company_id | self.company_ids).ids}
+
+        unfolded_lines = report._get_line_id_ancestors(line_id) if line_id else None
+        action['params'] = {
+            'options': self._get_closing_report_options(unfolded_lines=unfolded_lines, selected_section_id=section_id),
+            'ignore_session': True,
+        }
+        if line_id:
+            action['params']['focus_line_id'] = line_id
+
+        return action
+
     def _get_report_client_action(self, report):
         """ Returns the stored account_report client action for this report or its root report. """
         report_ids = [report.id] + report.root_report_id.ids
@@ -1908,18 +1949,9 @@ class AccountReturn(models.Model):
         self.ensure_one()
         if self.has_access('write'):
             self.report_opened_once = True
-        report = self.type_id.report_id
-        client_action = self._get_report_client_action(report)
-        action = client_action._get_action_dict() if client_action else {
-            'type': 'ir.actions.client',
-            'name': report.display_name,
-            'tag': 'account_report',
-            'context': {'report_id': report.id},
-        }
-        action['params'] = {'options': self._get_closing_report_options(), 'ignore_session': True}
-        return action
+        return self._get_report_open_action()
 
-    def _get_closing_report_options(self):
+    def _get_closing_report_options(self, **extra_options):
         report = self.type_id.report_id
 
         period_type = 'return_period'
@@ -1937,6 +1969,7 @@ class AccountReturn(models.Model):
             'sections_source_id': report.id,
             'tax_unit': 'company_only' if not self.tax_unit_id else self.tax_unit_id.id,
             'selected_return_type_id': self.type_id.id,
+            **{key: value for key, value in extra_options.items() if value},
         }
         current_company = self.company_id
         company_ids = self.company_ids.ids

@@ -7,16 +7,18 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 02:22+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:48+0000\n"
+"PO-Revision-Date: 2026-11-09 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/hr_payroll_expense/pt_BR/>\n"
+"20/hr_payroll_expense/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,6 +29,7 @@ msgstr ""
 
 #. module: hr_payroll_expense
 #: model:ir.module.module,description:base.module_hr_payroll_expense
+#, fuzzy
 msgid ""
 "\n"
 "Reimbursement of expenses in Payslips\n"
@@ -34,6 +37,11 @@ msgid ""
 "\n"
 "This application allows you to reimburse expenses in payslips.\n"
 msgstr ""
+"\n"
+"Reembolso de despesas em holerites\n"
+"===========================================\n"
+"\n"
+"Este aplicativo permite o reembolso de despesas em holerites.\n"
 
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.view_account_payment_register_form_inherit_hr_payroll_expense
@@ -67,12 +75,12 @@ msgstr "Exibir nome"
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/ir_actions_report.py:0
 msgid "Employee"
-msgstr ""
+msgstr "Funcionário"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields.selection,name:hr_payroll_expense.selection__hr_expense__payment_mode__payslip_account
-msgid "Employee (Through a Payslip)"
-msgstr ""
+msgid "Employee (Payslip)"
+msgstr "Funcionário (Holerite)"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_expense
@@ -109,8 +117,9 @@ msgstr "Reembolso de despesas"
 
 #. module: hr_payroll_expense
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_expense
+#, fuzzy
 msgid "Expenses in Payslips"
-msgstr ""
+msgstr "Despesas em holerites"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,help:hr_payroll_expense.field_hr_payslip__expense_ids
@@ -158,6 +167,11 @@ msgid ""
 msgstr ""
 "Apenas despesas aprovadas e lançadas com reembolso na folha de pagamento "
 "podem ser relatadas na próxima folha de pagamento."
+
+#. module: hr_payroll_expense
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__payment_mode
+msgid "Paid by"
+msgstr "Pago por"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_account_payment_register
@@ -208,11 +222,6 @@ msgid "Reimbursed Expenses"
 msgstr "Despesas reembolsadas"
 
 #. module: hr_payroll_expense
-#: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__payment_mode
-msgid "Reimbursement"
-msgstr "Reembolso"
-
-#. module: hr_payroll_expense
 #. odoo-javascript
 #: code:addons/hr_payroll_expense/static/src/views/list.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.hr_expense_view_form_inherit_payroll
@@ -222,7 +231,7 @@ msgstr "Remover da folha de pagamento"
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "Ação de relatório"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_product_product__salary_rule_ids
@@ -233,7 +242,7 @@ msgstr "Regras salariais"
 #. module: hr_payroll_expense
 #: model:ir.module.module,summary:base.module_hr_payroll_expense
 msgid "Submit, validate and reinvoice employee expenses"
-msgstr ""
+msgstr "Envie, valide e fature novamente as despesas do funcionário"
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -308,6 +317,13 @@ msgstr ""
 #: code:addons/hr_payroll_expense/models/account_move.py:0
 msgid "You don't have the access rights to post an invoice."
 msgstr "Você não tem direitos de acesso para lançar uma fatura."
+
+#, fuzzy
+#~ msgid "Employee (Through a Payslip)"
+#~ msgstr "Funcionário (através de um holerite)"
+
+#~ msgid "Reimbursement"
+#~ msgstr "Reembolso"
 
 #~ msgid "Add to Payslip"
 #~ msgstr "Adicionar ao holerite"

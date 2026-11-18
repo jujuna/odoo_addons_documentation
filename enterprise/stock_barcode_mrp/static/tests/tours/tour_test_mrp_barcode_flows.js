@@ -1649,7 +1649,16 @@ registry.category("web_tour.tours").add("test_barcode_production_settings", {
         { trigger: "body", run: "scan sn-003" },
         { trigger: "[data-barcode='compo_sn'].o_selected button.o_edit:not(:disabled)" },
         { trigger: "body", run: "scan sn-004" },
-        ...stepUtils.validateBarcodeOperation(".o_line_button.o_toggle_sublines"),
+        { trigger: ".o_line_button.o_toggle_sublines", run: "scan OBTVALI" },
+        // Updating quantities does not consume unscanned tracked components when lot/serial scanning is mandatory.
+        { trigger: "button[name='action_set_qty']", run: "click" },
+        {
+            trigger:
+                ".modal-content.o_error_dialog:contains(You need to supply a Lot/Serial Number for product: - productserial1) .btn-close",
+            run: "click",
+        },
+        { trigger: "button[name='action_confirm']", run: "click" },
+        { trigger: ".o_notification_bar.bg-success" },
     ],
 });
 

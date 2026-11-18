@@ -1,4 +1,5 @@
 from odoo import _, api, fields, models
+from odoo.fields import Domain
 from odoo.tools.translate import LazyTranslate
 
 _lt = LazyTranslate(__name__)
@@ -189,15 +190,38 @@ class AccountReturn(models.Model):
     @api.model
     def _run_das2_checks(self, check_codes_to_ignore):
         checks = []
-        partners = self.env['res.partner'].search([
-            *self.env['res.partner']._check_company_domain(self.company_id),
-            ('l10n_fr_profession_id', '!=', False),
-            ('invoice_ids', 'any', [('country_code', '=', 'FR'), ('state', '=', 'posted')]),
-        ])
+        das2_handler = self.env['l10n_fr.das2.report.handler']
+        totals = das2_handler._get_das2_totals(self._get_closing_report_options())
+        partners = self.env['res.partner'].browse(list(totals['partners'].keys()))
         contact_person = self.env.user.partner_id  # we use the contact_person's default value (current user) as a precaution
-        error_data = self.env['l10n_fr.das2.report.handler']._check_required_fields(partners, contact_person)
+        error_data = das2_handler._check_required_fields(partners, contact_person)
 
-        if 'partners_with_missing_information' not in check_codes_to_ignore and (partner_errors := error_data['partner']['errors']):
+        partner_errors = error_data['partner']['errors']
+        if 'no_das2_beneficiaries' not in check_codes_to_ignore and partner_errors and not error_data['partner']['records']:
+            checks.append(self._l10n_fr_reports_build_check_vals(
+                name=_lt("At least one DAS2 beneficiary"),
+                message=_lt(
+                    "No provider reaches the DAS2 reporting threshold: there is nothing to declare. "
+                    "Make sure the vendor bills are posted on accounts with DAS2 tags and that their partners have a profession."
+                ),
+                code='no_das2_beneficiaries',
+                records_model='res.partner',
+                records_count=0,
+                result='anomaly',
+                action=self.env['account.move.line']._get_records_action(
+                    name=self.env._("DAS2 Journal Items"),
+                    domain=Domain.AND([
+                        self.env['account.move']._check_company_domain(self.env.companies),
+                        Domain('account_id.tag_ids', 'in', das2_handler._get_das2_tags().ids),
+                        Domain('move_id.move_type', 'in', self.env['account.move'].get_purchase_types()),
+                        Domain('parent_state', '=', 'posted'),
+                        Domain('date', '>=', self.date_from),
+                        Domain('date', '<=', self.date_to),
+                    ]),
+                    views=[(False, 'list'), (False, 'form')],
+                ),
+            ))
+        elif 'partners_with_missing_information' not in check_codes_to_ignore and partner_errors:
             self._l10n_fr_reports_build_partners_with_missing_information(
                 checks=checks,
                 invalid_records=error_data['partner']['records'],
@@ -206,7 +230,7 @@ class AccountReturn(models.Model):
             )
 
         if 'no_accounts_with_das2_tags' not in check_codes_to_ignore:
-            das2_tags = self.env['l10n_fr.das2.report.handler']._get_das2_tags()
+            das2_tags = das2_handler._get_das2_tags()
             accounts_with_das2_tags_exist = self.env['account.account'].search_count([
                 ('tag_ids', 'in', das2_tags.ids),
             ], limit=1)

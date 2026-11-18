@@ -570,8 +570,8 @@ class EsgDatabase(models.Model):
             new_values, write_values = self._get_ademe_emission_factor_values(complete_data)
             _logger.info("ESG: Creating/Writing records")
             self.env['esg.emission.factor'].create(new_values)
+            self.env['esg.emission.factor.line'].search([('esg_emission_factor_id', 'in', [record.id for record in write_values])]).unlink()
             for record, values in write_values.items():
-                record.gas_line_ids = False
                 record.write(values)
             _logger.info("ESG: File imported")
         except KeyError as e:
@@ -758,6 +758,11 @@ class EsgDatabase(models.Model):
             {'xml_id': 'esg.uom_ha', 'noupdate': True, 'values': {'name': 'ha', 'relative_factor': 1}},
             {'xml_id': 'esg.uom_lt', 'noupdate': True, 'values': {'name': 'LTO', 'relative_factor': 1}},
         ])
+        # Existing gas lines are updated instead of recreated
+        gas_lines_per_code = {
+            factor.code: factor.gas_line_ids
+            for factor in self.env['esg.emission.factor'].search([('database_id', '=', self.id)])
+        }
         nb_skipped_records = 0
         for ef_data in ipcc_ef_data_list:
             code = ef_data['code']
@@ -836,6 +841,17 @@ class EsgDatabase(models.Model):
                 elif unit == 'kg/LTO':
                     uom = uom_lto
                 note += '\nUnit converted in kg: ' + unit
+            gas_line_values = {
+                'gas_id': gaz_id,
+                'quantity': value,
+            }
+            if gas_lines := gas_lines_per_code.get(code):
+                gas_line_commands = [
+                    Command.update(gas_lines[0].id, gas_line_values),
+                    *(Command.delete(gas_line.id) for gas_line in gas_lines[1:]),
+                ]
+            else:
+                gas_line_commands = [Command.create(gas_line_values)]
             emission_factor_xmlid_list.append({
                 'xml_id': f'esg.ipcc_emission_factor_{code}',
                 'noupdate': True,
@@ -847,12 +863,7 @@ class EsgDatabase(models.Model):
                     'source_id': source_id,
                     'region': ef_data['region'],
                     'database_id': self.id,
-                    'gas_line_ids': [
-                        Command.create({
-                            'gas_id': gaz_id,
-                            'quantity': value,
-                        }),
-                    ],
+                    'gas_line_ids': gas_line_commands,
                 },
             })
         if nb_skipped_records:

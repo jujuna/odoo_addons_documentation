@@ -41,17 +41,13 @@ class TestPayrollProfitSharingBonus(TestPayrollBase, TestBelgiumCommon):
 
     @freeze_time('2025-01-25')
     def test_profit_sharing_bonus_low(self):
-        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip._set_input_value('PROFITSHARINGLOW', 2452.87)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31), input_values={'PROFITSHARINGLOW': 2452.87})
         payslip_results = {'PROFITSHARINGLOW': 2452.87, 'BEPROFITSHARING_BASIC': 2452.87, 'PROFITSHARING_SALARY': 2452.87, 'ONSS_PROFITSHARING': -320.59, 'ONSSTOTAL': 320.59, 'PROFITSHARINGLOW.PP': -149.26, 'PPTOTAL': 149.26, 'NET': 1983.02}
         self._validate_payslip(payslip, payslip_results)
 
     @freeze_time('2025-01-25')
     def test_profit_sharing_bonus_high(self):
-        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip._set_input_value('PROFITSHARINGHIGH', 2452.87)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31), input_values={'PROFITSHARINGHIGH': 2452.87})
         payslip_results = {'PROFITSHARINGHIGH': 2452.87, 'BEPROFITSHARING_BASIC': 2452.87, 'PROFITSHARING_SALARY': 2452.87, 'ONSS_PROFITSHARING': -320.59, 'ONSSTOTAL': 320.59, 'PROFITSHARINGHIGH.PP': -319.84, 'PPTOTAL': 319.84, 'NET': 1812.44}
         self._validate_payslip(payslip, payslip_results)
 
@@ -65,4 +61,27 @@ class TestPayrollProfitSharingBonus(TestPayrollBase, TestBelgiumCommon):
         })
         payslip.compute_sheet()
         payslip_results = {'PROFITSHARINGLOW': 2452.87, 'BEPROFITSHARING_BASIC': 4905.74, 'PROFITSHARINGHIGH': 2452.87, 'PROFITSHARING_SALARY': 4905.74, 'ONSS_PROFITSHARING': -641.18, 'ONSSTOTAL': 641.18, 'PPTOTAL': 0.0, 'NET': 4264.56}
+        self._validate_payslip(payslip, payslip_results)
+
+    @freeze_time('2025-01-25')
+    def test_profit_sharing_bonus_low_and_high(self):
+        # The solidarity contribution is computed on both bonuses: each withholding
+        # tax base must only be reduced by the contribution on its own bonus.
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        payslip._set_input_values({
+            'PROFITSHARINGLOW': 1000.0,
+            'PROFITSHARINGHIGH': 1000.0,
+        })
+        payslip.compute_sheet()
+        payslip_results = {'PROFITSHARINGLOW': 1000.0, 'BEPROFITSHARING_BASIC': 2000.0, 'PROFITSHARINGHIGH': 1000.0, 'PROFITSHARING_SALARY': 2000.0, 'ONSS_PROFITSHARING': -261.4, 'ONSSTOTAL': 261.4, 'PROFITSHARINGLOW.PP': -60.85, 'PROFITSHARINGHIGH.PP': -130.4, 'PPTOTAL': 191.25, 'NET': 1547.35}
+        self._validate_payslip(payslip, payslip_results)
+
+    @freeze_time('2025-01-25')
+    def test_profit_sharing_bonus_student(self):
+        # The solidarity contribution is 13.07% of the bonus, students included.
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        payslip.version_id.l10n_be_dimona_category = 'stu'
+        payslip._set_input_value('PROFITSHARINGLOW', 1000.0)
+        payslip.compute_sheet()
+        payslip_results = {'PROFITSHARINGLOW': 1000.0, 'BEPROFITSHARING_BASIC': 1000.0, 'PROFITSHARING_SALARY': 1000.0, 'ONSS_PROFITSHARING': -130.7, 'ONSSTOTAL': 130.7, 'PROFITSHARINGLOW.PP': -60.85, 'PPTOTAL': 60.85, 'NET': 808.45}
         self._validate_payslip(payslip, payslip_results)

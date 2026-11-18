@@ -3,6 +3,7 @@ import { Domain } from "@web/core/domain";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
+import { user } from "@web/core/user";
 import { omit } from "@web/core/utils/objects";
 import { getFieldFromRegistry, getPropertyFieldInfo } from "@web/views/fields/field";
 import { formatFloatTime } from "@web/views/fields/formatters";
@@ -230,7 +231,9 @@ export const staticTimesheetTimerService = {
                     startTime = currentTime.minus({ seconds: totalSeconds });
                     timerState.values = manualChange.values;
                 } else {
-                    const data = await rpc("/timesheet_grid/get_timer_start_time");
+                    const data = await rpc("/timesheet_grid/get_timer_start_time", {
+                        context: user.context,
+                    });
                     if (data.elapsed_seconds) {
                         startTime = currentTime.minus({ seconds: data.elapsed_seconds });
                     } else {
@@ -382,11 +385,7 @@ export const staticTimesheetTimerService = {
                 timerState.startTime = currentTime;
                 timer.updateTimer(currentTime);
 
-                saveManualChange(
-                    currentTime.toISO(),
-                    0,
-                    copyParams
-                );
+                saveManualChange(currentTime.toISO(), 0, copyParams);
 
                 this.clearActiveTimesheetId();
 

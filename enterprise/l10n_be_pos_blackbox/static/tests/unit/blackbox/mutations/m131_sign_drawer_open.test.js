@@ -66,11 +66,14 @@ describe("sign_drawer_open", () => {
         await store.openCashbox();
         expect.verifySteps(["cashbox opened"]);
 
+        // Signing is not awaited: the cashbox does not wait for the blackbox response
         await store.openCashboxManually();
-        expect.verifySteps(["M131_signDrawerOpen", "cashbox opened"]);
+        await expect.waitForSteps(["M131_signDrawerOpen", "cashbox opened"], {
+            ignoreOrder: true,
+        });
     });
 
-    test("cashbox stays closed when the drawer opening is not signed", async () => {
+    test("cashbox opens even when the drawer opening is not signed", async () => {
         const store = await setupPosBlackboxEnv();
         setupCashdrawer(store);
         patchWithCleanup(store.blackbox.signDrawerOpen, {
@@ -80,6 +83,6 @@ describe("sign_drawer_open", () => {
         });
 
         await store.openCashboxManually();
-        expect.verifySteps([]);
+        expect.verifySteps(["cashbox opened"]);
     });
 });

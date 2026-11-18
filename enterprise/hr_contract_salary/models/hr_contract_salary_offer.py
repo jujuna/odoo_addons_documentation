@@ -154,6 +154,23 @@ class HrContractSalaryOffer(models.Model):
 
     @requires_hr_version_context()
     def _get_version(self):
+        """Return the ``hr.version`` used to simulate the package of the offer.
+
+        Must be called within ``hr_version_context()`` (savepoint rolled back at the end), as it
+        writes on the version and may create records:
+
+        * a ``half_signed`` offer returns the last archived version of the employee (or of the
+          applicant), i.e. the version created by the signed offer;
+        * otherwise, the current version of ``employee_id``, or of a new archived employee
+          (named after the applicant, or *Simulation Employee*) on which the values of
+          ``contract_template_id`` are applied.
+
+        The working schedule and the wage (``_get_wage_from_yearly_costs(final_yearly_costs)``,
+        prorated with the work time rate for simulation offers) are written on the returned
+        version, and the future versions of an active employee are archived.
+
+        :rtype: hr.version
+        """
         self.ensure_one()
         if self.state == 'half_signed':
             if self.employee_id:
@@ -209,6 +226,13 @@ class HrContractSalaryOffer(models.Model):
 
     @api.depends('salary_amount', 'budget_type')
     def _compute_final_yearly_costs(self):
+        """Compute the employer budget from ``salary_amount`` according to ``budget_type``.
+
+        * ``yearly_employer``: ``salary_amount`` itself;
+        * ``monthly_gross``: ``hr.version._get_employer_costs_from_gross(salary_amount)``;
+        * ``monthly_net``: the gross giving this ``NET`` on a simulated payslip is searched by
+          iterations (Newton method, at most 100 iterations), then converted as above.
+        """
         final_yearly_costs_by_offer = {}
         with hr_version_context(self, invalidate=True, employees=self.employee_id) as offers:
             for offer in offers.with_context(is_simulation_offer=True).filtered(lambda o: o.budget_type != 'yearly_employer'):
@@ -241,6 +265,11 @@ class HrContractSalaryOffer(models.Model):
 
     @api.depends('salary_amount', 'budget_type', 'structure_id', 'resource_calendar_id')
     def _compute_salary(self) -> None:
+        """Compute the package summary of the offer from a simulated payslip of :meth:`_get_version`.
+
+        ``gross_wage`` and ``net_wage`` are the totals of the ``BASIC`` and ``NET`` lines,
+        ``monthly_benefits`` and ``yearly_benefits`` come from :meth:`_get_benefits`.
+        """
         vals_by_offer = {}
         with hr_version_context(self, invalidate=True, employees=self.employee_id) as offers:
             for offer in offers:
@@ -289,6 +318,17 @@ class HrContractSalaryOffer(models.Model):
                     offer.sign_template_id = sign_template
 
     def _get_benefits(self, version):
+        """Return the amounts of the monthly and yearly benefits of ``version``.
+
+        Sum, for the ``sum`` resume lines of the *Monthly Benefits* and *Yearly Benefits*
+        categories (generic or of the structure type of ``version``), the values of their
+        benefits (field value, or payroll property for ``rule`` benefits), skipping the folded
+        benefits whose fold field is not set.
+
+        :param version: ``hr.version`` record
+        :return: ``(monthly_benefits, yearly_benefits)``
+        :rtype: tuple[float, float]
+        """
         monthly_benefit_category = self.env.ref('hr_contract_salary.hr_contract_salary_resume_category_monthly_benefits')
         yearly_benefit_category = self.env.ref('hr_contract_salary.hr_contract_salary_resume_category_yearly_benefits')
         resume_lines = self.env['hr.contract.salary.resume'].sudo().with_company(version.company_id).search([
@@ -309,6 +349,14 @@ class HrContractSalaryOffer(models.Model):
         return result[monthly_benefit_category.id], result[yearly_benefit_category.id]
 
     def _copy_contract_template_signatories(self):
+        """Copy the signatories of the contract template for the offer.
+
+        The *Contract Update* signatories are used for an active employee, the *New Contract*
+        ones otherwise.
+
+        :return: x2many commands replacing the signatories of the offer by the copies
+        :rtype: list
+        """
         self.ensure_one()
         if self.employee_id and self.employee_id.active:
             contract_template_signatories_copy = self.contract_template_id.contract_update_signatories_ids.copy()
@@ -327,7 +375,7 @@ class HrContractSalaryOffer(models.Model):
             else:
                 offer.sign_template_signatories_ids = self.env['hr.contract.signatory'].create_empty_signatories(offer.sign_template_id)
 
-    @api.depends('contract_template_id.sign_template_signatories_ids')
+    @api.depends('sign_template_signatories_ids')
     def _compute_is_half_sign_state_required(self):
         for offer in self:
             offer.is_half_sign_state_required = len(offer.sign_template_signatories_ids) != 1
@@ -508,6 +556,11 @@ class HrContractSalaryOffer(models.Model):
         }
 
     def action_refuse_offer(self, message=None, refusal_reason=None):
+        """Set the offers to ``refused`` and delete the archived versions they created.
+
+        :param str message: message posted on the offers (a default one if not given)
+        :param int refusal_reason: ``hr.contract.salary.offer.refusal.reason`` id
+        """
         self.unlink_archived_version_offer()
         if not message:
             message = _("%s manually set the Offer to Refused", self.env.user.name)
@@ -548,6 +601,7 @@ class HrContractSalaryOffer(models.Model):
         return super().unlink()
 
     def _cron_update_state(self):
+        """Set to ``expired`` the open and partially signed offers whose ``offer_end_date`` is passed."""
         self.search([
             ('state', 'in', ['open', 'half_signed']),
             ('offer_end_date', '<', fields.Date.today()),
@@ -641,6 +695,7 @@ class HrContractSalaryOffer(models.Model):
         }
 
     def unlink_archived_version_offer(self):
+        """Delete the archived versions created by the offers and cancel their signature requests."""
         archived_versions = self.env['hr.version'].search([
             ('originated_offer_id', 'in', self.ids),
             ('active', '=', False)
@@ -651,13 +706,19 @@ class HrContractSalaryOffer(models.Model):
 
     @api.model
     def action_cron_remove_simulation_offers(self):
+        """Delete the simulation offers (``is_simulation_offer``) created more than one month ago."""
         simulation_offers = self.env['hr.contract.salary.offer'].search([('is_simulation_offer', '=', True)])
         older_than_one_month_offers = simulation_offers.filtered(
-            lambda offer: offer.offer_create_date < (date.today() - relativedelta(month=1))
+            lambda offer: offer.offer_create_date < (date.today() - relativedelta(months=1))
         )
         return older_than_one_month_offers.unlink()
 
     def action_open_salary_configurator(self):
+        """Open the configurator page of the offer (``url``) in a new tab.
+
+        :raise UserError: if a field of :meth:`_get_simulation_required_fields` is missing on a
+            simulation offer.
+        """
         self.ensure_one()
         self.check_simulation_required_fields()
         self.resource_calendar_id = self.resource_calendar_id or self._get_default_resource_calendar_id()
@@ -668,9 +729,11 @@ class HrContractSalaryOffer(models.Model):
         }
 
     def _archive_future_versions(self, version=None):
-        """
-        Archive all versions that come after the provided version.
-        If no version is provided, fallback to archiving from the contract_start_date.
+        """Archive the versions of the employee dated on or after a cutoff date.
+
+        :param version: ``hr.version`` record kept active; the cutoff is its ``date_version``.
+            If not given, ``employee_version_id`` is kept and the cutoff is
+            ``contract_start_date`` (or the first day of the current month).
         """
         self.ensure_one()
         if not self.employee_id:
@@ -690,9 +753,17 @@ class HrContractSalaryOffer(models.Model):
             future_versions.flush_recordset(['active'])
 
     def _get_simulation_required_fields(self):
+        """Return the names of the offer fields required to open a simulation offer.
+
+        :rtype: list[str]
+        """
         return ["salary_amount", "employee_id"]
 
     def check_simulation_required_fields(self):
+        """Check that a simulation offer has all the fields of :meth:`_get_simulation_required_fields`.
+
+        :raise UserError: listing the missing fields.
+        """
         self.ensure_one()
         if not self.is_simulation_offer:
             return

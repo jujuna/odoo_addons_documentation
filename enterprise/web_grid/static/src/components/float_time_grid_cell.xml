@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<templates>
+    <t t-name="web_grid.FloatTimeGridCell" t-inherit="web_grid.Cell" t-inherit-mode="primary">
+        <xpath expr="//div[@t-if='this.cell()']" position="attributes">
+            <attribute name="t-key">`${this.cell().row.id}_${this.cell().column.id}`</attribute>
+        </xpath>
+        <xpath expr="//input" position="attributes">
+            <attribute name="t-on-focus">() => this.openPopover()</attribute>
+            <attribute name="t-on-focusout">() => this.closePopover()</attribute>
+            <attribute name="t-on-input">(ev) => this.onValueChange(ev)</attribute>
+        </xpath>
+    </t>
+</templates>

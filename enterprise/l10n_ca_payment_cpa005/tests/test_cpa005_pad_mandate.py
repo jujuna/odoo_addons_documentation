@@ -25,6 +25,21 @@ class TestCPA005PADMandate(CPA005Common):
         self.assertEqual(self.bank_partner_a.l10n_ca_cpa005_institution_number, '555')
         self.assertEqual(self.bank_partner_a.l10n_ca_cpa005_transit_number, '66666')
 
+    def test_cpa005_pad_mandate_generic_clearing_number(self):
+        """The generic Canadian clearing number can replace the FI number on the customer bank account."""
+        bank = self._create_ca_bank(
+            partner_id=self.partner_a,
+            account_number='999000111',
+            clearing_label_id=self.env.ref('base.clearing_label_ca').id,
+            clearing_number='0004-12345',
+        )
+        self.assertEqual(bank.l10n_ca_cpa005_institution_number, '004')
+        self.assertEqual(bank.l10n_ca_cpa005_transit_number, '12345')
+
+        mandate = self._create_cpa005_mandate(partner_bank_id=bank, validate=False)
+        mandate.action_validate_mandate()
+        self.assertEqual(mandate.state, 'active')
+
     def test_cpa005_pad_mandate_pdf_renders(self):
         """Generating the PAD mandate PDF must render the report without error."""
         self.bank_partner_a.bank_name = 'Royal Bank of Canada'

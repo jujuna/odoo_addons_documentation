@@ -390,6 +390,7 @@ class ProductTemplate(models.Model):
                     Command.set([
                         copied_ptavs[ptav.product_attribute_value_id.id]
                         for ptav in original_image.attribute_value_ids
+                        if ptav.product_attribute_value_id.id in copied_ptavs
                     ])
                 ]
         return template_copies
@@ -1059,8 +1060,12 @@ class ProductTemplate(models.Model):
 
         if combination_info["hide_price"]:
             # If the price should be hidden, we don't want to send any price information regarding
-            # the product
-            combination_info["compare_list_price"] = 0
+            # the product, including the price before discount
+            combination_info.update({
+                'compare_list_price': 0,
+                'has_discounted_price': False,
+                'list_price': combination_info['price'],
+            })
 
         if product_or_template._has_multiple_uoms():
             # for packaging pricings

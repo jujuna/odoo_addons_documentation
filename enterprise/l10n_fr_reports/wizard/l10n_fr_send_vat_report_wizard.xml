@@ -8,7 +8,12 @@
                 <field name="has_wrongly_configured_account" invisible="True"/>
                 <field name="is_vat_due" invisible="True"/>
                 <field name="currency_id" invisible="True"/>
+                <field name="is_accounting_firm_foreign" invisible="True"/>
                 <sheet>
+                    <div class="alert alert-info" role="alert" invisible="not is_accounting_firm_foreign">
+                        Your accounting firm is not located in France so it has no SIRET:
+                        the declaration will be sent with your company as writer (Rédacteur).
+                    </div>
                     <div class="alert alert-warning d-flex flex-column gap-1"
                          role="alert"
                          invisible="not has_wrongly_configured_account and vat_amount == computed_vat_amount and vat_amount"

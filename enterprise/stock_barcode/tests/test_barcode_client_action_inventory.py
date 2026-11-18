@@ -3,7 +3,7 @@
 import logging
 
 from odoo import Command, fields, http
-from odoo.tests import patch, tagged
+from odoo.tests import new_test_user, patch, tagged
 from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarcodeClientAction
 from odoo.addons.stock_barcode.controllers.stock_barcode import StockBarcodeController
 
@@ -12,6 +12,11 @@ _logger = logging.getLogger(__name__)
 
 @tagged('post_install', '-at_install')
 class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.barcode_user = new_test_user(cls.env, login='barcode_user', groups='base.group_user,stock_barcode.group_barcode_user')
+
     # === HELPER METHODS ===#
     def create_serial_numbers(self, product, start_index, quantity=1, prefix='sn'):
         return self.env['stock.lot'].create([{
@@ -22,19 +27,20 @@ class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
 
     # === TESTS ===#
     def test_inventory_adjustment(self):
-        """ Simulate the following actions:
+        """ Simulate the following actions as a Barcode user without Inventory rights:
         - Open the inventory from the barcode app.
         - Scan twice the product 1.
         - Edit the line.
-        - Add a product with the form view.
+        - Add a product with the form view, it has 5 units in stock.
         - Validate
         """
-        self.start_tour("/odoo/barcode", 'test_inventory_adjustment', login='admin', timeout=180)
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 5)
+        self.start_tour("/odoo/barcode", 'test_inventory_adjustment', login='barcode_user', timeout=180)
 
         inventory_moves = self.env['stock.move'].search([('product_id', 'in', [self.product1.id, self.product2.id]),
                                                          ('is_inventory', '=', True)])
         self.assertEqual(len(inventory_moves), 2)
-        self.assertEqual(inventory_moves.mapped('quantity'), [2.0, 2.0])
+        self.assertEqual(set(inventory_moves.mapped('quantity')), {2.0, 3.0})
         self.assertEqual(inventory_moves.mapped('state'), ['done', 'done'])
 
         quants = self.env['stock.quant'].search([('product_id', 'in', [self.product1.id, self.product2.id]),
@@ -122,13 +128,13 @@ class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
         - Add a product with the form view on an out-of-hierarchy location
         - Validate
         """
-        self.env.user.write({'group_ids': [Command.link(self.env.ref('stock.group_stock_multi_locations').id)]})
+        self.barcode_user.write({'group_ids': [Command.link(self.env.ref('stock.group_stock_multi_locations').id)]})
         out_of_hierarchy_loc = self.env['stock.location'].create({
             'name': 'Out of Hierarchy Location',
             'usage': 'internal',
             'location_id': False,
         })
-        self.start_tour("/odoo/barcode", 'test_inventory_adjustment_multi_location', login='admin', timeout=180)
+        self.start_tour("/odoo/barcode", 'test_inventory_adjustment_multi_location', login='barcode_user', timeout=180)
 
         inventory_moves = self.env['stock.move'].search([('product_id', 'in', [self.product1.id, self.product2.id]),
                                                          ('is_inventory', '=', True)])
@@ -166,9 +172,9 @@ class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
         productlot1 with a lot named lot3 (qty 1)
         - Validate
         """
-        self.env.user.write({'group_ids': [Command.link(self.env.ref('stock.group_production_lot').id)]})
+        self.barcode_user.write({'group_ids': [Command.link(self.env.ref('stock.group_production_lot').id)]})
         self.env['ir.config_parameter'].set_bool('stock.show_expected_quantity_count', True)
-        self.start_tour("/odoo/barcode", 'test_inventory_adjustment_tracked_product', login='admin', timeout=180)
+        self.start_tour("/odoo/barcode", 'test_inventory_adjustment_tracked_product', login='barcode_user', timeout=180)
 
         inventory_moves = self.env['stock.move'].search([('product_id', 'in', [self.productlot1.id, self.productserial1.id]),
                                                          ('is_inventory', '=', True)])

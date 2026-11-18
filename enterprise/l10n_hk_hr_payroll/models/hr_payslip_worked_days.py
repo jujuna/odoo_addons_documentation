@@ -20,11 +20,12 @@ class HrPayslipWorkedDays(models.Model):
             if not worked_days.version_id or worked_days.code == '000.00' or not worked_days.is_paid:
                 worked_days.amount = 0
                 continue
+            hours_per_day = worked_days.version_id.resource_calendar_id.hours_per_day or 8
             amount_rate = worked_days.work_entry_type_id.amount_rate
             if worked_days.payslip_id.wage_type == "hourly":
                 hourly_wage = worked_days.payslip_id.version_id.hourly_wage
                 if worked_days.work_entry_type_id.l10n_hk_use_713:
-                    hourly_wage = worked_days.payslip_id.l10n_hk_average_daily_wage / worked_days.version_id.resource_calendar_id.hours_per_day
+                    hourly_wage = worked_days.payslip_id.l10n_hk_average_daily_wage / hours_per_day
                 worked_days.amount = hourly_wage * worked_days.number_of_hours * amount_rate
             else:
                 payslip = worked_days.payslip_id
@@ -39,13 +40,13 @@ class HrPayslipWorkedDays(models.Model):
                     wd.number_of_hours for wd in payslip.worked_days_line_ids
                     if not wd.work_entry_type_id.is_extra_hours
                 )
-                sum_worked_days = attendance_hours / worked_days.version_id.resource_calendar_id.hours_per_day
+                sum_worked_days = attendance_hours / hours_per_day
                 daily_wage = worked_days.version_id._get_contract_wage() / (sum_worked_days or 1)
                 if worked_days.work_entry_type_id.l10n_hk_use_713:
                     daily_wage = payslip.l10n_hk_average_daily_wage
                 elif worked_days.work_entry_type_id.code == 'HKLEAVE112':  # Work Injury Sick Leave
                     daily_wage = worked_days._get_work_injury_baseline(payslip) / (sum_worked_days or 1)
-                number_of_days = worked_days.number_of_hours / worked_days.version_id.resource_calendar_id.hours_per_day
+                number_of_days = worked_days.number_of_hours / hours_per_day
                 worked_days.amount = daily_wage * number_of_days * amount_rate
 
         super(HrPayslipWorkedDays, self - hk_worked_days)._compute_amount()

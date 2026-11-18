@@ -77,4 +77,8 @@ class TestWhitelistFromTemplate(TransactionCase):
         self.employee_be._onchange_contract_template_id()
 
         for field in Version._get_whitelist_fields_from_template():
-            self.assertEqual(contract[field], template[field])
+            if field == 'transport_mode_car':
+                # "Uses company car" follows the company car, the template has none
+                self.assertFalse(contract.transport_mode_car)
+                continue
+            self.assertEqual(contract[field], template[field], field)

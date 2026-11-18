@@ -1,0 +1,520 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * ai_account_reports
+#
+# Bone NI <bounkirdni@gmail.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-11-02 03:19+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
+"ai_account_reports/lo/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: lo\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid ""
+"\n"
+"Builds reusable configuration from action_report_id returned by\n"
+"accounting_report_list, using the companies currently selected in Odoo.\n"
+"A matching current browser report supplies its native options and source\n"
+"action; otherwise native defaults apply.\n"
+"\n"
+"Returns report_config, currencies, available_option_overrides, a paginated\n"
+"line_catalog and report_config_ref. report_config contains action_report_id\n"
+"and options. options.companies lists the companies included by native reporting,\n"
+"which may be fewer than the current selection.\n"
+"Its options retain native settings and choices, including report_id and\n"
+"columns. report_config.options.columns contains all native column definitions\n"
+"in order; expression_label can repeat across groups. Match report_id to\n"
+"available_variants or sections for the selected report name. Currency details\n"
+"are listed separately by ID.\n"
+"Returned options are a subset of the saved settings. aging_based_on is\n"
+"base_on_invoice_date for invoice dates or base_on_maturity_date for due dates.\n"
+"\n"
+"Use native names in option_overrides. journals and account_type accept\n"
+"{id, selected} objects. In resolved native options, no selected entries means\n"
+"all listed entries apply. Use accounting_report_select to change identity or\n"
+"options. If the user changes the company selection, describe the report again\n"
+"to obtain a new reference.\n"
+"        "
+msgstr ""
+"\n"
+"ສ້າງການກຳນົດຄ່າທີ່ນຳມາໃຊ້ຄືນໃໝ່ໄດ້ຈາກ action_report_id ທີ່ສົ່ງຄືນມາໂດຍ\n"
+"accounting_report_list ໂດຍນຳໃຊ້ບັນດາບໍລິສັດທີ່ເລືອກໄວ້ໃນປະຈຸບັນໃນ Odoo.\n"
+"ລາຍງານຂອງບຣາວເຊີປະຈຸບັນທີ່ກົງກັນຈະສະໜອງຕົວເລືອກດັ້ງເດີມ ແລະ ການກະທຳຕົ້ນທາງ;\n"
+"ຖ້າບໍ່ດັ່ງນັ້ນ ຈະນຳໃຊ້ຄ່າເລີ່ມຕົ້ນດັ້ງເດີມ.\n"
+"\n"
+"ສົ່ງຄືນ report_config, ສະກຸນເງິນ, available_option_overrides, line_catalog\n"
+"ທີ່ມີການແບ່ງໜ້າ ແລະ report_config_ref. report_config ປະກອບມີ action_report_id\n"
+"ແລະ ຕົວເລືອກຕ່າງໆ. options.companies ຈະລະບຸລາຍຊື່ບໍລິສັດທີ່ລວມຢູ່ໃນການລາຍງານດັ້ງເດີມ,\n"
+"ເຊິ່ງອາດຈະໜ້ອຍກວ່າການເລືອກໃນປະຈຸບັນ.\n"
+"ຕົວເລືອກຕ່າງໆຈະຮັກສາການຕັ້ງຄ່າ ແລະ ຕົວເລືອກດັ້ງເດີມໄວ້, ລວມທັງ report_id ແລະ\n"
+"ຖັນຕ່າງໆ. report_config.options.columns ປະກອບມີຄຳອະທິບາຍຖັນດັ້ງເດີມທັງໝົດ\n"
+"ຕາມລຳດັບ; expression_label ສາມາດຊ້ຳກັນໄດ້ຂ້າມກຸ່ມ. ຈັບຄູ່ report_id ກັບ\n"
+"available_variants ຫຼື ພາກສ່ວນສຳລັບຊື່ລາຍງານທີ່ເລືອກ. ລາຍລະອຽດສະກຸນເງິນ\n"
+"ຈະຖືກສະແດງແຍກຕ່າງຫາກຕາມ ID.\n"
+"ຕົວເລືອກທີ່ສົ່ງຄືນແມ່ນສ່ວນຍ່ອຍຂອງການຕັ້ງຄ່າທີ່ບັນທຶກໄວ້. aging_based_on ແມ່ນ\n"
+"base_on_invoice_date ສຳລັບວັນທີໃບເກັບເງິນ ຫຼື base_on_maturity_date ສຳລັບວັນຄົບກຳນົດ.\n"
+"\n"
+"ໃຊ້ຊື່ດັ້ງເດີມໃນ option_overrides. journals ແລະ account_type ຮັບຄ່າເປັນ\n"
+"ວັດຖຸ {id, selected}. ໃນຕົວເລືອກດັ້ງເດີມທີ່ແກ້ໄຂແລ້ວ, ຖ້າບໍ່ມີການເລືອກລາຍການໝາຍຄວາມວ່າ\n"
+"ນຳໃຊ້ລາຍການທັງໝົດທີ່ສະແດງ. ໃຊ້ accounting_report_select ເພື່ອປ່ຽນຕົວຕົນ ຫຼື\n"
+"ຕົວເລືອກ. ຖ້າຜູ້ໃຊ້ປ່ຽນການເລືອກບໍລິສັດ, ໃຫ້ອະທິບາຍລາຍງານຄືນໃໝ່\n"
+"ເພື່ອຂໍເອົາການອ້າງອີງໃໝ່.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid ""
+"\n"
+"Computes native report values from report_config_ref returned by describe or\n"
+"select. Returns report_config, currencies, column_groups, paginated lines,\n"
+"native warnings and the same report_config_ref.\n"
+"An empty warnings object means the report returned no warnings. It does not\n"
+"establish that the accounts are correct, reconciled or compliant. Consider any\n"
+"line-level warning_text as well.\n"
+"report_config.options.columns keeps all native column definitions. Provide at\n"
+"least one expression_label in columns. These labels select row cells across all\n"
+"periods and groups without changing the config. Pagination limits rows,\n"
+"regardless of the number of columns.\n"
+"Each line contains native columns: expression_label, column_group_index,\n"
+"no_format (raw value) and name (formatted value). column_group_index indexes\n"
+"column_groups; forced_options.date identifies that group's period when present,\n"
+"otherwise use report_config.options.date. A configured date range does not mean\n"
+"every value is activity within that range: General Ledger account debit and\n"
+"credit totals include opening amounts. line_ref permits expansion.\n"
+"row_type distinguishes data, totals and load_more summaries. Lines retain\n"
+"native warning_text when present.\n"
+"        "
+msgstr ""
+"\n"
+"ຄິດໄລ່ຄ່າລາຍງານດັ້ງເດີມຈາກ report_config_ref ທີ່ສົ່ງຄືນມາໂດຍ describe ຫຼື\n"
+"select. ສົ່ງຄືນ report_config, ສະກຸນເງິນ, column_groups, ແຖວທີ່ມີການແບ່ງໜ້າ,\n"
+"ຄຳເຕືອນດັ້ງເດີມ ແລະ report_config_ref ອັນດຽວກັນ.\n"
+"ວັດຖຸຄຳເຕືອນທີ່ຫວ່າງເປົ່າໝາຍເຖິງລາຍງານບໍ່ໄດ້ສົ່ງຄືນຄຳເຕືອນໃດໆ. ມັນບໍ່ໄດ້\n"
+"ຢັ້ງຢືນວ່າບັນຊີມີຄວາມຖືກຕ້ອງ, ກວດສອບກະທົບຍອດແລ້ວ ຫຼື ສອດຄ່ອງຕາມມາດຕະຖານ. ຄວນພິຈາລະນາ\n"
+"warning_text ໃນລະດັບແຖວໄປພ້ອມກັນ.\n"
+"report_config.options.columns ຮັກສາຄຳອະທິບາຍຖັນດັ້ງເດີມທັງໝົດໄວ້. ໃຫ້ລະບຸຢ່າງໜ້ອຍ\n"
+"ໜຶ່ງ expression_label ໃນຖັນ. ປ້າຍກຳກັບເຫຼົ່ານີ້ຈະເລືອກຫ້ອງແຖວຂ້າມທຸກໆ\n"
+"ງວດ ແລະ ກຸ່ມ ໂດຍບໍ່ປ່ຽນແປງການກຳນົດຄ່າ. ການແບ່ງໜ້າຈະຈຳກັດຈຳນວນແຖວ,\n"
+"ໂດຍບໍ່ຂຶ້ນກັບຈຳນວນຂອງຖັນ.\n"
+"ແຕ່ລະແຖວປະກອບມີຖັນດັ້ງເດີມ: expression_label, column_group_index,\n"
+"no_format (ຄ່າດິບ) ແລະ name (ຄ່າທີ່ມີການຈັດຮູບແບບ). column_group_index ເປັນດັດຊະນີ\n"
+"ຊີ້ໄປຫາ column_groups; forced_options.date ຈະລະບຸງວດເວລາຂອງກຸ່ມນັ້ນເມື່ອມີຢູ່,\n"
+"ຖ້າບໍ່ມີ ແມ່ນໃຫ້ໃຊ້ report_config.options.date. ຊ່ວງວັນທີທີ່ກຳນົດໄວ້ບໍ່ໄດ້ໝາຍຄວາມວ່າ\n"
+"ທຸກໆຄ່າຈະເປັນການເຄື່ອນໄຫວພາຍໃນຊ່ວງນັ້ນ: ຍອດລວມເດບິດ ແລະ ເຄຣດິດຂອງບັນຊີໃຫຍ່\n"
+"ຈະລວມເອົາຈຳນວນເງິນຍອດຍົກມາ. line_ref ອະນຸຍາດໃຫ້ຂະຫຍາຍລາຍລະອຽດໄດ້.\n"
+"row_type ຈຳແນກລະຫວ່າງ ຂໍ້ມູນ, ຍອດລວມ ແລະ ສະຫຼຸບ load_more. ແຖວຕ່າງໆຈະຮັກສາ\n"
+"warning_text ດັ້ງເດີມໄວ້ເມື່ອມີ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid ""
+"\n"
+"Create a native audit working file for the currently selected company and\n"
+"exact dates, using the native local audit type and configured cycles. Select\n"
+"one company in Odoo before calling this tool. Requires confirmation. For branch\n"
+"structures, ask the user to create the file manually in the Accounting\n"
+"application and provide its ID. Returns the file scope, URL and native check\n"
+"progress.\n"
+"        "
+msgstr ""
+"\n"
+"ສ້າງແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີດັ້ງເດີມ ສຳລັບບໍລິສັດທີ່ເລືອກໃນປະຈຸບັນ ແລະ\n"
+"ວັນທີທີ່ແນ່ນອນ, ໂດຍນຳໃຊ້ປະເພດການກວດສອບພາຍໃນດັ້ງເດີມ ແລະ ຮອບວຽນທີ່ກຳນົດໄວ້.\n"
+"ເລືອກບໍລິສັດໜຶ່ງໃນ Odoo ກ່ອນທີ່ຈະເອີ້ນໃຊ້ເຄື່ອງມືນີ້. ຕ້ອງການການຢືນຢັນ. ສຳລັບ\n"
+"ໂຄງສ້າງສາຂາ, ໃຫ້ບອກໃຫ້ຜູ້ໃຊ້ນັ້ນສ້າງແຟ້ມເອກະສານດ້ວຍຕົນເອງໃນແອັບພລິເຄຊັນ\n"
+"ການບັນຊີ ແລະ ລະບຸ ID ຂອງມັນ. ສົ່ງຄືນຂອບເຂດຂອງແຟ້ມເອກະສານ, URL ແລະ ຄວາມຄືບໜ້າ\n"
+"ຂອງການກວດສອບດັ້ງເດີມ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid ""
+"\n"
+"Expands a line_ref issued by get_values or expand_line using its exact saved\n"
+"configuration and column selection. Returns the same report_config, currencies,\n"
+"lines, column_groups and pagination as get_values. Follow returned line_ref\n"
+"values for deeper detail. A load_more reference reloads its parent branch and\n"
+"may repeat earlier lines; do not double-count them.\n"
+"Rows represent report lines, not necessarily accounting records. Initial Balance\n"
+"is an opening summary. Row names are display descriptions; do not infer\n"
+"dimensions absent from the returned data. Lines retain native warning_text\n"
+"when present.\n"
+"        "
+msgstr ""
+"\n"
+"ຂະຫຍາຍ line_ref ທີ່ອອກໃຫ້ໂດຍ get_values ຫຼື expand_line ໂດຍນຳໃຊ້ການກຳນົດຄ່າ\n"
+"ທີ່ບັນທຶກໄວ້ຢ່າງແນ່ນອນ ແລະ ການເລືອກຖັນ. ສົ່ງຄືນ report_config, ສະກຸນເງິນ,\n"
+"ແຖວ, column_groups ແລະ ການແບ່ງໜ້າແບບດຽວກັນກັບ get_values. ຕິດຕາມຄ່າ line_ref\n"
+"ທີ່ສົ່ງຄືນມາເພື່ອເບິ່ງລາຍລະອຽດທີ່ເລິກເຊິ່ງກວ່າ. ການອ້າງອີງ load_more ຈະໂຫຼດສາຂາແມ່ຂອງມັນຄືນໃໝ່ ແລ"
+"ະ\n"
+"ອາດຈະເຮັດຊ້ຳແຖວກ່ອນໜ້າ; ຫ້າມນັບພວກມັນຊ້ຳຊ້ອນ.\n"
+"ແຖວຕ່າງໆສະແດງເຖິງແຖວລາຍງານ, ບໍ່ຈຳເປັນຕ້ອງເປັນລາຍການບັນທຶກບັນຊີສະເໝີໄປ. ຍອດຍົກມາ\n"
+"ແມ່ນບົດສະຫຼຸບຍອດເປີດ. ຊື່ແຖວແມ່ນຄຳອະທິບາຍສຳລັບການສະແດງຜົນ; ຢ່າອະນຸມານ\n"
+"ມິຕິທີ່ບໍ່ມີຢູ່ໃນຂໍ້ມູນທີ່ສົ່ງຄືນມາ. ແຖວຕ່າງໆຈະຮັກສາ warning_text ດັ້ງເດີມໄວ້\n"
+"ເມື່ອມີ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_list
+msgid ""
+"\n"
+"Lists accessible report entry points from account_report client actions.\n"
+"Use action_report_id to describe an entry; report.report_id identifies its\n"
+"native default selection. Returns report names, default variant/section IDs,\n"
+"filter_date_range and pagination. An empty list means no matching entries.\n"
+"        "
+msgstr ""
+"\n"
+"ສະແດງລາຍຊື່ຈຸດເຂົ້າເຖິງລາຍງານທີ່ສາມາດເຂົ້າໃຊ້ໄດ້ ຈາກການກະທຳຂອງລູກຂ່າຍ account_report.\n"
+"ໃຊ້ action_report_id ເພື່ອອະທິບາຍລາຍການ; report.report_id ຈະລະບຸ\n"
+"ຕົວເລືອກເລີ່ມຕົ້ນດັ້ງເດີມຂອງມັນ. ສົ່ງຄືນຊື່ລາຍງານ, ID ຕົວປ່ຽນ/ພາກສ່ວນເລີ່ມຕົ້ນ,\n"
+"filter_date_range ແລະ ການແບ່ງໜ້າ. ລາຍການທີ່ຫວ່າງເປົ່າໝາຍເຖິງບໍ່ມີລາຍການທີ່ກົງກັນ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_open
+msgid ""
+"\n"
+"Opens the exact saved report_config_ref using its source action and full\n"
+"native options. Returns opened, report_config, currencies and the reference.\n"
+"If that exact configuration is already displayed, opened is false and reason\n"
+"explains why. Otherwise a client action opens it. Call this tool alone and wait\n"
+"for its result before answering.\n"
+"        "
+msgstr ""
+"\n"
+"ເປີດ report_config_ref ທີ່ບັນທຶກໄວ້ຢ່າງແນ່ນອນ ໂດຍນຳໃຊ້ການກະທຳຕົ້ນທາງ ແລະ\n"
+"ຕົວເລືອກດັ້ງເດີມທັງໝົດ. ສົ່ງຄືນ opened, report_config, ສະກຸນເງິນ ແລະ ການອ້າງອີງ.\n"
+"ຖ້າການກຳນົດຄ່າທີ່ແນ່ນອນນັ້ນຖືກສະແດງຢູ່ແລ້ວ, opened ຈະເປັນ false ແລະ reason\n"
+"ຈະອະທິບາຍເຫດຜົນ. ຖ້າບໍ່ດັ່ງນັ້ນ ການກະທຳຂອງລູກຂ່າຍຈະເປີດມັນ. ເອີ້ນໃຊ້ເຄື່ອງມືນີ້ພຽງຢ່າງດຽວ ແລະ ລໍຖ້າ\n"
+"ຜົນລັບຂອງມັນກ່ອນທີ່ຈະຕອບກັບ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid ""
+"\n"
+"Preview and save a validated batch of findings for one assigned cycle, under\n"
+"native access and review rules. Only non-file checks may be updated. Use\n"
+"reviewed for supported clearance, anomaly for evidenced exceptions, and todo for\n"
+"incomplete or blocked checks. Never formally completes or supervises the\n"
+"working file. Requires confirmation. After saving, returns the updated check\n"
+"codes, native check progress and working-file URL.\n"
+"\n"
+"For each saved audit note, write a short, plain-language conclusion, normally\n"
+"two or three sentences. State what is established, what is wrong, or what\n"
+"remains unresolved. Include only the decisive facts or amounts and any\n"
+"necessary next action.\n"
+"\n"
+"Do not repeat the check description, company, period or procedures unless\n"
+"needed to understand the conclusion. Avoid headings such as Scope, Procedures\n"
+"and Evidence. Preserve limitations that change what can be concluded. Use\n"
+"neutral language without mentioning agents.\n"
+"        "
+msgstr ""
+"\n"
+"ສະແດງຕົວຢ່າງ ແລະ ບັນທຶກຊຸດຜົນການກວດພົບທີ່ຜ່ານການຢືນຢັນແລ້ວ ສຳລັບຮອບວຽນທີ່ຖືກມອບໝາຍໜຶ່ງຮອບວຽນ,\n"
+"ພາຍໃຕ້ກົດລະບຽບການເຂົ້າເຖິງ ແລະ ການກວດສອບຄືນດັ້ງເດີມ. ສາມາດອັບເດດໄດ້ສະເພາະການກວດສອບທີ່ບໍ່ແມ່ນແ"
+"ຟ້ມເອກະສານເທົ່ານັ້ນ. ໃຊ້\n"
+"reviewed ສຳລັບລາຍການທີ່ໄດ້ຮັບການອະນຸມັດຜ່ານ, anomaly ສຳລັບຂໍ້ຍົກເວັ້ນທີ່ມີຫຼັກຖານ, ແລະ todo ສຳລັ"
+"ບ\n"
+"ການກວດສອບທີ່ບໍ່ຄົບຖ້ວນ ຫຼື ຖືກບລັອກ. ບໍ່ມີການສຳເລັດ ຫຼື ກວດກາງານແຟ້ມເອກະສານປະຕິບັດງານ\n"
+"ຢ່າງເປັນທາງການຢ່າງເດັດຂາດ. ຕ້ອງການການຢືນຢັນ. ຫຼັງຈາກບັນທຶກແລ້ວ, ຈະສົ່ງຄືນລະຫັດການກວດສອບ\n"
+"ທີ່ອັບເດດແລ້ວ, ຄວາມຄືບໜ້າການກວດສອບດັ້ງເດີມ ແລະ URL ແຟ້ມເອກະສານປະຕິບັດງານ.\n"
+"\n"
+"ສຳລັບແຕ່ລະໝາຍເຫດການກວດສອບທີ່ບັນທຶກໄວ້, ໃຫ້ຂຽນຂໍ້ສະຫຼຸບສັ້ນໆ ດ້ວຍພາສາທີ່ເຂົ້າໃຈງ່າຍ, ໂດຍປົກກະຕິແລ້ວ\n"
+"ແມ່ນສອງ ຫຼື ສາມປະໂຫຍກ. ລະບຸສິ່ງທີ່ໄດ້ຮັບການຢັ້ງຢືນ, ສິ່ງທີ່ຜິດພາດ, ຫຼື ສິ່ງທີ່\n"
+"ຍັງບໍ່ທັນໄດ້ຮັບການແກ້ໄຂ. ໃຫ້ໃສ່ສະເພາະຂໍ້ເທັດຈິງ ຫຼື ຈຳນວນເງິນທີ່ຕັດສິນຊີ້ຂາດ ແລະ ການກະທຳຕໍ່ໄປທີ່ຈຳເປັ"
+"ນ.\n"
+"\n"
+"ຢ່າຂຽນຊ້ຳຄຳອະທິບາຍການກວດສອບ, ບໍລິສັດ, ງວດເວລາ ຫຼື ຂັ້ນຕອນຕ່າງໆ ເວັ້ນເສຍແຕ່\n"
+"ຈຳເປັນຕ້ອງໃຊ້ເພື່ອເຂົ້າໃຈຂໍ້ສະຫຼຸບ. ຫຼີກລ່ຽງຫົວຂໍ້ຕ່າງໆ ເຊັ່ນ: ຂອບເຂດ, ຂັ້ນຕອນ\n"
+"ແລະ ຫຼັກຖານ. ຮັກສາຂໍ້ຈຳກັດທີ່ອາດປ່ຽນແປງສິ່ງທີ່ຈະສະຫຼຸບໄດ້. ນຳໃຊ້\n"
+"ພາສາທີ່ເປັນກາງ ໂດຍບໍ່ກ່າວເຖິງຕົວແທນ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid ""
+"\n"
+"Read the native working file, complete check instructions and notes, company and\n"
+"dates, live cycle progress, and paginated checks. Pass cycle to read the\n"
+"assigned cycle, or omit it to discover all cycles. File checks require manual\n"
+"evidence. Native record count is only a capped hint; it is not a complete\n"
+"evidence count. Progress summarizes native statuses and refresh flags, not a\n"
+"record of agent investigations.\n"
+"        "
+msgstr ""
+"\n"
+"ອ່ານແຟ້ມເອກະສານປະຕິບັດງານດັ້ງເດີມ, ຄຳແນະນຳ ແລະ ໝາຍເຫດການກວດສອບທີ່ຄົບຖ້ວນ, ບໍລິສັດ ແລະ\n"
+"ວັນທີ, ຄວາມຄືບໜ້າຂອງຮອບວຽນແບບສົດໆ, ແລະ ການກວດສອບທີ່ມີການແບ່ງໜ້າ. ສົ່ງຄ່າ cycle ເພື່ອອ່ານ\n"
+"ຮອບວຽນທີ່ຖືກມອບໝາຍ, ຫຼື ລະເວັ້ນມັນເພື່ອຄົ້ນຫາຮອບວຽນທັງໝົດ. ການກວດສອບແຟ້ມເອກະສານຕ້ອງການ\n"
+"ຫຼັກຖານດ້ວຍຕົນເອງ. ຈຳນວນບັນທຶກດັ້ງເດີມແມ່ນພຽງແຕ່ຂໍ້ແນະນຳທີ່ມີຂອບເຂດສູງສຸດເທົ່ານັ້ນ; ມັນບໍ່ແມ່ນການນັບ\n"
+"ຫຼັກຖານທີ່ຄົບຖ້ວນ. ຄວາມຄືບໜ້າຈະສະຫຼຸບສະຖານະດັ້ງເດີມ ແລະ ທຸງການໂຫຼດໃໝ່, ບໍ່ແມ່ນ\n"
+"ບັນທຶກການສືບສວນຂອງຕົວແທນ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid ""
+"\n"
+"Return a check's native action in action_detail as an investigation hint, with\n"
+"search and main view XML for record actions. Interpret its domain, active search\n"
+"defaults and search-panel selections using the XML, including filter grouping.\n"
+"Group-by defaults suggest grouping rather than record restrictions. Choose\n"
+"fields and explicit domains for search/read-group, or use accounting-report\n"
+"tools for report actions. Native report IDs and options remain in the action.\n"
+"\n"
+"No records or report_config_ref are returned. Action context is metadata for\n"
+"interpreting the action; it does not configure subsequent tools.\n"
+"If no action is available, investigate from the check instructions and attached\n"
+"documents. Other executable actions are returned without being run.\n"
+"        "
+msgstr ""
+"\n"
+"ສົ່ງຄືນການກະທຳດັ້ງເດີມຂອງການກວດສອບໃນ action_detail ເພື່ອເປັນຂໍ້ແນະນຳໃນການສືບສວນ, ພ້ອມທັງ\n"
+"XML ຂອງມຸມມອງການຄົ້ນຫາ ແລະ ມຸມມອງຫຼັກ ສຳລັບການກະທຳຂອງບັນທຶກ. ແປຄວາມໝາຍໂດເມນ, ຄ່າເລີ່ມຕົ້ນກາ"
+"ນຄົ້ນຫາທີ່ໃຊ້ງານຢູ່\n"
+"ແລະ ການເລືອກໃນແຜງຄົ້ນຫາ ໂດຍນຳໃຊ້ XML, ລວມທັງການຈັດກຸ່ມຕົວກັ່ນຕອງ.\n"
+"ຄ່າເລີ່ມຕົ້ນ Group-by ແນະນຳການຈັດກຸ່ມຫຼາຍກວ່າການຈຳກັດບັນທຶກ. ເລືອກ\n"
+"ຟິວ ແລະ ໂດເມນທີ່ຊັດເຈນ ສຳລັບ search/read-group, ຫຼື ໃຊ້ເຄື່ອງມື accounting-report\n"
+"ສຳລັບການກະທຳລາຍງານ. ID ລາຍງານດັ້ງເດີມ ແລະ ຕົວເລືອກຕ່າງໆ ຍັງຄົງຢູ່ໃນການກະທຳ.\n"
+"\n"
+"ບໍ່ມີການສົ່ງຄືນບັນທຶກ ຫຼື report_config_ref. ບໍລິບົດການກະທຳແມ່ນເມຕາເດຕາ ສຳລັບ\n"
+"ການແປຄວາມໝາຍຂອງການກະທຳ; ມັນບໍ່ໄດ້ກຳນົດຄ່າເຄື່ອງມືທີ່ຕາມມາ.\n"
+"ຖ້າບໍ່ມີການກະທຳໃດໆ, ໃຫ້ສືບສວນຈາກຄຳແນະນຳການກວດສອບ ແລະ ເອກະສານ\n"
+"ຄັດຕິດ. ການກະທຳອື່ນໆທີ່ສາມາດປະຕິບັດໄດ້ ຈະຖືກສົ່ງຄືນໂດຍບໍ່ໄດ້ຖືກດຳເນີນການ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_report_select
+msgid ""
+"\n"
+"Selects a variant or section from an exact report_config_ref.\n"
+"Use choice={kind: \"variant\", id: ...} with an ID from\n"
+"report_config.options.available_variants, or kind: \"section\" with an ID from\n"
+"report_config.options.sections. These lists belong to the supplied\n"
+"configuration. A report can serve different roles in different lists; use the\n"
+"matching kind. Returns the same description as describe.\n"
+"Optional option_overrides uses native option names and selection objects.\n"
+"Checks reference ownership, selected companies and report access.\n"
+"        "
+msgstr ""
+"\n"
+"ເລືອກຕົວປ່ຽນ ຫຼື ພາກສ່ວນ ຈາກ report_config_ref ທີ່ແນ່ນອນ.\n"
+"ໃຊ້ choice={kind: \"variant\", id: ...} ພ້ອມກັບ ID ຈາກ\n"
+"report_config.options.available_variants, ຫຼື kind: \"section\" ພ້ອມກັບ ID ຈາກ\n"
+"report_config.options.sections. ລາຍການເຫຼົ່ານີ້ຂຶ້ນກັບການກຳນົດຄ່າ\n"
+"ທີ່ລະບຸໄວ້. ລາຍງານໜຶ່ງສາມາດເຮັດໜ້າທີ່ແຕກຕ່າງກັນໃນລາຍຊື່ທີ່ແຕກຕ່າງກັນ; ໃຫ້ໃຊ້\n"
+"ປະເພດທີ່ກົງກັນ. ສົ່ງຄືນຄຳອະທິບາຍດຽວກັນກັບ describe.\n"
+"option_overrides ທີ່ເປັນທາງເລືອກ ຈະໃຊ້ຊື່ຕົວເລືອກດັ້ງເດີມ ແລະ ວັດຖຸການເລືອກ.\n"
+"ກວດສອບຄວາມເປັນເຈົ້າຂອງການອ້າງອີງ, ບໍລິສັດທີ່ເລືອກ ແລະ ສິດການເຂົ້າເຖິງລາຍງານ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_description:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid ""
+"\n"
+"Set the working audit file for this session's context-dependent accounting\n"
+"fields, or pass null to clear it. Select the assigned file before querying audit\n"
+"fields with search/read-group. Wait for the setter result before issuing those\n"
+"queries. Clear it before unrelated work or select the new file when the\n"
+"assignment changes. Parent and child sessions keep separate working-file\n"
+"selections. The file's companies and main company must match Odoo's company\n"
+"selector.\n"
+"\n"
+"Returns the active file, company and period, or audit_context=null when cleared.\n"
+"This does not add company/date domains to ordinary searches, select report\n"
+"options or modify the working file's findings.\n"
+"        "
+msgstr ""
+"\n"
+"ກຳນົດແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີ ສຳລັບຟິວການບັນຊີທີ່ຂຶ້ນກັບບໍລິບົດຂອງເຊດຊັນນີ້,\n"
+"ຫຼື ສົ່ງຄ່າ null ເພື່ອລຶບລ້າງມັນ. ເລືອກແຟ້ມເອກະສານທີ່ມອບໝາຍກ່ອນທີ່ຈະສອບຖາມຟິວການກວດສອບ\n"
+"ດ້ວຍ search/read-group. ລໍຖ້າຜົນການກຳນົດຄ່າກ່ອນທີ່ຈະດຳເນີນການສອບຖາມ\n"
+"ເຫຼົ່ານັ້ນ. ລຶບລ້າງມັນກ່ອນທີ່ຈະເຮັດວຽກທີ່ບໍ່ກ່ຽວຂ້ອງ ຫຼື ເລືອກແຟ້ມເອກະສານໃໝ່ເມື່ອມີການປ່ຽນແປງ\n"
+"ການມອບໝາຍ. ເຊດຊັນແມ່ ແລະ ເຊດຊັນລູກ ຈະແຍກການເລືອກແຟ້ມເອກະສານປະຕິບັດງານຕ່າງຫາກ.\n"
+"ບັນດາບໍລິສັດ ແລະ ບໍລິສັດຫຼັກຂອງແຟ້ມເອກະສານ ຕ້ອງກົງກັບຕົວເລືອກບໍລິສັດຂອງ Odoo.\n"
+"\n"
+"ສົ່ງຄືນແຟ້ມເອກະສານທີ່ໃຊ້ງານຢູ່, ບໍລິສັດ ແລະ ງວດເວລາ, ຫຼື audit_context=null ເມື່ອລຶບລ້າງແລ້ວ.\n"
+"ສິ່ງນີ້ບໍ່ໄດ້ເພີ່ມໂດເມນບໍລິສັດ/ວັນທີ ເຂົ້າໃນການຄົ້ນຫາປົກກະຕິ, ເລືອກຕົວເລືອກລາຍງານ\n"
+"ຫຼື ແກ້ໄຂຜົນການກວດພົບຂອງແຟ້ມເອກະສານປະຕິບັດງານ.\n"
+"        "
+
+#. module: ai_account_reports
+#: model:ir.module.module,shortdesc:base.module_ai_account_reports
+msgid "AI Accounting Reports"
+msgstr "ລາຍງານການບັນຊີ AI"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_session
+msgid "AI Session"
+msgstr "ເຊດຊັນ AI"
+
+#. module: ai_account_reports
+#: model:ir.model,name:ai_account_reports.model_ai_tool
+msgid "AI Tool"
+msgstr "ເຄື່ອງມື AI"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "AI Tool: Create Audit Working File"
+msgstr "ເຄື່ອງມື AI: ສ້າງແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "AI Tool: Describe Accounting Report"
+msgstr "ເຄື່ອງມື AI: ອະທິບາຍລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "AI Tool: Expand Accounting Report Line"
+msgstr "ເຄື່ອງມື AI: ຂະຫຍາຍແຖວລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "AI Tool: Get Accounting Report Values"
+msgstr "ເຄື່ອງມື AI: ດຶງຄ່າລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "AI Tool: Get Audit Check Action Detail"
+msgstr "ເຄື່ອງມື AI: ດຶງລາຍລະອຽດການກະທຳກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "AI Tool: List Accounting Reports"
+msgstr "ເຄື່ອງມື AI: ສະແດງລາຍຊື່ລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "AI Tool: Open Accounting Report"
+msgstr "ເຄື່ອງມື AI: ເປີດລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "AI Tool: Read Audit Checks"
+msgstr "ເຄື່ອງມື AI: ອ່ານລາຍການກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "AI Tool: Save Audit Cycle Findings"
+msgstr "ເຄື່ອງມື AI: ບັນທຶກຜົນການກວດພົບຮອບວຽນການກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "AI Tool: Select Accounting Report Identity"
+msgstr "ເຄື່ອງມື AI: ເລືອກຕົວຕົນລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,name:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "AI Tool: Set Working Audit File"
+msgstr "ເຄື່ອງມື AI: ກຳນົດແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.module.module,summary:base.module_ai_account_reports
+msgid "AI-assisted accounting report analysis and audit review"
+msgstr "ການວິເຄາະລາຍງານການບັນຊີ ແລະ ການກວດສອບບັນຊີໂດຍມີ AI ຊ່ວຍເຫຼືອ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_get_values
+msgid "Computing selected accounting figures"
+msgstr "ກຳລັງຄິດໄລ່ຕົວເລກບັນຊີທີ່ເລືອກ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_create
+msgid "Create Audit Working File"
+msgstr "ສ້າງແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__display_name
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__display_name
+msgid "Display Name"
+msgstr "ຊື່ສະແດງ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_expand_line
+msgid "Drilling into the accounting report"
+msgstr "ກຳລັງເຈາະເລິກລາຍລະອຽດລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_list
+msgid "Finding accessible accounting reports"
+msgstr "ກຳລັງຊອກຫາລາຍງານການບັນຊີທີ່ສາມາດເຂົ້າເຖິງໄດ້"
+
+#. module: ai_account_reports
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_session__id
+#: model:ir.model.fields,field_description:ai_account_reports.field_ai_tool__id
+msgid "ID"
+msgstr "ID"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_describe
+msgid "Inspecting the accounting report"
+msgstr "ກຳລັງກວດກາລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_check_action_detail
+msgid "Inspecting the audit check action"
+msgstr "ກຳລັງກວດກາການກະທຳກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Invalid or inaccessible partner_categories."
+msgstr "partner_categories ບໍ່ຖືກຕ້ອງ ຫຼື ບໍ່ສາມາດເຂົ້າເຖິງໄດ້."
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_open
+msgid "Opening the supporting accounting report"
+msgstr "ກຳລັງເປີດລາຍງານການບັນຊີທີ່ສະໜັບສະໜູນ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_get_checks
+msgid "Read Audit Checks"
+msgstr "ອ່ານລາຍການກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_update_checks
+msgid "Save Audit Cycle Findings"
+msgstr "ບັນທຶກຜົນການກວດພົບຮອບວຽນການກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_report_select
+msgid "Selecting the accounting report"
+msgstr "ກຳລັງເລືອກລາຍງານການບັນຊີ"
+
+#. module: ai_account_reports
+#: model:ir.actions.server,ai_tool_thinking_text:ai_account_reports.ir_actions_server_accounting_audit_set_working_file
+msgid "Setting Working Audit File"
+msgstr "ກຳລັງກຳນົດແຟ້ມເອກະສານປະຕິບັດງານກວດສອບບັນຊີ"
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "The report engine returned an invalid company scope."
+msgstr "ລະບົບປະມວນຜົນລາຍງານໄດ້ສົ່ງຄືນຂອບເຂດບໍລິສັດທີ່ບໍ່ຖືກຕ້ອງ."
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "Unavailable report."
+msgstr "ລາຍງານບໍ່ພ້ອມໃຊ້ງານ."
+
+#. module: ai_account_reports
+#. odoo-python
+#: code:addons/ai_account_reports/models/ai_tool.py:0
+msgid "You must be an accountant to access accounting reports."
+msgstr "ທ່ານຕ້ອງເປັນນັກບັນຊີຈຶ່ງຈະສາມາດເຂົ້າເຖິງລາຍງານການບັນຊີໄດ້."

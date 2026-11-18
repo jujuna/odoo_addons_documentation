@@ -46,6 +46,7 @@ class TestMobilityBudget(TransactionCase):
             'company_id': cls.company.id,
         })
 
+        cls.company.resource_calendar_id.reference_calendar_id = cls.company.resource_calendar_id
         cls.resource_calendar = cls.env["resource.calendar"].create(
             {
                 "name": "Standard 40h/week",
@@ -530,12 +531,7 @@ class TestMobilityBudget(TransactionCase):
 
         departure_notice._compute_payslip_history()
         termination_fees_payslip = departure_notice._generate_termination_payslip()
-        termination_fee_mobility_payment_line = termination_fees_payslip.line_ids.filtered(lambda l: l.code == "MOBILITY_PAYMENT_TERM")
-
-        # 100.0 * 8 weeks * 3 / 13 = 184.62
-        self.assertEqual(termination_fee_mobility_payment_line.total, 184.62)
-        self.assertEqual(termination_fee_mobility_payment_line.quantity, 1.85)
-        self.assertEqual(termination_fee_mobility_payment_line.amount, 100.00)
+        self.assertNotIn("MOBILITY_PAYMENT_TERM", termination_fees_payslip.line_ids.mapped("code"))
 
     def test_mobility_payment_end_of_collaboration_partial_notice_respect(self):
         departure_notice = self.env['hr.employee.departure'].create({
@@ -553,12 +549,36 @@ class TestMobilityBudget(TransactionCase):
 
         departure_notice._compute_payslip_history()
         termination_fees_payslip = departure_notice._generate_termination_payslip()
-        termination_fee_mobility_payment_line = termination_fees_payslip.line_ids.filtered(lambda l: l.code == "MOBILITY_PAYMENT_TERM")
+        self.assertNotIn("MOBILITY_PAYMENT_TERM", termination_fees_payslip.line_ids.mapped("code"))
 
-        # 100.0 * 5 weeks * 3 / 13 = 184.62
-        self.assertEqual(termination_fee_mobility_payment_line.total, 115.38)
-        self.assertEqual(termination_fee_mobility_payment_line.quantity, 1.15)
-        self.assertEqual(termination_fee_mobility_payment_line.amount, 100.00)
+    def test_mobility_budget_termination_fees_counted_once(self):
+        # The mobility budget is part of the yearly reference salary of the termination fees
+        # and must not be paid a second time through a dedicated rule.
+        self.version.write({
+            'wage': 4500.0,
+            'eco_checks': 250.0,
+            'meal_voucher_amount': 0.0,
+            'l10n_be_mobility_budget_amount': 9000.0,
+        })
+        departure_notice = self.env['hr.employee.departure'].create({
+            'employee_id': self.employee.id,
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'dismissal_date': date(2025, 2, 1),
+            'l10n_be_notice_respect': 'without',
+        })
+        departure_notice._compute_payslip_history()
+        termination_fees_payslip = departure_notice._generate_termination_payslip()
+        line_values = termination_fees_payslip._get_line_values(
+            ['MOBILITY_BUDGET_ANNUAL', 'REFERENCE_SALARY_REVALUED', 'TOTALFEES', 'TERM_GROSS'])
+        totals = {code: line_values[code][termination_fees_payslip.id]['total'] for code in line_values}
+        self.assertNotIn("MOBILITY_PAYMENT_TERM", termination_fees_payslip.line_ids.mapped("code"))
+        self.assertEqual(totals['MOBILITY_BUDGET_ANNUAL'], 9000.0)
+        # 4500 * 13.92 + 250 + 9000
+        self.assertAlmostEqual(totals['REFERENCE_SALARY_REVALUED'], 71890.0, places=2)
+        # 71890 * 3 / (12 * 13) * 8 weeks
+        self.assertAlmostEqual(totals['TOTALFEES'], 11060.0, places=2)
+        # Nothing else than the indemnity in lieu of notice is paid
+        self.assertAlmostEqual(totals['TERM_GROSS'], 11060.0, places=2)
 
     def test_mobility_payment_end_of_collaboration_with_notice_respect(self):
         self.env['hr.employee.departure'].create({

@@ -121,7 +121,7 @@
                                     <field name="is_favorited" nolabel="1" widget="document_favorite" class="position-absolute top-0 end-0 p-1 pt-2 pe-2"/>
                                     <img t-if="youtubeVideoToken" alt="Document"
                                          t-attf-src="https://img.youtube.com/vi/{{youtubeVideoToken}}/0.jpg" class="o_documents_preview_image"/>
-                                    <a t-elif="record.type.raw_value === 'url'" target="_blank" t-att-href="record.url.raw_value" class="o_kanban_image_wrapper">
+                                    <a t-elif="record.type.raw_value === 'url'" target="_blank" t-att-href="record.url.raw_value" class="o_kanban_image_wrapper h-100 rounded-top">
                                         <img t-if="record.url_preview_image.raw_value" class="o_documents_preview_image"
                                             t-att-src="record.url_preview_image.raw_value" t-att-alt="record.name.raw_value"/>
                                         <t t-else="">

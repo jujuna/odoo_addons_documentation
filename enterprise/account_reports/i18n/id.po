@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-10-21 07:04+0000\n"
+"POT-Creation-Date: 2026-11-13 17:50+0000\n"
+"PO-Revision-Date: 2026-11-04 06:28+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/id/>\n"
@@ -107,6 +107,8 @@ msgid ""
 "'%(account_name)s' account balance is affected by journal items which don't "
 "originate from a bank statement or payment."
 msgstr ""
+"Saldo akun '%(account_name)s' dipengaruhi oleh item jurnal yang tidak "
+"berasal dari rekening koran atau pembayaran."
 
 #. module: account_reports
 #. odoo-python
@@ -145,6 +147,9 @@ msgid ""
 "'active' field of account.return.type shouldn't be directly written to in "
 "data files. Use active_fallback. (Detected while loading %(file_path)s)"
 msgstr ""
+"field 'active' dari account.return.type tidak boleh ditulis secara langsung "
+"dalam file data. Gunakan active_fallback. (Terdeteksi saat memuat %"
+"(file_path)s)"
 
 #. module: account_reports
 #. odoo-python
@@ -190,45 +195,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the list of your open invoices.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Kepada <t t-out=\"object.name or ''\"/> "
-"(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Kepada <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    Berikut daftar faktur Anda yang belum dibayar.\n"
-"                    <br/>\n"
-"                    Silakan hubungi kami jika ada yang ingin ditanyakan.\n"
-"                    <br/>\n"
-"                    Salam,\n"
-"                    <br/>\n"
-"                    <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_customer_statement
@@ -236,46 +221,25 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
+"                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,"
+"</t>\n"
+"                    <br>\n"
 "                    Please find enclosed the statement of your account.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Do not hesitate to contact us if you have any "
 "questions.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Sincerely,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "\t                <t t-out=\"object._get_followup_responsible().name if "
 "is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
+"object._get_followup_responsible().signature\"></t>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px;\">\n"
-"                    <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Yth <t t-out=\"object.name or ''\"/> (<t t-"
-"out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                    <t t-else=\"\">Yth <t t-out=\"object.name or ''\"/>,</"
-"t>\n"
-"                    <br/>\n"
-"                    Silakan temukan di dalam laporan untuk akun Anda.\n"
-"                    <br/>\n"
-"                    Jangan sungkan untuk menghubungi kami bila Anda memiliki "
-"pertanyaan apa pun.\n"
-"                    <br/>\n"
-"                    Hormat,\n"
-"                    <br/>\n"
-"\t                <t t-out=\"object._get_followup_responsible().name if "
-"is_html_empty(object._get_followup_responsible().signature) else "
-"object._get_followup_responsible().signature\"/>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_tax_return_deadline
@@ -283,17 +247,18 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px;\">\n"
 "                    Hi <span t-out=\"ctx.get('partner') and "
-"ctx['partner'].name\"/>,<br/><br/>\n"
-"                    The deadline to submit <strong t-out=\"object.name\"/> "
-"is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+"ctx['partner'].name\"></span>,<br><br>\n"
+"                    The deadline to submit <strong t-out=\"object.name\"></"
+"strong> is <strong t-out=\"format_date(object.date_deadline)\"></strong>."
+"<br>\n"
 "                    To avoid any potential fine, please ensure all remaining "
-"documents are sent over as soon as possible.<br/>\n"
+"documents are sent over as soon as possible.<br>\n"
 "                    If you've already submitted everything but still "
 "received this email, it's likely the tax return hasn't been marked as "
-"submitted in Odoo.<br/>\n"
+"submitted in Odoo.<br>\n"
 "                    Should you have any question or need assistance, feel "
-"free to get in touch.<br/><br/>\n"
-"                    Best regards,<br/>\n"
+"free to get in touch.<br><br>\n"
+"                    Best regards,<br>\n"
 "                </p>\n"
 "            </div>\n"
 "        "
@@ -312,12 +277,12 @@ msgid ""
 "return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
 "                    for period <t t-"
 "out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> has been submitted.\n"
+"object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
 "                    It has been determined that an amount of <t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
 "                <table style=\"border:1px solid black; padding:20px; text-"
 "align:left; border-spacing: 16px;\">\n"
@@ -325,12 +290,12 @@ msgid ""
 "                        <td>Amount to Pay</td>\n"
 "                        <td><t t-"
 "out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
+"object.amount_to_pay_currency_id)\"></t></td>\n"
 "                    </tr>\n"
 "                    <tr>\n"
 "                        <td>Due By</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"></"
+"t></td>\n"
 "                    </tr>\n"
 "                </table>\n"
 "                <p>Kind regards,</p>\n"
@@ -338,41 +303,6 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p>\n"
-"                    Kepada <t t-"
-"out=\"object.company_id.name\">PerusahaanAnda</t>,\n"
-"                </p>\n"
-"                <p>\n"
-"                    Berdasarkan dokumen dan informasi yang diterima, SPT <t "
-"t-out=\"object.company_id.name\">PerusahaanAnda</t>\n"
-"                    untuk periode <t t-"
-"out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
-"object.date_to)\"/> telah dikirim.\n"
-"                </p>\n"
-"                <p>\n"
-"                    Telah ditentukan bahwa jumlah <t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/> tersisa untuk dibayar.\n"
-"                </p>\n"
-"                <table style=\"border:1px solid black; padding:20px; text-"
-"align:left; border-spacing: 16px;\">\n"
-"                    <tr>\n"
-"                        <td>Jumlah untuk Dibayar</td>\n"
-"                        <td><t t-"
-"out=\"format_amount(object.total_amount_to_pay, "
-"object.amount_to_pay_currency_id)\"/></td>\n"
-"                    </tr>\n"
-"                    <tr>\n"
-"                        <td>Jatuh Tempo pada</td>\n"
-"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
-"></td>\n"
-"                    </tr>\n"
-"                </table>\n"
-"                <p>Salam hangat,</p>\n"
-"                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
-"            </div>\n"
-"        "
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -403,6 +333,8 @@ msgid ""
 "<i>Errors marked with <i class=\"oi\" data-icon=\"warning\"/> are critical "
 "and will produce an invalid file.</i>"
 msgstr ""
+"<i>Kesalahan yang ditandai dengan <i class=\"oi\" data-icon=\"warning\"/> "
+"bersifat kritis dan akan menghasilkan file yang tidak valid.</i>"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
@@ -419,6 +351,12 @@ msgid ""
 "class=\"oi text-danger pb-2\" data-icon=\"warning\" title=\"Another return "
 "already covers part of this period.\"/>"
 msgstr ""
+"<span invisible=\"not show_warning_existing_return\" class=\"oi text-danger "
+"pb-2\" data-icon=\"warning\" title=\"Sudah ada SPT untuk periode yang "
+"dipilih.\"/>\n"
+"                            <span invisible=\"not show_warning_overlap\" "
+"class=\"oi text-danger pb-2\" data-icon=\"warning\" title=\"SPT lain sudah "
+"mencakup sebagian periode ini.\"/>"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_form_view
@@ -607,7 +545,7 @@ msgstr "Templat Pemeriksaan Pengembalian Akun"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_financial_year_op__account_return_periodicity_label
 msgid "Account Return Periodicity Label"
-msgstr ""
+msgstr "Label Periodisitas SPT Akun"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_res_company__account_revaluation_journal_id
@@ -628,12 +566,12 @@ msgstr "Tipe Akun"
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_profit_account_id
 msgid "Account on which a rounding gain of the tax closing entry is posted."
-msgstr ""
+msgstr "Akun tempat laba pembulatan dari entri penutupan pajak direkam."
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_closing_rounding_loss_account_id
 msgid "Account on which a rounding loss of the tax closing entry is posted."
-msgstr ""
+msgstr "Akun tempat rugi pembulatan dari entri penutupan pajak direkam."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_account_balances_search_view
@@ -860,6 +798,7 @@ msgstr "Penyesuaian entri"
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
 msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
 msgstr ""
+"Penyesuaian untuk merekonsiliasi laba/(rugi) bersih dengan arus kas bersih:"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
@@ -1036,6 +975,8 @@ msgid ""
 "All the Journal Entries used to record received taxes amounts in the Cash "
 "Basis journal are in sequence."
 msgstr ""
+"Semua Entri Jurnal yang digunakan untuk mencatat jumlah pajak yang diterima "
+"dalam jurnal Basis Kas sudah berurutan."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_allocation_of_prior_year_result_to_equity
@@ -1391,6 +1332,8 @@ msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
 "taxes."
 msgstr ""
+"Audit item jurnal dan akun untuk memastikan semuanya telah ditetapkan ke "
+"pajak dengan benar."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__auto_generate
@@ -1533,7 +1476,7 @@ msgstr "Custom Handler Laporan Rekonsiliasi Bank"
 #. module: account_reports
 #: model:ir.actions.client,name:account_reports.action_account_report_bank_reconciliation
 msgid "Bank Reconciliation Summary"
-msgstr ""
+msgstr "Ringkasan Rekonsiliasi Bank"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_statements
@@ -1562,6 +1505,8 @@ msgid ""
 "Bank reconciliation helps identify missing invoices or bills that may affect "
 "taxes."
 msgstr ""
+"Rekonsiliasi bank membantu mengidentifikasi faktur atau tagihan yang hilang "
+"yang dapat memengaruhi pajak."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.bank_information_customer_report
@@ -1667,7 +1612,7 @@ msgstr "CTA"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Calculated Ending Bank Balance as of %(date_to)s"
-msgstr ""
+msgstr "Saldo Bank Akhir yang Dihitung per %(date_to)s"
 
 #. module: account_reports
 #. odoo-python
@@ -1733,7 +1678,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_indirect_report_handler
 msgid "Cash Flow Indirect Report Custom Handler"
-msgstr ""
+msgstr "Penangan Kustom Laporan Arus Kas Tidak Langsung"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_report_handler
@@ -1749,32 +1694,32 @@ msgstr "Laporan Alur Kas"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_financial_activities
 msgid "Cash Flows from financing activities"
-msgstr ""
+msgstr "Arus kas dari aktivitas pendanaan"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_investing_activities
 msgid "Cash Flows from investing activities"
-msgstr ""
+msgstr "Arus kas dari aktivitas investasi"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
 msgid "Cash Flows from operating activities"
-msgstr ""
+msgstr "Arus kas dari aktivitas operasional"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
 msgid "Cash advances made to third parties"
-msgstr ""
+msgstr "Uang muka tunai yang diberikan kepada pihak ketiga"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_bop
 msgid "Cash and cash equivalents at beginning"
-msgstr ""
+msgstr "Kas dan setara kas di awal"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_eop
 msgid "Cash and cash equivalents at end"
-msgstr ""
+msgstr "Kas dan setara kas di akhir"
 
 #. module: account_reports
 #. odoo-python
@@ -2087,7 +2032,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_advance_tax_payment_account_id
 msgid "Company Advance Tax Payment Account"
-msgstr ""
+msgstr "Akun Pembayaran Pajak di Muka Perusahaan"
 
 #. module: account_reports
 #. odoo-python
@@ -2111,12 +2056,12 @@ msgstr "Pengaturan Perusahaan"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_tax_payable_account_id
 msgid "Company Tax Payable Account"
-msgstr ""
+msgstr "Akun Utang Pajak Perusahaan"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__company_tax_receivable_account_id
 msgid "Company Tax Receivable Account"
-msgstr ""
+msgstr "Akun Piutang Pajak Perusahaan"
 
 #. module: account_reports
 #. odoo-python
@@ -2227,7 +2172,7 @@ msgstr "Konfigurasikan akun-akun"
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.res_config_settings_view_form
 msgid "Configure your tax returns"
-msgstr ""
+msgstr "Konfigurasikan SPT Anda"
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_marketable_securities_review
@@ -2340,7 +2285,7 @@ msgstr "Buat Pelanggan"
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_audit
 msgid "Create a new working file to start your next period review."
-msgstr ""
+msgstr "Buat file kerja baru untuk memulai tinjauan periode berikutnya."
 
 #. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_create_snapshots_ir_actions_server
@@ -2980,6 +2925,8 @@ msgid ""
 "Downpayments posted on this account will be considered by the Tax Closing "
 "Entry."
 msgstr ""
+"Uang muka yang diposting pada akun ini akan dipertimbangkan oleh Entri "
+"Penutupan Pajak."
 
 #. module: account_reports
 #. odoo-javascript
@@ -3195,7 +3142,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Ending General Ledger Balance as of %(date_to)s"
-msgstr ""
+msgstr "Saldo akhir Buku Besar per %(date_to)s"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3282,6 +3229,8 @@ msgid ""
 "Ensures that applied taxes and fiscal positions match the customer or vendor "
 "country location."
 msgstr ""
+"Memastikan bahwa pajak yang diterapkan dan posisi fiskal sesuai dengan "
+"lokasi negara pelanggan atau vendor."
 
 #. module: account_reports
 #. odoo-python
@@ -3299,7 +3248,7 @@ msgstr "Ekuitas"
 #. odoo-python
 #: code:addons/account_reports/models/interco_comparison_report.py:0
 msgid "Equity & Non-current Liabilities"
-msgstr ""
+msgstr "Ekuitas & Pasiva Tidak Lancar"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_equity_account_movements_legal_documents
@@ -3623,7 +3572,7 @@ msgstr "Perbedaan Valuta Asing"
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign advance tax payment account (%s)"
-msgstr ""
+msgstr "Akun pembayaran pajak dimuka luar negeri (%s)"
 
 #. module: account_reports
 #. odoo-python
@@ -3640,13 +3589,13 @@ msgstr "Foreign operations"
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign tax account payable (%s)"
-msgstr ""
+msgstr "Akun utang pajak asing (%s)"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_chart_template.py:0
 msgid "Foreign tax account receivable (%s)"
-msgstr ""
+msgstr "Akun piutang pajak asing (%s)"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3673,22 +3622,22 @@ msgstr "Aktivitas Mendatang"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
 msgid "Gain (-)/Loss (+) on sale of financial instruments"
-msgstr ""
+msgstr "Keuntungan (-)/Kerugian (+) atas penjualan instrumen keuangan"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
 msgid "Gain (-)/Loss (+) on sale of intangible assets"
-msgstr ""
+msgstr "Keuntungan (-)/Kerugian (+) atas penjualan aset takberwujud"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
 msgid "Gain (-)/Loss (+) on sale of property, plant and equipment"
-msgstr ""
+msgstr "Keuntungan (-)/Kerugian (+) atas penjualan aset tetap"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_rou
 msgid "Gain (-)/Loss (+) on sale of right-of-use assets"
-msgstr ""
+msgstr "Keuntungan (-)/Kerugian (+) atas penjualan aset hak guna"
 
 #. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_garbage_collect_snapshots_ir_actions_server
@@ -4166,7 +4115,7 @@ msgstr "Pemasukkan Provisi untuk %s"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
 msgid "Income tax paid (-)/received (+)"
-msgstr ""
+msgstr "Pajak penghasilan dibayar (-)/diterima (+)"
 
 #. module: account_reports
 #. odoo-python
@@ -4209,7 +4158,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report,name:account_reports.cash_flow_report_indirect
 msgid "Indirect Cash Flow Statement"
-msgstr ""
+msgstr "Laporan Arus Kas Tidak Langsung"
 
 #. module: account_reports
 #. odoo-python
@@ -4241,7 +4190,7 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_interco_comparison_report_handler
 msgid "Interco Comparison Report Custom Handler"
-msgstr ""
+msgstr "Penangan Kustom Laporan Perbandingan Interco"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_intercompany_account_reconciliation
@@ -4377,7 +4326,7 @@ msgstr "Apakah Selesai"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__is_country_in_active_country
 msgid "Is Country Fiscal Active"
-msgstr ""
+msgstr "Apakah Fiskal Negara Aktif"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_creation_wizard__is_create_disabled
@@ -4416,6 +4365,11 @@ msgstr "Apakah Dapat Dipulihkan"
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_report_set
 msgid "Is Report Set"
 msgstr "Apakah Laporan Ditetapkan"
+
+#. module: account_reports
+#: model:ir.model.fields,field_description:account_reports.field_account_journal__is_tax_return_journal
+msgid "Is Tax Return Journal"
+msgstr "Apakah Jurnal SPT"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__is_tax_return
@@ -4785,7 +4739,7 @@ msgstr "Sesuai"
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ikon Material Symbols, misalnya checklist"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__company_ids
@@ -4800,7 +4754,7 @@ msgstr "Menu"
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_base_partner_merge_automatic_wizard
 msgid "Merge Partner Wizard"
-msgstr ""
+msgstr "Gabung Wizard Partner"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_mail_message
@@ -4818,7 +4772,7 @@ msgstr "Error Pengiriman Pesan"
 #: model:ir.model.fields,field_description:account_reports.field_account_return__message_ids
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__message_ids
 msgid "Messages"
-msgstr "Pesan-Pesan"
+msgstr "Pesan"
 
 #. module: account_reports
 #. odoo-python
@@ -4855,6 +4809,9 @@ msgid ""
 "your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
+"Detail perusahaan yang masih kosong (seperti %(vat_label)s atau negara) "
+"dapat menyebabkan kesalahan dalam laporan Anda, seperti penggunaan tarif "
+"pajak yang salah, atau pembebasan transaksi yang keliru."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -4997,7 +4954,7 @@ msgstr "Aktiva bersih"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
 msgid "Net financial result : income (-)/cost (+)"
-msgstr ""
+msgstr "Hasil keuangan bersih : pendapatan (-)/biaya (+)"
 
 #. module: account_reports
 #. odoo-python
@@ -5109,7 +5066,7 @@ msgstr "Tidak ada entri untuk dibuat."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_audit
 msgid "No pending working files!"
-msgstr ""
+msgstr "Tidak ada file kerja yang tertunda!"
 
 #. module: account_reports
 #. odoo-python
@@ -5120,7 +5077,7 @@ msgstr "Tidak ada provisi yang dibutuhkan yang ditemukan."
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "No tax return to do!"
-msgstr ""
+msgstr "Tidak ada SPT yang harus dikerjakan!"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5201,7 +5158,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
 msgid "Not reconciled yet"
-msgstr ""
+msgstr "Belum direkonsiliasi"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__notes
@@ -5308,6 +5265,12 @@ msgstr "Terus-menerus"
 
 #. module: account_reports
 #. odoo-python
+#: code:addons/account_reports/models/res_partner.py:0
+msgid "Only a partner with a Tax ID can be set as main."
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Only an Accountant can delete a return."
 msgstr "Hanya Akuntan yang dapat menghapus retur."
@@ -5386,7 +5349,7 @@ msgstr "Opening Balance of Financial Year"
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Opening Bank Balance as of %(date_from)s"
-msgstr ""
+msgstr "Saldo Bank Awal per %(date_from)s"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_expense0
@@ -5615,7 +5578,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Partners: %(partnersCount)s, Tags: %(tagsCount)s"
-msgstr ""
+msgstr "Partner: %(partnersCount)s, Tag: %(tagsCount)s"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__resolved_check_count
@@ -5801,7 +5764,7 @@ msgstr "Rencana"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/interco_comparison_report/warnings.xml:0
 msgid "Please choose the counterparts to consider in the company selector."
-msgstr ""
+msgstr "Pilih counterpart yang akan dipertimbangkan dalam pemilih perusahaan."
 
 #. module: account_reports
 #. odoo-javascript
@@ -5840,6 +5803,7 @@ msgid ""
 "Please set a deferred account on the related account or in the accounting "
 "settings."
 msgstr ""
+"Silakan atur akun tangguhan pada akun terkait atau di pengaturan akuntansi."
 
 #. module: account_reports
 #. odoo-python
@@ -5954,12 +5918,12 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_recov_adv
 msgid "Proceeds from recoverable advances"
-msgstr ""
+msgstr "Hasil dari uang muka yang dapat dipulihkan"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_share_issuance
 msgid "Proceeds from share issuance"
-msgstr ""
+msgstr "Hasil dari penerbitan saham"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5984,7 +5948,7 @@ msgstr "Laba dan Rugi"
 #. module: account_reports
 #: model:ir.actions.client,name:account_reports.action_account_report_pl_generic
 msgid "Profit and Loss - Generic"
-msgstr ""
+msgstr "Laba Rugi - Umum"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profitability0
@@ -6045,7 +6009,7 @@ msgstr "Rating"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_inv_recep_recov_cash_adv
 msgid "Receipt of recoverable cash advances"
-msgstr ""
+msgstr "Bukti uang muka yang dapat ditarik kembali"
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_receipts
@@ -6172,7 +6136,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_recov_adv
 msgid "Repayment of recoverable advances"
-msgstr ""
+msgstr "Pelunasan uang muka yang dapat dipulihkan"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__account_report_id
@@ -6285,6 +6249,11 @@ msgstr "Return Selesai"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_list_view
 msgid "Return Name"
 msgstr "Nama Pengembalian"
+
+#. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Return Reminders"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__return_state
@@ -6432,6 +6401,8 @@ msgid ""
 "Review invoices, bills and entries which are either in draft or marked as "
 "Anomaly/To Review."
 msgstr ""
+"Tinjau faktur, tagihan, dan entri yang berstatus draft atau ditandai sebagai "
+"Anomali/Untuk Ditinjau."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6594,7 +6565,7 @@ msgstr "Bagian"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
 msgid "Select or type a value"
-msgstr ""
+msgstr "Pilih atau ketik nilai"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6621,6 +6592,11 @@ msgstr "Kirim %s Statement"
 #: model:ir.model.fields,field_description:account_reports.field_account_report__send_and_print_values
 msgid "Send And Print Values"
 msgstr "Kirim dan Cetak Value"
+
+#. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.account_reports_view_account_journal_form
+msgid "Send Copy To"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -6678,6 +6654,8 @@ msgid "Service Sales to North-Irish Customers"
 msgstr "Sales Layanan kepada Pelanggan Irlandia Utara"
 
 #. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/widgets/set_as_main_partner/set_as_main_partner.xml:0
 #: model_terms:ir.ui.view,arch_db:account_reports.duplicate_vat_partner_tree_view
 msgid "Set as main"
 msgstr "Tetapkan sebagai utama"
@@ -6751,7 +6729,7 @@ msgstr "Tunjukkan Peringatan Pengembalian Tersedia"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_qr_code_payment_wizard__show_warning_missing_vat_number
 msgid "Show Warning Missing Vat Number"
-msgstr ""
+msgstr "Tampilkan Peringatan Nomor PPN Kosong"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_multicurrency_revaluation_wizard__show_warning_move_id
@@ -6784,7 +6762,7 @@ msgstr "Tunjukkan penangguhan yang sudah dibuat."
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_reports_journal_dashboard_kanban_view
 msgid "Simplify tax filing. Automate return preparation."
-msgstr ""
+msgstr "Sederhanakan pelaporan pajak. Otomatisasi persiapan SPT."
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
@@ -7011,7 +6989,7 @@ msgstr "Pajak Diterapkan"
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_account_placeholder
 msgid "Tax Closing Account Placeholder"
-msgstr ""
+msgstr "Placeholder Akun Penutupan Pajak"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_form_view
@@ -7021,12 +6999,12 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_rounding_loss_account_id
 msgid "Tax Closing Rounding Loss Account"
-msgstr ""
+msgstr "Akun Rugi Pembulatan Penutupan Pajak"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__tax_closing_rounding_profit_account_id
 msgid "Tax Closing Rounding Profit Account"
-msgstr ""
+msgstr "Akun Laba Pembulatan Penutupan Pajak"
 
 #. module: account_reports
 #. odoo-python
@@ -7060,7 +7038,7 @@ msgstr "Periode Pajak"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Rate & Country Consistency"
-msgstr ""
+msgstr "Konsistensi Negara & Tarif Pajak"
 
 #. module: account_reports
 #. odoo-python
@@ -7110,7 +7088,7 @@ msgstr "Periodisitas SPT"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Return Type"
-msgstr ""
+msgstr "Jenis SPT"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__return_type
@@ -7151,7 +7129,7 @@ msgstr "Unit-Unit Pajak"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax and country mismatch"
-msgstr ""
+msgstr "Ketidaksesuaian pajak dan negara"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
@@ -7235,6 +7213,9 @@ msgid ""
 "General Ledger ending balance %(gl_balance)s for the selected report period, "
 "resulting in an unexplained difference of %(difference)s"
 msgstr ""
+"Saldo bank akhir yang dihitung %(bank_balance)s tidak cocok dengan saldo "
+"akhir Buku Besar %(gl_balance)s untuk periode laporan yang dipilih, "
+"menyebabkan selisih tak terjelaskan sebesar %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7287,6 +7268,9 @@ msgid ""
 "opening balance %(gl_balance)s for the selected report period, resulting in "
 "an unexplained difference of %(difference)s"
 msgstr ""
+"Saldo bank awal %(bank_balance)s tidak cocok dengan saldo awal Buku Besar %"
+"(gl_balance)s untuk periode laporan yang dipilih, menyebabkan selisih tak "
+"terjelaskan sebesar %(difference)s"
 
 #. module: account_reports
 #. odoo-python
@@ -7522,7 +7506,7 @@ msgstr ""
 #. module: account_reports
 #: model_terms:ir.actions.act_window,help:account_reports.action_view_account_return
 msgid "Time to relax 🌴"
-msgstr ""
+msgstr "Waktunya bersantai 🌴"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check_template__name
@@ -7644,7 +7628,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Transactions without Statement"
-msgstr ""
+msgstr "Transaksi tanpa Rekening Koran"
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_treasury_financing
@@ -7933,7 +7917,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_non_cash
 msgid "Variation of NON Cash"
-msgstr ""
+msgstr "Variasi NON Tunai"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_payment_wizard__vat_balance
@@ -8040,7 +8024,7 @@ msgstr "Lihat Pembayaran"
 #. module: account_reports
 #: model:ir.module.module,summary:base.module_account_reports
 msgid "View and create reports"
-msgstr ""
+msgstr "Lihat dan buat laporan"
 
 #. module: account_reports
 #. odoo-javascript
@@ -8233,6 +8217,12 @@ msgstr "Anda tidak dapat mengupdate value ini karena dikunci oleh: %s"
 
 #. module: account_reports
 #. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "You do not have permission to refresh returns."
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "You must be an accountant to access accounting reports."
 msgstr "Anda harus menjadi akuntan untuk mengakses laporan akuntansi."
@@ -8241,19 +8231,19 @@ msgstr "Anda harus menjadi akuntan untuk mengakses laporan akuntansi."
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a payable account for 'Tax Payable Account'."
-msgstr ""
+msgstr "Anda harus memilih akun utang untuk 'Akun Utang Pajak'."
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must select a receivable account for 'Tax Receivable Account'."
-msgstr ""
+msgstr "Anda harus memilih akun piutang untuk 'Akun Piutang Pajak'."
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "You must use non-trade accounts for tax returns."
-msgstr ""
+msgstr "Anda harus menggunakan akun non-perdagangan untuk laporan pajak."
 
 #. module: account_reports
 #. odoo-python
@@ -8459,7 +8449,7 @@ msgstr "dibawa ke baris ini dari periode sebelumnya."
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "which are not related to any bank statement."
-msgstr ""
+msgstr "yang tidak terkait dengan rekening koran apa pun."
 
 #. module: account_reports
 #. odoo-javascript
@@ -8518,6 +8508,206 @@ msgstr "⇒ Reset ke Kurs Odoo"
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the list of your open invoices.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Kepada <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Kepada <t t-out=\"object.name or ''\"/"
+#~ ">,</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Berikut daftar faktur Anda yang belum dibayar.\n"
+#~ "                    <br/>\n"
+#~ "                    Silakan hubungi kami jika ada yang ingin ditanyakan.\n"
+#~ "                    <br/>\n"
+#~ "                    Salam,\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+#~ "</t>\n"
+#~ "                    <br/>\n"
+#~ "                    Please find enclosed the statement of your account.\n"
+#~ "                    <br/>\n"
+#~ "                    Do not hesitate to contact us if you have any "
+#~ "questions.\n"
+#~ "                    <br/>\n"
+#~ "                    Sincerely,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Yth <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                    <t t-else=\"\">Yth <t t-out=\"object.name or ''\"/>,</"
+#~ "t>\n"
+#~ "                    <br/>\n"
+#~ "                    Silakan temukan di dalam laporan untuk akun Anda.\n"
+#~ "                    <br/>\n"
+#~ "                    Jangan sungkan untuk menghubungi kami bila Anda "
+#~ "memiliki pertanyaan apa pun.\n"
+#~ "                    <br/>\n"
+#~ "                    Hormat,\n"
+#~ "                    <br/>\n"
+#~ "\t                <t t-out=\"object._get_followup_responsible().name if "
+#~ "is_html_empty(object._get_followup_responsible().signature) else "
+#~ "object._get_followup_responsible().signature\"/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Hi <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>,<br/><br/>\n"
+#~ "                    The deadline to submit <strong t-out=\"object.name\"/"
+#~ "> is <strong t-out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    To avoid any potential fine, please ensure all "
+#~ "remaining documents are sent over as soon as possible.<br/>\n"
+#~ "                    If you've already submitted everything but still "
+#~ "received this email, it's likely the tax return hasn't been marked as "
+#~ "submitted in Odoo.<br/>\n"
+#~ "                    Should you have any question or need assistance, feel "
+#~ "free to get in touch.<br/><br/>\n"
+#~ "                    Best regards,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    Halo, <span t-out=\"ctx.get('partner') and "
+#~ "ctx['partner'].name\"/>.<br/><br/>\n"
+#~ "                    Batas waktu untuk mengirimkan <strong t-"
+#~ "out=\"object.name\"/> adalah <strong t-"
+#~ "out=\"format_date(object.date_deadline)\"/>.<br/>\n"
+#~ "                    Untuk menghindari potensi denda, pastikan semua sisa "
+#~ "dokumen dikirim sesegera mungkin.<br/>\n"
+#~ "                    Jika Anda sudah mengirimkan semuanya tetapi masih "
+#~ "menerima email ini, kemungkinan besar SPT belum ditandai sebagai sudah "
+#~ "dikirim di Odoo.<br/>\n"
+#~ "                    Jika ada pertanyaan atau butuh bantuan, jangan ragu "
+#~ "untuk menghubungi kami.<br/><br/>\n"
+#~ "                    Salam hormat,<br/>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Dear <t t-out=\"object.company_id.name\">YourCompany</"
+#~ "t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Based on the documents and information received, the "
+#~ "tax return of <t t-out=\"object.company_id.name\">YourCompany</t>\n"
+#~ "                    for period <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> has been submitted.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    It has been determined that an amount of <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> remains payable.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Amount to Pay</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Due By</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Kind regards,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p>\n"
+#~ "                    Kepada <t t-"
+#~ "out=\"object.company_id.name\">PerusahaanAnda</t>,\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Berdasarkan dokumen dan informasi yang diterima, SPT "
+#~ "<t t-out=\"object.company_id.name\">PerusahaanAnda</t>\n"
+#~ "                    untuk periode <t t-"
+#~ "out=\"object.type_id._get_period_name(object.company_id, "
+#~ "object.date_from, object.date_to)\"/> telah dikirim.\n"
+#~ "                </p>\n"
+#~ "                <p>\n"
+#~ "                    Telah ditentukan bahwa jumlah <t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/> tersisa untuk dibayar.\n"
+#~ "                </p>\n"
+#~ "                <table style=\"border:1px solid black; padding:20px; text-"
+#~ "align:left; border-spacing: 16px;\">\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Jumlah untuk Dibayar</td>\n"
+#~ "                        <td><t t-"
+#~ "out=\"format_amount(object.total_amount_to_pay, "
+#~ "object.amount_to_pay_currency_id)\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                    <tr>\n"
+#~ "                        <td>Jatuh Tempo pada</td>\n"
+#~ "                        <td><t t-out=\"format_date(object.date_deadline)"
+#~ "\"/></td>\n"
+#~ "                    </tr>\n"
+#~ "                </table>\n"
+#~ "                <p>Salam hangat,</p>\n"
+#~ "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Baris Rekening Koran"

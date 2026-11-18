@@ -1,3 +1,5 @@
+from datetime import date
+
 from odoo.tests.common import tagged, TransactionCase
 
 
@@ -88,3 +90,36 @@ class TestHrLeaveAllocation(TransactionCase):
             exceeded_allocations,
             "Valid allocation should NOT be returned"
         )
+
+    def test_birth_leave_allocation_limit(self):
+        # Of the 20 days of birth leave, the employer pays the 3 first ones (007.05), the mutual insurance the 17
+        # next ones (128.05), whatever the joint committee
+        birth_leave = self.env.ref('hr_work_entry.l10n_be_work_entry_type_paternity_legal')
+        for joint_committee in ('l10n_be_joint_committee_302', 'l10n_be_joint_committee_220'):
+            self.employee.l10n_be_joint_committee_id = self.env.ref(f'l10n_be_hr_payroll.{joint_committee}')
+            for days, exceeded in ((17, False), (18, True)):
+                allocation = self.env['hr.leave.allocation'].create({
+                    'name': 'Birth leave',
+                    'employee_id': self.employee.id,
+                    'work_entry_type_id': birth_leave.id,
+                    'number_of_days': days,
+                })
+                self.assertEqual(allocation._check_max_duration_exceeded()[0], exceeded, (joint_committee, days))
+
+    def test_senior_time_off_eligibility_age(self):
+        # Senior holidays: 50 years old on 31 December of the holiday exercise, the year before the holidays
+        senior_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_senior_time_off')
+        self.employee.birthday = date(1976, 3, 15)
+        allocation = self.env['hr.leave.allocation'].create({
+            'name': 'Senior holidays 2026',
+            'employee_id': self.employee.id,
+            'work_entry_type_id': senior_type.id,
+            'number_of_days': 5,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 12, 31),
+        })
+        # 50 on 15 March 2026, 49 on 31 December 2025
+        self.assertTrue(allocation.eligibility_warning)
+        self.employee.birthday = date(1975, 12, 31)
+        allocation.invalidate_recordset(['eligibility_warning'])
+        self.assertFalse(allocation.eligibility_warning)

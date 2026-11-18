@@ -20,9 +20,10 @@ class VoipPbxDestinationMixin(models.AbstractModel):
         references = [f"{record._name},{record.id}" for record in self]
 
         user_settings = self.env["res.users.settings"].sudo().search([
-            "|",
+            "|", "|",
             ("voip_no_answer_destination_ref", "in", references),
             ("voip_busy_destination_ref", "in", references),
+            ("voip_disconnected_destination_ref", "in", references),
         ])
 
         call_groups = self.env["voip.call.group"].sudo().search([

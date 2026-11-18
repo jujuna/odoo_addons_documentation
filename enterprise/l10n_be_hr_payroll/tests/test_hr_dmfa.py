@@ -2,8 +2,9 @@
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
+from unittest.mock import patch
 
-from odoo.tests import Form, tagged
+from odoo.tests import Form, new_test_user, tagged
 from odoo.exceptions import UserError, ValidationError
 from .common import TestPayrollCommon
 
@@ -35,6 +36,76 @@ class TestPayrollDmfa(TestPayrollCommon):
         companies = self.multibranch_company
         with self.assertRaises(UserError):
             self.env['l10n_be.dmfa'].with_company(companies[1]).create({})
+
+    def test_web_dmfa_correction_keeps_reference(self):
+        dmfa = self.env['l10n_be.dmfa'].with_company(self.belgian_company).create({
+            'name': 'DMFA-REF-1',
+            'year': '2026',
+            'quarter': '1',
+            'declaration_method': 'web',
+        })
+        modification = self.env['l10n_be.dmfa'].browse(dmfa.action_correct_web_dmfa()['res_id'])
+        self.assertEqual(modification.parent_id, dmfa)
+        self.assertEqual(modification.declaration_type, 'modification')
+        self.assertEqual(modification.name, 'DMFA-REF-1')
+
+    def test_natural_person_state_changes(self):
+        """ The changes of a worker record since the last declaration are kept on the state of the natural person """
+        state = self.env['l10n_be.dmfa.natural_person.state'].create({
+            'niss': '93051822361',
+            'quarter_start': date(2026, 4, 1),
+            'quarter_end': date(2026, 6, 30),
+            'worker_record_data': {'015': {'occupations': [{'date': '2026-04-01'}]}},
+        })
+        # Another worker code
+        state.validate_changes({'occupations': [{'date': date(2026, 5, 1)}]}, '495')
+        self.assertEqual(state.worker_record_data['495'], {'occupations': [{'date': '2026-05-01'}], 'update_action': 3})
+        self.assertEqual(state.version_number, '1')
+        # Unchanged, the dates being compared as stored
+        state.validate_changes({'occupations': [{'date': date(2026, 4, 1)}]}, '015')
+        self.assertEqual(state.worker_record_data['015']['update_action'], 9)
+        self.assertEqual(state.version_number, '1')
+        # Changed
+        state.validate_changes({'occupations': [{'date': date(2026, 4, 2)}]}, '015')
+        self.assertEqual(state.worker_record_data['015'], {'occupations': [{'date': '2026-04-02'}], 'update_action': 1})
+        self.assertEqual(state.version_number, '2')
+
+    def test_natural_person_state_consultation(self):
+        """ The worker records of a DmfA consultation become the reference states of the natural persons """
+        niss = '93051822361'
+        state = self.env['l10n_be.dmfa.natural_person.state'].create({
+            'niss': niss,
+            'quarter_start': date(2026, 4, 1),
+            'quarter_end': date(2026, 6, 30),
+            'worker_record_data': {'015': {'occupations': [], 'update_action': 3}},
+            'version_number': '4',
+        })
+
+        def worker_record(worker_code, contract_id):
+            return {
+                'WorkerCode': worker_code,
+                'WorkerRecordVersionNbr': '2',
+                'OccupationConsultation': {'OccupationUserReference': contract_id, 'OccupationVersionNbr': '3'},
+            }
+
+        self.env['l10n.be.onss.declaration']._sync_consultation_data({
+            'Quarter': '20262',
+            'NaturalPersonConsult': [{
+                'INSS': niss,
+                'NaturalPersonPID': '111',
+                'DeclNaturalPersonPID': '222',
+                'DeclNaturalPersonVersionNbr': '5',
+                'WorkerRecordConsult': [worker_record('015', '1'), worker_record('495', '2')],
+            }, {
+                # Unknown natural person, ignored
+                'INSS': '00000000000',
+                'WorkerRecordConsult': worker_record('015', '3'),
+            }],
+        })
+        self.assertEqual(set(state.worker_record_data), {'015', '495'})
+        self.assertEqual(state.worker_record_data['495']['update_action'], 9)
+        self.assertEqual(state.version_number, '5')
+        self.assertEqual(state.occupation_version_map, {'1': '00000000003', '2': '00000000003'})
 
     def test_include_child_branches_in_report(self):
         companies = self.belgian_company | self.multibranch_company
@@ -166,7 +237,7 @@ class TestPayrollDmfa(TestPayrollCommon):
             'Employees with work address missing ONSS code',
             'Missing NISS for employees',
             'Employees missing DMFA worker code',
-            'Missing employer class for company',
+            'Missing employer category for company',
             'Missing ONSS company ID for company',
             'Termination payslips missing notice period dates',
             'Employees exceeding quarterly occupation days',
@@ -230,6 +301,40 @@ class TestPayrollDmfa(TestPayrollCommon):
         self.assertFalse(any("aren't validated" in message for message in messages()))
 
     @freeze_time('2026-05-15')
+    def test_dmfa_payslip_of_archived_version(self):
+        """ The issues are computed with a payslip of an archived version during an open-ended occupation """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        old_version = self.employee_test.version_id
+        self.employee_test.create_version({'date_version': date(2026, 3, 1)})
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'version_id': old_version.id,
+            'name': 'Payslip',
+            'date_from': date(2026, 2, 1),
+            'date_to': date(2026, 2, 28),
+        })
+        old_version.active = False
+        payslip.state = 'validated'
+        dmfa = self.env['l10n_be.dmfa'].create({'company_id': self.env.company.id, 'year': '2026', 'quarter': '1'})
+        self.assertIn(payslip, dmfa.payslip_ids)
+        dmfa._compute_issues()
+        self.assertFalse(any("Wrong warning computation code" in issue['message'] for issue in (dmfa.issues or {}).values()))
+
+    @freeze_time('2026-05-15')
+    def test_dmfa_missing_employer_class_and_company_number(self):
+        """ The employer class and the company number of the configuration are declared """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.env.company.current_payroll_config_id.write({
+            'l10n_be_employer_category_id': False,
+            'l10n_be_company_number': False,
+        })
+        dmfa = self.env['l10n_be.dmfa'].create({'company_id': self.env.company.id, 'year': '2026', 'quarter': '1'})
+        dmfa._compute_issues()
+        messages = [issue['message'] for issue in (dmfa.issues or {}).values()]
+        self.assertIn("Missing employer category for company: %s." % self.env.company.name, messages)
+        self.assertIn("Missing ONSS company ID for company: %s." % self.env.company.name, messages)
+
+    @freeze_time('2026-05-15')
     def test_dmfa_invalid_niss(self):
         """ A NISS with a wrong check number is refused by the ONSS """
         self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
@@ -251,6 +356,46 @@ class TestPayrollDmfa(TestPayrollCommon):
         self.assertIn("Invalid NISS for employees %s" % self.employee_test.name, messages())
         self.employee_test.niss = '85010100115'
         self.assertFalse(any(message.startswith("Invalid NISS") for message in messages()))
+
+    @freeze_time('2026-05-15')
+    def test_dmfa_warning_archived_employees(self):
+        """ The archived employees should be shown when we click to the action of the warning Missing NISS for employees """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        employees = self.employee_test | self.employee_a
+        employees.niss = False
+        self.env['hr.payslip'].create([{
+            'employee_id': employee.id,
+            'name': 'Payslip',
+            'date_from': date(2026, 2, 1),
+            'date_to': date(2026, 2, 28),
+        } for employee in employees]).state = 'validated'
+        self.employee_a.action_archive()
+        dmfa = self.env['l10n_be.dmfa'].create({'company_id': self.env.company.id, 'year': '2026', 'quarter': '1'})
+        dmfa._compute_issues()
+
+        issue = next(issue for issue in dmfa.issues.values() if issue['message'].startswith("Missing NISS for employees"))
+        self.assertEqual(self.env['hr.employee'].search(issue['action']['domain']), employees)
+
+    @freeze_time('2026-05-15')
+    def test_dmfa_warning_invalid_niss_archived_employees(self):
+        """ The archived employees are also shown by the other DMFA warnings opening a list of employees """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        employees = self.employee_test | self.employee_a
+        self.env['hr.payslip'].create([{
+            'employee_id': employee.id,
+            'name': 'Payslip',
+            'date_from': date(2026, 2, 1),
+            'date_to': date(2026, 2, 28),
+        } for employee in employees]).state = 'validated'
+        # The NISS are checked when saved, but not the ones saved before that check
+        self.env.cr.execute("UPDATE hr_employee SET niss = '85010100116' WHERE id IN %s", [tuple(employees.ids)])
+        employees.invalidate_recordset(['niss'])
+        self.employee_a.action_archive()
+        dmfa = self.env['l10n_be.dmfa'].create({'company_id': self.env.company.id, 'year': '2026', 'quarter': '1'})
+        dmfa._compute_issues()
+
+        issue = next(issue for issue in dmfa.issues.values() if issue['message'].startswith("Invalid NISS for employees"))
+        self.assertEqual(self.env['hr.employee'].search(issue['action']['domain']), employees)
 
     @freeze_time('2026-05-15')
     def test_dmfa_unit_without_code(self):
@@ -275,6 +420,68 @@ class TestPayrollDmfa(TestPayrollCommon):
         self.assertIn("DMFA units without establishment unit code %s" % unit.name, messages())
         unit.bce_code = '8888888374'
         self.assertFalse(any(message.startswith("DMFA units without") for message in messages()))
+
+    def test_work_location_does_not_replace_dmfa_unit(self):
+        """ Only a DmfA unit of the version's company is the location unit of the version: creating another
+            kind of work location at the same address, or a DmfA unit of another company, doesn't replace it. """
+        version = self.employee_test.version_id
+        unit = self.env['hr.work.location'].search([
+            ('address_id', '=', version.address_id.id), ('location_type', '=', 'dmfa_unit')])
+        self.assertEqual(version.l10n_be_location_unit, unit)
+
+        self.env['hr.work.location'].create({
+            'name': 'Home',
+            'location_type': 'home',
+            'company_id': version.company_id.id,
+            'address_id': version.address_id.id,
+        })
+        self.assertEqual(version.l10n_be_location_unit, unit)
+
+        other_company = self.env['res.company'].create({'name': 'Other Company', 'country_id': self.env.ref('base.be').id})
+        self.env['hr.work.location'].create({
+            'name': 'Other Unit',
+            'location_type': 'dmfa_unit',
+            'company_id': other_company.id,
+            'address_id': version.address_id.id,
+        })
+        self.assertEqual(version.l10n_be_location_unit, unit)
+
+        version.address_id = self.env['res.partner'].create({'name': 'Other Address'})
+        self.assertFalse(version.l10n_be_location_unit)
+        unit.address_id = version.address_id
+        self.assertEqual(version.l10n_be_location_unit, unit)
+
+    def test_dmfa_unit_competence_from_address_city(self):
+        """ The competence of a DmfA unit is proposed from the city of its address, also without a city record. """
+        address = self.env['res.partner'].create({
+            'name': 'Floreffe Site',
+            'country_id': self.env.ref('base.be').id,
+            'zip': '5150',
+            'city': 'Floreffe',
+        })
+        with Form(self.env['hr.work.location'].with_company(self.belgian_company)) as unit_form:
+            unit_form.name = 'Floreffe Unit'
+            unit_form.location_type = 'dmfa_unit'
+            unit_form.address_id = address
+            self.assertEqual(unit_form.competence, 'wa')
+
+    def test_dmfa_unit_language_installed_by_payroll_manager(self):
+        """ A payroll manager who isn't an administrator can give an inactive payslip language to a DmfA unit:
+            the language is installed for him. """
+        payroll_manager = new_test_user(
+            self.env, login='be_payroll_manager', groups='hr_payroll.group_hr_payroll_manager',
+            company_id=self.belgian_company.id, company_ids=[(6, 0, self.belgian_company.ids)])
+        lang_de = self.env.ref('base.lang_de').with_context(active_test=False)
+        lang_de.active = False
+        with patch.object(self.registry['base.language.install'], 'lang_install', autospec=True) as lang_install:
+            self.env['hr.work.location'].with_user(payroll_manager).with_company(self.belgian_company).create({
+                'name': 'German Speaking Unit',
+                'location_type': 'dmfa_unit',
+                'company_id': self.belgian_company.id,
+                'address_id': self.env['res.partner'].create({'name': 'Eupen'}).id,
+                'payslip_language_id': lang_de.id,
+            })
+        lang_install.assert_called_once()
 
     @freeze_time('2026-05-15')
     def test_dmfa_refused_flexi_worker_code(self):
@@ -302,6 +509,34 @@ class TestPayrollDmfa(TestPayrollCommon):
         self.env.cr.execute("UPDATE hr_version SET l10n_be_worker_code_id = %s WHERE id = %s", [worker_codes['495'].id, version.id])
         version.invalidate_recordset()
         self.assertFalse(any(message.startswith("Refused flexi-jobs") for message in messages()))
+
+    @freeze_time('2026-05-15')
+    def test_dmfa_flexi_worker_code(self):
+        """ A flexi-job is declared with the worker code 050 or 450, and only the flexi-jobs are """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'name': 'Payslip',
+            'date_from': date(2026, 2, 1),
+            'date_to': date(2026, 2, 28),
+        }).state = 'validated'
+        version = self.employee_test.version_id
+        worker_codes = self.env['l10n.be.worker.code'].search([('dmfa_code', 'in', ('450', '495'))]).grouped('dmfa_code')
+        dmfa = self.env['l10n_be.dmfa'].create({'company_id': self.env.company.id, 'year': '2026', 'quarter': '1'})
+
+        def has_warning(dimona_category, worker_code):
+            self.env.cr.execute("""
+                UPDATE hr_version SET l10n_be_dimona_category = %s, l10n_be_worker_code_id = %s
+                WHERE id = %s""", [dimona_category, worker_codes[worker_code].id, version.id])
+            version.invalidate_recordset()
+            dmfa._compute_issues()
+            return any(issue['message'].startswith("The flexi-jobs are declared with the worker code 050 or 450")
+                       for issue in (dmfa.issues or {}).values())
+
+        self.assertTrue(has_warning('flx', '495'))
+        self.assertFalse(has_warning('flx', '450'))
+        self.assertTrue(has_warning('oth', '450'))
+        self.assertFalse(has_warning('oth', '495'))
 
     @freeze_time('2026-05-15')
     def test_dmfa_work_exemption_date(self):
@@ -396,8 +631,22 @@ class TestPayrollDmfa(TestPayrollCommon):
             return [issue['message'] for issue in (dmfa.issues or {}).values()]
 
         self.assertTrue(any(message.startswith("Students with more than 650 hours") for message in messages()))
-        payslip.worked_days_line_ids.number_of_hours = 600
+        work = payslip.worked_days_line_ids
+        work.number_of_hours = 600
         self.assertFalse(any(message.startswith("Students with more than 650 hours") for message in messages()))
+        # a paid public holiday not worked isn't deducted from the quota
+        public_holiday = work.copy({
+            'payslip_id': payslip.id, 'number_of_days': 13, 'number_of_hours': 100,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        })
+        self.assertTrue(public_holiday.is_paid)
+        self.assertFalse(any(message.startswith("Students with more than 650 hours") for message in messages()))
+        # the hours worked on a public holiday are, and the hours of the quarter are rounded up: 650h30 counts 651h
+        work.copy({
+            'payslip_id': payslip.id, 'number_of_days': 7, 'number_of_hours': 50.5,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_public_holiday_working_with_recovery').id,
+        })
+        self.assertTrue(any(message.startswith("Students with more than 650 hours") for message in messages()))
 
     @freeze_time('2026-05-15')
     def test_dmfa_student_worker_code(self):
@@ -605,6 +854,53 @@ class TestPayrollDmfa(TestPayrollCommon):
         ]:
             self.assertEqual(self.env.ref(f'hr_work_entry.{xmlid}').dmfa_code, dmfa_code, xmlid)
 
+    def test_dmfa_service_code_bad_weather_first_day(self):
+        """ The first day of bad weather in the construction is declared under the service code 1
+        from the quarter 3/2024, under the code 4 before """
+        bad_weather = self.env.ref('hr_work_entry.l10n_be_work_entry_type_construction_bad_weather_first_day')
+        self.assertEqual(bad_weather._get_l10n_be_dmfa_code(date(2024, 4, 1)), '4')
+        self.assertEqual(bad_weather._get_l10n_be_dmfa_code(date(2024, 7, 1)), '1')
+        self.assertEqual(bad_weather._get_l10n_be_dmfa_code(date(2026, 1, 1)), '1')
+        attendance = self.env.ref('hr_work_entry.be_work_entry_type_attendance')
+        self.assertEqual(attendance._get_l10n_be_dmfa_code(date(2024, 4, 1)), attendance.dmfa_code)
+
+    def test_structural_reduction_wage_year_end_bonus_paid_by_fund(self):
+        """ The wage W of the 4th quarter of a worker whose year-end bonus is paid by a fund (CP 124) is increased
+        by 25% for the structural reduction; nothing changes for the other quarters """
+        employee = self.create_employee({
+            'name': 'Construction Worker',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'wage': 2000,
+        })
+        version = employee.version_id
+        dmfa = self.env['l10n_be.dmfa']
+
+        def quarter_payslips(quarter_start):
+            payslips = self.env['hr.payslip'].create([{
+                'name': f'Payslip {quarter_start + relativedelta(months=month)}',
+                'employee_id': employee.id,
+                'version_id': version.id,
+                'date_from': quarter_start + relativedelta(months=month),
+                'date_to': quarter_start + relativedelta(months=month + 1, days=-1),
+            } for month in range(3)])
+            payslips.compute_sheet()
+            return payslips
+
+        def structural_reductions(payslips):
+            amounts = []
+            for joint_committee in ('l10n_be_joint_committee_200', 'l10n_be_joint_committee_124'):
+                version.l10n_be_joint_committee_id = self.env.ref(f'l10n_be_hr_payroll.{joint_committee}')
+                amounts.append(dmfa._get_l10n_be_structural_deduction_3000(payslips, 1.0))
+            return amounts
+
+        q3_cp200, q3_cp124 = structural_reductions(quarter_payslips(date(2025, 7, 1)))
+        self.assertTrue(q3_cp200)
+        self.assertEqual(q3_cp124, q3_cp200)
+        q4_payslips = quarter_payslips(date(2025, 10, 1))
+        q4_cp200, q4_cp124 = structural_reductions(q4_payslips)
+        self.assertLess(q4_cp124, q4_cp200)
+
     def test_dmfa_establishment_unit_code_format(self):
         """
         Test that checks if a validation error is raised when trying to write an invalid code on an establishment unit.
@@ -675,11 +971,14 @@ class TestPayrollDmfa(TestPayrollCommon):
             eu.bce_code = 8234567890
             eu.address_id = self.belgian_company.partner_id
         self.assertEqual(eu.competence, 'wa')
+        self.assertEqual(eu.payslip_language_id.code, 'fr_BE')
         with Form(self.env['hr.work.location']) as eu:
             eu.bce_code = 8234567890
             eu.address_id = nl_partner
         self.assertEqual(eu.competence, 'fl')
+        self.assertEqual(eu.payslip_language_id.code, 'nl_BE')
         with Form(self.env['hr.work.location']) as eu:
             eu.bce_code = 8234567890
             eu.address_id = de_partner
         self.assertEqual(eu.competence, 'cg')
+        self.assertEqual(eu.payslip_language_id.code, 'de_DE')

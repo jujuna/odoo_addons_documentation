@@ -808,15 +808,15 @@ class StockPicking(models.Model):
             fetched_data = record._l10n_mx_edi_request_mapbox(url, {'access_token': mb_token})
             res = json.loads(fetched_data.content)
             if 'features' in res:
-                record.picking_type_id.warehouse_id.partner_id.partner_latitude = res['features'][0]['geometry']['coordinates'][0]
-                record.picking_type_id.warehouse_id.partner_id.partner_longitude = res['features'][0]['geometry']['coordinates'][1]
+                record.picking_type_id.warehouse_id.partner_id.partner_longitude = res['features'][0]['geometry']['coordinates'][0]
+                record.picking_type_id.warehouse_id.partner_id.partner_latitude = res['features'][0]['geometry']['coordinates'][1]
             dest_address = url_quote(dest)
             url = f'{MAPBOX_GEOCODE_URL}{dest_address}.json?'
             fetched_data = record._l10n_mx_edi_request_mapbox(url, {'access_token': mb_token})
             res = json.loads(fetched_data.content)
             if 'features' in res:
-                record.partner_id.partner_latitude = res['features'][0]['geometry']['coordinates'][0]
-                record.partner_id.partner_longitude = res['features'][0]['geometry']['coordinates'][1]
+                record.partner_id.partner_longitude = res['features'][0]['geometry']['coordinates'][0]
+                record.partner_id.partner_latitude = res['features'][0]['geometry']['coordinates'][1]
 
     def l10n_mx_edi_action_calculate_distance(self):
         mb_token = self.env['ir.config_parameter'].sudo().get_str('web_map.token_map_box')
@@ -831,11 +831,12 @@ class StockPicking(models.Model):
         for record in self:
             if record.l10n_mx_edi_src_lat and record.l10n_mx_edi_src_lon \
                 and record.l10n_mx_edi_des_lat and record.l10n_mx_edi_des_lon:
-                url = f'{MAPBOX_MATRIX_URL}{record.l10n_mx_edi_src_lat},{record.l10n_mx_edi_src_lon};{record.l10n_mx_edi_des_lat},{record.l10n_mx_edi_des_lon}'
+                url = f'{MAPBOX_MATRIX_URL}{record.l10n_mx_edi_src_lon},{record.l10n_mx_edi_src_lat};{record.l10n_mx_edi_des_lon},{record.l10n_mx_edi_des_lat}'
                 fetched_data = record._l10n_mx_edi_request_mapbox(url, params)
                 res = json.loads(fetched_data.content)
-                if 'distances' in res:
-                    record.l10n_mx_edi_distance = res['distances'][0][1] // 1000
+                if 'distances' not in res:
+                    raise UserError(_('Mapbox could not compute the distance. Please click "Get Coordinates" again to refresh the coordinates of the warehouse and the delivery address.'))
+                record.l10n_mx_edi_distance = res['distances'][0][1] // 1000
             else:
                 raise UserError(_('Distance calculation requires both the source and destination coordinates'))
 

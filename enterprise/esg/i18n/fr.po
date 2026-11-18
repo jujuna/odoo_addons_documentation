@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
 "PO-Revision-Date: 2026-10-24 22:33+0000\n"
 "Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
 "Language-Team: French <https://translate.odoo.com/projects/odoo-20/esg/fr/>\n"
@@ -6015,10 +6015,10 @@ msgstr ""
 #. module: esg
 #: model:mail.template,body_html:esg.mail_template_esg_metric_ask_feedback
 msgid ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
 "                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+"\"></t>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
@@ -6028,18 +6028,18 @@ msgid ""
 "                            <t t-out=\"logged_user\">[Current user]</t> "
 "invites you to participate in the CSRD double materiality review for <t t-"
 "out=\"company_name\">[Company Name]</t>. We are looking for your input on: "
-"<br/>\n"
+"<br>\n"
 "                            - How the company impacts the environment, "
-"society, and the economy. <br/>\n"
+"society, and the economy. <br>\n"
 "                            - How these impacts could affect the company "
-"financially. <br/>\n"
+"financially. <br>\n"
 "                            Please complete your review by <t t-"
 "out=\"deadline\">[specified deadline]</t> to help us meet CSRD requirements. "
 "Your expertise is important for an accurate assessment. </span>\n"
-"                        <br/> Thank you for your contribution. <br/>\n"
+"                        <br> Thank you for your contribution. <br>\n"
 "                        Best regards, <t t-out=\"logged_user\">[Current "
 "user]</t>\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
 "center;\">\n"
 "                            <a t-att-href=\"object.get_start_url()\" t-attf-"
@@ -6054,44 +6054,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/> \n"
-"                <t t-set=\"company_name\" t-value=\"ctx.get('company_name')"
-"\"/> \n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
-"                 <div style=\"margin: 0px; padding: 0px;\"> \n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        </p><p style=\"margin-left:5px\">Cher/Chère <t t-"
-"out=\"object.partner_id.name or 'stakeholder'\">[Partie prenante]</t></p> \n"
-"                        <span> \n"
-"                            <t t-out=\"logged_user\">[Utilisateur actuel]</"
-"t> vous invite à participer à la revue de double matérialité CSRD pour <t t-"
-"out=\"company_name\">[Nom de la société]</t>. Nous souhaitons recueillir "
-"votre avis sur : <br/> \n"
-"                            - La manière dont la société impacte "
-"l’environnement, la société et l’économie. <br/> \n"
-"                            - La manière dont ces impacts pourraient "
-"affecter financièrement la société. <br/> \n"
-"                            Veuillez compléter votre revue avant le <t t-"
-"out=\"deadline\">[date limite spécifiée]</t> afin de nous aider à respecter "
-"les exigences CSRD. Votre expertise est importante pour une évaluation "
-"précise. </span> \n"
-"                        <br/> Merci pour votre contribution. <br/> \n"
-"                        Cordialement, <t t-out=\"logged_user\">[Utilisateur "
-"actuel]</t> \n"
-"                        <br/><br/> \n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
-"center;\"> <a t-att-href=\"object.get_start_url()\" t-attf-"
-"style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\"> \n"
-"                                Commencer la revue\n"
-"                             </a> \n"
-"                        </div>\n"
-"                    \n"
-"                </div>\n"
-"                "
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c1
@@ -7887,8 +7849,8 @@ msgid ""
 "HFCs,\n"
 "                        PFCs, SF₆), expressed in <strong>tCO₂e</strong>."
 msgstr ""
-"Par <strong>gaz à effet de serre</strong> (les six gaz de Kyoto : CO₂, CH₄, N"
-"₂O, HFC,\n"
+"Par <strong>gaz à effet de serre</strong> (les six gaz de Kyoto : CO₂, CH₄, "
+"N₂O, HFC,\n"
 "                        PFC, SF₆), exprimés en <strong>tCO₂e</strong>."
 
 #. module: esg
@@ -8438,7 +8400,8 @@ msgstr "Clarifier la couverture géographique et de la chaîne de valeur."
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_environmental_a
 msgid "Clarify geographic coverage and ecosystem types monitored."
-msgstr "Clarifier la couverture géographique et les types d’écosystèmes suivis."
+msgstr ""
+"Clarifier la couverture géographique et les types d’écosystèmes suivis."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_governance
@@ -8692,8 +8655,8 @@ msgstr ""
 "                                            des lignes d’alerte tierces ou "
 "des plateformes numériques.\n"
 "                                            Les rapports sont suivis et "
-"traités via le système de gestion de la responsabilité sociale de <strong>{{ "
-"company_name }}</strong>."
+"traités via le système de gestion de la responsabilité sociale de "
+"<strong>{{ company_name }}</strong>."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_social_b
@@ -8794,10 +8757,10 @@ msgid ""
 "                                                                        distribution)."
 msgstr ""
 "Complétez les tableaux par de <strong>courtes\n"
-"                                                                        "
-"analyses narratives</strong> (tendances,\n"
-"                                                                        "
-"équilibre femmes-hommes, répartition\n"
+"                                                                        analyses "
+"narratives</strong> (tendances,\n"
+"                                                                        équilibre "
+"femmes-hommes, répartition\n"
 "                                                                        de "
 "l’ancienneté)."
 
@@ -11099,8 +11062,8 @@ msgid ""
 "Energy consumption and mix (E1-5) <span class=\"d-print-none\">[Material]</"
 "span>"
 msgstr ""
-"Consommation et mix énergétique (E1-5) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Consommation et mix énergétique (E1-5) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e1
@@ -11250,9 +11213,9 @@ msgid ""
 "scope, remediability, likelihood, and financial magnitude. Apply thresholds "
 "to determine materiality."
 msgstr ""
-"Évaluer la significativité à l’aide de critères qualitatifs ou quantitatifs "
-": échelle, portée, remédiabilité, probabilité et ampleur financière. "
-"Appliquer des seuils pour déterminer la matérialité."
+"Évaluer la significativité à l’aide de critères qualitatifs ou "
+"quantitatifs : échelle, portée, remédiabilité, probabilité et ampleur "
+"financière. Appliquer des seuils pour déterminer la matérialité."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c6
@@ -11579,8 +11542,8 @@ msgstr ""
 "reporting incluent un total de bilan\n"
 "                                de {{ balance_sheet_total }} €, un chiffre "
 "d’affaires net de\n"
-"                                {{ net_turnover }} € et un personnel de {{ "
-"total_reporting }} employés."
+"                                {{ net_turnover }} € et un personnel de "
+"{{ total_reporting }} employés."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c1
@@ -11938,8 +11901,8 @@ msgstr "Réduction des émissions de GES"
 msgid ""
 "GHG Removals and Mitigation Projects Financed Through Carbon Credits(E1-7)"
 msgstr ""
-"Éliminations de GES et projets d’atténuation financés par des crédits carbone"
-"(E1-7)"
+"Éliminations de GES et projets d’atténuation financés par des crédits "
+"carbone(E1-7)"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e1
@@ -11947,8 +11910,8 @@ msgid ""
 "GHG Removals and Mitigation Projects Financed Through Carbon Credits(E1-7) "
 "<span class=\"d-print-none\">[Material]</span>"
 msgstr ""
-"Éliminations de GES et projets d’atténuation financés par des crédits carbone"
-"(E1-7) <span class=\"d-print-none\">[Matériel]</span>"
+"Éliminations de GES et projets d’atténuation financés par des crédits "
+"carbone(E1-7) <span class=\"d-print-none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e1
@@ -11956,8 +11919,8 @@ msgid ""
 "GHG Removals and Mitigation Projects Financed Through Carbon Credits(E1-7) "
 "<span class=\"d-print-none\">[Non Material]</span>"
 msgstr ""
-"Éliminations de GES et projets d’atténuation financés par des crédits carbone"
-"(E1-7) <span class=\"d-print-none\">[Non matériel]</span>"
+"Éliminations de GES et projets d’atténuation financés par des crédits "
+"carbone(E1-7) <span class=\"d-print-none\">[Non matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b3
@@ -12369,8 +12332,8 @@ msgid ""
 "Health and Safety Metrics (S1-14) <span class=\"d-print-none\">[Material]</"
 "span>"
 msgstr ""
-"Métriques de santé et sécurité (S1-14) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Métriques de santé et sécurité (S1-14) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -12478,8 +12441,7 @@ msgstr ""
 "Mettre en évidence l’alignement avec des cadres\n"
 "                                                                reconnus et "
 "des normes\n"
-"                                                                "
-"internationales."
+"                                                                internationales."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -12491,8 +12453,8 @@ msgid ""
 "employee workers."
 msgstr ""
 "Mettre en évidence toute <strong>différence\n"
-"                                                                    "
-"matérielle</strong> entre les employés\n"
+"                                                                    matérielle</"
+"strong> entre les employés\n"
 "                                                                    et les "
 "travailleurs non employés."
 
@@ -12708,8 +12670,8 @@ msgid ""
 "                                documented in the report (ex: Chapter 2)."
 msgstr ""
 "Identifier où les processus de gouvernance, de stratégie et d’IRO sont\n"
-"                                documentés dans le rapport (ex. : Chapitre 2)"
-"."
+"                                documentés dans le rapport (ex. : Chapitre "
+"2)."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -12859,8 +12821,8 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b5
 msgid "If no sites are in sensitive areas, explicitly state “none.”"
 msgstr ""
-"Si aucun site ne se trouve dans des zones sensibles, indiquez explicitement “"
-"aucun.”"
+"Si aucun site ne se trouve dans des zones sensibles, indiquez explicitement "
+"“aucun.”"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b7
@@ -13127,8 +13089,7 @@ msgstr ""
 "Inclure <strong>uniquement les catégories clés</strong> :\n"
 "                                                                    type "
 "d’emploi, genre, fonction et\n"
-"                                                                    "
-"géographie"
+"                                                                    géographie"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_environmental_a
@@ -13207,7 +13168,8 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c4
 msgid "Include both short-term (acute) and long-term (chronic) risks."
-msgstr "Inclure les risques à court terme (aigus) et à long terme (chroniques)."
+msgstr ""
+"Inclure les risques à court terme (aigus) et à long terme (chroniques)."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c5
@@ -13438,8 +13400,8 @@ msgid ""
 "                                            allocations</strong>."
 msgstr ""
 "Indiquer si les cibles tiennent compte des <strong>seuils écologiques\n"
-"                                        locaux</strong> ou des <strong>"
-"allocations\n"
+"                                        locaux</strong> ou des "
+"<strong>allocations\n"
 "                                            spécifiques à l’entité</strong>."
 
 #. module: esg
@@ -13933,8 +13895,8 @@ msgid ""
 "how progress is <strong>monitored\n"
 "                                and reported</strong>."
 msgstr ""
-"Rester concis. Décrire les <strong>principales sources de pollution</strong>"
-", les <strong>mesures de prévention\n"
+"Rester concis. Décrire les <strong>principales sources de pollution</"
+"strong>, les <strong>mesures de prévention\n"
 "                                et de réduction</strong>, et l’alignement "
 "avec les <strong>réglementations\n"
 "                                et\n"
@@ -14583,8 +14545,8 @@ msgid ""
 "regulatory and industry\n"
 "                        standards</strong> ."
 msgstr ""
-"Les IRO matériels sont revus et validés périodiquement via <strong>"
-"l’engagement\n"
+"Les IRO matériels sont revus et validés périodiquement via "
+"<strong>l’engagement\n"
 "                        des parties prenantes, l’expertise interne et "
 "l’alignement avec les normes \n"
 "                        réglementaires et sectorielles</strong> ."
@@ -14966,6 +14928,8 @@ msgstr "NOx"
 #: model:ir.model.fields,field_description:esg.field_esg_nace__name
 #: model:ir.model.fields,field_description:esg.field_esg_other_emission__name
 #: model:ir.model.fields,field_description:esg.field_esg_tag__name
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_list_view
+#: model_terms:ir.ui.view,arch_db:esg.carbon_emission_report_search_view
 msgid "Name"
 msgstr "Nom"
 
@@ -15879,8 +15843,8 @@ msgstr ""
 "                                        la santé &amp; sécurité,\n"
 "                                        la diversité, les salaires "
 "équitables et la formation. Relier les politiques aux conventions de l’OIT,\n"
-"                                        à la Charte des droits fondamentaux "
-"\n"
+"                                        à la Charte des droits "
+"fondamentaux \n"
 "                                        de l’UE ou aux lois nationales du "
 "travail \n"
 "                                        pertinentes lorsque\n"
@@ -16098,13 +16062,15 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Percentage of employees aged 30-50 in the base year"
-msgstr "Pourcentage d’employés âgés de 30 à 50 ans pendant l’année de référence"
+msgstr ""
+"Pourcentage d’employés âgés de 30 à 50 ans pendant l’année de référence"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Percentage of employees aged 30-50 in the reporting year"
-msgstr "Pourcentage d’employés âgés de 30 à 50 ans pendant l’année de reporting"
+msgstr ""
+"Pourcentage d’employés âgés de 30 à 50 ans pendant l’année de reporting"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -16355,18 +16321,21 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Percentage of other non-employees in the base year"
-msgstr "Pourcentage de non-employés de genre autre pendant l’année de référence"
+msgstr ""
+"Pourcentage de non-employés de genre autre pendant l’année de référence"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Percentage of other non-employees in the reporting year"
-msgstr "Pourcentage de non-employés de genre autre pendant l’année de reporting"
+msgstr ""
+"Pourcentage de non-employés de genre autre pendant l’année de reporting"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_appendix_b
 msgid "Percentage of payments made on time in the reporting year"
-msgstr "Pourcentage de paiements effectués à temps pendant l’année de reporting"
+msgstr ""
+"Pourcentage de paiements effectués à temps pendant l’année de reporting"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -16431,8 +16400,8 @@ msgid ""
 "Persons with Disabilities (S1-12) <span class=\"d-print-none\">[Material]</"
 "span>"
 msgstr ""
-"Personnes en situation de handicap (S1-12) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Personnes en situation de handicap (S1-12) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -16773,8 +16742,8 @@ msgid ""
 "Policies related to Pollution (E2-1) <span class=\"d-print-"
 "none\">[Material]</span>"
 msgstr ""
-"Politiques relatives à la pollution (E2-1) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Politiques relatives à la pollution (E2-1) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -16796,8 +16765,8 @@ msgid ""
 "Policies related to own workforce (S1-1) <span class=\"d-print-"
 "none\">[Material]</span>"
 msgstr ""
-"Politiques relatives au personnel propre (S1-1) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Politiques relatives au personnel propre (S1-1) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -16805,8 +16774,8 @@ msgid ""
 "Policies related to own workforce (S1-1) <span class=\"d-print-none\">[Non "
 "Material]</span>"
 msgstr ""
-"Politiques relatives au personnel propre (S1-1) <span class=\"d-print-none\">"
-"[Non matériel]</span>"
+"Politiques relatives au personnel propre (S1-1) <span class=\"d-print-"
+"none\">[Non matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c4
@@ -16844,7 +16813,8 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_governance_c
 msgid "Political and lobbying activities under the organization's influence."
-msgstr "Activités politiques et de lobbying sous l’influence de l’organisation."
+msgstr ""
+"Activités politiques et de lobbying sous l’influence de l’organisation."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b4
@@ -16896,8 +16866,8 @@ msgid ""
 "Pollution of Air, Water, and Soil (E2-4) <span class=\"d-print-"
 "none\">[Material]</span>"
 msgstr ""
-"Pollution de l’air, de l’eau et des sols (E2-4) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Pollution de l’air, de l’eau et des sols (E2-4) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -16905,8 +16875,8 @@ msgid ""
 "Pollution of Air, Water, and Soil (E2-4) <span class=\"d-print-none\">[Non "
 "Material]</span>"
 msgstr ""
-"Pollution de l’air, de l’eau et des sols (E2-4) <span class=\"d-print-none\">"
-"[Non matériel]</span>"
+"Pollution de l’air, de l’eau et des sols (E2-4) <span class=\"d-print-"
+"none\">[Non matériel]</span>"
 
 #. module: esg
 #: model:ir.model.fields.selection,name:esg.selection__esg_metric__type__positive_impact
@@ -17051,8 +17021,8 @@ msgid ""
 "Risks and Opportunities (E3-5) <span class=\"d-print-none\">[Material]</span>"
 msgstr ""
 "Effets financiers potentiels des impacts, risques et opportunités liés à "
-"l’eau et aux ressources marines (E3-5) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"l’eau et aux ressources marines (E3-5) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e3
@@ -17176,8 +17146,8 @@ msgid ""
 "none\">[Material]</span>"
 msgstr ""
 "Processus d’engagement avec les communautés affectées au sujet des impacts\n"
-"                                    (S3-2) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"                                    (S3-2) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s3
@@ -17230,8 +17200,8 @@ msgid ""
 "Impacts (S1-2) <span class=\"d-print-none\">[Material]</span>"
 msgstr ""
 "Processus d’engagement avec le personnel propre et les représentants des "
-"travailleurs au sujet des impacts (S1-2) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"travailleurs au sujet des impacts (S1-2) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -17385,8 +17355,9 @@ msgid ""
 msgstr ""
 "Les produits et services sont fournis via <strong>[décrire les canaux de "
 "distribution (p. ex., B2B, gros, détail)]</strong>,\n"
-"                        soutenus par des relations d’affaires avec <strong>"
-"[préciser les principaux fournisseurs, partenaires et clients]</strong>\n"
+"                        soutenus par des relations d’affaires avec "
+"<strong>[préciser les principaux fournisseurs, partenaires et clients]</"
+"strong>\n"
 "                        qui contribuent à la continuité opérationnelle et à "
 "des pratiques responsables dans la chaîne de valeur."
 
@@ -17923,8 +17894,7 @@ msgstr ""
 "Reporter la couverture, la fréquence et\n"
 "                                                                l’efficacité "
 "des programmes\n"
-"                                                                "
-"anticorruption."
+"                                                                anticorruption."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_c6
@@ -19024,8 +18994,8 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
 msgid "Substances of Concern and Substances of Very High Concern (SVHC) (E2-5)"
 msgstr ""
-"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) (E2-"
-"5)"
+"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) "
+"(E2-5)"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -19033,8 +19003,8 @@ msgid ""
 "Substances of Concern and Substances of Very High Concern (SVHC) (E2-5) "
 "<span class=\"d-print-none\">[Material]</span>"
 msgstr ""
-"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) (E2-"
-"5) <span class=\"d-print-none\">[Matériel]</span>"
+"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) "
+"(E2-5) <span class=\"d-print-none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e2
@@ -19042,8 +19012,8 @@ msgid ""
 "Substances of Concern and Substances of Very High Concern (SVHC) (E2-5) "
 "<span class=\"d-print-none\">[Non Material]</span>"
 msgstr ""
-"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) (E2-"
-"5) <span class=\"d-print-none\">[Non matériel]</span>"
+"Substances préoccupantes et substances extrêmement préoccupantes (SVHC) "
+"(E2-5) <span class=\"d-print-none\">[Non matériel]</span>"
 
 #. module: esg
 #: model:esg.gas,name:esg.esg_gas_so2
@@ -19076,8 +19046,8 @@ msgid ""
 "estimates are uncertain."
 msgstr ""
 "Résumer les <strong>impacts quantitatifs</strong> lorsque\n"
-"                                        possible ; inclure des <strong>"
-"explications\n"
+"                                        possible ; inclure des "
+"<strong>explications\n"
 "                                            qualitatives</strong> si les "
 "estimations sont incertaines."
 
@@ -19350,7 +19320,8 @@ msgstr "Tableau : Répartition des non-employés par type"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
 msgid "Table: Pay gap by contract type (employees and non-employees)"
-msgstr "Tableau : Écart salarial par type de contrat (employés et non-employés)"
+msgstr ""
+"Tableau : Écart salarial par type de contrat (employés et non-employés)"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_appendix_placeholders
@@ -19504,8 +19475,8 @@ msgid ""
 "Targets Related to Consumers (S4-4) <span class=\"d-print-none\">[Material]</"
 "span>"
 msgstr ""
-"Cibles liées aux consommateurs (S4-4) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Cibles liées aux consommateurs (S4-4) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s4
@@ -19541,8 +19512,8 @@ msgstr ""
 "Cibles liées à la gestion des impacts négatifs matériels, au développement\n"
 "                                des impacts positifs et à la gestion des "
 "risques et opportunités matériels\n"
-"                                (S1-5) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"                                (S1-5) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s1
@@ -19594,8 +19565,8 @@ msgid ""
 "Targets Related to Resource Use and Circular Economy (E5-3) <span class=\"d-"
 "print-none\">[Material]</span>"
 msgstr ""
-"Cibles liées à l’utilisation des ressources et à l’économie circulaire (E5-"
-"3) <span class=\"d-print-none\">[Matériel]</span>"
+"Cibles liées à l’utilisation des ressources et à l’économie circulaire "
+"(E5-3) <span class=\"d-print-none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e5
@@ -19603,8 +19574,8 @@ msgid ""
 "Targets Related to Resource Use and Circular Economy (E5-3) <span class=\"d-"
 "print-none\">[Non Material]</span>"
 msgstr ""
-"Cibles liées à l’utilisation des ressources et à l’économie circulaire (E5-"
-"3) <span class=\"d-print-none\">[Non matériel]</span>"
+"Cibles liées à l’utilisation des ressources et à l’économie circulaire "
+"(E5-3) <span class=\"d-print-none\">[Non matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s2
@@ -19663,8 +19634,8 @@ msgid ""
 "Targets Related to affected communities (S3-5) <span class=\"d-print-"
 "none\">[Material]</span>"
 msgstr ""
-"Cibles liées aux communautés affectées (S3-5) <span class=\"d-print-none\">"
-"[Matériel]</span>"
+"Cibles liées aux communautés affectées (S3-5) <span class=\"d-print-"
+"none\">[Matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s3
@@ -19672,8 +19643,8 @@ msgid ""
 "Targets Related to affected communities (S3-5) <span class=\"d-print-"
 "none\">[Non Material]</span>"
 msgstr ""
-"Cibles liées aux communautés affectées (S3-5) <span class=\"d-print-none\">"
-"[Non matériel]</span>"
+"Cibles liées aux communautés affectées (S3-5) <span class=\"d-print-"
+"none\">[Non matériel]</span>"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s4
@@ -20111,8 +20082,8 @@ msgid ""
 "The company applies a <strong>Double Materiality Assessment (DMA)</strong>,\n"
 "                        considering:"
 msgstr ""
-"La société applique une <strong>analyse de double matérialité (DMA)</strong>"
-",\n"
+"La société applique une <strong>analyse de double matérialité (DMA)</"
+"strong>,\n"
 "                        prenant en compte :"
 
 #. module: esg
@@ -20205,7 +20176,8 @@ msgstr ""
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b1
 msgid "The company holds the following sustainability-related certifications:"
-msgstr "La société détient les certifications suivantes liées à la durabilité :"
+msgstr ""
+"La société détient les certifications suivantes liées à la durabilité :"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_vsm_b3
@@ -20265,10 +20237,10 @@ msgid ""
 "                                including sites that are owned, leased, or "
 "managed."
 msgstr ""
-"La société opère en tant que {{ legal_form }} dans le secteur {{ nace_code }}"
-".\n"
-"                                Ses principales opérations sont menées en {{ "
-"country_of_main_operations }},\n"
+"La société opère en tant que {{ legal_form }} dans le secteur "
+"{{ nace_code }}.\n"
+"                                Ses principales opérations sont menées en "
+"{{ country_of_main_operations }},\n"
 "                                y compris des sites détenus, loués ou gérés."
 
 #. module: esg
@@ -20426,8 +20398,8 @@ msgid ""
 msgstr ""
 "L’accent est mis sur la garantie de <strong>conditions de travail "
 "équitables</strong>, la <strong>protection\n"
-"                        des droits humains</strong> et l’<strong>"
-"approvisionnement responsable</strong> dans l’ensemble de la\n"
+"                        des droits humains</strong> et "
+"l’<strong>approvisionnement responsable</strong> dans l’ensemble de la\n"
 "                        chaîne de valeur."
 
 #. module: esg
@@ -20513,9 +20485,10 @@ msgid ""
 "improvement in environmental performance and contribute to "
 "{{ company_name }}'s sustainability objectives."
 msgstr ""
-"Les initiatives entreprises ou prévues sont structurées autour de <strong>"
-"[préciser les principaux axes tels que la gestion de l’énergie, l’efficacité "
-"au travail, la mobilité, les processus opérationnels]</strong>.\n"
+"Les initiatives entreprises ou prévues sont structurées autour de "
+"<strong>[préciser les principaux axes tels que la gestion de l’énergie, "
+"l’efficacité au travail, la mobilité, les processus opérationnels]</"
+"strong>.\n"
 "                                Ces mesures soutiennent l’amélioration "
 "continue de la performance environnementale et contribuent aux objectifs de "
 "durabilité de {{ company_name }}."
@@ -20561,8 +20534,8 @@ msgid ""
 "                                PFCs, SF₆, NF₃)."
 msgstr ""
 "L’inventaire couvre les <strong>Scopes 1, 2 et 3</strong>,\n"
-"                                exprimés en tonnes métriques d’équivalent CO"
-"₂ (t CO₂e), et inclut\n"
+"                                exprimés en tonnes métriques d’équivalent "
+"CO₂ (t CO₂e), et inclut\n"
 "                                tous les gaz à effet de serre requis par "
 "l’ESRS E1 (CO₂, CH₄, N₂O, HFC,\n"
 "                                PFC, SF₆, NF₃)."
@@ -20580,8 +20553,8 @@ msgid ""
 "                        opportunities related to\n"
 "                            value-chain workers</strong>."
 msgstr ""
-"L’objectif de cette publication est d’expliquer comment <strong>{{ "
-"company_name }}</strong> gère ses <strong>impacts, risques et\n"
+"L’objectif de cette publication est d’expliquer comment "
+"<strong>{{ company_name }}</strong> gère ses <strong>impacts, risques et\n"
 "                        opportunités matériels liés aux\n"
 "                            travailleurs de la chaîne de valeur</strong>."
 
@@ -20593,8 +20566,8 @@ msgid ""
 "                            and opportunities related to affected "
 "communities."
 msgstr ""
-"L’objectif de cette publication est d’expliquer comment <strong>{{ "
-"company_name }}</strong> gère ses impacts, risques\n"
+"L’objectif de cette publication est d’expliquer comment "
+"<strong>{{ company_name }}</strong> gère ses impacts, risques\n"
 "                            et opportunités matériels liés aux communautés "
 "affectées."
 
@@ -20667,9 +20640,9 @@ msgid ""
 "                        biodiversity."
 msgstr ""
 "L’objectif de cette publication est d’expliquer comment l’entreprise gère\n"
-"                        ses impacts, risques et opportunités liés à <strong>"
-"l’eau et aux ressources marines</strong> ;<strong> </strong>y compris "
-"l’utilisation de l’eau, les rejets et\n"
+"                        ses impacts, risques et opportunités liés à "
+"<strong>l’eau et aux ressources marines</strong> ;<strong> </strong>y "
+"compris l’utilisation de l’eau, les rejets et\n"
 "                        la protection des écosystèmes marins. Elle vise à "
 "garantir un reporting transparent\n"
 "                        sur les actions qui réduisent la consommation, "
@@ -20786,8 +20759,8 @@ msgid ""
 "upstream emissions. It also includes monitoring and governance mechanisms to "
 "ensure effective implementation and measurable progress."
 msgstr ""
-"Le plan est aligné avec la stratégie globale de durabilité de {{ "
-"company_name }} et inclut des mesures telles que l’amélioration de "
+"Le plan est aligné avec la stratégie globale de durabilité de "
+"{{ company_name }} et inclut des mesures telles que l’amélioration de "
 "l’efficacité énergétique, l’augmentation de l’utilisation des énergies "
 "renouvelables, l’optimisation des processus opérationnels,\n"
 "                                et l’engagement avec les fournisseurs pour "
@@ -21205,10 +21178,10 @@ msgid ""
 "                        whether on a consolidated or individual basis</em>]</"
 "strong>."
 msgstr ""
-"La déclaration de durabilité a été préparée sur une base <strong>[<em>"
-"préciser\n"
-"                        si elle est consolidée ou individuelle</em>]</strong>"
-"."
+"La déclaration de durabilité a été préparée sur une base "
+"<strong>[<em>préciser\n"
+"                        si elle est consolidée ou individuelle</em>]</"
+"strong>."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_emission_factor__valid_from
@@ -21299,12 +21272,12 @@ msgstr ""
 "emplacements]</strong>, composées de <strong>[préciser les sites détenus/"
 "loués]</strong>\n"
 "                        et gérées par <strong>[préciser l’approche de "
-"gestion des installations]</strong>. En raison de la nature de ses activités "
-"; <strong>[décrire le type d’activité, p. ex., conseil, services, "
+"gestion des installations]</strong>. En raison de la nature de ses "
+"activités ; <strong>[décrire le type d’activité, p. ex., conseil, services, "
 "fabrication]</strong>,\n"
-"                        certains impacts environnementaux tels que <strong>"
-"[sujets non pertinents, le cas échéant]</strong> n’ont pas été identifiés "
-"comme significatifs."
+"                        certains impacts environnementaux tels que "
+"<strong>[sujets non pertinents, le cas échéant]</strong> n’ont pas été "
+"identifiés comme significatifs."
 
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__uom_id
@@ -21345,7 +21318,8 @@ msgstr "La valeur de l'indicateur au cours de l'année de référence."
 #. module: esg
 #: model:ir.model.fields,help:esg.field_esg_action__target_value
 msgid "The value the metric is expected to reach at the target year."
-msgstr "La valeur que l'indicateur devrait atteindre au cours de l'année cible."
+msgstr ""
+"La valeur que l'indicateur devrait atteindre au cours de l'année cible."
 
 #. module: esg
 #. odoo-python
@@ -21465,8 +21439,8 @@ msgstr ""
 "                                    pour <strong>{{ company_name }}</strong> "
 "selon le processus d’<strong>analyse de double\n"
 "                                    matérialité</strong>\n"
-"                                        (perspectives d’impact et financière)"
-"."
+"                                        (perspectives d’impact et "
+"financière)."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_e1
@@ -21688,8 +21662,8 @@ msgid ""
 msgstr ""
 "Cela inclut les travailleurs qui ne sont pas directement employés mais dont "
 "le travail contribue\n"
-"                        aux produits ou services de <strong>{{ "
-"company_name }}</strong>, tels que les prestataires,\n"
+"                        aux produits ou services de "
+"<strong>{{ company_name }}</strong>, tels que les prestataires,\n"
 "                        les fournisseurs et la main-d’œuvre externalisée."
 
 #. module: esg
@@ -21817,8 +21791,8 @@ msgid ""
 "estimates, exemptions, or\n"
 "                        references to other reports."
 msgstr ""
-"Cette section fournit une vue d’ensemble de la manière dont <strong>{{ "
-"company_name }}</strong>\n"
+"Cette section fournit une vue d’ensemble de la manière dont "
+"<strong>{{ company_name }}</strong>\n"
 "                        prépare ses informations de durabilité conformément "
 "aux European\n"
 "                        Sustainability Reporting Standards (ESRS). Elle "
@@ -21991,8 +21965,8 @@ msgid ""
 "initiatives (e.g., reusing office furniture, extending IT device lifespan, "
 "donating equipment)]</strong>."
 msgstr ""
-"Afin de prolonger le cycle de vie des produits et équipements, {{ "
-"company_name }} privilégie la réutilisation lorsque possible. Cela peut "
+"Afin de prolonger le cycle de vie des produits et équipements, "
+"{{ company_name }} privilégie la réutilisation lorsque possible. Cela peut "
 "inclure <strong>[insérer les initiatives de réutilisation (p. ex., "
 "réutilisation du mobilier de bureau, prolongation de la durée de vie des "
 "appareils IT, don d’équipements)]</strong>."
@@ -22005,9 +21979,9 @@ msgid ""
 "World Database on Key Biodiversity Areas, or tools such as the Integrated "
 "Biodiversity Assessment Tool (IBAT)."
 msgstr ""
-"Afin d’identifier les zones sensibles pour la biodiversité, {{ "
-"company_name }} peut consulter des bases de données mondiales telles que la "
-"World Database on Protected Areas (WDPA), la World Database on Key "
+"Afin d’identifier les zones sensibles pour la biodiversité, "
+"{{ company_name }} peut consulter des bases de données mondiales telles que "
+"la World Database on Protected Areas (WDPA), la World Database on Key "
 "Biodiversity Areas, ou des outils tels que l’Integrated Biodiversity "
 "Assessment Tool (IBAT)."
 
@@ -22581,8 +22555,8 @@ msgid ""
 msgstr ""
 "Utiliser des valeurs médianes plutôt que moyennes afin de garantir\n"
 "                                                la représentativité, comme\n"
-"                                                l’exige la guidance ESRS S1-"
-"16."
+"                                                l’exige la guidance ESRS "
+"S1-16."
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
@@ -22672,7 +22646,8 @@ msgstr "Historique des valeurs"
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_basic_for_prepation
 msgid "Value chain-related greenhouse gas emissions (Scope 3)"
-msgstr "Émissions de gaz à effet de serre liées à la chaîne de valeur (Scope 3)"
+msgstr ""
+"Émissions de gaz à effet de serre liées à la chaîne de valeur (Scope 3)"
 
 #. module: esg
 #: model_terms:knowledge.article,template_body:esg.esg_csrd_knowledge_article_template_csrd_esrs_s2
@@ -22684,8 +22659,8 @@ msgid ""
 "                        inclusion."
 msgstr ""
 "Les pratiques relatives aux travailleurs de la chaîne de valeur sont "
-"intégrées dans l’approche de durabilité plus large de <strong>{{ "
-"company_name }}</strong>, reliant\n"
+"intégrées dans l’approche de durabilité plus large de "
+"<strong>{{ company_name }}</strong>, reliant\n"
 "                        la responsabilité de la chaîne d’approvisionnement "
 "au devoir de vigilance en matière de droits humains et à \n"
 "                        l’inclusion sociale."
@@ -23047,8 +23022,8 @@ msgstr ""
 "corruption confirmés, couverture des politiques,\n"
 "                achèvement des formations éthiques) font l’objet d’une "
 "assurance externe selon des cadres reconnus\n"
-"                tels que ISO 37001, AA1000 Assurance Standard ou les normes "
-"\n"
+"                tels que ISO 37001, AA1000 Assurance Standard ou les "
+"normes \n"
 "                d’audit nationales."
 
 #. module: esg
@@ -23075,8 +23050,8 @@ msgstr ""
 "équité salariale, sécurité)\n"
 "                font l’objet d’une assurance externe conformément à des "
 "cadres reconnus tels que <strong>ISAE\n"
-"                3000</strong>, <strong>GRI 401-404</strong> ou les <strong>"
-"normes du travail de l’OIT</strong>\n"
+"                3000</strong>, <strong>GRI 401-404</strong> ou les "
+"<strong>normes du travail de l’OIT</strong>\n"
 "                ."
 
 #. module: esg
@@ -23273,8 +23248,8 @@ msgid ""
 "responsible behaviours, and foster a workplace culture where physical and "
 "mental well-being are central."
 msgstr ""
-"La santé et la sécurité du personnel sont des priorités fondamentales pour {"
-"{ company_name }}. L’organisation s’engage à fournir un environnement de "
+"La santé et la sécurité du personnel sont des priorités fondamentales pour "
+"{{ company_name }}. L’organisation s’engage à fournir un environnement de "
 "travail sûr, sain et inclusif à tous les employés. Cet engagement repose sur "
 "une approche proactive visant à prévenir les risques, à promouvoir des "
 "comportements responsables et à favoriser une culture de travail où le bien-"
@@ -25126,6 +25101,87 @@ msgid ""
 msgstr ""
 "Les “zones sensibles” incluent généralement les sites Natura 2000, les sites "
 "Ramsar, les réserves UNESCO ou les désignations nationales équivalentes."
+
+#~ msgid ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/>\n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Dear <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[Stakeholder]</t></p>\n"
+#~ "                        <span>\n"
+#~ "                            <t t-out=\"logged_user\">[Current user]</t> "
+#~ "invites you to participate in the CSRD double materiality review for <t t-"
+#~ "out=\"company_name\">[Company Name]</t>. We are looking for your input "
+#~ "on: <br/>\n"
+#~ "                            - How the company impacts the environment, "
+#~ "society, and the economy. <br/>\n"
+#~ "                            - How these impacts could affect the company "
+#~ "financially. <br/>\n"
+#~ "                            Please complete your review by <t t-"
+#~ "out=\"deadline\">[specified deadline]</t> to help us meet CSRD "
+#~ "requirements. Your expertise is important for an accurate assessment. </"
+#~ "span>\n"
+#~ "                        <br/> Thank you for your contribution. <br/>\n"
+#~ "                        Best regards, <t t-out=\"logged_user\">[Current "
+#~ "user]</t>\n"
+#~ "                        <br/><br/>\n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                                Start the Review\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/> \n"
+#~ "                <t t-set=\"company_name\" t-"
+#~ "value=\"ctx.get('company_name')\"/> \n"
+#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
+#~ "                 <div style=\"margin: 0px; padding: 0px;\"> \n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        </p><p style=\"margin-left:5px\">Cher/Chère <t t-"
+#~ "out=\"object.partner_id.name or 'stakeholder'\">[Partie prenante]</t></"
+#~ "p> \n"
+#~ "                        <span> \n"
+#~ "                            <t t-out=\"logged_user\">[Utilisateur "
+#~ "actuel]</t> vous invite à participer à la revue de double matérialité "
+#~ "CSRD pour <t t-out=\"company_name\">[Nom de la société]</t>. Nous "
+#~ "souhaitons recueillir votre avis sur : <br/> \n"
+#~ "                            - La manière dont la société impacte "
+#~ "l’environnement, la société et l’économie. <br/> \n"
+#~ "                            - La manière dont ces impacts pourraient "
+#~ "affecter financièrement la société. <br/> \n"
+#~ "                            Veuillez compléter votre revue avant le <t t-"
+#~ "out=\"deadline\">[date limite spécifiée]</t> afin de nous aider à "
+#~ "respecter les exigences CSRD. Votre expertise est importante pour une "
+#~ "évaluation précise. </span> \n"
+#~ "                        <br/> Merci pour votre contribution. <br/> \n"
+#~ "                        Cordialement, <t t-"
+#~ "out=\"logged_user\">[Utilisateur actuel]</t> \n"
+#~ "                        <br/><br/> \n"
+#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
+#~ "align: center;\"> <a t-att-href=\"object.get_start_url()\" t-attf-"
+#~ "style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\"> \n"
+#~ "                                Commencer la revue\n"
+#~ "                             </a> \n"
+#~ "                        </div>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "                "
 
 #~ msgid "Average number of employees in base year"
 #~ msgstr "Nombre moyen d’employés pendant l’année de référence"

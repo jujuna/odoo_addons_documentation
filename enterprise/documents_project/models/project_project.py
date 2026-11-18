@@ -18,8 +18,8 @@ class ProjectProject(models.Model):
                "'|', '&', ('res_model', '=', 'project.project'), ('res_id', '=', id), ('res_model', '=', False)]",
         index='btree_not_null',
         help="Folder in which all of the documents of this project will be categorized.")
-    document_count = fields.Integer(compute='_compute_document_count', export_string_translation=False)
-    document_ids = fields.One2many('documents.document', compute='_compute_document_count', export_string_translation=False)
+    document_count = fields.Integer(compute='_compute_document_count', compute_sudo=True, export_string_translation=False)
+    document_ids = fields.One2many('documents.document', compute='_compute_document_ids', export_string_translation=False)
     documents_folder_user_permission = fields.Selection(related='documents_folder_id.user_permission', export_string_translation=False)
 
     @api.ondelete(at_uninstall=False)
@@ -46,18 +46,29 @@ class ProjectProject(models.Model):
                     )
 
     def _compute_document_count(self):
+        count_by_record = self.env['documents.document']._read_group(
+            self._get_documents_domain(),
+            groupby=['res_model', 'res_id'],
+            aggregates=['__count'],
+        )
+        count_by_record = {(res_model, res_id): count for res_model, res_id, count in count_by_record}
+        for project in self:
+            project.document_count = count_by_record.get(('project.project', project.id), 0) + sum(
+                count_by_record.get(('project.task', task_id), 0) for task_id in project.task_ids.ids
+            )
+
+    def _compute_document_ids(self):
         docs_by_record = self.env['documents.document']._read_group(
             self._get_documents_domain(),
             groupby=['res_model', 'res_id'],
             aggregates=['id:recordset'],
         )
-        docs_by_record = {(res_model, res_id): doc for res_model, res_id, doc in docs_by_record}
+        docs_by_record = {(res_model, res_id): docs for res_model, res_id, docs in docs_by_record}
         for project in self:
             document_ids = docs_by_record.get(('project.project', project.id), self.env['documents.document'])
-            for task in project.task_ids:
+            for task in project.sudo().task_ids:
                 document_ids |= docs_by_record.get(('project.task', task.id), self.env['documents.document'])
             project.document_ids = document_ids
-            project.document_count = len(document_ids)
 
     def _create_missing_folders(self):
         folders_to_create_vals = []
@@ -72,6 +83,8 @@ class ProjectProject(models.Model):
                     'folder_id': documents_project_folder_id,
                     'name': project.name,
                     'type': 'folder',
+                    'res_model': 'project.project',
+                    'res_id': project.id,
                 }
                 folders_to_create_vals.append(folder_vals)
                 projects_with_folder_to_create.append(project)
@@ -94,7 +107,7 @@ class ProjectProject(models.Model):
 
     def _get_documents_domain(self):
         return super()._get_documents_domain() | Domain(
-            [('type', '!=', 'folder'), ('res_model', '=', 'project.task'), ('res_id', 'in', self.task_ids.ids)]
+            [('type', '!=', 'folder'), ('res_model', '=', 'project.task'), ('res_id', 'in', self.sudo().task_ids.ids)]
         )
 
     @api.model_create_multi
@@ -192,7 +205,8 @@ class ProjectProject(models.Model):
         for old_project, new_project in zip(self, copied_projects):
             if not self.env.context.get('no_create_folder') and old_project.documents_folder_id:
                 new_project.documents_folder_id = old_project.documents_folder_id.sudo().copy(
-                        {'name': new_project.name, 'owner_id': False}
+                        {'name': new_project.name, 'owner_id': False,
+                         'res_model': 'project.project', 'res_id': new_project.id}
                     )
 
         new_documents_sudo = self.env['documents.document'].sudo().search([

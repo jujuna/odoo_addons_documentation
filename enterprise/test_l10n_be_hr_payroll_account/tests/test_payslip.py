@@ -19,18 +19,19 @@ class TestPayslipBase(TestBelgiumCommon):
         for code, value in values.items():
             self.assertAlmostEqual(payslip.line_ids.filtered(lambda line: line.code == code).total, value)
 
-    def update_version(self, date_start, date_end=False, wage=2500):
-        self.version.write({
+    @classmethod
+    def update_version(cls, date_start, date_end=False, wage=2500):
+        cls.version.write({
             'wage': wage,
-            'employee_id': self.employee.id,
+            'employee_id': cls.employee.id,
             'contract_date_start': date_start,
             'contract_date_end': date_end,
             'date_version': date_start,
-            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'structure_type_id': cls.env.ref('hr.structure_type_employee_cp200').id,
             'internet': False,
             'mobile': False,
         })
-        return self.version
+        return cls.version
 
     def create_version(self, date_start, date_end=False, wage=2500):
         return self.employee.create_version({

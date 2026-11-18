@@ -1013,7 +1013,7 @@ class TestMockedDeliveryDHL(TestDeliveryDHLCommon):
             picking._action_done()
             self.assertIsNot(picking.carrier_tracking_ref, False)
 
-    def test_dhl_basic_international_flow_multi_company(self):
+    def test_08_dhl_basic_international_flow_multi_company(self):
         def commercial_invoice_data_check(endpoint, payload):
             if endpoint == 'shipments':
                 invoice_number_string = payload['content']['exportDeclaration']['invoice']['number']
@@ -1025,3 +1025,18 @@ class TestMockedDeliveryDHL(TestDeliveryDHLCommon):
         with _mock_request_call(commercial_invoice_data_check):
             self.patch(self, 'env', self.uk_co.env)
             super().dhl_basic_international_flow()
+
+    def test_09_dhl_international_flow_with_plt(self):
+        """
+        Ensure PaperLess Trade (PLT) is requested for both the outgoing and the return shipments.
+        """
+        requested_service_codes = []
+
+        def track_value_added_services(endpoint, payload):
+            if endpoint == 'shipments':
+                requested_service_codes.append([service['serviceCode'] for service in payload['valueAddedServices']])
+
+        self.delivery_carrier_dhl_eu_intl.return_label_on_delivery = True
+        with _mock_request_call(track_value_added_services):
+            super().dhl_basic_international_flow()
+        self.assertEqual(requested_service_codes, [['WY'], ['PV', 'WY']])

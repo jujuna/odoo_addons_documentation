@@ -51,7 +51,7 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
     def _get_l10n_se_sie4_ktyp(self, account_type):
         group_asset = {'asset_receivable', 'asset_cash', 'asset_current', 'asset_non_current', 'asset_prepayments', 'asset_fixed'}
         group_debt = {'liability_payable', 'liability_credit_card', 'liability_current', 'liability_non_current', 'equity',
-                      'equity_unaffected', 'off_balance'}
+                      'equity_unaffected', 'equity_retained', 'off_balance'}
         group_cost = {'expense', 'expense_depreciation', 'expense_direct_cost'}
 
         if account_type in group_asset:

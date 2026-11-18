@@ -15,13 +15,12 @@ class RestaurantTable(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        tables = super().create(vals_list)
+        tables = super().create([self._force_vals(vals) for vals in vals_list])
 
         for table in tables:
             if not table.appointment_resource_id:
                 table.appointment_resource_id = table.env['appointment.resource'].sudo().create({
-                    'name': f'Table {table.table_number}',
-                    'capacity': table.seats,
+                    **table._get_appointment_resource_vals(),
                     'pos_table_ids': table,
                     'appointment_type_ids': table.floor_id.pos_config_ids.appointment_type_id,
                 })
@@ -29,21 +28,31 @@ class RestaurantTable(models.Model):
         return tables
 
     def write(self, vals):
+        vals = self._force_vals(vals)
         res = super().write(vals)
 
-        if 'active' in vals:
-            if not vals['active']:
-                self.appointment_resource_id.sudo().active = False
-            else:
-                for table in self:
-                    if not table.appointment_resource_id:
-                        continue
-                    table.appointment_resource_id.sudo().write({
-                        'name': f'Table {table.table_number}',
-                        'capacity': table.seats,
-                    })
+        if {'active', 'seats', 'table_number'} & vals.keys():
+            for table in self:
+                resource = table.appointment_resource_id.sudo()
+                resource_vals = table._get_appointment_resource_vals()
+                if resource and any(resource[f] != v for f, v in resource_vals.items()):
+                    resource.write(resource_vals)
 
         return res
+
+    @api.model
+    def _force_vals(self, vals):
+        if 'seats' in vals and (vals['seats'] or 0) < 1:
+            vals = {**vals, 'seats': 1}
+        return vals
+
+    def _get_appointment_resource_vals(self):
+        self.ensure_one()
+        return {
+            'name': f'Table {self.table_number}',
+            'active': self.active,
+            'capacity': max(self.seats, 1),
+        }
 
     def unlink(self):
         for table in self:

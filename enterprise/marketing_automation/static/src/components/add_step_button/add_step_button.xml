@@ -40,15 +40,17 @@
                     <DropdownItem t-props="this.getDropdownItemProps('subscribe_to_list')">
                         <i class="oi pe-1" data-icon="contact_mail" aria-hidden="true"/>Update Subscription
                     </DropdownItem>
-                    <DropdownItem t-props="this.getDropdownItemProps('create_activity')">
-                        <i class="oi pe-1" data-icon="verified" aria-hidden="true"/>Create an Activity
-                    </DropdownItem>
-                    <DropdownItem t-props="this.getDropdownItemProps('update_record')">
-                        <i class="oi pe-1" data-icon="edit" aria-hidden="true"/>Update Record
-                    </DropdownItem>
-                    <DropdownItem t-props="this.getDropdownItemProps('action')">
-                        <i class="oi pe-1" data-icon="settings" aria-hidden="true"/>Server Action
-                    </DropdownItem>
+                    <div class="o_server_actions" t-if="this.canUserCreateServerAction">
+                        <DropdownItem t-props="this.getDropdownItemProps('create_activity')">
+                            <i class="oi pe-1" data-icon="verified" aria-hidden="true"/>Create an Activity
+                        </DropdownItem>
+                        <DropdownItem t-props="this.getDropdownItemProps('update_record')">
+                            <i class="oi pe-1" data-icon="edit" aria-hidden="true"/>Update Record
+                        </DropdownItem>
+                        <DropdownItem t-props="this.getDropdownItemProps('action')">
+                            <i class="oi pe-1" data-icon="settings" aria-hidden="true"/>Server Action
+                        </DropdownItem>
+                    </div>
                 </div>
             </t>
         </Dropdown>

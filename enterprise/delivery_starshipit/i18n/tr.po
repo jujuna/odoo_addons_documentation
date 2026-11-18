@@ -3,19 +3,20 @@
 # * delivery_starshipit
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 03:22+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-11-09 16:35+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "delivery_starshipit/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +38,16 @@ msgid ""
 "you can streamline every step of your fulfilment process,\n"
 "reduce handling time and improve customer experience.\n"
 msgstr ""
+"\n"
+"Gönderilerinizi Starshipit üzerinden gönderin ve çevrim içi olarak takip "
+"edin\n"
+"=======================================================\n"
+"\n"
+"Starshipit, büyüyen e-ticaret işletmeleri için entegre kargo ve takip "
+"çözümleri sağlayan lider sağlayıcıdır.\n"
+"Geniş bir kargo şirketi ve platform yelpazesiyle sorunsuz entegre olarak\n"
+"sipariş karşılama sürecinizin her adımını kolaylaştırabilir, işlem süresini\n"
+"azaltabilir ve müşteri deneyimini iyileştirebilirsiniz.\n"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -49,11 +60,18 @@ msgid ""
 "Please either continue the configuration or delete the order in Starshipit "
 "before trying again."
 msgstr ""
+"%(order_info)sAncak, kargo etiketi oluşturma işlemi aşağıdaki hata nedeniyle "
+"başarısız oldu:\n"
+"%(error)s\n"
+"\n"
+"Lütfen yapılandırmaya devam edin veya tekrar denemeden önce Starshipit'teki "
+"siparişi silin."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
 msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"east\"/>Daha fazla teslimat yöntemi edinin"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -95,12 +113,14 @@ msgid ""
 "<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the api keys."
 msgstr ""
+"<i class=\"oi\" data-icon=\"warning\"/> Yalnızca yöneticiler API "
+"anahtarlarını yapılandırabilir."
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/wizard/starshipit_shipping_wizard.py:0
 msgid "Add a shipping method"
-msgstr ""
+msgstr "Nakliye yöntemi ekle"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__package_carrier_type
@@ -159,12 +179,12 @@ msgstr "Teslimat"
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_delivery_carrier
 msgid "Delivery Method"
-msgstr ""
+msgstr "Teslim Yöntemi"
 
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_choose_delivery_carrier
 msgid "Delivery Method Selection Wizard"
-msgstr ""
+msgstr "Teslimat Yöntemi Seçim Sihirbazı"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -438,7 +458,7 @@ msgstr "Starshipit İade Koli Referansı"
 #. module: delivery_starshipit
 #: model:ir.module.module,shortdesc:base.module_delivery_starshipit
 msgid "Starshipit Shipping"
-msgstr ""
+msgstr "Starshipit Kargo"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_subscription_key
@@ -459,7 +479,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_starshipit/models/starshipit_service.py:0
 msgid "Starshipit should be used with a context manager."
-msgstr ""
+msgstr "Starshipit bir bağlam yöneticisi (context manager) ile kullanılmalıdır."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -525,6 +545,8 @@ msgid ""
 "field(s):  \n"
 " %s)"
 msgstr ""
+"Şirket/depo adres bilgileriniz eksik yada yanlış (Eşleşmeyen alan(lar):  \n"
+" %s)"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
@@ -548,13 +570,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "The order '%(order_number)s' has been created!\n"
-msgstr ""
+msgstr "'%(order_number)s' numaralı sipariş oluşturuldu!\n"
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "The order has been created!\n"
-msgstr ""
+msgstr "Sipariş oluşturuldu!\n"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -573,6 +595,8 @@ msgid ""
 "The recipient address is incomplete or wrong (Missing field(s):  \n"
 " %s)"
 msgstr ""
+"Alıcı adresi eksik yada yanlış (Eksik alan(lar):  \n"
+" %s)"
 
 #. module: delivery_starshipit
 #. odoo-python

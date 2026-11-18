@@ -260,11 +260,12 @@ class L10n_Be281_Mapping(models.Model):
                 kind, data = mapping_line._get_python_shortcut()
             plan.append((mapping_line, mapping_line.tag, mapping_line.is_monetary, kind, data))
         computed_tags = {step[1] for step in plan}
-        # A control row may total other control rows, so resolve them from the inside out.
+        # A control row may total other control rows, so resolve them from the inside out. It totals the rows of the
+        # year only: a zone the Belcotax schema of the year doesn't define (dated row of another year) is left out.
         pending_lines = self.filtered(lambda mapping_line: mapping_line.evaluation_type == 'control')
         while pending_lines:
             ready_lines = pending_lines.filtered(
-                lambda mapping_line: all(target.tag in computed_tags for target in mapping_line.control_mapping_ids)
+                lambda mapping_line: all(target.tag in computed_tags for target in mapping_line.control_mapping_ids & self)
             )
             if not ready_lines:
                 raise UserError(self.env._(
@@ -272,7 +273,8 @@ class L10n_Be281_Mapping(models.Model):
                     tags=', '.join(pending_lines.mapped('tag')),
                 ))
             plan.extend(
-                (mapping_line, mapping_line.tag, mapping_line.is_monetary, 'control', mapping_line.control_mapping_ids.mapped('tag'))
+                (mapping_line, mapping_line.tag, mapping_line.is_monetary, 'control',
+                 (mapping_line.control_mapping_ids & self).mapped('tag'))
                 for mapping_line in ready_lines
             )
             computed_tags.update(ready_lines.mapped('tag'))

@@ -1,6 +1,6 @@
 import { Component, t, useProps } from "@odoo/owl";
 import { ProductImageDialog } from "@stock_barcode/components/product_image_dialog";
-import { BarcodeGenerateDialog } from "./barcode_generate_serial";
+import { BarcodeGenerateLotDialog } from "./barcode_generate_lot_dialog";
 import { useService } from "@web/core/utils/hooks";
 
 export default class LineComponent extends Component {
@@ -24,6 +24,8 @@ export default class LineComponent extends Component {
             !this.props.subline &&
             this.line.packaging_uom_id &&
             this.line.packaging_uom_id.id !== this.line.uom_id.id;
+        this.showGenerateLot =
+            this.line.move_id && this.line.product_id.tracking && this.env.model.showGenerateLot;
     }
 
     get destinationLocationPath() {
@@ -45,7 +47,10 @@ export default class LineComponent extends Component {
         if (this.isPackage || this.incrementQty <= 0) {
             return false;
         }
-        return (this.incrementQty !== 1 || !this.isSelected) && this.env.model.getDisplayIncrementBtn(this.line);
+        return (
+            (this.incrementQty !== 1 || !this.isSelected) &&
+            this.env.model.getDisplayIncrementBtn(this.line)
+        );
     }
 
     get displayCompletePackageButton() {
@@ -173,19 +178,6 @@ export default class LineComponent extends Component {
         );
     }
 
-    get showCreateSNLN() {
-        const picking_type = this.env.model.pickingTypeId;
-        if (picking_type) {
-            return (
-                this.line.product_id.tracking &&
-                this.incrementQty > 0 &&
-                picking_type.use_create_lots &&
-                picking_type.restrict_scan_tracking_number === "optional"
-            );
-        }
-        return false;
-    }
-
     get showRemainingQty() {
         const picking_type = this.env.model.pickingTypeId;
         if (picking_type) {
@@ -244,21 +236,22 @@ export default class LineComponent extends Component {
         this.env.dialog.add(ProductImageDialog, { record: this.line.product_id });
     }
 
-    async openDialog() {
-        const nextSerial = (await this.orm.read(
-            "product.product",
-            [this.line.product_id.id],
-            ["next_serial"]
-        ))[0].next_serial;
+    async openGenerateLotDialog() {
+        const nextSerial = (
+            await this.orm.read("product.product", [this.line.product_id.id], ["next_serial"])
+        )[0].next_serial;
         const move =
             typeof this.line.move_id === "number"
                 ? this.env.model.cache.getRecord("stock.move", this.line.move_id)
                 : this.line.move_id;
-        this.env.dialog.add(BarcodeGenerateDialog, {
+        const assignedQty =
+            this.line.lines?.map((l) => l.lot_id && l.quantity).reduce((a, b) => a + b, 0.0) || 0;
+        this.env.dialog.add(BarcodeGenerateLotDialog, {
             model: this.env.model,
             move: move,
             line: this.line,
             nextCustomSerialNumber: nextSerial,
+            remainingUnassignedLots: Math.max(this.incrementQty - assignedQty, 0),
         });
     }
 }

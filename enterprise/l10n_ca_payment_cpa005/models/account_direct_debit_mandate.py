@@ -1,10 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-from odoo.addons.l10n_ca_payment_cpa005.models.res_partner_bank import (
-    cpa005_sanitize_account_number,
-    cpa005_sanitize_financial_institution_nr,
-)
+from odoo.addons.l10n_ca_payment_cpa005.models.res_partner_bank import cpa005_sanitize_account_number
 
 # CPA Rules H1 require the payor to be notified at least 10 days before a PAD collection.
 CPA005_MIN_PRENOT_PERIOD = 10
@@ -51,9 +48,9 @@ class AccountDirectDebitMandate(models.Model):
                 raise UserError(self.env._("A CPA 005 PAD mandate requires a customer bank account."))
             elif not cpa005_sanitize_account_number(mandate.partner_bank_id.account_number):
                 raise UserError(self.env._("A CPA 005 PAD mandate requires a valid bank account number."))
-            if not mandate.partner_bank_id.l10n_ca_financial_institution_number:
+            if not (mandate.partner_bank_id.l10n_ca_financial_institution_number or mandate.partner_bank_id._get_clearing_number('CA')):
                 raise UserError(self.env._("A CPA 005 PAD mandate requires a customer bank account with a Financial Institution ID Number."))
-            elif not cpa005_sanitize_financial_institution_nr(mandate.partner_bank_id.l10n_ca_financial_institution_number):
+            elif not mandate.partner_bank_id._l10n_ca_cpa005_get_financial_institution_number():
                 raise UserError(self.env._("A CPA 005 PAD mandate requires a customer bank account with a valid Financial Institution ID Number."))
 
     def _get_report_template(self):

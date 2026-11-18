@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:56+0000\n"
-"PO-Revision-Date: 2026-09-18 02:54+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
-"sign_itsme/nl/>\n"
+"POT-Creation-Date: 2026-10-30 17:55+0000\n"
+"PO-Revision-Date: 2026-11-03 14:33+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/sign_itsme/"
+"nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,11 +22,21 @@ msgstr ""
 "X-Generator: Weblate 2026.8.1\n"
 
 #. module: sign_itsme
+#: model_terms:ir.ui.view,arch_db:sign_itsme.sign_request_logs_user
+msgid ""
+"<small>Name: The signatory has provided this identity through itsme®</small>"
+msgstr ""
+"<small>Naam: De ondertekenaar heeft deze identiteit verstrekt via itsme®</"
+"small>"
+
+#. module: sign_itsme
 #: model:ir.module.module,description:base.module_sign_itsme
 msgid ""
 "Add support for itsme® identification when signing documents (Belgium and "
 "Netherlands only)"
 msgstr ""
+"Voeg ondersteuning toe voor itsme®-identificatie bij het ondertekenen van "
+"documenten (alleen België en Nederland)"
 
 #. module: sign_itsme
 #: model:iap.service,description:sign_itsme.iap_service_itsme_proxy
@@ -47,7 +57,7 @@ msgstr ""
 #. module: sign_itsme
 #: model:ir.model.fields,field_description:sign_itsme.field_sign_item_role__auth_method
 msgid "Authentication"
-msgstr ""
+msgstr "Authenticatie"
 
 #. module: sign_itsme
 #. odoo-javascript
@@ -62,6 +72,8 @@ msgid ""
 "Confirm your identity with itsme®, then review the final documents before "
 "signing securely."
 msgstr ""
+"Bevestig je identiteit met itsme® en controleer daarna de definitieve "
+"documenten voordat je veilig ondertekent."
 
 #. module: sign_itsme
 #: model:iap.service,unit_name:sign_itsme.iap_service_itsme_proxy
@@ -112,7 +124,7 @@ msgstr "Identificatie geweigerd"
 #. module: sign_itsme
 #: model:ir.model.fields.selection,name:sign_itsme.selection__sign_item_role__auth_method__itsme
 msgid "Identification via itsme®"
-msgstr ""
+msgstr "Identificatie via itsme®"
 
 #. module: sign_itsme
 #. odoo-javascript
@@ -123,7 +135,7 @@ msgstr "Identificeer je met itsme"
 #. module: sign_itsme
 #: model:iap.service,name:sign_itsme.iap_service_itsme_proxy
 msgid "Itsme"
-msgstr ""
+msgstr "Itsme"
 
 #. module: sign_itsme
 #: model_terms:ir.ui.view,arch_db:sign_itsme.sign_template_mail_not_enough_credits_itsme
@@ -134,7 +146,12 @@ msgstr "Itsme-ondertekeningscredits kunnen worden aangeschaft op"
 #. odoo-javascript
 #: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.xml:0
 msgid "Loading"
-msgstr ""
+msgstr "Laden"
+
+#. module: sign_itsme
+#: model_terms:ir.ui.view,arch_db:sign_itsme.sign_request_logs_user
+msgid "Name"
+msgstr "Naam"
 
 #. module: sign_itsme
 #. odoo-javascript
@@ -145,17 +162,17 @@ msgstr "Bevestig je identiteit om je handtekening af te ronden."
 #. module: sign_itsme
 #: model:ir.model.fields.selection,name:sign_itsme.selection__sign_item_role__auth_method__itsme_qes
 msgid "Qualified Signature via itsme®"
-msgstr ""
+msgstr "Gekwalificeerde handtekening via itsme®"
 
 #. module: sign_itsme
 #: model:ir.module.module,summary:base.module_sign_itsme
 msgid "Sign documents with itsme® identification"
-msgstr ""
+msgstr "Onderteken documenten met itsme®-identificatie"
 
 #. module: sign_itsme
 #: model:ir.module.module,shortdesc:base.module_sign_itsme
 msgid "Sign itsme"
-msgstr ""
+msgstr "Ondertekenen met itsme"
 
 #. module: sign_itsme
 #. odoo-python
@@ -172,7 +189,7 @@ msgstr "Ondertekenen verzoek verzenden"
 #. odoo-javascript
 #: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.js:0
 msgid "Sign with itsme"
-msgstr ""
+msgstr "Ondertekenen met itsme"
 
 #. module: sign_itsme
 #: model:ir.model,name:sign_itsme.model_sign_item_role
@@ -207,6 +224,12 @@ msgid ""
 "such as Adobe Acrobat\n"
 "                            or another compatible PDF reader."
 msgstr ""
+"Dit document is ondertekend met een gekwalificeerde elektronische "
+"handtekening van itsme®.\n"
+"                            Open het document in een pdf-lezer zoals Adobe "
+"Acrobat\n"
+"                            of een andere compatibele pdf-lezer om de "
+"handtekening te verifiëren."
 
 #. module: sign_itsme
 #. odoo-javascript
@@ -243,16 +266,6 @@ msgstr "Validatie token itsme®"
 #: model_terms:ir.ui.view,arch_db:sign_itsme.sign_template_mail_not_enough_credits_itsme
 msgid "this page"
 msgstr "deze pagina"
-
-#~ msgid ""
-#~ "<small>Name: The signatory has provided this identity through itsme®</"
-#~ "small>"
-#~ msgstr ""
-#~ "<small>Naam: De ondertekenaar heeft deze identiteit verstrekt via itsme®</"
-#~ "small>"
-
-#~ msgid "Name"
-#~ msgstr "Naam"
 
 #~ msgid "Extra Authentication Step"
 #~ msgstr "Extra authenticatiestap"

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:54+0000\n"
-"PO-Revision-Date: 2026-09-29 09:33+0000\n"
+"PO-Revision-Date: 2026-11-12 10:41+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "obox_point_of_sale/fi/>\n"
@@ -27,6 +27,10 @@ msgid ""
 "        network as the printer, so we need to use an Obox device as a\n"
 "        proxy to send print jobs to the printer."
 msgstr ""
+"\n"
+"        Itsepalvelukontekstissa asiakas ei ole samassa verkossa\n"
+"        kuin tulostin, joten meidän on käytettävä Obox-laitetta\n"
+"        välityspalvelimena tehtävien lähettämiseksi tulostimelle."
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_obox_queue
@@ -38,23 +42,32 @@ msgid ""
 "        it as processed in an atomic way to avoid conflicts.\n"
 "    "
 msgstr ""
+"\n"
+"        Jono on vain malli, johon tallennetaan Obox-laitteiden suoritettavat "
+"toiminnot.\n"
+"        Laitteet hakevat seuraavan suoritettavan toiminnon get_next_action -"
+"metodilla,\n"
+"        joka palauttaa toiminnon ja merkitsee sen käsitellyksi atomisella "
+"tavalla\n"
+"        ristiriitojen välttämiseksi.\n"
+"    "
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/utils/scale/obox_scale.js:0
 msgid "Cannot weigh product - %s"
-msgstr ""
+msgstr "Tuotteen punnitseminen epäonnistui - %s"
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Asetukset"
 
 #. module: obox_point_of_sale
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.obox_pos_config_view_form
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.res_config_view_form_inherit_obox_pos
 msgid "Connect devices using an Obox"
-msgstr ""
+msgstr "Yhdistä laitteet käyttämällä Oboxia"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_obox_device__display_name
@@ -71,13 +84,13 @@ msgstr "Näyttönimi"
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.obox_pos_config_view_form
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.res_config_view_form_inherit_obox_pos
 msgid "Electronic Scale"
-msgstr ""
+msgstr "Elektroninen vaaka"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.js:0
 msgid "Failed to connect to OBOX, see console for details."
-msgstr ""
+msgstr "OBOXin yhdistäminen epäonnistui, katso lisätiedot konsolista."
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_obox_device__id
@@ -88,23 +101,24 @@ msgstr ""
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_session__id
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_res_config_settings__id
 msgid "ID"
-msgstr ""
+msgstr "Tunnus"
 
 #. module: obox_point_of_sale
 #: model:ir.module.module,description:base.module_obox_point_of_sale
 msgid "Link between Obox and Point of Sale"
-msgstr ""
+msgstr "Oboxin ja kassajärjestelmän välinen linkki"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.js:0
 msgid "No printer found, please set up a printer to test print functionality."
 msgstr ""
+"Tulostinta ei löytynyt. Määritä tulostin testataksesi tulostustoimintoa."
 
 #. module: obox_point_of_sale
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.view_obox_pos_printer_form
 msgid "None"
-msgstr ""
+msgstr "Ei mitään"
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_obox_obox
@@ -112,7 +126,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.obox_pos_config_view_form
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.res_config_view_form_inherit_obox_pos
 msgid "Obox"
-msgstr ""
+msgstr "Obox"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
@@ -124,13 +138,13 @@ msgstr "Obox-viankorjaus"
 #: model:ir.model,name:obox_point_of_sale.model_obox_device
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_printer__obox_device_id
 msgid "Obox Device"
-msgstr ""
+msgstr "Obox-laite"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_config__obox_scale_id
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_res_config_settings__pos_obox_scale_id
 msgid "Obox Scale"
-msgstr ""
+msgstr "Obox-vaaka"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
@@ -142,68 +156,68 @@ msgstr "Obox-viankorjaus"
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.xml:0
 msgid "Obox not found!"
-msgstr ""
+msgstr "Oboxia ei löytynyt!"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_obox_queue__pos_order_id
 msgid "POS Order"
-msgstr ""
+msgstr "Kassajärjestelmän tilaus"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.xml:0
 msgid "Please make sure Obox is properly configured and connected."
-msgstr ""
+msgstr "Varmista, että Obox on määritetty ja kytketty oikein."
 
 #. module: obox_point_of_sale
 #: model:ir.module.module,shortdesc:base.module_obox_point_of_sale
 msgid "PoS & Obox"
-msgstr ""
+msgstr "Kassajärjestelmä & Obox"
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_pos_config
 msgid "Point of Sale Configuration"
-msgstr ""
+msgstr "Kassajärjestelmän asetukset"
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_pos_printer
 msgid "Point of Sale Printer"
-msgstr ""
+msgstr "Kassajärjestelmän tulostin"
 
 #. module: obox_point_of_sale
 #: model:ir.model,name:obox_point_of_sale.model_pos_session
 msgid "Point of Sale Session"
-msgstr ""
+msgstr "Kassajärjestelmän istunto"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_printer__printer_type
 msgid "Printer Type"
-msgstr ""
+msgstr "Tulostimen tyyppi"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_printer__proxy_obox_id
 msgid "Proxy device"
-msgstr ""
+msgstr "Välityspalvelinlaite"
 
 #. module: obox_point_of_sale
 #: model:ir.model.fields,field_description:obox_point_of_sale.field_pos_printer__obox_serial
 msgid "Serial Number"
-msgstr ""
+msgstr "Sarjanumero"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.xml:0
 msgid "Test Ping"
-msgstr ""
+msgstr "Testi-ping"
 
 #. module: obox_point_of_sale
 #. odoo-javascript
 #: code:addons/obox_point_of_sale/static/src/app/components/obox_debug_popup/obox_debug_popup.xml:0
 msgid "Test Print"
-msgstr ""
+msgstr "Testitulostus"
 
 #. module: obox_point_of_sale
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.obox_pos_config_view_form
 #: model_terms:ir.ui.view,arch_db:obox_point_of_sale.res_config_view_form_inherit_obox_pos
 msgid "none"
-msgstr ""
+msgstr "ei mitään"

@@ -123,6 +123,26 @@ class AccountReturn(models.Model):
 
     def _get_pay_wizard(self):
         if self.type_id == self.env.ref('l10n_nl_reports.nl_tax_return_type'):
+            # New bank account of the Belastingdienst since 2026-05-01
+            account_number = 'NL04RABO0200112244'
+            belastingdienst_partner = self.env.ref('l10n_nl_reports.partner_belastingdienst_netherlands')
+            # sudo: the return can be paid by accountants, who can neither trust bank accounts
+            # nor write the return types
+            ResPartnerBank = self.env['res.partner.bank'].sudo().with_context(active_test=False)
+            belastingdienst_account = ResPartnerBank.search([
+                ('partner_id', '=', belastingdienst_partner.id),
+                ('sanitized_account_number', '=', account_number),
+            ], limit=1)
+
+            if not belastingdienst_account:
+                belastingdienst_account = ResPartnerBank.create({
+                    'partner_id': belastingdienst_partner.id,
+                    'account_number': account_number,
+                    'allow_out_payment': True,
+                })
+            belastingdienst_account.active = True
+            self.type_id.sudo().payment_partner_bank_id = belastingdienst_account
+
             vat_pay_wizard = self.env['l10n_nl_reports.vat.pay.wizard'].create({
                 'company_id': self.company_id.id,
                 'partner_bank_id': self.type_id.payment_partner_bank_id.id,
@@ -203,8 +223,8 @@ class AccountReturn(models.Model):
 
         return super()._postprocess_vat_closing_entry_results(company, options, results)
 
-    def _get_closing_report_options(self):
-        options = super()._get_closing_report_options()
+    def _get_closing_report_options(self, **extra_options):
+        options = super()._get_closing_report_options(**extra_options)
 
         if self.type_id.id == self.env.ref('l10n_nl_reports.nl_tax_correction_return_type').id:
             options['l10n_nl_is_correction'] = True

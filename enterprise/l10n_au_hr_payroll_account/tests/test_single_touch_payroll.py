@@ -982,10 +982,12 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2)
         self.assertEqual(batch.l10n_au_stp_count, 1, "There should be 1 STP record for the 2 employees")
 
-        # Deleting the payslips
+        # Deleting all the payslips deletes the batch, along with its STP record
         batch.action_draft()
+        stp = self.env["l10n_au.stp"].union(batch.slip_ids._get_payslip_stp().values())
         batch.slip_ids.unlink()
-        self.assertEqual(batch.l10n_au_stp_count, 0, "There should be no STP record as there is no payslip")
+        self.assertFalse(batch.exists(), "The batch should be deleted with its last payslip")
+        self.assertFalse(stp.exists(), "The STP record of the deleted batch should be deleted")
 
     @freeze_time("2026-07-31")
     @mock_skip_stp_api_calls()

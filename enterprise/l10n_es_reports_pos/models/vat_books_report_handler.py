@@ -160,8 +160,8 @@ class L10n_EsVATBooksReportHandler(models.AbstractModel):
                 'income_computable': base_amount,
                 'tax_rate': tax_percentage,
                 'taxed_amount': tax_amount,
-                'surcharge_type': recargo_percentage or 0,
-                'surcharge_fee': recargo_amount or 0,
+                'surcharge_type': '' if recargo_percentage is None else recargo_percentage,
+                'surcharge_fee': '' if recargo_amount is None else recargo_amount,
                 'withholding_type': 0,
                 'withholding_amount': 0,
             })

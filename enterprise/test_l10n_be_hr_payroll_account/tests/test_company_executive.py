@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from odoo import Command
 from odoo.tests import tagged
@@ -34,10 +34,19 @@ class TestCompanyExecutive(TestPayrollAccountCommon):
             'contract_date_start': date(2020, 1, 1),
             'contract_date_end': False,
             'resource_calendar_id': be_resource_calendar.id,
+            'employee_type_id': cls.env.ref("hr.contract_type_company_executive").id,
+            'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
+        })
+        # Made a company executive by the tests, to compare with what an ordinary employee gets
+        cls.ordinary_employee = cls.create_employee({
+            'name': 'Sofia',
+            'date_version': date(2020, 1, 1),
+            'contract_date_start': date(2020, 1, 1),
+            'contract_date_end': False,
+            'resource_calendar_id': be_resource_calendar.id,
         })
 
     def test_meal_vouchers_company_executive(self):
-        self.employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id
         payslip = self.env['hr.payslip'].create({
             'employee_id': self.employee.id,
             'version_id': self.employee.version_id.id,
@@ -70,7 +79,6 @@ class TestCompanyExecutive(TestPayrollAccountCommon):
             'company_id': self.company_id.id,
         })
         self.employee.version_id.write({
-            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
             'wage': 900,
             'transport_mode_car': True,
             'car_id': car.id,
@@ -89,7 +97,6 @@ class TestCompanyExecutive(TestPayrollAccountCommon):
     def test_withholding_tax_on_custom_non_periodic_rule(self):
         # Withholding tax on non-periodic remuneration is computed on the yearly withholding base
         # Any rule in that category is taxed, not only N_P_BASIC
-        self.employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id
         monthly_structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
         non_periodic_rule = self.env.ref('l10n_be_hr_payroll.l10n_be_monthly_cp999_non_periodic_revenue')
         self.env['hr.salary.rule'].create({
@@ -122,3 +129,134 @@ class TestCompanyExecutive(TestPayrollAccountCommon):
         # Non-periodic withholding tax amount does not change because it uses category "YEARLY_WITHHOLDING_BASE"
         self.assertAlmostEqual(compute_non_periodic_withholding_tax({'N_P_BASIC': 0, 'CUSTOM_N_P': 6000}), tax_on_n_p_basic, places=2)
         self.assertAlmostEqual(compute_non_periodic_withholding_tax({'N_P_BASIC': 3000, 'CUSTOM_N_P': 3000}), tax_on_n_p_basic, places=2)
+
+    def test_company_executive_no_fiscal_voluntarism(self):
+        """Company executives get no FISC_VOL line from a fiscal voluntarism amount"""
+        self.ordinary_employee.fiscal_voluntarism_amount = 100
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.ordinary_employee.id,
+            'date_from': date(2026, 1, 1),
+        })
+        payslip.compute_sheet()
+        self.assertIn('FISC_VOL', payslip.line_ids.mapped('code'))
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        payslip.compute_sheet()
+        self.assertNotIn('FISC_VOL', payslip.line_ids.mapped('code'))
+
+    def test_company_executive_no_starterjob(self):
+        """Company executives get no starterjob salary reduction"""
+        self.ordinary_employee.write({
+            'birthday': date(2006, 1, 1),
+            'l10n_be_is_starterjob': True,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.ordinary_employee.id,
+            'date_from': date(2026, 1, 1),
+        })
+        payslip.compute_sheet()
+        self.assertTrue(payslip.line_ids.filtered(lambda line: 'STARTERJOB' in line.code or line.code in ('COMPSUPP', 'WITHHOLDING_TAX_EX_274_62')))
+        self.assertGreater(payslip._get_starterjob_deduction_rate(), 0)
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        payslip.compute_sheet()
+        self.assertFalse(payslip.line_ids.filtered(lambda line: 'STARTERJOB' in line.code or line.code in ('COMPSUPP', 'WITHHOLDING_TAX_EX_274_62')))
+        self.assertEqual(payslip._get_starterjob_deduction_rate(), 0)
+
+    def test_company_executive_no_rd_exemption(self):
+        """Company executives get no 274.32 withholding tax exemption"""
+        self.ordinary_employee.write({
+            'certificate': 'doctor',
+            'rd_percentage': 1.0,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.ordinary_employee.id,
+            'date_from': date(2026, 1, 1),
+        })
+        payslip.compute_sheet()
+        self.assertIn('WITHHOLDING_TAX_EX_274_32', payslip.line_ids.mapped('code'))
+        self.assertEqual(self.env['l10n_be.274_xx']._get_valid_274_32_payslips(payslip), payslip)
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        payslip.compute_sheet()
+        self.assertNotIn('WITHHOLDING_TAX_EX_274_32', payslip.line_ids.mapped('code'))
+        self.assertFalse(self.env['l10n_be.274_xx']._get_valid_274_32_payslips(payslip))
+
+    def test_company_executive_no_aid_zone_exemption(self):
+        """Company executives get no 274.81 withholding tax exemption from the aid zone"""
+        self.company_id.current_payroll_config_id.write({
+            'l10n_be_company_number': '0897223670',
+            'l10n_be_revenue_code': '1293',
+        })
+        # Aid zone employee from January, company executive from February
+        self.ordinary_employee.l10n_be_is_aid_zone = True
+        self.ordinary_employee.create_version({
+            'date_version': date(2026, 2, 1),
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
+        })
+        payslips = self.env['hr.payslip'].create([
+            {'employee_id': self.ordinary_employee.id, 'date_from': date(2026, month, 1)} for month in (1, 2)
+        ])
+        payslips.compute_sheet()
+        aid_zone_lines = payslips.line_ids.filtered(lambda line: line.code == 'WITHHOLDING_TAX_EX_274_81')
+        self.assertEqual(aid_zone_lines.mapped('slip_id.date_from'), [date(2026, 1, 1)])
+        payslips.action_payslip_done()
+
+        # Only January's declares the aid zone exemption
+        january, february = self.env['l10n_be.274_xx'].with_company(self.company_id).create([
+            {'year': 2026, 'month': month} for month in ('1', '2')
+        ])
+        self.assertTrue(january.line_274_81_ids)
+        self.assertFalse(february.line_274_81_ids)
+
+    def test_company_executive_attendance_based(self):
+        """Attendance Based has no effect on company executives"""
+        def start_payrun_warnings():
+            warnings = self.env['hr.payslip.run']._get_start_payrun_warnings(self.ordinary_employee.version_id, date(2026, 1, 1), date(2026, 1, 31))
+            return [warning['title'] for warning in warnings]
+
+        self.ordinary_employee.attendance_based = True
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.ordinary_employee.id,
+            'date_from': date(2026, 1, 1),
+        })
+        payslip.compute_sheet()
+        self.assertFalse(payslip.worked_days_line_ids)
+        self.assertIn('No Attendance', start_payrun_warnings())
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        payslip.action_refresh_from_work_entries()
+        self.assertTrue(self.ordinary_employee.attendance_based)
+        self.assertTrue(payslip.worked_days_line_ids)
+        self.assertNotIn('No Attendance', start_payrun_warnings())
+
+    def test_company_executive_not_subject_to_onss(self):
+        """Company executives get the 000 sub-type (not subject to ONSS), and lose it when they stop being one"""
+        not_subject_to_onss = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00000')
+        joint_committee_999 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        sub_type = self.ordinary_employee.l10n_be_worker_code_id
+        self.assertNotEqual(sub_type, not_subject_to_onss)
+
+        self.ordinary_employee.l10n_be_joint_committee_id = joint_committee_999
+        self.assertEqual(self.ordinary_employee.l10n_be_worker_code_id, not_subject_to_onss)
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.cp200
+        self.assertEqual(self.ordinary_employee.l10n_be_worker_code_id, sub_type)
+
+        executive = self.create_employee({'name': 'Executive', 'l10n_be_joint_committee_id': joint_committee_999.id})
+        self.assertEqual(executive.l10n_be_worker_code_id, not_subject_to_onss)
+
+    def test_company_executive_no_public_holiday_compensation(self):
+        """Company executives get no public holiday compensation, though their sub-type is set"""
+        public_holiday = self.env['resource.calendar.leaves'].create({
+            'name': 'Public Holiday on Sunday',
+            'date_from': datetime(2026, 1, 4),
+            'date_to': datetime(2026, 1, 4, 23, 59, 59),
+            'company_id': self.company_id.id,
+        })
+        action = public_holiday.action_open_multi_allocations_wizard()
+        wizard = self.env['hr.leave.allocation.generate.multi.wizard'].with_context(**action['context']).create({})
+        self.assertIn(self.ordinary_employee, self.env['hr.employee'].search(wizard._get_employee_domain()))
+
+        self.ordinary_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        self.assertNotIn(self.ordinary_employee, self.env['hr.employee'].search(wizard._get_employee_domain()))

@@ -13,10 +13,8 @@ class L10n_PeTaxPle82ReportHandler(models.AbstractModel):
 
     def export_to_txt(self, options):
         def format_float(amount):
-            """Avoid -0 on TXT report"""
-            if amount == 0:
-                return abs(amount)
-            return amount
+            """Format the amount with the two decimals SUNAT requires, leaving zero amounts empty"""
+            return "%.2f" % amount if amount else ""
 
         def _get_invoice_name(name, code):
             if not name or not code:
@@ -39,9 +37,9 @@ class L10n_PeTaxPle82ReportHandler(models.AbstractModel):
                     "document_type": columns["document_type"],
                     "document_serie": serie_folio["serie"].replace(" ", "")[1:],
                     "document_number": serie_folio["folio"].replace(" ", "").lstrip("0"),
-                    "base_igv": format_float(columns["base_igv"]) or "0.0",
+                    "base_igv": format_float(columns["base_igv"]) or "0.00",
                     "other_concepts": "",  # Otros conceptos adicionales
-                    "amount_total": columns["amount_total"] or "",
+                    "amount_total": format_float(columns["amount_total"]) or "",
                     "dua_type": columns["invoice_dua_document_type"] or "",
                     "dua_serie": self._get_serie_folio(serie_folio_dua["serie"])["folio"].replace(" ", "")[1:],
                     "dua_dsi_year": columns["invoice_dua_date"].year if columns["invoice_dua_date"] else "",

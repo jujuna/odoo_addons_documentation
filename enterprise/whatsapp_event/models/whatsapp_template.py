@@ -20,6 +20,13 @@ class WhatsappTemplate(models.Model):
             domain = Domain.AND([[('model', '=', 'event.registration')], [('status', '=', 'approved')], domain])
         return super()._search(domain, *args, **kwargs)
 
+    @api.private
+    def fetch(self, field_names=None):
+        # do not forcefully restrict access to unapproved templates, let
+        # normal access right/record rules applies
+        self_no_template_filter = self.with_context(filter_template_on_event=False)
+        return super(WhatsappTemplate, self_no_template_filter).fetch(field_names)
+
     def unlink(self):
         res = super().unlink()
         domain = ('template_ref', 'in', [f"{template._name},{template.id}" for template in self])

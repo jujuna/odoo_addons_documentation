@@ -339,7 +339,7 @@ result = payslip._get_paid_amount_13th_month()
             ref('l10n_be_hr_payroll.REMUNERATION'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
-            ref('l10n_be_hr_payroll.PREMIUM_PAY_NIGHT')
+            ref('l10n_be_hr_payroll.PREMIUM_PAY_NIGHT'),
         ])]"/>
         <field name="name">Premium Pay - Night</field>
         <field name="sequence">0</field>
@@ -637,7 +637,7 @@ result = hourly_rate
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS_BASE'),
-            ref('l10n_be_hr_payroll.WITHHOLDING_BASE')
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
         <field name="name">Deduction StarterJob (Basic Salary)</field>
         <field name="sequence">0</field>
@@ -652,6 +652,7 @@ result_rate = - payslip._get_starterjob_deduction_rate()
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -798,6 +799,7 @@ result_rate = 7
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.DH_ONSS_BASE'),
             ref('l10n_be_hr_payroll.DH_WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Double Holiday on Variable Salary</field>
         <field name="sequence">3</field>
@@ -878,7 +880,10 @@ result_qty, result = payslip._l10n_be_get_economic_unemployment_compensation(l10
         <field name="code">EUC</field>
         <field name="sequence">5</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result=any(days.work_entry_type_id.l10n_be_economic_unemployment for days in worked_days.values())</field>
+        <field name="condition_python">
+# no complement for the apprentices, who receive no salary but an apprenticeship allowance
+result = any(days.work_entry_type_id.l10n_be_economic_unemployment for days in worked_days.values()) and version.l10n_be_worker_code_id.dmfa_code not in ['035', '439']
+        </field>
         <field name="appears_on_payslip">always</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -905,50 +910,34 @@ result_qty, result = payslip._l10n_be_get_economic_unemployment_compensation(l10
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 wage = version.wage
-hours_per_week = version.full_time_required_hours
-hours_per_week_reference = version._get_reference_calendar().hours_per_week
 bonus_amount = payslip._rule_parameter('economic_unemployment_bonus')
 
 if version.wage_type == 'hourly':
     wage = wage * version.resource_calendar_id.hours_per_week * 13 / 3
 
-# The ONEM converts the hours of temporary unemployment into allocations of the 6 days week
-days = 0
-hours = 0
-for code, lines in worked_days.items():
-    for line in lines:
-        if line.work_entry_type_id.l10n_be_economic_unemployment:
-            days += line.number_of_days
-            hours += line.number_of_hours
+# The supplement is due per allowance of the ONEM, which converts the hours of temporary unemployment into
+# allowances of the 6 days week (half allowances for the voluntary part time workers)
+days, half_allowances = payslip._l10n_be_get_unemployment_supplement_allowances()
+if half_allowances:
+    # half the supplement per half allowance, to the cent
+    bonus_amount = float_round(bonus_amount * 0.5, precision_digits=2)
 
-#in Case of wage higher than threshold, employee gets paid on the 27th day of unemployment.
-previous_unemployment_days = 0
+# Above the wage threshold, the supplement is due from the 27th day covered by an allowance of the year
 if wage > payslip._rule_parameter('economic_unemployment_wage_threshold'):
     year_start = payslip.date_from.replace(month=1, day=1)
-    previous_payslips = payslip.env['hr.payslip'].search_fetch(domain=[
+    previous_payslips = payslip.env['hr.payslip'].search([
         ('employee_id', '=', payslip.employee_id.id),
         ('date_from', '>=', year_start),
         ('date_to', '&lt;', payslip.date_to),
         ('state', 'in', ['validated', 'paid']),
         ('struct_id.code', '=', payslip.struct_id.code),
-    ],
-    field_names=['worked_days_line_ids'])
-    for previous_worked_days in previous_payslips.worked_days_line_ids.filtered(lambda l: l.work_entry_type_id.l10n_be_economic_unemployment):
-        previous_unemployment_days += previous_worked_days.number_of_days
-    paid_days = max(0, days - max(0, 26 - previous_unemployment_days))
-    hours = hours * paid_days / days if days else 0
-if version._get_reference_calendar().is_fulltime or version.l10n_be_part_time_status == 'with_unemployment_rights_no_agr':
-    days = hours * 6 / (hours_per_week if hours_per_week else 1)
-    # rounded to the half day: below .25 down, from .75 up
-    days = float_round(days * 2, precision_digits=0) / 2
-elif version.l10n_be_part_time_status == 'with_unemployment_rights_agr':
-    days = hours * 6 / (hours_per_week_reference if hours_per_week_reference else 1)
-    # rounded to the half day: below .25 down, from .75 up
-    days = float_round(days * 2, precision_digits=0) / 2
-elif version.l10n_be_part_time_status == 'voluntary':
-    days = round(hours * 12 / (hours_per_week_reference if hours_per_week_reference else 1))
-    # half the supplement per half allocation, to the cent
-    bonus_amount = float_round(bonus_amount * 0.5, precision_digits=2)
+    ])
+    previous_allowance_days = 0
+    for previous_payslip in previous_payslips:
+        previous_allowances, previous_half_allowances = previous_payslip._l10n_be_get_unemployment_supplement_allowances()
+        previous_allowance_days += previous_allowances / 2 if previous_half_allowances else previous_allowances
+    allowances_before_supplement = max(0, 26 - previous_allowance_days)
+    days = max(0, days - (allowances_before_supplement * 2 if half_allowances else allowances_before_supplement))
 
 result_qty = days
 result = bonus_amount
@@ -964,11 +953,13 @@ result = bonus_amount
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.DH_ONSS_BASE'),
             ref('l10n_be_hr_payroll.DH_WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Simple Holiday on Variable Salary</field>
         <field name="sequence">5</field>
         <field name="code">SIMPLE_VARIABLE</field>
-        <field name="condition_select">none</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = not payslip._l10n_be_is_loss_on_commission_pto_monthly()</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 if result_rules['DOUBLE']['total'] != 0:
@@ -1036,7 +1027,7 @@ result_rate = 100 - deduct_rate
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
-        <field name="l10n_be_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_200'))]"/>
+        <field name="l10n_be_joint_committee_ids" eval="[(5, 0, 0)]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -1060,6 +1051,7 @@ result_rate = - payslip._get_starterjob_deduction_rate()
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -1342,6 +1334,7 @@ result_rate = - payslip._get_starterjob_deduction_rate()
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -1434,7 +1427,7 @@ result = (inputs['EXPATRIATE'].amount if 'EXPATRIATE' in inputs else 0.0)
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = payslip._l10n_be_get_meal_vouchers_yearly_estimated_quantity()
-result = version.meal_voucher_amount - version.meal_voucher_employee_share
+result = version.meal_voucher_paid_by_employer
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
@@ -1599,7 +1592,7 @@ if version.pension_amount:
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = 12
-result = payslip.vehicle_id._get_monthly_car_atn(date=payslip.date_from) if version.transport_mode_car else 0
+result = payslip.vehicle_id._get_monthly_car_atn(date=payslip.date_from) if payslip.vehicle_id else 0
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
@@ -1962,12 +1955,18 @@ result = - max(0, 4 * week_salary - days_taken * week_salary / 7)
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- The compensation for a manifestly unreasonable dismissal (CCT 109) is paid with the termination fees and taxed
+         as them, but it is no remuneration for the ONSS: it comes after TERM_BASIC, the remuneration declared in the
+         DmfA. -->
     <record id="cp200_employees_termination_fees_termination_unreasonable_dismissal" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.TERMINATION_WITHHOLDING_BASE'),
+        ])]"/>
         <field name="name">Unreasonable dismissal</field>
         <field name="input_suffix">weeks</field>
         <field name="code">UNREASONABLE_DISMISSAL</field>
-        <field name="sequence">44</field>
+        <field name="sequence">376</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
         <field name="input_section" ref="hr_payroll.default_salary_rule_section"/>
@@ -1987,12 +1986,17 @@ else:
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- The civil fine for not giving the reasons of the dismissal (CCT 109) is paid and taxed as the compensation for
+         a manifestly unreasonable dismissal: no remuneration for the ONSS either. -->
     <record id="cp200_employees_termination_fees_termination_non_respect_motivation" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.TERMINATION_WITHHOLDING_BASE'),
+        ])]"/>
         <field name="name">Non respect motivation (= 2 weeks)</field>
         <field name="input_suffix">weeks</field>
         <field name="code">NON_RESPECT_MOTIVATION</field>
-        <field name="sequence">45</field>
+        <field name="sequence">377</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
         <field name="input_section" ref="hr_payroll.default_salary_rule_section"/>
@@ -2038,11 +2042,11 @@ result_rate = payslip._l10n_be_get_warrant_atn_rate(inputs)
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Commission</field>
         <field name="input_suffix">€</field>
-        <field name="l10n_be_remuneration_code">2</field>
-        <field name="l10n_be_remuneration_frequency">0</field>
+        <field name="l10n_be_remuneration_code">1</field>
         <field name="code">COMMISSION</field>
         <field name="sequence">100</field>
         <field name="condition_select">property_input</field>
@@ -2060,6 +2064,7 @@ result_rate = payslip._l10n_be_get_warrant_atn_rate(inputs)
     <record id="l10n_be_presence_token_salary_rule" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.TAXABLE_30'),
         ])]"/>
         <field name="name">Presence Tokens</field>
         <field name="input_suffix">€</field>
@@ -2084,6 +2089,7 @@ result_rate = payslip._l10n_be_get_warrant_atn_rate(inputs)
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Advance On Commission</field>
         <field name="l10n_be_remuneration_code">2</field>
@@ -2095,7 +2101,8 @@ result_rate = payslip._l10n_be_get_warrant_atn_rate(inputs)
 if not version.l10n_be_is_sale_representative:
     result = False
 else:
-    min_wage = version._get_employee_min_wage(reference_date=payslip.date_to)
+    # the full-time scale, prorated for a part-time worker
+    min_wage = version._get_employee_min_wage(reference_date=payslip.date_to) * version.work_time_rate
     wage = categories['REMUNERATION_BASE']
     need_advance = wage &lt; min_wage
     need_advance_recovery = result_rules['COMMISSION_ADV']['ytd'] &gt; 0
@@ -2103,7 +2110,8 @@ else:
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-min_wage = version._get_employee_min_wage(reference_date=payslip.date_to)
+# the full-time scale, prorated for a part-time worker
+min_wage = version._get_employee_min_wage(reference_date=payslip.date_to) * version.work_time_rate
 wage = categories['REMUNERATION_BASE']
 if wage &lt; min_wage:
     result = min_wage - wage
@@ -2124,6 +2132,7 @@ else:
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Loss On Commission (Public Holiday)</field>
         <field name="l10n_be_remuneration_code">2</field>
@@ -2132,11 +2141,14 @@ else:
         <field name="sequence">130</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = version.commission_on_target and '006.00' in payslip.worked_days_line_ids.mapped('code')
+result = '006.00' in payslip.worked_days_line_ids.mapped('code') and (
+    payslip._l10n_be_has_variable_revenues(l10n_be_variable_revenues_by_payslip)
+    or result_rules['COMMISSION']['total']
+    or result_rules['COMMISSION_ADV']['total'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = payslip._l10n_be_get_loss_on_commission_amount_public_holiday(result_rules)
+result_qty, result = payslip._l10n_be_get_loss_on_commission_public_holiday_values(result_rules)
         </field>
         <field name="appears_on_payslip">non_zero</field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -2152,6 +2164,7 @@ result = payslip._l10n_be_get_loss_on_commission_amount_public_holiday(result_ru
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
         ])]"/>
         <field name="name">Loss On Commission (Sickness)</field>
         <field name="l10n_be_remuneration_code">2</field>
@@ -2160,17 +2173,47 @@ result = payslip._l10n_be_get_loss_on_commission_amount_public_holiday(result_ru
         <field name="sequence">130</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = version.commission_on_target and payslip.worked_days_line_ids.filtered_domain([('work_entry_type_id.category_ids.code' , '=', 'VARIABLE_SALARY_LOSS')])
+result = payslip.worked_days_line_ids.filtered_domain([('work_entry_type_id.category_ids.code', '=', 'VARIABLE_SALARY_LOSS')]) and payslip._l10n_be_has_variable_revenues(l10n_be_variable_revenues_by_payslip)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = payslip._l10n_be_get_loss_on_commission_amount_sickness()
+result = payslip._l10n_be_get_loss_on_commission_amount_sickness(result_rules)
         </field>
         <field name="appears_on_payslip">non_zero</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
         <field name="l10n_be_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_200'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_loss_on_commissions_pto" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.ONSS_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.VARIABLE_REVENUES'),
+        ])]"/>
+        <field name="name">Loss On Commission (PTO)</field>
+        <field name="l10n_be_remuneration_code">2</field>
+        <field name="l10n_be_remuneration_frequency">0</field>
+        <field name="code">COM_LOSS_PTO</field>
+        <field name="sequence">130</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = '016.00' in payslip.worked_days_line_ids.mapped('code') and payslip._l10n_be_has_variable_revenues(l10n_be_variable_revenues_by_payslip)
+        </field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result, explanation_info = payslip._l10n_be_get_loss_on_commission_amount_pto()
+        </field>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="l10n_be_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_200'))]"/>
+        <field name="explanation_template">Result = Average Variable Revenue per Day ({daily_variable} €) * Paid Time Off Days ({number_of_days})</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -2185,6 +2228,29 @@ result = payslip._l10n_be_get_loss_on_commission_amount_sickness()
         <field name="input_suffix">€</field>
         <field name="code">HIRINGBONUS</field>
         <field name="sequence">150</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_bonus" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.ONSS_BASE'),
+            ref('l10n_be_hr_payroll.BONUS_WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.REMUNERATION'),
+        ])]"/>
+        <field name="name">Bonus</field>
+        <field name="input_suffix">€</field>
+        <field name="code">BONUS</field>
+        <field name="sequence">180</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
         <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
@@ -2294,6 +2360,32 @@ result = payslip._l10n_be_get_loss_on_commission_amount_sickness()
         <field name="input_suffix">€</field>
         <field name="code">ADDITIONALGROSS</field>
         <field name="sequence">250</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- The pay of the days of a Horeca occasional worker's contingent is taxed at the flat rate, but some payroll
+         providers tax the worker's premiums (Sunday and public holiday premiums...) at the scale: subject to ONSS as
+         any pay (so covered by the flat wage on those days), left out of the flat rate (HORECA_OCC_TAXABLE) -->
+    <record id="cp200_employees_salary_horeca_occasional_scale_premium" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.ONSS_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.REMUNERATION'),
+        ])]"/>
+        <field name="name">Horeca Occasional Workers: Premiums Taxed at the Scale</field>
+        <field name="input_suffix">€</field>
+        <field name="code">HORECA_OCC_SCALE_PREMIUM</field>
+        <field name="sequence">251</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
         <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
@@ -2428,7 +2520,7 @@ result_rate = 100 - deduct_rate
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
-        <field name="l10n_be_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_200'))]"/>
+        <field name="l10n_be_joint_committee_ids" eval="[(5, 0, 0)]"/>
         <field name="explanation_template">Result = Simple Holiday Pay Balance, entered manually as input for the holiday pay calculation</field>
         <field name="country_id" ref="base.be"/>
     </record>
@@ -2448,7 +2540,7 @@ result_rate = 100 - deduct_rate
         <field name="condition_python">
 salary_simulation = payslip.env.context.get('salary_simulation')
 is_december = payslip.date_to.month == 12 or payslip.date_to.year > payslip.date_from.year
-is_termination = payslip.struct_id.code == 'BETERM'
+is_termination = payslip.struct_id.code == 'BETERM' or payslip._is_last_monthly_payslip()
 
 employee = version.employee_id
 to_recover = employee._get_simple_holiday_pay_recoverable_amount(payslip.date_from.year - 1)
@@ -2508,6 +2600,7 @@ result = categories['REMUNERATION_BASE']
         <field name="category_ids" eval="[(5, 0, 0)]"/>
         <field name="name">Expense reimbursement (manual)</field>
         <field name="input_suffix">€</field>
+        <field name="user_instructions" type="html"><p>Expenses of the employer reimbursed <b>outside of the payroll</b> only, on supporting documents. The amount is not paid by the payslip, it is only reported in the box 26a of the 281.10 (code 2201). The expense reports reimbursed by the payslip (Expenses) are already reported: don't enter them here.</p></field>
         <field name="code">EXPENSE_MANUAL</field>
         <field name="sequence">380</field>
         <field name="condition_select">property_input</field>
@@ -2590,6 +2683,8 @@ result = min(max(0, inputs['FUEL_CARD_PRIV'].amount), version.fuel_card)
         <field name="code">ATN.INT</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">400</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
 if version.is_PFI():
@@ -2606,7 +2701,10 @@ if not salary_simulation:
     first_period_contract = version.browse(first_period_contract_ids).filtered(lambda c: c.internet)
     if first_period_contract:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contract)
-    result = result if (first_period_contract and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    result = result if (first_period_contract and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
+# the input counts the devices beyond the one of the contract
+if 'ATN.INT' in inputs:
+    result_qty = 1 + inputs['ATN.INT'].amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -2624,6 +2722,8 @@ if not salary_simulation:
         <field name="code">ATN.MOB</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">450</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
 if version.is_PFI():
@@ -2640,7 +2740,10 @@ if not salary_simulation:
     first_period_contract = version.browse(first_period_contract_ids).filtered(lambda c: c.mobile)
     if first_period_contract:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contract)
-    result = result if (first_period_contract and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    result = result if (first_period_contract and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
+# the input counts the devices beyond the one of the contract
+if 'ATN.MOB' in inputs:
+    result_qty = 1 + inputs['ATN.MOB'].amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -2658,6 +2761,8 @@ if not salary_simulation:
         <field name="code">ATN.LAP</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">500</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
 if version.is_PFI():
@@ -2674,7 +2779,10 @@ if not salary_simulation:
     first_period_contract = version.browse(first_period_contract_ids).filtered(lambda c: c.laptop)
     if first_period_contract:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contract)
-    result = payslip._rule_parameter('bik_laptop_amount') if (first_period_contract and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    result = payslip._rule_parameter('bik_laptop_amount') if (first_period_contract and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
+# the input counts the devices beyond the one of the contract
+if 'ATN.LAP' in inputs:
+    result_qty = 1 + inputs['ATN.LAP'].amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -2692,6 +2800,8 @@ if not salary_simulation:
         <field name="code">ATN.PHONE_AMT</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">500</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
 if version.is_PFI():
@@ -2708,7 +2818,10 @@ if not salary_simulation:
     first_period_contract = version.browse(first_period_contract_ids).filtered(lambda c: c.mobile_amount)
     if first_period_contract:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contract)
-    result = payslip._rule_parameter('bik_phone_amount') if (first_period_contract and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    result = payslip._rule_parameter('bik_phone_amount') if (first_period_contract and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
+# the input counts the devices beyond the one of the contract
+if 'ATN.PHONE_AMT' in inputs:
+    result_qty = 1 + inputs['ATN.PHONE_AMT'].amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -2726,6 +2839,8 @@ if not salary_simulation:
         <field name="code">ATN.TAB</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">500</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
 if version.is_PFI():
@@ -2742,7 +2857,10 @@ if not salary_simulation:
     first_period_contract = version.browse(first_period_contract_ids).filtered(lambda c: c.tablet)
     if first_period_contract:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contract)
-    result = payslip._rule_parameter('bik_tablet_amount') if (first_period_contract and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    result = payslip._rule_parameter('bik_tablet_amount') if (first_period_contract and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
+# the input counts the devices beyond the one of the contract
+if 'ATN.TAB' in inputs:
+    result_qty = 1 + inputs['ATN.TAB'].amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -2898,6 +3016,7 @@ result = -result_rules['ATN_HOUSING_FISCAL']['total']
             ref('l10n_be_hr_payroll.BIK'),
         ])]"/>
         <field name="name">Benefit in Kind (Reclassified Rents)</field>
+        <field name="input_suffix">€</field>
         <field name="code">ATN_RENT</field>
         <field name="l10n_be_follow_pay_period">always</field>
         <field name="sequence">500</field>
@@ -2906,12 +3025,16 @@ result = -result_rules['ATN_HOUSING_FISCAL']['total']
 if version.is_student() or version.is_PFI():
     result = False
 else:
-    result = bool(version.rent_amount)
+    result = True if 'ATN_RENT' in inputs else bool(version.rent_amount)
         </field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = version.rent_amount
+result = inputs['ATN_RENT'].amount if 'ATN_RENT' in inputs else version.rent_amount
         </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
@@ -2995,6 +3118,30 @@ result = version.pension_amount
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- a benefit in kind subject to the withholding tax only, e.g. the share of the worker in the meal vouchers
+         taken over by the employer -->
+    <record id="cp200_employees_salary_atn_miscellaneous_no_onss" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.BIK'),
+        ])]"/>
+        <field name="name">Benefit in Kind (Miscellaneous, without ONSS)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">ATN_MISC_NO_ONSS</field>
+        <field name="l10n_be_follow_pay_period">always</field>
+        <field name="sequence">511</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <record id="cp200_employees_salary_gift_voucher_onss_pp" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
@@ -3016,13 +3163,18 @@ result = version.pension_amount
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- The commute allowances are interventions in the commuting costs, as the private car and bike reimbursements:
+         the car one is taxable with the commuting exemption (box 14c), the bike one is exempt up to a limit per
+         kilometer, the excess being taxable (box 14d). Both are computed before the taxable salary (GROSS). -->
     <record id="employees_salary_car_travel" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.SERIOUS_BASE_LUMP_SUM_ALLOWANCE')
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.TRANSPORTATION_BASE'),
         ])]"/>
         <field name="name">Lump Sum - Commute Allowance (Car)</field>
         <field name="code">LSA_CAR_TRAVEL_KM</field>
-        <field name="sequence">2197</field>
+        <field name="sequence">954</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
         <field name="input_suffix">km traveled</field>
@@ -3034,7 +3186,29 @@ result = version.l10n_be_lsa_car_travel_amount * \
         </field>
         <field name="input_usage_employee" eval="False"/>
         <field name="input_default_value" eval="0.0"/>
-        <field name="appears_on_payslip">never</field>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="employees_salary_bike_travel_taxable" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.TRANSPORTATION_BASE'),
+        ])]"/>
+        <field name="name">Lump Sum - Commute Allowance (Bike) (Taxable)</field>
+        <field name="code">LSA_BIKE_TRAVEL_KM.TAX</field>
+        <field name="sequence">955</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = 'LSA_BIKE_TRAVEL_KM' in inputs</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+exempt_amount, result, kilometers = payslip._get_be_lsa_bike_travel_amounts(result_rules, inputs)
+        </field>
+        <field name="appears_on_payslip">non_zero</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
@@ -3043,7 +3217,8 @@ result = version.l10n_be_lsa_car_travel_amount * \
 
     <record id="employees_salary_bike_travel" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.SERIOUS_BASE_LUMP_SUM_ALLOWANCE')
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.EXEMPTED_COMMUTING'),
         ])]"/>
         <field name="name">Lump Sum - Commute Allowance (Bike)</field>
         <field name="code">LSA_BIKE_TRAVEL_KM</field>
@@ -3054,15 +3229,14 @@ result = version.l10n_be_lsa_car_travel_amount * \
         <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_repr_fees_salary_rule_section"/>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-max_amount = payslip._rule_parameter('representation_fees_bike_travel_max_yearly')
-ytd_amount = result_rules['BIKE_TRAVEL_KM']['ytd']
-diff = max_amount - ytd_amount
-reimbursment_amount = min(diff, version.l10n_be_lsa_bike_travel_amount * (inputs['LSA_BIKE_TRAVEL_KM'].amount if 'LSA_BIKE_TRAVEL_KM' in inputs else 0.0))
-result = max(0, reimbursment_amount)
+# the exempt part, by kilometer
+result, taxable_amount, result_qty = payslip._get_be_lsa_bike_travel_amounts(result_rules, inputs)
+if result_qty:
+    result /= result_qty
         </field>
         <field name="input_usage_employee" eval="False"/>
         <field name="input_default_value" eval="0.0"/>
-        <field name="appears_on_payslip">never</field>
+        <field name="appears_on_payslip">non_zero</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
@@ -3652,8 +3826,9 @@ result_rate = payslip._get_repr_fees_proration_rate(result_rules, worked_days, w
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 # 7.67% of the whole flexi wage: every pay and benefit the social security counts as remuneration, the benefits in
-# kind included (the flexi wage covers all the pay, premiums and benefits, whatever their nature)
-result = categories['REMUNERATION_BASE'] + categories['BIK']
+# kind included (the flexi wage covers all the pay, premiums and benefits, whatever their nature), but not a benefit
+# subject to the withholding tax only (no social security remuneration, so no flexi wage)
+result = categories['REMUNERATION_BASE'] + categories['BIK'] - result_rules['ATN_MISC_NO_ONSS']['total']
 result_rate = payslip._rule_parameter('flexi_vacation_payment_rate')
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -3768,6 +3943,7 @@ result_rate = - payslip._get_starterjob_deduction_rate()
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
     <record id="cp200_employees_salary_bonus_gross_salary" model="hr.salary.rule">
@@ -3848,10 +4024,12 @@ result_rate = - payslip._get_starterjob_deduction_rate()
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="cp200_employees_salary_double_december_salary" model="hr.salary.rule">
+    <!-- Neutralized: DH_85_92_ONSS_BASE already has the starter job reduction. -->
+    <record id="cp200_employees_salary_double_december_deduction_salary_85_92" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.DH_85_92_ONSS_BASE'),
         ])]"/>
@@ -3859,21 +4037,20 @@ result_rate = - payslip._get_starterjob_deduction_rate()
         <field name="code">DED_STARTERJOB_DH_85_92_ONSS_BASE</field>
         <field name="sequence">555</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = version.l10n_be_is_starterjob and not payslip.env.context.get('without_starterjob')</field>
+        <field name="condition_python">result = False</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-result = categories['DH_85_92_ONSS_BASE']
-result_rate = - payslip._get_starterjob_deduction_rate()
-        </field>
+        <field name="amount_python_compute">result = 0</field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="cp200_employees_salary_double_december_salary" model="hr.salary.rule">
+    <!-- active_test: also clear the archived categories (wrongly given by a former duplicate of this record) -->
+    <record id="cp200_employees_salary_double_december_salary" model="hr.salary.rule" context="{'active_test': False}">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
         <field name="name">Gross Salary (Double Holiday)</field>
         <field name="code">DH_SALARY</field>
@@ -4013,22 +4190,29 @@ else:
         <field name="condition_python">result = version.is_flexi()</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-year_start = payslip.date_from.replace(month=1, day=1)
-previous_payslips = payslip.env['hr.payslip'].search([
-    ('employee_id', '=', payslip.employee_id.id),
-    ('date_from', '>=', year_start),
-    ('date_to', '&lt;', payslip.date_to),
-    ('state', 'in', ['validated', 'paid']),
-    ('struct_id.code', '=', payslip.struct_id.code),
-])
-current_cap = payslip._rule_parameter('flexi_cap_std') if not version.l10n_be_early_retirement_status else payslip._rule_parameter('flexi_cap_ret')
-
-previous_line_values = previous_payslips._get_line_values(['FLEXI_EXEMPTION'], compute_sum=True)
-previous_cumulated_exemption = abs(previous_line_values['FLEXI_EXEMPTION']['sum']['total'])
 current_exemption = categories['ONSS_BASE']
+# The flexi remuneration of the legal pensioners is exempt without any cap, and there is no cap before 2024
+# Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/socialsecuritycontributions/calculationbase/flexi/flexi_and_overtime_horeca.html
+current_cap = not version.l10n_be_is_retired and payslip._rule_parameter('flexi_cap_std', raise_if_not_found=False)
+if not current_cap:
+    result = - max(0.0, current_exemption)
+else:
+    # The cap is the one of the income year, the year the flexi remuneration is paid in (fiscal date): a December
+    # payslip paid in January consumes the cap of the next year, as declared on the 281.10
+    fiscal_year = (payslip.l10n_be_fiscal_date or payslip.date_to).year
+    previous_payslips = payslip.env['hr.payslip'].search([
+        ('employee_id', '=', payslip.employee_id.id),
+        ('l10n_be_fiscal_date', '>=', payslip.date_to.replace(year=fiscal_year, month=1, day=1)),
+        ('l10n_be_fiscal_date', '&lt;=', payslip.date_to.replace(year=fiscal_year, month=12, day=31)),
+        ('id', '!=', payslip.id),
+        ('state', 'in', ['validated', 'paid']),
+        ('struct_id.code', '=', payslip.struct_id.code),
+    ])
+    previous_line_values = previous_payslips._get_line_values(['FLEXI_EXEMPTION'], compute_sum=True)
+    previous_cumulated_exemption = abs(previous_line_values['FLEXI_EXEMPTION']['sum']['total'])
 
-remaining_cap = current_cap - previous_cumulated_exemption
-result = - max(0.0, min(current_exemption, remaining_cap))
+    remaining_cap = current_cap - previous_cumulated_exemption
+    result = - max(0.0, min(current_exemption, remaining_cap))
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -4062,6 +4246,26 @@ result = sum(flat.values()) * payslip._rule_parameter('horeca_occasional_hourly_
         <field name="appears_on_payslip">non_zero</field>
         <field name="country_id" ref="base.be"/>
     </record>
+    <record id="cp200_employees_salary_horeca_occasional_scale_premium_flat" model="hr.salary.rule">
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="name">Horeca Occasional Workers: Premiums Taxed at the Scale (Flat Wage Days)</field>
+        <field name="code">HORECA_OCC_SCALE_PREMIUM_FLAT</field>
+        <field name="sequence">539</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = result_rules['HORECA_OCC_SCALE_PREMIUM']['total'] and payslip._l10n_be_is_horeca_occasional()</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# the share of the premiums earned on the days of the flat wage: covered by it (outside the gross subject to ONSS,
+# SALARY) and out of the flat rate of withholding tax (HORECA_OCC_TAXABLE), the rest of them follows the pay of the
+# other days
+result = result_rules['HORECA_OCC_SCALE_PREMIUM']['total'] * payslip._l10n_be_get_horeca_occasional_share(work_entries)
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="appears_on_payslip">never</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
 
     <record id="cp200_employees_salary_onss_base_prev_payslips" model="hr.salary.rule">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
@@ -4089,7 +4293,7 @@ result = categories['EMPL_BONUS_ONSS_BASE'] + l10n_be_month_line_values_by_paysl
         <field name="sequence">595</field>
         <field name="appears_on_payslip" eval="False"/>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = not version.no_onss and not version.is_PFI() and version.is_worker()</field>
+        <field name="condition_python">result = not version.no_onss and not version.is_PFI() and not version.is_flexi() and version.is_worker()</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = categories['ONSS_BASE']
@@ -4144,7 +4348,8 @@ else:
         <field name="amount_python_compute">
 threshold = 0
 if payslip.struct_id.code == 'BECCT90':
-    threshold = payslip._rule_parameter('cct90_employer_onss_threshold')
+    # yearly ceiling, for all the CCT 90 bonuses of the year
+    threshold = payslip._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold')
 result = max(0, categories['BONUS_ONSS_BASE'] - threshold)
 result_rate = - payslip._get_onss_global_rates()['personal_rate']
         </field>
@@ -4160,21 +4365,14 @@ result_rate = - payslip._get_onss_global_rates()['personal_rate']
 
     <record id="cp200_employees_salary_employment_bonus_volet_A" model="hr.salary.rule">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Employment Bonus (Volet A: 33.14%)</field>
+        <field name="name">Employment Bonus (Volet A)</field>
         <field name="code">EmpBonus.A</field>
         <field name="sequence">700</field>
         <field name="appears_on_payslip">non_zero</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-wage = result_rules['ONSS_BASE_TOTAL']['total']
-if version.is_student() or version.is_PFI():
-    result = False
-else:
-    # the bound applies to the reference wage, below the pay when more hours are paid than the full-time month has
-    high = payslip._rule_parameter('work_bonus_reference_wage_high')
-    result = payslip.date_from >= date(2024, 4, 1) and wage and (
-        wage &lt;= high or l10n_be_month_payslips_by_payslip[payslip]
-        or payslip._l10n_be_get_work_bonus_reference_salary(result_rules, l10n_be_month_payslips_by_payslip[payslip]) &lt;= high)
+result = payslip.date_from >= date(2024, 4, 1) and (payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip])
+    or l10n_be_prev_month_line_values_by_payslip[payslip]['EmpBonus.A.CO']['sum']['total'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -4193,21 +4391,14 @@ explanation_info.update({'result': float_round(result, precision_digits=4)})
 
     <record id="cp200_employees_salary_employment_bonus_volet_B" model="hr.salary.rule">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Employment Bonus (Volet B: 52.54%)</field>
+        <field name="name">Employment Bonus (Volet B)</field>
         <field name="code">EmpBonus.B</field>
         <field name="sequence">700</field>
         <field name="appears_on_payslip">non_zero</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-wage = result_rules['ONSS_BASE_TOTAL']['total']
-if version.is_student() or version.is_PFI():
-    result = False
-else:
-    # the bound applies to the reference wage, below the pay when more hours are paid than the full-time month has
-    high = payslip._rule_parameter('work_bonus_reference_wage_high')
-    result = payslip.date_from >= date(2024, 4, 1) and wage and (
-        wage &lt;= high or l10n_be_month_payslips_by_payslip[payslip]
-        or payslip._l10n_be_get_work_bonus_reference_salary(result_rules, l10n_be_month_payslips_by_payslip[payslip]) &lt;= high)
+result = payslip.date_from >= date(2024, 4, 1) and (payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip])
+    or l10n_be_prev_month_line_values_by_payslip[payslip]['EmpBonus.B.CO']['sum']['total'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -4235,15 +4426,8 @@ explanation_info.update({'result': float_round(result, precision_digits=4)})
         <field name="appears_on_payslip">non_zero</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-wage = result_rules['ONSS_BASE_TOTAL']['total']
-if version.is_student() or version.is_PFI():
-    result = False
-else:
-    # the bound applies to the reference wage, below the pay when more hours are paid than the full-time month has
-    high = payslip._rule_parameter('work_bonus_reference_wage_high')
-    result = wage and (
-        wage &lt;= high or l10n_be_month_payslips_by_payslip[payslip]
-        or payslip._l10n_be_get_work_bonus_reference_salary(result_rules, l10n_be_month_payslips_by_payslip[payslip]) &lt;= high)
+result = (payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip])
+    or l10n_be_prev_month_line_values_by_payslip[payslip]['EmpBonus.Total.CO']['sum']['total'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -4342,7 +4526,8 @@ result_rate = - payslip._get_onss_global_rates()['personal_rate']
         <field name="condition_python">result=categories['BONUS_ONSS_BASE'] and not version.no_onss</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-threshold = payslip._rule_parameter('cct90_employer_onss_threshold')
+# yearly ceiling, for all the CCT 90 bonuses of the year
+threshold = payslip._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold')
 result = min(categories['BONUS_ONSS_BASE'], threshold)
 result_rate = - payslip._get_onss_global_rates()['personal_rate']
         </field>
@@ -4358,8 +4543,6 @@ result_rate = - payslip._get_onss_global_rates()['personal_rate']
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.ONSS'),
-            ref('l10n_be_hr_payroll.BEPROFITSHARING_PP_LOW_BASE'),
-            ref('l10n_be_hr_payroll.BEPROFITSHARING_PP_HIGH_BASE'),
         ])]"/>
         <field name="name">Solidarity Contribution (Profit Sharing Bonus)</field>
         <field name="code">ONSS_PROFITSHARING</field>
@@ -4369,7 +4552,9 @@ result_rate = - payslip._get_onss_global_rates()['personal_rate']
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = categories['BEPROFITSHARING_ONSS_BASE']
-result_rate = - payslip._get_onss_global_rates()['personal_rate']
+# 13.07% of the paid amount, whatever the worker (students and flexi-jobs included)
+# Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/other_specialcontributions/profitsharings.html
+result_rate = -13.07
         </field>
         <field name="partner_id" ref="res_partner_onss"/>
         <field name="quantity">1.0</field>
@@ -4490,6 +4675,7 @@ result_rate = - payslip._get_onss_global_rates()['personal_rate']
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays'),
         ])]"/>
+        <field name="partner_id" ref="res_partner_onss"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -4557,6 +4743,7 @@ result = - categories['ONSS']
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_profit_sharing_bonus'),
@@ -4567,6 +4754,7 @@ result = - categories['ONSS']
         ])]"/>
         <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="partner_id" ref="res_partner_onss"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -4606,7 +4794,7 @@ result = - categories['ONSS']
 if version.is_PFI():
     result = False
 elif payslip.env.context.get('salary_simulation'):
-    result = bool(version.transport_mode_car and payslip.vehicle_id._get_monthly_car_atn(date=payslip.date_from))
+    result = bool(payslip.vehicle_id and payslip.vehicle_id._get_monthly_car_atn(date=payslip.date_from))
 else:
     result = bool(not payslip.ignore_worked_day_lines and not payslip.is_outside_contract and payslip._get_versions_with_company_car_within_payslip_period())
         </field>
@@ -4621,8 +4809,7 @@ if not salary_simulation:
         days_prorata = payslip._get_be_contract_days_in_payslip_range_prorata(v.date_start, v.date_end)
         result += v.car_id._get_monthly_car_atn(date=payslip.date_from) * days_prorata
     target_contract = payslip._get_max_basic_salary_contract(versions) if versions else False
-    result = result if target_contract and target_contract in payslip.worked_days_line_ids.version_id else 0
-result = float_round(result, precision_digits=3)
+    result = result if target_contract and target_contract in payslip._l10n_be_get_benefit_versions() else 0
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -4682,6 +4869,52 @@ result = payslip._get_l10n_be_atn_car_regularization_amount(result_rules)
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- Taxable at the scale but not subject to ONSS, paid with the net; the next input deducts it -->
+    <record id="cp200_employees_salary_taxable_no_onss" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+        ])]"/>
+        <field name="name">Taxable Salary (No ONSS)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">TAXABLE_NO_ONSS</field>
+        <field name="sequence">875</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_taxable_no_onss_deduction" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+        ])]"/>
+        <field name="name">Taxable Salary Deduction (No ONSS)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">TAXABLE_NO_ONSS_DED</field>
+        <field name="sequence">876</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = -inputs['TAXABLE_NO_ONSS_DED'].amount
+        </field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <!-- Salary sacrifice - deduction-->
     <record id="l10n_be_cafeteria_plan_salary_sacrifice_deduction" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
@@ -4718,10 +4951,53 @@ result = -version.l10n_be_cafeteria_plan_salary_sacrifice
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <record id="cp200_employees_salary_sickness_complement" model="hr.salary.rule">
+        <!-- The extra-legal indemnities of the employer for a sickness (or an accident of common law) after the guaranteed salary: replacement income, taxed as such and declared on the 281.18 (code 269), not on the 281.10 -->
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.REPLACEMENT_REVENUE_BASE')])]"/>
+        <field name="name">Extra-legal Sickness Complement (after 30 days)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">SICK_COMPLEMENT</field>
+        <field name="user_instructions" type="html"><p>Extra-legal indemnities paid by the employer for a sickness or an accident of common law, after the guaranteed salary. Declared on the 281.18 (code 269), taxed as replacement income, without ONSS.</p></field>
+        <field name="sequence">5</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_misc_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_work_accident_complement" model="hr.salary.rule">
+        <!-- The extra-legal indemnities of the employer from the 31st day of a work accident or an occupational disease: replacement income, taxed as such and declared on the 281.18 (code 270), not on the 281.10. The guaranteed salary of the days 8 to 30 stays on the 281.10 (WORK_ACCIDENT) -->
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.REPLACEMENT_REVENUE_BASE')])]"/>
+        <field name="name">Extra-legal Work Accident / Occupational Disease Complement (after 30 days)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">WORK_ACCIDENT_COMPLEMENT</field>
+        <field name="user_instructions" type="html"><p>Extra-legal indemnities paid by the employer from the 31st calendar day of a work accident or an occupational disease. Declared on the 281.18 (code 270), taxed as replacement income, without ONSS. The number of days of the code 270 (zone 2091) is not known by Odoo: complete it by hand on the 281.18. The guaranteed salary of the days 8 to 30 is paid by the work accident work entries, on the 281.10.</p></field>
+        <field name="sequence">5</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_misc_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <record id="cp200_employees_salary_replacement_revenue" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.REMUNERATION'),
+            ref('l10n_be_hr_payroll.TAXABLE_18'),
         ])]"/>
         <field name="name">Replacement Revenue</field>
         <field name="code">REPLACEMENT_REVENUE</field>
@@ -4734,30 +5010,6 @@ result = categories['REPLACEMENT_REVENUE_BASE']
         <field name="amount_python_compute">
 result = categories['REPLACEMENT_REVENUE_BASE']
         </field>
-        <field name="struct_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
-        ])]"/>
-        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
-        <field name="country_id" ref="base.be"/>
-    </record>
-
-    <record id="cp200_employees_salary_replacement_revenue_withholding_tax" model="hr.salary.rule">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
-        ])]"/>
-        <field name="name">Replacement Revenue Withholding Tax</field>
-        <field name="code">REPLACEMENT_REVENUE.P.P</field>
-        <field name="sequence">930</field>
-        <field name="condition_select">python</field>
-        <field name="condition_python">
-result = not version.no_withholding_taxes and categories['REPLACEMENT_REVENUE_BASE']
-        </field>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-result = payslip._get_replacement_revenue_withholding_taxes(categories)
-        </field>
-        <field name="appears_on_employee_cost_dashboard" eval="True"/>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
@@ -4865,13 +5117,17 @@ result_rate = payslip._get_onss_global_rates()['personal_rate']
         <field name="name">Private car</field>
         <field name="code">CAR.PRIV</field>
         <field name="sequence">952</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_misc_salary_rule_section"/>
         <field name="amount_select">code</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = not payslip.ignore_worked_day_lines and version.private_car_employee_kilometer</field>
+        <field name="condition_python">result = not payslip.ignore_worked_day_lines and (version.private_car_employee_kilometer or 'CAR.PRIV' in inputs)</field>
         <field name="amount_python_compute">
 result = 0
-if result_rules['BASIC']['total']:
-    result, result_qty, result_rate = payslip._get_be_private_car_reimursement_amount(work_entries)
+if 'CAR.PRIV' in inputs:
+    result = inputs['CAR.PRIV'].amount
+elif result_rules['BASIC']['total']:
+    result, result_qty, result_rate = payslip._get_be_private_car_reimbursement_amount(work_entries)
     if payslip.env.context.get('salary_simulation'):
         result_rate = 100
         </field>
@@ -4907,6 +5163,7 @@ exempt_amount, result = payslip._get_be_bike_reimbursement_amounts(result_rules,
     <record id="cp200_employees_salary_horeca_occasional_taxable" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.OCCASIONAL_WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.TAXABLE_10_20'),
         ])]"/>
         <field name="name">Taxable Salary (Horeca Occasional Workers)</field>
         <field name="code">HORECA_OCC_TAXABLE</field>
@@ -4918,9 +5175,10 @@ exempt_amount, result = payslip._get_be_bike_reimbursement_amounts(result_rules,
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 # Annex III: the pay of the days of a Horeca occasional worker's contingent is taxed at a flat rate, apart from the
-# scale and its reductions; the commuting allowances keep their exemption in the scale
+# scale and its reductions; the commuting allowances keep their exemption in the scale, as the premiums taxed at the
+# scale (HORECA_OCC_SCALE_PREMIUM)
 share = payslip._l10n_be_get_horeca_occasional_share(work_entries)
-result = (categories['WITHHOLDING_BASE'] - categories['TRANSPORTATION_BASE']) * share
+result = (categories['WITHHOLDING_BASE'] - categories['TRANSPORTATION_BASE']) * share - result_rules['HORECA_OCC_SCALE_PREMIUM_FLAT']['total']
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -4967,8 +5225,12 @@ result = categories['WITHHOLDING_BASE'] + l10n_be_month_line_values_by_payslip[p
     </record>
 
     <record id="l10n_be_hr_payroll_structure_cp200_employee_salary_gross_salary_rule" model="hr.salary.rule">
-        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.WECH008_NET')])]"/>
-        <field name="name">Taxable Salary</field>
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.WECH008_NET'),
+            ref('l10n_be_hr_payroll.TAXABLE_10_20'),
+        ])]"/>
+        <field name="name">Withholding Tax Base (Regular) (natures 10/20)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="sequence">1000</field>
         <field name="code">GROSS</field>
         <field name="condition_select">none</field>
@@ -4982,9 +5244,36 @@ result = categories['WITHHOLDING_BASE']
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="l10n_be_hr_payroll_structure_cp200_employee_yearly_salary_gross_salary_rule" model="hr.salary.rule">
+    <!-- The taxable salary of all the natures of the 274, as shown to the employee. The withholding tax bases of the
+         scale (GROSS, BONUS_GROSS, ...) only hold the part of the remuneration they tax. -->
+    <record id="cp200_employees_salary_taxable_salary" model="hr.salary.rule">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Non periodic)</field>
+        <field name="name">Taxable Salary</field>
+        <field name="code">TAXABLE_SALARY_TOTAL</field>
+        <field name="sequence">1390</field>
+        <field name="appears_on_payslip">always</field>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = categories['TAXABLE_SALARY']
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="l10n_be_hr_payroll_structure_cp200_employee_yearly_salary_gross_salary_rule" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Non periodic)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="sequence">1000</field>
         <field name="code">GROSS_NP</field>
         <field name="condition_select">none</field>
@@ -5000,8 +5289,9 @@ result = categories['YEARLY_WITHHOLDING_BASE']
     </record>
 
     <record id="l10n_be_hr_payroll_structure_cp200_cct90_gross_salary_rule" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Bonus)</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Bonus)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="sequence">1000</field>
         <field name="code">BONUS_GROSS</field>
         <field name="condition_select">python</field>
@@ -5019,8 +5309,9 @@ result = categories['BONUS_WITHHOLDING_BASE']
     </record>
 
     <record id="l10n_be_hr_payroll_structure_cp200_structure_warrant_gross_salary_rule" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Warrant)</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Warrant)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="sequence">1000</field>
         <field name="code">WARRANT_GROSS</field>
         <field name="condition_select">none</field>
@@ -5035,8 +5326,9 @@ result = categories['WARRANT_WITHHOLDING_BASE']
     </record>
 
     <record id="cp200_employees_termination_fees_gross" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Termination Fees)</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Termination Fees)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="sequence">1000</field>
         <field name="code">TERM_GROSS</field>
         <field name="condition_select">none</field>
@@ -5051,12 +5343,12 @@ result = categories['TERMINATION_WITHHOLDING_BASE']
     </record>
 
     <record id="cp200_employees_salary_double_december_gross" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Double Holiday)</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Double Holiday)</field>
         <field name="sequence">1000</field>
         <field name="code">DH_GROSS</field>
         <field name="condition_select">none</field>
-        <field name="appears_on_payslip">non_zero</field>
+        <field name="appears_on_payslip">never</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = categories['DH_WITHHOLDING_BASE']
@@ -5069,8 +5361,9 @@ result = categories['DH_WITHHOLDING_BASE']
     </record>
 
     <record id="cp200_employees_termination_n_rules_taxable_termination" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Taxable Salary (Holiday Termination)</field>
+        <field name="category_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.TAXABLE_10_20')])]"/>
+        <field name="name">Withholding Tax Base (Holiday Termination)</field>
+        <field name="appears_on_payslip">never</field>
         <field name="code">HOLIDAY_TERM_GROSS</field>
         <field name="sequence">1000</field>
         <field name="condition_select">none</field>
@@ -5169,6 +5462,7 @@ result = categories['TERMINATION_YEARLY_TAXABLE']
     <record id="l10n_be_hr_payroll_structure_cp200_cct90_pp_exemption" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.BONUS_WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.TAXABLE_10_20'),
         ])]"/>
         <field name="name">Taxable Salary Exemption</field>
         <field name="sequence">1010</field>
@@ -5176,7 +5470,8 @@ result = categories['TERMINATION_YEARLY_TAXABLE']
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-exemption_amount = payslip._rule_parameter('cct90_employee_pp_threshold')
+# yearly ceiling, for all the CCT 90 bonuses of the year
+exemption_amount = payslip._l10n_be_get_cct90_threshold_left('cct90_employee_pp_threshold')
 result = -min(categories['BONUS_WITHHOLDING_BASE'], exemption_amount)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -5190,6 +5485,7 @@ result = -min(categories['BONUS_WITHHOLDING_BASE'], exemption_amount)
         <field name="name">Monthly Equivalent Taxable Salary</field>
         <field name="sequence">1050</field>
         <field name="code">GROSS.M</field>
+        <field name="appears_on_payslip">never</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
 result = not version.is_student() and not version.is_PFI()
@@ -5268,7 +5564,8 @@ result = not version.is_student() and not version.is_PFI()
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-joint_committee_code = payslip.l10n_be_joint_committee_id.egov3_code or '200'
+# The fees of the company directors (999) for a director under an employment contract
+joint_committee_code = payslip._l10n_be_get_professional_fees_joint_committee_code()
 
 fees_max = (
     payslip._rule_parameter(f'flat_rate_professional_fees_max_cp{joint_committee_code}', raise_if_not_found=False)
@@ -5418,61 +5715,41 @@ result = -max(0, 12 * payslip._rule_parameter('l10n_be_group_insurance_emp_cont_
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="l10n_be_presence_token_withholding_tax" model="hr.salary.rule">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
-        ])]"/>
-        <field name="name">Withholding Tax Presence Token</field>
-        <field name="code">PRESENCE_TOKEN_WITHHOLDING_TAX</field>
-        <field name="sequence">1360</field>
-        <field name="condition_select">python</field>
-        <field name="condition_python">result = result_rules['PRESENCE_TOKEN']['total']</field>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-tax_rates = payslip._rule_parameter('l10n_be_presence_token')
-tokens_amount = result_rules['PRESENCE_TOKEN']['total']
-rate = 0
-for min_token_amount, tax_rate in tax_rates:
-    if tokens_amount &gt;= min_token_amount:
-        rate = tax_rate
-    else:
-        break
-result_rate = rate
-result = -tokens_amount
-        </field>
-        <field name="struct_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
-        ])]"/>
-        <field name="country_id" ref="base.be"/>
-    </record>
-
     <record id="cp200_employees_salary_withholding_taxes" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
             ref('l10n_be_hr_payroll.WECH008_NET'),
         ])]"/>
         <field name="name">Withholding Tax</field>
         <field name="code">P.P</field>
         <field name="sequence">1400</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="hr_payroll.default_salary_rule_section"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result=not version.no_withholding_taxes and not version.is_student() and not payslip.l10n_be_arrear_salary</field>
         <field name="appears_on_payslip">always</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-if version.l10n_be_egov3_code == '999' and version.l10n_be_withholding_tax_type == 'fixed' and version.l10n_be_withholding_tax_amount:
+if 'P.P' in inputs:
+    # the withholding tax fixed for this payslip, without the reductions of the scale
+    result = -inputs['P.P'].amount
+elif version.l10n_be_egov3_code == '999' and version.l10n_be_withholding_tax_type == 'fixed' and version.l10n_be_withholding_tax_amount:
     result = -min(categories['WITHHOLDING_BASE'], version.l10n_be_withholding_tax_amount)
 elif version.l10n_be_egov3_code == '999' and version.l10n_be_withholding_tax_type == 'percentage' and version.l10n_be_withholding_tax_percentage:
     result = categories['WITHHOLDING_BASE']
     result_rate = -version.l10n_be_withholding_tax_percentage * 100
-elif version.is_PFI():
+elif version._l10n_be_has_internship_withholding_tax_rate():
     result = categories['WITHHOLDING_BASE']
     result_rate = -payslip._rule_parameter('pfi_withholding_tax_rate')
 else:
     already_paid = l10n_be_month_line_values_by_payslip[payslip]['P.P']['sum']['total']
-    yearly_taxable = result_rules['Y.P.P']['total'] + categories['TAX.NET.DED.Y']
-    result = -max(0, float_round(yearly_taxable / 12.0, precision_rounding=0.01, rounding_method='DOWN'))
+    # the group insurance reduction is one of the month: it is deducted from the month's tax once rounded
+    group_insurance_deduction = result_rules['P.P.G.I']['total']
+    yearly_taxable = result_rules['Y.P.P']['total'] + categories['TAX.NET.DED.Y'] - group_insurance_deduction
+    # the twelfth of the yearly tax, rounded to the nearest cent
+    monthly_tax = max(0, float_round(yearly_taxable / 12.0, precision_rounding=0.01))
+    result = -max(0, monthly_tax + float_round(group_insurance_deduction / 12.0, precision_rounding=0.01))
     result -= already_paid
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -5484,13 +5761,13 @@ else:
     <record id="cp200_employees_salary_withholding_reduction_extra_hours" model="hr.salary.rule">
          <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax reduction for Extra hours</field>
         <field name="code">P.P.DEDEH</field>
         <field name="sequence">1401</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = payslip._check_withholding_extra_hours_reduction()</field>
+        <field name="condition_python">result = 'P.P' not in inputs and payslip._check_withholding_extra_hours_reduction()</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 # Annex III AR/CIR 92 n° 43: a reduction of the withholding tax of the scale (P.P), at most that tax, never a refund
@@ -5507,7 +5784,7 @@ result = min(payslip._get_withholding_extra_hours_reduction(), max(0.0, -result_
     <record id="cp200_employees_arrear_salary_withholding_tax" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Arrear Salary)</field>
         <field name="code">P.P.ARREAR</field>
@@ -5526,17 +5803,40 @@ result = -result_rules['GROSS']['total'] * average_rate
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <record id="cp200_employees_economic_unemployment_tax" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_13'),
+        ])]"/>
+        <field name="name">Economic Unemployment Witholding Tax</field>
+        <field name="code">ECONOMIC_UNEMPLOYMENT.P.P</field>
+        <field name="sequence">1401</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result=not version.no_withholding_taxes and categories['TAXABLE_13']</field>
+        <field name="appears_on_payslip">always</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_rate = -26.75
+result = categories['TAXABLE_13']
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <record id="cp200_employees_cct90_p_p" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Bonus)</field>
         <field name="code">BONUS_PP</field>
         <field name="sequence">1402</field>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = payslip._get_thirteen_month_withholding_taxes(categories, l10n_be_year_payslips_by_payslip[payslip], work_entries)</field>
+        <field name="amount_python_compute">result, explanation_info = payslip._get_thirteen_month_withholding_taxes(categories, l10n_be_year_payslips_by_payslip[payslip], work_entries, get_explanation=True)</field>
+        <field name="explanation_template">{explanation}</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
@@ -5548,14 +5848,15 @@ result = -result_rules['GROSS']['total'] * average_rate
     <record id="cp200_employees_salary_atn_warrant_p_p" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Warrant)</field>
         <field name="code">WARRANT_PP</field>
         <field name="sequence">1402</field>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = payslip._get_warrant_withholding_taxes(categories)</field>
+        <field name="amount_python_compute">result, explanation_info = payslip._get_warrant_withholding_taxes(categories, get_explanation=True)</field>
+        <field name="explanation_template">{explanation}</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant'),
         ])]"/>
@@ -5565,7 +5866,7 @@ result = -result_rules['GROSS']['total'] * average_rate
     <record id="cp200_employees_salary_double_december_pp" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Double Holiday)</field>
         <field name="code">DH_PP</field>
@@ -5573,7 +5874,8 @@ result = -result_rules['GROSS']['total'] * average_rate
         <field name="condition_select">none</field>
         <field name="appears_on_payslip">non_zero</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = payslip._get_be_double_holiday_withholding_taxes(categories, l10n_be_year_payslips_by_payslip[payslip], work_entries)</field>
+        <field name="amount_python_compute">result, explanation_info = payslip._get_be_double_holiday_withholding_taxes(categories, l10n_be_year_payslips_by_payslip[payslip], work_entries, get_explanation=True)</field>
+        <field name="explanation_template">{explanation}</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
@@ -5584,7 +5886,7 @@ result = -result_rules['GROSS']['total'] * average_rate
     <record id="cp200_employees_termination_n_rules_professional_tax_termination" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Holiday Termination)</field>
         <field name="code">HOLIDAY_TERM_PP</field>
@@ -5594,8 +5896,9 @@ result = -result_rules['GROSS']['total'] * average_rate
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 rates = payslip._rule_parameter('holiday_pay_pp_rates')
-result = payslip._get_withholding_taxes_after_child_allowances(rates, HOLIDAY_TERM_GROSS)
+result, explanation_info = payslip._get_withholding_taxes_after_child_allowances(rates, HOLIDAY_TERM_GROSS, get_explanation=True)
         </field>
+        <field name="explanation_template">{explanation}</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays'),
@@ -5606,7 +5909,7 @@ result = payslip._get_withholding_taxes_after_child_allowances(rates, HOLIDAY_TE
     <record id="cp200_employees_termination_fees_withholding_taxes" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Termination Fees)</field>
         <field name="code">TERM_PP</field>
@@ -5633,7 +5936,7 @@ else:
     <record id="l10n_be_monthly_cp999_withholding_tax_np" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax on non-periodic</field>
         <field name="code">P.P.NP</field>
@@ -5662,21 +5965,53 @@ else:
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="cp200_employees_economic_unemployment_tax" model="hr.salary.rule">
+    <record id="cp200_employees_salary_replacement_revenue_withholding_tax" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_18'),
         ])]"/>
-        <field name="name">Economic Unemployment Witholding Tax</field>
-        <field name="code">ECONOMIC_UNEMPLOYMENT.P.P</field>
-        <field name="sequence">1401</field>
+        <field name="name">Replacement Revenue Withholding Tax</field>
+        <field name="code">REPLACEMENT_REVENUE.P.P</field>
+        <field name="sequence">1406</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result=not version.no_withholding_taxes and categories['ECONOMIC_UNEMPLOYMENT_BASE']</field>
-        <field name="appears_on_payslip">always</field>
+        <field name="condition_python">
+result = not version.no_withholding_taxes and not version.is_student() and categories['TAXABLE_18']
+        </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result_rate = -26.75
-result = categories['ECONOMIC_UNEMPLOYMENT_BASE']
+result, explanation_info = payslip._get_replacement_revenue_withholding_taxes(categories, get_explanation=True)
+        </field>
+        <field name="explanation_template">{explanation}</field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="l10n_be_presence_token_withholding_tax" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_30'),
+        ])]"/>
+        <field name="name">Withholding Tax Presence Token</field>
+        <field name="code">PRESENCE_TOKEN_WITHHOLDING_TAX</field>
+        <field name="sequence">1407</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = categories['TAXABLE_30']</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+tax_rates = payslip._rule_parameter('l10n_be_presence_token')
+tokens_amount = categories['TAXABLE_30']
+rate = 0
+for min_token_amount, tax_rate in tax_rates:
+    if tokens_amount &gt;= min_token_amount:
+        rate = tax_rate
+    else:
+        break
+result_rate = rate
+result = -tokens_amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -5687,7 +6022,7 @@ result = categories['ECONOMIC_UNEMPLOYMENT_BASE']
     <record id="cp200_employees_salary_withholding_reduction" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
             ref('l10n_be_hr_payroll.WECH008_NET'),
         ])]"/>
         <field name="name">Withholding reduction</field>
@@ -5695,7 +6030,7 @@ result = categories['ECONOMIC_UNEMPLOYMENT_BASE']
         <field name="amount_select">code</field>
         <field name="sequence">1500</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = bool(result_rules['EmpBonus.1']['total'])</field>
+        <field name="condition_python">result = bool(result_rules['EmpBonus.1']['total']) and 'P.P' not in inputs</field>
         <field name="amount_python_compute">
 already_paid = l10n_be_month_line_values_by_payslip[payslip]['P.P.DED']['sum']['total']
 result, explanation_info = payslip._get_withholding_reduction(result_rules, l10n_be_month_line_values_by_payslip[payslip])
@@ -5712,7 +6047,7 @@ result -= already_paid
     <record id="cp200_employees_salary_horeca_occasional_withholding_taxes" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Tax (Horeca Occasional Workers)</field>
         <field name="code">HORECA_OCC_PP</field>
@@ -5755,7 +6090,7 @@ result_rate = -payslip._rule_parameter('horeca_occasional_withholding_tax_rate')
      <record id="cp200_employees_salary_withholding_tax_threshold" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
         ])]"/>
         <field name="name">Withholding Taxes (Adjustment)</field>
         <field name="input_suffix">€</field>
@@ -5792,7 +6127,11 @@ result = -max(0, min_withholding_tax - total_withholding_tax)
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 low_tax_rate = payslip._rule_parameter('movable_income_withholding_tax_low')
-profit_low = categories['BEPROFITSHARING_PP_LOW_BASE']
+profit_low = result_rules['PROFITSHARINGLOW']['total']
+# Only deduct the part of the solidarity contribution that relates to this bonus
+onss_base = categories['BEPROFITSHARING_ONSS_BASE']
+if onss_base:
+    profit_low += result_rules['ONSS_PROFITSHARING']['total'] * profit_low / onss_base
 result = -1 * (low_tax_rate * profit_low)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -5815,7 +6154,11 @@ result = -1 * (low_tax_rate * profit_low)
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 high_tax_rate = payslip._rule_parameter('movable_income_withholding_tax_high')
-profit_high = categories['BEPROFITSHARING_PP_HIGH_BASE']
+profit_high = result_rules['PROFITSHARINGHIGH']['total']
+# Only deduct the part of the solidarity contribution that relates to this bonus
+onss_base = categories['BEPROFITSHARING_ONSS_BASE']
+if onss_base:
+    profit_high += result_rules['ONSS_PROFITSHARING']['total'] * profit_high / onss_base
 result = -1 * (high_tax_rate * profit_high)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -5830,10 +6173,9 @@ result = -1 * (high_tax_rate * profit_high)
         <field name="name">Withholding Tax (Total)</field>
         <field name="code">PPTOTAL</field>
         <field name="sequence">1600</field>
-        <field name="condition_select">python</field>
-        <field name="condition_python">
-result = not version.is_student()
-        </field>
+        <!-- All the withholding tax withheld, a student's included (bonuses, holiday pay, termination fees): it is
+             declared on the 274.10 and the 281.10 -->
+        <field name="condition_select">none</field>
         <field name="appears_on_payslip">never</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -5891,13 +6233,15 @@ has_working_days = any(
             for line in payslip.worked_days_line_ids
       )
 atn_total = result_rules['ATN_DED']['total'] + result_rules['ATN_HOUSING_ONSS_DED']['total']
-atn_total += result_rules['ATN.CAR']['total']
+# the benefits in kind outside the ONSS (company car, traffic fines) are not declared as remuneration
+atn_total += result_rules['ATN.CAR']['total'] + result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total']
 result = not has_working_days and bool(atn_total)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 atn_total = result_rules['ATN_DED']['total'] + result_rules['ATN_HOUSING_ONSS_DED']['total']
-result = atn_total + result_rules['ATN.CAR']['total']
+# the benefits in kind outside the ONSS (company car, traffic fines) are not declared as remuneration
+result = atn_total + result_rules['ATN.CAR']['total'] + result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total']
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -5920,13 +6264,15 @@ has_working_days = any(
             for line in payslip.worked_days_line_ids
       )
 atn_total = result_rules['ATN_DED']['total'] + result_rules['ATN_HOUSING_ONSS_DED']['total']
-atn_total += result_rules['ATN.CAR']['total']
+# the benefits in kind outside the ONSS (company car, traffic fines) are not declared as remuneration
+atn_total += result_rules['ATN.CAR']['total'] + result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total']
 result = not has_working_days and bool(atn_total)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 atn_total = result_rules['ATN_DED']['total'] + result_rules['ATN_HOUSING_ONSS_DED']['total']
-result = - (atn_total + result_rules['ATN.CAR']['total'])
+# the benefits in kind outside the ONSS (company car, traffic fines) are not declared as remuneration
+result = - (atn_total + result_rules['ATN.CAR']['total'] + result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total'])
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -5993,7 +6339,7 @@ result = payslip._cp302_get_paid_amount_13th_month(l10n_be_year_payslips_by_pays
         <field name="appears_on_payslip">always</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = not version.is_student() and not version.is_PFI() and not version.is_flexi() and (payslip.struct_id.code != 'BEWARRANT' or result_rules['WARRANT_SALARY']['total'])
+result = not version.no_onss and not version.is_student() and not version.is_PFI() and not version.is_flexi() and (payslip.struct_id.code != 'BEWARRANT' or result_rules['WARRANT_SALARY']['total'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -6017,6 +6363,7 @@ result = -payslip._l10n_be_get_special_social_contribution(result_rules, quarter
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant'),
         ])]"/>
         <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="partner_id" ref="res_partner_onss"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -6120,32 +6467,17 @@ elif version.meal_voucher_calculation_method == 'hours':
         if 'MEAL_VOUCHER' in (worked_day.work_entry_type_id.category_ids | worked_day.category_options_ids).mapped('code')
     )
     hours_per_day = version._get_reference_calendar().hours_per_day
-    result_qty = float_round(eligible_hours / hours_per_day, precision_digits=0) if hours_per_day else 0
+    # rounded up to the next unit
+    result_qty = float_round(eligible_hours / hours_per_day, precision_digits=0, rounding_method='UP') if hours_per_day else 0
+    # Limited to the working days of a full-time worker in the company
+    # Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/salary/particularcases/lunchcheques/salaryfeatures.html
+    full_time_days = payslip._l10n_be_get_full_time_working_days(version)
+    if full_time_days:
+        result_qty = min(result_qty, full_time_days)
 else:
     result_qty = payslip._get_be_benefit_count('MEAL_VOUCHER', work_entries)
         </field>
         <field name="appears_on_payslip">always</field>
-        <field name="partner_id" ref="res_partner_meal_vouchers"/>
-        <field name="struct_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
-        ])]"/>
-        <field name="country_id" ref="base.be"/>
-    </record>
-
-    <record id="hr_salary_rule_meal_voucher_employer" model="hr.salary.rule">
-        <field name="category_ids" eval="[(5, 0, 0)]"/>
-        <field name="name">Meal Voucher Employer Part</field>
-        <field name="code">MEAL_VOUCHER_EMPLOYER</field>
-        <field name="sequence">1855</field>
-        <field name="condition_select">python</field>
-        <field name="condition_python">result = version.meal_voucher_amount > 0</field>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-result_qty = result_rules['MEAL_V_EMP']['quantity'] if 'MEAL_V_EMP' in result_rules else 0
-result = version.meal_voucher_paid_by_employer
-        </field>
-        <field name="appears_on_payslip">non_zero</field>
-        <field name="display_in_pdf_extra_info" eval="True"/>
         <field name="partner_id" ref="res_partner_meal_vouchers"/>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -6161,7 +6493,7 @@ result = version.meal_voucher_paid_by_employer
         <field name="code">IMPULSION25</field>
         <field name="sequence">1950</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = version.l10n_be_impulsion_plan == '25yo'</field>
+        <field name="condition_python">result = version.l10n_be_impulsion_plan == '25yo' and version._get_l10n_be_employee_residence_region() == 'wa'</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 amount, coef = payslip._get_impulsion_plan_amount()
@@ -6183,7 +6515,7 @@ result_rate =  - coef
         <field name="code">IMPULSION12</field>
         <field name="sequence">2000</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = version.l10n_be_impulsion_plan == '12mo'</field>
+        <field name="condition_python">result = version.l10n_be_impulsion_plan == '12mo' and version._get_l10n_be_employee_residence_region() == 'wa'</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 amount, coef = payslip._get_impulsion_plan_amount()
@@ -6211,7 +6543,7 @@ result_rate = - coef
         <field name="condition_python">result = version.train_transport_employee_kilometer</field>
         <field name="amount_python_compute">
 if result_rules['BASIC']['total']:
-    result = version._get_train_transport_reimbursed_amount()
+    result = version._get_train_transport_reimbursed_amount(ref_date=payslip.date_from)
 else:
     result = 0
         </field>
@@ -6235,7 +6567,7 @@ else:
         <field name="condition_python">result = not payslip.ignore_worked_day_lines and (version.bus_transport_employee_amount or version.tram_transport_employee_amount or version.metro_transport_employee_amount)</field>
         <field name="amount_python_compute">
 if result_rules['BASIC']['total']:
-    result = version._get_public_transport_reimbursed_amount('bus') + version._get_public_transport_reimbursed_amount('tram') + version._get_public_transport_reimbursed_amount('metro')
+    result = sum(version._get_public_transport_reimbursed_amount(field, ref_date=payslip.date_from) for field in ('bus', 'tram', 'metro'))
 else:
     result = 0
 </field>
@@ -6305,16 +6637,23 @@ result, taxable_amount = payslip._get_be_bike_reimbursement_amounts(result_rules
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <!-- A rule modified by the user is not updated anymore: the category reaches it too -->
-    <function model="hr.salary.rule" name="write">
-        <value eval="[
-            ref('l10n_be_hr_payroll.employees_salary_train_transport'),
-            ref('l10n_be_hr_payroll.cp200_employees_salary_public_transport'),
-            ref('l10n_be_hr_payroll.cp200_employees_salary_third_party_transport'),
-            ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation'),
-        ]"/>
-        <value eval="{'category_ids': [(4, ref('l10n_be_hr_payroll.EXEMPTED_COMMUTING'))]}"/>
-    </function>
+    <!-- The benefit of a company bike (or speed pedelec) provided to the employee: tax exempted, out of the pay, only
+         declared on the 281 (box 14 e, 2208) at its monthly cost for the employer -->
+    <record id="cp200_employees_salary_company_bike_benefit" model="hr.salary.rule">
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="name">Company Bike Benefit</field>
+        <field name="code">BIKE_BENEFIT</field>
+        <field name="sequence">2155</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = bool(version.sudo().bike_id)</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = version.sudo().company_bike_depreciated_cost</field>
+        <field name="appears_on_payslip">never</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
 
     <record id="cp200_employees_salary_homeworking_fees" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
@@ -6405,13 +6744,14 @@ if 'REPFEESREGUL' in inputs:
     <record id="cp200_employees_salary_ip_deduction" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_273S'),
         ])]"/>
         <field name="name">Intellectual Property Income Deduction</field>
         <field name="code">IP.DED</field>
         <field name="amount_select">code</field>
         <field name="sequence">2350</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = categories['IP_WT']</field>
+        <field name="condition_python">result = categories['TAXABLE_273S']</field>
         <field name="amount_python_compute">result = payslip._get_be_ip_deduction(result_rules, categories, l10n_be_ip_data_by_payslip[payslip])</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -6620,6 +6960,7 @@ result = mb_remaining
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- Deactivated: the mobility budget is already in the reference salary (MOBILITY_BUDGET_ANNUAL). To remove in master. -->
     <record id="cp200_employees_salary_mobility_budget_payment_termination_fee" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
@@ -6628,14 +6969,12 @@ result = mb_remaining
         <field name="code">MOBILITY_PAYMENT_TERM</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-salary_simulation = payslip.env.context.get('salary_simulation')
-is_termination = payslip.struct_id.code == 'BETERM'
-result = not salary_simulation and is_termination and payslip.version_id.l10n_be_mobility_budget
+result = False
         </field>
         <field name="amount_select">code</field>
         <field name="sequence">2955</field>
         <field name="amount_python_compute">
-result, result_qty = payslip._get_l10n_be_mobility_budget_termination_fee_amount()
+result = 0
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
@@ -6670,6 +7009,7 @@ explanation_info = {'total': total}
         ])]"/>
         <field name="hide_amount">True</field>
         <field name="explanation_template">This rule is based on a quarterly calculation. Therefore, the standard Base amount is not relevant and is intentionally ignored in the computation.</field>
+        <field name="partner_id" ref="res_partner_onss"/>
         <field name="country_id" ref="base.be"/>
 
     </record>
@@ -6712,7 +7052,8 @@ if has_jc_matching_month or is_departing:
         ('date_from', '&lt;', payslip.date_from),
     ])
     existing_lines = existing.mapped('line_ids').filtered(lambda l: l.code == 'ECOVOUCHERS' and l.total)
-    result = not existing_lines
+    versions = employee._get_versions_with_contract_overlap_with_period(ref_start, payslip.date_to)
+    result = not existing_lines and any(not v.is_student() for v in versions)
 else:
     result = False
         </field>
@@ -6779,6 +7120,8 @@ if 'GI.EMP.VOL' in result_rules:
     disposable -= abs(result_rules['GI.EMP.VOL']['total'])
 if 'GI.EMP.CONT' in result_rules:
     disposable -= abs(result_rules['GI.EMP.CONT']['total'])
+if 'MEAL_V_EMP' in result_rules:
+    disposable -= result_rules['MEAL_V_EMP']['total']
 result = disposable
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -6956,7 +7299,11 @@ result_name = inputs['CHILD_SUPPORT'].name
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 expected_net = result_rules['DISPOSABLE_EARNINGS']['total']
-max_seizable_amount = payslip._get_l10n_be_max_seizable_amount(expected_net)
+# The sums paid to the maintenance creditor reduce the seizable amount (Code judiciaire, art. 1412)
+child_support = -result_rules['CHILD_SUPPORT']['total'] if 'CHILD_SUPPORT' in result_rules else 0
+# With several prior assignments (one line per payslip adjustment), the previous lines are deducted too
+already_assigned = -result_rules['ASSIG_SALARY_PRIOR']['total'] if 'ASSIG_SALARY_PRIOR' in result_rules else 0
+max_seizable_amount = max(0, payslip._get_l10n_be_max_seizable_amount(expected_net) - child_support - already_assigned)
 result = -min(inputs['ASSIG_SALARY_PRIOR'].amount, max_seizable_amount)
 result_name = inputs['ASSIG_SALARY_PRIOR'].name
         </field>
@@ -6989,7 +7336,7 @@ result_name = inputs['ASSIG_SALARY_PRIOR'].name
         <field name="amount_python_compute">
 expected_net = result_rules['DISPOSABLE_EARNINGS']['total']
 prior_adjustments = categories['SEIZED_AMOUNT']
-max_seizable_amount = payslip._get_l10n_be_max_seizable_amount(expected_net) + prior_adjustments
+max_seizable_amount = max(0, payslip._get_l10n_be_max_seizable_amount(expected_net) + prior_adjustments)
 result = -min(inputs['ASSIG_SALARY'].amount, max_seizable_amount)
 result_name = inputs['ASSIG_SALARY'].name
         </field>
@@ -7022,7 +7369,7 @@ result_name = inputs['ASSIG_SALARY'].name
         <field name="amount_python_compute">
 expected_net = result_rules['DISPOSABLE_EARNINGS']['total']
 prior_adjustments = categories['SEIZED_AMOUNT']
-max_seizable_amount = payslip._get_l10n_be_max_seizable_amount(expected_net) + prior_adjustments
+max_seizable_amount = max(0, payslip._get_l10n_be_max_seizable_amount(expected_net) + prior_adjustments)
 result = -min(inputs['ATTACH_SALARY'].amount, max_seizable_amount)
 result_name = inputs['ATTACH_SALARY'].name
         </field>
@@ -7070,70 +7417,190 @@ result_name = inputs['REIMBURSEMENT'].name
         <field name="country_id" ref="base.be"/>
     </record>
 
-    <record id="cp200_employees_salary_fiscal_voluntarism" model="hr.salary.rule">
+    <record id="cp200_employees_salary_fiscal_voluntarism_274_10" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.PP'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
+            ref('l10n_be_hr_payroll.FISCAL_VOLUNTARISM'),
         ])]"/>
-        <field name="name">Fiscal Voluntarism</field>
-        <field name="code">FISC_VOL</field>
-        <field name="sequence">3250</field>
+        <field name="name">Fiscal Voluntarism (Employees)</field>
+        <field name="code">FISC_VOL_10</field>
+        <field name="sequence">3251</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">
-if version.fiscal_voluntarism_type in ['fixed', 'total_amount']:
-    result = bool(version.fiscal_voluntarism_amount > 0)
-else:
-    result = bool(version.fiscal_voluntarism_percentage > 0)
-        </field>
-        <field name="appears_on_payslip">always</field>
+        <field name="condition_python">result = payslip._check_fiscal_voluntarism(categories, '10')</field>
+        <field name="appears_on_payslip">never</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-limit = max(0, categories['REMUNERATION_BASE'])
-total_withholding_tax = abs(categories['PP'])
-
-if version.fiscal_voluntarism_type == 'fixed':
-    voluntary_amount = version.fiscal_voluntarism_amount
-elif version.fiscal_voluntarism_type == 'total_amount':
-    voluntary_amount = max(0.0, version.fiscal_voluntarism_amount - total_withholding_tax)
-else:
-    voluntary_amount = total_withholding_tax * version.fiscal_voluntarism_percentage
-
-result = -min(limit, voluntary_amount)
-        </field>
+        <field name="amount_python_compute">result = payslip._get_fiscal_voluntarism(categories, '10')</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <record id="cp200_employees_salary_fiscal_voluntarism_274_20" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_10_20'),
+            ref('l10n_be_hr_payroll.FISCAL_VOLUNTARISM'),
+        ])]"/>
+        <field name="name">Fiscal Voluntarism (Company Executives)</field>
+        <field name="code">FISC_VOL_20</field>
+        <field name="sequence">3252</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._check_fiscal_voluntarism(categories, '20')</field>
+        <field name="appears_on_payslip">never</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip._get_fiscal_voluntarism(categories, '20')</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_fiscal_voluntarism_274_18" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_18'),
+            ref('l10n_be_hr_payroll.FISCAL_VOLUNTARISM'),
+        ])]"/>
+        <field name="name">Fiscal Voluntarism (Replacement Revenues)</field>
+        <field name="code">FISC_VOL_18</field>
+        <field name="sequence">3253</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._check_fiscal_voluntarism(categories, '18')</field>
+        <field name="appears_on_payslip">never</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip._get_fiscal_voluntarism(categories, '18')</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_fiscal_voluntarism_274_13" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_13'),
+            ref('l10n_be_hr_payroll.FISCAL_VOLUNTARISM'),
+        ])]"/>
+        <field name="name">Fiscal Voluntarism (Economic Unemployment)</field>
+        <field name="code">FISC_VOL_13</field>
+        <field name="sequence">3254</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._check_fiscal_voluntarism(categories, '13')</field>
+        <field name="appears_on_payslip">never</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip._get_fiscal_voluntarism(categories, '13')</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_fiscal_voluntarism_274_30" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_TAX_274_30'),
+            ref('l10n_be_hr_payroll.FISCAL_VOLUNTARISM'),
+        ])]"/>
+        <field name="name">Fiscal Voluntarism (Presence Tokens)</field>
+        <field name="code">FISC_VOL_30</field>
+        <field name="sequence">3255</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = payslip._check_fiscal_voluntarism(categories, '30')</field>
+        <field name="appears_on_payslip">never</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip._get_fiscal_voluntarism(categories, '30')</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_fiscal_voluntarism" model="hr.salary.rule">
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="name">Fiscal Voluntarism</field>
+        <field name="code">FISC_VOL</field>
+        <field name="sequence">3256</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = categories['FISCAL_VOLUNTARISM']</field>
+        <field name="appears_on_payslip">always</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories['FISCAL_VOLUNTARISM']</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Traffic fines the employer pays or reimburses: a taxable benefit in kind, subject to the solidarity
+         contribution 889 instead of the ONSS. The serious ones (3rd and 4th degree, speeding fines of 150 EUR or more)
+         are subject in full, the light ones (1st and 2nd degree) above a yearly exemption. A fine the worker pays back
+         is a deduction. -->
     <record id="l10n_be_employees_salary_traffic_fines" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.SEIZED_AMOUNT'),
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.BIK'),
         ])]"/>
-        <field name="name">Traffic Fines</field>
+        <field name="name">Traffic Fines (Serious Infractions)</field>
         <field name="input_suffix">€</field>
         <field name="code">TRAFFIC_FINES</field>
-        <field name="sequence">3280</field>
+        <field name="sequence">870</field>
         <field name="condition_select">property_input</field>
         <field name="input_usage_payslip" eval="True"/>
-        <field name="input_section" ref="hr_payroll.default_salary_rule_section"/>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-result = -(inputs['TRAFFIC_FINES'].amount if 'TRAFFIC_FINES' in inputs else 0.0)
-        </field>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
         <field name="input_usage_employee" eval="False"/>
         <field name="input_default_value" eval="0.0"/>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_profit_sharing_bonus'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays'),
-            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays'),
         ])]"/>
+        <field name="country_id" ref="base.be"/>
+        <field name="l10n_be_follow_pay_period">always</field>
+    </record>
+
+    <record id="l10n_be_employees_salary_traffic_fines_light" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
+            ref('l10n_be_hr_payroll.BIK'),
+        ])]"/>
+        <field name="name">Traffic Fines (Light Infractions)</field>
+        <field name="input_suffix">€</field>
+        <field name="code">TRAFFIC_FINES_LIGHT</field>
+        <field name="sequence">871</field>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_be_hr_payroll.l10n_be_extra_remuneration_salary_rule_section"/>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+        <field name="l10n_be_follow_pay_period">always</field>
+    </record>
+
+    <record id="l10n_be_employees_salary_traffic_fines_light_exemption" model="hr.salary.rule">
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="name">Traffic Fines (Light Infractions): Contribution Exemption</field>
+        <field name="code">TRAFFIC_FINES_LIGHT_EXEMPT</field>
+        <field name="sequence">872</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = bool(result_rules['TRAFFIC_FINES_LIGHT']['total'])</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# Exempt from the contribution 889 up to a yearly amount per worker: what the validated payslips of the year did not
+# exempt yet
+exempted = l10n_be_year_payslips_by_payslip[payslip]._get_line_values(['TRAFFIC_FINES_LIGHT_EXEMPT'], compute_sum=True)['TRAFFIC_FINES_LIGHT_EXEMPT']['sum']['total']
+remaining = max(0.0, payslip._rule_parameter('l10n_be_traffic_fines_light_exemption') - exempted)
+result = min(result_rules['TRAFFIC_FINES_LIGHT']['total'], remaining)
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+        ])]"/>
+        <field name="appears_on_payslip">never</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -7215,6 +7682,7 @@ else:
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -7261,6 +7729,27 @@ result = categories['REMUNERATION_BASE']
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays'),
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays'),
+        ])]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="hr_salary_rule_meal_voucher_employer" model="hr.salary.rule">
+        <field name="category_ids" eval="[(5, 0, 0)]"/>
+        <field name="name">Meal Voucher Employer Part</field>
+        <field name="code">MEAL_VOUCHER_EMPLOYER</field>
+        <field name="sequence">3350</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = version.meal_voucher_amount > 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result_qty = result_rules['MEAL_V_EMP']['quantity'] if 'MEAL_V_EMP' in result_rules else 0
+result = version.meal_voucher_paid_by_employer
+        </field>
+        <field name="appears_on_payslip">never</field>
+        <field name="display_in_pdf_extra_info" eval="True"/>
+        <field name="partner_id" ref="res_partner_meal_vouchers"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
         <field name="country_id" ref="base.be"/>
     </record>
@@ -7339,7 +7828,7 @@ if version.is_PFI():
 else:
     # the company car may be on a later version of the month than the payslip's
     result = bool(not payslip.ignore_worked_day_lines and not payslip.is_outside_contract and payslip.vehicle_id
-        and (version | payslip.worked_days_line_ids.version_id).filtered('transport_mode_car')
+        and (version | payslip.worked_days_line_ids.version_id).filtered('car_id')
         and not payslip.version_id.l10n_be_mobility_budget)
         </field>
         <field name="amount_select">code</field>
@@ -7352,10 +7841,10 @@ result = payslip.vehicle_id.with_context(
 salary_simulation = payslip.env.context.get('salary_simulation')
 if not salary_simulation:
     first_period_contract_ids = payslip._get_period_contracts()
-    first_period_contracts = version.browse(first_period_contract_ids).filtered(lambda c: c.transport_mode_car)
+    first_period_contracts = version.browse(first_period_contract_ids).filtered('car_id')
     if first_period_contracts:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contracts)
-    result = result if (first_period_contracts and target_contract in payslip.worked_days_line_ids.version_id) else 0</field>
+    result = result if (first_period_contracts and target_contract in payslip._l10n_be_get_benefit_versions()) else 0</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
@@ -7371,12 +7860,14 @@ if not salary_simulation:
         <field name="code">EmpBonus.A.CO</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = result_rules['EmpBonus.A']['total'] &gt; 0 and payslip._get_employment_bonus_employees_volet_A(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'] &gt; 0
+result = (payslip.date_from >= date(2024, 4, 1) and payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip])
+    and payslip._get_employment_bonus_employees_volet_A(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = payslip._get_employment_bonus_employees_volet_A(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus']
         </field>
+        <field name="explanation_template">Result ({remaining_bonus}) = Max(0, Bonus ({calculated_bonus}) - Already paid ({already_paid}) - ONSS ({onss})) - Already carried over ({already_carried_over})</field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -7392,12 +7883,14 @@ result = payslip._get_employment_bonus_employees_volet_A(result_rules, explanati
         <field name="code">EmpBonus.B.CO</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = result_rules['EmpBonus.B']['total'] &gt; 0 and payslip._get_employment_bonus_employees_volet_B(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'] &gt; 0
+result = (payslip.date_from >= date(2024, 4, 1) and payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip])
+    and payslip._get_employment_bonus_employees_volet_B(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = payslip._get_employment_bonus_employees_volet_B(result_rules, explanation_info, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus']
         </field>
+        <field name="explanation_template">Result ({remaining_bonus}) = Max(0, Bonus ({calculated_bonus}) - Already paid ({already_paid}) - Remaining ONSS after Volet A ({onss})) - Already carried over ({already_carried_over})</field>
         <field name="appears_on_payslip">never</field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -7409,11 +7902,11 @@ result = payslip._get_employment_bonus_employees_volet_B(result_rules, explanati
     <record id="hr_rule_onss_restructuring_carry_over" model="hr.salary.rule">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
         <field name="name">Employment Bonus Total Carry Over</field>
-        <field name="sequence">3950</field>
+        <field name="sequence">3951</field>
         <field name="code">EmpBonus.Total.CO</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = result_rules['EmpBonus.1']['total'] &gt; 0 and payslip._get_employment_bonus_employees(result_rules, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'] &gt; 0
+result = payslip._l10n_be_is_employment_bonus_eligible(result_rules, l10n_be_month_payslips_by_payslip[payslip]) and bool(payslip._get_employment_bonus_employees(result_rules, l10n_be_month_payslips_by_payslip[payslip], l10n_be_month_line_values_by_payslip[payslip], l10n_be_prev_month_line_values_by_payslip[payslip])['remaining_bonus'])
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -7437,7 +7930,8 @@ result = payslip._get_employment_bonus_employees(result_rules, l10n_be_month_pay
         <field name="condition_select">python</field>
         <field name="condition_python">
 result = (not version.is_PFI() and
-          not version.is_flexi())
+          not version.is_flexi() and
+          version.l10n_be_dimona_category != 'dwd')
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -7475,12 +7969,12 @@ explanation_info = {'total': total}
         <field name="condition_select">python</field>
         <field name="condition_python">
 is_s17_suitable = not (version.l10n_be_dimona_category == 's17' and payslip.date_from &gt;= datetime(2026, 7, 1).date())
-is_suitable_category = version.l10n_be_dimona_category not in ['flx', 'stu'] and is_s17_suitable
+is_suitable_category = version.l10n_be_dimona_category not in ['flx', 'stu', 'dwd'] and is_s17_suitable
 if not is_suitable_category:
     result = False
 else:
-    # Only the remuneration code 1 of the quarter (the gross salary without the commissions) counts for the ceiling
-    quarter_salary = payslip._get_current_quarter_sum(['SALARY'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip]) - payslip._get_current_quarter_sum(['COMMISSION'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
+    # Only the remuneration code 1 of the quarter (the gross salary, the commissions included) counts for the ceiling
+    quarter_salary = payslip._get_current_quarter_sum(['SALARY'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
     capped_amount = payslip._rule_parameter('employer_contribution_capping_amount', raise_if_not_found = False)
     result = capped_amount and quarter_salary &gt; capped_amount
         </field>
@@ -7488,8 +7982,8 @@ else:
         <field name="amount_python_compute">
 rates = payslip._get_onss_global_rates()
 basic_rate = rates['employer_rate'] + rates['salary_moderation_rate']
-# Only the remuneration code 1 of the quarter (the gross salary without the commissions) counts for the ceiling
-quarter_salary = payslip._get_current_quarter_sum(['SALARY'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip]) - payslip._get_current_quarter_sum(['COMMISSION'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
+# Only the remuneration code 1 of the quarter (the gross salary, the commissions included) counts for the ceiling
+quarter_salary = payslip._get_current_quarter_sum(['SALARY'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
 capped_amount = payslip._rule_parameter('employer_contribution_capping_amount')
 previous_deduction_quarter_sum = payslip._get_current_quarter_sum(['ONSSEMPLOYERBASICDEDUC'], result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], False)
 result = (capped_amount - quarter_salary) * (basic_rate / 100.0 if basic_rate else 1) - previous_deduction_quarter_sum
@@ -7628,8 +8122,8 @@ result = (payslip._should_apply_onss_contribution('260') and
         <field name="amount_python_compute">
 contribution_type, minimum, _increased = payslip._l10n_be_get_activation_contribution_type()
 rate = payslip._get_onss_rates('260', contribution_type)['total_rate']
-result = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_260', rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
-result = max(minimum, result)
+# the minimum is a quarterly one
+result = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_260', rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], quarter_minimum=minimum)
 explanation_info = {'total': result}
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -7666,8 +8160,8 @@ result = (payslip._should_apply_onss_contribution('261') and
         <field name="amount_python_compute">
 contribution_type, minimum, _increased = payslip._l10n_be_get_activation_contribution_type()
 rate = payslip._get_onss_rates('261', contribution_type)['total_rate']
-result = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_261', rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
-result = max(minimum, result)
+# the minimum is a quarterly one
+result = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_261', rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], quarter_minimum=minimum)
 explanation_info = {'total': result}
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -7854,8 +8348,8 @@ result = payslip._should_apply_onss_contribution('810') and version.is_classic_e
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-# the occasional workers' category (317) only has the rate of type 2
-result_rate = payslip._get_onss_rates('810')['total_rate'] or payslip._get_onss_rates('810', '2')['total_rate']
+# type 2 without wage moderation, as the occasional workers (317) and the subsidised contracts (ACS)
+result_rate = payslip._get_onss_rates('810', payslip._get_ffe_without_headcount_contribution_type())['total_rate']
 total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_810', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
@@ -7889,8 +8383,7 @@ result = payslip._should_apply_onss_contribution('811') and version.is_classic_e
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-contribution_type = '0' if payslip._with_salary_moderation() else '2'
-result_rate = payslip._get_onss_rates('811', contribution_type)['total_rate']
+result_rate = payslip._get_onss_rates('811', payslip._get_ffe_without_headcount_contribution_type())['total_rate']
 total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_811', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
@@ -7951,14 +8444,11 @@ result = payslip._get_termination_fees_contribution_basis(TERM_BASIC)
 # « pas perçues pour les apprentis-formation en alternance et pendant toute la durée de leur contrat »
 result = (payslip._should_apply_onss_contribution('820') and
           version.is_classic_employee() and
-          not (version.l10n_be_dimona_category == 'alt' or version.l10n_be_apprenticeship_contract_number) and
-          payroll_config.l10n_be_employer_category_id.dmfa_code in ('017', '210', '317'))  # TEMPORARY, to be removed when more cases handled
+          not (version.l10n_be_dimona_category == 'alt' or version.l10n_be_apprenticeship_contract_number))
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-contribution_type = '0' if payroll_config.onss_importance_code in ['1', '2', '3', '4'] else '5'
-# the training fund of the auxiliary committee for workers (category 210) has a single rate, of type 0
-result_rate = payslip._get_onss_rates('820', contribution_type)['total_rate'] or payslip._get_onss_rates('820')['total_rate']
+result_rate = payslip._get_onss_rates('820', payslip._get_fse_percentage_contribution_type())['total_rate']
 total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_820', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
@@ -8031,8 +8521,9 @@ result = payslip._should_apply_onss_contribution('826')
         <field name="amount_python_compute">
 quarter_payslips = payslip + l10n_be_quarter_payslips_by_payslip[payslip]
 result_rate = payslip._calculate_dmfa_occupation_fraction(quarter_payslips)
-flat_rate = payslip._get_onss_rates('826', contribution_type=2 if payslip.employee_id._get_age() &lt; 25 else 0)['total_rate']
-total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_826', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], None, flat_rate)
+flat_rate = payslip._get_onss_rates('826', contribution_type=payslip._get_fse_flat_contribution_type())['total_rate']
+# a flat amount by quarter, not a percentage of the remuneration: without the 108% basis of the blue collars
+total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_826', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], None, flat_rate, with_uplift=False)
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
         </field>
@@ -8069,7 +8560,8 @@ quarter_payslips = payslip + l10n_be_quarter_payslips_by_payslip[payslip]
 contribution_type, occupation_fraction = payslip._get_pension_fund_contribution_type(quarter_payslips)
 result_rate = occupation_fraction if payslip.company_id.current_payroll_config_id.l10n_be_employer_category_id.dmfa_code == '036' else 100
 flat_rate = payslip._get_onss_rates('827', contribution_type)['total_rate']
-total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_827', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], None, flat_rate)
+# a flat amount by quarter, not a percentage of the remuneration: without the 108% basis of the blue collars
+total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_827', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip], None, flat_rate, with_uplift=False)
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
         </field>
@@ -8104,8 +8596,7 @@ result = (payslip._should_apply_onss_contribution('830') and version.is_classic_
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-contribution_type = '0' if payroll_config.onss_importance_code in ['1', '2', '3', '4'] else '5'
-result_rate = payslip._get_onss_rates('830', contribution_type)['total_rate']
+result_rate = payslip._get_onss_rates('830', payslip._get_fse_percentage_contribution_type())['total_rate']
 total = payslip._get_regularised_onss_contribution_amount('ONSSEMPLOYER_830', result_rate, result_rules, l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_quarter_totals_by_payslip[payslip])
 result = total / result_rate * 100 if result_rate else total
 explanation_info = {'total': total}
@@ -8175,6 +8666,7 @@ explanation_info = {'total': total}
 result = (payslip._should_apply_onss_contribution('835') and
           version.is_classic_employee() and
           payslip._must_contribute_retirement_fund() and
+          not payslip._l10n_be_is_excluded_from_employee_retirement_fund() and
           payroll_config.l10n_be_employee_retirement_fund in ['0', '1', '8'])
         </field>
         <field name="amount_select">code</field>
@@ -8508,7 +9000,7 @@ result = (inputs['ONSSEMPLOYER_867'].amount if 'ONSSEMPLOYER_867' in inputs else
 result = (payslip._should_apply_onss_contribution('868') and version.is_classic_employee()
             and not payslip.ignore_worked_day_lines and not payslip.is_outside_contract
             and payslip.version_id.l10n_be_mobility_budget and payslip.vehicle_id
-            and (version | payslip.worked_days_line_ids.version_id).filtered('transport_mode_car'))
+            and (version | payslip.worked_days_line_ids.version_id).filtered('car_id'))
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
@@ -8523,10 +9015,10 @@ total = payslip.vehicle_id.with_context(
 salary_simulation = payslip.env.context.get('salary_simulation')
 if not salary_simulation:
     first_period_contract_ids = payslip._get_period_contracts()
-    first_period_contracts = version.browse(first_period_contract_ids).filtered(lambda c: c.transport_mode_car)
+    first_period_contracts = version.browse(first_period_contract_ids).filtered('car_id')
     if first_period_contracts:
         target_contract = payslip._get_max_basic_salary_contract(first_period_contracts)
-    total = total if (first_period_contracts and target_contract in payslip.worked_days_line_ids.version_id) else 0
+    total = total if (first_period_contracts and target_contract in payslip._l10n_be_get_benefit_versions()) else 0
 
 result = total / result_rate * 100 if result_rate else total
         </field>
@@ -8581,7 +9073,7 @@ result = payslip._should_apply_onss_contribution('888') and version.is_classic_e
         <field name="amount_python_compute">
 result_rate = payslip._get_onss_rates('888')['employer_rate']
 # Only due up to the ceiling, the part above being remuneration subject to the ordinary contributions
-result = min(result_rules['BONUS_SALARY']['total'], payslip._rule_parameter('cct90_employer_onss_threshold'))
+result = min(result_rules['BONUS_SALARY']['total'], payslip._l10n_be_get_cct90_threshold_left('cct90_employer_onss_threshold'))
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
@@ -8601,14 +9093,16 @@ result = min(result_rules['BONUS_SALARY']['total'], payslip._rule_parameter('cct
         <field name="condition_select">python</field>
         <field name="condition_python">
 # Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/other_specialcontributions/traffic_fine.html
+fines = result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total'] - result_rules['TRAFFIC_FINES_LIGHT_EXEMPT']['total']
 result = (payslip._should_apply_onss_contribution('889') and
           version.is_classic_employee() and
-          result_rules['TRAFFIC_FINES']['total'])
+          fines)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_rate = payslip._get_onss_rates('889')['total_rate']
-result = -result_rules['TRAFFIC_FINES']['total']
+# The serious fines and the light ones above the yearly exemption
+result = result_rules['TRAFFIC_FINES']['total'] + result_rules['TRAFFIC_FINES_LIGHT']['total'] - result_rules['TRAFFIC_FINES_LIGHT_EXEMPT']['total']
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
@@ -8627,19 +9121,48 @@ result = -result_rules['TRAFFIC_FINES']['total']
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.ONSSEMPLOYERDETAIL'),
         ])]"/>
-        <field name="name">NSSO Reduction - Elderly Worker</field>
+        <field name="name">Accounting: ONSS Target Group Reduction - Elderly Worker</field>
         <field name="code">ONSSELDERLY</field>
         <field name="sequence">4890</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = payslip._is_l10n_be_onss_elderly_eligible()
+result = not version.is_flexi() and payslip._l10n_be_is_last_payslip_of_quarter(l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_month_payslips_by_payslip[payslip]) and payslip._is_l10n_be_target_group_reduction_needed(
+    'elderly', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = payslip._get_l10n_be_onss_elderly_reduction(result_rules)
+result = payslip._get_l10n_be_target_group_reduction(
+    'elderly', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
+        ])]"/>
+        <field name="appears_on_payslip">never</field>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="cp200_employees_salary_onss_unexperienced" model="hr.salary.rule">
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.ONSSEMPLOYERDETAIL'),
+        ])]"/>
+        <field name="name">Accounting: ONSS Target Group Reduction - Unexperienced Worker (Flanders)</field>
+        <field name="code">ONSSUNEXPERIENCED</field>
+        <field name="sequence">4891</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = not version.is_flexi() and payslip._l10n_be_is_last_payslip_of_quarter(l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_month_payslips_by_payslip[payslip]) and payslip._is_l10n_be_target_group_reduction_needed(
+    'unexperienced_flander', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
+        </field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = payslip._get_l10n_be_target_group_reduction(
+    'unexperienced_flander', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
+        </field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
         ])]"/>
         <field name="appears_on_payslip">never</field>
         <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
@@ -8654,13 +9177,18 @@ result = payslip._get_l10n_be_onss_elderly_reduction(result_rules)
         <field name="code">ONSSEMPLOYER_ARTIST_REDUCTION</field>
         <field name="sequence">4890</field>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = version.l10n_be_worker_code_id.dmfa_code in ['046', '047']</field>
+        <field name="condition_python">
+result = not version.is_flexi() and payslip._l10n_be_is_last_payslip_of_quarter(l10n_be_quarter_payslips_by_payslip[payslip], l10n_be_month_payslips_by_payslip[payslip]) and payslip._is_l10n_be_target_group_reduction_needed(
+    'artist', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
+        </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = payslip._get_l10n_be_onss_artist_reduction(result_rules)
+result = payslip._get_l10n_be_target_group_reduction(
+    'artist', l10n_be_quarter_payslips_by_payslip[payslip], result_rules)
         </field>
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month'),
         ])]"/>
         <field name="appears_on_payslip">never</field>
         <field name="appears_on_employee_cost_dashboard" eval="True"/>
@@ -8675,8 +9203,8 @@ result = payslip._get_l10n_be_onss_artist_reduction(result_rules)
         <field name="code">ONSS_STRUCTURAL</field>
         <field name="sequence">4880</field>
         <field name="condition_select">python</field>
-        <!-- students only owe the solidarity contribution: no reduction, as in the DmfA -->
-        <field name="condition_python">result = not version.is_student()</field>
+        <!-- students only owe the solidarity contribution, accepted flexi-jobs the flexi one (450) and workers declared without ONSS (DWD) none: no reduction, as in the DmfA -->
+        <field name="condition_python">result = not version.is_student() and not version.is_flexi() and version.l10n_be_dimona_category != 'dwd'</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = payslip._l10n_be_get_monthly_regularized_structural_deduction(result_rules, l10n_be_quarter_payslips_by_payslip[payslip])
@@ -8856,6 +9384,7 @@ result = exemption
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
         <field name="appears_on_payslip">never</field>
     </record>
@@ -8883,6 +9412,7 @@ result = exemption
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
         <field name="appears_on_payslip">never</field>
     </record>
@@ -8906,6 +9436,7 @@ result = bachelor_34_exemption_by_slip.get(payslip, 0)
         <field name="struct_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
         ])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
         <field name="appears_on_payslip">never</field>
     </record>
@@ -8920,15 +9451,17 @@ result = bachelor_34_exemption_by_slip.get(payslip, 0)
         <field name="round_of_computation">1</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {'PPTOTAL': {payslip.id: result_rules['PPTOTAL']}})
+line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {code: {payslip.id: result_rules[code]} for code in ('PPTOTAL', 'FISC_VOL', 'DH_PP', 'BONUS_PP')})
 result = any(line_vals['nature_code'] == '274.44' for line_vals in line_ids_vals)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {'PPTOTAL': {payslip.id: result_rules['PPTOTAL']}})
+line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {code: {payslip.id: result_rules[code]} for code in ('PPTOTAL', 'FISC_VOL', 'DH_PP', 'BONUS_PP')})
 exemption = sum(line_vals['amount'] for line_vals in line_ids_vals if line_vals['nature_code'] == '274.44')
-# the employer keeps at most the withholding tax of the payslip the other exemptions leave
-result = min(exemption, max(0.0, result_rules['PPTOTAL']['total'] - categories['TAX_EXEMPTION_GRANTED']))
+# the employer keeps at most the withholding tax of the salary of the payslip (the voluntary one included, the ones of
+# the double holiday pay and of the bonuses excluded, see _get_overtime_withholding_tax) the other exemptions leave
+withholding = sum(line_vals['withholding_amount'] for line_vals in line_ids_vals if line_vals['nature_code'] == '274.44')
+result = min(exemption, max(0.0, withholding - categories['TAX_EXEMPTION_GRANTED']))
         </field>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')])]"/>
         <field name="country_id" ref="base.be"/>
@@ -8945,15 +9478,17 @@ result = min(exemption, max(0.0, result_rules['PPTOTAL']['total'] - categories['
         <field name="round_of_computation">1</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {'PPTOTAL': {payslip.id: result_rules['PPTOTAL']}})
+line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {code: {payslip.id: result_rules[code]} for code in ('PPTOTAL', 'FISC_VOL', 'DH_PP', 'BONUS_PP')})
 result = any(line_vals['nature_code'] == '274.55' for line_vals in line_ids_vals)
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {'PPTOTAL': {payslip.id: result_rules['PPTOTAL']}})
+line_ids_vals, _ = payslip.env['l10n_be.274_xx']._get_extra_hours_lines_ids(payslip, payslip.date_from, {code: {payslip.id: result_rules[code]} for code in ('PPTOTAL', 'FISC_VOL', 'DH_PP', 'BONUS_PP')})
 exemption = sum(line_vals['amount'] for line_vals in line_ids_vals if line_vals['nature_code'] == '274.55')
-# the employer keeps at most the withholding tax of the payslip the other exemptions leave
-result = min(exemption, max(0.0, result_rules['PPTOTAL']['total'] - categories['TAX_EXEMPTION_GRANTED']))
+# the employer keeps at most the withholding tax of the salary of the payslip (the voluntary one included, the ones of
+# the double holiday pay and of the bonuses excluded, see _get_overtime_withholding_tax) the other exemptions leave
+withholding = sum(line_vals['withholding_amount'] for line_vals in line_ids_vals if line_vals['nature_code'] == '274.55')
+result = min(exemption, max(0.0, withholding - categories['TAX_EXEMPTION_GRANTED']))
         </field>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')])]"/>
         <field name="country_id" ref="base.be"/>
@@ -8972,6 +9507,7 @@ result = min(exemption, max(0.0, result_rules['PPTOTAL']['total'] - categories['
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = result_rules['COMPSUPP']['total']</field>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
         <field name="appears_on_payslip">never</field>
     </record>
@@ -9085,6 +9621,7 @@ withholding_tax_amount = (
 result = 0.25 * withholding_tax_amount
         </field>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')])]"/>
+        <field name="l10n_be_excluded_joint_committee_ids" eval="[(4, ref('l10n_be_joint_committee_999'))]"/>
         <field name="country_id" ref="base.be"/>
         <field name="appears_on_payslip">never</field>
     </record>

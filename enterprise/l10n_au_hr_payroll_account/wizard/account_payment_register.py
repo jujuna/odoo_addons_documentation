@@ -34,7 +34,7 @@ class AccountPaymentRegister(models.TransientModel):
                 'journal_id': payments[0].journal_id.id,
                 'payment_ids': [(4, payment.id, None) for payment in payments],
                 'payment_method_id': payments[0].payment_method_id.id,
-                'batch_type': payments[0].payment_type,
+                'batch_type': payments[0].payment_method_id.payment_type,
                 'name': f"Payroll Payments ({payslip_batch.name})",
                 'l10n_au_is_payroll_payment': True,
             })

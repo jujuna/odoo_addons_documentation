@@ -6,9 +6,9 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account_fleet.view_move_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='line_ids']//field[@name='vehicle_id']" position="attributes">
-                <attribute name="column_invisible">parent.move_type not in ('entry', 'in_invoice', 'in_refund', 'in_receipt')</attribute>
-                <attribute name="required">need_vehicle and parent.move_type in ('in_invoice', 'in_refund')</attribute>
+            <xpath expr="//field[@name='line_ids']//field[@name='account_id']" position="attributes">
+                <attribute name="widget">m2o_cell_with_extra_fields</attribute>
+                <attribute name="options">{'parent_field': 'line_ids'}</attribute>
             </xpath>
         </field>
     </record>

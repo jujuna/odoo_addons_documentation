@@ -44,7 +44,10 @@ export class TaskGanttModelCommon extends ProjectTaskModelMixin(GanttModel) {
         if (!this.orm.isSample && !this.uiService.isSmall) {
             const prom = this.orm
                 .call("project.task", "get_all_deadlines", [globalStart, globalStop], {
-                    context: this.searchParams.context,
+                    context: {
+                        ...this.searchParams.context,
+                        gantt_task_domain: this.searchParams.domain,
+                    },
                 })
                 .then(({ milestone_id, project_id }) => {
                     milestones = milestone_id.map((m) => ({

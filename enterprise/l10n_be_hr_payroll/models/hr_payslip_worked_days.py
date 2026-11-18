@@ -1,7 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
+
 from odoo import fields, models, api
-from odoo.tools.float_utils import float_compare
+from odoo.tools.float_utils import float_compare, float_round
 
 
 class HrPayslipWorkedDays(models.Model):
@@ -11,6 +13,35 @@ class HrPayslipWorkedDays(models.Model):
     l10n_be_reorganisation_measure_ids = fields.Many2many(related='version_id.resource_calendar_id.l10n_be_reorganisation_measure_ids')
     l10n_be_replacement_amount = fields.Float(string="Replacement Amount", compute="_compute_replacement_amount")
     l10n_be_credit_time_proration_rate = fields.Float(string="Credit Time Proration Rate", compute="_compute_l10n_be_credit_time_proration_rate")
+
+    def _l10n_be_get_overtime_base(self):
+        """The overtime hours of the line at the normal hourly wage, without the overtime premium: the base of the
+        tax reduction and of the withholding tax exemption of the overtime (281.10 box 18, 274.44 and 274.55).
+
+        The line pays the hours at the rate of its work entry type (1.5: the hour and a premium of 50%, 0.5: the
+        premium alone of the overtime recovered later). Without rate, the line pays nothing (the rate of the
+        overtime to recover is still 0 on the databases installed before it was set): the base is the normal hourly
+        wage of the version.
+        """
+        self.ensure_one()
+        rate = self.work_entry_type_id.amount_rate
+        if rate:
+            return self.amount / rate
+        return self.number_of_hours * self._l10n_be_get_normal_hourly_wage()
+
+    def _l10n_be_get_normal_hourly_wage(self):
+        """Gross hourly wage of the line, without any premium: the hourly wage of an employee paid by the hour,
+        otherwise 3 months of pay over 13 weeks of the employee's schedule. Under a time credit, the wage of the
+        version is the full-time wage: it is prorated as the line prorates it for the part-time schedule."""
+        self.ensure_one()
+        version = self.version_id
+        if version.wage_type == 'hourly':
+            # the hourly wage of the version: the flexi hourly wage of a flexi-job (see _get_contract_wage_field)
+            return version._get_contract_wage()
+        if version.hourly_wage:
+            return version.hourly_wage
+        hours_per_week = version.resource_calendar_id.hours_per_week
+        return self._l10n_be_get_prorated_wage() * 3 / (13 * hours_per_week) if hours_per_week else 0.0
 
     def _l10n_be_skip_amount_computation(self):
         self.ensure_one()
@@ -26,7 +57,7 @@ class HrPayslipWorkedDays(models.Model):
         # In that case we have to adapt the wage.
         self.ensure_one()
         wage_to_deduct = 0
-        max_hours_per_week = self.version_id.reference_calendar_id.hours_per_week \
+        max_hours_per_week = self.version_id._get_reference_calendar().hours_per_week \
                                 or self.version_id.resource_calendar_id.hours_per_week
         training_ratio = 3 / (13 * max_hours_per_week) if max_hours_per_week else 0
         training_hours = sum(self.payslip_id.worked_days_line_ids.filtered(
@@ -158,7 +189,7 @@ class HrPayslipWorkedDays(models.Model):
             if time_credit:
                 # A time credit, partial or full, suspends part of the version's period: its
                 # worked and time credit hours together are the period in the reference calendar
-                other_hpw = other_v.reference_calendar_id.hours_per_week or other_hpw
+                other_hpw = other_v._get_reference_calendar().hours_per_week or other_hpw
             if not other_hpw:
                 continue
             other_total_hours = sum(
@@ -211,167 +242,272 @@ class HrPayslipWorkedDays(models.Model):
                 worked_day.l10n_be_credit_time_proration_rate = 1.0
 
     def _compute_amount(self):
-        computed_by_super = self.env['hr.payslip.worked_days']
-        # unrounded amounts of the lines valued at the hourly rate, and the main worked line of each payslip
-        exact_amounts = {}
-        main_lines = {}
-        unpaid_fte = {
-            payslip.id: sum(
-                wd.fte for wd in self
-                if wd.payslip_id == payslip and not wd.is_paid
-                and not wd.work_entry_type_id.l10n_be_is_time_credit and wd.code != '000.00'
-            )
-            for payslip in self.payslip_id
-        }
-
-        for worked_day in self:
-
-            wage = worked_day._l10n_be_get_prorated_wage()
-
-            if worked_day._l10n_be_skip_amount_computation():
-                computed_by_super += worked_day
-                continue
-            if worked_day.code == '072.00' and worked_day.payslip_id.wage_type != 'monthly':
-                worked_day.amount = worked_day._l10n_be_get_072_00_hourly_amount()
-                continue
-            if worked_day.work_entry_type_id.l10n_be_is_time_credit or worked_day.code == '000.00':
-                worked_day.amount = 0
-                continue
-            if not worked_day._l10n_be_has_enough_paid_hours():
-                # the hours at the hourly rate, at the rate of their work entry type as in the other methods (85.88 %
-                # of the days 8 to 30 of a worker's work accident)
-                worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * worked_day.work_entry_type_id.amount_rate
-                continue
-            if worked_day.code == '024.00':
-                worked_day.amount = worked_day._l10n_be_get_024_00_amount(wage)
-                continue
-            if worked_day.code == '072.00':
-                worked_day.amount = worked_day._l10n_be_get_072_00_amount(wage)
-                continue
-            if worked_day.code == '017.49':
-                worked_day.amount = worked_day._l10n_be_get_017_49_amount(wage)
-                continue
-
-            ####################################################################################
-            #  Example:
-            #  Note: (3/13/38) * wage : hourly wage, if 13th months and 38 hours/week calendar
-            #
-            #  CODE     :   number_of_hours    :    Amount
-            #  002.00  :      130 hours       : (1 - 3/13/38 * (15 + 30)) * wage
-            #  PAID     :      30 hours        : 3/13/38 * (15 + 30)) * wage
-            #  UNPAID   :      15 hours        : 0
-            #
-            #  TOTAL PAID : 002.00 + PAID + UNPAID = (1 - 3/13/38 * 15 ) * wage
-            ####################################################################################
-            paid_worked_days = worked_day._l10n_be_get_paid_work_days()
-            main_worked_day = paid_worked_days[0].code if paid_worked_days else False
-            amount_rate = worked_day.work_entry_type_id.amount_rate
-
-            if worked_day.code != main_worked_day:
-                exact_amounts[worked_day] = min(wage, worked_day._l10n_be_get_workday_amount(wage)) * amount_rate
-                worked_day.amount = exact_amounts[worked_day]
-                continue
-
-            # If out of contract, we use the hourly formula to deduct the real wage
-            out_ratio = worked_day._l10n_be_get_out_ratio()
-
-            # 002.00 (Generally)
-            worked_days_line_ids = worked_day.payslip_id.worked_days_line_ids
-
-            # Filter to this version for intra-version deduction/half-day logic
-            version_wds = worked_days_line_ids.filtered(lambda wd: wd.version_id == worked_day.version_id)
-            # All lines for the main code within this version (half-day detection)
-            work100_wds = version_wds.filtered(lambda wd: wd.code == main_worked_day)
-
-            if not float_compare(unpaid_fte[worked_day.payslip_id.id], 0.5, 2):
-                # should be strictly proportional to the number of hours for this worked days line
-                total_hours = sum(
-                    wd.number_of_hours for wd in version_wds
-                    if not wd.work_entry_type_id.l10n_be_is_time_credit and wd.code != '000.00'
+        def compute_amount_by_payslip(worked_days):
+            computed_by_super = worked_days.env['hr.payslip.worked_days']
+            # unrounded amounts of the lines valued at the hourly rate, and the main worked line of each payslip
+            exact_amounts = {}
+            main_lines = {}
+            unpaid_fte = {
+                payslip.id: sum(
+                    wd.fte for wd in payslip_worked_days
+                    if not wd.is_paid
+                    and not wd.work_entry_type_id.l10n_be_is_time_credit and wd.code != '000.00'
                 )
-                worked_day.amount = amount_rate * wage * worked_day.number_of_hours / total_hours
-                continue
+                for payslip, payslip_worked_days in worked_days.grouped('payslip_id').items()
+            }
 
-            # Non-main hours within this version that must be deducted from the main code
-            number_of_other_hours = sum(
-                wd.number_of_hours
-                for wd in version_wds
-                if wd.code not in [main_worked_day, '000.00', '202.00']
-                and not wd.work_entry_type_id.l10n_be_is_time_credit
-                and not wd.work_entry_type_id.is_extra_hours
-            )
+            for worked_day in worked_days:
 
-            # Multi-version (schedule/salary change mid-month): GPA proratization rules
-            # Per GPA docs, the largest period gets the deduction (salary - redeployed_hours *
-            # hourly_rate). All other periods are fully valorized, including their main code.
-            all_versions = worked_days_line_ids.version_id
-            if len(all_versions) > 1:
-                largest_version = worked_day._l10n_be_get_largest_period_version(all_versions)
-                if worked_day.version_id != largest_version:
-                    # Smaller period: all codes including the main code are valorized
-                    amount = min(wage, worked_day._l10n_be_get_workday_amount(wage)) * amount_rate
-                    worked_day.amount = amount
-                    if not float_compare(worked_day.version_id._get_contract_wage(), largest_version._get_contract_wage(), 2) \
-                            and not float_compare(worked_day.version_id.resource_calendar_id.hours_per_week,
-                                                  largest_version.resource_calendar_id.hours_per_week, 2):
-                        # the same pay in both periods (a car change, for instance): the month pays the wage to the
-                        # cent, the rounding of this line goes on the main line
-                        exact_amounts[worked_day] = amount
+                wage = worked_day._l10n_be_get_prorated_wage()
+
+                if worked_day._l10n_be_skip_amount_computation():
+                    computed_by_super += worked_day
                     continue
-                # Largest period: add other versions' hours redeployed at this version's
-                # calendar to the deduction base (GPA formula: salary_P1 - P2_hours_in_P1_cal
-                # * P1_hourly_rate - P1_other_codes * P1_hourly_rate)
-                other_versions = all_versions - worked_day.version_id
-                number_of_other_hours += worked_day._l10n_be_get_cross_version_hours(
-                    other_versions, worked_days_line_ids
+                if worked_day.code == '072.00' and worked_day.payslip_id.wage_type != 'monthly':
+                    worked_day.amount = worked_day._l10n_be_get_072_00_hourly_amount()
+                    continue
+                if worked_day.work_entry_type_id.l10n_be_is_time_credit or worked_day.code == '000.00':
+                    worked_day.amount = 0
+                    continue
+                if not worked_day._l10n_be_has_enough_paid_hours():
+                    # the hours at the hourly rate, at the rate of their work entry type as in the other methods (85.88 %
+                    # of the days 8 to 30 of a worker's work accident)
+                    worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * worked_day.work_entry_type_id.amount_rate
+                    continue
+                if worked_day.code == '024.00':
+                    worked_day.amount = worked_day._l10n_be_get_024_00_amount(wage)
+                    continue
+                if worked_day.code == '072.00':
+                    worked_day.amount = worked_day._l10n_be_get_072_00_amount(wage)
+                    continue
+                if worked_day.code == '017.49':
+                    worked_day.amount = worked_day._l10n_be_get_017_49_amount(wage)
+                    continue
+
+                ####################################################################################
+                #  Example:
+                #  Note: (3/13/38) * wage : hourly wage, if 13th months and 38 hours/week calendar
+                #
+                #  CODE     :   number_of_hours    :    Amount
+                #  002.00  :      130 hours       : (1 - 3/13/38 * (15 + 30)) * wage
+                #  PAID     :      30 hours        : 3/13/38 * (15 + 30)) * wage
+                #  UNPAID   :      15 hours        : 0
+                #
+                #  TOTAL PAID : 002.00 + PAID + UNPAID = (1 - 3/13/38 * 15 ) * wage
+                ####################################################################################
+                paid_worked_days = worked_day._l10n_be_get_paid_work_days()
+                main_worked_day = paid_worked_days[0].code if paid_worked_days else False
+                amount_rate = worked_day.work_entry_type_id.amount_rate
+                worked_days_line_ids = worked_day.payslip_id.worked_days_line_ids
+                # Filter to this version for intra-version deduction/half-day logic
+                version_wds = worked_days_line_ids.filtered(lambda wd: wd.version_id == worked_day.version_id)
+                # All lines for the main code within this version (half-day detection)
+                work100_wds = version_wds.filtered(lambda wd: wd.code == main_worked_day)
+
+                if not float_compare(unpaid_fte[worked_day.payslip_id.id], 0.5, 2) \
+                        and not worked_day.work_entry_type_id.is_extra_hours:
+                    # As many unpaid hours as paid hours: half of the wage. All the paid lines (the work, but also the
+                    # paid leaves and public holidays) share it in proportion to their hours, instead of adding the
+                    # paid leaves at the hourly rate on top of the half wage of the work.
+                    total_hours = sum(
+                        wd.number_of_hours for wd in version_wds
+                        if not wd.work_entry_type_id.l10n_be_is_time_credit and wd.code != '000.00'
+                        and not wd.work_entry_type_id.is_extra_hours
+                    )
+                    amount = wage * worked_day.number_of_hours / total_hours if total_hours else 0
+                    if worked_day.code != main_worked_day:
+                        exact_amounts[worked_day] = amount * amount_rate
+                        worked_day.amount = exact_amounts[worked_day]
+                    elif len(work100_wds) == 1 and len(worked_days_line_ids.version_id) == 1:
+                        # the rounding of the other lines goes on the main line: the month pays half the wage to the cent
+                        main_lines[worked_day.payslip_id] = (worked_day, amount, amount_rate)
+                        worked_day.amount = amount * amount_rate
+                    else:
+                        worked_day.amount = amount * amount_rate
+                    continue
+
+                if worked_day.code != main_worked_day:
+                    exact_amounts[worked_day] = min(wage, worked_day._l10n_be_get_workday_amount(wage)) * amount_rate
+                    worked_day.amount = exact_amounts[worked_day]
+                    continue
+
+                # If out of contract, we use the hourly formula to deduct the real wage
+                out_ratio = worked_day._l10n_be_get_out_ratio()
+
+                # Non-main hours within this version that must be deducted from the main code
+                number_of_other_hours = sum(
+                    wd.number_of_hours
+                    for wd in version_wds
+                    if wd.code not in [main_worked_day, '000.00', '202.00']
+                    and not wd.work_entry_type_id.l10n_be_is_time_credit
+                    and not wd.work_entry_type_id.is_extra_hours
                 )
 
-            if len(work100_wds) == 1:
-                main_amount = worked_day._l10n_be_get_workday_amount(wage, number_of_other_hours, out_ratio)
-                main_lines[worked_day.payslip_id] = (worked_day, main_amount, amount_rate)
-                worked_day.amount = max(0, main_amount) * amount_rate
-                continue
+                # Multi-version (schedule/salary change mid-month): GPA proratization rules
+                # Per GPA docs, the largest period gets the deduction (salary - redeployed_hours *
+                # hourly_rate). All other periods are fully valorized, including their main code.
+                all_versions = worked_days_line_ids.version_id
+                if len(all_versions) > 1:
+                    largest_version = worked_day._l10n_be_get_largest_period_version(all_versions)
+                    if worked_day.version_id != largest_version:
+                        # Smaller period: all codes including the main code are valorized
+                        amount = min(wage, worked_day._l10n_be_get_workday_amount(wage)) * amount_rate
+                        worked_day.amount = amount
+                        if not float_compare(worked_day.version_id._get_contract_wage(), largest_version._get_contract_wage(), 2) \
+                                and not float_compare(worked_day.version_id.resource_calendar_id.hours_per_week,
+                                                      largest_version.resource_calendar_id.hours_per_week, 2):
+                            # the same pay in both periods (a car change, for instance): the month pays the wage to the
+                            # cent, the rounding of this line goes on the main line
+                            exact_amounts[worked_day] = amount
+                        continue
+                    # Largest period: add other versions' hours redeployed at this version's
+                    # calendar to the deduction base (GPA formula: salary_P1 - P2_hours_in_P1_cal
+                    # * P1_hourly_rate - P1_other_codes * P1_hourly_rate)
+                    other_versions = all_versions - worked_day.version_id
+                    number_of_other_hours += worked_day._l10n_be_get_cross_version_hours(
+                        other_versions, worked_days_line_ids
+                    )
 
-            # one line takes the rest of the month: the one with the most hours, the first of equal ones
-            biggest = max(work100_wds, key=lambda wd: round(wd.number_of_hours, 2))
-            # Case with half days mixed with full days (single version only, same code split
-            # across AM/PM lines). The cross-version hours are already included in
-            # number_of_other_hours above when applicable.
-            # If only presence -> Compute the full days from the hourly formula
-            if len(set(version_wds.mapped('code'))) == 1 and len(set(version_wds.mapped('category_options_ids'))) < 1:
-                wage = worked_day._l10n_be_get_workday_amount(wage, number_of_other_hours, out_ratio)
-                if worked_day != biggest:  # lowest lines
-                    number_of_hours = sum((work100_wds - worked_day).mapped('number_of_hours'))
-                    worked_day.amount = worked_day._l10n_be_get_workday_amount(wage, number_of_hours, inverse=True) * amount_rate
-                else:  # biggest line
-                    worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * amount_rate
-            # Mix of presence/absences - Compute the half days from the hourly formula
-            else:
-                if worked_day != biggest:  # lowest lines
-                    worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * amount_rate
-                else:  # biggest line
-                    total_wage = worked_day._l10n_be_get_workday_amount(wage, number_of_other_hours, out_ratio)
-                    number_of_hours = sum((work100_wds - worked_day).mapped('number_of_hours'))
-                    worked_day.amount = (total_wage - worked_day._l10n_be_get_workday_amount(wage, number_of_hours)) * amount_rate
+                if len(work100_wds) == 1:
+                    unpaid_wds = version_wds.filtered(lambda wd: (
+                        not wd.is_paid
+                        and wd.code not in [main_worked_day, '000.00', '202.00']
+                        and not wd.work_entry_type_id.l10n_be_is_time_credit
+                        and not wd.work_entry_type_id.is_extra_hours
+                    )) if len(all_versions) == 1 else version_wds.browse()
+                    unpaid_hours = sum(unpaid_wds.mapped('number_of_hours'))
+                    main_amount = worked_day._l10n_be_get_workday_amount(
+                        wage, number_of_other_hours - unpaid_hours, out_ratio,
+                    ) - unpaid_wds._l10n_be_get_unpaid_days_deduction(wage)
+                    main_lines[worked_day.payslip_id] = (worked_day, main_amount, amount_rate)
+                    worked_day.amount = max(0, main_amount) * amount_rate
+                    continue
 
-        for main_line, main_amount, amount_rate in main_lines.values():
-            other_lines = [wd for wd in main_line.payslip_id.worked_days_line_ids if wd in exact_amounts]
-            if main_amount < 0:
-                # the paid leaves at the hourly rate are worth more than the month: they share the wage
-                leave_lines = [wd for wd in other_lines if exact_amounts[wd] and not wd.work_entry_type_id.is_extra_hours]
-                leave_total = sum(exact_amounts[wd] for wd in leave_lines)
-                if leave_total > 0:
-                    ratio = max(0.0, leave_total + main_amount * amount_rate) / leave_total
-                    for wd in leave_lines:
-                        exact_amounts[wd] *= ratio
-                        wd.amount = exact_amounts[wd]
-                main_amount = 0.0
-            # the rounding of the other lines goes on the main line: a complete month pays the wage to the cent
-            # (extra hours are paid on top of the wage, rounded on their own line)
-            residue = sum(exact_amounts[wd] - wd.amount for wd in other_lines if not wd.work_entry_type_id.is_extra_hours)
-            main_line.amount = main_amount * amount_rate + residue
+                # One line takes the rest of the month: the one with the most hours,
+                # the first of equal ones. Use sequence and id to define "first"
+                # consistently, independently of the order in which lines were prefetched.
+                biggest = max(work100_wds, key=lambda wd: (
+                    round(wd.number_of_hours, 2), -wd.sequence, -(wd._origin.id or 0),
+                ))
+                # Case with half days mixed with full days (single version only, same code split
+                # across AM/PM lines). The cross-version hours are already included in
+                # number_of_other_hours above when applicable.
+                # If only presence -> Compute the full days from the hourly formula
+                if len(set(version_wds.mapped('code'))) == 1 and len(set(version_wds.mapped('category_options_ids'))) < 1:
+                    wage = worked_day._l10n_be_get_workday_amount(wage, number_of_other_hours, out_ratio)
+                    if worked_day != biggest:  # lowest lines
+                        number_of_hours = sum((work100_wds - worked_day).mapped('number_of_hours'))
+                        worked_day.amount = worked_day._l10n_be_get_workday_amount(wage, number_of_hours, inverse=True) * amount_rate
+                    else:  # biggest line
+                        worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * amount_rate
+                # Mix of presence/absences - Compute the half days from the hourly formula
+                else:
+                    if worked_day != biggest:  # lowest lines
+                        worked_day.amount = worked_day._l10n_be_get_workday_amount(wage) * amount_rate
+                    else:  # biggest line
+                        total_wage = worked_day._l10n_be_get_workday_amount(wage, number_of_other_hours, out_ratio)
+                        number_of_hours = sum((work100_wds - worked_day).mapped('number_of_hours'))
+                        worked_day.amount = (total_wage - worked_day._l10n_be_get_workday_amount(wage, number_of_hours)) * amount_rate
 
-        super(HrPayslipWorkedDays, computed_by_super)._compute_amount()
+            for main_line, main_amount, amount_rate in main_lines.values():
+                other_lines = [wd for wd in main_line.payslip_id.worked_days_line_ids if wd in exact_amounts]
+                if main_amount < 0:
+                    # the paid leaves at the hourly rate are worth more than the month: they share the wage
+                    leave_lines = [wd for wd in other_lines if exact_amounts[wd] and not wd.work_entry_type_id.is_extra_hours]
+                    leave_total = sum(exact_amounts[wd] for wd in leave_lines)
+                    if leave_total > 0:
+                        ratio = max(0.0, leave_total + main_amount * amount_rate) / leave_total
+                        for wd in leave_lines:
+                            exact_amounts[wd] *= ratio
+                            wd.amount = exact_amounts[wd]
+                    main_amount = 0.0
+                # the rounding of the other lines goes on the main line: a complete month pays the wage to the cent
+                # (extra hours are paid on top of the wage, rounded on their own line)
+                residue = sum(exact_amounts[wd] - wd.amount for wd in other_lines if not wd.work_entry_type_id.is_extra_hours)
+                main_line.amount = main_amount * amount_rate + residue
+
+            super(HrPayslipWorkedDays, computed_by_super)._compute_amount()
+            computed_by_super.filtered(lambda wd: (
+                wd.payslip_id.struct_id.country_id.code == 'BE'
+                and wd.payslip_id.state == 'draft'
+                and not wd.payslip_id.edited
+                and wd.version_id.wage_type == 'hourly'
+                and wd.is_paid
+                and wd.amount
+                and wd.code != '000.00'
+                and not wd.work_entry_type_id.is_extra_hours
+            ))._l10n_be_round_hourly_amount_per_day()
+
+        payslips = self.payslip_id.filtered(
+            lambda slip: (
+                slip.state == 'draft'
+                and not slip.edited
+                and slip.struct_id.country_id.code == 'BE'
+                and slip.wage_type == 'monthly'
+            )
+        )
+        # Redistribution and rounding need every line of the related payslips.
+        # A recompute triggered from a modified dependency may not concern all lines
+        # related to a specific payslip, so we need to add those that aren't in the batch
+        # to be recomputed for correctness of the results.
+        # This may also happen at the boundary of an ORM batch during recomputing.
+        worked_days = self | payslips.worked_days_line_ids
+        other_worked_days = worked_days - self
+        # Treat added lines as computed values instead of ordinary writes.
+        with self.env.protecting([self._fields['amount']], other_worked_days):
+            compute_amount_by_payslip(worked_days)
+        # Notify dependents of the additional `amounts` we recomputed
+        # that didn't come from the original `self`.
+        other_worked_days.modified(['amount'])
+
+    def _l10n_be_get_unpaid_days_deduction(self, wage):
+        """The deduction of the unpaid lines from a monthly wage: every unpaid day at the hourly rate (3 / 13 of the
+        wage a week, rounded to 4 decimals), rounded to the cent. The hours of a line without days of its own are
+        shared equally between its days, or deducted as a whole when they are not whole days."""
+        if not self:
+            return 0
+        payslip = self.payslip_id
+        version = self.version_id
+        hours_per_week = version.resource_calendar_id.hours_per_week
+        if not hours_per_week:
+            return 0
+        hourly_rate = float_round(wage * 3 / (13 * hours_per_week), precision_digits=4)
+        empty_options = self.env['hr.salary.rule.category']
+        hours_by_day = defaultdict(lambda: defaultdict(float))  # (type, options): {date: hours}
+        for vals in version.generate_work_entries(payslip.date_from, payslip.date_to):
+            if payslip.date_from <= vals['date'] <= payslip.date_to and vals['version_id'] == version:
+                options = vals.get('category_options_ids', empty_options).sorted()
+                hours_by_day[vals['work_entry_type_id'], options][vals['date']] += vals['duration']
+        deduction = 0
+        for worked_day in self:
+            daily_hours = list(hours_by_day.get(
+                (worked_day.work_entry_type_id, worked_day.category_options_ids.sorted()), {}).values())
+            if float_compare(sum(daily_hours), worked_day.number_of_hours, 2):
+                days = worked_day.number_of_days
+                daily_hours = [worked_day.number_of_hours / round(days)] * round(days) \
+                    if days >= 1 and not float_compare(days, round(days), 2) else [worked_day.number_of_hours]
+            deduction += sum(float_round(hours * hourly_rate, precision_rounding=0.01) for hours in daily_hours)
+        return deduction
+
+    def _l10n_be_round_hourly_amount_per_day(self):
+        """Paid by the hour, the pay of every day is rounded to the cent, as a pay line per day: the line pays the sum
+        of the rounded pays of its days. A line whose days do not give its hours keeps the pay of its hours, as the
+        extra hours (paid on the hours of the month)."""
+        empty_options = self.env['hr.salary.rule.category']
+        for payslip, worked_days in self.grouped('payslip_id').items():
+            hours_by_day = defaultdict(lambda: defaultdict(float))  # (version, type, options): {date: hours}
+            for vals in worked_days.version_id.generate_work_entries(payslip.date_from, payslip.date_to):
+                if payslip.date_from <= vals['date'] <= payslip.date_to:
+                    options = vals.get('category_options_ids', empty_options).sorted()
+                    hours_by_day[vals['version_id'], vals['work_entry_type_id'], options][vals['date']] += vals['duration']
+            for worked_day in worked_days:
+                daily_hours = hours_by_day.get(
+                    (worked_day.version_id, worked_day.work_entry_type_id, worked_day.category_options_ids.sorted()))
+                if not daily_hours or float_compare(sum(daily_hours.values()), worked_day.number_of_hours, 2):
+                    continue
+                hourly_rate = worked_day.version_id._get_contract_wage() * worked_day.work_entry_type_id.amount_rate
+                worked_day.amount = sum(
+                    float_round(hours * hourly_rate, precision_rounding=0.01) for hours in daily_hours.values())
 
     def _l10n_be_get_prorated_wage(self):
         """The wage of the month after the time credit. The wage is the wage after the salary sacrifice of a cafeteria

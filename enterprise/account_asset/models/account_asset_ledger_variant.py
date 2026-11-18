@@ -48,17 +48,18 @@ class AccountAssetVariant(models.Model):
         main_variants.recovery_account_id = False
         for variant in sub_variants:
             main_variant = variant.asset_id.main_variant_id
+            model = variant.model_id.with_company(variant.company_id)
             variant.account_depreciation_id = (
                 variant.account_depreciation_id
-                or variant.model_id.ledger_depreciation_account_id
+                or model.ledger_depreciation_account_id
                 or main_variant.account_depreciation_id
             )
             variant.account_depreciation_expense_id = (
                 variant.account_depreciation_expense_id
-                or variant.model_id.ledger_expense_account_id
+                or model.ledger_expense_account_id
                 or main_variant.account_depreciation_expense_id
             )
-            variant.recovery_account_id = variant.recovery_account_id or variant.model_id.ledger_recovery_account_id
+            variant.recovery_account_id = variant.recovery_account_id or model.ledger_recovery_account_id
 
     @api.depends('is_ledger_variant')
     def _compute_model_id(self):

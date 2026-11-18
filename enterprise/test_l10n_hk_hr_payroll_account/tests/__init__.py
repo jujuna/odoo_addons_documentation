@@ -6,6 +6,7 @@ from . import test_controller
 from . import test_casual_employees
 from . import test_empf
 from . import test_autopay_file
+from . import test_hk_hr_payroll_attendance
 from . import test_ird_reports
 from . import test_leave_limit
 from . import test_salary_rules_schedule_monthly

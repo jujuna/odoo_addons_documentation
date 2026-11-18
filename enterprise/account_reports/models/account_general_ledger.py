@@ -171,7 +171,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             },
         }
 
-    @snapshotable_engine(result_aggregators=GL_RESULT_AGGREGATORS, sub_engine_of='_report_engine_gl_initial_balance')
+    @snapshotable_engine(result_aggregators=GL_RESULT_AGGREGATORS, sub_engine_of='_report_engine_gl_initial_balance', version=2)
     def _report_engine_gl_init_bal_sub(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         domain = [('account_id.include_initial_balance', '=', True)]
         result = self._get_gl_engine_data(options, date_scope, formulas_dict, current_groupby, additional_domain=domain, warnings=warnings)

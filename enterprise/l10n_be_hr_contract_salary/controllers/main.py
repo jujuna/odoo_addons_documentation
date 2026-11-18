@@ -29,10 +29,6 @@ class SignContract(Sign):
                 version.bike_id.plan_to_change_vehicle = False
         # All signers have signed
         if request_item.sign_request_id.nb_wait == 0:
-            if version.car_id:
-                version.car_id.driver_id = version.employee_id.work_contact_id
-                version.car_id.plan_to_change_vehicle = False
-                version.car_id.future_driver_id = False
             if version.bike_id:
                 version.bike_id.driver_id = version.employee_id.work_contact_id
                 version.bike_id.plan_to_change_vehicle = False
@@ -403,7 +399,8 @@ class HrContractSalary(main.HrContractSalary):
 
         # Eco-voucher fallback: if the computed eco_checks is 0 (e.g. no JC on the version),
         # show the maximum possible amount from the company's JC or the legal maximum (250 EUR).
-        if not initial_values.get('eco_checks'):
+        # A student's 0 is the default amount, not a missing one.
+        if not initial_values.get('eco_checks') and not version.is_student():
             eco_config = request.env['hr.rule.parameter'].sudo()._get_parameter_from_code('eco_voucher_config', raise_if_not_found=False) or {}
             jc = version.company_id.l10n_be_joint_committee_id
             if jc and jc.egov3_code in eco_config:
@@ -427,7 +424,8 @@ class HrContractSalary(main.HrContractSalary):
                 res[field_to_copy] = version_vals.get(field_to_copy)
         res['has_hospital_insurance'] = float(benefits['has_hospital_insurance_radio']) == 1.0 if 'has_hospital_insurance_radio' in benefits else False
         res['l10n_be_has_ambulatory_insurance'] = float(benefits['l10n_be_has_ambulatory_insurance_radio']) == 1.0 if 'l10n_be_has_ambulatory_insurance_radio' in benefits else False
-        res['ip_wage_rate'] = benefits['ip_value'] if 'ip_value' in benefits else 0
+        # The rate is the one of the offer, the configurator only tells whether it is chosen
+        res['ip_wage_rate'] = (version_vals.get('ip_wage_rate') or 0) if float(benefits.get('ip_value') or 0) else 0
         return res
 
     def create_new_version(self, version_vals, offer, benefits, no_write=False, **kw):
@@ -499,7 +497,8 @@ class HrContractSalary(main.HrContractSalary):
         resume = result['resume_lines_mapped'][monthly_salary_name]
         if 'SALARY' in resume and resume.get("wage") and resume["wage"][1] != resume['SALARY'][1]:
             ordered_fields = ["wage", 'SALARY', 'NET']
-            if new_version.env.context.get('simulation_working_schedule', '100') != '100':
+            # The working schedule is only given for the part-time simulations
+            if new_version.env.context.get('simulation_working_schedule') not in (False, None, '100'):
                 salary_tuple = result['resume_lines_mapped'][monthly_salary_name]['SALARY']
                 salary_tuple = (self.env._('Gross (Part Time)'), *salary_tuple[1:])
                 result['resume_lines_mapped'][monthly_salary_name]['SALARY'] = salary_tuple

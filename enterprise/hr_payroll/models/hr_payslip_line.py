@@ -66,6 +66,10 @@ class HrPayslipLine(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Create the lines, defaulting ``employee_id`` and ``version_id`` from the payslip.
+
+        :raise UserError: if neither the values nor the payslip give a version.
+        """
         for values in vals_list:
             if 'employee_id' not in values or 'version_id' not in values:
                 payslip = self.env['hr.payslip'].browse(values.get('slip_id'))
@@ -77,6 +81,7 @@ class HrPayslipLine(models.Model):
 
     @api.depends('salary_rule_id', 'salary_rule_id.appears_on_employee_cost_dashboard', 'total')
     def _compute_employer_cost(self):
+        """Set ``employer_cost`` to the total of the lines whose rule appears on the employee cost dashboard, 0 otherwise."""
         to_assign = self.filtered(
             lambda line: line.salary_rule_id and line.salary_rule_id.appears_on_employee_cost_dashboard
         )
@@ -97,6 +102,13 @@ class HrPayslipLine(models.Model):
         (self - to_sync).custom_name = False
 
     def get_payslip_styling_dict(self):
+        """Return the styling of the line in the payslip report, from its salary rule display options.
+
+        :return: ``{'line_style': str, 'line_class': str, 'o_title': str}``, i.e. the inline CSS
+            color, the bootstrap classes (bold, italic, underline, space above, indented) and
+            ``'d-none'`` to hide the amount columns of title rules.
+        :rtype: dict
+        """
         self.ensure_one()
         rule = self.salary_rule_id
         classes = []

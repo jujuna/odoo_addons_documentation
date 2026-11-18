@@ -7,8 +7,8 @@ from odoo.addons.timesheet_grid.controllers.timesheet_systray_controller import 
 class TimesheetSystrayAttendanceController(TimesheetSystrayController):
 
     @route()
-    def get_timer_start_time(self):
-        result = super().get_timer_start_time()
+    def get_timer_start_time(self, **kwargs):
+        result = super().get_timer_start_time(**kwargs)
 
         # If no elapsed time from timesheet, check for attendance check-in
         if not result.get("elapsed_seconds"):

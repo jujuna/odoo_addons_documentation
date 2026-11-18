@@ -67,22 +67,22 @@ class TestPayrollArrearSalary(TestPayrollCommon):
         Validation error is raised when l10n_be_arrear_salary is set to True on a
         payslip whose period is in the same calendar year as its creation date.
         """
-        with freeze_time('2026-01-15'):
-            employee = self.create_employee({
-                'name': 'Arrear Validation Test Employee',
-                'date_version': date(2025, 1, 1),
-                'contract_date_start': date(2025, 1, 1),
-                'contract_date_end': False,
-            })
-            payslip = self.env['hr.payslip'].create({
-                'employee_id': employee.id,
-                'company_id': employee.company_id.id,
-                'version_id': employee.version_id.id,
-                'date_from': date(2026, 1, 1),
-                'date_to': date(2026, 1, 31),
-            })
-            with self.assertRaises(ValidationError):
-                payslip.write({'l10n_be_arrear_salary': True})
+        current_year = date.today().year
+        employee = self.create_employee({
+            'name': 'Arrear Validation Test Employee',
+            'date_version': date(current_year - 1, 1, 1),
+            'contract_date_start': date(current_year - 1, 1, 1),
+            'contract_date_end': False,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'company_id': employee.company_id.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(current_year, 1, 1),
+            'date_to': date(current_year, 1, 31),
+        })
+        with self.assertRaises(ValidationError):
+            payslip.write({'l10n_be_arrear_salary': True})
 
     def test_arrear_salary_withholding_tax(self):
         """

@@ -97,8 +97,8 @@ class CzechVIESReportTest(CzechReportsCommon):
                 ('3 Service',           'DE',              'DE123456788',           '3',                   1,                        80),
                 ('Partner EU 3',        'BE',              'BE0477472701',          '',                    1,                        60),
                 ('2 Triangular',        'BE',              'BE0477472701',          '2',                   1,                        60),
-                ('Partner EU 4',        'BE',              '0477472701',            '',                    1,                        60),
-                ('2 Triangular',        'BE',              '0477472701',            '2',                   1,                        60),
+                ('Partner EU 4',        'BE',              'BE0477472701',            '',                    1,                        60),
+                ('2 Triangular',        'BE',              'BE0477472701',            '2',                   1,                        60),
             ],
             options,
         )

@@ -57,10 +57,10 @@ class AccountMove(models.Model):
     extract_detected_layout = fields.Integer("Extract Detected Layout Id", readonly=True)
 
     def _should_store_import_source_attachment(self, selected_file_data):
-        decoder = (selected_file_data.get('decoder_info') or {}).get('decoder')
+        decoder_info = selected_file_data.get('decoder_info') or {}
 
         # OCR has its own separate flow for reloading so we don't store the imported attachment
-        if decoder == self._import_invoice_ocr:
+        if decoder_info.get('is_ocr'):
             return False
 
         return super()._should_store_import_source_attachment(selected_file_data)
@@ -871,6 +871,7 @@ class AccountMove(models.Model):
             return {
                 'decoder': self._import_invoice_ocr,
                 'priority': 10 if file_data['import_file_type'] == 'pdf' else 5,
+                'is_ocr': True,
             }
         return super()._get_edi_decoder(file_data, new)
 

@@ -96,10 +96,11 @@ class ResCompany(models.Model):
     def _l10n_be_dimona_can_declare(self, payroll_config=None):
         """Whether Dimona declarations can be filed for this company."""
         self.ensure_one()
-        if self.l10n_be_dimona_environment == 'sandbox':
+        # The access of the employer, for all its branches
+        if self.root_id.l10n_be_dimona_environment == 'sandbox':
             return True
         config = self.current_payroll_config_id if payroll_config is None else payroll_config
-        return bool(config.onss_registration_number and self.onss_certificate_id)
+        return bool(config.onss_registration_number and self.root_id.onss_certificate_id)
 
     def _l10n_be_dimona_uses_rest_api(self):
         """Whether this company talks to the ONSS Dimona REST API itself.
@@ -107,7 +108,7 @@ class ResCompany(models.Model):
         A database that does not file over REST must not poll over REST either.
         """
         self.ensure_one()
-        return self.l10n_be_dimona_environment in ('production', 'test', 'sandbox')
+        return self.root_id.l10n_be_dimona_environment in ('production', 'test', 'sandbox')
 
     def _prepare_resource_calendar_values(self):
         """

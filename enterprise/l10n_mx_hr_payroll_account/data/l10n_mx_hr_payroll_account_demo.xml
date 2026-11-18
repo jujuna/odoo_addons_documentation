@@ -23,6 +23,11 @@
         <field name="l10n_mx_imss_id">Z879200284</field>
     </record>
 
+    <record id="mx_2_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_2_mx"/>
+    </record>
+
     <record id="l10n_mx_hr_payroll.user_xochilt" model="res.users">
         <field name="company_ids" eval="[Command.link(ref('base.demo_company_2_mx'))]"/>
         <field name="company_id" ref="base.demo_company_2_mx"/>
@@ -68,6 +73,7 @@
         <field name="l10n_mx_curp">CACX760431HNESHC03</field>
         <field name="employee_type_id" ref="l10n_mx_contract_type_01"/>
         <field name="company_id" ref="base.demo_company_2_mx"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll_account.mx_2_hr_job_developer"/>
     </record>
 
     <record id="base.hr_employee_karla" model="hr.employee">
@@ -75,6 +81,7 @@
         <field name="l10n_mx_curp">FUNK671228MYNNLR02</field>
         <field name="employee_type_id" ref="l10n_mx_contract_type_01"/>
         <field name="company_id" ref="base.demo_company_2_mx"/>
+        <field name="job_id" ref="l10n_mx_hr_payroll_account.mx_2_hr_job_developer"/>
     </record>
 
     <record id="base.hr_employee_maria" model="hr.employee">

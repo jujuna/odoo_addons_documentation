@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="l10n_it_pos_fiskaly.DebugWidget" t-inherit="point_of_sale.DebugWidget" t-inherit-mode="extension">
+        <xpath expr="//div[@data-tooltip='Print changes receipt']" position="after">
+            <div t-if="this.isItalianFiskalyCommissioned" data-tooltip="Fetch the fiskaly record of a paid order" data-tooltip-delay="0">
+                <button class="btn btn-secondary btn-sm text-nowrap" t-on-click="() => this.l10nItFiskalySelectOrder()">
+                    <i class="oi" data-icon="download" aria-hidden="true"/> Fiskaly Record
+                </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

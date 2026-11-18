@@ -31,13 +31,16 @@ class AccountChartTemplate(models.AbstractModel):
             ('struct_ids', 'in', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month').id),
             ('code', '=', 'BONUS_BASIC')
         ])
-        rules_mapping[basic_rule]['credit'] = due_amount_net
+        rules_mapping[basic_rule]['debit'] = remuneration
+        rules_mapping[basic_rule]['credit'] = None
 
+        # The ONSS and the withholding taxes on the bonus are booked by the total rules
+        # (ONSSTOTAL and PPTOTAL), as on the monthly payslips
         onss_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_bonus_social_contributions')
-        rules_mapping[onss_rule]['credit'] = onss
+        rules_mapping[onss_rule]['credit'] = None
 
         pp_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_cct90_p_p')
-        rules_mapping[pp_rule]['credit'] = withholding_taxes
+        rules_mapping[pp_rule]['credit'] = None
 
         net_rule = self.env['hr.salary.rule'].search([
             ('struct_ids', 'in', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month').id),
@@ -69,6 +72,12 @@ class AccountChartTemplate(models.AbstractModel):
         pp_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')
         rules_mapping[pp_rule]['credit'] = withholding_taxes
 
+        # Withholding tax exemptions (274.xx) granted on the payslip: the withholding tax not to be paid, a reduction of
+        # the remuneration cost. The 274 declaration books what the payslips could not (see l10n_be.274_xx)
+        exemption_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_274_exemption_total')
+        rules_mapping[exemption_rule]['debit'] = withholding_taxes
+        rules_mapping[exemption_rule]['credit'] = remuneration
+
         # Special Social Contribution (MISC ONSS)
         monss_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_mis_ex_onss')
         rules_mapping[monss_rule]['debit'] = onss  # Note: this is a credit, but the amount is negative
@@ -80,6 +89,10 @@ class AccountChartTemplate(models.AbstractModel):
         # IP Deduction
         ip_ded_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_ip_deduction')
         rules_mapping[ip_ded_rule]['debit'] = withholding_taxes  # Note: This is a credit, but the amount is negative
+
+        # Voluntary withholding taxes, owed with the other ones
+        fiscal_voluntarism_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_fiscal_voluntarism')
+        rules_mapping[fiscal_voluntarism_rule]['debit'] = withholding_taxes  # Note: This is a credit, but the amount is negative
 
         # Meal vouchers
         meal_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_ch_worker')
@@ -96,15 +109,21 @@ class AccountChartTemplate(models.AbstractModel):
         ])
         rules_mapping[net_rule]['credit'] = due_amount_net
 
+        # Net amount to recover: owed by the employee (positive), then recovered (negative)
+        net_to_recover_rule = self.env.ref('l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_net_to_recover', raise_if_not_found=False)
+        if net_to_recover_rule:
+            rules_mapping[net_to_recover_rule]['debit'] = due_amount_net
+
         # ONSS Employer
         onss_rule = self.env.ref('l10n_be_hr_payroll.l10n_be_employees_salary_onss_employer_total')
         rules_mapping[onss_rule]['debit'] = onss_employer
         rules_mapping[onss_rule]['credit'] = onss
 
-        # Mobility Budget Withholding Tax
-        net_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_mobility_budget_tax', raise_if_not_found=False)
-        if net_rule:
-            rules_mapping[net_rule]['credit'] = onss
+        # Mobility Budget Special Contribution (worker contribution, DmfA code 869)
+        mobility_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_mobility_budget_tax', raise_if_not_found=False)
+        if mobility_rule:
+            rules_mapping[mobility_rule]['debit'] = onss  # Note: this is a credit, but the amount is negative
+            rules_mapping[mobility_rule]['credit'] = None
 
         # ================================================ #
         #              CP200: Termination Holidays N       #

@@ -72,6 +72,13 @@
         <td id="payslip_line_amount" position="replace"/>
         <td id="payslip_line_quantity" position="replace"/>
         <td id="payslip_line_rate" position="replace"/>
+        <xpath expr="//t[@t-set='show_days']" position="attributes">
+            <attribute name="t-value">any(worked_days_lines.mapped('number_of_days'))</attribute>
+        </xpath>
+
+        <xpath expr="//div[@id='to_pay']" position="before">
+            <div style="border-bottom: 2px solid black;" class="mb-3"/>
+        </xpath> 
     </template>
 
     <template id="report_payslip_in_lang">

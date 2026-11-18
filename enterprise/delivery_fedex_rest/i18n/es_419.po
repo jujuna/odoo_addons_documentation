@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-10-12 18:25+0000\n"
+"PO-Revision-Date: 2026-11-12 16:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
 "odoo-20/delivery_fedex_rest/es_419/>\n"
@@ -122,8 +122,8 @@ msgid ""
 "Automated return label generation is not supported by FedEx for multi-"
 "package shipments. Please generate the return labels manually."
 msgstr ""
-"FedEx no permite la generación automática de etiquetas de devolución para "
-"envíos con varios paquetes. Genere las etiquetas de devolución de forma "
+"FedEx no admite la generación automática de etiquetas de devolución para "
+"envíos con varios paquetes. Genera las etiquetas de devolución de forma "
 "manual."
 
 #. module: delivery_fedex_rest
@@ -134,12 +134,12 @@ msgstr "Transportista"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_residential_address__check
 msgid "Check using FedEx Address API"
-msgstr "Comprobación con la dirección API de FedEx"
+msgstr "Verificar con la API de direcciones de FedEx"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_droppoff_type__contact_fedex_to_schedule
 msgid "Contact FedEx for pickup"
-msgstr "Contacte a FedEx para recolección"
+msgstr "Contacta a FedEx para programar una recolección"
 
 #. module: delivery_fedex_rest
 #. odoo-python
@@ -160,11 +160,11 @@ msgid ""
 "this information using the FedEx Address API, we assume that the address is "
 "residential unless it is marked explicitly as a BUSINESS address."
 msgstr ""
-"Determine si marcar la dirección del destinatario como una dirección "
-"residencial (para calcular posibles cargos adicionales). Tome en cuenta: al "
-"obtener esta información con la API de dirección de FedEx, asumimos que la "
-"dirección es residencial a no ser que se marque explícitamente como una "
-"dirección COMERCIAL."
+"Determina si debes marcar la dirección del destinatario como residencial "
+"(para calcular de forma correcta los posibles cargos adicionales). Ten en "
+"cuenta que, al obtener esta información a través de la API de direcciones de "
+"FedEx, asumimos que la dirección es residencial, a menos que se indique de "
+"forma explícita que es una dirección COMERCIAL."
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__display_name
@@ -763,7 +763,7 @@ msgstr "El envío %s se canceló"
 #. odoo-python
 #: code:addons/delivery_fedex_rest/models/delivery_fedex.py:0
 msgid "Shipment created into Fedex"
-msgstr "El envío se creó en FedEx"
+msgstr "Envío creado en FedEx"
 
 #. module: delivery_fedex_rest
 #. odoo-python
@@ -786,11 +786,10 @@ msgid ""
 "what you are doing.\n"
 "More info on https://www.developer.fedex.com"
 msgstr ""
-"Los datos adicionales de FedEx se organizan como el interior de un archivo "
-"json.\n"
-"Esta función es avanzada (técnica) y debería usarse solo si sabe qué está "
-"haciendo.\n"
-"Para más información consulte https://www.developer.fedex.com"
+"Los datos adicionales de FedEx se organizan con una estructura similar a la "
+"de un archivo JSON.\n"
+"Esta función es avanzada y técnica. Úsala solo si sabes lo que haces.\n"
+"Obtén más información en https://www.developer.fedex.com"
 
 #. module: delivery_fedex_rest
 #. odoo-python
@@ -842,11 +841,11 @@ msgid ""
 "provided the regular tax id on the company will be used with type "
 "BUSINESS_NATIONAL."
 msgstr ""
-"Se le proporcionará a FedEx como el principal identificador fiscal de la "
-"empresa del tipo BUSINESS_UNION para poner en la factura generada. Use esto "
-"cuando necesite usar un número IOSS o EORI además del número fiscal "
-"nacional. Si no se especifica, se utilizará el número de identificación "
-"fiscal ordinario de la empresa de tipo BUSINESS_NATIONAL."
+"Se proporcionará a FedEx como identificador fiscal principal de la empresa, "
+"de tipo BUSINESS_UNION, para incluirlo en la factura generada. Usa este "
+"campo cuando necesites incluir un número IOSS o EORI además del número de "
+"identificación fiscal nacional. Si no proporcionas ningún valor, se usará el "
+"identificador fiscal habitual de la empresa, de tipo BUSINESS_NATIONAL."
 
 #. module: delivery_fedex_rest
 #. odoo-python

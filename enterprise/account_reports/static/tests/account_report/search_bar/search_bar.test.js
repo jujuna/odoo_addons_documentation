@@ -4,6 +4,7 @@ import { Component, Plugin, providePlugins, useProps, xml } from "@odoo/owl";
 import { defineModels, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 
+import { AccountReportController as realAccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportSearchBar } from "@account_reports/components/account_report/search_bar/search_bar";
 
 defineModels(mailModels);
@@ -19,8 +20,11 @@ function makeControllerWrapper(lines) {
     class AccountReportController extends Plugin {
         reportLoadingPromise = Promise.resolve();
         lines = lines;
-        updateOption(key, value) { expect.step(`updateOption:${key}:${value}`); }
-        deleteOption(key) { expect.step(`deleteOption:${key}`); }
+        options() { return { search_bar: true }; }
+        setLineSearchMatch() {
+            realAccountReportController.prototype.setLineSearchMatch.call(this);
+            expect.step("setLineSearchMatch");
+        }
         invalidateVisibleLines() { expect.step("invalidateVisibleLines"); }
     }
 
@@ -45,7 +49,7 @@ test("non-matching lines get search_match set to false", async () => {
 
     expect(lines[0].search_match).toBe(true);
     expect(lines[1].search_match).toBe(false);
-    expect.verifySteps(["updateOption:filter_search_bar:revenue", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("search is case-insensitive", async () => {
@@ -58,7 +62,7 @@ test("search is case-insensitive", async () => {
 
     expect(lines[0].search_match).toBe(true);
     expect(lines[1].search_match).toBe(false);
-    expect.verifySteps(["updateOption:filter_search_bar:REVENUE", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("partial query matches substrings in line names", async () => {
@@ -73,7 +77,7 @@ test("partial query matches substrings in line names", async () => {
     expect(lines[0].search_match).toBe(true);
     expect(lines[1].search_match).toBe(false);
     expect(lines[2].search_match).toBe(false);
-    expect.verifySteps(["updateOption:filter_search_bar:Sales", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("empty query sets all lines as matching and removes filter option", async () => {
@@ -94,9 +98,9 @@ test("empty query sets all lines as matching and removes filter option", async (
     expect(lines[0].search_match).toBe(true);
     expect(lines[1].search_match).toBe(true);
     expect.verifySteps([
-        "updateOption:filter_search_bar:revenue",
+        "setLineSearchMatch",
         "invalidateVisibleLines",
-        "deleteOption:filter_search_bar",
+        "setLineSearchMatch",
         "invalidateVisibleLines",
     ]);
 });
@@ -113,7 +117,7 @@ test("child match makes ancestor lines visible", async () => {
     expect(lines[0].search_match).toBe(true);  // Parent becomes visible
     expect(lines[1].search_match).toBe(true);  // Matched line
     expect(lines[2].search_match).toBe(false); // Unrelated top-level sibling
-    expect.verifySteps(["updateOption:filter_search_bar:child", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("parent match makes all descendant lines visible", async () => {
@@ -130,7 +134,7 @@ test("parent match makes all descendant lines visible", async () => {
     expect(lines[1].search_match).toBe(true);  // Child carried down
     expect(lines[2].search_match).toBe(true);  // Grandchild carried down
     expect(lines[3].search_match).toBe(false); // Same-level sibling stops propagation
-    expect.verifySteps(["updateOption:filter_search_bar:parent", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("sibling of matched line does not inherit search_match", async () => {
@@ -145,7 +149,7 @@ test("sibling of matched line does not inherit search_match", async () => {
     expect(lines[0].search_match).toBe(true);  // Parent becomes visible
     expect(lines[1].search_match).toBe(true);  // Matched child
     expect(lines[2].search_match).toBe(false); // Sibling at same level not matched
-    expect.verifySteps(["updateOption:filter_search_bar:matching", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });
 
 test("initialQuery prop triggers search on mount", async () => {
@@ -158,5 +162,5 @@ test("initialQuery prop triggers search on mount", async () => {
 
     expect(lines[0].search_match).toBe(true);
     expect(lines[1].search_match).toBe(false);
-    expect.verifySteps(["updateOption:filter_search_bar:revenue", "invalidateVisibleLines"]);
+    expect.verifySteps(["setLineSearchMatch", "invalidateVisibleLines"]);
 });

@@ -16,4 +16,7 @@
             Show already generated deferrals.
         </a>
     </t>
+    <t t-name="account_reports.deferred_lines_without_deferral_entry_warning">
+        There are <a type="button" t-on-click="(ev) => this.controller.reportAction(ev, 'open_deferred_lines_without_deferral_entry', {account_ids: this.controller.warnings['account_reports.deferred_lines_without_deferral_entry_warning'].account_ids})">Journal Items</a> in Deferred Accounts not associated with a Deferral Entry.
+    </t>
 </templates>

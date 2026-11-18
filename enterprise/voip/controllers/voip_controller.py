@@ -8,6 +8,7 @@ from odoo.http import Response, request
 from odoo.tools import config, consteq, verify_hash_signed
 
 from odoo.addons.phone_validation.tools.phone_validation import phone_format
+from odoo.addons.voip.models.phone_service_api import get_buy_credits_action
 from odoo.addons.voip.models.utils import extract_country_code
 from odoo.addons.voip.tools.linphone import (
     PROVISIONING_KEY_HEADER,
@@ -219,6 +220,10 @@ class VoipController(http.Controller):
             filename_field="recording_filename",
         )
         return stream.get_response(as_attachment=False)
+
+    @http.route("/voip/buy_credits", type="http", auth="user", methods=["GET"])
+    def buy_credits(self):
+        return request.redirect(get_buy_credits_action(request.env)["url"], local=False)
 
     @http.route("/voip/linphone_provisioning/<string:token>", type="http", auth="public", methods=["GET"])
     def linphone_provisioning(self, token):

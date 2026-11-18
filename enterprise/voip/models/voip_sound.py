@@ -278,6 +278,38 @@ class VoipSound(models.Model):
             self._sync_pbx_music_on_hold()
         return result
 
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_used_by_menu(self):
+        # menu_sound_id's SQL "cascade" would otherwise silently delete the
+        # Menus using these sounds, bypassing their own unlink hooks: their
+        # PBX IVR would be left behind, and the Call Flows routing to them
+        # would point to a missing record. A "Play Audio" Menu left outside
+        # of a Call Flow (one that was never saved) is not a use: it goes,
+        # through the ORM -- unless it is used as a destination elsewhere,
+        # which voip.ivr refuses.
+        ivrs = self.env["voip.ivr"].search([("menu_sound_id", "in", self.ids)])
+        orphan_audio_messages = ivrs._filter_orphan_audio_messages()
+        if used_by := ivrs - orphan_audio_messages:
+            usages = []
+            for ivr in used_by:
+                if not ivr.is_audio_message:
+                    usages.append(_('the Menu "%(menu)s"', menu=ivr.name))
+                elif ivr.callflow_id:
+                    usages.append(_(
+                        'a "Play Audio" node of the Call Flow "%(call_flow)s"',
+                        call_flow=ivr.callflow_id.name,
+                    ))
+                else:
+                    # Flows archived before wrappers retained callflow_id
+                    # still reference them through their saved graph.
+                    usages.append(_('a "Play Audio" node of an archived Call Flow'))
+            raise UserError(_(
+                "A sound used by a Menu cannot be deleted. Delete the Menu first, "
+                "or remove the node from its Call Flow. It is used by:\n%(usages)s",
+                usages="\n".join(f"- {usage}" for usage in usages),
+            ))
+        orphan_audio_messages.unlink()
+
     def _get_default_filename(self, name=None):
         name = name or self.name or "audio_message"
         slug = self.env["ir.http"]._slugify(name) or "audio_message"

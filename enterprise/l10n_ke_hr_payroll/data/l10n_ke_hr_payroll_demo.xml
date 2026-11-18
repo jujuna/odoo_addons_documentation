@@ -105,6 +105,15 @@
         <field name="company_id" ref="base.demo_company_ke"/>
     </record>
 
+    <record id="ke_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_ke"/>
+    </record>
+    <record id="ke_hr_job_consultant" model="hr.job">
+        <field name="name">Consultant</field>
+        <field name="company_id" ref="base.demo_company_ke"/>
+    </record>
+
     <record id="hr_employee_ahmed" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_ahmed')).name"/>
         <field name="address_id" ref="l10n_ke_hr_payroll.res_partner_ke_work_address"/>
@@ -138,7 +147,7 @@
         <field name="l10n_ke_kra_pin">0101</field>
         <field name="l10n_ke_nssf_number">230115</field>
         <field name="l10n_ke_nhif_number">871024</field>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_ke_hr_payroll.ke_hr_job_developer"/>
         <field name="department_id" ref="l10n_ke_hr_payroll.ke_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_ke_hr_payroll.structure_type_employee_ken"/>
         <field name="wage_type">monthly</field>
@@ -194,7 +203,7 @@
         <field name="l10n_ke_nssf_number">160465</field>
         <field name="l10n_ke_nhif_number">871542</field>
         <field name="l10n_ke_shif_number">245178</field>
-        <field name="job_id" ref="hr.job_consultant"/>
+        <field name="job_id" ref="l10n_ke_hr_payroll.ke_hr_job_consultant"/>
         <field name="department_id" ref="l10n_ke_hr_payroll.ke_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_ke_hr_payroll.structure_type_employee_ken"/>
         <field name="wage_type">monthly</field>

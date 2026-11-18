@@ -11,6 +11,13 @@ class HrPayrollStructureType(models.Model):
     _order = 'sequence, id'
 
     def _get_selection_schedule_pay(self):
+        """
+        Return the pay schedules selectable on structure types (``default_schedule_pay``) and
+        versions (``schedule_pay``). Override to restrict them in a country (e.g.
+        ``l10n_bd_hr_payroll`` only keeps ``monthly``).
+
+        :return: list of ``(key, label)``
+        """
         return [
             ('annually', self.env._('year')),
             ('semi-annually', self.env._('half-year')),
@@ -24,6 +31,10 @@ class HrPayrollStructureType(models.Model):
         ]
 
     def _default_work_entry_type_id(self):
+        """
+        Default time type of regular attendances: the ``002.00`` time type of the company
+        country, or ``hr_work_entry.generic_work_entry_type_attendance``.
+        """
         country_code = self.env.company.country_code
         attendance = self.env['hr.work.entry.type'].search([
             ('code', '=', '002.00'),
@@ -59,6 +70,10 @@ class HrPayrollStructureType(models.Model):
             structure_type.struct_type_count = len(structure_type.struct_ids)
 
     def _check_country(self, vals):
+        """
+        Raise a ``UserError`` if ``vals`` sets a country that is not the country of one of the
+        allowed companies. Only called with ``payroll_check_country`` in the context.
+        """
         country_id = vals.get('country_id')
         if country_id and country_id not in self.env.companies.mapped('country_id').ids:
             raise UserError(_('You should also be logged into a company in %s to set this country.', self.env['res.country'].browse(country_id).name))

@@ -13,13 +13,18 @@ export class POSAppointmentQuickCreateFormController extends FormController {
                 no_show: 1,
             }[status];
             buttonClass = `o_appointment_status_btn_color_${colorIndex}`;
+        } else if (status === "no_show") {
+            buttonClass += " text-danger";
+        }
+        if (this.ui.isSmall) {
+            buttonClass += " p-0 fs-6 flex-fill";
         }
         return buttonClass;
     }
 
-    onClickAppointmentStatus(status) {
+    async onClickAppointmentStatus(status) {
         this.model.root.update({ appointment_status: status });
-        this.saveButtonClicked();
+        return this.saveButtonClicked();
     }
 }
 

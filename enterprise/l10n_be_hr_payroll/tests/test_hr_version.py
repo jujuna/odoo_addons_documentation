@@ -1,8 +1,9 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 from .common import TestPayrollCommon
+from ..models.hr_version import EMPLOYER_ONSS
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -73,6 +74,18 @@ class TestPayrollHrVersion(TestPayrollCommon):
             self.assertFalse(assertion)
         else:
             self.assertEqual(expected_employee in applicable_warnings[0]['warning_records'], assertion)
+
+    def test_car_travel_amount_2026(self):
+        """ The default car mileage allowance follows the monthly amounts of April, May and June 2026 """
+        for today, amount in [
+            ('2026-04-15', 0.4571),
+            ('2026-05-15', 0.4841),
+            ('2026-06-15', 0.5055),
+            ('2026-07-15', 0.4440),
+        ]:
+            with freeze_time(today):
+                employee = self.env['hr.employee'].create({'name': f'Car {today}', 'company_id': self.test_company.id})
+                self.assertEqual(employee.version_id.l10n_be_lsa_car_travel_amount, amount, today)
 
     def test_compute_display_be_with_200_strucure(self):
         """
@@ -162,6 +175,7 @@ class TestPayrollHrVersion(TestPayrollCommon):
             'date_version': date(2026, 1, 1),
             'contract_date_start': date(2026, 1, 1),
             'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'employee_type_id': self.env.ref("hr.contract_type_company_executive").id,
             'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
             'wage': 500.0,
             'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp200_d').id,
@@ -204,22 +218,57 @@ class TestPayrollHrVersion(TestPayrollCommon):
         result = dimona_emp.version_id._check_dimona_out_requirements()
         self.assertTrue(result, "Should return True when all conditions are met.")
 
-    def test_check_dimona_out_requirements_wrong_dmfa_code_returns_false(self):
-        """ Test: Code 015 + Open Dimona + Departure Reason Set = FALSE """
+    def test_check_dimona_out_requirements_blue_collar_returns_true(self):
+        """ Test: Code 015 + Open Dimona + Departure Reason Set = TRUE """
         dimona_emp = self.env["hr.employee"].create(
             {
                 'name': "dimona employee",
                 'company_id': self.test_company.id,
                 'date_version': "2026-06-29",
                 'contract_date_start': "2026-06-29",
-                'l10n_be_worker_code_id': self.worker_code_other.id,  # Wrong code
+                'l10n_be_worker_code_id': self.worker_code_other.id,
                 'l10n_be_dimona_declaration_id': self.dimona_open.id,
             }
         )
         dimona_emp.departure_reason_id = self.departure_reason.id
 
         result = dimona_emp.version_id._check_dimona_out_requirements()
-        self.assertFalse(result, "Should return False because DMFA code is not 495.")
+        self.assertTrue(result, "Any open Dimona period must be closed, whatever the worker code.")
+
+    def test_check_dimona_out_requirements_closed_period_returns_false(self):
+        """ Test: Code 495 + Dimona declared with an end date + Departure Reason Set = FALSE """
+        # date_end is computed from the content of the declaration, which is empty here
+        self.dimona_closed.date_end = date(2026, 4, 17)
+        dimona_emp = self.env["hr.employee"].create(
+            {
+                'name': "dimona employee",
+                'company_id': self.test_company.id,
+                'date_version': "2026-01-01",
+                'contract_date_start': "2026-01-01",
+                'l10n_be_worker_code_id': self.worker_code_495.id,
+                'l10n_be_dimona_declaration_id': self.dimona_closed.id,
+            }
+        )
+        dimona_emp.departure_reason_id = self.departure_reason.id
+
+        result = dimona_emp.version_id._check_dimona_out_requirements()
+        self.assertFalse(result, "The end date of the period was declared with the entrance, no Dimona OUT is needed.")
+
+    def test_check_dimona_out_requirements_no_declaration_returns_false(self):
+        """ Test: Code 495 + No Dimona IN + Departure Reason Set = FALSE """
+        dimona_emp = self.env["hr.employee"].create(
+            {
+                'name': "dimona employee",
+                'company_id': self.test_company.id,
+                'date_version': "2026-06-29",
+                'contract_date_start': "2026-06-29",
+                'l10n_be_worker_code_id': self.worker_code_495.id,
+            }
+        )
+        dimona_emp.departure_reason_id = self.departure_reason.id
+
+        result = dimona_emp.version_id._check_dimona_out_requirements()
+        self.assertFalse(result, "There is no Dimona period to close.")
 
     def test_check_dimona_out_requirements_no_departure_reason_returns_false(self):
         """ Test: Code 495 + Open Dimona + NO Departure Reason = FALSE """
@@ -229,7 +278,7 @@ class TestPayrollHrVersion(TestPayrollCommon):
                 'company_id': self.test_company.id,
                 'date_version': "2026-06-29",
                 'contract_date_start': "2026-06-29",
-                'l10n_be_worker_code_id': self.worker_code_other.id,  # Wrong code
+                'l10n_be_worker_code_id': self.worker_code_495.id,
                 'l10n_be_dimona_declaration_id': self.dimona_open.id,
             }
         )
@@ -371,3 +420,244 @@ class TestPayrollHrVersion(TestPayrollCommon):
         self.assertEqual({frozenset(versions.ids) for versions, _start, _end in groups}, {
             frozenset(fixed.ids), frozenset(variable.ids), frozenset((fixed_again | salary_change).ids),
         })
+
+    def test_occupation_contract_gap(self):
+        """
+        Contracts with the same occupation data are one occupation only without a day between them, as the day
+        contracts of a flexi-job: Monday and Tuesday are one occupation, Thursday another one.
+        """
+        employee = self.create_employee({
+            'name': 'Day contracts employee',
+            'date_version': date(2025, 7, 7),
+            'contract_date_start': date(2025, 7, 7),
+            'contract_date_end': date(2025, 7, 7),
+        })
+        monday = employee.version_id
+        tuesday, thursday = (employee.create_version({
+            'date_version': day,
+            'contract_date_start': day,
+            'contract_date_end': day,
+        }) for day in (date(2025, 7, 8), date(2025, 7, 10)))
+        groups = employee.version_ids.sorted('date_start', reverse=True)._get_occupation_dates()
+        self.assertEqual({(frozenset(versions.ids), date_from, date_to) for versions, date_from, date_to in groups}, {
+            (frozenset((monday | tuesday).ids), date(2025, 7, 7), date(2025, 7, 8)),
+            (frozenset(thursday.ids), date(2025, 7, 10), date(2025, 7, 10)),
+        })
+
+    def test_yearly_costs_include_employer_onss_on_benefits(self):
+        benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_housing_onss')
+        version = self.employee.version_id
+        version.l10n_be_dimona_category = 'oth'
+
+        onss_rules = benefit.salary_rule_ids.filtered(
+            lambda rule: self.env.ref('l10n_be_hr_payroll.ONSS_BASE') in rule.category_ids
+        )
+        self.assertTrue(onss_rules)
+        self.assertEqual(benefit._l10n_be_get_onss_values({version: benefit}), {version: {benefit: 0.0}})
+        yearly_cost_without_benefit = version.with_context(prefetch_fields=False)._get_benefits_costs()
+        version.write({'housing_onss_amount': 100, 'housing_fiscal_amount': 100})
+        self.assertEqual(benefit._l10n_be_get_onss_values({version: benefit}), {version: {benefit: 100.0}})
+        yearly_cost_with_benefit = version._get_benefits_costs()
+
+        self.assertEqual(benefit.cost_field, 'housing_onss_amount')
+        self.assertAlmostEqual(
+            yearly_cost_with_benefit - yearly_cost_without_benefit,
+            100 * 12 * (1 + version._l10n_be_get_employer_onss_rate()) + 100 * 12,
+        )
+
+    def test_yearly_costs_do_not_add_employer_onss_for_no_onss_employee(self):
+        version = self.employee.version_id
+        # Company executive (JC 999): no ONSS
+        version.employee_type_id = self.env.ref('hr.contract_type_company_executive')
+        self.assertEqual(version.l10n_be_egov3_code, '999')
+
+        yearly_cost_without_benefit = version._get_benefits_costs()
+        version.write({'housing_onss_amount': 100, 'housing_fiscal_amount': 100})
+        yearly_cost_with_benefit = version._get_benefits_costs()
+
+        self.assertAlmostEqual(
+            yearly_cost_with_benefit - yearly_cost_without_benefit,
+            100 * 12 + 100 * 12,
+        )
+
+    def test_yearly_costs_employer_onss_on_phone_subscription(self):
+        version = self.employee.version_id
+        version.mobile = 0
+        yearly_cost_without_benefit = version._get_benefits_costs()
+        version.mobile = 30
+        yearly_cost_with_benefit = version._get_benefits_costs()
+        bik_phone_amount = self.env['hr.rule.parameter']._get_parameter_from_code('bik_phone_sub_amount')
+        self.assertEqual(bik_phone_amount, 4)
+        # 12 x 30 € (cost) + 12 x 4 € (benefit in kind subject to ONSS) x employer rate (imported: 25 %)
+        self.assertAlmostEqual(
+            yearly_cost_with_benefit - yearly_cost_without_benefit,
+            12 * 30 + 12 * 4 * 0.25,
+        )
+
+    def test_yearly_costs_imported_employer_onss_rate(self):
+        # The employer rate comes from the ONSS rates imported for the employer category (010) and the
+        # worker code (495): 19.88 % (basic) + 5.12 % (wage moderation)
+        version = self.employee.version_id
+        self.assertEqual(version.company_id.current_payroll_config_id.l10n_be_employer_category_id.dmfa_code, '010')
+        self.assertEqual(version.l10n_be_worker_code_id.dmfa_code, '495')
+        self.assertAlmostEqual(version._l10n_be_get_employer_onss_rate(), 0.25)
+        version.write({'wage': 3000, 'mobile': 30})
+        # Wage and benefits: 3000 x (13.92 + 13 x 25 %) + 12 x 30 € + 12 x 4 € x 25 %
+        self.assertAlmostEqual(version.final_yearly_costs, 51882.0, places=2)
+
+    def test_yearly_costs_employer_onss_rate_fallback(self):
+        # Without imported ONSS rates (not fetched yet), the flat employer rate is used
+        version = self.employee.version_id
+        self.env['hr.rule.parameter'].search([('code', '=like', 'l10n_be_onss_rates_010_495_%')]).unlink()
+        self.env.transaction.invalidate_ormcache()
+        self.assertAlmostEqual(version._l10n_be_get_employer_onss_rate(), EMPLOYER_ONSS)
+        version.write({'wage': 3000, 'mobile': 30})
+        # 3000 x (13.92 + 13 x 27.14 %) + 12 x 30 € + 12 x 4 € x 27.14 %
+        self.assertAlmostEqual(version.final_yearly_costs, 52717.63, places=2)
+
+    def test_yearly_costs_recomputed_on_joint_committee_change(self):
+        version = self.employee.version_id
+        version.write({'wage': 3000, 'mobile': 30})
+        # 3000 x (13.92 + 13 x 25 %) + 12 x 30 € + 12 x 4 € x 25 %
+        self.assertAlmostEqual(version.final_yearly_costs, 51882.0, places=2)
+        version.employee_type_id = self.env.ref('hr.contract_type_company_executive')
+        self.assertEqual(version.l10n_be_egov3_code, '999')
+        # Company executive: no ONSS, no 13th month and no double holiday pay: 12 x 3000 + 12 x 30 €
+        self.assertAlmostEqual(version.final_yearly_costs, 36360.0, places=2)
+
+    def test_wage_kept_on_joint_committee_change_in_form(self):
+        # The yearly cost is recomputed in the form (onchange) and converted back to the wage on save: the
+        # archived benefits (e.g. the lump sum allowances, with a default amount) must not be counted in the
+        # onchange only, or the wage increases at each change.
+        self.employee.write({'wage': 3000, 'mobile': 30})
+        yearly_costs = self.employee.final_yearly_costs
+        for joint_committee in ('l10n_be_joint_committee_124', 'l10n_be_joint_committee_200'):
+            with Form(self.employee) as employee_form:
+                employee_form.l10n_be_joint_committee_id = self.env.ref(f'l10n_be_hr_payroll.{joint_committee}')
+            self.assertEqual(self.employee.wage, 3000)
+            self.assertAlmostEqual(self.employee.final_yearly_costs, yearly_costs, places=2)
+
+    def _create_company_car(self, driver=False):
+        brand = self.env['fleet.vehicle.model.brand'].create({'name': 'Test Brand'})
+        model = self.env['fleet.vehicle.model'].create({
+            'name': 'Test Model',
+            'brand_id': brand.id,
+            'default_car_value': 30000.0,
+            'default_fuel_type': 'diesel',
+            'default_co2': 90.0,
+        })
+        return self.env['fleet.vehicle'].create({
+            'model_id': model.id,
+            'company_id': self.employee.company_id.id,
+            'car_value': 30000.0,
+            'co2': 90.0,
+            'driver_id': driver and driver.id,
+        })
+
+    def test_company_car_uses_company_car(self):
+        version = self.employee.version_id
+        version.private_car_employee_kilometer = 10
+        self.assertFalse(version.transport_mode_car)
+        car = self._create_company_car(self.employee.work_contact_id)
+        # Set from the employee form
+        self.employee.car_id = car
+        self.assertTrue(version.transport_mode_car)
+        self.assertEqual(version.private_car_employee_kilometer, 0)
+        self.employee.car_id = False
+        self.assertFalse(version.transport_mode_car)
+
+    def test_company_car_wrong_driver_warning(self):
+        warning_name = 'Company cars with wrong driver'
+        other_partner = self.env['res.partner'].create({'name': 'Other Driver'})
+        car = self._create_company_car(other_partner)
+        self.employee.car_id = car
+        # e.g. a pool car given to another driver afterwards
+        car.future_driver_id = False
+        self.assertEqual(car.driver_id, other_partner)
+
+        def dashboard_records():
+            warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
+            cards = self.env['hr.payroll.warning'].get_payroll_dashboard_warning_cards(warning_ids)
+            return sum((card['warning_records'] for card in cards if card['name'] == warning_name), self.env['hr.employee'])
+
+        def version_issues():
+            version = self.employee.version_id.with_context(hr_payroll_force_compute_issue=True)
+            version.invalidate_recordset(['issues'])
+            version._compute_issues()
+            return [issue['message'] for issue in (version.issues or {}).values()]
+
+        message = "The employee is not set as driver or future driver of their company car"
+        self.assertIn(self.employee, dashboard_records())
+        self.assertIn(message, version_issues())
+
+        car.future_driver_id = self.employee.work_contact_id
+        self.assertNotIn(self.employee, dashboard_records())
+        self.assertNotIn(message, version_issues())
+
+    def _create_bike_model(self):
+        brand = self.env['fleet.vehicle.model.brand'].create({'name': 'Test Bike Brand'})
+        return self.env['fleet.vehicle.model'].create({
+            'name': 'Test Bike Model',
+            'brand_id': brand.id,
+            'vehicle_type': 'bike',
+            'default_recurring_cost_amount_depreciated': 50.0,
+        })
+
+    def test_company_bike_uses_company_bike(self):
+        version = self.employee.version_id
+        self.assertFalse(version.transport_mode_bike)
+        bike = self.env['fleet.vehicle'].create({
+            'model_id': self._create_bike_model().id,
+            'company_id': self.employee.company_id.id,
+        })
+        # Set from the employee form: "Uses company bike" follows the company bike, which costs the employer
+        self.employee.bike_id = bike
+        self.assertTrue(version.transport_mode_bike)
+        self.assertEqual(version.company_bike_depreciated_cost, 50.0)
+        # Unticking "Uses company bike" discards the company bike
+        version.transport_mode_bike = False
+        self.assertFalse(version.bike_id)
+        self.assertEqual(version.company_bike_depreciated_cost, 0.0)
+
+    def test_company_bike_new_bike_requested(self):
+        version = self.employee.version_id
+        bike_model = self._create_bike_model()
+        # New bike requested (as written by the salary configurator)
+        version.write({
+            'transport_mode_bike': True,
+            'new_bike': True,
+            'new_bike_model_id': bike_model.id,
+            'bike_id': False,
+        })
+        self.assertEqual(version.company_bike_depreciated_cost, 50.0)
+        # Recomputing "Uses company bike" keeps the model of the new bike
+        version.new_bike = True
+        self.assertTrue(version.transport_mode_bike)
+        self.assertEqual(version.new_bike_model_id, bike_model)
+        self.assertEqual(version.company_bike_depreciated_cost, 50.0)
+        # The bike is delivered: the request is closed
+        bike = self.env['fleet.vehicle'].create({'model_id': bike_model.id, 'company_id': self.employee.company_id.id})
+        version.bike_id = bike
+        self.assertTrue(version.transport_mode_bike)
+        self.assertFalse(version.new_bike)
+        self.assertFalse(version.new_bike_model_id)
+        # No company bike anymore: nothing is requested either
+        version.transport_mode_bike = False
+        self.assertFalse(version.bike_id)
+        self.assertFalse(version.new_bike)
+
+    def test_bike_reimbursement_daily_cap(self):
+        # CP200: 0.32 € / km from October 2026, capped at 12.80 € a day (40 km)
+        version = self.employee.version_id
+        version.write({
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'bike_transport_employee_kilometer': 25,
+        })
+        self.assertAlmostEqual(version._get_bike_reimbursed_amount(date(2026, 9, 15)), 10.80, places=2)
+        self.assertAlmostEqual(version._get_bike_reimbursed_amount(date(2026, 10, 15)), 12.80, places=2)
+
+    def test_student_eco_checks(self):
+        version = self.employee.version_id
+        self.assertTrue(version.eco_checks)
+        version.l10n_be_dimona_category = 'stu'
+        self.assertEqual(version.eco_checks, 0)

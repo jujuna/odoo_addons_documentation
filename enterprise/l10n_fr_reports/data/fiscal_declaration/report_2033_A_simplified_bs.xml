@@ -37,10 +37,16 @@
                 <field name="horizontal_split_side">left</field>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
+                    <record id="l10n_fr_2033_A_actif_passif_total_column_net" model="account.report.expression">
+                        <field name="label">net</field>
+                        <field name="engine">aggregation</field>
+                        <field name="formula">l10n_fr_actif_tot.net - l10n_fr_passif_tot.net</field>
+                    </record>
                     <record id="l10n_fr_2033_A_actif_passif_total_column_net_round" model="account.report.expression">
                         <field name="label">net_round</field>
                         <field name="engine">aggregation</field>
-                        <field name="formula">l10n_fr_actif_tot.net_round - l10n_fr_passif_tot.net_round</field>
+                        <field name="formula">l10n_fr_actif_passif_total.net</field>
+                        <field name="subformula">round(0, HALF-UP)</field>
                     </record>
                 </field>
                 <field name="children_ids">
@@ -49,20 +55,38 @@
                         <field name="name@fr">General Actif (I + II)</field>
                         <field name="code">l10n_fr_actif_tot</field>
                         <field name="expression_ids">
+                            <record id="l10n_fr_2033_A_actif_total_column_brut" model="account.report.expression">
+                                <field name="label">brut</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">l10n_fr_actif_immobilise.brut + l10n_fr_actif_circulant.brut</field>
+                            </record>
                             <record id="l10n_fr_2033_A_actif_total_column_brut_round" model="account.report.expression">
                                 <field name="label">brut_round</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">l10n_fr_actif_immobilise.brut_round + l10n_fr_actif_circulant.brut_round</field>
+                                <field name="formula">l10n_fr_actif_tot.brut</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
+                            </record>
+                            <record id="l10n_fr_2033_A_actif_total_column_amort" model="account.report.expression">
+                                <field name="label">amort</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">l10n_fr_actif_immobilise.amort + l10n_fr_actif_circulant.amort</field>
                             </record>
                             <record id="l10n_fr_2033_A_actif_total_column_amort_round" model="account.report.expression">
                                 <field name="label">amort_round</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">l10n_fr_actif_immobilise.amort_round + l10n_fr_actif_circulant.amort_round</field>
+                                <field name="formula">l10n_fr_actif_tot.amort</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
+                            </record>
+                            <record id="l10n_fr_2033_A_actif_total_column_net" model="account.report.expression">
+                                <field name="label">net</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">l10n_fr_actif_immobilise.net + l10n_fr_actif_circulant.net</field>
                             </record>
                             <record id="l10n_fr_2033_A_actif_total_column_net_round" model="account.report.expression">
                                 <field name="label">net_round</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">l10n_fr_actif_immobilise.net_round + l10n_fr_actif_circulant.net_round</field>
+                                <field name="formula">l10n_fr_actif_tot.net</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                         <field name="children_ids">
@@ -71,20 +95,38 @@
                                 <field name="name@fr">I. Actif immobilisé (1)</field>
                                 <field name="code">l10n_fr_actif_immobilise</field>
                                 <field name="expression_ids">
+                                    <record id="l10n_fr_2033_A_line_01_actif_column_brut" model="account.report.expression">
+                                        <field name="label">brut</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_immobilis_incorpo.brut + l10n_fr_immobilis_corporelles.brut + l10n_fr_immobilis_fin.brut</field>
+                                    </record>
                                     <record id="l10n_fr_2033_A_line_01_actif_column_brut_round" model="account.report.expression">
                                         <field name="label">brut_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_immobilis_incorpo.brut_round + l10n_fr_immobilis_corporelles.brut_round + l10n_fr_immobilis_fin.brut_round</field>
+                                        <field name="formula">l10n_fr_actif_immobilise.brut</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
+                                    </record>
+                                    <record id="l10n_fr_2033_A_line_01_actif_column_amort" model="account.report.expression">
+                                        <field name="label">amort</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_immobilis_incorpo.amort + l10n_fr_immobilis_corporelles.amort + l10n_fr_immobilis_fin.amort</field>
                                     </record>
                                     <record id="l10n_fr_2033_A_line_01_actif_column_amort_round" model="account.report.expression">
                                         <field name="label">amort_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_immobilis_incorpo.amort_round + l10n_fr_immobilis_corporelles.amort_round + l10n_fr_immobilis_fin.amort_round</field>
+                                        <field name="formula">l10n_fr_actif_immobilise.amort</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
+                                    </record>
+                                    <record id="l10n_fr_2033_A_line_01_actif_column_net" model="account.report.expression">
+                                        <field name="label">net</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_immobilis_incorpo.net + l10n_fr_immobilis_corporelles.net + l10n_fr_immobilis_fin.net</field>
                                     </record>
                                     <record id="l10n_fr_2033_A_line_01_actif_column_net_round" model="account.report.expression">
                                         <field name="label">net_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_immobilis_incorpo.net_round + l10n_fr_immobilis_corporelles.net_round + l10n_fr_immobilis_fin.net_round</field>
+                                        <field name="formula">l10n_fr_actif_immobilise.net</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -93,20 +135,38 @@
                                         <field name="name@fr">Immobilisations incorporelles</field>
                                         <field name="code">l10n_fr_immobilis_incorpo</field>
                                         <field name="expression_ids">
+                                            <record id="l10n_fr_2033_A_line_01_1_actif_column_brut" model="account.report.expression">
+                                                <field name="label">brut</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_fonds_commercial.brut + l10n_fr_autres_incorp.brut</field>
+                                            </record>
                                             <record id="l10n_fr_2033_A_line_01_1_actif_column_brut_round" model="account.report.expression">
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_fonds_commercial.brut_round + l10n_fr_autres_incorp.brut_round</field>
+                                                <field name="formula">l10n_fr_immobilis_incorpo.brut</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_01_1_actif_column_amort" model="account.report.expression">
+                                                <field name="label">amort</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_fonds_commercial.amort + l10n_fr_autres_incorp.amort</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_1_actif_column_amort_round" model="account.report.expression">
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_fonds_commercial.amort_round + l10n_fr_autres_incorp.amort_round</field>
+                                                <field name="formula">l10n_fr_immobilis_incorpo.amort</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_01_1_actif_column_net" model="account.report.expression">
+                                                <field name="label">net</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_fonds_commercial.net + l10n_fr_autres_incorp.net</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_1_actif_column_net_round" model="account.report.expression">
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_fonds_commercial.net_round + l10n_fr_autres_incorp.net_round</field>
+                                                <field name="formula">l10n_fr_immobilis_incorpo.net</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -124,7 +184,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_fonds_commercial.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_01_1_1_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -135,7 +195,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_fonds_commercial.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_01_1_1_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -146,7 +206,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_fonds_commercial.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -164,7 +224,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_incorp.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_01_1_2_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -175,7 +235,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_incorp.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_01_1_2_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -186,7 +246,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_incorp.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -206,7 +266,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_corporelles.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_2_actif_column_amort" model="account.report.expression">
                                                 <field name="label">amort</field>
@@ -217,7 +277,7 @@
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_corporelles.amort</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_2_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -228,7 +288,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_corporelles.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -246,7 +306,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_fin.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_3_actif_column_amort" model="account.report.expression">
                                                 <field name="label">amort</field>
@@ -257,7 +317,7 @@
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_fin.amort</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_3_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -268,7 +328,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_immobilis_fin.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -279,20 +339,38 @@
                                 <field name="name@fr">II. Actif circulant</field>
                                 <field name="code">l10n_fr_actif_circulant</field>
                                 <field name="expression_ids">
+                                    <record id="l10n_fr_2033_A_line_02_actif_column_brut" model="account.report.expression">
+                                        <field name="label">brut</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_stock.brut + l10n_fr_advances_commandes.brut + l10n_fr_creances.brut + l10n_fr_valeurs_placement.brut + l10n_fr_dispo.brut + l10n_fr_charges_avance.brut</field>
+                                    </record>
                                     <record id="l10n_fr_2033_A_line_02_actif_column_brut_round" model="account.report.expression">
                                         <field name="label">brut_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_stock.brut_round + l10n_fr_advances_commandes.brut_round + l10n_fr_creances.brut_round + l10n_fr_valeurs_placement.brut_round + l10n_fr_dispo.brut_round + l10n_fr_charges_avance.brut_round</field>
+                                        <field name="formula">l10n_fr_actif_circulant.brut</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
+                                    </record>
+                                    <record id="l10n_fr_2033_A_line_02_actif_column_amort" model="account.report.expression">
+                                        <field name="label">amort</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_stock.amort + l10n_fr_creances.amort + l10n_fr_valeurs_placement.amort</field>
                                     </record>
                                     <record id="l10n_fr_2033_A_line_02_actif_column_amort_round" model="account.report.expression">
                                         <field name="label">amort_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_stock.amort_round + l10n_fr_creances.amort_round + l10n_fr_valeurs_placement.amort_round</field>
+                                        <field name="formula">l10n_fr_actif_circulant.amort</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
+                                    </record>
+                                    <record id="l10n_fr_2033_A_line_02_actif_column_net" model="account.report.expression">
+                                        <field name="label">net</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_stock.net + l10n_fr_advances_commandes.net + l10n_fr_creances.net + l10n_fr_valeurs_placement.net + l10n_fr_dispo.net + l10n_fr_charges_avance.net</field>
                                     </record>
                                     <record id="l10n_fr_2033_A_line_02_actif_column_net_round" model="account.report.expression">
                                         <field name="label">net_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_stock.net_round + l10n_fr_advances_commandes.net_round + l10n_fr_creances.net_round + l10n_fr_valeurs_placement.net_round + l10n_fr_dispo.net_round + l10n_fr_charges_avance.net_round</field>
+                                        <field name="formula">l10n_fr_actif_circulant.net</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -301,20 +379,38 @@
                                         <field name="name@fr">Stock</field>
                                         <field name="code">l10n_fr_stock</field>
                                         <field name="expression_ids">
+                                            <record id="l10n_fr_2033_A_line_02_1_actif_column_brut" model="account.report.expression">
+                                                <field name="label">brut</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_matieres_approvi_cours.brut + l10n_fr_marchandises.brut</field>
+                                            </record>
                                             <record id="l10n_fr_2033_A_line_02_1_actif_column_brut_round" model="account.report.expression">
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_matieres_approvi_cours.brut_round + l10n_fr_marchandises.brut_round</field>
+                                                <field name="formula">l10n_fr_stock.brut</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_02_1_actif_column_amort" model="account.report.expression">
+                                                <field name="label">amort</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_matieres_approvi_cours.amort + l10n_fr_marchandises.amort</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_1_actif_column_amort_round" model="account.report.expression">
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_matieres_approvi_cours.amort_round + l10n_fr_marchandises.amort_round</field>
+                                                <field name="formula">l10n_fr_stock.amort</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_02_1_actif_column_net" model="account.report.expression">
+                                                <field name="label">net</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_matieres_approvi_cours.net + l10n_fr_marchandises.net</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_1_actif_column_net_round" model="account.report.expression">
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_matieres_approvi_cours.net_round + l10n_fr_marchandises.net_round</field>
+                                                <field name="formula">l10n_fr_stock.net</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -332,7 +428,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_matieres_approvi_cours.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_1_1_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -343,7 +439,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_matieres_approvi_cours.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_1_1_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -354,7 +450,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_matieres_approvi_cours.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -372,7 +468,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_marchandises.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_1_2_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -383,7 +479,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_marchandises.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_1_2_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -394,7 +490,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_marchandises.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -414,7 +510,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_advances_commandes.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_2_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -425,7 +521,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_advances_commandes.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -434,20 +530,38 @@
                                         <field name="name@fr">Créances (3)</field>
                                         <field name="code">l10n_fr_creances</field>
                                         <field name="expression_ids">
+                                            <record id="l10n_fr_2033_A_line_02_3_actif_column_brut" model="account.report.expression">
+                                                <field name="label">brut</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_creances_rattaches.brut + l10n_fr_autres_creances.brut</field>
+                                            </record>
                                             <record id="l10n_fr_2033_A_line_02_3_actif_column_brut_round" model="account.report.expression">
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_creances_rattaches.brut_round + l10n_fr_autres_creances.brut_round</field>
+                                                <field name="formula">l10n_fr_creances.brut</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_02_3_actif_column_amort" model="account.report.expression">
+                                                <field name="label">amort</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_creances_rattaches.amort + l10n_fr_autres_creances.amort</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_3_actif_column_amort_round" model="account.report.expression">
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_creances_rattaches.amort_round + l10n_fr_autres_creances.amort_round</field>
+                                                <field name="formula">l10n_fr_creances.amort</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
+                                            </record>
+                                            <record id="l10n_fr_2033_A_line_02_3_actif_column_net" model="account.report.expression">
+                                                <field name="label">net</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_creances_rattaches.net + l10n_fr_autres_creances.net</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_3_actif_column_net_round" model="account.report.expression">
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_creances_rattaches.net_round + l10n_fr_autres_creances.net_round</field>
+                                                <field name="formula">l10n_fr_creances.net</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -465,7 +579,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_creances_rattaches.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_3_1_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -476,7 +590,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_creances_rattaches.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_3_1_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -487,7 +601,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_creances_rattaches.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -505,7 +619,7 @@
                                                         <field name="label">brut_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_creances.brut</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_3_2_actif_column_amort" model="account.report.expression">
                                                         <field name="label">amort</field>
@@ -516,7 +630,7 @@
                                                         <field name="label">amort_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_creances.amort</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                     <record id="l10n_fr_2033_A_line_02_3_2_actif_column_net" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -527,7 +641,7 @@
                                                         <field name="label">net_round</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">l10n_fr_autres_creances.net</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -547,7 +661,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_valeurs_placement.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_4_actif_column_amort" model="account.report.expression">
                                                 <field name="label">amort</field>
@@ -558,7 +672,7 @@
                                                 <field name="label">amort_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_valeurs_placement.amort</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_4_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -569,7 +683,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_valeurs_placement.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -587,7 +701,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_dispo.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_5_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -598,7 +712,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_dispo.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -616,7 +730,7 @@
                                                 <field name="label">brut_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_charges_avance.brut</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_02_6_actif_column_net" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -627,7 +741,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_charges_avance.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -641,10 +755,16 @@
                         <field name="code">l10n_fr_passif_tot</field>
                         <field name="horizontal_split_side">right</field>
                         <field name="expression_ids">
+                            <record id="l10n_fr_2033_A_passif_total_column_net" model="account.report.expression">
+                                <field name="label">net</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">l10n_fr_capitaux_propres.net + l10n_fr_provisions_risque_charge.net + l10n_fr_dettes.net</field>
+                            </record>
                             <record id="l10n_fr_2033_A_passif_total_column_net_round" model="account.report.expression">
                                 <field name="label">net_round</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">l10n_fr_capitaux_propres.net_round + l10n_fr_provisions_risque_charge.net_round + l10n_fr_dettes.net_round</field>
+                                <field name="formula">l10n_fr_passif_tot.net</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                         <field name="children_ids">
@@ -653,10 +773,16 @@
                                 <field name="name@fr">I. Capitaux Propres</field>
                                 <field name="code">l10n_fr_capitaux_propres</field>
                                 <field name="expression_ids">
+                                    <record id="l10n_fr_2033_A_line_01_passif_column_net" model="account.report.expression">
+                                        <field name="label">net</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_capital.net + l10n_fr_ecarts_reeval.net + l10n_fr_reserve_legale.net + l10n_fr_reserve_regl.net + l10n_fr_autres_reserves.net + l10n_fr_report_nouveau.net + l10n_fr_result_exercice.net + l10n_fr_subventions_invest.net + l10n_fr_provisions_reglement.net</field>
+                                    </record>
                                     <record id="l10n_fr_2033_A_line_01_passif_column_net_round" model="account.report.expression">
                                         <field name="label">net_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_capital.net_round + l10n_fr_ecarts_reeval.net_round + l10n_fr_reserve_legale.net_round + l10n_fr_reserve_regl.net_round + l10n_fr_autres_reserves.net_round + l10n_fr_report_nouveau.net_round + l10n_fr_result_exercice.net_round + l10n_fr_subventions_invest.net_round + l10n_fr_provisions_reglement.net_round</field>
+                                        <field name="formula">l10n_fr_capitaux_propres.net</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -674,7 +800,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_capital.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -692,7 +818,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_ecarts_reeval.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -710,7 +836,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_reserve_legale.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -728,7 +854,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_reserve_regl.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -746,7 +872,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_autres_reserves.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -759,19 +885,13 @@
                                                 <field name="label">past_pnl</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="subformula">cross_report(l10n_fr_reports.l10n_fr_2033_B, force_date_scope)</field>
-                                                <field name="formula">FR_2033_B_c310.balance</field>
+                                                <field name="formula">FR_2033_B_c310.balance_unrounded</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_6_passif_deprecated_income" model="account.report.expression">
                                                 <field name="label">deprecated_income</field>
                                                 <field name="engine">account_codes</field>
-                                                <field name="formula">-771 - 774 - 775 - 777 - 791 - 796 - 797</field>
-                                                <field name="date_scope">to_beginning_of_fiscalyear</field>
-                                            </record>
-                                            <record id="l10n_fr_2033_A_line_01_6_passif_deprecated_expense" model="account.report.expression">
-                                                <field name="label">deprecated_expense</field>
-                                                <field name="engine">account_codes</field>
-                                                <field name="formula">671 + 674 + 675 + 6812</field>
+                                                <field name="formula">-791 - 796</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>
                                             <record id="l10n_fr_2033_A_line_01_6_passif_accounts" model="account.report.expression">
@@ -780,11 +900,16 @@
                                                 <field name="formula">['|', '|', ('account_id.code','=like','11%'), ('account_id.code','=like','12%'), ('account_id.account_type','=','equity_unaffected')]</field>
                                                 <field name="subformula">-sum</field>
                                             </record>
+                                            <record id="l10n_fr_2033_A_line_01_6_passif_net" model="account.report.expression">
+                                                <field name="label">net</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">l10n_fr_report_nouveau.past_pnl + l10n_fr_report_nouveau.deprecated_income + l10n_fr_report_nouveau.accounts</field>
+                                            </record>
                                             <record id="l10n_fr_2033_A_line_01_6_passif_net_round" model="account.report.expression">
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">l10n_fr_report_nouveau.past_pnl + l10n_fr_report_nouveau.deprecated_income - l10n_fr_report_nouveau.deprecated_expense + l10n_fr_report_nouveau.accounts</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="formula">l10n_fr_report_nouveau.net</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -796,7 +921,7 @@
                                             <record id="l10n_fr_2033_A_line_01_7_passif_net" model="account.report.expression">
                                                 <field name="label">net</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">FR_2033_B_c310.balance</field>
+                                                <field name="formula">FR_2033_B_c310.balance_unrounded</field>
                                                 <field name="subformula">cross_report(l10n_fr_reports.l10n_fr_2033_B, force_date_scope)</field>
                                                 <field name="date_scope">from_fiscalyear</field>
                                             </record>
@@ -804,7 +929,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_result_exercice.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -822,7 +947,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_subventions_invest.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -840,7 +965,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_provisions_reglement.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -860,7 +985,7 @@
                                         <field name="label">net_round</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">l10n_fr_provisions_risque_charge.net</field>
-                                        <field name="subformula">round(0)</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                             </record>
@@ -869,10 +994,16 @@
                                 <field name="name@fr">III. Dettes (6)</field>
                                 <field name="code">l10n_fr_dettes</field>
                                 <field name="expression_ids">
+                                    <record id="l10n_fr_2033_A_line_03_passif_column_net" model="account.report.expression">
+                                        <field name="label">net</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">l10n_fr_emprunts_dettes.net + l10n_fr_avances_cours.net + l10n_fr_dettes_rattaches.net + l10n_fr_dettes_sociales.net + l10n_fr_compte_assoc.net + l10n_fr_autres_dettes.net + l10n_fr_produits_davance.net</field>
+                                    </record>
                                     <record id="l10n_fr_2033_A_line_03_passif_column_net_round" model="account.report.expression">
                                         <field name="label">net_round</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">l10n_fr_emprunts_dettes.net_round + l10n_fr_avances_cours.net_round + l10n_fr_dettes_rattaches.net_round + l10n_fr_dettes_sociales.net_round + l10n_fr_compte_assoc.net_round + l10n_fr_autres_dettes.net_round + l10n_fr_produits_davance.net_round</field>
+                                        <field name="formula">l10n_fr_dettes.net</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -890,7 +1021,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_emprunts_dettes.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -908,7 +1039,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_avances_cours.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -926,7 +1057,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_dettes_rattaches.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -944,7 +1075,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_dettes_sociales.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -962,7 +1093,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_compte_assoc.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -980,7 +1111,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_autres_dettes.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -998,7 +1129,7 @@
                                                 <field name="label">net_round</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_fr_produits_davance.net</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -1018,12 +1149,13 @@
                         <field name="label">net</field>
                         <field name="engine">account_codes</field>
                         <field name="formula">20D + 21D + 23D + 72C</field>
+                        <field name="date_scope">from_fiscalyear</field>
                     </record>
                     <record id="l10n_fr_2033_A_subline_1_column_net_round" model="account.report.expression">
                         <field name="label">net_round</field>
                         <field name="engine">aggregation</field>
                         <field name="formula">l10n_fr_immo_creees_cours.net</field>
-                        <field name="subformula">round(0)</field>
+                        <field name="subformula">round(0, HALF-UP)</field>
                     </record>
                 </field>
             </record>
@@ -1037,12 +1169,13 @@
                         <field name="label">net</field>
                         <field name="engine">account_codes</field>
                         <field name="formula">775</field>
+                        <field name="date_scope">from_fiscalyear</field>
                     </record>
                     <record id="l10n_fr_2033_A_subline_2_column_net_round" model="account.report.expression">
                         <field name="label">net_round</field>
                         <field name="engine">aggregation</field>
                         <field name="formula">l10n_fr_immo_vendues_cours.net</field>
-                        <field name="subformula">round(0)</field>
+                        <field name="subformula">round(0, HALF-UP)</field>
                     </record>
                 </field>
             </record>
@@ -1091,7 +1224,7 @@
                         <field name="label">net_round</field>
                         <field name="engine">aggregation</field>
                         <field name="formula">l10n_fr_compte_cour_assoc.net</field>
-                        <field name="subformula">round(0)</field>
+                        <field name="subformula">round(0, HALF-UP)</field>
                     </record>
                 </field>
             </record>
@@ -1134,13 +1267,13 @@
                     <record id="l10n_fr_2033_A_subline_8_column_net" model="account.report.expression">
                         <field name="label">net</field>
                         <field name="engine">account_codes</field>
-                        <field name="formula">44551 + 4457 + 4458</field>
+                        <field name="formula">-44551 - 4457 - 4458</field>
                     </record>
                     <record id="l10n_fr_2033_A_subline_8_column_net_round" model="account.report.expression">
                         <field name="label">net_round</field>
                         <field name="engine">aggregation</field>
                         <field name="formula">l10n_fr_dette_tva.net</field>
-                        <field name="subformula">round(0)</field>
+                        <field name="subformula">round(0, HALF-UP)</field>
                     </record>
                 </field>
             </record>

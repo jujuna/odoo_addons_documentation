@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:48+0000\n"
-"PO-Revision-Date: 2026-09-17 22:56+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-30 17:49+0000\n"
+"PO-Revision-Date: 2026-11-02 17:33+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "pos_settle_due/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "Action not allowed"
-msgstr ""
+msgstr "Actie niet toegestaan"
 
 #. module: pos_settle_due
 #: model_terms:ir.ui.view,arch_db:pos_settle_due.due_account_move_list_view
@@ -36,24 +36,27 @@ msgstr "Totaalbedrag"
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "An error occurred while depositing the money. Please try again."
 msgstr ""
+"Er is een fout opgetreden bij het storten van het geld. Probeer het opnieuw."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "An error occurred while settling the invoice(s). Please try again."
 msgstr ""
+"Er is een fout opgetreden bij het voldoen van de factuur/facturen. Probeer "
+"het opnieuw."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "Are you sure you want to cancel the settlement process?"
-msgstr ""
+msgstr "Weet je zeker dat je het afrekenproces wilt annuleren?"
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "Cancel Settlement"
-msgstr ""
+msgstr "Afrekening annuleren"
 
 #. module: pos_settle_due
 #: model:ir.model,name:pos_settle_due.model_res_company
@@ -84,6 +87,12 @@ msgstr "Kredietlimiet:"
 
 #. module: pos_settle_due
 #. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
+msgid "Deposit Money"
+msgstr "Geld storten"
+
+#. module: pos_settle_due
+#. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Deposit money"
 msgstr "Geld storten"
@@ -92,19 +101,19 @@ msgstr "Geld storten"
 #. odoo-python
 #: code:addons/pos_settle_due/models/res_partner.py:0
 msgid "Deposit money from PoS session %s"
-msgstr ""
+msgstr "Geld storten vanuit kassasessie %s"
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Deposit successful."
-msgstr ""
+msgstr "Storting geslaagd."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Deposit:"
-msgstr ""
+msgstr "Storting:"
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -136,7 +145,7 @@ msgstr "Openstaand"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Due:"
-msgstr ""
+msgstr "Verschuldigd:"
 
 #. module: pos_settle_due
 #: model:ir.model.fields,field_description:pos_settle_due.field_account_move__id
@@ -151,7 +160,7 @@ msgstr "ID"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/payment_screen/payment_screen.js:0
 msgid "Invalid Payment"
-msgstr ""
+msgstr "Ongeldige betaling"
 
 #. module: pos_settle_due
 #: model_terms:ir.ui.view,arch_db:pos_settle_due.due_account_move_list_view
@@ -162,7 +171,7 @@ msgstr "Factuurdatum"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Invoice(s) settled successfully."
-msgstr ""
+msgstr "Factuur/facturen succesvol afgerekend."
 
 #. module: pos_settle_due
 #. odoo-javascript
@@ -181,6 +190,8 @@ msgstr "Boeking"
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Pay later payments cannot be used when settling invoices."
 msgstr ""
+"Pay Later-betalingen kunnen niet worden gebruikt bij het afrekenen van "
+"facturen."
 
 #. module: pos_settle_due
 #: model:ir.model,name:pos_settle_due.model_pos_config
@@ -195,30 +206,37 @@ msgstr "Kassasessie"
 #. module: pos_settle_due
 #: model:ir.module.module,shortdesc:base.module_pos_settle_due
 msgid "Point of Sale Settle Due"
-msgstr ""
+msgstr "Kassa verschuldigd bedrag afrekenen"
 
 #. module: pos_settle_due
 #. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "Settle Invoice"
-msgstr "Factuur afhandelen"
+msgstr "Factuur afrekenen"
+
+#. module: pos_settle_due
+#. odoo-javascript
+#: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
+msgid "Settle Invoice (%(name)s)"
+msgstr "Factuur afrekenen (%(name)s)"
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/partner_list/partner_line/partner_line.xml:0
 msgid "Settle invoices"
-msgstr "Facturen afhandelen"
+msgstr "Facturen afrekenen"
 
 #. module: pos_settle_due
 #: model:ir.module.module,summary:base.module_pos_settle_due
 msgid "Settle partner's due in the POS UI."
-msgstr ""
+msgstr "Verreken klantschulden in de kassa-gebruikersinterface."
 
 #. module: pos_settle_due
 #. odoo-python
 #: code:addons/pos_settle_due/models/account_move.py:0
 msgid "Settling invoice %(invoice)s"
-msgstr ""
+msgstr "Factuur %(invoice)s afrekenen"
 
 #. module: pos_settle_due
 #: model:ir.model.fields,field_description:pos_settle_due.field_res_partner__invoices_amount_due
@@ -253,17 +271,17 @@ msgstr "Ja"
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/services/pos_store.js:0
 msgid "You cannot change the customer while settling invoices."
-msgstr ""
+msgstr "Je kunt de klant niet wijzigen tijdens het afrekenen van facturen."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/utils/order_payment_validation.js:0
 msgid "You cannot have a change when settling invoices."
-msgstr ""
+msgstr "Je kunt geen wisselgeld hebben bij het afrekenen van facturen."
 
 #. module: pos_settle_due
 #. odoo-javascript
 #: code:addons/pos_settle_due/static/src/app/screens/payment_screen/payment_screen.js:0
 msgid ""
 "You cannot validate a payment of 0 amount when you are depositing money."
-msgstr ""
+msgstr "Je kunt geen betaling van 0 valideren wanneer je geld stort."

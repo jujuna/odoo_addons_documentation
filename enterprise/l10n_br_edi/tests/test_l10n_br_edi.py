@@ -260,26 +260,30 @@ class TestL10nBREDI(TestL10nBREDICommon):
 
         self.assertEqual(header["goods"]["class"], "TEST CLASS VALUE", "Test class value should be included in header.")
 
-    def _prepare_return(self, lines):
-        self.invoice.l10n_br_access_key = "12345678901234567890123456789012345678901234"
-        refund = self.invoice._reverse_moves()
+    def _prepare_return(self, lines, origin=None):
+        origin = origin or self.invoice
+        origin.l10n_br_access_key = "12345678901234567890123456789012345678901234"
+        refund = origin._reverse_moves()
         refund.l10n_br_edi_avatax_data = {
             "header": invoice_1_request["header"], "lines": lines, "summary": invoice_1_request["summary"],
         }
         return refund
 
     def test_prepare_tax_data_return_access_key(self):
-        referenced_item = {"documentCode": "account.move_1", "lineCode": 2}
-        refund = self._prepare_return([{"lineCode": 1, "referencedItem": referenced_item}, {"lineCode": 3}])
+        for origin in self.invoice + self.bill:
+            with self.subTest(move_type=origin.move_type):
+                referenced_item = {"documentCode": "account.move_1", "lineCode": 2}
+                lines = [{"lineCode": 1, "referencedItem": referenced_item}, {"lineCode": 3}]
+                refund = self._prepare_return(lines, origin)
 
-        lines = refund._l10n_br_edi_get_tax_data()[0]["lines"]
+                lines = refund._l10n_br_edi_get_tax_data()[0]["lines"]
 
-        self.assertEqual(
-            lines[0]["referencedItem"],
-            {"invoiceAccessKey": self.invoice.l10n_br_access_key, "lineCode": 2},
-            "Returns should reference the original NF-e by access key alone on each referenced line.",
-        )
-        self.assertNotIn("referencedItem", lines[1], "Lines without a reference should be left alone.")
+                self.assertEqual(
+                    lines[0]["referencedItem"],
+                    {"invoiceAccessKey": origin.l10n_br_access_key, "lineCode": 2},
+                    "Returns should reference the original NF-e by access key alone on each referenced line.",
+                )
+                self.assertNotIn("referencedItem", lines[1], "Lines without a reference should be left alone.")
 
     def test_submit_payload_has_no_header_ref_for_return(self):
         """The header reference built from the service params must not reach the submitted payload."""

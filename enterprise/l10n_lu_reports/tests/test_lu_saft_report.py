@@ -52,7 +52,6 @@ class TestLuSaftReport(TestSaftReport):
         cls.company_data['default_tax_sale'].sequence += 1
 
         # Create invoices
-
         invoices = cls.env['account.move'].create(
             list(starmap(cls._l10n_lu_saft_invoice_data, [
                 ('out_invoice', '2019-01-01', cls.partner_a, [
@@ -91,6 +90,24 @@ class TestLuSaftReport(TestSaftReport):
             ]
         }).action_post()
 
+        # Create bank entry
+        bank_entry = cls.env['account.move'].create({
+            'date': '2019-01-01',
+            'move_type': 'entry',
+            'state': 'draft',
+            'journal_id': cls.company_data['default_journal_bank'].id,
+            'line_ids': [
+                Command.create({
+                    'account_id': account.id,
+                    field: 100.0,
+                    'name': 'Bank line',
+                }) for field, account in (
+                    ('debit', cls.company_data['default_journal_bank'].default_account_id),
+                    ('credit', cls.company_data['company'].transfer_account_id)
+            )]
+        })
+        bank_entry.action_post()
+
     @classmethod
     def _l10n_lu_saft_invoice_data(cls, move_type, invoice_date, partner, lines_data):
         tax_type = 'purchase' if move_type == 'in_invoice' else 'sale'
@@ -123,6 +140,37 @@ class TestLuSaftReport(TestSaftReport):
         with self.assertRaises(self.ReportException) as cm:
             self._l10n_lu_saft_generate_report()
         self.assertEqual(set(cm.exception.errors), {'product_duplicate_ref', 'product_missing_ref', 'undistributed_earnings'})
+
+    def test_saft_standard_account_mapping_subgroups(self):
+        company = self.company_data['company']
+        account_vals_list = []
+        test_cases = [
+            (f'account.{company.id}_lu_2020_account_5131', -100.0, '5131', '5132'),
+            (f'account.{company.id}_lu_2020_account_5132', 100.0, '5132', '5131'),
+            (f'account.{company.id}_lu_2020_account_5171', -100.0, '5171', '5172'),
+            (f'account.{company.id}_lu_2020_account_5172', 100.0, '5172', '5171'),
+            (f'account.{company.id}_lu_2011_account_484', -100.0, '484', '485'),
+            (f'account.{company.id}_lu_2011_account_485', 100.0, '485', '484'),
+
+        ]
+        for account_ref, balance, group_code, expected in test_cases:
+            account = self.env.ref(account_ref)
+            self.assertTrue(account.code.startswith(group_code))
+            account_vals_list.append({
+                'account': account,
+                'closing_balance': balance,
+            })
+
+        values = {
+            'company': company,
+            'account_vals_list': account_vals_list,
+        }
+        self.env['account.general.ledger.report.handler']._fill_l10n_lu_saft_report_account_values(
+            {'date': {'date_from': '2020-01-01'}},
+            values)
+
+        for account_vals, (_, _, _, expected) in zip(account_vals_list, test_cases):
+            self.assertEqual(account_vals['standard_account'], expected)
 
     def test_saft_report_values(self):
         tax_8 = self.env['account.tax'].search([

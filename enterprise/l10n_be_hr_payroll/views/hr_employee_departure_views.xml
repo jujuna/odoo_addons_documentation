@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="hr.hr_employee_departure_view_form"/>
         <field name="arch" type="xml">
               <group name="header_group" position="after">
-                <notebook>
+                <notebook invisible="l10n_be_reason_code == 360">
                 <page string="Notice Period" invisible="country_code != 'BE' or not departure_reason_id or l10n_be_reason_code in [350, 351] or l10n_be_egov3_code == '999'">
                     <group>
                         <group class="o_label_nowrap">
@@ -13,6 +13,7 @@
                                    invisible="l10n_be_notice_duration_month_before_2014 == 0 and l10n_be_notice_duration_week_after_2014 == 0"/>
                             <field name="l10n_be_first_contract_id"/>
                             <field name="l10n_be_seniority_description"/>
+                            <field name="l10n_be_is_economic_unemployment" readonly="1"/>
                         </group>
                         <group class="o_label_nowrap">
                             <field name="l10n_be_notice_period_start" invisible="l10n_be_notice_respect == 'without'"/>
@@ -36,8 +37,8 @@
                             <field name="departure_date" readonly="l10n_be_notice_respect != 'partial'"/>
                             <field name="l10n_be_work_time_rate" invisible="1"/>
                             <field name="l10n_be_special_outplacement_warning" invisible="1"/>
-                            <div class="o_row gap-2" invisible="l10n_be_reason_code not in (342, 358, 359)">
-                                <label for="l10n_be_professional_reclassification" string="Outplacement" invisible="l10n_be_reason_code not in (342, 358, 359)"/>
+                            <div class="o_row gap-2" invisible="l10n_be_reason_code not in (342, 353, 358, 359)">
+                                <label for="l10n_be_professional_reclassification" string="Outplacement" invisible="l10n_be_reason_code not in (342, 353, 358, 359)"/>
                                 <i class="oi oi-filled text-info" data-icon="info" role="img"
                                     invisible="not l10n_be_special_outplacement_warning"
                                     aria-label="Since work rate of this employee is less than 50%, outplacement (Special Scheme) is not mandatory, unless requested directly from the employee."
@@ -45,7 +46,7 @@
                                     data-tooltip="Since work rate of this employee is less than 50%, outplacement (Special Scheme) is not mandatory, unless requested directly from the employee."/>
                             </div>
                             <field name="l10n_be_professional_reclassification" string="Outplacement" placeholder="None" widget="outplacement_selection" nolabel="1"
-                                invisible="l10n_be_reason_code not in (342, 358, 359)"/>
+                                invisible="l10n_be_reason_code not in (342, 353, 358, 359)"/>
                         </group>
                         <group>
                             <field name="l10n_be_salary_december_2013" invisible="not l10n_be_salary_visibility"/>

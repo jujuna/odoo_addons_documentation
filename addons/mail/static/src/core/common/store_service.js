@@ -274,7 +274,7 @@ export class Store extends BaseStore {
         navigator.serviceWorker?.addEventListener("message", ({ data = {} }) => {
             const { type, payload } = data;
             if (type === "notification-display-request") {
-                const { correlationId, model, res_id } = payload;
+                const { correlationId, model, res_id, message_id } = payload;
                 const thread = this["mail.thread"].get({ model, id: res_id });
                 let isTabFocused;
                 try {
@@ -282,9 +282,15 @@ export class Store extends BaseStore {
                 } catch {
                     // assumes tab not focused: parent.document from iframe triggers CORS error
                 }
+                const isMessageSeen =
+                    model === "discuss.channel"
+                        ? thread?.channel?.self_member_id?.seen_message_id?.id >= message_id
+                        : thread?.messages.some((m) => m.id === message_id) ||
+                          this["mail.message"].get(message_id)?.needaction === false;
                 if (
                     this.self_user?.im_status === "busy" ||
-                    (isTabFocused && thread?.channel?.isDisplayed)
+                    (isTabFocused && thread?.channel?.isDisplayed) ||
+                    isMessageSeen
                 ) {
                     navigator.serviceWorker.controller?.postMessage({
                         type: "notification-display-response",
@@ -491,7 +497,7 @@ export class Store extends BaseStore {
             this.env.services.ui.isSmall &&
             ev.target.closest(".o-mail-ChatWindow") &&
             link.href &&
-            !link.href.startsWith("#")
+            (model || !link.getAttribute("href").startsWith("#"))
         ) {
             let url;
             try {
@@ -824,7 +830,7 @@ export class Store extends BaseStore {
      * @param {string|undefined} search_filter
      */
     async searchMessagesInThread(searchTerm, thread, before, search_filter) {
-        const { count, messages } = await this.fetchStoreData(
+        const { messages } = await this.fetchStoreData(
             thread.getFetchRoute(),
             {
                 ...thread.getFetchParams(),
@@ -832,14 +838,15 @@ export class Store extends BaseStore {
                     search_filter,
                     search_term: searchTerm,
                     before,
+                    // one extra message to know whether there are more results
+                    limit: this.FETCH_LIMIT + 1,
                 },
             },
             { requestData: true }
         );
         return {
-            count,
-            loadMore: messages.length === this.FETCH_LIMIT,
-            messages,
+            loadMore: messages.length > this.FETCH_LIMIT,
+            messages: messages.slice(0, this.FETCH_LIMIT),
         };
     }
 }

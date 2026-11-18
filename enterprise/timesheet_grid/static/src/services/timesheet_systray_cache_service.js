@@ -1,4 +1,5 @@
 import { rpc } from "@web/core/network/rpc";
+import { user } from "@web/core/user";
 import { registry } from "@web/core/registry";
 import { proxy } from "@odoo/owl";
 
@@ -7,6 +8,7 @@ export const timesheetSystrayCacheService = {
 
     start(env, { lazy_session: lazySession }) {
         let fetchPromise = null;
+        let preFilledFormValue = null;
 
         const state = proxy({
             timesheets: [],
@@ -37,7 +39,9 @@ export const timesheetSystrayCacheService = {
 
                 fetchPromise = (async () => {
                     try {
-                        const data = await rpc("/timesheet_grid/timesheet_systray_user_data");
+                        const data = await rpc("/timesheet_grid/timesheet_systray_user_data", {
+                            context: user.context,
+                        });
                         const newRecords = data.timesheets?.records || [];
 
                         if (JSON.stringify(state.timesheets) !== JSON.stringify(newRecords)) {
@@ -56,10 +60,19 @@ export const timesheetSystrayCacheService = {
             },
 
             fetchPreFilledForm() {
-                state.pre_filled_form = JSON.parse(
-                    localStorage.getItem("timesheet.preFilledForm") || "{}"
-                );
+                preFilledFormValue = localStorage.getItem("timesheet.preFilledForm");
+                state.pre_filled_form = JSON.parse(preFilledFormValue || "{}");
                 return state.pre_filled_form;
+            },
+
+            /**
+             * Drops the stored task/ticket the server refused to prefill, unless
+             * another one has been visited since it was read.
+             */
+            discardStalePreFilledForm() {
+                if (localStorage.getItem("timesheet.preFilledForm") === preFilledFormValue) {
+                    localStorage.removeItem("timesheet.preFilledForm");
+                }
             },
 
             clearPreFilledForm() {

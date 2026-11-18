@@ -346,7 +346,7 @@ class DHLProvider:
         }
 
     def _send_shipment(self, shipment_request):
-        url = 'shipments'
+        url = 'shipments?bypassPLTError=true'
         res = self._send_request(url, method='POST', json=shipment_request)
         try:
             res_body = res.json()

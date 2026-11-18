@@ -101,6 +101,15 @@ class HrContractSalaryPersonalInfo(models.Model):
             info.res_model = MODELS_MAPPED.get(info.applies_on)
 
     def _hide_children(self, version):
+        """Return whether the child personal infos must be hidden for the current value.
+
+        With values (``value_ids``), the ``hide_children`` of the matching value; otherwise,
+        whether the field of the employee, version or bank account of ``version`` is empty.
+        Always ``False`` without children.
+
+        :param version: ``hr.version`` record
+        :rtype: bool
+        """
         self.ensure_one()
         for info in self:
             if not info.child_ids:

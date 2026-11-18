@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.5+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 17:49+0000\n"
-"PO-Revision-Date: 2026-10-22 16:38+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-03 16:39+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "hr_holidays_gantt/it/>\n"
@@ -56,7 +56,7 @@ msgstr "%(name)s ha richiesto ferie %(leaves)s. \n"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.js:0
 msgid "%s h / Week"
-msgstr ""
+msgstr "%s ora/settimana"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -67,7 +67,7 @@ msgstr "%sh"
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid ""
-"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time Off "
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
 "Type\" name=\"work_entry_type_id\"/>"
 msgstr ""
 
@@ -77,6 +77,8 @@ msgid ""
 "<i class=\"oi oi-lg align-self-center\" data-icon=\"schedule\" "
 "title=\"Dates\" name=\"date\"/>"
 msgstr ""
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"schedule\" "
+"title=\"Date\" name=\"date\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -84,11 +86,13 @@ msgid ""
 "<i class=\"oi oi-lg oi-filled align-self-center\" data-icon=\"edit\" "
 "title=\"Description\" name=\"name\"/>"
 msgstr ""
+"<i class=\"oi oi-lg oi-filled align-self-center\" data-icon=\"edit\" "
+"title=\"Descrizione\" name=\"name\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid "<i class=\"oi\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"east\" aria-label=\"to\" title=\"A\"/>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
@@ -96,11 +100,13 @@ msgid ""
 "<span class=\"text-muted text-nowrap\" invisible=\"not "
 "context.get('is_multi_day_selection', False)\">per day</span>"
 msgstr ""
+"<span class=\"text-muted text-nowrap\" invisible=\"not "
+"context.get('is_multi_day_selection', False)\">al giorno</span>"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid "<span> day(s)</span>"
-msgstr ""
+msgstr "<span> giorno(i)</span>"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -111,8 +117,14 @@ msgstr "Aggiungi"
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
+msgid "Allocate and Add"
+msgstr "Assegna e aggiungi"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
 msgid "Apply"
-msgstr ""
+msgstr "Applica"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -125,6 +137,8 @@ msgstr "Approva"
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.xml:0
 msgid "Approved after validation, it will require a payroll correction"
 msgstr ""
+"Una volta approvato tramite convalida, richiederà una rettifica del libro "
+"paga"
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_view
@@ -141,7 +155,7 @@ msgstr "Elimina"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/components/hr_holidays_popover/hr_holidays_gantt_popover.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "Abbandona"
 
 #. module: hr_holidays_gantt
 #: model:ir.model.fields,field_description:hr_holidays_gantt.field_hr_leave__display_code
@@ -160,14 +174,14 @@ msgstr "Nome visualizzato"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/components/hr_holidays_popover/hr_holidays_gantt_popover.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/components/hr_holidays_popover/hr_holidays_gantt_popover.js:0
 #: model:ir.model,name:hr_holidays_gantt.model_hr_employee
 msgid "Employee"
-msgstr ""
+msgstr "Dipendente"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -190,14 +204,31 @@ msgstr "ID"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.xml:0
+msgid "New"
+msgstr ""
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.xml:0
 msgid "New Employee Record"
+msgstr "Record nuovo dipendente"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "New Time Off"
 msgstr ""
 
 #. module: hr_holidays_gantt
 #: model_terms:ir.ui.view,arch_db:hr_holidays_gantt.hr_leave_gantt_multi_create_view
 msgid "Optional Description..."
 msgstr "Descrizione facoltativa..."
+
+#. module: hr_holidays_gantt
+#: model:ir.actions.server,name:hr_holidays_gantt.action_hr_holidays_overview
+msgid "Overview"
+msgstr "Panoramica"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -220,7 +251,7 @@ msgstr "Risorsa orario lavorativo"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/components/hr_holidays_popover/hr_holidays_gantt_popover.xml:0
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #. module: hr_holidays_gantt
 #: model:ir.model.fields,help:hr_holidays_gantt.field_hr_leave__display_code
@@ -229,6 +260,14 @@ msgid ""
 msgstr ""
 "Questo codice può essere modificato, serve solo a scopo di visualizzazione "
 "(max 3 lettere)"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid ""
+"This operation is not allowed as you are not linked to an employee in the "
+"current company."
+msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
@@ -253,31 +292,37 @@ msgstr "Gantt Ferie"
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Time off could not be merged back"
-msgstr ""
+msgstr "Non è stato possibile unire nuovamente le ferie"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Time off divided into two"
-msgstr ""
+msgstr "Ferie divise in due"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Time off merged back"
-msgstr ""
+msgstr "Ferie riunite"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_renderer.js:0
 msgid "Undo"
+msgstr "Annulla"
+
+#. module: hr_holidays_gantt
+#. odoo-javascript
+#: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_controller.js:0
+msgid "UserError"
 msgstr ""
 
 #. module: hr_holidays_gantt
 #. odoo-python
 #: code:addons/hr_holidays_gantt/models/hr_employee.py:0
 msgid "days"
-msgstr ""
+msgstr "giorni"
 
 #. module: hr_holidays_gantt
 #. odoo-python
@@ -289,13 +334,13 @@ msgstr "dal %(start_date)s al %(end_date)s"
 #. odoo-python
 #: code:addons/hr_holidays_gantt/models/hr_employee.py:0
 msgid "hours"
-msgstr ""
+msgstr "ore"
 
 #. module: hr_holidays_gantt
 #. odoo-javascript
 #: code:addons/hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_multi_selection_buttons.xml:0
 msgid "left"
-msgstr ""
+msgstr "rimanenti"
 
 #. module: hr_holidays_gantt
 #. odoo-python
@@ -308,6 +353,13 @@ msgstr "il %(start_date)s"
 #: code:addons/hr_holidays_gantt/models/hr_leave.py:0
 msgid "on %(start_date)s from %(start_time)s to %(end_time)s"
 msgstr "il %(start_date)s dalle %(start_time)s alle %(end_time)s"
+
+#~ msgid ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Time "
+#~ "Off Type\" name=\"work_entry_type_id\"/>"
+#~ msgstr ""
+#~ "<i class=\"oi oi-lg align-self-center\" data-icon=\"label\" title=\"Tipo "
+#~ "ferie\" name=\"work_entry_type_id\"/>"
 
 #~ msgid "Set"
 #~ msgstr "Imposta"

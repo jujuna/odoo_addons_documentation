@@ -104,7 +104,7 @@ class UPSRequest:
             # Label format is GIF, so need to rotate and convert as PDF
             im = binary_to_image(img_decoded)
             label_result = io.BytesIO()
-            im.save(label_result, 'pdf')
+            im.save(label_result, 'pdf', resolution=200)
             return label_result.getvalue()
         else:
             return img_decoded

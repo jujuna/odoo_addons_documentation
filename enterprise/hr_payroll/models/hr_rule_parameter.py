@@ -14,6 +14,8 @@ class HrRuleParameter(models.Model):
     _name = 'hr.rule.parameter'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Salary Rule Parameter'
+    _clear_cache_name = 'default'
+    _clear_cache_on_fields = {'code'}
 
     name = fields.Char(required=True, tracking=True, translate=True)
     code = fields.Char(required=True, tracking=True, copy=lambda r: f'{r.code}_copy',
@@ -37,6 +39,24 @@ class HrRuleParameter(models.Model):
 
     @api.model
     def _get_parameter_from_code(self, code, date=None, raise_if_not_found=True):
+        """
+        Return the value of the rule parameter ``code`` at ``date``.
+
+        The value is the ``parameter_value`` of the most recent ``hr.rule.parameter.value`` with
+        ``date_from <= date``, evaluated with :func:`~odoo.tools.safe_eval.expr_eval` (literals,
+        lists, tuples, dicts, arithmetic, comparisons, ``min``/``max``): typically a number, a
+        list of brackets or a dict. The lookup is cached and the result is a deep copy, which can
+        be modified safely. In salary rules, use ``payslip._rule_parameter(code)``, which takes
+        the payslip reference date (``date_to``) by default.
+
+        :param str code: code of the rule parameter
+        :param date: reference date, today if not set
+        :type date: datetime.date
+        :param bool raise_if_not_found: if no value exists at that date, raise instead of
+            returning ``None``
+        :return: the evaluated value
+        :raise UserError: if no value is found and ``raise_if_not_found`` is set
+        """
         if not date:
             date = fields.Date.today()
         parameter_value = self._get_cached_parameter_from_code(code, date)
@@ -49,14 +69,31 @@ class HrRuleParameter(models.Model):
     @api.model
     @api.ormcache('code', 'date', 'frozenset(self.env.companies.ids)')
     def _get_cached_parameter_from_code(self, code, date):
-        # This should be quite fast as it uses a limit and fields are indexed
-        # moreover the method is cached
-        rule_parameter = self.env['hr.rule.parameter.value'].search([
-            ('code', '=', code),
-            ('date_from', '<=', date)], limit=1)
-        if rule_parameter:
-            return expr_eval(rule_parameter.parameter_value)
+        """
+        Cached lookup of :meth:`_get_parameter_from_code`: return the evaluated value, or the
+        ``_PARAMETER_NOT_FOUND`` sentinel. The cache is invalidated when parameter values are
+        created, deleted, or written on ``date_from`` or ``parameter_value``.
+        """
+        # a datetime or a string compares as its day, as it did in the query
+        date = fields.Date.to_date(date)
+        for date_from, parameter_value in self._get_cached_parameter_values(code):
+            if date_from <= date:
+                return expr_eval(parameter_value)
         return _PARAMETER_NOT_FOUND
+
+    @api.model
+    @api.ormcache('code', 'frozenset(self.env.companies.ids)')
+    def _get_cached_parameter_values(self, code):
+        """
+        Return the ``(date_from, parameter_value)`` of all the values of the parameter ``code``,
+        most recent first, with a single query whatever the dates they are then looked up at.
+        Invalidated with :meth:`_get_cached_parameter_from_code`.
+
+        :rtype: tuple[tuple[date, str]]
+        """
+        values = self.env['hr.rule.parameter.value'].search_fetch(
+            [('code', '=', code)], ['date_from', 'parameter_value'], order='date_from desc')
+        return tuple((value.date_from, value.parameter_value) for value in values)
 
     @api.depends('parameter_version_ids')
     def _compute_current_value(self):
@@ -107,6 +144,11 @@ class HrRuleParameter(models.Model):
         return action
 
     def _set_all_external_identifiers_noupdate(self, noupdate):
+        """
+        Set the ``noupdate`` flag of the XML ids of these parameters and of their values.
+
+        :param bool noupdate: ``True`` to protect them from module updates
+        """
         rule_parameter_values = self.env['hr.rule.parameter.value'].search([
             ('rule_parameter_id', 'in', self.ids)
         ])
@@ -121,6 +163,11 @@ class HrRuleParameter(models.Model):
         self.env.flush_all()
 
     def write(self, vals):
+        """
+        Write on the parameters. When a user modifies a parameter created by the system, it is
+        flagged ``modified_by_user`` and its XML ids (and those of its values) are set
+        ``noupdate``.
+        """
         rule_parameters_created_by_system = self.filtered(lambda r: r.create_uid.id == SUPERUSER_ID)
         if self.env.uid != SUPERUSER_ID and rule_parameters_created_by_system:
             rule_parameters_created_by_system._set_all_external_identifiers_noupdate(True)
@@ -128,6 +175,13 @@ class HrRuleParameter(models.Model):
         return super().write(vals)
 
     def action_reset_rule_parameter(self):
+        """
+        Restore this parameter as defined in the module data: delete the values created by
+        users, re-enable the update of the XML ids, reload the payroll data files of its country
+        (``hr.payslip._update_payroll_data``), then unarchive it and clear ``modified_by_user``.
+
+        :return: client action displaying a success notification
+        """
         self.ensure_one()
         rule_parameter_values = self.env['hr.rule.parameter.value'].search([
             ('rule_parameter_id', '=', self.id)

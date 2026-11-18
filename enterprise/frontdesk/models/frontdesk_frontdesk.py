@@ -20,7 +20,7 @@ class FrontdeskFrontdesk(models.Model):
     responsible_ids = fields.Many2many(
         'res.users',
         string='Responsibles',
-        required=True, help="Responsibles are notified if no host is selected."
+        required=True, help="Responsibles are notified in Discuss of every check-in at this station, whether a host is selected or not."
     )
     host_ids = fields.Many2many('hr.employee', string='Hosts', check_company=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
@@ -33,7 +33,7 @@ class FrontdeskFrontdesk(models.Model):
     )
     authenticate_guest = fields.Boolean('Guest Details', default=True, groups='frontdesk.frontdesk_group_user')
     ask_phone = fields.Boolean(string='Phone', default=True)
-    ask_company = fields.Boolean(string='Organization', default=False)
+    ask_company = fields.Boolean(string='Visitor Company', default=False)
     ask_email = fields.Boolean(string='Email', default=False)
     notify_email = fields.Boolean('Notify by email', groups='frontdesk.frontdesk_group_user')
     mail_template_id = fields.Many2one(

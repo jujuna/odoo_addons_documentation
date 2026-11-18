@@ -63,14 +63,28 @@ class PlanningSend(models.TransientModel):
         for wiz in self:
             wiz.slot_ids = self.env['planning.slot'].with_user(self.env.user).search(self._get_slot_domain())
 
-    @api.depends('employee_ids')
+    def _get_employees_with_contact(self):
+        self.ensure_one()
+        employees = self.employee_ids
+        for company, slots in self.slot_ids.grouped("company_id").items():
+            slot_employees = slots.employee_ids
+            if self.include_unassigned and slots.filtered(lambda s: not s.resource_ids):
+                slot_employees |= self.employee_ids.filtered_domain([
+                    ("company_id", "=", company.id),
+                ])
+            employees -= slot_employees.filtered_domain([
+                (slots[0]._get_employee_contact_field(), "=", False),
+            ])
+        return employees
+
+    @api.depends("employee_ids", "include_unassigned", "slot_ids")
     def _compute_employees_no_email(self):
         for planning in self:
-            planning.employees_no_email = planning.employee_ids.filtered(lambda employee: not employee.work_email)
+            planning.employees_no_email = planning.employee_ids - planning._get_employees_with_contact()
 
     def _inverse_employees_no_email(self):
         for planning in self:
-            planning.employee_ids = planning.employees_no_email + planning.employee_ids.filtered('work_email')
+            planning.employee_ids = planning.employees_no_email + planning._get_employees_with_contact()
 
     def get_employees_without_work_email(self):
         self.ensure_one()
@@ -102,6 +116,9 @@ class PlanningSend(models.TransientModel):
     def _get_employees_missing_val(self):
         return self.employees_no_email
 
+    def _get_employee_contact_skipped_message(self):
+        return self.env._("Shifts published — employees without a work email were skipped")
+
     def action_send(self):
         employees_no_email = self.sudo()._get_employees_missing_val()
         employees = self.sudo().employee_ids - employees_no_email
@@ -119,24 +136,28 @@ class PlanningSend(models.TransientModel):
                 }
             }
 
-        planning = self.env['planning.planning']._get_preview_planning(self.start_datetime, self.end_datetime, self.include_unassigned)
-        planning.is_planning_preview = False
-        planning.include_unassigned = self.include_unassigned
-
-        slot_employees = slot_to_send.employee_ids
-        open_slots = slot_to_send.filtered(lambda s: not s.resource_ids and not s.is_past)
-        employees_to_send = self.sudo().env['hr.employee']
-        for employee in employees:
-            if employee in slot_employees:
-                employees_to_send |= employee
-            else:
-                for slot in open_slots:
-                    if not employee.planning_role_ids or not slot.role_id or slot.role_id in employee.planning_role_ids:
-                        employees_to_send |= employee
-        res = planning._send_planning(slots=slot_to_send, message=self.note, employees=employees_to_send)
+        res = True
+        for company, company_slots in slot_to_send.grouped("company_id").items():
+            planning = self.env["planning.planning"].create({
+                "company_id": company.id,
+                "start_datetime": self.start_datetime,
+                "end_datetime": self.end_datetime,
+                "include_unassigned": self.include_unassigned,
+            })
+            slot_employees = company_slots.employee_ids
+            open_slots = company_slots.filtered(lambda s: not s.resource_ids and not s.is_past)
+            employees_to_send = self.sudo().env["hr.employee"]
+            for employee in employees:
+                if employee in slot_employees:
+                    employees_to_send |= employee
+                elif employee.company_id == company:
+                    for slot in open_slots:
+                        if not employee.planning_role_ids or not slot.role_id or slot.role_id in employee.planning_role_ids:
+                            employees_to_send |= employee
+            res = planning._send_planning(slots=company_slots, message=self.note, employees=employees_to_send) and res
         if res:
             if employees_no_email:
-                message = self.env._("Shifts published — employees without a work email were skipped")
+                message = self._get_employee_contact_skipped_message()
                 notification_type = "info"
             else:
                 message = self.env._("Schedule sent to your employees")

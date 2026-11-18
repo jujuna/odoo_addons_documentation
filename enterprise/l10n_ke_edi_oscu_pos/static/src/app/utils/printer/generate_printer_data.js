@@ -18,7 +18,7 @@ patch(GeneratePrinterData.prototype, {
                 const taxTypes = { B: "16%", E: "8%", C: "0%", D: "Non-VAT", A: "Exempt" };
                 const qrcode = this.generateQrCode(this.order.l10n_ke_edi_oscu_pos_qrsrc);
                 const serial = this.order.company.l10n_ke_oscu_serial_number;
-                const sign = this.order.is_refund_or_negative() ? -1 : 1;
+                const sign = this.order.is_refund || this.order.amount_total < 0 ? -1 : 1;
                 const taxes = Object.entries(taxTypes).reduce((acc, [type, rate]) => {
                     const taxableAmount = (parsed[`taxblAmt${type}`] || 0.0) * sign;
                     const taxAmount = (parsed[`taxAmt${type}`] || 0.0) * sign;

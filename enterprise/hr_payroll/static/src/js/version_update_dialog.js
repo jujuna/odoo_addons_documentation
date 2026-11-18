@@ -6,7 +6,7 @@ import { deserializeDate, formatDate, serializeDate } from "@web/core/l10n/dates
 const { DateTime } = luxon;
 
 export class VersionUpdateDialog extends Component {
-    static template = "l10n_be_hr_payroll.VersionUpdateDialog";
+    static template = "hr_payroll.VersionUpdateDialog";
     static components = { DateTimeInput, Dialog };
 
     props = useProps({

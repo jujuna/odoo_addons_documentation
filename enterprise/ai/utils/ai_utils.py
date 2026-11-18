@@ -1003,7 +1003,7 @@ def make_batch_update_preview(env, explanation, updates):
     if not sections:
         raise ValueError("No records matched the given domain. Try again with another domain")
 
-    return env['ir.qweb']._render('ai.ai_records_preview', {"template": "update", "explanation": explanation, 'sections': sections})
+    return env['ir.qweb']._render('ai.ai_records_preview', {"template": "update", "explanation": markdown_format(explanation), 'sections': sections})
 
 
 def make_create_preview(env: Environment, explanation: str, model_name: str, preview_data: list[dict]):
@@ -1036,7 +1036,7 @@ def make_create_preview(env: Environment, explanation: str, model_name: str, pre
 
     return env["ir.qweb"]._render(
         "ai.ai_records_preview",
-        {"template": "create", "explanation": explanation, "sections": sections},
+        {"template": "create", "explanation": markdown_format(explanation), "sections": sections},
     )
 
 

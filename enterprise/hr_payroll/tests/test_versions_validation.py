@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 from odoo.exceptions import ValidationError
 from .common import TestPayslipBase
 
@@ -86,3 +86,23 @@ class TestVersionsValidation(TestPayslipBase):
 
         version.active = True
         payslip.action_validate()
+
+    def test_05_new_payslip_ignores_archived_version(self):
+        """ The version of a new payslip, in the form, is the active version of its period: an archived
+        version replacing it during the previous month is ignored. """
+        employee = self.env['hr.employee'].create({
+            'name': 'Archived Version Employee',
+            'date_version': date(2025, 10, 1),
+            'contract_date_start': date(2025, 10, 1),
+            'wage': 3000,
+            'structure_type_id': self.structure_type.id,
+        })
+        new_salary_version = employee.create_version({'date_version': date(2026, 10, 1), 'wage': 3500})
+        employee.create_version({'date_version': date(2026, 10, 15), 'wage': 4000}).action_archive()
+
+        payslip_form = Form(self.env['hr.payslip'].with_context(
+            default_employee_id=employee.id,
+            default_date_from=date(2026, 11, 1),
+        ))
+        self.assertEqual(payslip_form.version_id, new_salary_version)
+        self.assertEqual(payslip_form.allowed_version_ids[:], new_salary_version)

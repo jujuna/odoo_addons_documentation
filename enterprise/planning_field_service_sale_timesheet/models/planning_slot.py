@@ -30,7 +30,7 @@ class PlanningSlot(models.Model):
     quotations_count = fields.Integer('Quotations Count', compute='_compute_quotations_count', export_string_translation=True, groups="sales_team.group_sale_salesman")
     material_line_product_count = fields.Integer(compute='_compute_material_line_product_count', export_string_translation=False)
     pricelist_id = fields.Many2one('product.pricelist', compute="_compute_pricelist_id", export_string_translation=False)
-    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id', compute_sql='_compute_currency_id', compute_sudo=True)
+    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id', compute_sql='_compute_sql_currency_id', compute_sudo=True)
     partner_id = fields.Many2one(compute='_compute_partner_id', inverse='_inverse_partner_id', readonly=False, store=True)
     intervention_timesheet_ids = fields.One2many('account.analytic.line', 'planning_slot_id', groups="hr_timesheet.group_hr_timesheet_user", export_string_translation=False)
     intervention_effective_hours = fields.Float(compute='_compute_intervention_effective_hours', compute_sudo=True, export_string_translation=False)
@@ -279,8 +279,9 @@ class PlanningSlot(models.Model):
             is_task_related = (slot or slot._origin) == sale_line.planning_slot_id
             return all([is_not_timesheet_line, is_not_empty, is_not_service_from_so, is_task_related])
 
+        # sudo: hr.employee - can read the service product of the shift employees
         service_products = (
-            self.employee_ids.sudo().timesheet_product_id
+            self.sudo().employee_ids.timesheet_product_id
             | self.env.ref('sale_timesheet.time_product')
             | self.company_id.travel_time_invoicing_product_id.product_variant_id
         )
@@ -601,13 +602,6 @@ class PlanningSlot(models.Model):
                 **self._get_sale_order_line_vals(),
                 'product_id': product.id,
                 'product_uom_qty': quantity,
-                'price_unit': product._get_tax_included_unit_price(
-                    self.sale_order_id.company_id,
-                    self.sale_order_id.currency_id,
-                    self.sale_order_id.date_order,
-                    'sale',
-                    fiscal_position=self.sale_order_id.fiscal_position_id,
-                ),
             })
 
     def action_plan_shift(self):

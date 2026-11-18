@@ -25,5 +25,6 @@ class ResUsers(models.Model):
     def _compute_filtered_commission_plan_users_ids(self):
         today = fields.Date.context_today(self)
         for user in self:
-            user.filtered_commission_plan_users_ids = user.commission_plan_users_ids.filtered(lambda x:
-                x.date_from >= today and x.date_to <= today)
+            user.filtered_commission_plan_users_ids = user.commission_plan_users_ids.filtered(
+                lambda x: x.date_from and x.date_from <= today and (not x.date_to or x.date_to >= today)
+            )

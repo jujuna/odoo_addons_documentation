@@ -2,17 +2,18 @@
 # This file contains the translation of the following modules:
 # * equity
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-14 13:34+0000\n"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-11-10 15:31+0000\n"
 "Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/equity/"
 "tr/>\n"
@@ -34,6 +35,19 @@ msgstr "# Menkul Kıymetler"
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__shares
 msgid "# Shares"
 msgstr "# Hisseler"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "%(partner)s does not belong to a company compatible with this record."
+msgstr "%(partner)s, bu kayıtla uyumlu bir şirkete ait değil."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid ""
+"%(partner)s does not belong to a company compatible with this transaction."
+msgstr "%(partner)s, bu işlemle uyumlu bir şirkete ait değil."
 
 #. module: equity
 #. odoo-python
@@ -117,39 +131,69 @@ msgstr "<br/> Uyruk:"
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello,<br/>\n"
+"                    <p> Hello,<br>\n"
 "                        Following our legal obligations to identify clients, "
 "we need to report natural persons who directly or indirectly\n"
 "                        hold or control at least 25% in the capital or "
-"voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/>\n"
+"voting rights of <b><t t-out=\"user_id.company_id.name\"></t></b>. <br> "
+"<br>\n"
 "                        Please fill in the UBO request through the link "
-"above.<br/> <br/>\n"
+"above.<br> <br>\n"
 "                        Thank you,\n"
 "                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature\"/>\n"
+"                            <br>--<br>\n"
+"                            <t t-out=\"user_id.signature\"></t>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p> Merhaba,<br/>\n"
+"                        Müşterileri tanımlama konusundaki yasal "
+"yükümlülüklerimiz gereği, <b><t t-out=\"user_id.company_id.name\"/></b> "
+"şirketinin sermayesinde veya oy haklarında doğrudan veya dolaylı olarak\n"
+"                        en az %25% ipay sahibi olan veya kontrolü elinde "
+"bulunduran gerçek kişileri bildirmemiz gerekmektedir. <br/> <br/>\n"
+"                        Lütfen yukarıdaki bağlantıdan UBO talebini "
+"doldurun.<br/> <br/>\n"
+"                        Teşekkür ederiz,\n"
+"                       <t t-if=\"user_id.signature\">\n"
+"                            <br/> --<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div> \n"
+"            "
 
 #. module: equity
 #: model:mail.template,body_html:equity.equity_shareholder_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello,<br/>\n"
+"                    <p> Hello,<br>\n"
 "                        You will find your latest transaction and valuations "
-"in the link above. <br/> <br/>\n"
+"in the link above. <br> <br>\n"
 "                        Best,\n"
 "                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature\"/>\n"
+"                            <br>--<br>\n"
+"                            <t t-out=\"user_id.signature\"></t>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p> Merhaba,<br/>\n"
+"                        En son işleminizi ve değerlemelerinizi yukarıdaki "
+"bağlantıda bulabilirsiniz. <br/> <br/>\n"
+"                        Saygılarımla,\n"
+"                       <t t-if=\"user_id.signature\">\n"
+"                            <br/> --<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div> \n"
+"            "
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
@@ -278,7 +322,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "A partner cannot have transactions in different currencies."
-msgstr ""
+msgstr "Bir iş ortağının farklı para birimlerinde işlemleri olamaz."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -345,7 +389,7 @@ msgstr "Denetçi"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__author_id
 msgid "Author"
-msgstr ""
+msgstr "Üretici"
 
 #. module: equity
 #. odoo-javascript
@@ -404,7 +448,7 @@ msgstr "Yönetim Kurulu Üyesi"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body_has_template_value
 msgid "Body content is the same as the template"
-msgstr ""
+msgstr "Gövde içeriği şablonla aynı"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
@@ -419,12 +463,12 @@ msgstr "CEO"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
 msgid "Can Change Currency"
-msgstr ""
+msgstr "Para Birimini Değiştirebilir"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
 msgid "Can Edit Body"
-msgstr ""
+msgstr "Gövdeyi Düzenleyebilir"
 
 #. module: equity
 #. odoo-python
@@ -449,7 +493,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_ubo.py:0
 msgid "Cannot create new UBO for an existing holder"
-msgstr ""
+msgstr "Mevcut bir hamil için yeni bir UBO oluşturulamaz"
 
 #. module: equity
 #. odoo-python
@@ -516,12 +560,12 @@ msgstr "Şirket - Kat 3. İcra memuru"
 #: model:ir.model.fields,help:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,help:equity.field_equity_valuation__company_id
 msgid "Company to which this record is visible"
-msgstr ""
+msgstr "Bu kaydın görünür olduğu şirket"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "Compose Email"
-msgstr ""
+msgstr "E-posta Oluştur"
 
 #. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_configuration
@@ -539,7 +583,7 @@ msgstr "Kontak"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body
 msgid "Contents"
-msgstr ""
+msgstr "İçerikler"
 
 #. module: equity
 #. odoo-javascript
@@ -729,17 +773,17 @@ msgstr "Özkaynak Erişim Jetonu"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button
 msgid "Equity Button"
-msgstr ""
+msgstr "Özsermaye Butonu"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_text
 msgid "Equity Button Text"
-msgstr ""
+msgstr "Özsermaye Buton Metni"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_url
 msgid "Equity Button Url"
-msgstr ""
+msgstr "Özsermaye Buton URL'si"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__equity_currency_id
@@ -751,13 +795,13 @@ msgstr "Özkaynak Para Birimi"
 #. module: equity
 #: model:ir.model,name:equity.model_equity_mail_compose_message
 msgid "Equity Email composition wizard"
-msgstr ""
+msgstr "Özsermaye E-posta oluşturma sihirbazı"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "Equity Invitation"
-msgstr ""
+msgstr "Özsermaye Daveti"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_kanban_dashboard_graph
@@ -863,7 +907,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "Fill UBO"
-msgstr ""
+msgstr "UBO'yu Doldur"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -906,7 +950,7 @@ msgstr "Oluşum Tarihi"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__email_from
 msgid "From"
-msgstr ""
+msgstr "Başlama"
 
 #. module: equity
 #. odoo-javascript
@@ -1096,7 +1140,7 @@ msgstr "Geçersiz jeton"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__is_mail_template_editor
 msgid "Is Editor"
-msgstr ""
+msgstr "İş Düzenleyicisi"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_is_follower
@@ -1119,7 +1163,7 @@ msgstr "İş Pozisyonu:"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__lang
 msgid "Language"
-msgstr ""
+msgstr "Dil"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_uid
@@ -1158,12 +1202,12 @@ msgstr "Tasfiye Memuru"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__template_id
 msgid "Mail Template"
-msgstr ""
+msgstr "E-Posta Şablonu"
 
 #. module: equity
 #: model:ir.module.module,summary:base.module_equity
 msgid "Manage securities, transactions, and cap tables."
-msgstr ""
+msgstr "Menkul kıymetleri, işlemleri ve sermaye tablolarını yönetin."
 
 #. module: equity
 #. odoo-javascript
@@ -1203,7 +1247,7 @@ msgstr "Eksik Belgeler"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
 msgid "Model"
-msgstr ""
+msgstr "Model"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
@@ -1324,7 +1368,7 @@ msgstr "Bu şirket için kaydedilmiş UBO bulunmamaktadır."
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "No holders were set!"
-msgstr ""
+msgstr "Hiçbir hak sahibi ayarlanmadı!"
 
 #. module: equity
 #. odoo-javascript
@@ -1439,6 +1483,10 @@ msgid ""
 "usually be a placeholder expression that provides the appropriate language, "
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
+"Bir e-posta gönderirken seçmek için isteğe bağlı çeviri dili (ISO kodu). "
+"Ayarlanmazsa, ana ortağın dili kullanılacaktır. Bu genellikle uygun dili "
+"sağlayan bir yer tutucu ifade olmalıdır, örneğin {{ object.partner_id.lang }}"
+"."
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__options
@@ -1481,13 +1529,13 @@ msgstr "İş Ortağı"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
 msgid "Partner Ids All Have Email"
-msgstr ""
+msgstr "Ortak Kimliklerinin Hepsinin E-postası Var"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_ubo.py:0
 msgid "Partner is not allowed to fill UBO form"
-msgstr ""
+msgstr "İş ortağının UBO formunu doldurmasına izin verilmiyor"
 
 #. module: equity
 #. odoo-javascript
@@ -1549,7 +1597,7 @@ msgstr "İşlemin menkul kıymetlerinin alıcısı."
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids
 msgid "Recipients"
-msgstr ""
+msgstr "Alıcılar"
 
 #. module: equity
 #. odoo-javascript
@@ -1566,7 +1614,7 @@ msgstr "Tutucu çıkış tarihini kaldırın."
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__render_model
 msgid "Rendering Model"
-msgstr ""
+msgstr "İşleme Modeli"
 
 #. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_reporting
@@ -1581,7 +1629,7 @@ msgstr "UBO Talep Formu"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__res_ids
 msgid "Res"
-msgstr ""
+msgstr "Devam Et"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__auth_rep_role
@@ -1711,7 +1759,7 @@ msgstr "Kullanım Fiyatı"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
 msgid "Subject"
-msgstr ""
+msgstr "Konu"
 
 #. module: equity
 #. odoo-javascript
@@ -2002,7 +2050,7 @@ msgstr "Hakediş süresi, son egzersiz tarihi, vb."
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "View Equity"
-msgstr ""
+msgstr "Özsermayeyi görüntüle"
 
 #. module: equity
 #: model:res.groups,name:equity.group_equity_viewer
@@ -2014,7 +2062,7 @@ msgstr "Görüntüleyici"
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
 msgid "Visible to"
-msgstr ""
+msgstr "Görünürlük"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -2065,7 +2113,7 @@ msgstr "Beyannameyi kim doldurmalı ve imzalamalıdır?"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "Write your message here..."
-msgstr ""
+msgstr "Mesajını buraya yaz..."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2089,6 +2137,8 @@ msgid ""
 "You cannot change the equity currency because this partner already has "
 "existing transactions."
 msgstr ""
+"Bu iş ortağının halihazırda mevcut işlemleri bulunduğundan özsermaye para "
+"birimini değiştiremezsiniz."
 
 #. module: equity
 #. odoo-javascript
@@ -2196,7 +2246,7 @@ msgstr "Örneğin Tohum, Seri A, ..."
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "e.g. Welcome to MyCompany!"
-msgstr ""
+msgstr "ör. MyCompany'e Hoş Geldiniz!"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2229,7 +2279,7 @@ msgstr "veya"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "per security"
-msgstr ""
+msgstr "menkul kıymet başına"
 
 #. module: equity
 #. odoo-javascript

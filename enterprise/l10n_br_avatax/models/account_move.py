@@ -151,7 +151,7 @@ class AccountMove(models.Model):
 
     def _l10n_br_avatax_check_missing_export_fields(self, params):
         res = {}
-        if params['is_export_goods']:
+        if params['is_export_goods'] and params['partner_shipping'].country_code != 'BR':
             if not params['incoterm_location']:
                 res['missing_incoterm_location'] = {
                     "message": _("Incoterm Location is required to calculate taxes with Avatax for export of goods."),

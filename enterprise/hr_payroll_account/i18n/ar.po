@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 17:49+0000\n"
-"PO-Revision-Date: 2026-10-23 12:52+0000\n"
+"PO-Revision-Date: 2026-11-10 06:33+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
 "Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll_account/ar/>\n"
@@ -240,7 +240,7 @@ msgstr "شبكات ضرائب الخصم"
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__account_debit
 msgid "Default account defined on the journal of the pay structure."
-msgstr ""
+msgstr "الحساب الافتراضي المحدد في يومية هيكل الراتب."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_chart_template__display_name
@@ -312,6 +312,7 @@ msgstr ""
 msgid ""
 "Enable this option to set the employee on the journal items of the payslips."
 msgstr ""
+"قم بتمكين هذا الخيار لتعيين الموظف في عناصر اليومية الخاصة بإيصالات المرتبات."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
@@ -320,6 +321,9 @@ msgid ""
 "the payslip line name. It could be useful for deduction/reimbursement or "
 "payslip adjustments for instance."
 msgstr ""
+"قم بتمكين هذا الخيار لتقسيم القيود المحاسبية لهذه القاعدة وفقًا لاسم بند إيصال "
+"الدفع. قد يكون ذلك مفيدًا في حالات الخصم/التعويض أو تعديلات إيصالات الدفع على "
+"سبيل المثال."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -420,7 +424,7 @@ msgstr "عنصر اليومية"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Journal Items"
-msgstr ""
+msgstr "عناصر اليومية"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
@@ -436,13 +440,13 @@ msgstr "ملصق"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "آخر تحديث بواسطة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "آخر تحديث في"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
@@ -452,7 +456,7 @@ msgstr "البند "
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
 msgid "Mock version of an account move line used for simulations"
-msgstr ""
+msgstr "نسخة وهمية من بند قيد الحساب تُستخدم لعمليات المحاكاة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -467,7 +471,7 @@ msgstr "حالة الحركة"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "No Journal"
-msgstr ""
+msgstr "لا يوجد دفتر يومية"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -514,12 +518,12 @@ msgstr "تم الدفع في %s"
 #. module: hr_payroll_account
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_account
 msgid "Payroll Accounting"
-msgstr ""
+msgstr "محاسبة الرواتب"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_warning
 msgid "Payroll Warning"
-msgstr ""
+msgstr "تحذير كشوف المرتبات"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_line
@@ -550,7 +554,7 @@ msgstr "الرقم المرجعي "
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Review Records"
-msgstr ""
+msgstr "مراجعة السجلات"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -623,7 +627,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__tax_tag_ids
 msgid "Tax Grids"
-msgstr ""
+msgstr "شبكات الضرائب"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -640,16 +644,19 @@ msgid ""
 "with accounting rights can cancel them:\n"
 "%s"
 msgstr ""
+"إيصالات المرتبات التالية مرتبطة بقيد يومية مُرحّل، ولا يمكن إلغاؤها إلا من قِبل "
+"مستخدم يمتلك صلاحيات المحاسبة:\n"
+"%s"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Credit"
-msgstr ""
+msgstr "إجمالي الدائن"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Debit"
-msgstr ""
+msgstr "إجمالي المدين"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -659,7 +666,7 @@ msgstr "تصديق "
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
 msgid "Wizard to show previews of account moves related to pay runs."
-msgstr ""
+msgstr "معالج لعرض معاينات قيود الحساب المتعلقة بدورات الرواتب."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -671,7 +678,7 @@ msgstr "لا يمكنك إنشاء قيد دفتر يومية لإيصال دف�
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Pay Structure"
-msgstr ""
+msgstr "لا يمكنك حذف اليومية المرتبطة بهيكل الراتب"
 
 #~ msgid "Account Payslip Houserental"
 #~ msgstr "حساب إيصالات دفع تأجير المنازل"

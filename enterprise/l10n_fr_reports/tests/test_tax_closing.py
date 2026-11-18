@@ -1,6 +1,9 @@
+from ast import literal_eval
+from lxml import etree
 from unittest.mock import patch
 
 from odoo import Command
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 from odoo.tools import mute_logger
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
@@ -29,6 +32,16 @@ class TestFrenchTaxClosing(TestAccountReportsCommon):
 
         cls.partner = cls.env['res.partner'].create({
             'name': 'A partner',
+        })
+
+        cls.accounting_firm = cls.env['res.partner'].create({
+            'name': 'Accounting Firm',
+            'is_company': True,
+            'additional_identifiers': {'FR_SIRET': '73282932000074'},
+            'street': 'Rue de la Paix 1',
+            'zip': '75002',
+            'city': 'Paris',
+            'country_id': cls.env.ref('base.fr').id,
         })
 
         cls.company_data['company'].write({
@@ -445,6 +458,49 @@ class TestFrenchTaxClosing(TestAccountReportsCommon):
             edi_vals_6['declarations'][0]['forms'][0]['zones'],
         )
 
+    def _send_vat_return_get_writer_siret(self):
+        send_vat_wizard = self.env['l10n_fr_reports.send.vat.report'].create({
+            'date_from': '2024-05-01',
+            'date_to': '2024-05-31',
+            'report_id': self.report.id,
+            'bank_partner_id': self.bank_partner.id,
+        })
+        with patch.object(self.env.registry['l10n_fr_reports.send.vat.report'], '_send_xml_to_aspone') as mock_send:
+            send_vat_wizard.send_vat_return()
+        xml_content = mock_send.call_args.args[0]
+        return etree.fromstring(xml_content).findtext('.//Redacteur/Siret'), send_vat_wizard
+
+    def test_fr_send_edi_vat_writer_without_accounting_firm(self):
+        """ Without accounting firm, the company itself is the writer (Rédacteur) of the EDI declaration. """
+        writer_siret, send_vat_wizard = self._send_vat_return_get_writer_siret()
+        self.assertEqual(writer_siret, '40678483500521')
+        self.assertFalse(send_vat_wizard.is_accounting_firm_foreign)
+
+    def test_fr_send_edi_vat_writer_french_accounting_firm(self):
+        """ A French accounting firm is the writer (Rédacteur) of the EDI declaration. """
+        self.env.company.account_representative_id = self.accounting_firm
+        writer_siret, send_vat_wizard = self._send_vat_return_get_writer_siret()
+        self.assertEqual(writer_siret, '73282932000074')
+        self.assertFalse(send_vat_wizard.is_accounting_firm_foreign)
+
+    def test_fr_send_edi_vat_writer_french_accounting_firm_without_siret(self):
+        """ A French accounting firm without SIRET blocks the sending of the EDI declaration. """
+        self.accounting_firm.l10n_fr_siret = False
+        self.env.company.account_representative_id = self.accounting_firm
+        with self.assertRaises(ValidationError):
+            self._send_vat_return_get_writer_siret()
+
+    def test_fr_send_edi_vat_writer_foreign_accounting_firm(self):
+        """ A foreign accounting firm has no SIRET: the company itself is the writer (Rédacteur) of the EDI declaration. """
+        self.accounting_firm.write({
+            'additional_identifiers': {'BE_EN': '0321383962'},
+            'country_id': self.env.ref('base.be').id,
+        })
+        self.env.company.account_representative_id = self.accounting_firm
+        writer_siret, send_vat_wizard = self._send_vat_return_get_writer_siret()
+        self.assertEqual(writer_siret, '40678483500521')
+        self.assertTrue(send_vat_wizard.is_accounting_firm_foreign)
+
     def test_fr_send_edi_vat_values_with_reimbursements(self):
         """ The aim of this test is to verify edi VAT export is created
             correctly when there are reimbursements not due.
@@ -507,6 +563,77 @@ class TestFrenchTaxClosing(TestAccountReportsCommon):
             self.assertEqual(export.state, 'mixed')
             export.document_ids[1].state = 'accepted'
             self.assertEqual(export.state, 'accepted')
+
+    def test_activity_created_on_tax_report_error_multi_company(self):
+        """ The aim of this test is to verify that an activity is created when the
+            VAT EDI submission is in an error state in a multi-company setup.
+        """
+        with self.enter_registry_test_mode():
+            company_1 = self.company_data['company']
+            company_2 = self.company_data_2['company']
+            company_2.write({
+                'additional_identifiers': {'FR_SIRET': '10693937400216'},
+                'street': 'Rue Mouffetard',
+                'street2': '2',
+                'zip': '75005',
+                'city': 'Paris',
+            })
+            for company in [company_1, company_2]:
+                self.env.user.company_id = company
+
+                may_return = self.env['account.return'].create({
+                    'name': "May return",
+                    'date_from': '2024-05-01',
+                    'date_to': '2024-05-31',
+                    'type_id': self.env.ref('l10n_fr_reports.vat_return_type').id,
+                    'company_id': company.id,
+                })
+                with self.allow_pdf_render():
+                    may_return.action_validate()
+
+                send_vat_wizard = self.env['l10n_fr_reports.send.vat.report'].create({
+                    'date_from': '2024-05-01',
+                    'date_to': '2024-05-31',
+                    'report_id': self.report.id,
+                    'return_id': may_return.id,
+                    'bank_partner_id': self.bank_partner.id,
+                })
+
+                mock_aspone_response = {
+                    'success': True,
+                    'data': {
+                        'deposit_id': 123,
+                    },
+                }
+
+                with patch.object(self.env.registry['account.report.async.document'], '_get_fr_webservice_answer', return_value=mock_aspone_response):
+                    send_vat_wizard.send_vat_return()
+
+                mock_aspone_rejection = {
+                    'success': True,
+                    'data': {
+                        'interchange': {
+                            'interchange_id': 1,
+                            'declaration_ids': [1],
+                            'states': [{
+                                'name': 'history',
+                                'label': 'history',
+                                'type': 'ERROR',
+                                'final': True,
+                                'details': False,
+                            }]},
+                    },
+                }
+
+                with patch.object(self.env.registry['account.report.async.document'], '_get_fr_webservice_answer', return_value=mock_aspone_rejection):
+                    self.env['account.report.async.export'].button_process_report()
+
+                activity = self.env['mail.activity'].search([
+                    ('res_id', '=', may_return.id),
+                    ('summary', '=', 'Tax Report Error: May return'),
+                ])
+                activity.ensure_one()
+                self.assertEqual(activity.user_id.id, self.uid)
 
     def test_fr_send_edi_vat_values_with_carryover_reimbursements(self):
         """ The aim of this test is to verify carryover reimboursement move
@@ -588,3 +715,16 @@ class TestFrenchTaxClosing(TestAccountReportsCommon):
             {'account_id': self.return_receivable_account.id, 'balance': -6600.00},
             {'account_id': self.env['account.chart.template'].ref('pcg_44583').id, 'balance': 6600.00},
         ])
+
+    def test_fr_send_vat_report_bank_account_foreign_company(self):
+        """ A company located outside of France but registered for French VAT
+        (through a foreign fiscal position) must be able to select its bank
+        accounts in the EDI VAT wizard.
+        """
+        self.env.company.partner_id.country_id = self.env.ref('base.es')
+        wizard_model = self.env['l10n_fr_reports.send.vat.report']
+        domain = literal_eval(
+            wizard_model._fields['bank_partner_id'].domain
+            .replace('company_partner_id', str(self.env.company.partner_id.id)),
+        )
+        self.assertIn(self.bank_partner, self.env['res.partner.bank'].search(domain))

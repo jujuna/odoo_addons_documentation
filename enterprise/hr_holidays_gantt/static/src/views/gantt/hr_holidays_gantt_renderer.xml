@@ -2,6 +2,9 @@
 
 <templates>
     <t t-name="hr_holidays_gantt.GanttView.Buttons">
+        <button t-if="this.model.metaData.canCreate and !this.env.inDialog" class="o_gantt_button_add btn btn-primary" data-hotkey="c" t-on-click="this.onNewClicked">
+            New
+        </button>
     </t>
 
     <t t-name="hr_holidays_gantt.HrHolidaysGanttRenderer" t-inherit="web_gantt.GanttRenderer" t-inherit-mode="primary">

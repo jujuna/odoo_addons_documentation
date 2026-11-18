@@ -642,7 +642,7 @@ class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
                 Command.create({
                     'product_id': self.product_a.id,
                     'analytic_distribution': {
-                        f'{self.analytic_account_partner_a.id}, {self.analytic_account_administratif.id}': 100,
+                        f'{self.analytic_account_partner_a.id},{self.analytic_account_administratif.id}': 100,
                     },
                     'quantity': 1,
                     'price_unit': 100,

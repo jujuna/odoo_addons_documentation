@@ -557,6 +557,7 @@ class TestExpenseStripeCommon(TestExpenseCommon):
     def test_create_cardholder(self):
         """ Test the creation of the cardholder wizard """
         self.setup_account_creation(funds_amount=10000)
+        self.stripe_employee.sudo().mobile_phone = '+32111111111'  # The work mobile should be preferred over the work phone, as it is able to receive SMS
         card = self.env['hr.expense.stripe.card'].with_user(self.expense_user_manager).create([{
             'employee_id': self.stripe_employee.id,
             'name': 'Test Card',
@@ -567,6 +568,7 @@ class TestExpenseStripeCommon(TestExpenseCommon):
             card.with_user(self.expense_user_employee).action_open_cardholder_wizard()
         action = card.with_user(self.expense_user_manager).action_open_cardholder_wizard()
         wizard = self.env['hr.expense.stripe.cardholder.wizard'].with_context(action['context']).browse(action['res_id']).sudo()
+        self.assertEqual(wizard.phone_number, '+32111111111')
         with Form(wizard) as form:
             self.assertEqual(form.firstname, 'Stripe')
             self.assertEqual(form.lastname, 'Employee')

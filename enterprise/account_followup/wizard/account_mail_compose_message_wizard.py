@@ -37,7 +37,9 @@ class MailComposeMessage(models.TransientModel):
             if composer.model != 'account.move':
                 return
             move = composer.env[composer.model].browse(composer._evaluate_res_ids())
-            if not move.is_overdue_invoice():
+            # In batch or email mode, only attachment_ids from template are used on
+            # the composer. Reports will be generated at sending time.
+            if len(move) > 1 or not move.is_overdue_invoice():
                 return
             if composer.template_id.get_external_id().get(composer.template_id.id) in REMINDER_XML_IDS:
                 composer.attachment_ids += composer.cached_followup_attachment_id

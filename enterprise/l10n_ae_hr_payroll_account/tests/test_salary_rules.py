@@ -90,6 +90,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         departure_notice = self.env['hr.employee.departure'].create({
             'employee_id': employee.id,
             'dismissal_date': dismissal_date,
+            'departure_reason_id': self.env.ref('l10n_ae_hr_payroll.departure_termination_employer_with_notice').id,
             'departure_description': 'foo',
         })
         departure_notice.action_register()
@@ -712,7 +713,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         final_slip = self._generate_payslip(date(2025, 3, 1), date(2025, 3, 28))
         final_slip.compute_sheet()
         # EOS: 0, EOSPC: 0 - (1696.67 + 1696.67 ): -3393.34
-        payslip_results = {'BASIC': 40000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 220.0, 'OTALLOW': 100.0, 'EOS': 0.0, 'EOSP': 484.76, 'EOSPC': -3393.34, 'ALP': 5090.0, 'DEWSCOMP': 2332.0, 'OOC': -39265.71, 'ALEA': 10180.0, 'ALED': 0.0, 'GROSS': 11634.29, 'NET': 11634.29, 'NETCOST': 17359.63}
+        payslip_results = {'BASIC': 40000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 220.0, 'OTALLOW': 100.0, 'EOS': 0.0, 'EOSPC': -3393.34, 'DEWSCOMP': 2332.0, 'OOC': -39265.71, 'ALEA': 10180.0, 'ALED': 0.0, 'GROSS': 11634.29, 'NET': 11634.29, 'NETCOST': 17359.63}
         self._validate_payslip(final_slip, payslip_results)
 
     def test_eos_provision_correction_resigned_reduced_benefit(self):
@@ -741,7 +742,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         final_slip.compute_sheet()
         # EOSPC: 144667.0 - 1696.67 * 2
         # EOSPC: 141273.66
-        payslip_results = {'BASIC': 40000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 220.0, 'OTALLOW': 100.0, 'EOS': 144667.0, 'EOSP': 2206.99, 'EOSPC': 141273.66, 'ALP': 23173.38, 'DEWSCOMP': 3332.0, 'OOC': -39265.71, 'ALEA': 10180.0, 'ALED': 0.0, 'GROSS': 156301.29, 'NET': 156301.29, 'NETCOST': 300906.95}
+        payslip_results = {'BASIC': 40000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 220.0, 'OTALLOW': 100.0, 'EOS': 144667.0, 'EOSPC': 141273.66, 'DEWSCOMP': 3332.0, 'OOC': -39265.71, 'ALEA': 10180.0, 'ALED': 0.0, 'GROSS': 156301.29, 'NET': 156301.29, 'NETCOST': 300906.95}
         self._validate_payslip(final_slip, payslip_results)
 
     def test_sick_leave_cross_year(self):

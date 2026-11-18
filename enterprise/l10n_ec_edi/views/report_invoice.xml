@@ -79,7 +79,7 @@
 
         <xpath expr="//table[@name='invoice_line_table']/tbody//span[@t-field='line.price_unit']" position="replace">
             <t t-set="line_edi_values" t-value="line._l10n_ec_prepare_edi_vals_to_export_USD()"/>
-            <span t-out="line_edi_values['price_unit']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
+            <span t-out="line_edi_values['price_unit_currency']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
         </xpath>
 
         <!-- Add a table for payment methods and additional info -->
@@ -96,7 +96,7 @@
                             <tr>
                                 <td t-out="o.l10n_ec_sri_payment_id.name"/>
                                 <td class="text-end">
-                                    <span t-out="sum(d['payment_total'] for d in o._l10n_ec_get_payment_data())"
+                                    <span t-out="sum(d['payment_total_currency'] for d in o._l10n_ec_get_payment_data())"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
                             </tr>

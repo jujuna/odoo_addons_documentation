@@ -64,6 +64,11 @@ class HrLeave(models.Model):
         return False
 
     def _process_auto_approve_activities(self):
+        """
+        Don't auto-approve a time off without validation requested by a non-officer if a
+        blocking (danger) payroll warning applies to it: add the employee as follower and
+        schedule an approval activity for his HR responsible instead.
+        """
         # Auto approve shouldn't be processed for non-officers when leave contains blocking warning
         self.ensure_one()
         is_officer = self.env.user.has_group('hr_holidays.group_hr_holidays_user')
@@ -127,16 +132,18 @@ class HrLeave(models.Model):
     @api.model
     def _gantt_availability(self, field, res_ids, start, stop, scale):
         """
-            return {
-                value: [
-                    {
-                        'date': date,
-                        'hours': hours,
-                        'full_cell': full_cell,
-                    },
-                    ...
-                ]
-            }
+        Return the work intervals of each employee between ``start`` and ``stop``: from the
+        calendars of the versions under contract (flexible calendars are skipped), else from
+        the employee resource calendar.
+
+        :param str field: grouping field; only ``employee_id`` is supported
+        :param list res_ids: employee ids
+        :param datetime start: start of the period
+        :param datetime stop: end of the period
+        :param str scale: gantt scale (unused)
+        :return: ``{employee id: [{'date': interval start, 'hours': duration in hours}, ...]}``,
+            or ``None`` if ``field`` is not ``employee_id``
+        :rtype: dict
         """
         if field != "employee_id":
             return None
@@ -193,6 +200,10 @@ class HrLeave(models.Model):
         read_specification, limit=None, offset=0, unavailability_fields=None,
         progress_bar_fields=None, start_date=None, stop_date=None, scale=None,
     ):
+        """
+        Add the key ``availabilities``, ``{'employee_id': _gantt_availability(...)}``, to the
+        gantt data when grouped by employee.
+        """
         gantt_data = super().get_gantt_data(
             domain,
             groupby,
@@ -230,6 +241,13 @@ class HrLeave(models.Model):
             or super()._plans_hours_on_the_clock(worked_hours)
 
     def _get_payslip_domain(self):
+        """
+        Return the domain of the payslips of the employee, neither draft nor cancelled,
+        overlapping the requested dates and with a worked days line of the time type of this
+        time off.
+
+        :rtype: list
+        """
         self.ensure_one()
         return [
             ('employee_id', '=', self.employee_id.id),
@@ -255,6 +273,11 @@ class HrLeave(models.Model):
                 leave.payslip_count = self.env['hr.payslip'].search_count(leave._get_payslip_domain())
 
     def _action_validate(self, check_state=True):
+        """
+        Validate the time off, then refresh the affected draft payslips. A time off overlapping
+        a validated or paid regular payslip, and no draft one, gets ``payslip_state =
+        'blocked'``: it will be deferred to another payslip.
+        """
         def _overlaps(payslip, leave):
             """Check if a payslip overlaps with a leave."""
             return (
@@ -289,6 +312,12 @@ class HrLeave(models.Model):
         return res
 
     def action_adjust_corresponding_payslip(self):
+        """
+        Open the adjustment of the latest validated or paid payslip of the same structure type
+        overlapping each time off (``hr.payslip.action_adjust_payslip``).
+
+        :return: the adjustment action, or ``False`` if there is no such payslip
+        """
         payslips = self.env["hr.payslip"]
         for leave in self:
             matching_payslip = self.env["hr.payslip"].search([
@@ -333,6 +362,11 @@ class HrLeave(models.Model):
         self.sudo()._recompute_payslips()
 
     def _recompute_payslips(self):
+        """
+        Refresh the draft regular payslips overlapping these time off: recompute the worked
+        days lines of the payslips without lines, refresh the computed ones from the work
+        entries.
+        """
         # Recompute draft/waiting payslips
         all_payslips = self.env['hr.payslip'].sudo().search([
             ('employee_id', 'in', self.mapped('employee_id').ids),
@@ -353,11 +387,19 @@ class HrLeave(models.Model):
             waiting_payslips.action_refresh_from_work_entries()
 
     def activity_feedback(self, act_type_xmlids, user_id=None, feedback=None, attachment_ids=None, only_automated=True):
+        """Set ``payslip_state`` to ``'done'`` when the activity to defer the time off is done."""
         if 'hr_payroll.mail_activity_data_hr_leave_to_defer' in act_type_xmlids:
             self.write({'payslip_state': 'done'})
         return super().activity_feedback(act_type_xmlids, user_id=user_id, feedback=feedback, attachment_ids=attachment_ids, only_automated=only_automated)
 
     def _check_leave_in_payslip(self):
+        """
+        Return, per time off, whether it is **not** covered by a validated or paid regular
+        payslip (despite the name). Used to allow going back to the approval state.
+
+        :return: ``{leave: True}`` for uncovered time off, ``False`` by default
+        :rtype: collections.defaultdict
+        """
         payslips = self.env['hr.payslip'].sudo().search([
             ('employee_id', 'in', self.employee_id.ids),
             ('date_from', '<=', max(self.mapped('date_to'))),
@@ -378,6 +420,10 @@ class HrLeave(models.Model):
         return leaves_in_payslip
 
     def _check_uncovered_by_validated_payslip(self):
+        """
+        Raise a ``UserError`` if a validated time off is covered by a validated or paid regular
+        payslip validated after the creation of the time off. Return nothing.
+        """
         payslips = self.env['hr.payslip'].sudo().search([
             ('employee_id', 'in', self.employee_id.ids),
             ('date_from', '<=', max(self.mapped('date_to'))),
@@ -397,7 +443,14 @@ class HrLeave(models.Model):
                 raise UserError(_("The pay of the month is already validated with this day included. If you need to adapt, please refer to HR."))
 
     def write(self, vals):
-        if vals.get('active') and self._check_uncovered_by_validated_payslip():
+        """
+        Write on the time off and check that their ``category_options_ids`` are allowed by their
+        time type. When unarchiving, check that they are not covered by a validated payslip
+        (:meth:`_check_uncovered_by_validated_payslip`).
+
+        :raise UserError: if an option is not allowed
+        """
+        if vals.get('active'):
             self._check_uncovered_by_validated_payslip()
 
         res = super().write(vals)

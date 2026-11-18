@@ -158,7 +158,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             employee_id=self.saudi_employee.id,
             version_id=self.saudi_employee.version_id.id,
             struct_id=self.env.ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure').id)
-        payslip_results = {'BASIC': 12000.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'HOUALLOW': 1000.0, 'OTALLOW': 500.0, 'TRAALLOW': 200.0, 'EOSP': 570.83, 'EOSB': 27400.0, 'EOSPC': 26258.34, 'ANNUALP': 1141.67, 'ANNUALCOMP': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'GROSS': 54800.0, 'NET': 53532.5, 'NETCOST': 83785.84}
+        payslip_results = {'BASIC': 12000.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'HOUALLOW': 1000.0, 'OTALLOW': 500.0, 'TRAALLOW': 200.0, 'EOSB': 27400.0, 'EOSPC': 26258.34, 'ANNUALCOMP': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'GROSS': 54800.0, 'NET': 53532.5, 'NETCOST': 83785.84}
         self._validate_payslip(payslip, payslip_results)
 
     def test_payslip_overtime_1(self):

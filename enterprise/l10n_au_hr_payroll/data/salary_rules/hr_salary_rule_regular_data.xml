@@ -424,19 +424,21 @@ result, backpay_stsl = payslip._l10n_au_compute_backpay_withhold(net_salary, res
         <field name="sequence">109</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-if version.schedule_pay not in ["weekly", "fortnightly"] or not version.l10n_au_extra_pay or not payslip._l10n_au_has_extra_pay():
-    result = False
-else:
-    weekly_min_amount = payslip._rule_parameter("l10n_au_extra_withholding")[version.schedule_pay][0][0]
-    weekly_earnings = payslip._l10n_au_compute_weekly_earning(categories['GROSS'], version.schedule_pay)
-    result = weekly_earnings &gt; weekly_min_amount
+result = False
+# Only look up the rule parameter once an extra pay is due, so payslips that
+# never need it don't depend on it being defined for their date.
+if version.l10n_au_extra_pay and payslip._l10n_au_has_extra_pay():
+    brackets = payslip._rule_parameter("l10n_au_extra_withholding").get(version.schedule_pay)
+    if brackets:
+        # The brackets are expressed in whole dollars of the pay schedule's own period.
+        result = int(categories['GROSS']) &gt;= brackets[0][0]
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-weekly_earnings = payslip._l10n_au_compute_weekly_earning(categories['GROSS'], version.schedule_pay)
+earnings = int(categories['GROSS'])
 brackets = payslip._rule_parameter("l10n_au_extra_withholding")[version.schedule_pay]
 for bracket in brackets:
-    if bracket[0] &lt;= weekly_earnings &lt;= float(bracket[1]):
+    if bracket[0] &lt;= earnings &lt;= float(bracket[1]):
         result = -bracket[2]
         break
         </field>

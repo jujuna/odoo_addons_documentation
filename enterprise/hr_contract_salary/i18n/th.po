@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-09-18 01:12+0000\n"
 "Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
@@ -114,10 +114,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -134,43 +134,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>ขอแสดงความยินดี!</h2>\n"
-"                คุณสามารถกำหนดแพ็คเกจเงินเดือนของคุณได้โดยคลิกที่ลิงก์ด้านล่าง<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    ลิงก์นี้จะหมดอายุในวันที่<t t-out=\"ctx.get('validity_end')\"/>"
-".\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        กำหนดแพ็คเกจของคุณ\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -189,7 +168,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -305,8 +284,8 @@ msgid ""
 "A signatory role is unassigned. Please ensure there is a valid group or "
 "person assigned to each role."
 msgstr ""
-"บทบาทผู้ลงนามไม่ได้ถูกกำหนด โปรดตรวจสอบให้แน่ใจว่ามีกลุ่มหรือบุคคลที่ถูกต้องที่ได้รับมอบหมายให้แต่ละ"
-"บทบาท"
+"บทบาทผู้ลงนามไม่ได้ถูกกำหนด "
+"โปรดตรวจสอบให้แน่ใจว่ามีกลุ่มหรือบุคคลที่ถูกต้องที่ได้รับมอบหมายให้แต่ละบทบาท"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -887,8 +866,8 @@ msgid ""
 "Default contract used to generate an offer. If empty, benefits will be taken "
 "from current contract of the employee/nothing for an applicant."
 msgstr ""
-"สัญญาเริ่มต้นที่ใช้ในการสร้างข้อเสนอ หากว่างเปล่า ผลประโยชน์จะถูกหักออกจากสัญญาปัจจุบันของพนักงา"
-"น/ไม่มีเลยสำหรับผู้สมัคร"
+"สัญญาเริ่มต้นที่ใช้ในการสร้างข้อเสนอ หากว่างเปล่า "
+"ผลประโยชน์จะถูกหักออกจากสัญญาปัจจุบันของพนักงาน/ไม่มีเลยสำหรับผู้สมัคร"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__sign_template_id
@@ -917,8 +896,8 @@ msgid ""
 msgstr ""
 "กำหนดเมื่อระบบสร้างกิจกรรมใหม่:\n"
 "- เมื่อกำหนดสิทธิประโยชน์: การสร้างที่ไม่ซ้ำกันในครั้งแรกที่พนักงานจะรับผลประโยชน์\n"
-"- เมื่อแก้ไขสิทธิประโยชน์: กิจกรรมจะถูกสร้างขึ้นสำหรับการเปลี่ยนแปลงแต่ละรายการที่เกี่ยวข้องกับสิทธิ"
-"ประโยชน์"
+"- เมื่อแก้ไขสิทธิประโยชน์: "
+"กิจกรรมจะถูกสร้างขึ้นสำหรับการเปลี่ยนแปลงแต่ละรายการที่เกี่ยวข้องกับสิทธิประโยชน์"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__sign_frenquency
@@ -931,8 +910,8 @@ msgid ""
 msgstr ""
 "กำหนดเมื่อระบบสร้างคำขอเข้าสู่ระบบใหม่:\n"
 "- เมื่อกำหนดสิทธิประโยชน์: ขอลายเซ็นเฉพาะในครั้งแรกที่พนักงานจะรับผลประโยชน์\n"
-"- เมื่อแก้ไขสิทธิประโยชน์: คำขอลายเซ็นจะถูกสร้างขึ้นสำหรับการเปลี่ยนแปลงแต่ละรายการที่เกี่ยวข้องกั"
-"บสิทธิประโยชน์"
+"- เมื่อแก้ไขสิทธิประโยชน์: "
+"คำขอลายเซ็นจะถูกสร้างขึ้นสำหรับการเปลี่ยนแปลงแต่ละรายการที่เกี่ยวข้องกับสิทธิประโยชน์"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__department_id
@@ -1028,8 +1007,8 @@ msgid ""
 "signatures related to the benefit. eg: A company car policy to approve if "
 "you choose a company car."
 msgstr ""
-"เอกสารที่เลือกที่นี่จะถูกขอให้พนักงานเซ็นชื่อเพิ่มเติมที่เกี่ยวข้องกับสวัสดิการ เช่น นโยบายรถของบริษัทที่ต้"
-"องอนุมัติหากคุณเลือกรถบริษัท"
+"เอกสารที่เลือกที่นี่จะถูกขอให้พนักงานเซ็นชื่อเพิ่มเติมที่เกี่ยวข้องกับสวัสดิการ เช่น "
+"นโยบายรถของบริษัทที่ต้องอนุมัติหากคุณเลือกรถบริษัท"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -1320,8 +1299,7 @@ msgstr "ความรับผิดชอบ HR"
 msgid ""
 "HR Responsible %s should be a user of Sign when New Contract Document "
 "Template is specified"
-msgstr ""
-"%s ที่รับผิดชอบด้านทรัพยากรบุคคลควรเป็นผู้ใช้ลงชื่อเมื่อมีการระบุเทมเพลตเอกสารสัญญาใหม่"
+msgstr "%s ที่รับผิดชอบด้านทรัพยากรบุคคลควรเป็นผู้ใช้ลงชื่อเมื่อมีการระบุเทมเพลตเอกสารสัญญาใหม่"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -1432,8 +1410,7 @@ msgstr "ถ้าเลือก ข้อความบางข้อคว�
 msgid ""
 "If checked, the value of this information will be computed in all "
 "information set as Monthly Total"
-msgstr ""
-"หากทำเครื่องหมาย ค่าของข้อมูลนี้จะถูกคำนวณในข้อมูลทั้งหมดที่ตั้งเป็นยอดรวมรายเดือน"
+msgstr "หากทำเครื่องหมาย ค่าของข้อมูลนี้จะถูกคำนวณในข้อมูลทั้งหมดที่ตั้งเป็นยอดรวมรายเดือน"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__always_show_description
@@ -1480,9 +1457,9 @@ msgid ""
 "annual time off (legal leaves)."
 msgstr ""
 "นอกจากการลาตามกฎหมายแล้ว คุณสามารถเลือกวันหยุดเพิ่มเติมได้สูงสุด 30 วัน\n"
-"            จำนวนวันหยุดประจำปี (ลาตามกฎหมาย) ที่คุณได้รับขึ้นอยู่กับตารางการทำงานของคุณในปี"
-"ที่แล้ว ตารางการทำงานเต็มเวลาจนถึง 12 เดือนของปีที่แล้วภายใต้สัญญาของคุณ จะทำให้คุณได้รับวันหยุด"
-"ประจำปี 20 ครั้ง (ลาตามกฎหมาย)"
+"            จำนวนวันหยุดประจำปี (ลาตามกฎหมาย) "
+"ที่คุณได้รับขึ้นอยู่กับตารางการทำงานของคุณในปีที่แล้ว ตารางการทำงานเต็มเวลาจนถึง 12 "
+"เดือนของปีที่แล้วภายใต้สัญญาของคุณ จะทำให้คุณได้รับวันหยุดประจำปี 20 ครั้ง (ลาตามกฎหมาย)"
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.personal.info.type,name:hr_contract_salary.hr_contract_salary_personal_info_type_emergency
@@ -1571,6 +1548,11 @@ msgstr "ตำแหน่งงาน"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__job_title
 msgid "Job Title"
 msgstr "ชื่อตำแหน่งงาน"
+
+#. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
@@ -1826,8 +1808,7 @@ msgstr "ไม่"
 msgid ""
 "No HR responsible defined on the job position. Please contact an "
 "administrator."
-msgstr ""
-"ไม่มี ฝ่ายความรับผิดชอบ HR ที่กำหนดไว้ในตำแหน่งงาน โปรดติดต่อผู้ดูแลระบบ"
+msgstr "ไม่มี ฝ่ายความรับผิดชอบ HR ที่กำหนดไว้ในตำแหน่งงาน โปรดติดต่อผู้ดูแลระบบ"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2522,8 +2503,8 @@ msgid ""
 "Select a contract template to auto-fill the contract form with predefined "
 "values. You can still edit the fields as needed after applying the template."
 msgstr ""
-"เลือกเทมเพลตสัญญาเพื่อกรอกข้อมูลในแบบฟอร์มสัญญาโดยอัตโนมัติด้วยค่าที่กำหนดไว้ล่วงหน้า หลังจากใช้เ"
-"ทมเพลตแล้ว คุณยังสามารถแก้ไขข้อมูลในแต่ละช่องได้ตามต้องการ"
+"เลือกเทมเพลตสัญญาเพื่อกรอกข้อมูลในแบบฟอร์มสัญญาโดยอัตโนมัติด้วยค่าที่กำหนดไว้ล่วงหน้า "
+"หลังจากใช้เทมเพลตแล้ว คุณยังสามารถแก้ไขข้อมูลในแต่ละช่องได้ตามต้องการ"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2560,8 +2541,8 @@ msgid ""
 "        "
 msgstr ""
 "เลือกเฉพาะเอกสารที่มีผู้ลงนาม 1 หรือ 2 คนเท่านั้น\n"
-"        เอกสารที่มีผู้ลงนาม 1 คน จะต้องมีลายเซ็นของพนักงานเพียงคนเดียว ส่วนเอกสารที่มีผู้ลงนา"
-"ม 2 คน จะต้องมีลายเซ็นของทั้งพนักงานและผู้รับผิดชอบฝ่ายบุคคล\n"
+"        เอกสารที่มีผู้ลงนาม 1 คน จะต้องมีลายเซ็นของพนักงานเพียงคนเดียว "
+"ส่วนเอกสารที่มีผู้ลงนาม 2 คน จะต้องมีลายเซ็นของทั้งพนักงานและผู้รับผิดชอบฝ่ายบุคคล\n"
 "        "
 
 #. module: hr_contract_salary
@@ -2801,7 +2782,7 @@ msgstr "ประเภทโครงสร้าง"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
+msgid "Sum of Benefits Values"
 msgstr ""
 
 #. module: hr_contract_salary
@@ -2831,6 +2812,12 @@ msgstr "เทมเพลต"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "ข้อความ"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -2904,8 +2891,7 @@ msgstr ""
 #: code:addons/hr_contract_salary/models/hr_applicant.py:0
 msgid ""
 "The offer has been marked as refused when the linked applicant was declined."
-msgstr ""
-"ข้อเสนอนี้ถูกทำเครื่องหมายว่าถูกปฏิเสธเมื่อผู้สมัครที่เชื่อมโยงถูกปฏิเสธ"
+msgstr "ข้อเสนอนี้ถูกทำเครื่องหมายว่าถูกปฏิเสธเมื่อผู้สมัครที่เชื่อมโยงถูกปฏิเสธ"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_employee__originated_offer_id
@@ -2923,8 +2909,7 @@ msgstr ""
 msgid ""
 "The type of activity that will be created automatically on the contract if "
 "this benefit is chosen by the employee."
-msgstr ""
-"ประเภทของกิจกรรมที่จะถูกสร้างขึ้นโดยอัตโนมัติในสัญญาหากพนักงานเลือกสวัสดิการนี้"
+msgstr "ประเภทของกิจกรรมที่จะถูกสร้างขึ้นโดยอัตโนมัติในสัญญาหากพนักงานเลือกสวัสดิการนี้"
 
 #. module: hr_contract_salary
 #. odoo-javascript
@@ -2971,8 +2956,8 @@ msgid ""
 "This offer has been fully signed and can no longer be edited. However, you "
 "can still make changes to the Signed Contract if needed."
 msgstr ""
-"ข้อเสนอนี้ได้รับการลงนามครบถ้วนแล้วและไม่สามารถแก้ไขได้อีก อย่างไรก็ตาม คุณยังสามารถแก้ไขสัญญา"
-"ที่ลงนามแล้วได้หากจำเป็น"
+"ข้อเสนอนี้ได้รับการลงนามครบถ้วนแล้วและไม่สามารถแก้ไขได้อีก อย่างไรก็ตาม "
+"คุณยังสามารถแก้ไขสัญญาที่ลงนามแล้วได้หากจำเป็น"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3206,6 +3191,11 @@ msgid "id"
 msgstr "ไอดี"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3223,10 +3213,58 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: ข้อเสนองาน - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: ข้อเสนองาน - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>ขอแสดงความยินดี!</h2>\n"
+#~ "                คุณสามารถกำหนดแพ็คเกจเงินเดือนของคุณได้โดยคลิกที่ลิงก์ด้านล่าง<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    ลิงก์นี้จะหมดอายุในวันที่<t t-out=\"ctx.get('validity_end')\"/"
+#~ ">.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        กำหนดแพ็คเกจของคุณ\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "

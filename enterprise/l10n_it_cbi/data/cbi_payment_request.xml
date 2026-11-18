@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="l10n_it_cbi_payment_request_xml">
+        <CBIPaymentRequest xmlns="urn:CBI:xsd:CBIPaymentRequest.00.04.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <GrpHdr>
+                <MsgId t-out="msg_id"/>
+                <CreDtTm t-out="cre_dt_tm"/>
+                <NbOfTxs t-out="nb_of_txs"/>
+                <CtrlSum t-out="ctrl_sum"/>
+                <InitgPty>
+                    <Nm t-out="company_name"/>
+                    <Id>
+                        <OrgId>
+                            <Othr>
+                                <Id t-out="cuc"/>
+                                <Issr>CBI</Issr>
+                            </Othr>
+                        </OrgId>
+                    </Id>
+                </InitgPty>
+            </GrpHdr>
+            <PmtInf>
+                <PmtInfId t-out="msg_id"/>
+                <PmtMtd>TRF</PmtMtd>
+                <BtchBookg t-out="batch_booking"/>
+                <PmtTpInf>
+                    <InstrPrty t-if="priority" t-out="priority"/>
+                    <SvcLvl>
+                        <Cd>SEPA</Cd>
+                    </SvcLvl>
+                </PmtTpInf>
+                <ReqdExctnDt>
+                    <Dt t-out="batch_date"/>
+                </ReqdExctnDt>
+                <Dbtr>
+                    <Nm t-out="company_name"/>
+                    <Id t-if="fiscal_id">
+                        <OrgId>
+                            <Othr>
+                                <Id t-out="fiscal_id"/>
+                                <Issr>ADE</Issr>
+                            </Othr>
+                        </OrgId>
+                    </Id>
+                </Dbtr>
+                <DbtrAcct>
+                    <Id>
+                        <IBAN t-out="debtor_iban"/>
+                    </Id>
+                </DbtrAcct>
+                <DbtrAgt>
+                    <FinInstnId>
+                        <ClrSysMmbId>
+                            <MmbId t-out="abi_code"/>
+                        </ClrSysMmbId>
+                    </FinInstnId>
+                </DbtrAgt>
+                <ChrgBr>SLEV</ChrgBr>
+
+                <t t-foreach="transactions" t-as="tx">
+                    <CdtTrfTxInf>
+                        <PmtId>
+                            <InstrId t-out="tx['index']"/>
+                            <EndToEndId t-out="tx['e2e_name']"/>
+                        </PmtId>
+                        <PmtTpInf t-if="tx['is_it_iban']">
+                            <CtgyPurp>
+                                <Cd>SUPP</Cd>
+                            </CtgyPurp>
+                        </PmtTpInf>
+                        <Amt>
+                            <InstdAmt Ccy="EUR" t-out="tx['amount']"/>
+                        </Amt>
+                        <CdtrAgt t-if="tx['bank_bic']">
+                            <FinInstnId>
+                                <BICFI t-out="tx['bank_bic']"/>
+                            </FinInstnId>
+                        </CdtrAgt>
+                        <Cdtr>
+                            <Nm t-out="tx['partner_name']"/>
+                            <PstlAdr t-if="tx['street'] or tx['zip'] or tx['city'] or tx['country_code']">
+                                <StrtNm t-if="tx['street']" t-out="tx['street']"/>
+                                <PstCd t-if="tx['zip']" t-out="tx['zip']"/>
+                                <TwnNm t-if="tx['city']" t-out="tx['city']"/>
+                                <Ctry t-if="tx['country_code']" t-out="tx['country_code']"/>
+                            </PstlAdr>
+                        </Cdtr>
+                        <CdtrAcct>
+                            <Id>
+                                <IBAN t-out="tx['dest_iban']"/>
+                            </Id>
+                        </CdtrAcct>
+                        <RmtInf t-if="tx['ustrd']">
+                            <Ustrd t-out="tx['ustrd']"/>
+                        </RmtInf>
+                    </CdtTrfTxInf>
+                </t>
+            </PmtInf>
+        </CBIPaymentRequest>
+    </template>
+</odoo>

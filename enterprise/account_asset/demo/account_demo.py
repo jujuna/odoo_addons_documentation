@@ -43,6 +43,8 @@ class AccountChartTemplate(models.AbstractModel):
                 'prorata_computation_type': 'none',
                 'original_value': 1000,
                 'account_asset_id': 'fixed_assets',
+                'account_depreciation_id': 'fixed_assets',
+                'account_depreciation_expense_id': 'expense',
                 'asset_group_id': 'account_asset_group_demo',
                 'model_id': 'account_depreciation_model_demo',
             },

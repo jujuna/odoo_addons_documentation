@@ -12,17 +12,15 @@ patch(OpeningControlPopup.prototype, {
         if (this.pos.blackbox.isActive) {
             await this.pos.data.read("pos.session", [this.pos.session.id]);
             const cashier = this.pos.accessRight.loggedCashier;
-            const result = await this.pos.handleClockInOut(cashier, "in");
-            if (!result) {
-                this.pos.resetCashier();
-            }
+            // If it fails, the cashier stays logged in: the work in is retried before the next event
+            await this.pos.handleClockInOut(cashier, "in");
         }
     },
     async openDetailsPopup() {
         if (this.pos.blackbox.isActive) {
             await this.pos.blackbox.signDrawerOpen.sign(
                 this.pos.models,
-                this.pos.accessRight.loggedCashier.l10n_be_insz_or_bis_number
+                this.pos.l10nBeSigningInsz
             );
         }
         return super.openDetailsPopup();

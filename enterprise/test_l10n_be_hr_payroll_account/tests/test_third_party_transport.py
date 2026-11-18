@@ -11,11 +11,12 @@ from .test_payslip import TestPayslipBase
 @tagged('post_install', '-at_install', 'third_party_transport')
 class TestThirdPartyTransport(TestPayslipBase, TestBelgiumCommon):
 
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         # The employee starts a regular CP200 monthly contract at the start of the period.
-        self.update_version(date(2024, 9, 1))
-        self.monthly_struct = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
+        cls.update_version(date(2024, 9, 1))
+        cls.monthly_struct = cls.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
 
     def test_third_party_transport_lines(self):
         """ The subscription must produce a visible rule line and an equal negative deduction line. """

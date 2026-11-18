@@ -1,8 +1,9 @@
 from odoo import Command
-from odoo.exceptions import RedirectWarning
+from odoo.exceptions import RedirectWarning, UserError
 from odoo.tests import freeze_time, tagged, patch
 from odoo.tools import file_open
-from odoo.addons.l10n_fr_reports.tests.common import TestL10nFrReportsCommon
+from odoo.addons.l10n_fr_reports.tests.common import REPORT_PERIOD_END_DATE, REPORT_PERIOD_START_DATE, TestL10nFrReportsCommon
+from odoo.addons.l10n_fr_reports.models.l10n_fr_reports_das2_report_handler import THRESHOLD_DAS2_REPORT
 
 
 @freeze_time('2025-12-12')
@@ -225,6 +226,9 @@ class TestDAS2Report(TestL10nFrReportsCommon):
         assert_error("partner 'partner_b' city is not set")
         self.partner_b.city = "Berlin"
 
+        with self.assertRaisesRegex(UserError, f"no vendor reaches the DAS2 reporting threshold of {THRESHOLD_DAS2_REPORT}€, there is nothing to declare"):
+            handler._raise_required_fields_errors(handler._check_required_fields(self.env['res.partner'], contact_person))
+
     def test_edi_vals_generation_and_export(self):
         expected_file = file_open('l10n_fr_reports/tests/expected_files/DAS2_company_1_data_2025.xml', 'rb').read()
         self._generate_move(amount=3000).action_post()
@@ -362,6 +366,32 @@ class TestDAS2Report(TestL10nFrReportsCommon):
             xml_file = wizard._export_das2_report()
             self.assertEqual(xml_file['file_name'], 'DAS2_company_1_data_2025.xml')
             self.assertEqual(xml_file['file_content'], expected_file)
+
+    def test_edi_export_without_beneficiaries(self):
+        # Below the threshold, no DAS2TV form would be generated
+        self._generate_move(amount=1000).action_post()
+        wizard = self.env['l10n_fr.send.das2.report'].create({'year': '2025'})
+
+        with self.assertRaisesRegex(UserError, "there is nothing to declare"):
+            wizard._export_das2_report()
+
+    def test_return_check_no_das2_beneficiaries(self):
+        das2_return = self.env['account.return'].create({
+            'name': "DAS2 2025",
+            'date_from': REPORT_PERIOD_START_DATE,
+            'date_to': REPORT_PERIOD_END_DATE,
+            'type_id': self.env.ref('l10n_fr_reports.das2_return_type').id,
+            'company_id': self.env.company.id,
+        })
+
+        self._generate_move(amount=1000).action_post()
+        das2_return.refresh_checks()
+        check = das2_return.check_ids.filtered(lambda check: check.code == 'no_das2_beneficiaries')
+        self.assertEqual(check.result, 'anomaly')
+
+        self._generate_move(amount=3000).action_post()
+        das2_return.refresh_checks()
+        self.assertFalse(das2_return.check_ids.filtered(lambda check: check.code == 'no_das2_beneficiaries'))
 
     def test_format_phone_number(self):
         handler = self.env['l10n_fr.das2.report.handler']

@@ -452,7 +452,10 @@ class TestAmazon(common.TestAmazonCommon):
             """Return a mocked response without making an actual call to the SP-API."""
             base_response_ = common.OPERATIONS_RESPONSES_MAP.get(operation_)
             if operation_ == "searchOrders":
-                order_mock = base_response_["orders"][0]
+                order_mock = {
+                    **base_response_["orders"][0]
+                }
+                del order_mock["proceeds"]  # Remove the proceeds object from the order data
                 order_items = order_mock["orderItems"][0]
                 return {
                     **base_response_,
@@ -465,9 +468,6 @@ class TestAmazon(common.TestAmazonCommon):
                                     "associationType": "REPLACEMENT_ORIGINAL_ID",
                                 }
                             ],
-                            "proceeds": {
-                                # No currencyCode
-                            },
                             "orderItems": [
                                 {
                                     **order_items,
@@ -988,6 +988,8 @@ class TestAmazon(common.TestAmazonCommon):
             self.assertEqual(contact.id, delivery.id)
             self.assertEqual(contact.name, "Gederic Frilson")
             self.assertEqual(contact.type, "contact")
+            self.assertEqual(contact.vat, "1234567890")
+            self.assertTrue(contact.is_company)
             self.assertEqual(contact.street, "123 RainBowMan Street")
             self.assertFalse(contact.street2)
             self.assertEqual(contact.zip, "12345-1234")

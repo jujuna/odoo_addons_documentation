@@ -3,8 +3,6 @@
     --Card-border-radius:
             var(--Card-border-radius-top, 0) var(--Card-border-radius-top, 0)
             var(--Card-border-radius-bottom, 0) var(--Card-border-radius-bottom, 0);
-    --Card-padding-v: 10px;
-    --Card-padding-h: 14px;
 
     --badge-padding-x: 0.52em;
     --o-Badge-lineHeight: 1.166;
@@ -23,6 +21,13 @@
             border-bottom-left-radius: inherit;
             overflow: hidden;
         }
+    }
+
+    // The dashboard graph bleeds to the card edges: follow its bottom corners
+    .o_dashboard_graph {
+        overflow: hidden;
+        border-bottom-left-radius: calc(var(--Card-border-radius-bottom, 0) - var(--Card-border-width, #{$border-width}));
+        border-bottom-right-radius: calc(var(--Card-border-radius-bottom, 0) - var(--Card-border-width, #{$border-width}));
     }
 
     &.cursor-pointer:hover {

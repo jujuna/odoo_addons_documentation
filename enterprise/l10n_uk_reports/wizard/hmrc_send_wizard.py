@@ -20,7 +20,7 @@ class L10n_UkHmrcSendWizard(models.TransientModel):
         self.env['l10n_uk.vat.obligation'].import_vat_obligations()
 
         if 'obligation_id' in fields:
-            obligations = self.env['l10n_uk.vat.obligation'].search([('status', '=', 'open')])
+            obligations = self.env['l10n_uk.vat.obligation'].search([('status', '=', 'open'), ('company_id', '=', self.env.company.id)])
             if not obligations:
                 raise UserError(self.env._('No open VAT obligations were found on HMRC. '
                     'You can manually mark the return as completed or archive it if no further action is required.'))

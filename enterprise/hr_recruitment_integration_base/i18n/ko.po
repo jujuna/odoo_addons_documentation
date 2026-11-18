@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-09-18 03:37+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
@@ -48,7 +48,8 @@ msgstr "<span class=\"px-2\">-</span>"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid ""
 "<span class=\"text-muted\" invisible=\"campaign_end_date\">No limit</span>"
-msgstr "<span class=\"text-muted\" invisible=\"campaign_end_date\">무제한</span>"
+msgstr ""
+"<span class=\"text-muted\" invisible=\"campaign_end_date\">무제한</span>"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
@@ -433,7 +434,8 @@ msgstr "팔로워입니다."
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job__date_from
 msgid ""
 "Is set, update applicants availability once hired for that specific mission."
-msgstr "설정하면 특정 직무에 채용될 때 지원자의 채용 가능 여부를 업데이트합니다."
+msgstr ""
+"설정하면 특정 직무에 채용될 때 지원자의 채용 가능 여부를 업데이트합니다."
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban_search
@@ -454,6 +456,8 @@ msgid "Job Board"
 msgstr "채용 게시판"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
+#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_kanban
 msgid "Job Board Posts"
 msgstr "채용 게시판 게시물"
@@ -462,12 +466,6 @@ msgstr "채용 게시판 게시물"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Job Boards"
 msgstr "채용 게시판"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.actions.act_window,name:hr_recruitment_integration_base.action_open_hr_job_post
-#: model:ir.ui.menu,name:hr_recruitment_integration_base.menu_hr_job_boards
-msgid "Job Boards Posts"
-msgstr "채용 게시판 게시물"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_job
@@ -678,13 +676,9 @@ msgstr "업데이트 가격"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.actions.server,name:hr_recruitment_integration_base.action_publish_on_job_board
+#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid "Publish on Job Board"
 msgstr "채용 게시판에 게시"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
-msgid "Publish on Jobs Board"
-msgstr "채용 게시판에 게시하기"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -695,8 +689,8 @@ msgstr "채용 게시판에 게시"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.actions.act_window,help:hr_recruitment_integration_base.action_open_hr_job_post
-msgid "Publish one of our job position to a Jobs Board"
-msgstr "채용 공고 중에서 하나를 채용 게시판에 게시합니다."
+msgid "Publish one of our job positions on a Job Board"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban_search
@@ -808,8 +802,8 @@ msgid ""
 "job             position. The Recruiter is automatically added to all "
 "meetings with the Applicant."
 msgstr ""
-"채용 담당자는 해당 직무의 모든 지원자 채용에 대한 기본값으로 설정됩니다. "
-"채용 담당자는 지원자와의 모든 미팅에 자동으로 추가됩니다."
+"채용 담당자는 해당 직무의 모든 지원자 채용에 대한 기본값으로 설정됩니다. 채"
+"용 담당자는 지원자와의 모든 미팅에 자동으로 추가됩니다."
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__campaign_end_date
@@ -818,8 +812,8 @@ msgid ""
 "The date when the campaign will end. If not set, the campaign will run "
 "indefinitely or to the maximum allowed by a platform."
 msgstr ""
-"캠페인이 종료되는 날짜입니다. 설정하지 않으면 캠페인이 무기한 또는 "
-"플랫폼에서 허용하는 최대 기간까지 계속됩니다."
+"캠페인이 종료되는 날짜입니다. 설정하지 않으면 캠페인이 무기한 또는 플랫폼에"
+"서 허용하는 최대 기간까지 계속됩니다."
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__campaign_start_date
@@ -903,8 +897,17 @@ msgstr "플랫폼 아이콘"
 msgid "updated"
 msgstr "업데이트됨"
 
-msgid "Website Messages"
-msgstr "웹사이트 메시지"
+#~ msgid "Job Boards Posts"
+#~ msgstr "채용 게시판 게시물"
 
-msgid "Website communication history"
-msgstr "웹사이트 대화 이력"
+#~ msgid "Publish on Jobs Board"
+#~ msgstr "채용 게시판에 게시하기"
+
+#~ msgid "Publish one of our job position to a Jobs Board"
+#~ msgstr "채용 공고 중에서 하나를 채용 게시판에 게시합니다."
+
+#~ msgid "Website Messages"
+#~ msgstr "웹사이트 메시지"
+
+#~ msgid "Website communication history"
+#~ msgstr "웹사이트 대화 이력"

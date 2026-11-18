@@ -258,6 +258,17 @@ class TestShopFloor(HttpCase):
         self.assertEqual(mo.workorder_ids[0].check_ids[3].move_id.quantity, 2)
         self.assertRecordValues(mo.workorder_ids[0].check_ids[3].move_id.lot_ids, [{'id': neck_sn_1}, {'id': neck_sn_2}])
 
+    def test_shop_floor_deselect_overflowed_workcenters(self):
+        self.env['mrp.workcenter'].create([
+            {'name': f'Overflow Regression {index}'}
+            for index in range(5)
+        ])
+        self.start_tour(
+            '/odoo/shop-floor',
+            'test_shop_floor_deselect_overflowed_workcenters',
+            login='shop_floor_user',
+        )
+
     def test_shop_floor_disable_serial_create(self):
         """ This test ensures user can't create serial number in shopfloor if forbidden """
         self._enable_settings('tracking')
@@ -623,6 +634,69 @@ class TestShopFloor(HttpCase):
 
         mo.button_mark_done()
         self.assertEqual(mo.state, 'done')
+
+    def test_prefilled_lot_consumption(self):
+        """Check that prefilled lots edited, removed or applied unchanged in Shop Floor
+        are consumed as confirmed by the operator when closing the MO.
+        """
+        self._enable_settings('tracking')
+        self.warehouse.manu_type_id.write({
+            'prefill_shop_floor_lots': True,
+            'auto_close_production': False,
+        })
+        comp_1, comp_2, comp_3 = self.env['product.product'].create([{
+            'name': name,
+            'is_storable': True,
+            'tracking': 'lot',
+        } for name in ('Comp 1', 'Comp 2', 'Comp 3')])
+        bom = self.env['mrp.bom'].create({
+            'product_id': self.final_product.id,
+            'product_tmpl_id': self.final_product.product_tmpl_id.id,
+            'product_qty': 1,
+            'operation_ids': [Command.create({
+                'name': 'Consume',
+                'workcenter_id': self.workcenter.id,
+            })],
+            'bom_line_ids': [
+                Command.create({'product_id': component.id, 'product_qty': 1})
+                for component in (comp_1, comp_2, comp_3)
+            ],
+        })
+        bom.bom_line_ids.operation_id = bom.operation_ids.id
+        c1_lot_1, c2_lot_1, c2_lot_2, c3_lot_1, c3_lot_2 = self.env['stock.lot'].create([
+            {'name': 'C1-L1', 'product_id': comp_1.id},
+            {'name': 'C2-L1', 'product_id': comp_2.id},
+            {'name': 'C2-L2', 'product_id': comp_2.id},
+            {'name': 'C3-L1', 'product_id': comp_3.id},
+            {'name': 'C3-L2', 'product_id': comp_3.id},
+        ])
+        for lot, quantity in ((c1_lot_1, 10), (c2_lot_1, 3), (c2_lot_2, 2), (c3_lot_1, 3), (c3_lot_2, 2)):
+            self.env['stock.quant']._update_available_quantity(lot.product_id, self.stock_location, quantity, lot_id=lot)
+        mo = self.env['mrp.production'].create({
+            'product_id': self.final_product.id,
+            'product_qty': 5,
+            'bom_id': bom.id,
+            'picking_type_id': self.warehouse.manu_type_id.id,
+        })
+        mo.action_confirm()
+        mo.action_assign()
+        self.assertRecordValues(mo.move_raw_ids.move_line_ids, [
+            {'lot_id': c1_lot_1.id, 'quantity': 5, 'picked': False},
+            {'lot_id': c2_lot_1.id, 'quantity': 3, 'picked': False},
+            {'lot_id': c2_lot_2.id, 'quantity': 2, 'picked': False},
+            {'lot_id': c3_lot_1.id, 'quantity': 3, 'picked': False},
+            {'lot_id': c3_lot_2.id, 'quantity': 2, 'picked': False},
+        ])
+        self.start_tour('/odoo/shop-floor', 'test_prefilled_lot_consumption', login='shop_floor_user')
+        self.assertEqual(mo.workorder_ids.state, 'done')
+        mo.with_context(skip_consumption=True).button_mark_done()
+        self.assertEqual(mo.state, 'done')
+        self.assertRecordValues(mo.move_raw_ids.move_line_ids, [
+            {'lot_id': c1_lot_1.id, 'quantity': 6},
+            {'lot_id': c2_lot_2.id, 'quantity': 2},
+            {'lot_id': c3_lot_1.id, 'quantity': 3},
+            {'lot_id': c3_lot_2.id, 'quantity': 2},
+        ])
 
     def test_byproduct_serial_with_prefill_lots(self):
         """ When prefill_shop_floor_lots is enabled, by-products tracked by serial

@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.tools import float_round
 
 
 class HrVersion(models.Model):
@@ -45,6 +46,28 @@ class HrVersion(models.Model):
          'CHECK (0 <= l10n_mx_holiday_bonus_rate AND l10n_mx_holiday_bonus_rate <= 1.0)',
          'The Christmas Bonus rate must be between 0 and 100',
     )
+
+    def _l10n_mx_get_min_wage_period_days(self, reference_date):
+        """Number of days used to check if this version's wage is at or below minimum wage
+        (LSS Art. 36 / ISR exemption). For periods of 15 days or more (bi-weekly, monthly,
+        bi-monthly), it follows the Minimum Wage Days Per Month rule parameter; shorter
+        periods (daily, weekly, 10-day, 14-day) keep using the Schedule Table as-is.
+        This must not be used for the SBC, absences, vacations or bonuses, which always use
+        the Schedule Table.
+        """
+        self.ensure_one()
+        schedule_days = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_mx_schedule_table', reference_date)[self.schedule_pay]
+        if schedule_days >= 15:
+            return schedule_days / 30 * self.env['hr.rule.parameter']._get_parameter_from_code('l10n_mx_min_wage_days_per_month', reference_date)
+        return schedule_days
+
+    def _l10n_mx_is_minimum_wage(self, reference_date):
+        self.ensure_one()
+        min_wage_period_days = self._l10n_mx_get_min_wage_period_days(reference_date)
+        if not min_wage_period_days:
+            return False
+        daily_min_wage = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_mx_daily_min_wage', reference_date)[self.l10n_mx_min_wage_zone]
+        return float_round(self.wage / min_wage_period_days, precision_digits=2) <= daily_min_wage
 
     @api.model
     def _get_whitelist_fields_from_template(self):

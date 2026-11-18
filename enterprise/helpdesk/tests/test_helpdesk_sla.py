@@ -269,7 +269,7 @@ class HelpdeskSLA(TransactionCase):
             tickets.write({'stage_id': self.stage_progress.id})
             self.cr.flush()
 
-        # Set tickets to done and check teams success rates.
+        # Set tickets to done and check their SLA status.
         with self._ticket_patch_now(NOW + relativedelta(days=6)):
             tickets.write({'stage_id': self.stage_done.id})
             self.cr.flush()
@@ -278,6 +278,10 @@ class HelpdeskSLA(TransactionCase):
                 self.assertTrue(ticket.sla_success, "Tickets Reached should have sla_success True")
             for ticket in tickets_late:
                 self.assertFalse(ticket.sla_success, "Tickets (late) should have sla_success False")
+
+        # Check teams success rates the day after, as the rate covers the 7 days
+        # before today and therefore leaves out the tickets closed today.
+        with self._ticket_patch_now(NOW + relativedelta(days=7)):
             # Sentinel check for no ticket team.
             self.assertEqual(self.test_team_no_tickets.success_rate, -1.0, "Teams without tickets should have -1.0 sentinel success rate")
             # Success rate checks
@@ -340,6 +344,23 @@ class HelpdeskSLA(TransactionCase):
                 self.env[report].search([('ticket_id', 'in', all_tickets.ids), ('sla_success', '=', True)]).ticket_id,
                 ticket_reached,
                 f"{report} should only consider the SLA reached on time as a success")
+
+    def test_tickets_closed_last_7_days(self):
+        for days_ago in (0, 1, 7, 8):
+            with self._ticket_patch_now(NOW - relativedelta(days=days_ago)):
+                self.create_ticket(team=self.test_team_reached, stage_id=self.stage_done.id)
+
+        with self._ticket_patch_now(NOW):
+            self.test_team_reached._compute_ticket_closed()
+            self.assertEqual(
+                self.test_team_reached.ticket_closed, 2,
+                "Only the tickets closed in the 7 days before today should be counted, "
+                "leaving out the ones closed today and 8 days ago")
+            action = self.test_team_reached.action_view_closed_ticket()
+            self.assertEqual(
+                self.env['helpdesk.ticket'].search_count(action['domain']),
+                self.test_team_reached.ticket_closed,
+                "The Tickets Closed list should hold exactly the tickets counted on the card")
 
     def test_move_ticket_to_done_and_cancel_with_disabled_sla_and_no_calendar(self):
         """ Test moving a ticket does not cause an exception when SLAs are disabled when the calendar is empty. """

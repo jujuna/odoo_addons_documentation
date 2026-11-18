@@ -213,3 +213,38 @@ class TestMxEdiHrPayrollCommon(TestMxEdiCommon):
             payslip.l10n_mx_edi_cfdi_try_sat()
 
         self.assertRecordValues(document, [{'sat_state': 'valid'}])
+
+    def test_cfdi_nomina_seniority_from_first_contract(self):
+        """FechaInicioRelLaboral and Antigüedad must use the start of the
+        continuous employment relationship, not the current contract's start date.
+        """
+        self.employee.create_version({
+            'date_version': '1987-01-03',
+            'contract_date_start': '1987-01-03',
+            'contract_date_end': '2014-12-31'
+        })
+        payslip = self._generate_payslip_with_cfdi()
+        cfdi_values = payslip._l10n_mx_edi_add_payslip_cfdi_values()
+        receptor = cfdi_values['nomina_receptor']
+        self.assertEqual(receptor['fecha_inicio_rel_laboral'], '1987-01-03',
+            "FechaInicioRelLaboral must reflect the original employment start, not the current contract.")
+        self.assertEqual(receptor['antigüedad'], 'P2053W',
+            "Antigüedad must be computed from the original employment start.")
+
+    def test_cfdi_nomina_seniority_non_continuous(self):
+        """If the employment relationship is not continuous (there is a gap
+        between contracts), FechaInicioRelLaboral and Antigüedad must not use the first
+        contract's start date, but the start of the current continuous employment period.
+        """
+        self.employee.create_version({
+            'date_version': '1987-01-03',
+            'contract_date_start': '1987-01-03',
+            'contract_date_end': '2014-12-01',  # 31-day gap before 2015-01-01
+        })
+        payslip = self._generate_payslip_with_cfdi()
+        cfdi_values = payslip._l10n_mx_edi_add_payslip_cfdi_values()
+        receptor = cfdi_values['nomina_receptor']
+        self.assertEqual(receptor['fecha_inicio_rel_laboral'], '2015-01-01',
+            "FechaInicioRelLaboral must not use the first version if employment was not continuous.")
+        self.assertEqual(receptor['antigüedad'], 'P593W',
+            "Antigüedad must be computed from the current continuous employment start date.")

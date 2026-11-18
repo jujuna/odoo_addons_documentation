@@ -7,9 +7,9 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='resource_details']/group[1]" position="inside">
                 <field name="l10n_be_reorganisation_measure_ids" widget="many2many_tags" options="{'color_field': 'color'}" 
-                    invisible="calendar_type != 'variable' and not l10n_be_reorganisation_measure_ids"/>
+                    invisible="(country_code and country_code != 'BE') or (calendar_type != 'variable' and not l10n_be_reorganisation_measure_ids)"/>
                 <field name="l10n_be_time_reorganisation_amount"
-                    invisible="calendar_type != 'variable' or not l10n_be_show_time_reorganisation_amount"/>
+                    invisible="(country_code and country_code != 'BE') or calendar_type != 'variable' or not l10n_be_show_time_reorganisation_amount"/>
             </xpath>
         </field>
     </record>

@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-09-18 01:11+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
@@ -111,10 +111,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -131,42 +131,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>축하합니다!</h2>\n"
-"                아래 링크를 클릭하면 급여 패키지를 설정할 수 있습니다.<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    링크 만료일: <t t-out=\"ctx.get('validity_end')\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        패키지 설정하기\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -185,7 +165,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -212,7 +192,8 @@ msgstr "<i class=\"oi oi-filled\" data-icon=\"chat_bubble\"/> 피드백"
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_sidebar
 msgid ""
 "<i class=\"oi\" data-icon=\"check\"/> Your message was successfully sent!"
-msgstr "<i class=\"oi\" data-icon=\"check\"/> 메시지가 성공적으로 전송되었습니다!"
+msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/> 메시지가 성공적으로 전송되었습니다!"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -303,8 +284,8 @@ msgid ""
 "A signatory role is unassigned. Please ensure there is a valid group or "
 "person assigned to each role."
 msgstr ""
-"서명자의 직무가 할당되지 않았습니다. 각 직무에 유효한 그룹 또는 사람이 "
-"할당되어 있는지 확인하세요."
+"서명자의 직무가 할당되지 않았습니다. 각 직무에 유효한 그룹 또는 사람이 할당되"
+"어 있는지 확인하세요."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -434,7 +415,8 @@ msgstr ""
 #: code:addons/hr_contract_salary/models/hr_version.py:0
 msgid ""
 "An %(offer)s has been sent by %(user)s to the employee (mail: %(email)s)"
-msgstr "%(offer)s가 %(user)s에 의해 직원에게 전송되었습니다. (이(메일: %(email)s)"
+msgstr ""
+"%(offer)s가 %(user)s에 의해 직원에게 전송되었습니다. (이(메일: %(email)s)"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -599,8 +581,8 @@ msgid ""
 msgstr ""
 "활동이 생성되는 시기를 선택합니다:\n"
 "- 직원이 계약서에 서명: 직원이 계약서에 서명하는 즉시 활동이 생성됩니다.\n"
-"- 계약서에 연대 서명이 완료: 담당자가 계약서에 서명하고 프로세스를 "
-"완료합니다."
+"- 계약서에 연대 서명이 완료: 담당자가 계약서에 서명하고 프로세스를 완료합니"
+"다."
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.personal.info,name:hr_contract_salary.hr_contract_salary_personal_info_city
@@ -886,8 +868,8 @@ msgid ""
 "Default contract used to generate an offer. If empty, benefits will be taken "
 "from current contract of the employee/nothing for an applicant."
 msgstr ""
-"채용 제안을 생성하는 데 사용되는 기본 계약입니다. 비어 있으면 직원의 현재 "
-"계약에서 혜택을 불러오거나/지원자에게 아무 혜택도 제공하지 않습니다."
+"채용 제안을 생성하는 데 사용되는 기본 계약입니다. 비어 있으면 직원의 현재 계"
+"약에서 혜택을 불러오거나/지원자에게 아무 혜택도 제공하지 않습니다."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__sign_template_id
@@ -915,8 +897,8 @@ msgid ""
 "regarding the benefit."
 msgstr ""
 "시스템에서 새 활동을 생성하는 시기를 정의합니다:\n"
-"- 혜택이 처음 설정된 경우: 직원이 처음으로 혜택을 이용할 때 고유한 활동이 "
-"생성됩니다.\n"
+"- 혜택이 처음 설정된 경우: 직원이 처음으로 혜택을 이용할 때 고유한 활동이 생"
+"성됩니다.\n"
 "- 혜택이 수정된 경우: 혜택이 변경될 때마다 활동이 생성되어 모든 수정 사항을 "
 "기록합니다."
 
@@ -930,8 +912,8 @@ msgid ""
 "change regarding the benefit."
 msgstr ""
 "시스템은 다음과 같은 상황에서 새 서명 요청을 생성합니다:\n"
-"- 혜택이 처음 설정된 경우: 직원이 처음으로 혜택을 이용할 때 고유한 서명 "
-"요청이 생성됩니다.\n"
+"- 혜택이 처음 설정된 경우: 직원이 처음으로 혜택을 이용할 때 고유한 서명 요청"
+"이 생성됩니다.\n"
 "- 혜택이 수정된 경우: 혜택이 변경될 때마다 서명 요청이 생성되어 직원이 모든 "
 "변경 사항을 확인하고 서명하도록 합니다."
 
@@ -1030,8 +1012,8 @@ msgid ""
 "you choose a company car."
 msgstr ""
 "여기에서 선택한 서류에는 직원이 선택한 혜택과 관련된 추가 서명이 요청됩니다. "
-"(예: 직원이 회사 차량을 복리후생으로 선택한 경우 회사 차량 정책 문서를 "
-"승인하고 서명해야 합니다."
+"(예: 직원이 회사 차량을 복리후생으로 선택한 경우 회사 차량 정책 문서를 승인하"
+"고 서명해야 합니다."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -1323,8 +1305,8 @@ msgid ""
 "HR Responsible %s should be a user of Sign when New Contract Document "
 "Template is specified"
 msgstr ""
-"HR 담당자 %s 의 경우 새 계약 문서 템플릿이 지정할 때 전자 서명 사용자여야 "
-"합니다."
+"HR 담당자 %s 의 경우 새 계약 문서 템플릿이 지정할 때 전자 서명 사용자여야 합"
+"니다."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -1333,8 +1315,8 @@ msgid ""
 "HR Responsible %s should have a valid email address when New Contract "
 "Document Template is specified"
 msgstr ""
-"HR 담당자 %s 의 경우 새 계약 문서 템플릿이 지정되면 유효한 이메일 주소를 "
-"가지고 있어야 합니다."
+"HR 담당자 %s 의 경우 새 계약 문서 템플릿이 지정되면 유효한 이메일 주소를 가지"
+"고 있어야 합니다."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_sidebar
@@ -1576,6 +1558,11 @@ msgid "Job Title"
 msgstr "직함"
 
 #. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
 msgid "Languages"
 msgstr "언어"
@@ -1686,8 +1673,8 @@ msgid ""
 "Mismatch between res_field_id %(field)s and model %(model)s for info %"
 "(personal_info)s"
 msgstr ""
-"res_field_id %(field)s와 모델 %(model)s중 %(personal_info)s에 대한 내용이 "
-"일치하지 않습니다."
+"res_field_id %(field)s와 모델 %(model)s중 %(personal_info)s에 대한 내용이 일"
+"치하지 않습니다."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2519,8 +2506,8 @@ msgid ""
 "Select a contract template to auto-fill the contract form with predefined "
 "values. You can still edit the fields as needed after applying the template."
 msgstr ""
-"계약서 템플릿을 선택하면 미리 지정된 값으로 계약서 양식이 자동으로 "
-"입력됩니다. 템플릿을 적용한 후에도 필요에 따라 필드를 수정할 수 있습니다."
+"계약서 템플릿을 선택하면 미리 지정된 값으로 계약서 양식이 자동으로 입력됩니"
+"다. 템플릿을 적용한 후에도 필요에 따라 필드를 수정할 수 있습니다."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2557,8 +2544,8 @@ msgid ""
 "        "
 msgstr ""
 "서명자가 1명 또는 다른 2명인 문서만 선택합니다.\n"
-"        서명자가 1명인 문서는 직원 서명만 있으면 되지만, 서명자가 2명인 "
-"문서는 직원과 HR 담당자 모두의 서명이 필요합니다.\n"
+"        서명자가 1명인 문서는 직원 서명만 있으면 되지만, 서명자가 2명인 문서"
+"는 직원과 HR 담당자 모두의 서명이 필요합니다.\n"
 "        "
 
 #. module: hr_contract_salary
@@ -2798,7 +2785,7 @@ msgstr "구조 유형"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
+msgid "Sum of Benefits Values"
 msgstr ""
 
 #. module: hr_contract_salary
@@ -2828,6 +2815,12 @@ msgstr "템플릿(서식)"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "문자"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -2939,7 +2932,8 @@ msgstr "이전 계약 이후 변경된 사항은 없습니다."
 msgid ""
 "They will review your contract.<br/> Feel free to contact them if you have "
 "any questions."
-msgstr "계약서를 검토할 예정입니다.<br/> 궁금한 점이 있으시면 언제든지 연락 주십시오."
+msgstr ""
+"계약서를 검토할 예정입니다.<br/> 궁금한 점이 있으시면 언제든지 연락 주십시오."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_view_employee_form_readonly
@@ -2966,8 +2960,8 @@ msgid ""
 "This offer has been fully signed and can no longer be edited. However, you "
 "can still make changes to the Signed Contract if needed."
 msgstr ""
-"해당 제안서는 서명이 모두 완료되었으며 더 이상 수정할 수 없습니다. 다만 "
-"필요한 경우 서명된 계약 내용의 변경은 가능합니다."
+"해당 제안서는 서명이 모두 완료되었으며 더 이상 수정할 수 없습니다. 다만 필요"
+"한 경우 서명된 계약 내용의 변경은 가능합니다."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3144,8 +3138,8 @@ msgid ""
 "You cannot have multiple person responsible for the same role on contract "
 "signature template."
 msgstr ""
-"계약 서명 템플릿에는 동일한 역할에 대해 여러 명의 담당자를 지정할 수 "
-"없습니다."
+"계약 서명 템플릿에는 동일한 역할에 대해 여러 명의 담당자를 지정할 수 없습니"
+"다."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3205,6 +3199,11 @@ msgid "id"
 msgstr "ID"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3222,13 +3221,61 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: 채용 제안 - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: 채용 제안 - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>축하합니다!</h2>\n"
+#~ "                아래 링크를 클릭하면 급여 패키지를 설정할 수 있습니다.<br/"
+#~ ">\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    링크 만료일: <t t-out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        패키지 설정하기\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

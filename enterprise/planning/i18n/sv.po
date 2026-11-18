@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-17 23:58+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-master/"
-"planning/sv/>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-12 15:30+0000\n"
+"Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
+"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/planning/"
+"sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +38,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning/models/resource_resource.py:0
 msgid "%(resource_name)s \t --(%(role)s)--"
-msgstr ""
+msgstr "%(resource_name)s \t --(%(role)s)--"
 
 #. module: planning
 #. odoo-python
@@ -61,7 +61,7 @@ msgstr ""
 #. module: planning
 #: model:ir.actions.report,print_report_name:planning.report_planning_slot
 msgid "'Planning'"
-msgstr ""
+msgstr "'Planering'"
 
 #. module: planning
 #. odoo-python
@@ -147,7 +147,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee')\">Dear <t t-"
 "out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('start_datetime') and "
 "ctx.get('end_datetime')\">\n"
 "                        Your upcoming shifts from <t t-"
@@ -175,7 +175,7 @@ msgid ""
 "                            </a>\n"
 "                        </div>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('planning_url') and "
 "(ctx.get('slot_unassigned') or (object.allow_self_unassign and "
 "object.self_unassign_days_before))\">\n"
@@ -192,8 +192,8 @@ msgid ""
 "of the shift.\n"
 "                        </t>\n"
 "                    </p>\n"
-"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/"
-">\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']"
+"\"></p>\n"
 "                    <p t-if=\"ctx.get('is_internal_user') and not "
 "object.allow_self_unassign\">In case your current schedule doesn't suit you, "
 "we encourage you to reach out to your colleagues and request to switch "
@@ -209,7 +209,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
 "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p>\n"
 "                        The following shift that you requested to switch has "
 "been re-assigned\n"
@@ -278,7 +278,7 @@ msgid ""
 "or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                </div>\n"
 "            "
 msgstr ""
@@ -368,7 +368,7 @@ msgid ""
 "                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-"
 "out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <p t-if=\"ctx.get('open_shift_available')\">We have a "
 "new shift opening:</p>\n"
 "                    <p t-else=\"\">You have been assigned the following "
@@ -463,7 +463,7 @@ msgid ""
 "                            Add to iCal/Outlook\n"
 "                        </a>\n"
 "                    </div>\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-if=\"ctx.get('open_shift_available')\">\n"
 "                        <p t-if=\"ctx.get('is_internal_user')\">\n"
 "                            If you are interested and available, please "
@@ -661,7 +661,7 @@ msgstr ""
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_controller.xml:0
 #: model:ir.actions.server,name:planning.model_planning_slot_action_auto_plan
 msgid "Auto Plan"
-msgstr ""
+msgstr "Planera automatiskt"
 
 #. module: planning
 #. odoo-javascript
@@ -788,6 +788,13 @@ msgstr "Kopiera föregående"
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_controller.xml:0
 msgid "Copy previous week"
 msgstr "Kopiera föregående vecka"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Could not undo scheduling"
+msgstr ""
 
 #. module: planning
 #: model:planning.role,name:planning.planning_role_crane
@@ -997,12 +1004,12 @@ msgstr ""
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__duration
 msgid "Duration"
-msgstr "Tidsperiod"
+msgstr "Tid"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot_template__duration_days
 msgid "Duration Days"
-msgstr ""
+msgstr "Tid i dagar"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_role_view_kanban
@@ -1426,12 +1433,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning.planning_slot_template_view_search
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "My Roles"
-msgstr ""
+msgstr "Mina roller"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "My Shifts"
-msgstr ""
+msgstr "Mina arbetspass"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_role_view_search
@@ -1454,7 +1461,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Needs Attention"
-msgstr ""
+msgstr "Kräver åtgärder"
 
 #. module: planning
 #. odoo-javascript
@@ -1569,7 +1576,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:planning.planning_action_open_shifts
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Open Shifts"
-msgstr ""
+msgstr "Lediga arbetspass"
 
 #. module: planning
 #. odoo-javascript
@@ -1769,6 +1776,18 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer_controls.xml:0
 msgid "Press Ctrl to duplicate the shift"
+msgstr "Tryck på Ctrl för att duplicera arbetspasset"
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's copied shifts removed"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_hooks.js:0
+msgid "Previous week's shifts copied"
 msgstr ""
 
 #. module: planning
@@ -2111,7 +2130,7 @@ msgstr "Schema"
 #. module: planning
 #: model:ir.actions.act_window,name:planning.planning_action_schedule_by_resource
 msgid "Schedule by Resource"
-msgstr ""
+msgstr "Planera per resurs"
 
 #. module: planning
 #: model:ir.actions.act_window,name:planning.planning_action_schedule_by_role
@@ -2237,6 +2256,12 @@ msgstr ""
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift divided into two"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shift duplicated"
 msgstr ""
 
@@ -2285,14 +2310,33 @@ msgid "Shift sent"
 msgstr ""
 
 #. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_calendar/common/planning_calendar_common_renderer.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shift unscheduled"
+msgstr ""
+
+#. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Shifts Planned"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts could not be merged back"
 msgstr ""
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "Shifts in Conflict"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts merged back"
 msgstr ""
 
 #. module: planning
@@ -2316,6 +2360,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Shifts scheduled"
+msgstr ""
+
+#. module: planning
+#. odoo-javascript
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
+msgid "Shifts unscheduled"
 msgstr ""
 
 #. module: planning
@@ -2917,6 +2967,162 @@ msgstr ""
 #: model:mail.template,subject:planning.email_template_slot_single
 msgid "{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
 msgstr ""
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
+#~ "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
+#~ "                    <p t-else=\"\">Hello,</p>\n"
+#~ "                    <br/>\n"
+#~ "                    <p>\n"
+#~ "                        The following shift that you requested to switch "
+#~ "has been re-assigned\n"
+#~ "                        <t t-if=\"ctx.get('new_assignee_names')\"> to <t "
+#~ "t-out=\"ctx['new_assignee_names']\">Marc Demo</t></t>.\n"
+#~ "                    </p>\n"
+#~ "                    <table style=\"margin-left: 30px;\">\n"
+#~ "                        <tr t-if=\"(ctx.get('start_datetime') and "
+#~ "ctx.get('end_datetime'))                                   or "
+#~ "ctx.get('allocated_hours')                                   or "
+#~ "ctx.get('allocated_percentage')\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Date</th>\n"
+#~ "                            <td style=\"padding: 5px;\">\n"
+#~ "                                <span t-if=\"ctx.get('start_datetime') "
+#~ "and ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+#~ "(                                     ctx['start_datetime'],                                     "
+#~ "ctx['end_datetime'],                                 )\">\n"
+#~ "                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, "
+#~ "4:00 PM\n"
+#~ "                                </span>\n"
+#~ "                                <span t-if=\"ctx.get('allocated_hours')\" "
+#~ "style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-out=\"ctx['allocated_hours']"
+#~ "\">4:00</t>h)\n"
+#~ "                                </span>\n"
+#~ "                                <span t-"
+#~ "if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != "
+#~ "'100'\" style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-"
+#~ "out=\"ctx['allocated_percentage']\">50</t>%)\n"
+#~ "                                </span>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"object.role_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Role</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.role_id.name or ''\">Bartender</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'project_id') and "
+#~ "object.project_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Project</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'task_id') and "
+#~ "object.task_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Task</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().task_id.name or ''\">Chef</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+#~ "object.sale_line_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Sales Order Item</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'name') and "
+#~ "object.name\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Note</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.name or ''\">/</td>\n"
+#~ "                        </tr>\n"
+#~ "                    </table>\n"
+#~ "                    <br/>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
+#~ "out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
+#~ "                    <p t-else=\"\">Hej,</p>\n"
+#~ "                    <br/>\n"
+#~ "                    <p>\n"
+#~ "                        Följande arbetspass som du velat byta har "
+#~ "tilldelats\n"
+#~ "                        <t t-if=\"ctx.get('new_assignee_names')\"> till "
+#~ "<t t-out=\"ctx['new_assignee_names']\">Marc Demo</t></t>.\n"
+#~ "                    </p>\n"
+#~ "                    <table style=\"margin-left: 30px;\">\n"
+#~ "                        <tr t-if=\"(ctx.get('start_datetime') and "
+#~ "ctx.get('end_datetime'))                                   or "
+#~ "ctx.get('allocated_hours')                                   or "
+#~ "ctx.get('allocated_percentage')\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Datum</th>\n"
+#~ "                            <td style=\"padding: 5px;\">\n"
+#~ "                                <span t-if=\"ctx.get('start_datetime') "
+#~ "and ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+#~ "(                                     ctx['start_datetime'],                                     "
+#~ "ctx['end_datetime'],                                 )\">\n"
+#~ "                                    05/31/2021, 8:00 ⟶ 05/31/2021, 16:00\n"
+#~ "                                </span>\n"
+#~ "                                <span t-if=\"ctx.get('allocated_hours')\" "
+#~ "style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-out=\"ctx['allocated_hours']"
+#~ "\">4:00</t>h)\n"
+#~ "                                </span>\n"
+#~ "                                <span t-"
+#~ "if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != "
+#~ "'100'\" style=\"opacity: 0.5;\">\n"
+#~ "                                    (<t t-"
+#~ "out=\"ctx['allocated_percentage']\">50</t>%)\n"
+#~ "                                </span>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"object.role_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Roll</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.role_id.name or ''\">Bartender</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'project_id') and "
+#~ "object.project_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Projekt</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().project_id.name or ''\">Sammankomst</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'task_id') and "
+#~ "object.task_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Uppgift</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().task_id.name or ''\">Kock</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+#~ "object.sale_line_id\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Rad i försäljningsorder</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.sudo().sale_line_id.name or ''\">Kaffe</td>\n"
+#~ "                        </tr>\n"
+#~ "                        <tr t-if=\"hasattr(object, 'name') and "
+#~ "object.name\">\n"
+#~ "                            <th style=\"padding: 5px; text-align: left;"
+#~ "\">Anteckning</th>\n"
+#~ "                            <td style=\"padding: 5px;\" t-"
+#~ "out=\"object.name or ''\">/</td>\n"
+#~ "                        </tr>\n"
+#~ "                    </table>\n"
+#~ "                    <br/>\n"
+#~ "                </div>\n"
+#~ "            "
 
 #~ msgid "Deadline"
 #~ msgstr "Tidsfrist"

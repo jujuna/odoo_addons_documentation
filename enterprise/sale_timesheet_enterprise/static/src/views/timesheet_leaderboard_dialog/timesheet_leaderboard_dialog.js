@@ -39,10 +39,10 @@ export class TimesheetLeaderboardDialog extends Component {
         await this.getLeaderboardData(true);
     }
 
-    async getLeaderboardData(fetchTip=false) {
+    async getLeaderboardData(fetchTips=false) {
         await this.timesheetLeaderboardService.getLeaderboardData({
             periodStart: this.state.date,
-            fetchTip,
+            fetchTips,
         });
         this.state.leaderboard = this.timesheetLeaderboardService.data.leaderboard;
         this.state.current_employee = this.timesheetLeaderboardService.data.currentEmployee;

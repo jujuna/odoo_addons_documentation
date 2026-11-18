@@ -283,12 +283,12 @@
                             <field name="l10n_ch_compensation_fund_id" string="Compensation Fund" options="{'no_create': True, 'no_open': True}"/>
                         </group>
                         <group string="Accident Insurance">
-                            <field name="l10n_ch_laa_group" string="LAA Group" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="l10n_ch_laa_group" string="LAA Group" domain="[('insurance_id.company_id', '=', company_id)]" options="{'no_create': True, 'no_open': True}"/>
                             <field name="laa_solution_number" string="LAA Solution" widget="radio"/>
                         </group>
                         <group string="Additional Insurances">
-                            <field name="l10n_ch_additional_accident_insurance_line_ids" widget="many2many_tags" options="{'no_create':True}"/>
-                            <field name="l10n_ch_sickness_insurance_line_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="l10n_ch_additional_accident_insurance_line_ids" widget="many2many_tags" domain="[('insurance_id.company_id', '=', company_id)]" options="{'no_create':True}"/>
+                            <field name="l10n_ch_sickness_insurance_line_ids" widget="many2many_tags" domain="[('insurance_id.company_id', '=', company_id)]" options="{'no_create': True, 'no_open': True}"/>
                         </group>
                     </group>
                     <group string="LPP">

@@ -75,6 +75,9 @@ export class PlanningFieldServiceLiveMapRenderer extends PlanningFieldServiceMap
         return new Set(resourcesToDisplay);
     }
 
+    /**
+     * @override
+     */
     addMarkers() {
         super.addMarkers();
         if (!this.props.model.data.locatedResources.length) {
@@ -112,11 +115,35 @@ export class PlanningFieldServiceLiveMapRenderer extends PlanningFieldServiceMap
         }
     }
 
+    /**
+     * @override
+     */
+    getLatLng() {
+        const result = super.getLatLng();
+        const resourcesToDiplay = this.resourcesToDiplay;
+        const tabLatLng = this.props.model.data.locatedResources
+            .filter(
+                (resource) =>
+                    resourcesToDiplay.has(resource.id) &&
+                    resource.live_latitude &&
+                    resource.live_longitude
+            )
+            .map((resource) => L.latLng(resource.live_latitude, resource.live_longitude));
+
+        if (!tabLatLng.length) {
+            return result;
+        }
+        if (!result) {
+            return L.latLngBounds(tabLatLng);
+        }
+        return result.extend(tabLatLng);
+    }
+
     isResourceLocated(resourceId) {
-        return (
+        return Boolean(
             this.props.model.data.groupByKey === "resource_ids" &&
-            !this.props.model.closedGroupIds().has(resourceId) &&
-            this.props.model.data.locatedResources.find((r) => r.id == resourceId)
+                !this.props.model.closedGroupIds().has(resourceId) &&
+                this.props.model.data.locatedResources.find((r) => r.id == resourceId)
         );
     }
 

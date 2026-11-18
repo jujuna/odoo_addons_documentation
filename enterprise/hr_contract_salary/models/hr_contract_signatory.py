@@ -18,6 +18,15 @@ class HrContractSignatory(models.Model):
 
     @api.model
     def create_empty_signatories(self, sign_template):
+        """Return the commands creating one signatory per role of the sign template.
+
+        The *Employee* role is signed by the employee, any other role by the HR responsible,
+        all in order 1.
+
+        :param sign_template: ``sign.template`` record
+        :return: x2many commands replacing the signatories
+        :rtype: list
+        """
         roles = set(sign_template.sign_item_ids.responsible_id.ids)
 
         role_dict = {

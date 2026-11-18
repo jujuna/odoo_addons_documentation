@@ -57,7 +57,7 @@
                                                 <span t-out="form.country_id.name"/> <!-- Partner Country name -->
                                             </p>
                                             <br/>
-                                            <p class="text-start" t-if="not form.partner_is_natural_person">
+                                            <p class="text-start" t-if="form.partner_bce_number">
                                                 Enterprise N°:
                                                 <span t-out="form.partner_bce_number"/>
                                             </p>
@@ -145,8 +145,8 @@
                                         <div class="col-4" style="padding-top: 1%; padding-bottom: 1%;">
                                             <p class="text-end">
                                                 <t t-if="form.paid_amount == 0">NIL</t>
-                                                <t t-elif="form.paid_amount == form.total_remuneration">0.00</t>
-                                                <t t-else=""><span t-out="form.paid_amount" t-options="{'widget': 'float', 'precision': 2}"/></t>
+                                                <!-- only filled if the paid amount differs from the total (e) -->
+                                                <t t-elif="form.currency_id.compare_amounts(form.paid_amount, form.total_remuneration) != 0"><span t-out="form.paid_amount" t-options="{'widget': 'float', 'precision': 2}"/></t>
                                             </p>
                                         </div>
                                     </div>

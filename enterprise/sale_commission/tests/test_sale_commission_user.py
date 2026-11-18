@@ -435,6 +435,7 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         achievements = self.env['sale.commission.achievement.report'].search([('plan_id', '=', self.commission_plan_user.id)])
         commissions = self.env['sale.commission.report'].search([('plan_id', '=', self.commission_plan_user.id)])
         self.assertEqual(achievements.currency_id, self.env.company.currency_id)
+        self.assertAlmostEqual(achievements.target_amount, 90, 2, msg="The target is displayed in the current company currency")
         self.assertAlmostEqual(sum(achievements.mapped('achieved')), 100, msg="30% of 20000 with a curency rate of 60 (invoice is in another currency)")
         # 90 = is the maximum commission (100%).  20000 * 0.3 / 60 = 100 --> capped as 90
         self.assertAlmostEqual(sum(commissions.mapped('commission')), 90, msg="75 commission (100%) with a curency rate of 60 (invoice is in another currency)")
@@ -450,6 +451,7 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         all_targets = [v == 5400 for v in commissions.mapped('target_amount')]
         self.assertTrue(all(all_targets), 'all targets are 5400')
         self.assertAlmostEqual(sum(commissions.mapped('commission')), 5400, msg="5400 commission (100%) (no rate)")
+        self.assertAlmostEqual(achievements.target_amount, 5400, 2, msg="The target is displayed in the IN currency")
 
     @freeze_time('2024-02-02')
     def test_edit_forecast(self):

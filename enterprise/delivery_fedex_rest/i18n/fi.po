@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 00:51+0000\n"
+"PO-Revision-Date: 2026-11-09 11:33+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "delivery_fedex_rest/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -132,18 +132,18 @@ msgstr "Kuljetusyritys"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_residential_address__check
 msgid "Check using FedEx Address API"
-msgstr "Tarkista käyttämällä FedEx Address API:a"
+msgstr "Tarkista käyttämällä FedEx-osoitteen rajapintaa"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_droppoff_type__contact_fedex_to_schedule
 msgid "Contact FedEx for pickup"
-msgstr "Ota yhteyttä FedExiin järjestääksesi noudon"
+msgstr "Ota yhteyttä FedExiin noutoa varten"
 
 #. module: delivery_fedex_rest
 #. odoo-python
 #: code:addons/delivery_fedex_rest/models/fedex_request.py:0
 msgid "Could not decode response"
-msgstr "Vastausta ei voitu tulkita."
+msgstr "Vastauksen purkaminen epäonnistui"
 
 #. module: delivery_fedex_rest
 #: model:ir.model,name:delivery_fedex_rest.model_delivery_carrier
@@ -188,7 +188,7 @@ msgstr "EPL2"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_documentation_type__etd
 msgid "Electronic Trade Documents"
-msgstr "Electronic Trade Documents (lähetysten asiakirjat sähköisesti)"
+msgstr "Sähköiset kauppa-asiakirjat"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_email_notifications
@@ -208,7 +208,7 @@ msgstr ""
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
 msgid "Extra Data"
-msgstr "Lisätiedot"
+msgstr "Lisädata"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_extra_data_rate_request
@@ -264,7 +264,7 @@ msgstr "FedEx käyttöoikeustunnus"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_account_number
 msgid "FedEx Account Number"
-msgstr "FedExin tilinumero"
+msgstr "FedEx-tilinumero"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_droppoff_type
@@ -414,7 +414,7 @@ msgstr "FedEx SameDay® City"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_service_type
 msgid "FedEx Service Type"
-msgstr "FedEx Service Type"
+msgstr "FedEx-palvelun tyyppi"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_service_type__standard_overnight
@@ -444,12 +444,12 @@ msgstr "FedEx® Regional Economy Freight"
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_uom_uom__fedex_code
 msgid "Fedex Code"
-msgstr "Fedex-Koodi"
+msgstr "Fedex-koodi"
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
 msgid "Fedex Configuration"
-msgstr "Fedexin määritykset"
+msgstr "FedEx-asetukset"
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
@@ -475,7 +475,7 @@ msgstr "Fedex Rest painoyksikkö"
 #. module: delivery_fedex_rest
 #: model:ir.module.module,shortdesc:base.module_delivery_fedex_rest
 msgid "Fedex Shipping"
-msgstr ""
+msgstr "Fedex-toimitus"
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
@@ -741,6 +741,11 @@ msgid ""
 "developer.fedex.com/. It is no longercompatible with the older FedEx SOAP "
 "APIs (which have their own credentials)."
 msgstr ""
+"Lähetä toimituksesi FedExin kautta ja seuraa niitä verkossa. Tämä FedEx-"
+"versio on yhteensopiva FedEx REST -ohjelmointirajapinnan kanssa, joka on "
+"saatavilla osoitteessa https://developer.fedex.com/. Se ei ole enää "
+"yhteensopiva vanhempien FedEx SOAP -ohjelmointirajapintojen kanssa (joilla "
+"on omat tunnistetietonsa)."
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_duty_payment__sender
@@ -835,11 +840,11 @@ msgid ""
 "provided the regular tax id on the company will be used with type "
 "BUSINESS_NATIONAL."
 msgstr ""
-"Tätä käytetään pääasiallisena yrityksen verotunnisteena FedEx:illä, kun "
-"kyseessä on tyyppi BUSINESS_UNION, ja lisätään luotavaan laskuun. Käytä "
-"tätä, kun sinun on käytettävä IOSS- tai EORI-numeroa kansallisen veronumeron "
-"lisäksi. Jos tätä ei ole saataville, käytetään yrityksen tavanomaista "
-"verotunnusta BUSINESS_NATIONAL tyyppinä."
+"Annetaan FedExille yrityksen pääasiallisena verotunnisteena BUSINESS_UNION -"
+"tyypille, luotavaan laskuun lisättäväksi. Käytä tätä, kun sinun on "
+"käytettävä IOSS- tai EORI-numeroa kansallisen veronumeron lisäksi. Jos tätä "
+"ei ole saatavilla, käytetään yrityksen tavanomaista verotunnusta "
+"BUSINESS_NATIONAL tyypille."
 
 #. module: delivery_fedex_rest
 #. odoo-python

@@ -345,6 +345,7 @@ class AccountMove(models.Model):
             nom_item, item_description = self._l10n_uy_edi_get_line_nom_and_desc(line)
             temp = {
                 "NroLinDet": k,  # B1
+                "CodItem": self._l10n_uy_edi_get_line_cod_items(line),  # B2 - B3
                 "IndFact": invoice_ind,  # B4
                 "NomItem": nom_item,  # B7
                 "DscItem": item_description if item_description else None,  # B8
@@ -365,6 +366,11 @@ class AccountMove(models.Model):
             res.append(temp)
             k += 1
         return res
+
+    def _l10n_uy_edi_get_line_cod_items(self, aml):
+        """ B2 TpoCod, B3 Cod: the item codes to report for the given line
+        (see product.product._l10n_uy_edi_get_cod_items). """
+        return aml.product_id._l10n_uy_edi_get_cod_items()
 
     def _l10n_uy_edi_cfe_C_totals(self, tax_details):
         """ XML Section C (SUBTOTALES INFORMATIVOS) """
@@ -786,15 +792,18 @@ class AccountMove(models.Model):
             description = aml.name and aml.name[80:] or ''
         else:
             # If the product is defined, we use its name as the item name
-            # and the line name as the description.
-            display_name = aml.with_context(lang=aml.partner_id.lang).product_id.display_name \
-                if aml.partner_id.lang else aml.product_id.display_name
+            # and the line name as the description. The internal reference is
+            # not part of the item name: it is reported in its own <CodItem>
+            # node instead (see _l10n_uy_edi_get_line_cod_items).
+            product = aml.with_context(lang=aml.partner_id.lang).product_id \
+                if aml.partner_id.lang else aml.product_id
+            display_name = product.with_context(display_default_code=False).display_name
             nom_item = display_name[:80]
 
             # The description has the product name, so we do not include that part
             description = display_name[80:]
             if aml.name:
-                description += aml.name.replace(display_name, '').replace('\n', '')
+                description += aml.name.replace(product.display_name, '').replace(display_name, '').replace('\n', '')
 
         if aml.l10n_uy_edi_addenda_ids:
             adenda = [" {%s}" % addenda.content if addenda.is_legend else " " + addenda.content for addenda in aml.l10n_uy_edi_addenda_ids]
@@ -844,8 +853,16 @@ class AccountMove(models.Model):
         UYU = self.env.ref("base.UYU")
         res = 0.0
         if self.currency_id != UYU:
-            res = 1 / self.invoice_currency_rate if self.company_id.currency_id == UYU else\
-                self.currency_id._convert(1.0, UYU, self.company_id, self.date, round=False)
+            if self.company_id.currency_id == UYU:
+                res = 1 / self.invoice_currency_rate
+            else:
+                attachment = self.l10n_uy_edi_xml_attachment_id
+                if attachment and self.l10n_uy_edi_cfe_state == "accepted":
+                    xml_tree = etree.fromstring(attachment.raw.content)
+                    res = float(xml_tree.findtext(".//{*}TpoCambio"))
+                else:
+                    res = self.currency_id._convert(1.0, UYU, self.company_id, self.date, round=False)
+
         return res
 
     def _l10n_uy_edi_get_xml_content(self):

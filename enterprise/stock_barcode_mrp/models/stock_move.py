@@ -42,10 +42,10 @@ class StockMove(models.Model):
         return super(StockMove, self - production_moves).split_uncompleted_moves()
 
     def _should_bypass_set_qty_producing(self):
-        if self.env.context.get('barcode_view') or self.env.context.get('barcode_trigger'):
+        if self.env.context.get('barcode_view'):
             picking_type = self.raw_material_production_id.picking_type_id
             if picking_type.restrict_scan_product or (
-                picking_type.restrict_scan_tracking_number and self.product_id.tracking in ('lot', 'serial')
+                picking_type.restrict_scan_tracking_number == 'mandatory' and self.has_tracking in ('lot', 'serial')
             ):
                 return True
         return super()._should_bypass_set_qty_producing()

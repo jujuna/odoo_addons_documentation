@@ -4,3 +4,4 @@ from . import res_users
 from . import hmrc_vat_obligation
 from . import hmrc_service
 from . import template_uk
+from . import res_config_settings

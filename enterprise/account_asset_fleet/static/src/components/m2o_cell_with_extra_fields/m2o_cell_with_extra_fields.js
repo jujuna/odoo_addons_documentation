@@ -1,12 +1,16 @@
 import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
 import { computeM2OProps } from "@web/views/fields/many2one/many2one";
-import { ProductLabelSectionAndNoteListRender } from '@account/components/product_label_section_and_note_o2m/product_label_section_and_note_field_o2m';
+import { ListRenderer } from "@web/views/list/list_renderer";
 import { M2OCellWithExtraFields } from '@account/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields';
 
-patch(ProductLabelSectionAndNoteListRender.prototype, {
+patch(ListRenderer.prototype, {
     getActiveColumns() {
         let activeColumns = super.getActiveColumns();
+        const accountCol = this.allColumns.find((col) => col.name === "account_id");
+        if (this.props.list.resModel !== "account.move.line" || accountCol?.widget !== "m2o_cell_with_extra_fields") {
+            return activeColumns;
+        }
         const isSelected = activeColumns.some((col) => col.name === "vehicle_id");
 
         // If vehicle_id is required and empty then we always show it for that record even if unselected
@@ -39,7 +43,7 @@ patch(M2OCellWithExtraFields.prototype, {
                 readonly: this.isReadonlyList,
             },
             invisible: this.props.name !== 'account_id' || !this.props.record.showVehicle,
-            required: this.props.record.data.need_vehicle,
+            required: this.props.record._isRequired("vehicle_id"),
         };
     }
 });

@@ -10,13 +10,13 @@
         'l10n_be_hr_payroll',
     ],
     'data': [
+        'views/hr_employee_views.xml',
         'data/hr_contract_salary_benefit_data.xml',
         'data/hr_contract_salary_resume_data.xml',
         'data/hr_contract_salary_personal_info_data.xml',
         'views/hr_contract_salary_template.xml',
         'views/hr_contract_salary_offer_views.xml',
         'views/hr_fleet_state_views.xml',
-        'views/hr_employee_views.xml',
     ],
     'demo': [
         'data/l10n_be_hr_contract_salary_demo.xml',

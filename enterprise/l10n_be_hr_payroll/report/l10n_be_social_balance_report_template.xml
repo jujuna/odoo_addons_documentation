@@ -21,7 +21,7 @@
 							<div class="col-12 border p-2">
 								<div class="mb-2">VAT Number: <t t-out="wizard.company_id.vat"/></div>
 								<div class="mb-2">ONSS Number: <t t-out="wizard.company_id._get_payroll_config(wizard.date_from).onss_registration_number"/></div>
-								<div class="mb-2">Numbers of joint committees: 20000</div>
+								<div class="mb-2">Numbers of joint committees: <t t-out="', '.join(data['sbs_data']['joint_committees'])"/></div>
 								<div class="mb-2">Established on: <span t-field="wizard.create_date"/></div>
 								<div class="mb-2">Period: From <span t-field="wizard.date_from"/> To <span t-field="wizard.date_to"/></div>
 								<div class="mb-2">Currency: <t t-out="wizard.company_id.currency_id.name"/></div>
@@ -29,7 +29,7 @@
 						</div>
 					</div>
 					<t t-value="data['sbs_data']['year']" t-set="year"/>
-					<t t-value="data['sbs_data']['social_balance_sheet']" t-set="data"/>
+					<t t-value="data['sbs_data']" t-set="data"/>
 					<div class="page container-fluid">
 						<div style="page-break-before: always;">
 							<div class="mt-4 row">
@@ -49,11 +49,13 @@
 										<th scope="col" class="text-end"><b>Total</b></th>
 										<th scope="col" class="text-end"><b>Male</b></th>
 										<th scope="col" class="text-end"><b>Female</b></th>
+										<th scope="col" class="text-end"><b>Previous exercise: total</b></th>
 									</tr>
 								</thead>
 								<tbody align="right">
 									<tr>
 										<th><b>Average number of workers</b></th>
+										<td/>
 										<td/>
 										<td/>
 										<td/>
@@ -65,6 +67,7 @@
 										<td><t t-out="round(data['1001_total'], 2)"/></td>
 										<td><t t-out="round(data['1001_male'], 2)"/></td>
 										<td><t t-out="round(data['1001_female'], 2)"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Part-time workers</th>
@@ -72,6 +75,7 @@
 										<td><t t-out="round(data['1002_total'], 2)"/></td>
 										<td><t t-out="round(data['1002_male'], 2)"/></td>
 										<td><t t-out="round(data['1002_female'], 2)"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Total in FTEs</th>
@@ -79,9 +83,11 @@
 										<td><t t-out="round(data['1003_total'], 2)"/></td>
 										<td><t t-out="round(data['1003_male'], 2)"/></td>
 										<td><t t-out="round(data['1003_female'], 2)"/></td>
+										<td><t t-if="'1003' in data['previous_exercise']" t-out="round(data['previous_exercise']['1003'], 2)"/></td>
 									</tr>
 									<tr>
 										<th><b>Number of hours actually worked</b></th>
+										<td/>
 										<td/>
 										<td/>
 										<td/>
@@ -93,6 +99,7 @@
 										<td><t t-out="round(data['1011_total'], 2)"/></td>
 										<td><t t-out="round(data['1011_male'], 2)"/></td>
 										<td><t t-out="round(data['1011_female'], 2)"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Part-time</th>
@@ -100,6 +107,7 @@
 										<td><t t-out="round(data['1012_total'], 2)"/></td>
 										<td><t t-out="round(data['1012_male'], 2)"/></td>
 										<td><t t-out="round(data['1012_female'], 2)"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Total</th>
@@ -107,9 +115,11 @@
 										<td><t t-out="round(data['1013_total'], 2)"/></td>
 										<td><t t-out="round(data['1013_male'], 2)"/></td>
 										<td><t t-out="round(data['1013_female'], 2)"/></td>
+										<td><t t-if="'1013' in data['previous_exercise']" t-out="round(data['previous_exercise']['1013'], 2)"/></td>
 									</tr>
 									<tr>
 										<th><b>Staff Costs</b></th>
+										<td/>
 										<td/>
 										<td/>
 										<td/>
@@ -118,30 +128,34 @@
 									<tr>
 										<th class="ps-4">Full Time</th>
 										<td>1021</td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['male']['full'] + data['102']['total_gross']['female']['full'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['male']['full'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['female']['full'], 2)"/></td>
+										<td><span t-out="data['102']['total']['male']['full'] + data['102']['total']['female']['full']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['male']['full']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['female']['full']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Partial Time</th>
 										<td>1022</td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['male']['part'] + data['102']['total_gross']['female']['part'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['male']['part'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total_gross']['female']['part'], 2)"/></td>
+										<td><span t-out="data['102']['total']['male']['part'] + data['102']['total']['female']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['male']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['female']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td/>
 									</tr>
 									<tr>
 										<th class="ps-4">Total</th>
 										<td>1023</td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total']['male']['full'] + data['102']['total']['female']['full'] + data['102']['total']['male']['part'] + data['102']['total']['female']['part'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total']['male']['full'] + data['102']['total']['male']['part'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['102']['total']['female']['full'] + data['102']['total']['female']['part'], 2)"/></td>
+										<td><span t-out="data['102']['total']['male']['full'] + data['102']['total']['female']['full'] + data['102']['total']['male']['part'] + data['102']['total']['female']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['male']['full'] + data['102']['total']['male']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['102']['total']['female']['full'] + data['102']['total']['female']['part']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td t-if="'1023' in data['previous_exercise']"><span t-out="data['previous_exercise']['1023']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td><td t-else=""/>
 									</tr>
 									<tr>
 										<th><b>Benefits granted in addition to salary</b></th>
 										<td>1033</td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['103']['male'] + data['103']['female'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['103']['male'], 2)"/></td>
-										<td><t t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}" t-out="round(data['103']['female'], 2)"/></td>
+										<td><span t-out="data['103']['male'] + data['103']['female']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['103']['male']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td><span t-out="data['103']['female']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td>
+										<td t-if="'1033' in data['previous_exercise']"><span t-out="data['previous_exercise']['1033']" t-options="{'widget': 'float', 'precision': 0}"/> <t t-out="wizard.company_id.currency_id.symbol"/></td><td t-else=""/>
 									</tr>
 								</tbody>
 							</table>
@@ -486,6 +500,13 @@
 										<td><t t-out="round(data['343']['full'], 2)"/></td>
 										<td><t t-out="round(data['343']['part'], 2)"/></td>
 										<td><t t-out="round(data['343']['fte'], 2)"/></td>
+									</tr>
+									<tr>
+										<th class="ps-5">Of which: the number of persons who continue to provide services to the company at least half-time as self-employed</th>
+										<td>350</td>
+										<td><t t-out="round(data['350']['full'], 2)"/></td>
+										<td><t t-out="round(data['350']['part'], 2)"/></td>
+										<td><t t-out="round(data['350']['fte'], 2)"/></td>
 									</tr>
 								</tbody>
 							</table>

@@ -581,7 +581,7 @@ patch(PosStore.prototype, {
                 return;
             }
             const order = this.getOrder();
-            const identifier = cashier.l10n_be_insz_or_bis_number;
+            const identifier = this.l10nBeSigningInsz;
             // We only 'signOrder' if the order has already be sent to the blackbox, otherwise it's a direct sale (no need to signOrder before the signSale)
             if (order.l10n_be_last_transaction_by_line) {
                 await this.blackbox.signOrder.sign(order, identifier);

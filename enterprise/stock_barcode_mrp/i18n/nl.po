@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 17:57+0000\n"
-"PO-Revision-Date: 2026-09-17 23:05+0000\n"
+"POT-Creation-Date: 2026-10-30 17:55+0000\n"
+"PO-Revision-Date: 2026-11-03 12:33+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "stock_barcode_mrp/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +45,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/main.js:0
 msgid "Add By-Product"
-msgstr ""
+msgstr "Bijproduct toevoegen"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -70,9 +70,9 @@ msgstr "Sta het aanmaken van serie/partijnummers toe voor de onderdelen"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.view_picking_type_form
-msgid "Allow user to produce all even if no components were scanned"
+msgid "Allow user to produce even if no components were scanned"
 msgstr ""
-"Gebruiker toestaan om alles te produceren, zelfs als er geen onderdelen zijn "
+"Gebruiker toestaan om te produceren, zelfs als er geen onderdelen zijn "
 "gescand"
 
 #. module: stock_barcode_mrp
@@ -145,6 +145,7 @@ msgid "Destination Location"
 msgstr "Bestemmingslocatie"
 
 #. module: stock_barcode_mrp
+#: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_consumption_warning__display_name
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_production__display_name
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_production_backorder__display_name
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_product_product__display_name
@@ -156,6 +157,7 @@ msgid "Display Name"
 msgstr "Schermnaam"
 
 #. module: stock_barcode_mrp
+#: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_consumption_warning__id
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_production__id
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_production_backorder__id
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_product_product__id
@@ -174,12 +176,12 @@ msgstr "Is voltooid"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_stock_move__is_kit_component
 msgid "Is Kit Component"
-msgstr ""
+msgstr "Is kit-onderdeel"
 
 #. module: stock_barcode_mrp
 #: model:ir.module.module,shortdesc:base.module_stock_barcode_mrp
 msgid "MRP Barcode"
-msgstr ""
+msgstr "MRP Barcode"
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production
@@ -190,7 +192,7 @@ msgstr "Productieorder"
 #. odoo-python
 #: code:addons/stock_barcode_mrp/models/mrp_production.py:0
 msgid "Manufacturing order was cancelled."
-msgstr ""
+msgstr "Productieorder is geannuleerd."
 
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_mrp_production__move_byproduct_line_ids
@@ -218,7 +220,7 @@ msgstr "Geen productieorder gereed voor deze %(barcode_type)s"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/header.js:0
 msgid "No Package"
-msgstr ""
+msgstr "Geen pakket"
 
 #. module: stock_barcode_mrp
 #. odoo-python
@@ -258,7 +260,7 @@ msgstr "Label eindproduct afdrukken (ZPL)"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "Print Packages"
-msgstr ""
+msgstr "Pakketten afdrukken"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -269,13 +271,19 @@ msgstr "Productieorder afdrukken"
 #. module: stock_barcode_mrp
 #: model:ir.module.module,summary:base.module_stock_barcode_mrp
 msgid "Process Manufacturing Orders from the barcode application"
-msgstr ""
+msgstr "Productieorders verwerken vanuit de Barcode-app"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "Produce"
 msgstr "Produceer"
+
+#. module: stock_barcode_mrp
+#. odoo-python
+#: code:addons/stock_barcode_mrp/models/stock_picking_type.py:0
+msgid "Produce or scan another component"
+msgstr "Produceer of scan een ander onderdeel"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -316,9 +324,17 @@ msgstr "Aantal"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
+#. odoo-python
+#: code:addons/stock_barcode_mrp/models/stock_picking_type.py:0
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "Scan a component"
 msgstr "Scan een onderdeel"
+
+#. module: stock_barcode_mrp
+#. odoo-python
+#: code:addons/stock_barcode_mrp/models/stock_picking_type.py:0
+msgid "Scan a lot/serial number if component is tracked"
+msgstr "Scan een partij-/serienummer als het onderdeel getracked wordt"
 
 #. module: stock_barcode_mrp
 #. odoo-python
@@ -410,6 +426,15 @@ msgid "Unit"
 msgstr "Eenheid"
 
 #. module: stock_barcode_mrp
+#: model:ir.model,name:stock_barcode_mrp.model_mrp_consumption_warning
+msgid ""
+"Wizard for warning about mismatching expected vs actual component "
+"consumption quantities for MOs"
+msgstr ""
+"Wizard voor waarschuwing over afwijking tussen verwachte en werkelijke "
+"hoeveelheden van onderdelen voor productieorders"
+
+#. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
 msgid "Wizard to mark as done or create back order"
 msgstr "Wizard om als klaar te markeren of om een backorder te maken"
@@ -426,3 +451,18 @@ msgstr "Er wordt verwacht dat je één of meerdere producten scant."
 msgid "You can't add the final product of a MO as a byproduct."
 msgstr ""
 "Je kunt het eindproduct van een productieorder niet als bijproduct toevoegen."
+
+#. module: stock_barcode_mrp
+#. odoo-python
+#: code:addons/stock_barcode_mrp/wizard/mrp_consumption_warning.py:0
+msgid ""
+"You need to supply a Lot/Serial Number for product:\n"
+"%(products)s"
+msgstr ""
+"Je moet een serie-/partijnummer opgeven voor het product:\n"
+"%(products)s"
+
+#~ msgid "Allow user to produce all even if no components were scanned"
+#~ msgstr ""
+#~ "Gebruiker toestaan om alles te produceren, zelfs als er geen onderdelen "
+#~ "zijn gescand"

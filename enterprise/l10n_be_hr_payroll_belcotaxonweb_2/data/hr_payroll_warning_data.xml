@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- The national number of the beneficiaries is mandatory on all the tax forms from 01/01/2028 at the latest
+             (law of 12 May 2024, brochure of the pre-opening of Belcotax-on-web, section 3.5). -->
+        <record id="hr_payroll_warning_281_no_national_number" model="hr.payroll.warning">
+            <field name="name">Employees without National Number</field>
+            <field name="description">The national or BIS number will be mandatory on the 281 tax forms from 2028.</field>
+            <field name="country_id" ref="base.be"/>
+            <field name="warning_color_class">warning</field>
+            <field name="is_in_contract" eval="True"/>
+            <field name="button_name">Review Employees</field>
+            <field name="warning_type">domain</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="warning_domain">[('niss', '=', '/')]</field>
+        </record>
+
+        <!-- Belcotax-on-web refuses the whole sending when the identification data of a beneficiary are missing
+             (brochure of the pre-opening of Belcotax-on-web, sections 3.5 and 6.1.1). -->
+        <record id="hr_payroll_warning_281_incomplete_identification" model="hr.payroll.warning">
+            <field name="name">Incomplete Identification for the 281 Tax Forms</field>
+            <field name="description">The legal first and last names and the private address (street, zip, city and country) are required on the 281 tax forms.</field>
+            <field name="country_id" ref="base.be"/>
+            <field name="warning_color_class">warning</field>
+            <field name="is_in_contract" eval="True"/>
+            <field name="button_name">Review Employees</field>
+            <field name="warning_type">domain</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="warning_domain">['|', '|', '|', '|', '|', ('l10n_be_legal_first_name', '=', False), ('l10n_be_legal_last_name', '=', False), ('private_street', '=', False), ('private_zip', '=', False), ('private_city', '=', False), ('private_country_id', '=', False)]</field>
+        </record>
+
+    </data>
+</odoo>

@@ -27,9 +27,7 @@ class TestWarrant(TestPayrollBase, TestBelgiumCommon):
         )
 
     def _generate_warrant_payslip(self, **inputs):
-        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip._set_input_values(inputs)
-        payslip.compute_sheet()
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31), input_values=inputs)
         return payslip
 
     def test_warrant_without_onss(self):

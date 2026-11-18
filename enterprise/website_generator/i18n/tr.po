@@ -2,18 +2,19 @@
 # This file contains the translation of the following modules:
 # * website_generator
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:57+0000\n"
-"PO-Revision-Date: 2026-10-14 13:35+0000\n"
-"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:57+0000\n"
+"PO-Revision-Date: 2026-11-09 14:37+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "website_generator/tr/>\n"
 "Language: tr\n"
@@ -30,6 +31,9 @@ msgid ""
 "Generates a new website in Odoo, with the goal of recreating an external "
 "website as close as possible.\n"
 msgstr ""
+"\n"
+"Odoo'da yeni bir web sitesi oluşturur; amacı, harici bir web sitesini mümkün "
+"olduğunca aslına sadık şekilde yeniden oluşturmaktır.\n"
 
 #. module: website_generator
 #: model:mail.template,body_html:website_generator.email_template_website_scrapped
@@ -39,21 +43,21 @@ msgid ""
 "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 "
 "and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products and "
-"<t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</"
-"p>\n"
+"generated, and <t t-out=\"ctx.get('nbr_products_created')\"></t> products "
+"and <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog posts have been "
+"created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url') and "
 "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
 "0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) have "
-"been created.</p>\n"
+"generated and <t t-out=\"ctx.get('nbr_products_created')\"></t> product(s) "
+"have been created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url') and "
 "ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have "
+"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog posts have "
 "been created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url')\">\n"
@@ -64,18 +68,18 @@ msgid ""
 "ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and "
 "ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-"
-"out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+"created <t t-out=\"ctx.get('nbr_products_created')\"></t> products and <t t-"
+"out=\"ctx.get('nbr_blogs_created')\"></t> blog posts.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('nbr_products_created') and "
 "ctx.get('nbr_products_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_products_created')\"/> product(s).</p>\n"
+"created <t t-out=\"ctx.get('nbr_products_created')\"></t> product(s).</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('nbr_blogs_created') and "
 "ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog post(s).</p>\n"
+"created <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog post(s).</p>\n"
 "                    </t>\n"
 "                    <t t-else=\"\">\n"
 "                        <p><b>Update:</b> We were unable to generate your "
@@ -108,11 +112,88 @@ msgid ""
 "            \n"
 "            <p>Thank you for choosing Odoo for your web integration!</p>\n"
 "            <p>Best regards,</p>\n"
-"            <br/>\n"
+"            <br>\n"
 "            <p>Odoo - The best open source website builder.</p>\n"
 "            </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <t t-if=\"ctx.get('website_url') and ctx.get"
+"('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and "
+"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> Websitesiniz oluşturuldu ve "
+"<t t-out=\"ctx.get('nbr_products_created')\"></t> ürün ile <t t-out=\"ctx.get"
+"('nbr_blogs_created')\"></t> blog gönderisi oluşturuldu.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get"
+"('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> Websitesiniz oluşturuldu ve "
+"<t t-out=\"ctx.get('nbr_products_created')\"></t> ürün oluşturuldu.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get"
+"('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> Websitesiniz oluşturuldu ve "
+"<t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog gönderisi oluşturuldu.</"
+"p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>Harika haber!</b> Websitesiniz başarıyla "
+"oluşturuldu.</p>\n"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get"
+"('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> İçe aktarma aracı başarıyla "
+"<t t-out=\"ctx.get('nbr_products_created')\"></t> ürün ve <t t-out=\"ctx.get"
+"('nbr_blogs_created')\"></t> blog gönderisi oluşturdu.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> İçe aktarma aracı başarıyla "
+"<t t-out=\"ctx.get('nbr_products_created')\"></t> ürün oluşturdu.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get"
+"('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Harika haber!</b> İçe aktarma aracı başarıyla "
+"<t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog gönderisi oluşturdu.</p>"
+"\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p><b>Güncelleme:</b> Bu sefer websitesinizi veya "
+"ürünlerinizi oluşturamadık.</p>\n"
+"                        <p>Bu durum çeşitli nedenlerle gerçekleşebilir, "
+"örneğin:</p>\n"
+"                        <ul>\n"
+"                            <li>Websitesinizdeki otomatik erişimi engelleyen "
+"koruma mekanizmaları,</li>\n"
+"                            <li>Sunucularımızda geçici bakım veya sınırlı "
+"erişilebilirlik,</li>\n"
+"                            <li>Websitesinizde sürecimizle tam uyumlu "
+"olmayan özel kod veya yapılandırmalar.</li>\n"
+"                        </ul>\n"
+"                        <p>Lütfen daha sonra tekrar deneyin veya sorun devam "
+"ederse bizimle iletişime geçin — yardımcı olmak için buradayız!</p>\n"
+"                    </t>\n"
+"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>Aşağıdaki düğmeye tıklayarak websitesinize "
+"erişebilirsiniz:</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('website_url')\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        Websitesine Git\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
+"            \n"
+"            <p>Web entegrasyonunuz için Odoo'yu seçtiğiniz için teşekkür "
+"ederiz!</p>\n"
+"            <p>Saygılarımızla,</p>\n"
+"            <br>\n"
+"            <p>Odoo - En iyi açık kaynaklı website oluşturucu.</p>\n"
+"            </div>\n"
+"            "
 
 #. module: website_generator
 #: model_terms:ir.ui.view,arch_db:website_generator.res_config_settings_view_form
@@ -120,30 +201,32 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>Import "
 "Website"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>"
+"Websitesini İçe Aktar"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "API Check failed"
-msgstr ""
+msgstr "API kontrolü başarısız"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "API Key is not valid"
-msgstr ""
+msgstr "API Anahtarı geçersiz"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "API Key is valid."
-msgstr ""
+msgstr "API Anahtarı geçerli."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "API authentication not setup"
-msgstr ""
+msgstr "API kimlik doğrulaması ayarlanmadı"
 
 #. module: website_generator
 #. odoo-javascript
@@ -152,24 +235,26 @@ msgid ""
 "API key has either expired, is invalid or there is no content to extract. "
 "Please provide a new API key."
 msgstr ""
+"API anahtarının süresi dolmuş, anahtar geçersiz veya ayıklanacak içerik yok. "
+"Lütfen yeni bir API anahtarı girin."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
 msgid "Adapting building blocks."
-msgstr ""
+msgstr "Yapı taşları uyarlanıyor."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Add your Ghost API key here"
-msgstr ""
+msgstr "Ghost API anahtarınızı buraya ekleyin"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Add your PrestaShop API key here"
-msgstr ""
+msgstr "PrestaShop API anahtarınızı buraya ekleyin"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__additional_urls
@@ -180,13 +265,13 @@ msgstr "Ek URL'ler"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "All"
-msgstr ""
+msgstr "Tümü"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Already connected on"
-msgstr ""
+msgstr "Zaten şu tarihte bağlı:"
 
 #. module: website_generator
 #. odoo-python
@@ -204,7 +289,7 @@ msgstr "Ek bulunamadı"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Authorization"
-msgstr ""
+msgstr "Yetkilendirme"
 
 #. module: website_generator
 #. odoo-python
@@ -230,19 +315,19 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Click to authenticate with WooCommerce."
-msgstr ""
+msgstr "WooCommerce ile kimlik doğrulaması yapmak için tıklayın."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Connect via WooCommerce"
-msgstr ""
+msgstr "WooCommerce üzerinden bağlan"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
 msgid "Copying your text."
-msgstr ""
+msgstr "Metniniz kopyalanıyor."
 
 #. module: website_generator
 #. odoo-python
@@ -254,7 +339,7 @@ msgstr "Sonuç alınamadı, geçersiz çıktı uuid'si veya sonucun süresi dold
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Could not generate WooCommerce URL"
-msgstr ""
+msgstr "WooCommerce URL'si oluşturulamadı"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__create_uid
@@ -273,6 +358,8 @@ msgid ""
 "Creates a new website and imports the foreign website pages onto this "
 "website."
 msgstr ""
+"Yeni bir websitesi oluşturur ve harici websitesi sayfalarını bu websitesine "
+"içe aktarır."
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__display_name
@@ -292,29 +379,32 @@ msgstr "Tamamlandı; web sitesi oluşturulmuştur"
 #: code:addons/website_generator/utils/constants.py:0
 msgid "Draft, record created but request not yet accepted by the server"
 msgstr ""
+"Taslak, kayıt oluşturuldu ancak istek sunucu tarafından henüz kabul edilmedi"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Error"
-msgstr ""
+msgstr "Hata"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__generation_progress
 msgid "Generation Progress"
-msgstr ""
+msgstr "Oluşturma İlerlemesi"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Ghost API Key"
-msgstr ""
+msgstr "Ghost API Anahtarı"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Ghost API detected, please provide an API key. For more info, visit:"
 msgstr ""
+"Ghost API algılandı, lütfen bir API anahtarı girin. Daha fazla bilgi için "
+"ziyaret edin:"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__id
@@ -327,7 +417,7 @@ msgstr "ID"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import Blogs"
-msgstr ""
+msgstr "Blogları İçe Aktar"
 
 #. module: website_generator
 #. odoo-javascript
@@ -339,23 +429,23 @@ msgstr "Ürünleri İçe Aktarın"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import Website"
-msgstr ""
+msgstr "Websitesini İçe Aktar"
 
 #. module: website_generator
 #: model:ir.actions.client,name:website_generator.action_open_website_import_form
 msgid "Import Your Pages and Products"
-msgstr ""
+msgstr "Sayfalarınızı ve Ürünlerinizi İçe Aktarın"
 
 #. module: website_generator
 #: model:ir.module.module,summary:base.module_website_generator
 msgid "Import a pre-existing website"
-msgstr ""
+msgstr "Önceden var olan bir web sitesini içe aktar"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_website_cog_menu/import_website_cog_menu.xml:0
 msgid "Import from website"
-msgstr ""
+msgstr "Websitesinden içe aktar"
 
 #. module: website_generator
 #. odoo-javascript
@@ -366,7 +456,7 @@ msgstr "Web sitemi içe aktar"
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__import_website
 msgid "Import website"
-msgstr ""
+msgstr "Websitesini içe aktar"
 
 #. module: website_generator
 #. odoo-javascript
@@ -384,7 +474,7 @@ msgstr "İçe Aktarılan Altbilgi"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
 msgid "Importing your colors and design."
-msgstr ""
+msgstr "Renkleriniz ve tasarımınız içe aktarılıyor."
 
 #. module: website_generator
 #. odoo-javascript
@@ -393,12 +483,17 @@ msgid ""
 "Imports products found on the website into your Odoo database. This means "
 "potentially installing the ecommerce app and creating products."
 msgstr ""
+"Websitesinde bulunan ürünleri Odoo veritabanınıza aktarır. Bu, potansiyel "
+"olarak e-Ticaret uygulamasının kurulması ve ürünlerin oluşturulması anlamına "
+"gelir."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Imports the blogs. This means potentially installing the blogs app."
 msgstr ""
+"Blogları içe aktarır. Bu, bloglar uygulamasının potansiyel olarak yüklenmesi "
+"anlamına gelir."
 
 #. module: website_generator
 #. odoo-python
@@ -438,13 +533,13 @@ msgstr "Son Güncelleme"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Loading..."
-msgstr ""
+msgstr "Yükleniyor..."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Make sure that you have set the website URL first."
-msgstr ""
+msgstr "Öncelikle websiteleri URL'sini ayarladığınızdan emin olun."
 
 #. module: website_generator
 #. odoo-javascript
@@ -453,6 +548,8 @@ msgid ""
 "No blog platform detected. Please select at least Import Website or Import "
 "Products to continue."
 msgstr ""
+"Blog platformu algılanmadı. Devam etmek için lütfen en az Websitesi İçe "
+"Aktar veya Ürünleri İçe Aktar seçeneklerinden birini seçin."
 
 #. module: website_generator
 #. odoo-javascript
@@ -461,18 +558,22 @@ msgid ""
 "No supported API platform detected, we will search the pages for products "
 "metadata."
 msgstr ""
+"Desteklenen bir API platformu algılanmadı, sayfaları ürün meta verileri için "
+"tarayacağız."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "No supported blog API found."
-msgstr ""
+msgstr "Desteklenen bir blog API'si bulunamadı."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "No supported blog API platform detected. No blogs will be imported."
 msgstr ""
+"Desteklenen bir blog API platformu algılanmadı. Hiçbir blog içe "
+"aktarılmayacak."
 
 #. module: website_generator
 #. odoo-python
@@ -495,12 +596,12 @@ msgstr "Sayfa sayısı"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Odoo's website import documentation"
-msgstr ""
+msgstr "Odoo'nun websitesi içe aktarma belgeleri"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__out_json_attachment_id
 msgid "Out Json Attachment"
-msgstr ""
+msgstr "Çıkış JSON Eklentisi"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__uuid
@@ -516,7 +617,7 @@ msgstr "Sayfa"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Please make sure the URL is correct and try again."
-msgstr ""
+msgstr "Lütfen URL'nin doğru olduğundan emin olun ve tekrar deneyin."
 
 #. module: website_generator
 #. odoo-javascript
@@ -525,18 +626,20 @@ msgid ""
 "Please select at least one option: Import Website, Import Products or Import "
 "Blogs."
 msgstr ""
+"Lütfen en az bir seçenek belirleyin: Websitesi İçe Aktar, Ürünleri İçe Aktar "
+"veya Blogları İçe Aktar."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Please wait for the API check to finish."
-msgstr ""
+msgstr "Lütfen API kontrolünün tamamlanmasını bekleyin."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "PrestaShop API Key"
-msgstr ""
+msgstr "PrestaShop API Anahtarı"
 
 #. module: website_generator
 #. odoo-javascript
@@ -544,6 +647,8 @@ msgstr ""
 msgid ""
 "PrestaShop API detected, please provide an API key. For more info, visit:"
 msgstr ""
+"PrestaShop API algılandı, lütfen bir API anahtarı girin. Daha fazla bilgi "
+"için ziyaret edin:"
 
 #. module: website_generator
 #. odoo-python
@@ -555,7 +660,7 @@ msgstr "İşleniyor"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Reconnect via WooCommerce"
-msgstr ""
+msgstr "WooCommerce aracılığıyla yeniden bağlan"
 
 #. module: website_generator
 #. odoo-python
@@ -567,13 +672,13 @@ msgstr "Talep hala işleniyor, sonuç henüz mevcut değil"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Select the website of which you want to create the products/blogs for."
-msgstr ""
+msgstr "Ürünleri/blogları oluşturmak istediğiniz websitelerini seçin."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Sending request..."
-msgstr ""
+msgstr "İstek gönderiliyor..."
 
 #. module: website_generator
 #. odoo-python
@@ -585,7 +690,7 @@ msgstr "Sunucu şu anda bakımda. Lütfen daha sonra tekrar deneyin"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Shopify API detected."
-msgstr ""
+msgstr "Shopify API algılandı."
 
 #. module: website_generator
 #. odoo-javascript
@@ -600,18 +705,20 @@ msgid ""
 "Something went wrong applying your API key. Please check your API key and "
 "try again."
 msgstr ""
+"API anahtarınız uygulanırken bir hata oluştu. Lütfen API anahtarınızı "
+"kontrol edin ve tekrar deneyin."
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Something went wrong during the import"
-msgstr ""
+msgstr "İçe aktarma sırasında bir sorun oluştu"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Something went wrong while importing your website"
-msgstr ""
+msgstr "Websiteniz içe aktarılırken bir sorun oluştu"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__status
@@ -635,37 +742,39 @@ msgstr "Başarılı"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is not reachable."
-msgstr ""
+msgstr "URL'ye ulaşılamıyor."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is reachable."
-msgstr ""
+msgstr "URL'ye ulaşılabiliyor."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The number of pages is limited. If you need more, contact us at"
 msgstr ""
+"Sayfa sayısı sınırlıdır. Daha fazlasına ihtiyaç duyarsanız, bizimle "
+"iletişime geçin:"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is empty"
-msgstr ""
+msgstr "Sağlanan URL boş"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not allowed"
-msgstr ""
+msgstr "Sağlanan URL'ye izin verilmiyor"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not reachable"
-msgstr ""
+msgstr "Sağlanan URL'ye ulaşılamıyor"
 
 #. module: website_generator
 #. odoo-python
@@ -707,13 +816,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The search for blogs API is done."
-msgstr ""
+msgstr "Bloglar için API araması tamamlandı."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The search for products API is done."
-msgstr ""
+msgstr "Ürünler için API araması tamamlandı."
 
 #. module: website_generator
 #. odoo-javascript
@@ -725,7 +834,7 @@ msgstr "Bu işlem birkaç dakika sürebilir."
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Too many requests"
-msgstr ""
+msgstr "Çok fazla istek"
 
 #. module: website_generator
 #. odoo-python
@@ -737,7 +846,7 @@ msgstr "%s Web Sitesi için En İyi Menü"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "URL redirection"
-msgstr ""
+msgstr "URL yönlendirmesi"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__target_url
@@ -748,13 +857,13 @@ msgstr "Kazınacak URL"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "URL unreachable"
-msgstr ""
+msgstr "URL'ye ulaşılamıyor"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
 msgid "Uploading your images."
-msgstr ""
+msgstr "Görselleriniz yükleniyor."
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__version
@@ -806,7 +915,7 @@ msgstr "Web Sitesi Oluşturucu Talebi"
 #. module: website_generator
 #: model:ir.actions.server,name:website_generator.cron_generate_site_ir_actions_server
 msgid "Website Generator: Create the website"
-msgstr ""
+msgstr "Websitesi Oluşturucu: Websitesini oluştur"
 
 #. module: website_generator
 #: model:ir.actions.server,name:website_generator.cron_get_result_ir_actions_server
@@ -842,18 +951,21 @@ msgstr "Web sitesi desteklenmiyor"
 msgid ""
 "WooCommerce API detected, please authenticate to import WooCommerce Products."
 msgstr ""
+"WooCommerce API algılandı, WooCommerce Ürünlerini içe aktarmak için lütfen "
+"kimlik doğrulaması yapın."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "WordPress Blog API detected."
-msgstr ""
+msgstr "WordPress Blog API algılandı."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "You must add a Ghost API key before trying to import Ghost Blogs."
 msgstr ""
+"Ghost Bloglarını içe aktarmadan önce bir Ghost API anahtarı eklemelisiniz."
 
 #. module: website_generator
 #. odoo-javascript
@@ -862,6 +974,8 @@ msgid ""
 "You must add a PrestaShop API key before trying to import PrestaShop "
 "products."
 msgstr ""
+"PrestaShop ürünlerini içe aktarmadan önce bir PrestaShop API anahtarı "
+"eklemelisiniz."
 
 #. module: website_generator
 #. odoo-javascript
@@ -870,6 +984,8 @@ msgid ""
 "You must authenticate the WooCommerce API before trying to import "
 "WooCommerce Products."
 msgstr ""
+"WooCommerce Ürünlerini içe aktarmadan önce WooCommerce API kimlik "
+"doğrulamasını yapmalısınız."
 
 #. module: website_generator
 #. odoo-javascript
@@ -881,67 +997,67 @@ msgstr "Web siteniz hazır olduğunda yönlendirileceksiniz."
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "You will receive an"
-msgstr ""
+msgstr "Bir tane alacaksınız"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your blogs have been imported!"
-msgstr ""
+msgstr "Bloglarınız içe aktarıldı!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your new blogs and products are ready!"
-msgstr ""
+msgstr "Yeni bloglarınız ve ürünleriniz hazır!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your new website and blogs are ready!"
-msgstr ""
+msgstr "Yeni websitesiniz ve bloglarınız hazır!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your new website and products are ready!"
-msgstr ""
+msgstr "Yeni websitesiniz ve ürünleriniz hazır!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your new website is ready!"
-msgstr ""
+msgstr "Yeni websitesiniz hazır!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your new website, blogs and products are ready!"
-msgstr ""
+msgstr "Yeni websitesiniz, bloglarınız ve ürünleriniz hazır!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
 msgid "Your products have been imported!"
-msgstr ""
+msgstr "Ürünleriniz içe aktarıldı!"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Your request has been submitted!"
-msgstr ""
+msgstr "İsteğiniz gönderildi!"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
 msgid "Your website, now customizable effortless."
-msgstr ""
+msgstr "Websitesi, artık zahmetsizce özelleştirilebilir."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "email notification"
-msgstr ""
+msgstr "e-posta bildirimi"
 
 #. module: website_generator
 #. odoo-javascript
@@ -959,12 +1075,12 @@ msgstr "odoo.com/yardım"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "once your website and/or products are ready."
-msgstr ""
+msgstr "Websitesi ve/veya ürünleriniz hazır olduğunda."
 
 #. module: website_generator
 #: model:mail.template,subject:website_generator.email_template_website_scrapped
 msgid "{{ ctx.get('subject') }}"
-msgstr ""
+msgstr "{{ ctx.get('subject') }}"
 
 #~ msgid "HTTP Routing"
 #~ msgstr "HTTP Yönlendirme"

@@ -549,6 +549,13 @@ class Base(models.AbstractModel):
         self._web_gantt_update_next_pills_first_possible_date(dependency_field_name, dependency_inverted_field_name, search_forward, first_possible_start_date_per_candidate, last_possible_end_date_per_candidate, consume_buffer, start_date_field_name,
             stop_date_field_name, self[start_date_field_name], self[stop_date_field_name], old_vals_per_pill_id[self.id].get(start_date_field_name, self[start_date_field_name]), old_vals_per_pill_id[self.id].get(stop_date_field_name, self[stop_date_field_name]),
         )
+        if not search_forward and stop_date_field_name in vals and start_date_field_name not in vals:
+            stop_date_delta = self[stop_date_field_name] - old_vals_per_pill_id[self.id][stop_date_field_name]
+            for candidate in candidates:
+                candidate_stop_date = candidate[stop_date_field_name] + stop_date_delta
+                if isinstance(candidate_stop_date, datetime):
+                    candidate_stop_date = candidate_stop_date.astimezone(UTC)
+                last_possible_end_date_per_candidate.setdefault(candidate.id, candidate_stop_date)
 
         for candidate in candidates:
             if consume_buffer and not candidate._web_gantt_is_candidate_in_conflict(start_date_field_name, stop_date_field_name, dependency_field_name, dependency_inverted_field_name):

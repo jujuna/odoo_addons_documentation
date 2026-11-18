@@ -544,13 +544,6 @@ result = min(version.l10n_mx_savings_fund * month_to_period_ratio, result_rules[
         <field name="country_id" ref="base.mx"/>
     </record>
 
-    <function model="hr.salary.rule" name="write">
-        <value model="hr.salary.rule" search="[
-            ('struct_ids', 'in', ref('l10n_mx_regular_pay')),
-            ('code', '=', 'REIMBURSEMENT')]"/>
-        <value eval="{'sequence': 90}"/>
-    </function>
-
     <record id="l10n_mx_regular_pay_expenses" model="hr.salary.rule">
         <field name="name">Expenses</field>
         <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
@@ -647,10 +640,9 @@ if gross:
         low, high, fix, rate = find_rates(gross, isr_tables[version.schedule_pay])
         result = -((gross - low) * rate + fix)
 
-schedule_days = payslip._rule_parameter('l10n_mx_schedule_table')[version.schedule_pay]
-min_wage = payslip._rule_parameter('l10n_mx_daily_min_wage')[version.l10n_mx_min_wage_zone] * (round(schedule_days) - unpaid_days_in_period)
+min_wage = float_round(payslip._rule_parameter('l10n_mx_daily_min_wage')[version.l10n_mx_min_wage_zone] * (min_wage_period_days - unpaid_days_in_period), precision_digits=2)
 
-if gross &lt;= min_wage and payslip.l10n_mx_daily_salary &lt;= payslip._rule_parameter('l10n_mx_daily_min_wage')[version.l10n_mx_min_wage_zone]:
+if gross &lt;= min_wage and is_minimum_wage:
     result_qty = 0.0
         </field>
         <field name="struct_ids" eval="[(6, 0, [
@@ -1490,7 +1482,7 @@ result_name = inputs['REIMBURSEMENT'].name
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = -categories['IMSS_EMPLOYEE']
-if payslip.l10n_mx_daily_salary &lt;= payslip._rule_parameter('l10n_mx_daily_min_wage')[version.l10n_mx_min_wage_zone]:
+if is_minimum_wage:
     result_qty = 0.0
         </field>
         <field name="appears_on_payslip">always</field>
@@ -1524,7 +1516,7 @@ result = categories['IMSS_EMPLOYER']
         <field name="sequence">200</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = payslip.l10n_mx_daily_salary &lt;= payslip._rule_parameter('l10n_mx_daily_min_wage')[version.l10n_mx_min_wage_zone]
+result = is_minimum_wage
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">

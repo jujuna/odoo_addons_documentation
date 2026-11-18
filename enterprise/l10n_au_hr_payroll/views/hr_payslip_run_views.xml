@@ -7,21 +7,19 @@
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('o_payrun_metrics')]/div[.//field[@name='net_sum']]" position="after">
                 <div class="d-flex flex-column align-items-start" invisible="country_code != 'AU'">
-                    <div class="small fw-medium d-flex gap-2 align-items-center">
-                        <i class="oi" data-icon="account_balance"/>
+                    <div class="o_payrun_metric_label small text-muted">
                         <span>Super Contributions</span>
                     </div>
-                    <div class="fs-6 fw-medium">
-                        <field name="l10n_au_total_super_contributions"/>
+                    <div class="o_payrun_metric_value">
+                        <field name="l10n_au_total_super_contributions" widget="payrun_kpi"/>
                     </div>
                 </div>
                 <div class="d-flex flex-column align-items-start" invisible="country_code != 'AU'">
-                    <div class="small fw-medium d-flex gap-2 align-items-center">
-                        <i class="oi" data-icon="content_cut"/>
+                    <div class="o_payrun_metric_label small text-muted">
                         <span>Tax Withholding</span>
                     </div>
-                    <div class="fs-6 fw-medium">
-                        <field name="l10n_au_total_withholding_tax"/>
+                    <div class="o_payrun_metric_value">
+                        <field name="l10n_au_total_withholding_tax" widget="payrun_kpi"/>
                     </div>
                 </div>
             </xpath>

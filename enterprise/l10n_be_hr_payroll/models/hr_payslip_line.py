@@ -13,12 +13,14 @@ class HrPayslipLine(models.Model):
         help="Define if this amount must be fiscally attached to the fiscal period of this payslip "
              "or to the pay period. Example: benefit in kind must be attached to the pay period.")
 
-    @api.depends('salary_rule_id', 'total', 'slip_id.origin_payslip_id')
+    @api.depends('salary_rule_id', 'total', 'slip_id.origin_payslip_id', 'slip_id.l10n_be_arrear_salary')
     def _compute_l10n_be_follow_pay_period(self):
         """Resolve the attachment its salary rule gives the amount.
 
         The delta is what the amount adds to what was already declared for it. Outside of a
         correction there is nothing declared yet, so the delta is the amount itself.
+
+        The arrears are declared as a whole when they are paid, their benefits in kind included.
         """
         delta_lines = self.filtered(
             lambda line: line.salary_rule_id.l10n_be_follow_pay_period in ['positive', 'negative'])
@@ -27,6 +29,9 @@ class HrPayslipLine(models.Model):
         if corrections and delta_lines.mapped('code'):
             declared = corrections.origin_payslip_id._get_line_values(delta_lines.mapped('code'))
         for line in self:
+            if line.slip_id.l10n_be_arrear_salary:
+                line.l10n_be_follow_pay_period = False
+                continue
             policy = line.salary_rule_id.l10n_be_follow_pay_period
             if policy in ['always', 'never']:
                 line.l10n_be_follow_pay_period = policy == 'always'

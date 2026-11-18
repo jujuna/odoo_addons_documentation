@@ -1,3 +1,5 @@
+import re
+
 from odoo import _, fields, models, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import BinaryBytes
@@ -62,6 +64,11 @@ class L10n_BeForm28150(models.Model):
         tracking=True,
         compute='_compute_partner_names', store=True, readonly=False,
     )
+    is_first_name_missing = fields.Boolean(
+        string='First Name Missing',
+        compute='_compute_is_first_name_missing',
+        help='The first name of a natural person (zone 2.114) is found in its name, after a comma (e.g. "Doe, John")',
+    )
     partner_address = fields.Char(
         string='Address',
         help='Address of the partner when the form was created',
@@ -114,24 +121,28 @@ class L10n_BeForm28150(models.Model):
     )
     commissions = fields.Monetary(
         string="Commissions",
+        help='Balance of the expense accounts tagged "281.50 - Commissions", excluding VAT: book the deductible VAT on the VAT accounts.',
         default=0.0,
         required=True,
         readonly=True,
     )
     fees = fields.Monetary(
         string="Fees",
+        help='Balance of the expense accounts tagged "281.50 - Fees", excluding VAT: book the deductible VAT on the VAT accounts.',
         default=0.0,
         required=True,
         readonly=True,
     )
     atn = fields.Monetary(
         string="ATN",
+        help='Balance of the expense accounts tagged "281.50 - ATN", VAT included and minus the contribution of the beneficiary: book the non-deductible VAT of the benefits on these accounts, and the contribution of the beneficiary as a credit on them.',
         default=0.0,
         required=True,
         readonly=True,
     )
     exposed_expenses = fields.Monetary(
         string="Exposed expenses",
+        help='Balance of the expense accounts tagged "281.50 - Exposed Expenses", excluding VAT: book the deductible VAT on the VAT accounts.',
         default=0.0,
         required=True,
         readonly=True,
@@ -143,7 +154,7 @@ class L10n_BeForm28150(models.Model):
     )
     paid_amount = fields.Monetary(
         string="Paid amount",
-        help="Amount paid during the reference year and the preceding year related to the total remuneration",
+        help="Amount paid during the reference year, including the amounts related to other years",
         default=0.0,
         required=True,
         readonly=True,
@@ -175,12 +186,31 @@ class L10n_BeForm28150(models.Model):
         sequence_per_company = self._get_sequence_per_company()
         form_requiring_real_sequence = self.filtered(lambda f: not f.form_325_id.is_test)
         for form in form_requiring_real_sequence.sorted(lambda f: (f.partner_zip, f.partner_name, f.id)):
+            # A corrective or cancelled form (2.028 = 1 or 3) replaces the form sent before: it keeps its number
+            original_form = form._get_original_form() if form.treatment_type in ('1', '3') else form.browse()
+            if original_form:
+                form.official_id = original_form.official_id
+                continue
             sequence = sequence_per_company.get(form.company_id.id)
             form.official_id = sequence.next_by_id(sequence_date=fields.Datetime.to_datetime(str(form.reference_year)))
 
         test_forms = self - form_requiring_real_sequence
         for i, form in enumerate(test_forms.sorted(lambda f: (f.partner_zip, f.partner_name, f.id)), start=1):
             form.official_id = str(i)
+
+    def _get_original_form(self):
+        """The last form sent for the same beneficiary, company and year, that a corrective or cancelled form
+        replaces."""
+        self.ensure_one()
+        return self.search([
+            ('id', '!=', self.id),
+            ('partner_id', '=', self.partner_id.id),
+            ('form_325_id.company_id', '=', self.company_id.id),
+            ('form_325_id.reference_year', '=', self.reference_year),
+            ('form_325_id.state', '=', 'generated'),
+            ('form_325_id.is_test', '=', False),
+            ('official_id', '!=', False),
+        ], order='id desc', limit=1)
 
     def _get_sequence_per_company(self):
         sequences = self.env['ir.sequence'].search([
@@ -215,6 +245,11 @@ class L10n_BeForm28150(models.Model):
                 form.partner_name = form.partner_id.name
                 form.partner_first_name = ''
 
+    @api.depends('partner_is_natural_person', 'partner_first_name')
+    def _compute_is_first_name_missing(self):
+        for form in self:
+            form.is_first_name_missing = form.partner_is_natural_person and not (form.partner_first_name or '').strip()
+
     @api.depends('partner_id')
     def _compute_partner_address(self):
         for form in self:
@@ -240,11 +275,16 @@ class L10n_BeForm28150(models.Model):
         for form in self:
             form.partner_citizen_identification = form.partner_id.citizen_identification
 
-    @api.depends('partner_is_natural_person')
+    @api.depends('partner_id')
     def _compute_partner_bce_number(self):
+        # Natural persons exercising a liberal profession also have a BCE number (zone 2.110)
         for form in self:
-            if not form.partner_is_natural_person:
-                form.partner_bce_number = form.partner_id._get_bce_number()
+            partner = form.partner_id
+            form.partner_bce_number = (
+                partner._get_additional_identifier('BE_EN')
+                or (partner.has_vat and partner._get_bce_number())
+                or ''
+            )
 
     @api.depends('partner_id')
     def _compute_partner_is_natural_person(self):
@@ -275,6 +315,15 @@ class L10n_BeForm28150(models.Model):
     def get_dict_values(self):
         self.ensure_one()
         is_partner_from_belgium = self.country_id.code == 'BE'
+        bce_number = self.partner_bce_number if is_partner_from_belgium else ''
+        # A non-resident is identified by the tax identification number of its country of residence (2.109), its
+        # foreign VAT number or else its citizen identification, never in 2.011 (both zones can't be filled together)
+        if is_partner_from_belgium:
+            national_number = re.sub(r'\D', '', self.partner_citizen_identification or '') if self.partner_is_natural_person else bce_number
+            foreign_tax_number = ''
+        else:
+            national_number = ''
+            foreign_tax_number = re.sub(r'\s', '', self.partner_bce_number or self.partner_citizen_identification or '')
         sum_control = sum([
             self.commissions,
             self.fees,
@@ -291,6 +340,8 @@ class L10n_BeForm28150(models.Model):
             'F2005': self.income_debtor_bce_number,
             'F2008': 28150,  # fiche type
             'F2009': int(self.official_id),  # id number of this fiche for this beneficiary
+            # national number of a natural person, BCE number of a legal person
+            'F2011': national_number,
             'F2013': self.partner_name[:41],
             'F2015': self.partner_address,
             'F2016': self.partner_zip if is_partner_from_belgium else '',
@@ -317,8 +368,8 @@ class L10n_BeForm28150(models.Model):
             'F50_2099': '',  # further comments concerning amounts from 2060 to 2067
             'F50_2103': '',  # nature of the amounts
             'F50_2107': self.partner_job_position,
-            'F50_2109': self.partner_citizen_identification,
-            'F50_2110': self.partner_bce_number if is_partner_from_belgium else '',  # KBO/BCE number
+            'F50_2109': foreign_tax_number,  # tax identification number given by the country of residence of a non-resident
+            'F50_2110': bce_number if self.partner_is_natural_person else '',  # KBO/BCE number of a natural person
         }
 
     def _get_pdf_file_name(self):

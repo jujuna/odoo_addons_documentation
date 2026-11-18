@@ -31,11 +31,16 @@
                         <field name="name">1 - Operating result (I-II)</field>
                         <field name="code">FR_2033_B_c270</field>
                         <field name="expression_ids">
+                            <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_expr_raw">
+                                <field name="label">balance_unrounded</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">FR_2033_B_c232.balance_unrounded - FR_2033_B_c264.balance_unrounded</field>
+                            </record>
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_expr">
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">FR_2033_B_c232.balance - FR_2033_B_c264.balance</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="formula">FR_2033_B_c270.balance_unrounded</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                         <field name="children_ids">
@@ -44,11 +49,16 @@
                                 <field name="name">Operating income (I)</field>
                                 <field name="code">FR_2033_B_c232</field>
                                 <field name="expression_ids">
+                                    <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_inc_I_232_expr_raw">
+                                        <field name="label">balance_unrounded</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">FR_2033_B_c210.balance_from_account_codes + FR_2033_B_prod_sold.balance_unrounded + FR_2033_B_c222.balance_from_account_codes + FR_2033_B_c224.balance_from_account_codes + FR_2033_B_c226.balance_from_account_codes + FR_2033_B_c230.balance_from_account_codes</field>
+                                    </record>
                                     <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_inc_I_232_expr">
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">FR_2033_B_c210.balance + FR_2033_B_prod_sold.balance + FR_2033_B_c222.balance + FR_2033_B_c226.balance + FR_2033_B_c230.balance</field>
-                                        <field name="subformula">round(0)</field>
+                                        <field name="formula">FR_2033_B_c232.balance_unrounded</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -66,7 +76,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c210.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -93,7 +103,7 @@
                                                         <field name="label">balance</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">FR_2033_B_c209.balance_from_domain</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                             </record>
@@ -104,11 +114,16 @@
                                         <field name="name">Production sold</field>
                                         <field name="code">FR_2033_B_prod_sold</field>
                                         <field name="expression_ids">
+                                            <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_inc_I_232_prod_sold_expr_raw">
+                                                <field name="label">balance_unrounded</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">FR_2033_B_c214.balance_from_account_codes + FR_2033_B_c218.balance_from_account_codes</field>
+                                            </record>
                                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_inc_I_232_prod_sold_expr">
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">FR_2033_B_c214.balance + FR_2033_B_c218.balance</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="formula">FR_2033_B_prod_sold.balance_unrounded</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -126,7 +141,7 @@
                                                         <field name="label">balance</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">FR_2033_B_c214.balance_from_account_codes</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                                 <field name="children_ids">
@@ -156,7 +171,7 @@
                                                                 <field name="label">balance</field>
                                                                 <field name="engine">aggregation</field>
                                                                 <field name="formula">FR_2033_B_c215.balance_from_domain</field>
-                                                                <field name="subformula">round(0)</field>
+                                                                <field name="subformula">round(0, HALF-UP)</field>
                                                             </record>
                                                         </field>
                                                     </record>
@@ -176,7 +191,7 @@
                                                         <field name="label">balance</field>
                                                         <field name="engine">aggregation</field>
                                                         <field name="formula">FR_2033_B_c218.balance_from_account_codes</field>
-                                                        <field name="subformula">round(0)</field>
+                                                        <field name="subformula">round(0, HALF-UP)</field>
                                                     </record>
                                                 </field>
                                                 <field name="children_ids">
@@ -210,7 +225,7 @@
                                                                 <field name="label">balance</field>
                                                                 <field name="engine">aggregation</field>
                                                                 <field name="formula">FR_2033_B_c217.balance_from_domain</field>
-                                                                <field name="subformula">round(0)</field>
+                                                                <field name="subformula">round(0, HALF-UP)</field>
                                                             </record>
                                                         </field>
                                                     </record>
@@ -232,7 +247,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c222.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -250,7 +265,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c224.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -268,7 +283,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c226.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -286,7 +301,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c230.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -297,11 +312,16 @@
                                 <field name="name">Operating expenses (II)</field>
                                 <field name="code">FR_2033_B_c264</field>
                                 <field name="expression_ids">
+                                    <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_exp_II_264_expr_raw">
+                                        <field name="label">balance_unrounded</field>
+                                        <field name="engine">aggregation</field>
+                                        <field name="formula">FR_2033_B_c234.balance_from_account_codes + FR_2033_B_c236.balance_from_account_codes + FR_2033_B_c238.balance_from_account_codes + FR_2033_B_c240.balance_from_account_codes + FR_2033_B_c242.balance_from_account_codes + FR_2033_B_c244.balance_from_account_codes + FR_2033_B_c250.balance_from_account_codes + FR_2033_B_c252.balance_from_account_codes + FR_2033_B_c254.balance_from_account_codes + FR_2033_B_c256.balance_from_account_codes + FR_2033_B_c262.balance_from_account_codes</field>
+                                    </record>
                                     <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_exp_II_264_expr">
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="formula">FR_2033_B_c234.balance + FR_2033_B_c236.balance + FR_2033_B_c238.balance + FR_2033_B_c240.balance + FR_2033_B_c242.balance + FR_2033_B_c244.balance + FR_2033_B_c250.balance + FR_2033_B_c252.balance + FR_2033_B_c254.balance + FR_2033_B_c256.balance + FR_2033_B_c262.balance</field>
-                                        <field name="subformula">round(0)</field>
+                                        <field name="formula">FR_2033_B_c264.balance_unrounded</field>
+                                        <field name="subformula">round(0, HALF-UP)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -319,7 +339,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c234.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -337,7 +357,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c236.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -355,7 +375,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c238.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -373,7 +393,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c240.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -391,7 +411,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c242.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -437,7 +457,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c244.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -464,13 +484,13 @@
                                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_exp_II_264_250_expr">
                                                 <field name="label">balance_from_account_codes</field>
                                                 <field name="engine">account_codes</field>
-                                                <field name="formula">650</field>
+                                                <field name="formula">641 + 644 + 648</field>
                                             </record>
                                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_op_res_1_270_op_exp_II_264_250_expr_round">
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c250.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -488,7 +508,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c252.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -521,7 +541,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c254.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -554,7 +574,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c256.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -572,7 +592,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">FR_2033_B_c262.balance_from_account_codes</field>
-                                                <field name="subformula">round(0)</field>
+                                                <field name="subformula">round(0, HALF-UP)</field>
                                             </record>
                                         </field>
                                         <field name="children_ids">
@@ -616,13 +636,13 @@
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_fin_inc_II_280_expr">
                                 <field name="label">balance_from_account_codes</field>
                                 <field name="engine">account_codes</field>
-                                <field name="formula">- 761 - 762 - 764 - 763 - 765 - 768 - 786 - 766 - 7671 - 7672 - 7673 - 7674</field>
+                                <field name="formula">-76 - 786</field>
                             </record>
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_fin_inc_II_280_expr_round">
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">FR_2033_B_c280.balance_from_account_codes</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                     </record>
@@ -640,7 +660,7 @@
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">FR_2033_B_c290.balance_from_account_codes</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                     </record>
@@ -652,13 +672,13 @@
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_fin_charges_V_294_expr">
                                 <field name="label">balance_from_account_codes</field>
                                 <field name="engine">account_codes</field>
-                                <field name="formula">686\(6862) + 6812 + 661 + 664 + 665 + 669 + 666 + 6671 + 6672 + 6673 + 6674</field>
+                                <field name="formula">66 + 686\(6862) + 6812</field>
                             </record>
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_fin_charges_V_294_expr_round">
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">FR_2033_B_c294.balance_from_account_codes</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                     </record>
@@ -676,7 +696,7 @@
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">FR_2033_B_c300.balance_from_account_codes</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                         <field name="children_ids">
@@ -722,7 +742,7 @@
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">FR_2033_B_c306.balance_from_account_codes</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                     </record>
@@ -731,11 +751,16 @@
                         <field name="name">2 - Profit or loss: Income (I + III + IV) - Expenses (II + V + VI + VII)</field>
                         <field name="code">FR_2033_B_c310</field>
                         <field name="expression_ids">
+                            <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_P_and_L_2_310_expr_raw">
+                                <field name="label">balance_unrounded</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">FR_2033_B_c232.balance_unrounded + FR_2033_B_c280.balance_from_account_codes + FR_2033_B_c290.balance_from_account_codes - FR_2033_B_c264.balance_unrounded - FR_2033_B_c294.balance_from_account_codes - FR_2033_B_c300.balance_from_account_codes - FR_2033_B_c306.balance_from_account_codes</field>
+                            </record>
                             <record model="account.report.expression" id="l10n_fr_2033_B_acc_income_P_and_L_2_310_expr">
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
-                                <field name="formula">FR_2033_B_c232.balance + FR_2033_B_c280.balance + FR_2033_B_c290.balance - FR_2033_B_c264.balance - FR_2033_B_c294.balance - FR_2033_B_c300.balance - FR_2033_B_c306.balance</field>
-                                <field name="subformula">round(0)</field>
+                                <field name="formula">FR_2033_B_c310.balance_unrounded</field>
+                                <field name="subformula">round(0, HALF-UP)</field>
                             </record>
                         </field>
                     </record>

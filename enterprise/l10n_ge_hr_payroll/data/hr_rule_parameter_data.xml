@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_parameter_ge_weekly_hours" model="hr.rule.parameter">
+            <field name="name">GE: Standard Weekly Hours</field>
+            <field name="code">l10n_ge_weekly_hours</field>
+            <field name="description">Standard working time of 40 hours a week (Labour Code, art. 24(1)), used for the hours of a month when the employee has no working schedule.</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_weekly_hours_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">40</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_weekly_hours"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_pension_rates" model="hr.rule.parameter">
+            <field name="name">GE: Funded Pension Rates (%)</field>
+            <field name="code">l10n_ge_pension_rates</field>
+            <field name="description">Contributions of the funded pension scheme on the taxable salary paid, without ceiling: 2% withheld from the employee and 2% paid by the employer (Law on Funded Pensions No. 3303 of 2018, art. 3(6)(a) and (b)).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_pension_rates_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'employee': 2, 'employer': 2}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pension_rates"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_pension_state_bands" model="hr.rule.parameter">
+            <field name="name">GE: Funded Pension State Co-financing</field>
+            <field name="code">l10n_ge_pension_state_bands</field>
+            <field name="description">Contribution of the State on the annual salary of the participant: 2% of the first GEL 24,000 and 1% up to GEL 60,000, nothing above (Law on Funded Pensions, art. 3(6)(e) and (f)), applied as marginal bands since 20 November 2023 (Law No. 3601 of 2023). Paid by the State, shown for information.</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_pension_state_bands_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">[(24000, 2), (60000, 1), (None, 0)]</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pension_state_bands"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_pit_rates" model="hr.rule.parameter">
+            <field name="name">GE: Income Tax Rates (%)</field>
+            <field name="code">l10n_ge_pit_rates</field>
+            <field name="description">Rates of the income tax on salaries by income tax regime of the company: 20% (Tax Code, art. 79, 81(1) and 101), also for an innovative SME and a virtual zone person, which have no reduced rate on the salaries; 5% for the employees of an international company (art. 23(7)); 0% in a Free Industrial Zone (Law on Free Industrial Zones). From 24 September 2025 (Law No. 718 of 2025; Government Resolution No. 424 of 2025): 5% for an R&amp;D services company, 0% in the years 1 to 3 of an innovation start-up within its monthly cap, 5% in the years 4 to 6 and 10% in the years 7 to 10 (Law on Innovations, art. 15^3 and 15^7).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_pit_rates_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'standard': 20, 'international': 5, 'innovative_sme': 20, 'vzp': 20, 'fiz': 0}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pit_rates"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ge_pit_rates_2025_09" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'standard': 20, 'international': 5, 'rnd': 5, 'startup_1': 0, 'startup_4': 5, 'startup_7': 10, 'innovative_sme': 20, 'vzp': 20, 'fiz': 0}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pit_rates"/>
+            <field name="date_from" eval="datetime(2025, 9, 24).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_pit_startup_cap" model="hr.rule.parameter">
+            <field name="name">GE: Innovation Start-up Exempt Salary</field>
+            <field name="code">l10n_ge_pit_startup_cap</field>
+            <field name="description">Monthly salary of each employee exempt from the income tax in the first 3 years of the status of innovation start-up: up to GEL 10,000 (Government Resolution No. 424 of 2025, art. 9). The salary above is taxed at the standard rate.</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_pit_startup_cap_2025_09" model="hr.rule.parameter.value">
+            <field name="parameter_value">10000</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pit_startup_cap"/>
+            <field name="date_from" eval="datetime(2025, 9, 24).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_pit_privileges" model="hr.rule.parameter">
+            <field name="name">GE: Income Tax Annual Privileges</field>
+            <field name="code">l10n_ge_pit_privileges</field>
+            <field name="description">Taxable income of the calendar year not taxed (Tax Code, art. 82(2)): GEL 3,000 for the war veterans, the 'Mother of Georgia', the single parents, the adopters for one year and the foster parents (a); GEL 6,000 for the persons with a disability from childhood or a severe or significant disability and the persons injured in peacekeeping operations (b, b1) and for the permanent residents of a high-mountain settlement on the income of the work there (c).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_pit_privileges_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'a': 3000, 'b': 6000, 'c': 6000}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_pit_privileges"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_severance_months" model="hr.rule.parameter">
+            <field name="name">GE: Severance (Months)</field>
+            <field name="code">l10n_ge_severance_months</field>
+            <field name="description">Severance of an employer termination on economic or organisational grounds, unsuitability, long incapacity or another objective ground: 1 month of remuneration with a notice of at least 30 days, 2 months with a shorter notice (Labour Code, art. 48(1) and (2)).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_severance_months_2020_10" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'notice': 1, 'short_notice': 2}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_severance_months"/>
+            <field name="date_from" eval="datetime(2020, 10, 5).date()"/>
+        </record>
+
+        <record id="rule_parameter_ge_deduction_cap" model="hr.rule.parameter">
+            <field name="name">GE: Deduction Cap (%)</field>
+            <field name="code">l10n_ge_deduction_cap</field>
+            <field name="description">The overpayments and the sums owed by the employee under the labour relation are deducted within 50% of the remuneration (Labour Code, art. 43(2)), applied to the net pay of the period.</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_ge_deduction_cap_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">50</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ge_deduction_cap"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+    </data>
+</odoo>

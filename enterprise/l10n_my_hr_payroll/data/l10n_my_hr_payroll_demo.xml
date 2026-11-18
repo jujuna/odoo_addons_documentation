@@ -23,9 +23,14 @@
         <field name="company_id" ref="base.demo_company_my"/>
     </record>
 
+    <record id="my_hr_job_developer" model="hr.job">
+        <field name="name">Experienced Developer</field>
+        <field name="company_id" ref="base.demo_company_my"/>
+    </record>
+
     <record id="hr_employee_kah_yoon_ooi" model="hr.employee">
         <field name="name">Kah Yoon Ooi</field>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_my_hr_payroll.my_hr_job_developer"/>
         <field name="country_id" ref="base.my"/>
         <field name="company_id" ref="base.demo_company_my"/>
         <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
@@ -104,7 +109,7 @@
         <field name="company_id" ref="base.demo_company_my"/>
         <field name="user_id" ref="l10n_my_hr_payroll.user_xiu_mei_lee"/>
         <field name="department_id" ref="hr_department_rdmy"/>
-        <field name="job_id" ref="hr.job_developer"/>
+        <field name="job_id" ref="l10n_my_hr_payroll.my_hr_job_developer"/>
         <field name="structure_type_id" ref="l10n_my_hr_payroll.structure_type_employee_my"/>
         <field name="wage">7000</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>

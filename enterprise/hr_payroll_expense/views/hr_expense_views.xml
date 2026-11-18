@@ -26,13 +26,13 @@
                         invisible="nb_attachment  &gt;= 1 or not refund_in_payslip or not payslip_id or state in ('posted', 'in_payment', 'paid') or payment_mode != 'payslip_account'"/>
             </xpath>
             <xpath expr="//button[hasclass('o_expense_refuse')]" position="attributes">
-                <attribute name="invisible">state not in ('submitted', 'approved') or refund_in_payslip</attribute>
+                <attribute name="invisible">state not in ('submitted', 'approved') or account_move_state == 'posted' or refund_in_payslip</attribute>
             </xpath>
             <xpath expr="//button[hasclass('o_expense_split_user')]" position="attributes">
                 <attribute name="invisible">state != 'draft' or product_has_cost or refund_in_payslip</attribute>
             </xpath>
             <xpath expr="//button[hasclass('o_expense_split_manager')]" position="attributes">
-                <attribute name="invisible">state in ('in_payment', 'paid', 'refused', 'posted') or product_has_cost or refund_in_payslip</attribute>
+                <attribute name="invisible">state in ('in_payment', 'paid', 'refused', 'posted') or account_move_state == 'posted' or product_has_cost or refund_in_payslip</attribute>
             </xpath>
         </field>
     </record>

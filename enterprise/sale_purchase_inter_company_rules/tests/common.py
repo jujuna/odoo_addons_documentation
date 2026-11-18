@@ -53,3 +53,15 @@ class TestInterCompanyRulesCommonSOPO(TestInterCompanyRulesCommon):
         # fiscal positions need some taxes to enable mapping - normally default taxes should belong to a domestic fiscal position
         (cls.company_a.account_sale_tax_id | cls.company_a.account_purchase_tax_id).fiscal_position_ids = [Command.link(cls.fp_a.id)]
         (cls.company_b.account_sale_tax_id | cls.company_b.account_purchase_tax_id).fiscal_position_ids = [Command.link(cls.fp_b.id)]
+
+        analytic_plan = cls.env['account.analytic.plan'].create({'name': 'Inter Company Plan'})
+        cls.analytic_account_shared = cls.env['account.analytic.account'].create({
+            'name': 'Shared Account',
+            'plan_id': analytic_plan.id,
+            'company_id': False,
+        })
+        cls.analytic_account_company_a = cls.env['account.analytic.account'].create({
+            'name': 'Company A Account',
+            'plan_id': analytic_plan.id,
+            'company_id': cls.company_a.id,
+        })

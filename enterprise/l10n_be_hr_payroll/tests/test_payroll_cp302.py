@@ -240,6 +240,13 @@ class TestPayrollCP302(TransactionCase):
         )
         self.assertEqual(v2.l10n_be_base_computed_seniority, 0)
 
+    def test_change_category_from_not_applicable(self):
+        """A new contract on category 5 after an N.A. contract must not crash.
+        N.A. has no seniority scale, so the base seniority stays 0."""
+        v1 = self._make_cp302_version_for_bridge('l10n_be_hr_payroll.salary_scale_na', years_in_position=3)
+        v2 = self._apply_category_change(v1, 'l10n_be_hr_payroll.cp302_5')
+        self.assertEqual(v2.l10n_be_base_computed_seniority, 0)
+
     def test_seniority_bridge_uses_hourly_when_previous_cat_le_3(self):
         """When the previous category code is <= 3, the bridge uses the hourly scale regardless of wage_type.
         cat3 seniority 5 = 16.7318/h; first cat4 hourly entry >= that is [3] = 17.0347, so base = 3."""
@@ -318,6 +325,40 @@ class TestPayrollCP302(TransactionCase):
         dashboard_data = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
         self.check_warnings(dashboard_data, 'Employees Under Minimum Wage', version.employee_id, False)
         self.assertFalse(self._has_min_wage_issue(new_version))
+
+    def test_min_wage_part_time_hourly_not_prorated(self):
+        """An hourly minimum doesn't depend on the work time rate: only a monthly minimum is prorated."""
+        half_time_calendar = self.env['resource.calendar'].create({
+            'name': 'CP302 Half-Time',
+            'company_id': self.belgian_company.id,
+            'full_time_required_hours': 40,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'dayofweek': str(day), 'hour_from': 8, 'hour_to': 12,
+            }) for day in range(5)],
+        })
+        start = date.today() - relativedelta(months=28)
+        hourly_version = self._make_cp302_cdi_version(start, self.env.ref('l10n_be_hr_payroll.cp302_1').id, wage_type='hourly')
+        hourly_version.write({'resource_calendar_id': half_time_calendar.id, 'hourly_wage': 10.0})
+        self.assertLess(hourly_version.work_time_rate, 1)
+        scales = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')
+        min_wage, wage_type, _seniority = hourly_version._get_l10n_be_min_wage()
+        self.assertEqual(wage_type, 'hourly')
+        self.assertAlmostEqual(min_wage, scales['1']['hourly'][2], places=4)
+        self.assertTrue(self._has_min_wage_issue(hourly_version))
+
+        monthly_version = self._make_cp302_cdi_version(start, self.env.ref('l10n_be_hr_payroll.cp302_5').id)
+        monthly_version.resource_calendar_id = half_time_calendar
+        min_wage, wage_type, _seniority = monthly_version._get_l10n_be_min_wage()
+        self.assertEqual(wage_type, 'monthly')
+        self.assertLess(monthly_version.work_time_rate, 1)
+        self.assertAlmostEqual(min_wage, scales['5']['monthly'][2] * monthly_version.work_time_rate, places=4)
+
+    def test_min_wage_seniority_above_scale(self):
+        """Beyond the last seniority of the scale, the minimum is the one of the last seniority."""
+        version = self._make_cp302_cdi_version(date.today() - relativedelta(years=47), self.env.ref('l10n_be_hr_payroll.cp302_5').id)
+        self.assertGreater(version.l10n_be_computed_seniority_years, 45)
+        scale = self.env['hr.rule.parameter']._get_parameter_from_code('cp302_salary_scales')['5']['monthly']
+        self.assertEqual(version._get_l10n_be_min_wage()[0], scale[max(scale)] * version.work_time_rate)
 
     # -------------------------------------------------------------------------
     # _get_seniority_change_date for CP302 CDI (time-based)

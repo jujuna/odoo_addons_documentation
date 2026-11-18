@@ -27,12 +27,10 @@ class PlanningPlanning(models.Model):
         ## /!\ For security reason, we only make message models for public employees
         first_start_date = {}
         last_end_date = {}
-        partner_to_employee = {}
         for slot in slots:
-            if not slot.employee_ids:
-                continue
-            for employee in slot.employee_ids:
-                if employee not in first_start_date:
+            # sudo: hr.employee - can read the employees of the shifts to send them their own dates
+            for employee in slot.sudo().employee_ids:
+                if employee.id not in first_start_date:
                     first_start_date[employee.id] = slot.start_datetime
                     last_end_date[employee.id] = slot.end_datetime
                     continue
@@ -43,25 +41,56 @@ class PlanningPlanning(models.Model):
             if employee.id not in first_start_date:
                 first_start_date[employee.id] = self.date_start
                 last_end_date[employee.id] = self.date_end
-            for partner in employee._get_related_partners():
-                partner_to_employee[partner.id] = employee.id
         public_employees = self.env['hr.employee.public'].browse(employees.ids)
-        comp = self.env['whatsapp.composer'].create({
-            'res_model': 'res.partner',
-            'res_ids': public_employees.employee_id._get_related_partners().ids,
-            'batch_mode': len(public_employees.employee_id._get_related_partners().ids) > 1,
-            'wa_template_id': template.id
-        })
-        messages = self.env['whatsapp.message'].create(comp._create_whatsapp_messages_values())
-        for message in messages:
-            employee_id = partner_to_employee[message.mail_message_id.res_id]
-            message.free_text_json = {
-                'free_text_1': format_date(self.env, datetime(first_start_date[employee_id].year, first_start_date[employee_id].month, first_start_date[employee_id].day)),
-                'free_text_2': format_date(self.env, datetime(last_end_date[employee_id].year, last_end_date[employee_id].month, last_end_date[employee_id].day)),
-                'free_text_4': employee_url_map.get(employee_id, "/"),
-                'button_dynamic_url_1': ics_url_per_employee_id[employee_id],
-            }
-            message._send()
+        if self.allow_self_unassign:
+            unassign_message = self.env._(
+                "If you are unable to work an assigned shift please unassign yourself at least %s day(s) before the shift starts.",
+                self.company_id.planning_self_unassign_days_before,
+            )
+        else:
+            unassign_message = self.env._(
+                "If you need to change a shift, please contact your colleagues to request a shift exchange.",
+            )
+        batch_mode = len(public_employees.employee_id._get_related_partners().ids) > 1
+        composers = self.env["whatsapp.composer"].create(
+            [
+                {
+                    "res_model": "res.partner",
+                    "res_ids": employee._get_related_partners().ids,
+                    "batch_mode": batch_mode,
+                    "wa_template_id": template.id,
+                    "free_text_1": format_date(
+                        self.env,
+                        datetime(
+                            first_start_date[employee.id].year,
+                            first_start_date[employee.id].month,
+                            first_start_date[employee.id].day,
+                        ),
+                    ),
+                    "free_text_2": format_date(
+                        self.env,
+                        datetime(
+                            last_end_date[employee.id].year,
+                            last_end_date[employee.id].month,
+                            last_end_date[employee.id].day,
+                        ),
+                    ),
+                    "free_text_3": unassign_message,
+                    "free_text_4": (
+                        self.get_base_url() + employee_url_map[employee.id]
+                        if employee.id in employee_url_map
+                        else "/"
+                    ),
+                    "button_dynamic_url_1": ics_url_per_employee_id[employee.id],
+                }
+                for employee in public_employees.employee_id
+            ],
+        )
+        message_vals = [
+            vals for composer in composers for vals in composer._create_whatsapp_messages_values()
+        ]
+        for wa_message in self.env["whatsapp.message"].create(message_vals):
+            wa_message._send()
 
         # mark as sent
         return slots.write({

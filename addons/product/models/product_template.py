@@ -28,8 +28,12 @@ class ProductTemplate(models.Model):
     @api.model
     def default_get(self, fields):
         res = super().default_get(fields)
-        if ('uom_id' in fields and not res.get('uom_id')) or self.env.context.get('default_uom_id') is False:
-            res['uom_id'] = self._default_uom_id().id
+        if 'uom_id' in fields and not res.get('uom_id'):
+            clean_ctxt = dict(self.env.context)
+            clean_ctxt.pop('default_uom_id', None)
+            # Since uom is required, always fallback on a default (if any) even when the context
+            # gives an empty default value.
+            res['uom_id'] = self.with_context(clean_ctxt).default_get(['uom_id']).get('uom_id', False)
         return res
 
     @api.ormcache()
@@ -44,7 +48,14 @@ class ProductTemplate(models.Model):
         return categories.browse(category_ids)
 
     def _domain_pricelist_rule_ids(self):
-        return Domain('pricelist_id', '=', False) | Domain('pricelist_id.active', '=', True)
+        return (
+            (Domain('pricelist_id', '=', False) | Domain('pricelist_id.active', '=', True))
+            & (
+                Domain('product_tmpl_id.active', '=', False)
+                | Domain('product_id', '=', False)
+                | Domain('product_id.active', '=', True)
+            )
+        )
 
     @api.model
     def _domain_fixed_pricelist_rule_ids(self):

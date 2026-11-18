@@ -175,3 +175,27 @@ class TestAnalyticLine(TestCommonTimesheet):
         result = analytic_line_model.grid_unavailability('2025-06-22', '2025-06-28', 'employee_id', res_ids=[self.empl_employee.id])[False]
 
         self.assertNotIn(holiday_date, result, "The company-wide leaves should NOT include a holiday from another company.")
+
+    def test_timesheet_systray_pre_filled_unavailable_task(self):
+        """ The task last visited is only pre-filled in the timesheet systray while the user can still access it. """
+        archived_task, deleted_task = self.env['project.task'].create([
+            {'name': 'Archived Task', 'project_id': self.project_customer.id, 'active': False},
+            {'name': 'Deleted Task', 'project_id': self.project_customer.id},
+        ])
+        deleted_task_id = deleted_task.id
+        deleted_task.unlink()
+        private_task = self.project.task_ids[0]  # the user is not a follower of its project
+        AccountAnalyticLine = self.env['account.analytic.line'].with_user(self.user_employee)
+        for task_id, expected in [
+            (self.task1.id, self.task1.id),
+            (archived_task.id, False),
+            (deleted_task_id, False),
+            (private_task.id, False),
+        ]:
+            with self.subTest(task_id=task_id):
+                values = AccountAnalyticLine.with_context(
+                    default_task_id=task_id,
+                    timesheet_systray_prefill={'task_id': task_id},
+                ).onchange({}, [], {'task_id': {}, 'project_id': {}})['value']
+                self.assertEqual(values['task_id'], expected)
+                self.assertEqual(values['project_id'], expected and self.project_customer.id)

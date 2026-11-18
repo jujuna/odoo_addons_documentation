@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 17:50+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
 "PO-Revision-Date: 2026-10-18 17:02+0000\n"
 "Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
 "Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/voip/lo/>\n"
@@ -126,8 +126,8 @@ msgid ""
 "%(number)s was automatically selected as the Default Outgoing Number because "
 "the previous Default Outgoing Number is no longer active."
 msgstr ""
-"%(number)s ຖືກເລືອກເປັນເບີໂທອອກເລີ່ມຕົ້ນໂດຍອັດຕະໂນມັດ ເນື່ອງຈາກເບີໂທອອກເລີ່ມຕົ້ນກ່ອນໜ້ານີ້ບໍ່ໄດ້ໃຊ້ງານ"
-"ແລ້ວ."
+"%(number)s ຖືກເລືອກເປັນເບີໂທອອກເລີ່ມຕົ້ນໂດຍອັດຕະໂນມັດ "
+"ເນື່ອງຈາກເບີໂທອອກເລີ່ມຕົ້ນກ່ອນໜ້ານີ້ບໍ່ໄດ້ໃຊ້ງານແລ້ວ."
 
 #. module: voip
 #. odoo-python
@@ -249,16 +249,16 @@ msgstr "221B Baker Street"
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> has requested a phone "
-"number.\n"
-"                    <br/><br/>\n"
+"                    Dear <t t-out=\"ctx.get('recipient_name')\"></t>,\n"
+"                    <br><br>\n"
+"                    <strong t-out=\"user.name\"></strong> has requested a "
+"phone number.\n"
+"                    <br><br>\n"
 "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
 "                        <span>They added the following comment:</span>\n"
 "                        <div style=\"border-left: 4px solid #dee2e6; "
 "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
+"                            <t t-out=\"object.body_html\"></t>\n"
 "                        </div>\n"
 "                    </t>\n"
 "                    <a t-attf-style=\"background-color: "
@@ -272,78 +272,33 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                    ຮຽນ <t t-out=\"ctx.get('recipient_name')\"/>,\n"
-"                    <br/><br/>\n"
-"                    <strong t-out=\"user.name\"/> ໄດ້ຮ້ອງຂໍເບີໂທລະສັບ.\n"
-"                    <br/><br/>\n"
-"                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
-"                        <span>ພວກເຂົາໄດ້ເພີ່ມຄຳເຫັນດັ່ງນີ້:</span>\n"
-"                        <div style=\"border-left: 4px solid #dee2e6; "
-"padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
-"                            <t t-out=\"object.body_html\"/>\n"
-"                        </div>\n"
-"                    </t>\n"
-"                    <a t-attf-style=\"background-color: {"
-"{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px; "
-"text-decoration: none; color: {{user.company_id.email_primary_color or "
-"'#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
-"voip.action_voip_did_number\">\n"
-"                        ຊື້ເບີໂທ\n"
-"                    </a>\n"
-"                </p>\n"
-"            </div>\n"
-"        "
 
 #. module: voip
 #: model:mail.template,body_html:voip.mail_template_voicemail_message
 msgid ""
 "<div>\n"
 "                <p>A new mailbox message was left in <t t-"
-"out=\"object.voicemail_id.name\"/>.</p>\n"
+"out=\"object.voicemail_id.name\"></t>.</p>\n"
 "                <ul>\n"
 "                    <li>\n"
 "                        <strong>Caller:</strong>\n"
 "                        <t t-if=\"object.caller_id_name or "
 "object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
+"object.caller_id_num\"></t>\n"
 "                        <t t-else=\"\">Unknown caller</t>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.caller_id_name and "
 "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
+"out=\"object.caller_id_num\"></t></li>\n"
 "                    <li><strong>Received on:</strong> <t t-"
-"out=\"format_datetime(object.occurred_at)\"/></li>\n"
+"out=\"format_datetime(object.occurred_at)\"></t></li>\n"
 "                    <li><strong>Duration:</strong> <t t-"
-"out=\"format_duration(object.duration / 3600)\"/></li>\n"
+"out=\"format_duration(object.duration / 3600)\"></t></li>\n"
 "                </ul>\n"
 "                <p>The recording is attached to this email.</p>\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div>\n"
-"                <p>ມີຂໍ້ຄວາມສຽງໃໝ່ຝາກໄວ້ໃນ <t t-out=\"object.voicemail_id.name\"/>"
-".</p>\n"
-"                <ul>\n"
-"                    <li>\n"
-"                        <strong>ຜູ້ໂທ:</strong>\n"
-"                        <t t-if=\"object.caller_id_name or "
-"object.caller_id_num\" t-out=\"object.caller_id_name or "
-"object.caller_id_num\"/>\n"
-"                        <t t-else=\"\">ບໍ່ຮູ້ຜູ້ໂທ</t>\n"
-"                    </li>\n"
-"                    <li t-if=\"object.caller_id_name and "
-"object.caller_id_num\"><strong>ເບີໂທລະສັບ:</strong> <t t-"
-"out=\"object.caller_id_num\"/></li>\n"
-"                    <li><strong>ໄດ້ຮັບເມື່ອ:</strong> <t t-out=\"format_datetime"
-"(object.occurred_at)\"/></li>\n"
-"                    <li><strong>ຄວາມຍາວ:</strong> <t t-out=\"format_duration"
-"(object.duration / 3600)\"/></li>\n"
-"                </ul>\n"
-"                <p>ຟາຍສຽງທີ່ບັນທຶກໄວ້ໄດ້ຄັດຕິດມານຳອີເມວນີ້ແລ້ວ.</p>\n"
-"            </div>\n"
-"        "
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_form
@@ -403,8 +358,8 @@ msgid ""
 msgstr ""
 "<i class=\"oi\" data-icon=\"warning\" role=\"img\" aria-label=\"Warning\" "
 "title=\"ຄຳເຕືອນ\"/> \n"
-"                                ບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. ການບັນທຶກ"
-"ສຽງໂທຈຶ່ງຖືກປິດໄວ້."
+"                                ບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. "
+"ການບັນທຶກສຽງໂທຈຶ່ງຖືກປິດໄວ້."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_form
@@ -480,8 +435,8 @@ msgid ""
 "<span class=\"text-muted\" invisible=\"agent_disconnect_code\">Auto-"
 "generated</span>"
 msgstr ""
-"<span class=\"text-muted\" invisible=\"agent_disconnect_code\">ສ້າງຂຶ້ນອັດຕະໂນມັ"
-"ດ</span>"
+"<span class=\"text-muted\" "
+"invisible=\"agent_disconnect_code\">ສ້າງຂຶ້ນອັດຕະໂນມັດ</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_view_kanban
@@ -546,8 +501,8 @@ msgid ""
 msgstr ""
 "<span>\n"
 "                        <strong>ເບີນີ້ຖືກໂຈະການໃຊ້ງານເນື່ອງຈາກເຄຣດິດບໍ່ພຽງພໍ.</strong>\n"
-"                        ການໂທຈະຖືກລະງັບໄວ້ຈົນກວ່າທ່ານຈະຕື່ມເງິນ. ກະລຸນາຕື່ມເຄຣດິດເພື່ອເປີດນຳໃ"
-"ຊ້ອີກຄັ້ງ.\n"
+"                        ການໂທຈະຖືກລະງັບໄວ້ຈົນກວ່າທ່ານຈະຕື່ມເງິນ. "
+"ກະລຸນາຕື່ມເຄຣດິດເພື່ອເປີດນຳໃຊ້ອີກຄັ້ງ.\n"
 "                    </span>"
 
 #. module: voip
@@ -576,8 +531,8 @@ msgid ""
 "timeout)</span>"
 msgstr ""
 "<span>ວິນາທີ</span>\n"
-"                                <span invisible=\"timeout != 0\">(ບໍ່ມີກຳນົດເວລາ)"
-"</span>"
+"                                <span invisible=\"timeout != "
+"0\">(ບໍ່ມີກຳນົດເວລາ)</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
@@ -605,8 +560,8 @@ msgid ""
 "avoid automatic cancellation."
 msgstr ""
 "<strong>ຕ້ອງການຂໍ້ມູນເພີ່ມເຕີມ.</strong>\n"
-"                        ກວດສອບ ແລະ ຕອບກັບດ້ານລຸ່ມພາຍໃນ 5 ວັນລັດຖະການເພື່ອຫຼີກລ່ຽງການຍົກເລີ"
-"ກອັດຕະໂນມັດ."
+"                        ກວດສອບ ແລະ ຕອບກັບດ້ານລຸ່ມພາຍໃນ 5 "
+"ວັນລັດຖະການເພື່ອຫຼີກລ່ຽງການຍົກເລີກອັດຕະໂນມັດ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -616,8 +571,8 @@ msgid ""
 "and the request is fulfilled."
 msgstr ""
 "<strong>Odoo ກຳລັງຈັດຫາເບີໃຫ້ທ່ານ.</strong>\n"
-"                        ທ່ານຈະຍັງບໍ່ຖືກຮຽກເກັບເງິນຈົນກວ່າທ່ານຈະອະນຸມັດຂໍ້ສະເໜີ ແລະ ຄຳຮ້ອງຂໍຖືກດ"
-"ຳເນີນການສຳເລັດ."
+"                        ທ່ານຈະຍັງບໍ່ຖືກຮຽກເກັບເງິນຈົນກວ່າທ່ານຈະອະນຸມັດຂໍ້ສະເໜີ ແລະ "
+"ຄຳຮ້ອງຂໍຖືກດຳເນີນການສຳເລັດ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -627,8 +582,8 @@ msgid ""
 "Numbers and search again."
 msgstr ""
 "<strong>ການສັ່ງຊື້ນີ້ບໍ່ສຳເລັດ.</strong>\n"
-"                    ກວດເບິ່ງຂໍ້ຄວາມຫຼ້າສຸດໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກັບໄປທີ່ໜ້າ ເບີໂທລະສັບ ແລ້ວຄົ້ນຫາໃ"
-"ໝ່ອີກຄັ້ງ."
+"                    ກວດເບິ່ງຂໍ້ຄວາມຫຼ້າສຸດໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກັບໄປທີ່ໜ້າ ເບີໂທລະສັບ "
+"ແລ້ວຄົ້ນຫາໃໝ່ອີກຄັ້ງ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -684,6 +639,15 @@ msgstr ""
 "<strong>ລາຍການສັ່ງຊື້ຂອງທ່ານກຳລັງຢູ່ໃນຂັ້ນຕອນການກວດສອບ.</strong>\n"
 "                    ທ່ານຈະໄດ້ຮັບຂໍ້ຄວາມຜ່ານກ່ອງຂໍ້ຄວາມນີ້ຖ້າມີເອກະສານໃດໜຶ່ງຖືກປະຕິເສດ.\n"
 "                    ກະລຸນາອັບເດດເອກະສານຈົນກວ່າເອກະສານທັງໝົດຈະໄດ້ຮັບການອະນຸມັດ."
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_ivr.py:0
+msgid ""
+"A \"Play Audio\" node is still used as a destination:\n"
+"%(references)s\n"
+"Reassign those destinations first."
+msgstr ""
 
 #. module: voip
 #. odoo-python
@@ -748,8 +712,7 @@ msgstr "ໂນດເງື່ອນໄຂເວລາຕ້ອງມີຊ່ອ
 msgid ""
 "A Time Condition outside Start must have its Open output connected to a Call "
 "Group or Queue."
-msgstr ""
-"ເງື່ອນໄຂເວລາທີ່ຢູ່ນອກຈຸດເລີ່ມຕົ້ນ ຕ້ອງມີຊ່ອງອອກແບບ 'ເປີດ' ເຊື່ອມຕໍ່ກັບກຸ່ມສາຍໂທ ຫຼື ຄິວ."
+msgstr "ເງື່ອນໄຂເວລາທີ່ຢູ່ນອກຈຸດເລີ່ມຕົ້ນ ຕ້ອງມີຊ່ອງອອກແບບ 'ເປີດ' ເຊື່ອມຕໍ່ກັບກຸ່ມສາຍໂທ ຫຼື ຄິວ."
 
 #. module: voip
 #. odoo-python
@@ -765,8 +728,8 @@ msgid ""
 "device. Please ensure that your computer is up to date (e.g. the drivers) "
 "and try again."
 msgstr ""
-"ເກີດຂໍ້ຜິດພາດທາງຮາດແວຂະນະພະຍາຍາມເຂົ້າເຖິງອຸປະກອນບັນທຶກສຽງ. ກະລຸນາກວດສອບວ່າຄອມພິວເຕີຂອງທ່ານໄດ້"
-"ອັບເດດແລ້ວ (ເຊັ່ນ: ໄດຣເວີ) ແລ້ວລອງໃໝ່ອີກຄັ້ງ."
+"ເກີດຂໍ້ຜິດພາດທາງຮາດແວຂະນະພະຍາຍາມເຂົ້າເຖິງອຸປະກອນບັນທຶກສຽງ. "
+"ກະລຸນາກວດສອບວ່າຄອມພິວເຕີຂອງທ່ານໄດ້ອັບເດດແລ້ວ (ເຊັ່ນ: ໄດຣເວີ) ແລ້ວລອງໃໝ່ອີກຄັ້ງ."
 
 #. module: voip
 #. odoo-python
@@ -800,6 +763,15 @@ msgstr "ຊ່ອງອອກຂອງໂນດເຊື່ອມຕໍ່ກັ
 #: model:ir.model.constraint,message:voip.constraint_voip_phone_service_event_unique_event_id
 msgid "A phone service event is processed only once."
 msgstr "ເຫດການບໍລິການໂທລະສັບຈະຖືກປະມວນຜົນພຽງຄັ້ງດຽວເທົ່ານັ້ນ."
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid ""
+"A sound used by a Menu cannot be deleted. Delete the Menu first, or remove "
+"the node from its Call Flow. It is used by:\n"
+"%(usages)s"
+msgstr ""
 
 #. module: voip
 #. odoo-python
@@ -911,8 +883,8 @@ msgid ""
 "(requirements)s. Review the guidelines in the chatter, then click Update "
 "Requirements."
 msgstr ""
-"ຕ້ອງການການດຳເນີນການ: %(count)s ເອກະສານຕາມລະບຽບການຖືກປະຕິເສດ: %(requirements)s. ກວ"
-"ດເບິ່ງຄຳແນະນຳໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກົດ ອັບເດດເອກະສານທີ່ກຳນົດ."
+"ຕ້ອງການການດຳເນີນການ: %(count)s ເອກະສານຕາມລະບຽບການຖືກປະຕິເສດ: %(requirements)s. "
+"ກວດເບິ່ງຄຳແນະນຳໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກົດ ອັບເດດເອກະສານທີ່ກຳນົດ."
 
 #. module: voip
 #. odoo-python
@@ -921,8 +893,8 @@ msgid ""
 "Action required: a regulatory requirement was rejected: %(requirements)s. "
 "Review the guidelines in the chatter, then click Update Requirements."
 msgstr ""
-"ຕ້ອງການການດຳເນີນການ: ເອກະສານຕາມລະບຽບການຖືກປະຕິເສດ: %(requirements)s. ກວດເບິ່ງຄຳແນະນ"
-"ຳໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກົດ ອັບເດດເອກະສານທີ່ກຳນົດ."
+"ຕ້ອງການການດຳເນີນການ: ເອກະສານຕາມລະບຽບການຖືກປະຕິເສດ: %(requirements)s. "
+"ກວດເບິ່ງຄຳແນະນຳໃນກ່ອງຂໍ້ຄວາມ, ຈາກນັ້ນກົດ ອັບເດດເອກະສານທີ່ກຳນົດ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_flow__active
@@ -1058,8 +1030,7 @@ msgstr "ທີ່ຢູ່ຄວນລະບຸ ຊື່ ແລະ ນາມສ
 msgid ""
 "Adds a softphone and helpers to make phone calls directly from within your "
 "Odoo database."
-msgstr ""
-"ເພີ່ມ Softphone ແລະ ເຄື່ອງມືຊ່ວຍໂທລະສັບໂດຍກົງຈາກພາຍໃນຖານຂໍ້ມູນ Odoo ຂອງທ່ານ."
+msgstr "ເພີ່ມ Softphone ແລະ ເຄື່ອງມືຊ່ວຍໂທລະສັບໂດຍກົງຈາກພາຍໃນຖານຂໍ້ມູນ Odoo ຂອງທ່ານ."
 
 #. module: voip
 #: model:res.groups,name:voip.group_voip_admin
@@ -1175,8 +1146,7 @@ msgstr "ເກີດຂໍ້ຜິດພາດຂະນະພະຍາຍາມ
 #. odoo-python
 #: code:addons/voip/models/pbx_service.py:0
 msgid "An older tenant migration mapping cannot replace the current mapping."
-msgstr ""
-"ການເຊື່ອມໂຍງການຍ້າຍຖານຂໍ້ມູນເກົ່າບໍ່ສາມາດນຳມາປ່ຽນແທນການເຊື່ອມໂຍງປັດຈຸບັນໄດ້."
+msgstr "ການເຊື່ອມໂຍງການຍ້າຍຖານຂໍ້ມູນເກົ່າບໍ່ສາມາດນຳມາປ່ຽນແທນການເຊື່ອມໂຍງປັດຈຸບັນໄດ້."
 
 #. module: voip
 #. odoo-python
@@ -1237,8 +1207,7 @@ msgstr "ຫ້ອງແຖວ/ຫ້ອງຊຸດ/ຊັ້ນ"
 msgid ""
 "Are you sure you want to delete this activity? It will be lost forever! (A "
 "long time!)"
-msgstr ""
-"ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບກິດຈະກຳນີ້? ມັນຈະຖືກລຶບຖາວອນ! (ບໍ່ສາມາດກູ້ຄືນໄດ້ເລີຍ!)"
+msgstr "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບກິດຈະກຳນີ້? ມັນຈະຖືກລຶບຖາວອນ! (ບໍ່ສາມາດກູ້ຄືນໄດ້ເລີຍ!)"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__area_code
@@ -1248,8 +1217,7 @@ msgstr "ລະຫັດພື້ນທີ່"
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_mail_call_artifact_artifact_has_possessor
 msgid "Artifact must be linked to exactly one call source (Discuss or VoIP)."
-msgstr ""
-"Artifact ຕ້ອງເຊື່ອມໂຍງກັບແຫຼ່ງທີ່ມາຂອງສາຍໂທແຫຼ່ງດຽວເທົ່ານັ້ນ (Discuss ຫຼື VoIP)."
+msgstr "Artifact ຕ້ອງເຊື່ອມໂຍງກັບແຫຼ່ງທີ່ມາຂອງສາຍໂທແຫຼ່ງດຽວເທົ່ານັ້ນ (Discuss ຫຼື VoIP)."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__artifact_ids
@@ -1273,8 +1241,7 @@ msgstr "ສອບຖາມສະຖານະຫຼ້າສຸດຂອງແຕ
 msgid ""
 "Ask your administrator to purchase a phone number for calls through Odoo "
 "Phone Service."
-msgstr ""
-"ຕິດຕໍ່ຜູ້ດູແລລະບົບຂອງທ່ານເພື່ອສັ່ງຊື້ເບີໂທລະສັບສຳລັບການໂທຜ່ານລະບົບບໍລິການ Odoo Phone."
+msgstr "ຕິດຕໍ່ຜູ້ດູແລລະບົບຂອງທ່ານເພື່ອສັ່ງຊື້ເບີໂທລະສັບສຳລັບການໂທຜ່ານລະບົບບໍລິການ Odoo Phone."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__message_attachment_count
@@ -1394,8 +1361,8 @@ msgid ""
 "Bumped every time a Linphone bootstrap document is served, which invalidates "
 "every QR code issued before."
 msgstr ""
-"ອັບເດດທຸກຄັ້ງທີ່ມີການຮຽກໃຊ້ເອກະສານ bootstrap ຂອງ Linphone, ເຊິ່ງຈະເຮັດໃຫ້ລະຫັດ QR ທີ່ສ້າງຂຶ້ນກ່ອ"
-"ນໜ້ານີ້ໃຊ້ງານບໍ່ໄດ້."
+"ອັບເດດທຸກຄັ້ງທີ່ມີການຮຽກໃຊ້ເອກະສານ bootstrap ຂອງ Linphone, ເຊິ່ງຈະເຮັດໃຫ້ລະຫັດ QR "
+"ທີ່ສ້າງຂຶ້ນກ່ອນໜ້ານີ້ໃຊ້ງານບໍ່ໄດ້."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_business_name
@@ -1784,8 +1751,7 @@ msgstr "ສາຍໂທຈະໃຊ້ເບີ %(number)s ຈົນກວ່າ
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid "Calls use %(number)s while your number is under review."
-msgstr ""
-"ສາຍໂທຈະໃຊ້ເບີ %(number)s ໃນລະຫວ່າງທີ່ເບີຂອງທ່ານກຳລັງຢູ່ໃນຂັ້ນຕອນການກວດສອບ."
+msgstr "ສາຍໂທຈະໃຊ້ເບີ %(number)s ໃນລະຫວ່າງທີ່ເບີຂອງທ່ານກຳລັງຢູ່ໃນຂັ້ນຕອນການກວດສອບ."
 
 #. module: voip
 #. odoo-javascript
@@ -1814,9 +1780,9 @@ msgid ""
 "website is running over HTTPS and that your browser is not set to deny "
 "access to media devices."
 msgstr ""
-"ບໍ່ສາມາດເຂົ້າເຖິງອຸປະກອນບັນທຶກສຽງໄດ້. ຖ້າທ່ານໄດ້ປະຕິເສດການເຂົ້າເຖິງໄມໂຄຣໂຟນ, ກະລຸນາອະນຸຍາດແລ້ວລອ"
-"ງໃໝ່ອີກຄັ້ງ. ຫຼື ກວດສອບໃຫ້ແນ່ໃຈວ່າເວັບໄຊນີ້ເຮັດວຽກຜ່ານ HTTPS ແລະ ບຣາວເຊີຂອງທ່ານບໍ່ໄດ້ຕັ້ງຄ່າປິດກັ້ນອຸປະ"
-"ກອນສື່."
+"ບໍ່ສາມາດເຂົ້າເຖິງອຸປະກອນບັນທຶກສຽງໄດ້. ຖ້າທ່ານໄດ້ປະຕິເສດການເຂົ້າເຖິງໄມໂຄຣໂຟນ, "
+"ກະລຸນາອະນຸຍາດແລ້ວລອງໃໝ່ອີກຄັ້ງ. ຫຼື ກວດສອບໃຫ້ແນ່ໃຈວ່າເວັບໄຊນີ້ເຮັດວຽກຜ່ານ HTTPS ແລະ "
+"ບຣາວເຊີຂອງທ່ານບໍ່ໄດ້ຕັ້ງຄ່າປິດກັ້ນອຸປະກອນສື່."
 
 #. module: voip
 #. odoo-python
@@ -1903,8 +1869,8 @@ msgid ""
 "Cloud storage is not configured. Call recording cannot be enabled. Please "
 "configure a cloud storage provider first."
 msgstr ""
-"ບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. ຈຶ່ງບໍ່ສາມາດເປີດການບັນທຶກສຽງໂທໄດ້. ກະລຸນາຕັ້ງຄ່າຜູ້ໃຫ້"
-"ບໍລິການບ່ອນເກັບຂໍ້ມູນຄລາວກ່ອນ."
+"ບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. ຈຶ່ງບໍ່ສາມາດເປີດການບັນທຶກສຽງໂທໄດ້. "
+"ກະລຸນາຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິການບ່ອນເກັບຂໍ້ມູນຄລາວກ່ອນ."
 
 #. module: voip
 #. odoo-python
@@ -1913,8 +1879,8 @@ msgid ""
 "Cloud storage is not installed. Call recording cannot be enabled. Please "
 "install the cloud storage module first."
 msgstr ""
-"ໂມດູນບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຖືກຕິດຕັ້ງ. ຈຶ່ງບໍ່ສາມາດເປີດການບັນທຶກສຽງໂທໄດ້. ກະລຸນາຕິດຕັ້ງໂມ"
-"ດູນບ່ອນເກັບຂໍ້ມູນຄລາວກ່ອນ."
+"ໂມດູນບ່ອນເກັບຂໍ້ມູນຄລາວ (Cloud) ຍັງບໍ່ໄດ້ຖືກຕິດຕັ້ງ. ຈຶ່ງບໍ່ສາມາດເປີດການບັນທຶກສຽງໂທໄດ້. "
+"ກະລຸນາຕິດຕັ້ງໂມດູນບ່ອນເກັບຂໍ້ມູນຄລາວກ່ອນ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request_wizard__body_html
@@ -1950,8 +1916,7 @@ msgstr "ການຕັ້ງຄ່າ"
 #: code:addons/voip/static/src/core/web/session.js:0
 msgid ""
 "Configuration or compatibility issue (for example codecs or encryption)."
-msgstr ""
-"ບັນຫາການຕັ້ງຄ່າ ຫຼື ຄວາມເຂົ້າກັນບໍ່ໄດ້ (ຕົວຢ່າງ: ໂຄເດັກ (codecs) ຫຼື ການເຂົ້າລະຫັດ)."
+msgstr "ບັນຫາການຕັ້ງຄ່າ ຫຼື ຄວາມເຂົ້າກັນບໍ່ໄດ້ (ຕົວຢ່າງ: ໂຄເດັກ (codecs) ຫຼື ການເຂົ້າລະຫັດ)."
 
 #. module: voip
 #. odoo-javascript
@@ -2002,8 +1967,7 @@ msgstr "ການເຊື່ອມຕໍ່ຂາດຫາຍ. ກຳລັງ�
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/user_agent.js:0
 msgid "Connection lost. Please ask your administrator for help."
-msgstr ""
-"ການເຊື່ອມຕໍ່ຂາດຫາຍ. ກະລຸນາຕິດຕໍ່ຜູ້ດູແລລະບົບຂອງທ່ານເພື່ອຂໍຄວາມຊ່ວຍເຫຼືອ."
+msgstr "ການເຊື່ອມຕໍ່ຂາດຫາຍ. ກະລຸນາຕິດຕໍ່ຜູ້ດູແລລະບົບຂອງທ່ານເພື່ອຂໍຄວາມຊ່ວຍເຫຼືອ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__consecutive
@@ -2438,9 +2402,9 @@ msgid ""
 "links use Odoo Phone when the provider and current user are configured for "
 "calling. Otherwise, they open the device's calling app through a tel: link."
 msgstr ""
-"ໂໝດທົດລອງ (Demo): ສາຍໂທຈະເປັນການຈຳລອງ ແລະ ບໍ່ມີອຸປະກອນໃດດັງຂຶ້ນ. ໃຊ້ງານຈິງ (Production)"
-": ລິ້ງເບີໂທລະສັບຈະໃຊ້ Odoo Phone ເມື່ອຜູ້ໃຫ້ບໍລິການ ແລະ ຜູ້ໃຊ້ປັດຈຸບັນໄດ້ຮັບການຕັ້ງຄ່າສຳລັບການໂທ. ຖ້າບໍ່"
-"ດັ່ງນັ້ນ, ຈະເປີດແອັບໂທຂອງອຸປະກອນຜ່ານລິ້ງ tel:."
+"ໂໝດທົດລອງ (Demo): ສາຍໂທຈະເປັນການຈຳລອງ ແລະ ບໍ່ມີອຸປະກອນໃດດັງຂຶ້ນ. ໃຊ້ງານຈິງ "
+"(Production): ລິ້ງເບີໂທລະສັບຈະໃຊ້ Odoo Phone ເມື່ອຜູ້ໃຫ້ບໍລິການ ແລະ "
+"ຜູ້ໃຊ້ປັດຈຸບັນໄດ້ຮັບການຕັ້ງຄ່າສຳລັບການໂທ. ຖ້າບໍ່ດັ່ງນັ້ນ, ຈະເປີດແອັບໂທຂອງອຸປະກອນຜ່ານລິ້ງ tel:."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__description
@@ -2550,6 +2514,7 @@ msgid "Disconnected Internal Destination"
 msgstr "ປາຍທາງພາຍໃນເມື່ອຕັດການເຊື່ອມຕໍ່"
 
 #. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_http__display_name
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__display_name
@@ -2837,8 +2802,8 @@ msgid ""
 "Enter the number of another device (desk phone or mobile). Calls placed in "
 "Odoo Phone will ring that device and then connect you to the recipient."
 msgstr ""
-"ປ້ອນເບີຂອງອຸປະກອນອື່ນ (ໂທລະສັບຕັ້ງໂຕະ ຫຼື ມືຖື). ເມື່ອໂທອອກໃນ Odoo Phone ລະບົບຈະໂທຫາອຸປະກອນນັ້ນ"
-"ກ່ອນ ແລ້ວຈຶ່ງເຊື່ອມຕໍ່ທ່ານໄປຫາຜູ້ຮັບ."
+"ປ້ອນເບີຂອງອຸປະກອນອື່ນ (ໂທລະສັບຕັ້ງໂຕະ ຫຼື ມືຖື). ເມື່ອໂທອອກໃນ Odoo Phone "
+"ລະບົບຈະໂທຫາອຸປະກອນນັ້ນກ່ອນ ແລ້ວຈຶ່ງເຊື່ອມຕໍ່ທ່ານໄປຫາຜູ້ຮັບ."
 
 #. module: voip
 #. odoo-javascript
@@ -3449,6 +3414,12 @@ msgid "I have updated the proof of address with a more recent bill..."
 msgstr "ຂ້ອຍໄດ້ອັບເດດເອກະສານຢືນຢັນທີ່ຢູ່ດ້ວຍໃບບິນໃໝ່ຫຼ້າສຸດແລ້ວ..."
 
 #. module: voip
+#: model:ir.model,name:voip.model_iap_account
+msgid "IAP Account"
+msgstr ""
+
+#. module: voip
+#: model:ir.model.fields,field_description:voip.field_iap_account__id
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:voip.field_ir_http__id
 #: model:ir.model.fields,field_description:voip.field_ir_qweb__id
@@ -3535,8 +3506,8 @@ msgid ""
 "unchecked, they will be forwarded according to the On Busy rule or they will "
 "return a busy tone."
 msgstr ""
-"ຖ້າໝາຍຕິກ, ສາຍໂທເຂົ້າໃນຂະນະທີ່ກຳລັງຕິດສາຍຢູ່ຈະດັງເຕືອນ. ຖ້າບໍ່ໝາຍຕິກ, ສາຍຈະຖືກສົ່ງຕໍ່ຕາມກົດລະບຽບ 'ເ"
-"ມື່ອສາຍບໍ່ຫວ່າງ' ຫຼື ສົ່ງສັນຍານສາຍບໍ່ຫວ່າງກັບໄປ."
+"ຖ້າໝາຍຕິກ, ສາຍໂທເຂົ້າໃນຂະນະທີ່ກຳລັງຕິດສາຍຢູ່ຈະດັງເຕືອນ. ຖ້າບໍ່ໝາຍຕິກ, ສາຍຈະຖືກສົ່ງຕໍ່ຕາມກົດລະບຽບ "
+"'ເມື່ອສາຍບໍ່ຫວ່າງ' ຫຼື ສົ່ງສັນຍານສາຍບໍ່ຫວ່າງກັບໄປ."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call__message_needaction
@@ -3644,8 +3615,8 @@ msgid ""
 "Internal and external calls are unavailable until Odoo Phone is activated "
 "and the user is configured."
 msgstr ""
-"ການໂທພາຍໃນ ແລະ ພາຍນອກຈະຍັງບໍ່ສາມາດໃຊ້ງານໄດ້ ຈົນກວ່າຈະເປີດໃຊ້ງານ Odoo Phone ແລະ ຕັ້ງຄ່າຜູ້ໃຊ້"
-"ແລ້ວ."
+"ການໂທພາຍໃນ ແລະ ພາຍນອກຈະຍັງບໍ່ສາມາດໃຊ້ງານໄດ້ ຈົນກວ່າຈະເປີດໃຊ້ງານ Odoo Phone ແລະ "
+"ຕັ້ງຄ່າຜູ້ໃຊ້ແລ້ວ."
 
 #. module: voip
 #. odoo-javascript
@@ -3663,8 +3634,8 @@ msgid ""
 "Internal calling is not configured. Ask your administrator to activate Odoo "
 "Phone and configure an extension."
 msgstr ""
-"ການໂທພາຍໃນຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. ກະລຸນາບອກໃຫ້ຜູ້ດູແລລະບົບຂອງທ່ານເປີດໃຊ້ Odoo Phone ແລະ ຕັ້ງຄ່າເບີ"
-"ພາຍໃນ."
+"ການໂທພາຍໃນຍັງບໍ່ໄດ້ຮັບການຕັ້ງຄ່າ. ກະລຸນາບອກໃຫ້ຜູ້ດູແລລະບົບຂອງທ່ານເປີດໃຊ້ Odoo Phone ແລະ "
+"ຕັ້ງຄ່າເບີພາຍໃນ."
 
 #. module: voip
 #. odoo-javascript
@@ -3673,8 +3644,8 @@ msgid ""
 "Internal calls are available through extension %(extension)s. An active "
 "company number is required for external calls."
 msgstr ""
-"ການໂທພາຍໃນພ້ອມໃຊ້ງານຜ່ານເບີຕໍ່ %(extension)s. ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີບໍລິສັດທີ່ກຳລັງໃຊ້ງ"
-"ານ."
+"ການໂທພາຍໃນພ້ອມໃຊ້ງານຜ່ານເບີຕໍ່ %(extension)s. "
+"ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີບໍລິສັດທີ່ກຳລັງໃຊ້ງານ."
 
 #. module: voip
 #. odoo-javascript
@@ -3682,8 +3653,7 @@ msgstr ""
 msgid ""
 "Internal calls are available through your extension. Get a company number to "
 "make and receive external calls."
-msgstr ""
-"ການໂທພາຍໃນພ້ອມໃຊ້ງານຜ່ານເບີຕໍ່ຂອງທ່ານ. ຊື້ເບີບໍລິສັດເພື່ອໂທອອກ ແລະ ຮັບສາຍຈາກພາຍນອກ."
+msgstr "ການໂທພາຍໃນພ້ອມໃຊ້ງານຜ່ານເບີຕໍ່ຂອງທ່ານ. ຊື້ເບີບໍລິສັດເພື່ອໂທອອກ ແລະ ຮັບສາຍຈາກພາຍນອກ."
 
 #. module: voip
 #. odoo-javascript
@@ -3691,16 +3661,14 @@ msgstr ""
 msgid ""
 "Internal calls are available. An active company number is required for "
 "external calls."
-msgstr ""
-"ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີບໍລິສັດທີ່ກຳລັງໃຊ້ງານ."
+msgstr "ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີບໍລິສັດທີ່ກຳລັງໃຊ້ງານ."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid ""
 "Internal calls are available. External calls require an active phone number."
-msgstr ""
-"ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີໂທລະສັບທີ່ກຳລັງໃຊ້ງານ."
+msgstr "ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກແມ່ນຕ້ອງການເບີໂທລະສັບທີ່ກຳລັງໃຊ້ງານ."
 
 #. module: voip
 #. odoo-javascript
@@ -3708,8 +3676,7 @@ msgstr ""
 msgid ""
 "Internal calls are available. External calls will be available once your "
 "number is approved."
-msgstr ""
-"ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກຈະພ້ອມໃຊ້ງານທັນທີທີ່ເບີຂອງທ່ານໄດ້ຮັບການອະນຸມັດ."
+msgstr "ການໂທພາຍໃນພ້ອມໃຊ້ງານ. ສ່ວນການໂທພາຍນອກຈະພ້ອມໃຊ້ງານທັນທີທີ່ເບີຂອງທ່ານໄດ້ຮັບການອະນຸມັດ."
 
 #. module: voip
 #. odoo-javascript
@@ -3863,9 +3830,9 @@ msgid ""
 "configuration refresh, oldest first. One entry per phone; consuming a QR "
 "code appends one and drops the oldest beyond the cap."
 msgstr ""
-"Keyed digests ຂອງຄີທີ່ໂທລະສັບທີ່ຕັ້ງຄ່າແລ້ວສົ່ງກັບຄືນມາທຸກຄັ້ງທີ່ມີການໂຫຼດການຕັ້ງຄ່າໃໝ່, ລຽງຈາກເກົ່າສຸດກ່ອ"
-"ນ. ໜຶ່ງລາຍການຕໍ່ໜຶ່ງເຄື່ອງ; ການໃຊ້ລະຫັດ QR ຈະເພີ່ມໃໝ່ໜຶ່ງລາຍການ ແລະ ລຶບລາຍການເກົ່າສຸດອອກຫາກເກີນກຳ"
-"ນົດ."
+"Keyed digests ຂອງຄີທີ່ໂທລະສັບທີ່ຕັ້ງຄ່າແລ້ວສົ່ງກັບຄືນມາທຸກຄັ້ງທີ່ມີການໂຫຼດການຕັ້ງຄ່າໃໝ່, "
+"ລຽງຈາກເກົ່າສຸດກ່ອນ. ໜຶ່ງລາຍການຕໍ່ໜຶ່ງເຄື່ອງ; ການໃຊ້ລະຫັດ QR ຈະເພີ່ມໃໝ່ໜຶ່ງລາຍການ ແລະ "
+"ລຶບລາຍການເກົ່າສຸດອອກຫາກເກີນກຳນົດ."
 
 #. module: voip
 #. odoo-javascript
@@ -3969,8 +3936,7 @@ msgstr "ໃຊ້ເວລາ: %(duration)s"
 msgid ""
 "Latest regulatory review statuses for this phone number, keyed by "
 "requirement ID."
-msgstr ""
-"ສະຖານະການກວດສອບຕາມລະບຽບການຫຼ້າສຸດສຳລັບເບີໂທລະສັບນີ້, ອີງຕາມລະຫັດ requirement ID."
+msgstr "ສະຖານະການກວດສອບຕາມລະບຽບການຫຼ້າສຸດສຳລັບເບີໂທລະສັບນີ້, ອີງຕາມລະຫັດ requirement ID."
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__leastrecent
@@ -4041,8 +4007,7 @@ msgstr "ລາຍການເອກະສານຕາມລະບຽບການ
 #: model:ir.model.fields,help:voip.field_voip_did_number__telnyx_synced_comment_ids
 msgid ""
 "List of Telnyx comment IDs already posted to chatter (for deduplication)"
-msgstr ""
-"ລາຍການ Telnyx comment ID ທີ່ໂພສລົງກ່ອງຂໍ້ຄວາມແລ້ວ (ເພື່ອປ້ອງກັນການຊ້ຳຊ້ອນ)"
+msgstr "ລາຍການ Telnyx comment ID ທີ່ໂພສລົງກ່ອງຂໍ້ຄວາມແລ້ວ (ເພື່ອປ້ອງກັນການຊ້ຳຊ້ອນ)"
 
 #. module: voip
 #. odoo-javascript
@@ -4137,8 +4102,7 @@ msgstr "ກົດຄ້າງໄວ້ເພື່ອໂທຫາກ່ອງຂ
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_voicemail__pbx_voicemail_number
 msgid "Long-press 1 in Odoo Phone to access your personal mailbox."
-msgstr ""
-"ກົດເລກ 1 ຄ້າງໄວ້ໃນ Odoo Phone ເພື່ອເຂົ້າເຖິງກ່ອງຂໍ້ຄວາມສຽງສ່ວນຕົວຂອງທ່ານ."
+msgstr "ກົດເລກ 1 ຄ້າງໄວ້ໃນ Odoo Phone ເພື່ອເຂົ້າເຖິງກ່ອງຂໍ້ຄວາມສຽງສ່ວນຕົວຂອງທ່ານ."
 
 #. module: voip
 #. odoo-javascript
@@ -4221,16 +4185,14 @@ msgstr "ຈຳນວນສາຍສູງສຸດທີ່ລໍຖ້າຢູ
 msgid ""
 "Maximum number of seconds a call may remain in the queue. Set to 0 for no "
 "timeout."
-msgstr ""
-"ຈຳນວນວິນາທີສູງສຸດທີ່ສາຍໂທສາມາດລໍຖ້າຢູ່ໃນຄິວ. ຕັ້ງເປັນ 0 ເພື່ອບໍ່ກຳນົດເວລາໝົດ."
+msgstr "ຈຳນວນວິນາທີສູງສຸດທີ່ສາຍໂທສາມາດລໍຖ້າຢູ່ໃນຄິວ. ຕັ້ງເປັນ 0 ເພື່ອບໍ່ກຳນົດເວລາໝົດ."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call_group__timeout
 msgid ""
 "Maximum number of seconds the call may remain in this group. Set to 0 for no "
 "timeout."
-msgstr ""
-"ຈຳນວນວິນາທີສູງສຸດທີ່ສາຍໂທສາມາດຢູ່ໃນກຸ່ມນີ້. ຕັ້ງເປັນ 0 ເພື່ອບໍ່ກຳນົດເວລາໝົດ."
+msgstr "ຈຳນວນວິນາທີສູງສຸດທີ່ສາຍໂທສາມາດຢູ່ໃນກຸ່ມນີ້. ຕັ້ງເປັນ 0 ເພື່ອບໍ່ກຳນົດເວລາໝົດ."
 
 #. module: voip
 #. odoo-javascript
@@ -4285,8 +4247,7 @@ msgstr "ເມນູຕ່າງໆ"
 msgid ""
 "Menus (also called IVRs) ask callers to press certain digits to progress in "
 "the call flow."
-msgstr ""
-"ເມນູ (ຫຼື ເອີ້ນວ່າ IVR) ຈະຂໍໃຫ້ຜູ້ໂທກົດປຸ່ມຕົວເລກເພື່ອດຳເນີນການຕໍ່ໃນຜັງສາຍໂທ."
+msgstr "ເມນູ (ຫຼື ເອີ້ນວ່າ IVR) ຈະຂໍໃຫ້ຜູ້ໂທກົດປຸ່ມຕົວເລກເພື່ອດຳເນີນການຕໍ່ໃນຜັງສາຍໂທ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__new_comment
@@ -4402,8 +4363,8 @@ msgid ""
 "More information is required for this number request. Review and reply "
 "within five business days to avoid automatic cancellation."
 msgstr ""
-"ຕ້ອງການຂໍ້ມູນເພີ່ມເຕີມສຳລັບຄຳຮ້ອງຂໍເບີນີ້. ກວດສອບ ແລະ ຕອບກັບພາຍໃນ 5 ວັນລັດຖະການເພື່ອຫຼີກລ່ຽງການຍົກເ"
-"ລີກອັດຕະໂນມັດ."
+"ຕ້ອງການຂໍ້ມູນເພີ່ມເຕີມສຳລັບຄຳຮ້ອງຂໍເບີນີ້. ກວດສອບ ແລະ ຕອບກັບພາຍໃນ 5 "
+"ວັນລັດຖະການເພື່ອຫຼີກລ່ຽງການຍົກເລີກອັດຕະໂນມັດ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
@@ -4504,8 +4465,7 @@ msgstr "ຂໍ້ຄວາມກ່ອງສຽງໃໝ່ໃນ {{ object.voic
 msgid ""
 "New recordings are sent to this address. If a personal mailbox has no "
 "address, the user's email is used."
-msgstr ""
-"ສຽງບັນທຶກໃໝ່ຈະຖືກສົ່ງໄປທີ່ທີ່ຢູ່ນີ້. ຖ້າກ່ອງຂໍ້ຄວາມສ່ວນຕົວບໍ່ມີທີ່ຢູ່, ລະບົບຈະໃຊ້ອີເມວຂອງຜູ້ໃຊ້ແທນ."
+msgstr "ສຽງບັນທຶກໃໝ່ຈະຖືກສົ່ງໄປທີ່ທີ່ຢູ່ນີ້. ຖ້າກ່ອງຂໍ້ຄວາມສ່ວນຕົວບໍ່ມີທີ່ຢູ່, ລະບົບຈະໃຊ້ອີເມວຂອງຜູ້ໃຊ້ແທນ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__activity_calendar_event_id
@@ -4651,8 +4611,8 @@ msgid ""
 "No coverage found in the selected country based on the provided search "
 "parameters. Please try a different country or search criteria."
 msgstr ""
-"ບໍ່ພົບພື້ນທີ່ໃຫ້ບໍລິການໃນປະເທດທີ່ເລືອກຕາມເງື່ອນໄຂການຄົ້ນຫາທີ່ລະບຸ. ກະລຸນາລອງເລືອກປະເທດອື່ນ ຫຼື ປ່ຽນເງື່ອນໄ"
-"ຂການຄົ້ນຫາ."
+"ບໍ່ພົບພື້ນທີ່ໃຫ້ບໍລິການໃນປະເທດທີ່ເລືອກຕາມເງື່ອນໄຂການຄົ້ນຫາທີ່ລະບຸ. ກະລຸນາລອງເລືອກປະເທດອື່ນ ຫຼື "
+"ປ່ຽນເງື່ອນໄຂການຄົ້ນຫາ."
 
 #. module: voip
 #. odoo-javascript
@@ -4689,8 +4649,7 @@ msgstr "ບໍ່ພົບຄຳຮ້ອງຂໍເບີ"
 msgid ""
 "No numbers found based on the provided search parameters. Please try "
 "different search criteria."
-msgstr ""
-"ບໍ່ພົບເບີຕາມເງື່ອນໄຂການຄົ້ນຫາທີ່ລະບຸ. ກະລຸນາລອງໃຊ້ເງື່ອນໄຂການຄົ້ນຫາອື່ນ."
+msgstr "ບໍ່ພົບເບີຕາມເງື່ອນໄຂການຄົ້ນຫາທີ່ລະບຸ. ກະລຸນາລອງໃຊ້ເງື່ອນໄຂການຄົ້ນຫາອື່ນ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
@@ -4775,16 +4734,15 @@ msgid ""
 "(needed).2f credits (first month, prorated) but only %(balance).2f are "
 "available."
 msgstr ""
-"ເຄຣດິດບໍ່ພຽງພໍທີ່ຈະຊື້ທັງໝົດ %(count)s ເບີທີ່ເລືອກ: ຕ້ອງໃຊ້ %(needed).2f ເຄຣດິດ (ເດືອນທຳອິດ, ຄິດໄ"
-"ລ່ຕາມສັດສ່ວນ) ແຕ່ມີພຽງ %(balance).2f ເຄຣດິດເທົ່ານັ້ນ."
+"ເຄຣດິດບໍ່ພຽງພໍທີ່ຈະຊື້ທັງໝົດ %(count)s ເບີທີ່ເລືອກ: ຕ້ອງໃຊ້ %(needed).2f ເຄຣດິດ (ເດືອນທຳອິດ, "
+"ຄິດໄລ່ຕາມສັດສ່ວນ) ແຕ່ມີພຽງ %(balance).2f ເຄຣດິດເທົ່ານັ້ນ."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement_group__shared_pending_count
 msgid ""
 "Not-yet-active DIDs sharing this group, whose pending orders a resubmission "
 "affects."
-msgstr ""
-"ເບີ DID ທີ່ຍັງບໍ່ທັນເປີດນຳໃຊ້ໃນກຸ່ມນີ້, ເຊິ່ງລາຍການສັ່ງຊື້ທີ່ລໍຖ້າຢູ່ຈະໄດ້ຮັບຜົນກະທົບຈາກການສົ່ງໃໝ່."
+msgstr "ເບີ DID ທີ່ຍັງບໍ່ທັນເປີດນຳໃຊ້ໃນກຸ່ມນີ້, ເຊິ່ງລາຍການສັ່ງຊື້ທີ່ລໍຖ້າຢູ່ຈະໄດ້ຮັບຜົນກະທົບຈາກການສົ່ງໃໝ່."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
@@ -4898,8 +4856,8 @@ msgid ""
 "replaying the menu, redirecting the call to the timeout destination (if set) "
 "or aborting the call (if the maximum number of tries has been reached)."
 msgstr ""
-"ຈຳນວນວິນາທີທີ່ຈະລໍຖ້າຫຼັງຈາກສຽງເມນູຫຼິ້ນຈົບ ກ່ອນທີ່ຈະຫຼິ້ນເມນູຊ້ຳ, ໂອນສາຍໄປຍັງປາຍທາງເມື່ອໝົດເວລາ (ຖ້າມີກ"
-"ານຕັ້ງໄວ້) ຫຼື ຕັດສາຍ (ຖ້າຮອດຈຳນວນຄັ້ງສູງສຸດທີ່ກຳນົດໄວ້)."
+"ຈຳນວນວິນາທີທີ່ຈະລໍຖ້າຫຼັງຈາກສຽງເມນູຫຼິ້ນຈົບ ກ່ອນທີ່ຈະຫຼິ້ນເມນູຊ້ຳ, ໂອນສາຍໄປຍັງປາຍທາງເມື່ອໝົດເວລາ "
+"(ຖ້າມີການຕັ້ງໄວ້) ຫຼື ຕັດສາຍ (ຖ້າຮອດຈຳນວນຄັ້ງສູງສຸດທີ່ກຳນົດໄວ້)."
 
 #. module: voip
 #. odoo-python
@@ -4930,8 +4888,7 @@ msgstr "ສາມາດຮ້ອງຂໍເບີໄດ້ສະເພາະຕ
 msgid ""
 "Number requests are not available for toll-free numbers in Canada or the "
 "United States."
-msgstr ""
-"ບໍ່ສາມາດຮ້ອງຂໍເບີໂທຟຣີ (Toll-free) ໃນປະເທດການາດາ ຫຼື ສະຫະລັດອາເມລິກາໄດ້."
+msgstr "ບໍ່ສາມາດຮ້ອງຂໍເບີໂທຟຣີ (Toll-free) ໃນປະເທດການາດາ ຫຼື ສະຫະລັດອາເມລິກາໄດ້."
 
 #. module: voip
 #. odoo-python
@@ -4951,8 +4908,7 @@ msgstr "ເບີພວມຢູ່ໃນຂັ້ນຕອນການກວດ
 msgid ""
 "Numbers still being ordered will update on their own, without another "
 "refresh."
-msgstr ""
-"ເບີທີ່ພວມຢູ່ໃນຂະບວນການສັ່ງຊື້ຈະອັບເດດເອງໂດຍອັດຕະໂນມັດ ໂດຍບໍ່ຈຳເປັນຕ້ອງໂຫຼດຄືນໃໝ່."
+msgstr "ເບີທີ່ພວມຢູ່ໃນຂະບວນການສັ່ງຊື້ຈະອັບເດດເອງໂດຍອັດຕະໂນມັດ ໂດຍບໍ່ຈຳເປັນຕ້ອງໂຫຼດຄືນໃໝ່."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_cost_line__occurred_at
@@ -5004,8 +4960,7 @@ msgstr "ທີມງານ Odoo Phone"
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid "Odoo Phone is unavailable until your user is fully configured."
-msgstr ""
-"Odoo Phone ຍັງບໍ່ສາມາດນຳໃຊ້ໄດ້ ຈົນກວ່າບັນຊີຜູ້ໃຊ້ຂອງທ່ານຈະໄດ້ຮັບການຕັ້ງຄ່າຄົບຖ້ວນ."
+msgstr "Odoo Phone ຍັງບໍ່ສາມາດນຳໃຊ້ໄດ້ ຈົນກວ່າບັນຊີຜູ້ໃຊ້ຂອງທ່ານຈະໄດ້ຮັບການຕັ້ງຄ່າຄົບຖ້ວນ."
 
 #. module: voip
 #. odoo-javascript
@@ -5072,8 +5027,8 @@ msgid ""
 "a fallback outgoing number for users who have an extension and no phone "
 "number."
 msgstr ""
-"ຕ້ອງມີເບີໜຶ່ງ (ແລະ ພຽງເບີດຽວເທົ່ານັ້ນ) ເປັນເບີໂທອອກເລີ່ມຕົ້ນ. ມັນຈະຖືກນຳໃຊ້ເປັນເບີໂທອອກສຳຮອງ ສຳລັບຜູ້"
-"ໃຊ້ທີ່ມີເບີພາຍໃນ ແຕ່ບໍ່ມີເບີໂທລະສັບສະເພາະ."
+"ຕ້ອງມີເບີໜຶ່ງ (ແລະ ພຽງເບີດຽວເທົ່ານັ້ນ) ເປັນເບີໂທອອກເລີ່ມຕົ້ນ. ມັນຈະຖືກນຳໃຊ້ເປັນເບີໂທອອກສຳຮອງ "
+"ສຳລັບຜູ້ໃຊ້ທີ່ມີເບີພາຍໃນ ແຕ່ບໍ່ມີເບີໂທລະສັບສະເພາະ."
 
 #. module: voip
 #. odoo-javascript
@@ -5092,29 +5047,25 @@ msgstr "ສະເພາະຜູ້ເບິ່ງແຍງລະບົບ VoIP 
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid "Only VoIP administrators can reach the Odoo Phone Service."
-msgstr ""
-"ສະເພາະຜູ້ເບິ່ງແຍງລະບົບ VoIP ເທົ່ານັ້ນທີ່ສາມາດເຂົ້າເຖິງບໍລິການ Odoo Phone ໄດ້."
+msgstr "ສະເພາະຜູ້ເບິ່ງແຍງລະບົບ VoIP ເທົ່ານັ້ນທີ່ສາມາດເຂົ້າເຖິງບໍລິການ Odoo Phone ໄດ້."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/res_users_settings.py:0
 msgid "Only VoIP administrators can select demo providers."
-msgstr ""
-"ສະເພາະຜູ້ເບິ່ງແຍງລະບົບ VoIP ເທົ່ານັ້ນທີ່ສາມາດເລືອກຜູ້ໃຫ້ບໍລິການແບບທົດລອງໄດ້."
+msgstr "ສະເພາະຜູ້ເບິ່ງແຍງລະບົບ VoIP ເທົ່ານັ້ນທີ່ສາມາດເລືອກຜູ້ໃຫ້ບໍລິການແບບທົດລອງໄດ້."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_queue.py:0
 msgid "Only agents assigned to this queue can join or leave it."
-msgstr ""
-"ສະເພາະເຈົ້າໜ້າທີ່ທີ່ຖືກມອບໝາຍໃຫ້ຄິວນີ້ເທົ່ານັ້ນ ຈຶ່ງສາມາດເຂົ້າຮ່ວມ ຫຼື ອອກຈາກຄິວໄດ້."
+msgstr "ສະເພາະເຈົ້າໜ້າທີ່ທີ່ຖືກມອບໝາຍໃຫ້ຄິວນີ້ເທົ່ານັ້ນ ຈຶ່ງສາມາດເຂົ້າຮ່ວມ ຫຼື ອອກຈາກຄິວໄດ້."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Only an active phone number can be the default outgoing number."
-msgstr ""
-"ສະເພາະເບີໂທລະສັບທີ່ເປີດໃຊ້ງານຢູ່ເທົ່ານັ້ນ ທີ່ສາມາດເປັນເບີໂທອອກເລີ່ມຕົ້ນໄດ້."
+msgstr "ສະເພາະເບີໂທລະສັບທີ່ເປີດໃຊ້ງານຢູ່ເທົ່ານັ້ນ ທີ່ສາມາດເປັນເບີໂທອອກເລີ່ມຕົ້ນໄດ້."
 
 #. module: voip
 #. odoo-python
@@ -5189,8 +5140,8 @@ msgid ""
 "enter a menu input while it is playing and must wait for the menu sound to "
 "start."
 msgstr ""
-"ສຽງແນະນຳເພີ່ມເຕີມທີ່ຈະຫຼິ້ນໜຶ່ງຄັ້ງກ່ອນສຽງເມນູ. ຜູ້ໂທຈະບໍ່ສາມາດກົດເລືອກເມນູໄດ້ໃນຂະນະທີ່ສຽງນີ້ພວມຫຼິ້ນຢູ່ ແລ"
-"ະ ຕ້ອງລໍຖ້າຈົນກວ່າສຽງເມນູຈະເລີ່ມຕົ້ນ."
+"ສຽງແນະນຳເພີ່ມເຕີມທີ່ຈະຫຼິ້ນໜຶ່ງຄັ້ງກ່ອນສຽງເມນູ. ຜູ້ໂທຈະບໍ່ສາມາດກົດເລືອກເມນູໄດ້ໃນຂະນະທີ່ສຽງນີ້ພວມຫຼິ້ນຢູ່ "
+"ແລະ ຕ້ອງລໍຖ້າຈົນກວ່າສຽງເມນູຈະເລີ່ມຕົ້ນ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
@@ -5364,8 +5315,8 @@ msgid ""
 "PBX call id of the dial_mobile wakeup channel that rang this member while "
 "their softphone was unregistered. The decline handle when no SIP leg exists."
 msgstr ""
-"ID ການໂທ PBX ຂອງຊ່ອງທາງ dial_mobile ທີ່ໂທປຸກສະມາຊິກຄົນນີ້ໃນຂະນະທີ່ຊອບໂຟນຍັງບໍ່ທັນລົງທະບຽນ. ໃ"
-"ຊ້ຈັດການການປະຕິເສດເມື່ອບໍ່ມີ SIP leg."
+"ID ການໂທ PBX ຂອງຊ່ອງທາງ dial_mobile ທີ່ໂທປຸກສະມາຊິກຄົນນີ້ໃນຂະນະທີ່ຊອບໂຟນຍັງບໍ່ທັນລົງທະບຽນ. "
+"ໃຊ້ຈັດການການປະຕິເສດເມື່ອບໍ່ມີ SIP leg."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call_leg__pbx_call_id
@@ -5644,8 +5595,8 @@ msgid ""
 "then be provided a <strong>URL to a third-party service</strong> to verify "
 "your identity."
 msgstr ""
-"ກະລຸນາລະບຸຊື່ຂອງທ່ານຢູ່ລຸ່ມນີ້ ແລ້ວ <strong>ກົດ “ບັນທຶກ”</strong>. ຈາກນັ້ນທ່ານຈະໄດ້ຮັບ <strong>"
-"URL ໄປຍັງບໍລິການພາຍນອກ</strong> ເພື່ອຢັ້ງຢືນຕົວຕົນຂອງທ່ານ."
+"ກະລຸນາລະບຸຊື່ຂອງທ່ານຢູ່ລຸ່ມນີ້ ແລ້ວ <strong>ກົດ “ບັນທຶກ”</strong>. ຈາກນັ້ນທ່ານຈະໄດ້ຮັບ "
+"<strong>URL ໄປຍັງບໍລິການພາຍນອກ</strong> ເພື່ອຢັ້ງຢືນຕົວຕົນຂອງທ່ານ."
 
 #. module: voip
 #. odoo-python
@@ -5703,8 +5654,8 @@ msgid ""
 "Prompts callers to choose an input. Callers can enter an input while this "
 "sound is playing; the timeout starts after it finishes."
 msgstr ""
-"ແຈ້ງເຕືອນໃຫ້ຜູ້ໂທເລືອກຕົວເລືອກ. ຜູ້ໂທສາມາດກົດເລືອກໄດ້ໃນຂະນະທີ່ສຽງນີ້ພວມຫຼິ້ນຢູ່; ເວລາລໍຖ້າຈະເລີ່ມນັບຫຼັງຈາ"
-"ກສຽງຫຼິ້ນຈົບ."
+"ແຈ້ງເຕືອນໃຫ້ຜູ້ໂທເລືອກຕົວເລືອກ. ຜູ້ໂທສາມາດກົດເລືອກໄດ້ໃນຂະນະທີ່ສຽງນີ້ພວມຫຼິ້ນຢູ່; "
+"ເວລາລໍຖ້າຈະເລີ່ມນັບຫຼັງຈາກສຽງຫຼິ້ນຈົບ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__candidate_numbers
@@ -5781,8 +5732,7 @@ msgstr "ຊື້ເບີໂທລະສັບເພື່ອໂທອອກ �
 msgid ""
 "Purchase phone numbers, pay monthly fees, and call minutes - all from one "
 "credit balance."
-msgstr ""
-"ຊື້ເບີໂທລະສັບ, ຈ່າຍຄ່າທຳນຽມລາຍເດືອນ, ແລະ ຄ່າໂທເປັນນາທີ - ທັງໝົດລວມຢູ່ໃນຍອດເຄຣດິດດຽວ."
+msgstr "ຊື້ເບີໂທລະສັບ, ຈ່າຍຄ່າທຳນຽມລາຍເດືອນ, ແລະ ຄ່າໂທເປັນນາທີ - ທັງໝົດລວມຢູ່ໃນຍອດເຄຣດິດດຽວ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -6025,8 +5975,8 @@ msgid ""
 "Regulatory requirements approved by the provider — orders using this group "
 "will activate automatically."
 msgstr ""
-"ຂໍ້ກຳນົດຕາມລະບຽບການໄດ້ຮັບການອະນຸມັດຈາກຜູ້ໃຫ້ບໍລິການແລ້ວ — ລາຍການສັ່ງຊື້ທີ່ໃຊ້ກຸ່ມນີ້ຈະເປີດນຳໃຊ້ອັດຕະໂນມັ"
-"ດ."
+"ຂໍ້ກຳນົດຕາມລະບຽບການໄດ້ຮັບການອະນຸມັດຈາກຜູ້ໃຫ້ບໍລິການແລ້ວ — "
+"ລາຍການສັ່ງຊື້ທີ່ໃຊ້ກຸ່ມນີ້ຈະເປີດນຳໃຊ້ອັດຕະໂນມັດ."
 
 #. module: voip
 #. odoo-python
@@ -6035,8 +5985,8 @@ msgid ""
 "Regulatory requirements are no longer eligible (provider policy change). A "
 "new group must be created."
 msgstr ""
-"ຂໍ້ກຳນົດຕາມລະບຽບການບໍ່ເຂົ້າເກນອີກຕໍ່ໄປ (ເນື່ອງຈາກການປ່ຽນແປງນະໂຍບາຍຂອງຜູ້ໃຫ້ບໍລິການ). ຕ້ອງສ້າງກຸ່ມໃ"
-"ໝ່."
+"ຂໍ້ກຳນົດຕາມລະບຽບການບໍ່ເຂົ້າເກນອີກຕໍ່ໄປ (ເນື່ອງຈາກການປ່ຽນແປງນະໂຍບາຍຂອງຜູ້ໃຫ້ບໍລິການ). "
+"ຕ້ອງສ້າງກຸ່ມໃໝ່."
 
 #. module: voip
 #. odoo-python
@@ -6044,8 +5994,7 @@ msgstr ""
 msgid ""
 "Regulatory requirements have expired. Please resubmit to keep ordering "
 "numbers under this group."
-msgstr ""
-"ຂໍ້ກຳນົດຕາມລະບຽບການໝົດອາຍຸແລ້ວ. ກະລຸນາສົ່ງໃໝ່ເພື່ອສັ່ງຊື້ເບີພາຍໃຕ້ກຸ່ມນີ້ຕໍ່ໄປ."
+msgstr "ຂໍ້ກຳນົດຕາມລະບຽບການໝົດອາຍຸແລ້ວ. ກະລຸນາສົ່ງໃໝ່ເພື່ອສັ່ງຊື້ເບີພາຍໃຕ້ກຸ່ມນີ້ຕໍ່ໄປ."
 
 #. module: voip
 #. odoo-python
@@ -6053,8 +6002,7 @@ msgstr ""
 msgid ""
 "Regulatory requirements were declined: %(error)s. Please review the "
 "requirements and resubmit."
-msgstr ""
-"ຂໍ້ກຳນົດຕາມລະບຽບການຖືກປະຕິເສດ: %(error)s. ກະລຸນາກວດກາເບິ່ງຂໍ້ກຳນົດຄືນ ແລ້ວສົ່ງໃໝ່."
+msgstr "ຂໍ້ກຳນົດຕາມລະບຽບການຖືກປະຕິເສດ: %(error)s. ກະລຸນາກວດກາເບິ່ງຂໍ້ກຳນົດຄືນ ແລ້ວສົ່ງໃໝ່."
 
 #. module: voip
 #. odoo-javascript
@@ -6243,8 +6191,9 @@ msgid ""
 "outgoing one), a participant was reached by it, a routing leg only relayed "
 "it."
 msgstr ""
-"ບົດບາດຂອງ endpoint ໃນ leg ນີ້ພາຍໃນການສົນທະນາ: ຕົ້ນທາງເປັນຜູ້ເປີດສາຍ (ຜູ້ໂທພາຍນອກສຳລັບສາຍໂທ"
-"ເຂົ້າ, leg ຂອງຜູ້ໃຊ້ເອງສຳລັບສາຍໂທອອກ), ຜູ້ເຂົ້າຮ່ວມໄດ້ຮັບສາຍ, ຫຼື leg ເສັ້ນທາງພຽງແຕ່ສົ່ງຕໍ່ເທົ່ານັ້ນ."
+"ບົດບາດຂອງ endpoint ໃນ leg ນີ້ພາຍໃນການສົນທະນາ: ຕົ້ນທາງເປັນຜູ້ເປີດສາຍ "
+"(ຜູ້ໂທພາຍນອກສຳລັບສາຍໂທເຂົ້າ, leg ຂອງຜູ້ໃຊ້ເອງສຳລັບສາຍໂທອອກ), ຜູ້ເຂົ້າຮ່ວມໄດ້ຮັບສາຍ, ຫຼື leg "
+"ເສັ້ນທາງພຽງແຕ່ສົ່ງຕໍ່ເທົ່ານັ້ນ."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__activity_user_id
@@ -6476,8 +6425,7 @@ msgstr "ການຄົ້ນຫາພົບເບີທີ່ພ້ອມຊື
 msgid ""
 "Search returned affordable results whose numbers still need regulatory info, "
 "so the footer offers Continue."
-msgstr ""
-"ການຄົ້ນຫາພົບເບີທີ່ຍັງຕ້ອງມີຂໍ້ມູນຕາມລະບຽບການ, ດ້ານລຸ່ມຈຶ່ງສະແດງປຸ່ມ ສືບຕໍ່."
+msgstr "ການຄົ້ນຫາພົບເບີທີ່ຍັງຕ້ອງມີຂໍ້ມູນຕາມລະບຽບການ, ດ້ານລຸ່ມຈຶ່ງສະແດງປຸ່ມ ສືບຕໍ່."
 
 #. module: voip
 #. odoo-javascript
@@ -6689,8 +6637,8 @@ msgid ""
 "in the VoIP Provider Settings and the credentials in your user preferences "
 "are correct."
 msgstr ""
-"ການຢັ້ງຢືນຕົວຕົນກັບເຊີບເວີຫຼົ້ມເຫຼວ. ກະລຸນາກວດສອບວ່າເຊີບເວີ (ເຊັ່ນ IP ເຊີບເວີ PBX) ໃນການຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິ"
-"ການ VoIP ແລະ ຂໍ້ມູນການເຂົ້າສູ່ລະບົບໃນການຕັ້ງຄ່າຜູ້ໃຊ້ຂອງທ່ານຖືກຕ້ອງຫຼືບໍ່."
+"ການຢັ້ງຢືນຕົວຕົນກັບເຊີບເວີຫຼົ້ມເຫຼວ. ກະລຸນາກວດສອບວ່າເຊີບເວີ (ເຊັ່ນ IP ເຊີບເວີ PBX) "
+"ໃນການຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິການ VoIP ແລະ ຂໍ້ມູນການເຂົ້າສູ່ລະບົບໃນການຕັ້ງຄ່າຜູ້ໃຊ້ຂອງທ່ານຖືກຕ້ອງຫຼືບໍ່."
 
 #. module: voip
 #. odoo-javascript
@@ -6700,8 +6648,8 @@ msgid ""
 "persists, please try again later or ask your administrator for additional "
 "help."
 msgstr ""
-"ບໍລິການບໍ່ພ້ອມໃຊ້ງານ. ກະລຸນາໂຫຼດໜ້າຄືນໃໝ່ແລ້ວລອງອີກຄັ້ງ. ຖ້າບັນຫາຍັງຄົງຢູ່ ກະລຸນາລອງໃໝ່ພາຍຫຼັງ ຫຼື ຕິດຕໍ່ຜູ້ເ"
-"ບິ່ງແຍງລະບົບເພື່ອຂໍຄວາມຊ່ວຍເຫຼືອ."
+"ບໍລິການບໍ່ພ້ອມໃຊ້ງານ. ກະລຸນາໂຫຼດໜ້າຄືນໃໝ່ແລ້ວລອງອີກຄັ້ງ. ຖ້າບັນຫາຍັງຄົງຢູ່ ກະລຸນາລອງໃໝ່ພາຍຫຼັງ ຫຼື "
+"ຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບເພື່ອຂໍຄວາມຊ່ວຍເຫຼືອ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -6813,8 +6761,7 @@ msgstr ""
 msgid ""
 "Some selected numbers require regulatory documentation. Please fill in the "
 "required information below."
-msgstr ""
-"ເບີທີ່ເລືອກບາງເບີຕ້ອງມີເອກະສານຕາມລະບຽບການ. ກະລຸນາປ້ອນຂໍ້ມູນທີ່ຈຳເປັນຢູ່ລຸ່ມນີ້."
+msgstr "ເບີທີ່ເລືອກບາງເບີຕ້ອງມີເອກະສານຕາມລະບຽບການ. ກະລຸນາປ້ອນຂໍ້ມູນທີ່ຈຳເປັນຢູ່ລຸ່ມນີ້."
 
 #. module: voip
 #. odoo-javascript
@@ -7180,8 +7127,8 @@ msgid ""
 "The DTLS fingerprint and/or setup is missing from the SDP. Verify that the "
 "VoIP provider is configured to use SRTP-DTLS."
 msgstr ""
-"DTLS fingerprint ແລະ/ຫຼື setup ບໍ່ມີໃນ SDP. ກະລຸນາກວດສອບວ່າຜູ້ໃຫ້ບໍລິການ VoIP ໄດ້ຖືກຕັ້ງຄ່າໃຫ້ນ"
-"ຳໃຊ້ SRTP-DTLS ແລ້ວ."
+"DTLS fingerprint ແລະ/ຫຼື setup ບໍ່ມີໃນ SDP. ກະລຸນາກວດສອບວ່າຜູ້ໃຫ້ບໍລິການ VoIP "
+"ໄດ້ຖືກຕັ້ງຄ່າໃຫ້ນຳໃຊ້ SRTP-DTLS ແລ້ວ."
 
 #. module: voip
 #. odoo-python
@@ -7234,8 +7181,7 @@ msgstr "ບໍລິການ Odoo Phone ສົ່ງໄຟລ໌ສຽງທີ
 msgid ""
 "The Odoo Phone Service returned an invalid number request. Please try again "
 "later."
-msgstr ""
-"ບໍລິການ Odoo Phone ສົ່ງຄຳຂໍເບີທີ່ບໍ່ຖືກຕ້ອງກັບຄືນມາ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ."
+msgstr "ບໍລິການ Odoo Phone ສົ່ງຄຳຂໍເບີທີ່ບໍ່ຖືກຕ້ອງກັບຄືນມາ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ."
 
 #. module: voip
 #. odoo-python
@@ -7243,8 +7189,7 @@ msgstr ""
 msgid ""
 "The PBX destinations of records used in a Call Flow can only be modified "
 "from that Call Flow."
-msgstr ""
-"ປາຍທາງ PBX ຂອງຂໍ້ມູນທີ່ໃຊ້ໃນ Call Flow ສາມາດແກ້ໄຂໄດ້ຈາກ Call Flow ນັ້ນເທົ່ານັ້ນ."
+msgstr "ປາຍທາງ PBX ຂອງຂໍ້ມູນທີ່ໃຊ້ໃນ Call Flow ສາມາດແກ້ໄຂໄດ້ຈາກ Call Flow ນັ້ນເທົ່ານັ້ນ."
 
 #. module: voip
 #. odoo-python
@@ -7389,8 +7334,8 @@ msgid ""
 "The connection failed. Please try again later. If the problem persists, "
 "please ask your administrator to check the configuration."
 msgstr ""
-"ການເຊື່ອມຕໍ່ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ. ຖ້າບັນຫາຍັງຄົງຢູ່ ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານເພື່ອກວດສ"
-"ອບການຕັ້ງຄ່າ."
+"ການເຊື່ອມຕໍ່ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ. ຖ້າບັນຫາຍັງຄົງຢູ່ "
+"ກະລຸນາຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຂອງທ່ານເພື່ອກວດສອບການຕັ້ງຄ່າ."
 
 #. module: voip
 #. odoo-javascript
@@ -7400,8 +7345,9 @@ msgid ""
 "preferences for the phone might be incorrect. Please check or ask your "
 "administrator to check if needed."
 msgstr ""
-"ການເຊື່ອມຕໍ່ບໍ່ສຳເລັດ. ຂໍ້ມູນການເຂົ້າສູ່ລະບົບ ຫຼື ຂໍ້ມູນຜູ້ໃຫ້ບໍລິການໃນການຕັ້ງຄ່າສ່ວນຕົວສຳລັບໂທລະສັບຂອງທ່ານອາດ"
-"ບໍ່ຖືກຕ້ອງ. ກະລຸນາກວດສອບ ຫຼື ຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຫາກຕ້ອງການ."
+"ການເຊື່ອມຕໍ່ບໍ່ສຳເລັດ. ຂໍ້ມູນການເຂົ້າສູ່ລະບົບ ຫຼື "
+"ຂໍ້ມູນຜູ້ໃຫ້ບໍລິການໃນການຕັ້ງຄ່າສ່ວນຕົວສຳລັບໂທລະສັບຂອງທ່ານອາດບໍ່ຖືກຕ້ອງ. ກະລຸນາກວດສອບ ຫຼື "
+"ຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຫາກຕ້ອງການ."
 
 #. module: voip
 #. odoo-python
@@ -7538,8 +7484,8 @@ msgid ""
 "The number appears to be invalid. If you believe it is valid, check that "
 "your VoIP configuration is correct."
 msgstr ""
-"ເບີດັ່ງກ່າວເບິ່ງຄືວ່າບໍ່ຖືກຕ້ອງ. ຖ້າທ່ານໝັ້ນໃຈວ່າມັນຖືກຕ້ອງ, ກະລຸນາກວດສອບວ່າການກຳນົດຄ່າ VoIP ຂອງທ່ານຖືກ"
-"ຕ້ອງແລ້ວ."
+"ເບີດັ່ງກ່າວເບິ່ງຄືວ່າບໍ່ຖືກຕ້ອງ. ຖ້າທ່ານໝັ້ນໃຈວ່າມັນຖືກຕ້ອງ, ກະລຸນາກວດສອບວ່າການກຳນົດຄ່າ VoIP "
+"ຂອງທ່ານຖືກຕ້ອງແລ້ວ."
 
 #. module: voip
 #. odoo-javascript
@@ -7553,8 +7499,7 @@ msgstr "ເບີທີ່ທ່ານໂທເບິ່ງຄືວ່າບໍ
 msgid ""
 "The options of an IVR used in a Call Flow can only be modified from that "
 "Call Flow."
-msgstr ""
-"ຕົວເລືອກຂອງ IVR ທີ່ໃຊ້ໃນ Call Flow ສາມາດແກ້ໄຂໄດ້ຈາກ Call Flow ນັ້ນເທົ່ານັ້ນ."
+msgstr "ຕົວເລືອກຂອງ IVR ທີ່ໃຊ້ໃນ Call Flow ສາມາດແກ້ໄຂໄດ້ຈາກ Call Flow ນັ້ນເທົ່ານັ້ນ."
 
 #. module: voip
 #. odoo-python
@@ -7573,9 +7518,9 @@ msgid ""
 "review. The documents you have submitted are being evaluated. You will be "
 "notified if we need more information to complete the order."
 msgstr ""
-"ໄດ້ຮັບຄຳສັ່ງຊື້ເບີໂທລະສັບ %(number)s ຂອງທ່ານແລ້ວ ແລະ ພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. ເອກະສານທີ່ທ່ານສົ່"
-"ງມາກຳລັງໄດ້ຮັບການປະເມີນ. ພວກເຮົາຈະແຈ້ງເຕືອນໃຫ້ທ່ານຊາບ ຖ້າຕ້ອງການຂໍ້ມູນເພີ່ມເຕີມເພື່ອເຮັດໃຫ້ການສັ່ງຊື້ສ"
-"ຳເລັດ."
+"ໄດ້ຮັບຄຳສັ່ງຊື້ເບີໂທລະສັບ %(number)s ຂອງທ່ານແລ້ວ ແລະ ພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. "
+"ເອກະສານທີ່ທ່ານສົ່ງມາກຳລັງໄດ້ຮັບການປະເມີນ. ພວກເຮົາຈະແຈ້ງເຕືອນໃຫ້ທ່ານຊາບ "
+"ຖ້າຕ້ອງການຂໍ້ມູນເພີ່ມເຕີມເພື່ອເຮັດໃຫ້ການສັ່ງຊື້ສຳເລັດ."
 
 #. module: voip
 #. odoo-python
@@ -7584,8 +7529,8 @@ msgid ""
 "The order for your phone number %(number)s is complete. Your number is now "
 "active and you can assign it."
 msgstr ""
-"ການສັ່ງຊື້ເບີໂທລະສັບ %(number)s ຂອງທ່ານສຳເລັດແລ້ວ. ຕອນນີ້ເບີຂອງທ່ານເປີດໃຊ້ງານແລ້ວ ແລະ ທ່ານສາມາ"
-"ດກຳນົດໃຫ້ນຳໃຊ້ໄດ້."
+"ການສັ່ງຊື້ເບີໂທລະສັບ %(number)s ຂອງທ່ານສຳເລັດແລ້ວ. ຕອນນີ້ເບີຂອງທ່ານເປີດໃຊ້ງານແລ້ວ ແລະ "
+"ທ່ານສາມາດກຳນົດໃຫ້ນຳໃຊ້ໄດ້."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_partner__t9_name
@@ -7702,8 +7647,8 @@ msgid ""
 "The search result expired or the number became unavailable. Search again and "
 "complete the purchase promptly. No credits were charged."
 msgstr ""
-"ຜົນການຄົ້ນຫາໝົດອາຍຸ ຫຼື ເບີນັ້ນບໍ່ຫວ່າງແລ້ວ. ກະລຸນາຄົ້ນຫາໃໝ່ ແລະ ເຮັດການຊື້ໃຫ້ສຳເລັດໂດຍໄວ. ບໍ່ມີການຮຽກເ"
-"ກັບເຄຣດິດໃດໆ."
+"ຜົນການຄົ້ນຫາໝົດອາຍຸ ຫຼື ເບີນັ້ນບໍ່ຫວ່າງແລ້ວ. ກະລຸນາຄົ້ນຫາໃໝ່ ແລະ ເຮັດການຊື້ໃຫ້ສຳເລັດໂດຍໄວ. "
+"ບໍ່ມີການຮຽກເກັບເຄຣດິດໃດໆ."
 
 #. module: voip
 #. odoo-python
@@ -7729,8 +7674,8 @@ msgid ""
 "The sound played when the caller chooses an invalid option. Not used if an "
 "invalid destination is set."
 msgstr ""
-"ສຽງທີ່ຈະຫຼິ້ນເມື່ອຜູ້ໂທເລືອກຕົວເລືອກທີ່ບໍ່ຖືກຕ້ອງ. ຈະບໍ່ຖືກນຳໃຊ້ຖ້າມີການກຳນົດປາຍທາງສຳລັບຕົວເລືອກທີ່ບໍ່ຖືກຕ້ອງໄ"
-"ວ້."
+"ສຽງທີ່ຈະຫຼິ້ນເມື່ອຜູ້ໂທເລືອກຕົວເລືອກທີ່ບໍ່ຖືກຕ້ອງ. "
+"ຈະບໍ່ຖືກນຳໃຊ້ຖ້າມີການກຳນົດປາຍທາງສຳລັບຕົວເລືອກທີ່ບໍ່ຖືກຕ້ອງໄວ້."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
@@ -7794,8 +7739,7 @@ msgstr "ພອດເປົ້າໝາຍບໍ່ມີຢູ່ນຳແລ້
 msgid ""
 "The text is too long to be converted to speech (maximum %(max_length)s "
 "characters)."
-msgstr ""
-"ຂໍ້ຄວາມຍາວເກີນໄປທີ່ຈະແປງເປັນສຽງເວົ້າໄດ້ (ສູງສຸດ %(max_length)s ຕົວອັກສອນ)."
+msgstr "ຂໍ້ຄວາມຍາວເກີນໄປທີ່ຈະແປງເປັນສຽງເວົ້າໄດ້ (ສູງສຸດ %(max_length)s ຕົວອັກສອນ)."
 
 #. module: voip
 #. odoo-python
@@ -7809,8 +7753,7 @@ msgstr "ຂໍ້ຄວາມຍາວເກີນໄປທີ່ຈະແປງ
 msgid ""
 "The text or voice changed while the audio was being generated. Generate it "
 "again."
-msgstr ""
-"ຂໍ້ຄວາມ ຫຼື ສຽງມີການປ່ຽນແປງໃນຂະນະທີ່ພວມສ້າງໄຟລ໌ສຽງ. ກະລຸນາສ້າງໃໝ່ອີກຄັ້ງ."
+msgstr "ຂໍ້ຄວາມ ຫຼື ສຽງມີການປ່ຽນແປງໃນຂະນະທີ່ພວມສ້າງໄຟລ໌ສຽງ. ກະລຸນາສ້າງໃໝ່ອີກຄັ້ງ."
 
 #. module: voip
 #. odoo-python
@@ -7836,8 +7779,8 @@ msgid ""
 "The user agent could not be started. The WebSocket server URL may be "
 "incorrect. Check the WebSocket server URL in the VoIP Provider Settings."
 msgstr ""
-"ບໍ່ສາມາດເລີ່ມຕົ້ນ user agent ໄດ້. URL ຂອງເຊີບເວີ WebSocket ອາດຈະບໍ່ຖືກຕ້ອງ. ກວດສອບ URL ຂອງ"
-"ເຊີບເວີ WebSocket ໃນການຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິການ VoIP."
+"ບໍ່ສາມາດເລີ່ມຕົ້ນ user agent ໄດ້. URL ຂອງເຊີບເວີ WebSocket ອາດຈະບໍ່ຖືກຕ້ອງ. ກວດສອບ URL "
+"ຂອງເຊີບເວີ WebSocket ໃນການຕັ້ງຄ່າຜູ້ໃຫ້ບໍລິການ VoIP."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_username
@@ -7861,16 +7804,14 @@ msgstr "ເບິ່ງຄືວ່າມີບັນຫາກັບການເ
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
 msgid ""
 "These numbers are not charged yet. Reply below to approve or decline them."
-msgstr ""
-"ເບີເຫຼົ່ານີ້ຍັງບໍ່ທັນຖືກຄິດໄລ່ເງິນ. ຕອບກັບຢູ່ລຸ່ມນີ້ເພື່ອອະນຸມັດ ຫຼື ປະຕິເສດ."
+msgstr "ເບີເຫຼົ່ານີ້ຍັງບໍ່ທັນຖືກຄິດໄລ່ເງິນ. ຕອບກັບຢູ່ລຸ່ມນີ້ເພື່ອອະນຸມັດ ຫຼື ປະຕິເສດ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 msgid ""
 "These numbers require regulatory documentation. Please fill in the required "
 "information below."
-msgstr ""
-"ເບີເຫຼົ່ານີ້ຕ້ອງມີເອກະສານຕາມລະບຽບການ. ກະລຸນາປ້ອນຂໍ້ມູນທີ່ຈຳເປັນຢູ່ລຸ່ມນີ້."
+msgstr "ເບີເຫຼົ່ານີ້ຕ້ອງມີເອກະສານຕາມລະບຽບການ. ກະລຸນາປ້ອນຂໍ້ມູນທີ່ຈຳເປັນຢູ່ລຸ່ມນີ້."
 
 #. module: voip
 #. odoo-python
@@ -7934,8 +7875,7 @@ msgstr ""
 msgid ""
 "This number request could not be fulfilled. Review the latest message below "
 "for details."
-msgstr ""
-"ບໍ່ສາມາດດຳເນີນການຕາມຄຳຂໍເບີນີ້ໄດ້. ເບິ່ງຂໍ້ຄວາມຫຼ້າສຸດຢູ່ລຸ່ມນີ້ສຳລັບລາຍລະອຽດ."
+msgstr "ບໍ່ສາມາດດຳເນີນການຕາມຄຳຂໍເບີນີ້ໄດ້. ເບິ່ງຂໍ້ຄວາມຫຼ້າສຸດຢູ່ລຸ່ມນີ້ສຳລັບລາຍລະອຽດ."
 
 #. module: voip
 #. odoo-python
@@ -7943,8 +7883,7 @@ msgstr ""
 msgid ""
 "This number request has been processed. Phone numbers will appear here as "
 "their individual orders complete."
-msgstr ""
-"ຄຳຂໍເບີນີ້ໄດ້ຮັບການປະມວນຜົນແລ້ວ. ເບີໂທລະສັບຈະສະແດງຢູ່ນີ້ ເມື່ອການສັ່ງຊື້ແຕ່ລະເບີສຳເລັດ."
+msgstr "ຄຳຂໍເບີນີ້ໄດ້ຮັບການປະມວນຜົນແລ້ວ. ເບີໂທລະສັບຈະສະແດງຢູ່ນີ້ ເມື່ອການສັ່ງຊື້ແຕ່ລະເບີສຳເລັດ."
 
 #. module: voip
 #. odoo-python
@@ -7970,8 +7909,8 @@ msgid ""
 "This will permanently release this phone number back to the carrier. This "
 "cannot be undone. Continue?"
 msgstr ""
-"ການດຳເນີນການນີ້ຈະປ່ອຍເບີໂທລະສັບນີ້ຄືນໃຫ້ກັບຜູ້ໃຫ້ບໍລິການຢ່າງຖາວອນ. ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້. ຕ້ອງກ"
-"ານສືບຕໍ່ບໍ່?"
+"ການດຳເນີນການນີ້ຈະປ່ອຍເບີໂທລະສັບນີ້ຄືນໃຫ້ກັບຜູ້ໃຫ້ບໍລິການຢ່າງຖາວອນ. ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້. "
+"ຕ້ອງການສືບຕໍ່ບໍ່?"
 
 #. module: voip
 #. odoo-javascript
@@ -8068,8 +8007,7 @@ msgstr "ໂທຟຣີ"
 msgid ""
 "Too many text-to-speech requests were made recently. Please try again in a "
 "few minutes."
-msgstr ""
-"ມີການຮ້ອງຂໍແປງຂໍ້ຄວາມເປັນສຽງເວົ້າຫຼາຍເກີນໄປໃນໄລຍະນີ້. ກະລຸນາລອງໃໝ່ອີກໃນສອງສາມນາທີ."
+msgstr "ມີການຮ້ອງຂໍແປງຂໍ້ຄວາມເປັນສຽງເວົ້າຫຼາຍເກີນໄປໃນໄລຍະນີ້. ກະລຸນາລອງໃໝ່ອີກໃນສອງສາມນາທີ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_tree_view
@@ -8123,16 +8061,14 @@ msgstr "ບໍ່ຮອງຮັບການໂອນສາຍໃນໂໝດທ
 #: model:ir.model.fields,help:voip.field_voip_did_number__has_pending_action_requirement
 msgid ""
 "True if an action requirement (identity verification) is awaiting completion."
-msgstr ""
-"ເປັນຈິງ ຖ້າຫາກຂໍ້ກຳນົດການດຳເນີນການ (ການຢັ້ງຢືນຕົວຕົນ) ພວມລໍຖ້າໃຫ້ສຳເລັດ."
+msgstr "ເປັນຈິງ ຖ້າຫາກຂໍ້ກຳນົດການດຳເນີນການ (ການຢັ້ງຢືນຕົວຕົນ) ພວມລໍຖ້າໃຫ້ສຳເລັດ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 msgid ""
 "Try adjusting your filters and search again, or submit a request and we'll "
 "try to obtain them for you."
-msgstr ""
-"ລອງປັບປ່ຽນຕົວກັ່ນຕອງແລ້ວຄົ້ນຫາໃໝ່, ຫຼື ສົ່ງຄຳຂໍ ແລ້ວພວກເຮົາຈະພະຍາຍາມຈັດຫາເບີໃຫ້ທ່ານ."
+msgstr "ລອງປັບປ່ຽນຕົວກັ່ນຕອງແລ້ວຄົ້ນຫາໃໝ່, ຫຼື ສົ່ງຄຳຂໍ ແລ້ວພວກເຮົາຈະພະຍາຍາມຈັດຫາເບີໃຫ້ທ່ານ."
 
 #. module: voip
 #. odoo-javascript
@@ -8296,8 +8232,8 @@ msgid ""
 "Use this box to communicate with Odoo's phone carrier about this request and "
 "eventually confirm your order. Messages are recorded in the chatter."
 msgstr ""
-"ໃຊ້ກ່ອງນີ້ເພື່ອຕິດຕໍ່ສື່ສານກັບຜູ້ໃຫ້ບໍລິການເຄືອຂ່າຍໂທລະສັບຂອງ Odoo ກ່ຽວກັບຄຳຂໍນີ້ ແລະ ຢືນຢັນການສັ່ງຊື້ຂອງທ່າ"
-"ນ. ຂໍ້ຄວາມທັງໝົດຈະຖືກບັນທຶກໄວ້ໃນຫ້ອງສົນທະນາ."
+"ໃຊ້ກ່ອງນີ້ເພື່ອຕິດຕໍ່ສື່ສານກັບຜູ້ໃຫ້ບໍລິການເຄືອຂ່າຍໂທລະສັບຂອງ Odoo ກ່ຽວກັບຄຳຂໍນີ້ ແລະ "
+"ຢືນຢັນການສັ່ງຊື້ຂອງທ່ານ. ຂໍ້ຄວາມທັງໝົດຈະຖືກບັນທຶກໄວ້ໃນຫ້ອງສົນທະນາ."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number__is_default_outgoing_number
@@ -8393,8 +8329,8 @@ msgid ""
 "User-facing call this leg folds into; empty for routing legs and for the "
 "external source leg of an incoming call."
 msgstr ""
-"ສາຍໂທດ້ານຜູ້ໃຊ້ທີ່ leg ນີ້ລວມເຂົ້າ; ຈະວ່າງເປົ່າສຳລັບ leg ການກຳນົດເສັ້ນທາງ ແລະ ສຳລັບ leg ຕົ້ນທາງພາ"
-"ຍນອກຂອງສາຍໂທເຂົ້າ."
+"ສາຍໂທດ້ານຜູ້ໃຊ້ທີ່ leg ນີ້ລວມເຂົ້າ; ຈະວ່າງເປົ່າສຳລັບ leg ການກຳນົດເສັ້ນທາງ ແລະ ສຳລັບ leg "
+"ຕົ້ນທາງພາຍນອກຂອງສາຍໂທເຂົ້າ."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
@@ -8799,8 +8735,7 @@ msgstr "ຊ່ອງຂໍ້ມູນທີ່ຢູ່ທີ່ຈຳເປັ
 msgid ""
 "Whether the call happened in a production environment. True for all calls "
 "created before this tracking was implemented."
-msgstr ""
-"ການໂທເກີດຂຶ້ນໃນລະບົບນຳໃຊ້ຈິງຫຼືບໍ່. ຈະເປັນຈິງສຳລັບທຸກສາຍໂທທີ່ຖືກສ້າງຂຶ້ນກ່ອນທີ່ຈະມີການຕິດຕາມນີ້."
+msgstr "ການໂທເກີດຂຶ້ນໃນລະບົບນຳໃຊ້ຈິງຫຼືບໍ່. ຈະເປັນຈິງສຳລັບທຸກສາຍໂທທີ່ຖືກສ້າງຂຶ້ນກ່ອນທີ່ຈະມີການຕິດຕາມນີ້."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__needs_credits
@@ -8959,8 +8894,8 @@ msgid ""
 "Your decision is needed for this number request. Review any proposed numbers "
 "and reply within five business days to avoid automatic cancellation."
 msgstr ""
-"ຕ້ອງການການຕັດສິນໃຈຂອງທ່ານສຳລັບຄຳຂໍເບີນີ້. ກະລຸນາກວດກາເບິ່ງເບີທີ່ສະເໜີ ແລະ ຕອບກັບພາຍໃນຫ້າວັນລັດຖະກ"
-"ານ ເພື່ອຫຼີກລ່ຽງການຍົກເລີກອັດຕະໂນມັດ."
+"ຕ້ອງການການຕັດສິນໃຈຂອງທ່ານສຳລັບຄຳຂໍເບີນີ້. ກະລຸນາກວດກາເບິ່ງເບີທີ່ສະເໜີ ແລະ "
+"ຕອບກັບພາຍໃນຫ້າວັນລັດຖະການ ເພື່ອຫຼີກລ່ຽງການຍົກເລີກອັດຕະໂນມັດ."
 
 #. module: voip
 #. odoo-javascript
@@ -8975,8 +8910,8 @@ msgid ""
 "Your login details to use the phone are not set in your user preferences. "
 "Please check or ask your administrator if needed."
 msgstr ""
-"ຂໍ້ມູນການເຂົ້າສູ່ລະບົບເພື່ອໃຊ້ໂທລະສັບຍັງບໍ່ໄດ້ຖືກຕັ້ງຄ່າໃນການຕັ້ງຄ່າສ່ວນຕົວຂອງທ່ານ. ກະລຸນາກວດສອບ ຫຼື ຕິດຕໍ່ຜູ້ເ"
-"ບິ່ງແຍງລະບົບຫາກຕ້ອງການ."
+"ຂໍ້ມູນການເຂົ້າສູ່ລະບົບເພື່ອໃຊ້ໂທລະສັບຍັງບໍ່ໄດ້ຖືກຕັ້ງຄ່າໃນການຕັ້ງຄ່າສ່ວນຕົວຂອງທ່ານ. ກະລຸນາກວດສອບ ຫຼື "
+"ຕິດຕໍ່ຜູ້ເບິ່ງແຍງລະບົບຫາກຕ້ອງການ."
 
 #. module: voip
 #. odoo-javascript
@@ -9012,8 +8947,8 @@ msgid ""
 "Your number is active. Your phone setup is still being finalized. Calling "
 "will be available once setup is complete."
 msgstr ""
-"ເບີຂອງທ່ານເປີດໃຊ້ງານແລ້ວ. ການຕັ້ງຄ່າໂທລະສັບຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນສຳເລັດ. ຈະສາມາດໂທໄດ້ເມື່ອການຕັ້ງ"
-"ຄ່າສຳເລັດສົມບູນ."
+"ເບີຂອງທ່ານເປີດໃຊ້ງານແລ້ວ. ການຕັ້ງຄ່າໂທລະສັບຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນສຳເລັດ. "
+"ຈະສາມາດໂທໄດ້ເມື່ອການຕັ້ງຄ່າສຳເລັດສົມບູນ."
 
 #. module: voip
 #. odoo-python
@@ -9062,8 +8997,8 @@ msgid ""
 "Your number is under review. Internal calling is not configured; external "
 "calls also require an approved number."
 msgstr ""
-"ເບີຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. ຍັງບໍ່ໄດ້ຕັ້ງຄ່າການໂທພາຍໃນ; ແລະ ການໂທພາຍນອກກໍຈຳເປັນຕ້ອງໃຊ້"
-"ເບີທີ່ໄດ້ຮັບການອະນຸມັດແລ້ວ."
+"ເບີຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. ຍັງບໍ່ໄດ້ຕັ້ງຄ່າການໂທພາຍໃນ; ແລະ "
+"ການໂທພາຍນອກກໍຈຳເປັນຕ້ອງໃຊ້ເບີທີ່ໄດ້ຮັບການອະນຸມັດແລ້ວ."
 
 #. module: voip
 #. odoo-javascript
@@ -9072,8 +9007,8 @@ msgid ""
 "Your number is under review. Internal calls remain available; external calls "
 "will be available after approval."
 msgstr ""
-"ເບີຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. ຍັງສາມາດໂທພາຍໃນໄດ້; ສ່ວນການໂທພາຍນອກຈະໃຊ້ໄດ້ຫຼັງຈາກໄດ້ຮັບ"
-"ການອະນຸມັດແລ້ວ."
+"ເບີຂອງທ່ານພວມຢູ່ໃນຂັ້ນຕອນການກວດສອບ. ຍັງສາມາດໂທພາຍໃນໄດ້; "
+"ສ່ວນການໂທພາຍນອກຈະໃຊ້ໄດ້ຫຼັງຈາກໄດ້ຮັບການອະນຸມັດແລ້ວ."
 
 #. module: voip
 #. odoo-python
@@ -9111,8 +9046,8 @@ msgid ""
 "could not cover its monthly fee. Buy credits to reactivate it, otherwise it "
 "will be released."
 msgstr ""
-"ເບີໂທລະສັບ %(number)s ຂອງທ່ານຖືກໂຈະການນຳໃຊ້ ເນື່ອງຈາກຍອດເຄຣດິດບໍ່ພໍຈ່າຍຄ່າບໍລິການລາຍເດືອນ. ກະ"
-"ລຸນາຕື່ມເຄຣດິດເພື່ອເປີດໃຊ້ອີກຄັ້ງ, ບໍ່ດັ່ງນັ້ນເບີຈະຖືກປ່ອຍຄືນ."
+"ເບີໂທລະສັບ %(number)s ຂອງທ່ານຖືກໂຈະການນຳໃຊ້ ເນື່ອງຈາກຍອດເຄຣດິດບໍ່ພໍຈ່າຍຄ່າບໍລິການລາຍເດືອນ. "
+"ກະລຸນາຕື່ມເຄຣດິດເພື່ອເປີດໃຊ້ອີກຄັ້ງ, ບໍ່ດັ່ງນັ້ນເບີຈະຖືກປ່ອຍຄືນ."
 
 #. module: voip
 #. odoo-python
@@ -9131,6 +9066,18 @@ msgstr "ຊູມເຂົ້າ"
 #: code:addons/voip/static/src/core/flow_editor/flow_editor.js:0
 msgid "Zoom out"
 msgstr "ຊູມອອກ"
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of an archived Call Flow"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "a \"Play Audio\" node of the Call Flow \"%(call_flow)s\""
+msgstr ""
 
 #. module: voip
 #. odoo-javascript
@@ -9293,6 +9240,111 @@ msgstr "phone"
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
 msgstr "phone_disabled"
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_sound.py:0
+msgid "the Menu \"%(menu)s\""
+msgstr ""
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    Dear <t t-out=\"ctx.get('recipient_name')\"/>,\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> has requested a phone "
+#~ "number.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>They added the following comment:</span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        Buy Number\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                    ຮຽນ <t t-out=\"ctx.get('recipient_name')\"/>,\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <strong t-out=\"user.name\"/> ໄດ້ຮ້ອງຂໍເບີໂທລະສັບ.\n"
+#~ "                    <br/><br/>\n"
+#~ "                    <t t-if=\"not is_html_empty(object.body_html)\">\n"
+#~ "                        <span>ພວກເຂົາໄດ້ເພີ່ມຄຳເຫັນດັ່ງນີ້:</span>\n"
+#~ "                        <div style=\"border-left: 4px solid #dee2e6; "
+#~ "padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+#~ "                            <t t-out=\"object.body_html\"/>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                    <a t-attf-style=\"background-color: "
+#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
+#~ "16px; text-decoration: none; color: {{user.company_id.email_primary_color "
+#~ "or '#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+#~ "voip.action_voip_did_number\">\n"
+#~ "                        ຊື້ເບີໂທ\n"
+#~ "                    </a>\n"
+#~ "                </p>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                <p>A new mailbox message was left in <t t-"
+#~ "out=\"object.voicemail_id.name\"/>.</p>\n"
+#~ "                <ul>\n"
+#~ "                    <li>\n"
+#~ "                        <strong>Caller:</strong>\n"
+#~ "                        <t t-if=\"object.caller_id_name or "
+#~ "object.caller_id_num\" t-out=\"object.caller_id_name or "
+#~ "object.caller_id_num\"/>\n"
+#~ "                        <t t-else=\"\">Unknown caller</t>\n"
+#~ "                    </li>\n"
+#~ "                    <li t-if=\"object.caller_id_name and "
+#~ "object.caller_id_num\"><strong>Phone number:</strong> <t t-"
+#~ "out=\"object.caller_id_num\"/></li>\n"
+#~ "                    <li><strong>Received on:</strong> <t t-"
+#~ "out=\"format_datetime(object.occurred_at)\"/></li>\n"
+#~ "                    <li><strong>Duration:</strong> <t t-"
+#~ "out=\"format_duration(object.duration / 3600)\"/></li>\n"
+#~ "                </ul>\n"
+#~ "                <p>The recording is attached to this email.</p>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                <p>ມີຂໍ້ຄວາມສຽງໃໝ່ຝາກໄວ້ໃນ <t t-"
+#~ "out=\"object.voicemail_id.name\"/>.</p>\n"
+#~ "                <ul>\n"
+#~ "                    <li>\n"
+#~ "                        <strong>ຜູ້ໂທ:</strong>\n"
+#~ "                        <t t-if=\"object.caller_id_name or "
+#~ "object.caller_id_num\" t-out=\"object.caller_id_name or "
+#~ "object.caller_id_num\"/>\n"
+#~ "                        <t t-else=\"\">ບໍ່ຮູ້ຜູ້ໂທ</t>\n"
+#~ "                    </li>\n"
+#~ "                    <li t-if=\"object.caller_id_name and "
+#~ "object.caller_id_num\"><strong>ເບີໂທລະສັບ:</strong> <t t-"
+#~ "out=\"object.caller_id_num\"/></li>\n"
+#~ "                    <li><strong>ໄດ້ຮັບເມື່ອ:</strong> <t t-"
+#~ "out=\"format_datetime(object.occurred_at)\"/></li>\n"
+#~ "                    <li><strong>ຄວາມຍາວ:</strong> <t t-"
+#~ "out=\"format_duration(object.duration / 3600)\"/></li>\n"
+#~ "                </ul>\n"
+#~ "                <p>ຟາຍສຽງທີ່ບັນທຶກໄວ້ໄດ້ຄັດຕິດມານຳອີເມວນີ້ແລ້ວ.</p>\n"
+#~ "            </div>\n"
+#~ "        "
 
 #, fuzzy
 #~ msgid "Website Messages"

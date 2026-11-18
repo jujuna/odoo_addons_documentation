@@ -125,6 +125,19 @@ class QualityPoint(models.Model):
             ('zpl_units', _('ZPL Labels - One per unit')),
         ]
 
+    @api.model
+    def default_get(self, fields):
+        res = super().default_get(fields)
+        if 'sequence' in fields and 'sequence' not in res and 'operation_id':
+            previous_point = self.search(
+                [('operation_id', '=', res.get('operation_id', False))],
+                order='sequence DESC',
+                limit=1
+            )
+            next_seq = previous_point.sequence + 10 if previous_point else 10
+            res['sequence'] = next_seq
+        return res
+
     @api.onchange('bom_product_ids', 'is_workorder_step')
     def _onchange_bom_product_ids(self):
         if self.is_workorder_step and self.bom_product_ids:

@@ -121,9 +121,9 @@ class HrContractSalaryBenefit(models.Model):
     def create(self, vals_list):
         records = super().create(vals_list)
         for record in records:
-            if record.view_ids:
+            if record.sudo().view_ids:
                 # sudo needed for payroll admins to write on `ir.ui.view`
-                record.view_ids.sudo().write({'active': record.active})
+                record.sudo().view_ids.write({'active': record.active})
         records._sync_salary_rules_active()
         return records
 
@@ -132,7 +132,7 @@ class HrContractSalaryBenefit(models.Model):
         res = super().write(vals)
         if 'active' in vals:
             #  sudo needed for payroll admins to write on `ir.ui.view`
-            self.view_ids.sudo().write({'active': vals['active']})
+            self.sudo().view_ids.write({'active': vals['active']})
             self._sync_salary_rules_active()
         return res
 

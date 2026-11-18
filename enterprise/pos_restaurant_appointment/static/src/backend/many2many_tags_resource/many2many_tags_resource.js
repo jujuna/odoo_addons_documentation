@@ -3,35 +3,25 @@ import {
     Many2ManyTagsField,
     many2ManyTagsField,
 } from "@web/views/fields/many2many_tags/many2many_tags_field";
-import { Many2XAutocomplete, many2XAutocompleteProps } from "@web/views/fields/relational_utils";
-import { deserializeDateTime } from "@web/core/l10n/dates";
-import { useProps, t } from "@odoo/owl";
+import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
+import { deserializeDateTime, serializeDateTime } from "@web/core/l10n/dates";
 
 export class FieldMany2ManyTagsResourceMany2XAutocomplete extends Many2XAutocomplete {
     static template = "pos_restaurant_appointment.FieldMany2ManyTagsResourceMany2XAutocomplete";
     static components = {
         ...Many2XAutocomplete.components,
     };
-    props = useProps({
-        ...many2XAutocompleteProps,
-        event_start_time: t.or([t.object(), t.boolean()]).optional(),
-        event_end_time: t.or([t.object(), t.boolean()]).optional(),
-    });
 
-    getPeopleCount(record) {
-        if (record.is_used) {
-            const eventStart = this.props.event_start_time;
-            const eventEnd = this.props.event_end_time;
-            if (!eventStart || !eventEnd) {
-                return "";
-            }
-            const localStartTime = deserializeDateTime(record.is_used.event_start);
-            const localEndTime = deserializeDateTime(record.is_used.event_stop);
-            return localStartTime < eventEnd && localEndTime > eventStart
-                ? record.is_used.capacity
-                : "";
+    getUsage(record) {
+        if (!record.is_used?.event_id) {
+            return false;
         }
-        return "";
+        const { event_start, event_stop, capacity } = record.is_used;
+        return {
+            start: deserializeDateTime(event_start).toFormat("HH:mm"),
+            stop: deserializeDateTime(event_stop).toFormat("HH:mm"),
+            capacity,
+        };
     }
 }
 
@@ -44,8 +34,9 @@ export class FieldMany2ManyTagsResource extends Many2ManyTagsField {
 
     get context() {
         const context = this.props.context || {};
-        const jsDate = this.props.record.data.start;
-        context["start_date"] = jsDate ? jsDate.toFormat("yyyy-MM-dd HH:mm:ss") : null;
+        const { start, stop } = this.props.record.data;
+        context["start_date"] = start ? serializeDateTime(start) : null;
+        context["stop_date"] = stop ? serializeDateTime(stop) : null;
         return context;
     }
 

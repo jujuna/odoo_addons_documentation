@@ -746,6 +746,21 @@ class WhatsAppTemplateInternals(WhatsAppTemplateCommon):
                     self.assertFalse(template.button_ids.variable_ids)
                 self.assertEqual(clone.template_name, f'test_copy_template_{button_type}_copy')
 
+    def test_display_name(self):
+        """Test the display name computation for WhatsApp templates."""
+        template = self.basic_template
+        account_name = self.whatsapp_account.name
+
+        self.assertEqual(template.display_name, f"Base Template [{account_name}]")
+        template.status = 'draft'
+        self.assertEqual(template.display_name, f"Base Template [{account_name}] (Draft)")
+        template.active = False
+        self.assertEqual(template.display_name, f"Base Template [{account_name}] (Archived)")
+        template.name = False
+        self.assertEqual(template.display_name, '')
+        # Test that copying an unnamed template results in a copy with the name "Unnamed (copy)"
+        self.assertEqual(template.copy().name, "Unnamed (copy)")
+
 
 @tagged('wa_template')
 @tagged('at_install', '-post_install')  # LEGACY at_install

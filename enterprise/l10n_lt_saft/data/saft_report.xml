@@ -24,9 +24,12 @@
             <PeriodEnd t-out="date_to"/>
         </xpath>
 
-        <xpath expr="//Account/StandardAccountID" position="replace">
-            <AccountTableID t-out="account.code"/>
-            <AccountTableDescription t-out="account.name[:256]"/>
+        <xpath expr="//StandardAccountID" position="replace">
+            <t t-if="company.account_fiscal_country_id.code != 'LT'">$0</t>
+            <t t-else="">
+                <AccountTableID t-out="account.code"/>
+                <AccountTableDescription t-out="account.name[:256]"/>
+            </t>
         </xpath>
 
         <xpath expr="//Owners/Owner" position="replace">

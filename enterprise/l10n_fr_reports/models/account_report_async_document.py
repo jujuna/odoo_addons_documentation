@@ -128,7 +128,7 @@ class AccountReportAsyncDocument(models.Model):
                         export.state = 'rejected'
                         export.account_report_async_export_id.return_id._message_log(body=self.env._(
                             "The document %(document_name)s was rejected by ASPOne.",
-                            documentname=export.name,
+                            document_name=export.name,
                         ))
                     first_step_state_final = any(status['is_final'] for status in step_1_logs)
 
@@ -142,29 +142,31 @@ class AccountReportAsyncDocument(models.Model):
                         export.state = 'rejected'
                         export.account_report_async_export_id.return_id._message_log(body=self.env._(
                             "The document %(document_name)s was rejected by ASPOne.",
-                            documentname=export.name,
+                            document_name=export.name,
                         ))
                     elif any(status['is_final'] for status in step_2_logs):
                         export.state = 'accepted'
                         export.account_report_async_export_id.return_id._message_log(body=self.env._(
                             "The document %(document_name)s was accepted by ASPOne.",
-                            documentname=export.name,
+                            document_name=export.name,
                         ))
+                    if self.env['account.move']._can_commit():
+                        self.env.cr.commit()
             except Exception as e:  # noqa: BLE001
                 _logger.warning("Error while processing interchanges response: %s", e)
 
             if export.state == 'rejected':
-                report_closing_entry = export.env['account.move'].search([
-                    ('closing_return_id', '=', export.account_report_async_export_id.report_id.id),
-                    ('date', '=', export.account_report_async_export_id.date_to),
-                ])
-                act_type_xmlid = 'account_reports.mail_activity_type_tax_report_error'
-                report_closing_entry.activity_reschedule(
+                act_type_xmlid = 'mail.mail_activity_data_warning'
+                user_id = export.create_uid.id
+                closing_return = export.account_report_async_export_id.return_id
+                closing_return.activity_reschedule(
                     act_type_xmlids=[act_type_xmlid],
-                    date_deadline=fields.Date.context_today(report_closing_entry)
-                ) or report_closing_entry.activity_schedule(
+                    date_deadline=fields.Date.context_today(closing_return),
+                    user_id=user_id,
+                ) or closing_return.activity_schedule(
                     act_type_xmlid=act_type_xmlid,
-                    summary=_("Tax Report Error: %s", report_closing_entry.closing_return_id.name),
+                    summary=_("Tax Report Error: %s", closing_return.name),
+                    user_id=user_id,
                 )
 
     # ------------------------------------------------------------

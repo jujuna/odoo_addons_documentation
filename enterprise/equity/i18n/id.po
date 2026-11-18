@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:47+0000\n"
-"PO-Revision-Date: 2026-10-12 10:38+0000\n"
+"POT-Creation-Date: 2026-11-06 17:46+0000\n"
+"PO-Revision-Date: 2026-10-30 05:33+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "equity/id/>\n"
@@ -32,6 +32,19 @@ msgstr "# Sekuritas"
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__shares
 msgid "# Shares"
 msgstr "# Share"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "%(partner)s does not belong to a company compatible with this record."
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid ""
+"%(partner)s does not belong to a company compatible with this transaction."
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -84,7 +97,7 @@ msgstr "(Opsi yang non-positif tidak kadaluarsa)"
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 msgid "(Optional)"
-msgstr ""
+msgstr "(Opsional)"
 
 #. module: equity
 #. odoo-python
@@ -103,27 +116,30 @@ msgid ""
 "<br/>\n"
 "                                            Politically Exposed Person:"
 msgstr ""
+"<br/>\n"
+"                                            Orang yang Berpolitik (PEP):"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<br/> Nationality:"
-msgstr ""
+msgstr "<br/> Kewarganegaraan:"
 
 #. module: equity
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello,<br/>\n"
+"                    <p> Hello,<br>\n"
 "                        Following our legal obligations to identify clients, "
 "we need to report natural persons who directly or indirectly\n"
 "                        hold or control at least 25% in the capital or "
-"voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/>\n"
+"voting rights of <b><t t-out=\"user_id.company_id.name\"></t></b>. <br> "
+"<br>\n"
 "                        Please fill in the UBO request through the link "
-"above.<br/> <br/>\n"
+"above.<br> <br>\n"
 "                        Thank you,\n"
 "                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature\"/>\n"
+"                            <br>--<br>\n"
+"                            <t t-out=\"user_id.signature\"></t>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -134,13 +150,13 @@ msgstr ""
 #: model:mail.template,body_html:equity.equity_shareholder_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello,<br/>\n"
+"                    <p> Hello,<br>\n"
 "                        You will find your latest transaction and valuations "
-"in the link above. <br/> <br/>\n"
+"in the link above. <br> <br>\n"
 "                        Best,\n"
 "                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature\"/>\n"
+"                            <br>--<br>\n"
+"                            <t t-out=\"user_id.signature\"></t>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -153,6 +169,8 @@ msgid ""
 "<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Email "
 "Address\" title=\"Email Address\"/>"
 msgstr ""
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Alamat "
+"Email\" title=\"Alamat Email\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
@@ -160,6 +178,8 @@ msgid ""
 "<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Phone "
 "Number\" title=\"Phone Number\"/>"
 msgstr ""
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Nomor "
+"Telepon\" title=\"Nomor Telepon\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
@@ -167,6 +187,8 @@ msgid ""
 "<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'exercise'\"/>"
 msgstr ""
+"<i title=\"Ke\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
+"invisible=\"transaction_type != 'exercise'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
@@ -174,16 +196,18 @@ msgid ""
 "<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'transfer'\"/>"
 msgstr ""
+"<i title=\"Ke\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
+"invisible=\"transaction_type != 'transfer'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "<span class=\"o_stat_text\">Shareholders</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Pemegang saham</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
 msgid "<span class=\"text-muted\">Valuation</span>"
-msgstr ""
+msgstr "<span class=\"text-muted\">Valuasi</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -191,6 +215,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
+"<span> Pemegang Saham<span invisible=\"equity_shareholders_count == 1\">s</"
+"span></span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -198,16 +224,18 @@ msgid ""
 "<span> Transaction<span invisible=\"equity_transaction_count == 1\">s</"
 "span></span>"
 msgstr ""
+"<span> Transaksi<span invisible=\"equity_transaction_count == 1\">s</span></"
+"span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "<span>Missing supporting documents! Attach them in the chatter.</span>"
-msgstr ""
+msgstr "<span>Kurang dokumen pendukung! Lampirkan di obrolan.</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "<span>per share</span>"
-msgstr ""
+msgstr "<span>per lembar saham</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -217,17 +245,17 @@ msgstr "<strong>Alamat:</strong>"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>Company Name:</strong>"
-msgstr ""
+msgstr "<strong>Nama Perusahaan:</strong>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>OR</strong>"
-msgstr ""
+msgstr "<strong>ATAU</strong>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>Tax ID Number:</strong>"
-msgstr ""
+msgstr "<strong>Nomor ID Pajak:</strong>"
 
 #. module: equity
 #. odoo-javascript
@@ -244,6 +272,10 @@ msgid ""
 "                            country equivalence list for a simplified due "
 "diligence (article 37(2), subparagraph 1(2 and 5), of the AML law);"
 msgstr ""
+"Lembaga kredit atau keuangan yang berlokasi di negara yang tercantum dalam "
+"Keputusan Kerajaan tanggal 19 Juli 2013 yang menyusun\n"
+"                            daftar kesetaraan negara ketiga untuk uji tuntas "
+"yang disederhanakan (pasal 37(2), ayat 1(2 dan 5), undang-undang AML);"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -252,12 +284,15 @@ msgid ""
 "Member States of the European\n"
 "                            Economic Area; or"
 msgstr ""
+"Perusahaan terdaftar: perusahaan yang sahamnya diperdagangkan di pasar yang "
+"diatur di Negara Anggota\n"
+"                            Kawasan Ekonomi Eropa; atau"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "A partner cannot have transactions in different currencies."
-msgstr ""
+msgstr "Partner tidak boleh memiliki transaksi dalam mata uang yang berbeda."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -265,6 +300,8 @@ msgid ""
 "According to laws related to anti money laundering, the notary must identify "
 "the beneficial owners of their customer."
 msgstr ""
+"Berdasarkan undang-undang terkait pencegahan pencucian uang, notaris wajib "
+"mengidentifikasi pemilik manfaat dari pelanggannya."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_needaction
@@ -350,6 +387,14 @@ msgid ""
 "                    but who are de facto exercising similar control over the "
 "company."
 msgstr ""
+"Pemilik manfaat adalah orang perseorangan yang secara mutlak memiliki atau "
+"mengendalikan pelanggan atau orang perseorangan\n"
+"                    yang atas namanya atau untuk kepentingannya suatu "
+"transaksi dilakukan atau hubungan bisnis dibentuk. Hal ini\n"
+"                    termasuk orang-orang perseorangan yang tidak memiliki "
+"kepemilikan pengendali di perusahaan atau mandat resmi apa pun,\n"
+"                    tetapi yang secara de facto menjalankan kendali serupa "
+"atas perusahaan."
 
 #. module: equity
 #. odoo-javascript
@@ -388,7 +433,7 @@ msgstr "CEO"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
 msgid "Can Change Currency"
-msgstr ""
+msgstr "Dapat Mengubah Mata Uang"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
@@ -418,7 +463,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_ubo.py:0
 msgid "Cannot create new UBO for an existing holder"
-msgstr ""
+msgstr "Tidak dapat membuat UBO baru untuk pemegang yang sudah ada"
 
 #. module: equity
 #. odoo-python
@@ -485,12 +530,12 @@ msgstr "Perusahaan - Kategori 3. Petugas eksekutif"
 #: model:ir.model.fields,help:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,help:equity.field_equity_valuation__company_id
 msgid "Company to which this record is visible"
-msgstr ""
+msgstr "Perusahaan yang dapat melihat record ini"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "Compose Email"
-msgstr ""
+msgstr "Buat Email"
 
 #. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_configuration
@@ -546,6 +591,10 @@ msgid ""
 "                    directors or managers or over the direction of its "
 "operations."
 msgstr ""
+"Kontrol adalah hak hukum atau hak de facto untuk memberikan pengaruh yang "
+"menentukan terhadap penunjukan mayoritas\n"
+"                    atas direktur atau manajernya atau terhadap arah "
+"operasinya."
 
 #. module: equity
 #. odoo-javascript
@@ -601,7 +650,7 @@ msgstr "Tanggal"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Decision maker"
-msgstr ""
+msgstr "Pengambil keputusan"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -609,6 +658,8 @@ msgid ""
 "Definitions: \"beneficial owners\", \"control\", \"shareholder holding 25% "
 "or more\", \"decision makers\""
 msgstr ""
+"Definisi: \"pemilik manfaat\", \"kendali\", \"pemegang saham yang memiliki "
+"25% atau lebih\", \"pengambil keputusan\""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__destination_class_id
@@ -737,7 +788,7 @@ msgstr "Equity Last Valuation"
 #. module: equity
 #: model:mail.template,name:equity.equity_shareholder_email_template
 msgid "Equity Shareholder Email"
-msgstr ""
+msgstr "Email Pemegang Saham Ekuitas"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_shareholders_count
@@ -761,7 +812,7 @@ msgstr "Equity Transaction Count"
 #. module: equity
 #: model:mail.template,name:equity.equity_ubo_form_email_template
 msgid "Equity UBO Form Email"
-msgstr ""
+msgstr "Email Formulir UBO Ekuitas"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_valuation_ids
@@ -772,7 +823,7 @@ msgstr "Equity Valuation"
 #. module: equity
 #: model:mail.template,subject:equity.equity_shareholder_email_template
 msgid "Equity notice"
-msgstr ""
+msgstr "Pemberitahuan ekuitas"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__event
@@ -783,7 +834,7 @@ msgstr "Acara"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Exemption from the identification of beneficial"
-msgstr ""
+msgstr "Pengecualian dari identifikasi manfaat"
 
 #. module: equity
 #. odoo-python
@@ -809,7 +860,7 @@ msgstr "Expiration Diff"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "Expired Documents"
-msgstr ""
+msgstr "Dokumen Kedaluwarsa"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -818,6 +869,9 @@ msgid ""
 "persons considered as equivalent to the\n"
 "                        spouse; the parents;"
 msgstr ""
+"Anggota keluarga: pasangan, siapa pun yang dianggap setara dengan orang-"
+"orang yang dianggap setara dengan\n"
+"                        pasangan; orang tua;"
 
 #. module: equity
 #. odoo-python
@@ -828,7 +882,7 @@ msgstr "Isi UBO"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "First and Last Name:"
-msgstr ""
+msgstr "Nama Depan dan Belakang:"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_follower_ids
@@ -852,6 +906,10 @@ msgid ""
 "                <b>hold or control at least 25% in the capital or voting "
 "rights</b> of"
 msgstr ""
+"Sesuai dengan kewajiban hukum untuk mengidentifikasi klien, harap laporkan "
+"orang perseorangan yang secara langsung atau tidak langsung\n"
+"               <b> memiliki atau mengendalikan setidaknya 25% dari modal "
+"atau hak suara</b> dari"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_formation_date
@@ -884,6 +942,11 @@ msgid ""
 "                            drawing up a list of European governing "
 "authorities, bodies and specialized agencies for a simplified due diligence."
 msgstr ""
+"Otoritas pemerintahan Uni Eropa, badan, dan lembaga sebagaimana "
+"didefinisikan dalam Keputusan Kerajaan tanggal 19 Juli 2013\n"
+"                            yang menyusun daftar otoritas pemerintahan, "
+"badan, dan lembaga khusus di Eropa untuk proses uji tuntas yang "
+"disederhanakan."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__has_auth_rep_role
@@ -942,7 +1005,7 @@ msgstr "Holder"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "Holdings"
-msgstr ""
+msgstr "Kepemilikan"
 
 #. module: equity
 #. odoo-javascript
@@ -951,6 +1014,8 @@ msgid ""
 "I hereby declare on honor that the information provided is truthful and "
 "accurate."
 msgstr ""
+"Dengan ini saya deklarasikan dengan penuh hormat bahwa informasi yang "
+"disediakan tepat dan akurat."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__id
@@ -994,11 +1059,15 @@ msgid ""
 "persons in the main interests of whom the\n"
 "                                    legal entity was formed or operates."
 msgstr ""
+"Jika penerima manfaat di masa depan belum ditunjuk, kelompok orang yang "
+"menjadi tujuan utama\n"
+"                                    didirikan atau dioperasikannya badan "
+"hukum tersebut."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "If the shareholder holding more than 25% is"
-msgstr ""
+msgstr "Jika pemegang saham memiliki lebih dari 25%"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
@@ -1006,6 +1075,8 @@ msgid ""
 "If you are returning to an already submitted form, please note that your "
 "information has been securely stored."
 msgstr ""
+"Jika Anda kembali ke formulir yang telah dikirimkan, harap diperhatikan "
+"bahwa informasi Anda telah disimpan dengan aman."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
@@ -1013,11 +1084,13 @@ msgid ""
 "If your form has been successfully submitted, our team will review it and "
 "keep you informed of any updates."
 msgstr ""
+"Jika formulir Anda berhasil dikirim, tim kami akan memeriksanya dan memberi "
+"tahu Anda jika ada pembaruan."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "In Control"
-msgstr ""
+msgstr "Pemegang Kendali"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__invalid_securities_error
@@ -1091,7 +1164,7 @@ msgstr "Formulir Legal"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Legal persons governed by public national laws;"
-msgstr ""
+msgstr "Badan hukum yang diatur oleh undang-undang nasional;"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__liquidator
@@ -1106,7 +1179,7 @@ msgstr "Templat Email"
 #. module: equity
 #: model:ir.module.module,summary:base.module_equity
 msgid "Manage securities, transactions, and cap tables."
-msgstr ""
+msgstr "Kelola sekuritas, transaksi, dan tabel modal."
 
 #. module: equity
 #. odoo-javascript
@@ -1141,7 +1214,7 @@ msgstr "Pesan"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "Missing Documents"
-msgstr ""
+msgstr "Dokumen Tidak Ada"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
@@ -1151,7 +1224,7 @@ msgstr "Model"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
 msgid "My Companies"
-msgstr ""
+msgstr "Perusahaan Saya"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_1
@@ -1251,7 +1324,7 @@ msgstr "Transaksi Baru"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "New Valuation"
-msgstr ""
+msgstr "Valuasi Baru"
 
 #. module: equity
 #: model:res.groups.privilege,placeholder:equity.res_groups_privilege_equity
@@ -1262,7 +1335,7 @@ msgstr "Tidak"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No UBOs recorded for this company."
-msgstr ""
+msgstr "Tidak ada UBO yang tercatat untuk perusahaan ini."
 
 #. module: equity
 #. odoo-python
@@ -1397,7 +1470,7 @@ msgstr "Opsi"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_search
 msgid "Options Exercise"
-msgstr ""
+msgstr "Eksekusi Opsi"
 
 #. module: equity
 #. odoo-javascript
@@ -1420,7 +1493,7 @@ msgstr "PEP"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "PEP - Politically Exposed Person"
-msgstr ""
+msgstr "PEP - Orang Berpengaruh Politik"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__partner_id
@@ -1436,7 +1509,7 @@ msgstr "ID Partner Semua Memiliki Email"
 #. odoo-python
 #: code:addons/equity/models/equity_ubo.py:0
 msgid "Partner is not allowed to fill UBO form"
-msgstr ""
+msgstr "Partner tidak diizinkan untuk mengisi formulir UBO"
 
 #. module: equity
 #. odoo-javascript
@@ -1460,12 +1533,12 @@ msgstr "Harga"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Price FD"
-msgstr ""
+msgstr "Harga FD"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Price ND"
-msgstr ""
+msgstr "Harga ND"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__security_price
@@ -1578,12 +1651,12 @@ msgstr "Kelas Keamanan"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "Security Price"
-msgstr ""
+msgstr "Harga Sekuritas"
 
 #. module: equity
 #: model:portal.entry,description:equity.equity_portal_entry
 msgid "See your shares and transactions"
-msgstr ""
+msgstr "Lihat saham dan transaksi Anda"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__seller_id
@@ -1623,7 +1696,7 @@ msgstr "Urutan"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Shareholders who hold more than 25%"
-msgstr ""
+msgstr "Pemegang saham yang memiliki lebih dari 25%"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__shares
@@ -1639,7 +1712,7 @@ msgstr "Transaksi share harus memiliki subscriber"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Signature date:"
-msgstr ""
+msgstr "Tanggal tanda tangan:"
 
 #. module: equity
 #. odoo-javascript
@@ -1655,7 +1728,7 @@ msgstr "Tandatangan:"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Strike Price"
-msgstr ""
+msgstr "Harga Strike"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
@@ -1694,6 +1767,7 @@ msgstr "Dokumen Pendukung"
 msgid ""
 "Thank you for providing your Ultimate Beneficial Owner (UBO) information."
 msgstr ""
+"Terima kasih telah memberikan informasi Ultimate Beneficial Owner (UBO) Anda."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
@@ -1703,6 +1777,10 @@ msgid ""
 "The \"Transaction Price\" total is not counting the prices of options "
 "issuance transactions because that is a strike price."
 msgstr ""
+"Total \"# Sekuritas\" tidak termasuk transaksi \"Pelaksanaan Opsi\" (karena "
+"transaksi tersebut dihitung pada saat \"Penerbitan Opsi\"). Total \"Harga "
+"Transaksi\" tidak termasuk harga transaksi penerbitan opsi karena merupakan "
+"harga pelaksanaan."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1710,6 +1788,8 @@ msgid ""
 "The declaration must be completed by the persons authorized to represent the "
 "company or entity according to its Articles of Association."
 msgstr ""
+"Pernyataan ini harus diisi oleh orang-orang yang berwenang mewakili "
+"perusahaan atau badan hukum tersebut sesuai dengan Anggaran Dasarnya."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1737,21 +1817,23 @@ msgid ""
 "The undersigned (executive officer or administrator) acting as a "
 "representative of the company:"
 msgstr ""
+"Yang bertanda tangan di bawah ini (pejabat eksekutif atau administrator) "
+"bertindak sebagai perwakilan perusahaan:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "There are currently no transactions for your account."
-msgstr ""
+msgstr "Saat ini tidak ada transaksi untuk akun Anda."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "There are two classes of beneficial owners:"
-msgstr ""
+msgstr "Ada dua kategori pemilik manfaat:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
 msgid "There is currently no equity for your account."
-msgstr ""
+msgstr "Saat ini tidak ada ekuitas untuk akun Anda."
 
 #. module: equity
 #: model:ir.model.constraint,message:equity.constraint_equity_ubo_unique_ubo
@@ -1764,6 +1846,8 @@ msgid ""
 "This said, where a shareholder holding more than 25% is a legal arrangement "
 "other than a registered company, beneficial owners are:"
 msgstr ""
+"Dengan demikian, jika pemegang saham yang memiliki lebih dari 25% adalah "
+"pengaturan hukum selain perusahaan terdaftar, pemilik manfaat adalah:"
 
 #. module: equity
 #. odoo-javascript
@@ -1790,7 +1874,7 @@ msgstr "Transaksi"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "Transaction Price"
-msgstr ""
+msgstr "Harga Transaksi"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__transaction_type
@@ -1847,7 +1931,7 @@ msgstr "UBO ID Number"
 #. module: equity
 #: model:mail.template,subject:equity.equity_ubo_form_email_template
 msgid "UBO form"
-msgstr ""
+msgstr "Formulir UBO"
 
 #. module: equity
 #. odoo-python
@@ -1879,12 +1963,12 @@ msgstr "Ultimate Beneficial Owner"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Ultimate Beneficial Owners (UBO) Request"
-msgstr ""
+msgstr "Permintaan Pemilik Manfaat Akhir (UBO)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Ultimate Beneficial Owners (UBO) statement"
-msgstr ""
+msgstr "Laporan Pemilik Manfaat Akhir (UBO)"
 
 #. module: equity
 #. odoo-javascript
@@ -1901,7 +1985,7 @@ msgstr "Unggah"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Upload Files"
-msgstr ""
+msgstr "Unggah File"
 
 #. module: equity
 #. odoo-python
@@ -1934,7 +2018,7 @@ msgstr "Valuasi"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Vesting period, exercise deadline, etc."
-msgstr ""
+msgstr "Periode vesting, batas waktu eksekusi, dll."
 
 #. module: equity
 #. odoo-python
@@ -1952,7 +2036,7 @@ msgstr "Viewer"
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
 msgid "Visible to"
-msgstr ""
+msgstr "Terlihat oleh"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -1981,6 +2065,8 @@ msgstr "Hak Voting"
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "When did the shareholder lose its 25% stake in control or in votes?"
 msgstr ""
+"Kapan pemegang saham kehilangan 25% kepemilikan saham dalam kendali atau "
+"pemungutan suara?"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1990,16 +2076,20 @@ msgid ""
 "                                    more of the property of a legal "
 "arrangement or entity or"
 msgstr ""
+"Apabila penerima manfaat di masa depan telah ditentukan, orang perseorangan "
+"yang menjadi penerima manfaat dari 25% atau\n"
+"                                    lebih dari harta benda milik suatu "
+"pengaturan atau badan hukum atau"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Who should complete and sign the declaration?"
-msgstr ""
+msgstr "Siapa yang harus mengisi dan menandatangani deklarasi?"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "Write your message here..."
-msgstr ""
+msgstr "Tulis pesan Anda di sini..."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2023,6 +2113,8 @@ msgid ""
 "You cannot change the equity currency because this partner already has "
 "existing transactions."
 msgstr ""
+"Anda tidak dapat mengubah mata uang ekuitas karena partner ini sudah "
+"memiliki transaksi."
 
 #. module: equity
 #. odoo-javascript
@@ -2045,7 +2137,7 @@ msgstr "Jabatan Anda"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
 msgid "Your UBO Declaration Has Been Submitted!"
-msgstr ""
+msgstr "Deklarasi UBO Anda Telah Dikirim!"
 
 #. module: equity
 #. odoo-python
@@ -2060,6 +2152,9 @@ msgid ""
 "legal arrangement which is known to have\n"
 "                        been set up for the benefit de facto of a PEP."
 msgstr ""
+"setiap orang perseorangan yang memiliki kepemilikan manfaat tunggal atas "
+"suatu badan hukum atau pengaturan hukum yang diketahui\n"
+"                        telah didirikan untuk kepentingan de facto PEP."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -2068,6 +2163,9 @@ msgid ""
 "entities or legal arrangements, or any\n"
 "                        other close business relations, with a PEP;"
 msgstr ""
+"setiap orang perseorangan yang diketahui memiliki kepemilikan manfaat "
+"bersama atas badan hukum atau pengaturan hukum, atau\n"
+"                        hubungan bisnis dekat lainnya, dengan seorang PEP;"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2075,6 +2173,8 @@ msgid ""
 "are the following individuals who have control by other means on the "
 "direction of the company (administrators)"
 msgstr ""
+"adalah individu-individu berikut yang memiliki kendali melalui cara lain "
+"atas arah perusahaan (administrator)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2083,16 +2183,20 @@ msgid ""
 "or indirectly more than 25% of the shares or of the voting rights of this "
 "company"
 msgstr ""
+"adalah individu-individu berikut ini yang, pada akhirnya, memiliki atau "
+"mengendalikan secara langsung atau tidak langsung lebih dari 25% saham atau "
+"hak suara perusahaan ini"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "are the following publicly traded companies."
 msgstr ""
+"adalah perusahaan-perusahaan berikut yang diperdagangkan secara publik."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "born"
-msgstr ""
+msgstr "lahir"
 
 #. module: equity
 #. odoo-python
@@ -2109,17 +2213,17 @@ msgstr "hari"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "declares that the beneficial owners of the company:"
-msgstr ""
+msgstr "menyatakan bahwa pemilik manfaat perusahaan:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "e.g. Seed, Series A, ..."
-msgstr ""
+msgstr "cth: Seed, Seri A, ..."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
 msgid "e.g. Welcome to MyCompany!"
-msgstr ""
+msgstr "Cth: Selamat Datang di MyCompany!"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2152,7 +2256,7 @@ msgstr "atau"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "per security"
-msgstr ""
+msgstr "per sekuritas"
 
 #. module: equity
 #. odoo-javascript
@@ -2182,6 +2286,71 @@ msgstr "tahun"
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "years"
 msgstr "tahun"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p> Hello,<br/>\n"
+#~ "                        Following our legal obligations to identify "
+#~ "clients, we need to report natural persons who directly or indirectly\n"
+#~ "                        hold or control at least 25% in the capital or "
+#~ "voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/"
+#~ ">\n"
+#~ "                        Please fill in the UBO request through the link "
+#~ "above.<br/> <br/>\n"
+#~ "                        Thank you,\n"
+#~ "                        <t t-if=\"user_id.signature\">\n"
+#~ "                            <br/>--<br/>\n"
+#~ "                            <t t-out=\"user_id.signature\"/>\n"
+#~ "                        </t>\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p> Halo,<br/>\n"
+#~ "                        Karena secara hukum kami wajib mengidentifikasi "
+#~ "klien, kami harus melaporkan orang-orang yang secara langsung atau tidak "
+#~ "langsung\n"
+#~ "                        memegang atau mengendalikan minimal 25% modal "
+#~ "atau hak suara <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/"
+#~ ">\n"
+#~ "                        Harap lengkapi permohonan UBO lewat tautan di "
+#~ "atas.<br/> <br/>\n"
+#~ "                        Terima kasih,\n"
+#~ "                        <t t-if=\"user_id.signature\">\n"
+#~ "                            <br/>--<br/>\n"
+#~ "                            <t t-out=\"user_id.signature\"/>\n"
+#~ "                        </t>\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p> Hello,<br/>\n"
+#~ "                        You will find your latest transaction and "
+#~ "valuations in the link above. <br/> <br/>\n"
+#~ "                        Best,\n"
+#~ "                        <t t-if=\"user_id.signature\">\n"
+#~ "                            <br/>--<br/>\n"
+#~ "                            <t t-out=\"user_id.signature\"/>\n"
+#~ "                        </t>\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p> Halo,<br/>\n"
+#~ "                        Transaksi dan valuasi terbaru Anda dapat dilihat "
+#~ "di tautan di atas. <br/> <br/>\n"
+#~ "                        Salam,\n"
+#~ "                       <t t-if=\"user_id.signature\">\n"
+#~ "                            <br/> --<br/>\n"
+#~ "                            <t t-out=\"user_id.signature\"/>\n"
+#~ "                       </t>\n"
+#~ "                    </p> \n"
+#~ "               </div> \n"
+#~ "            "
 
 #~ msgid "Website Messages"
 #~ msgstr "Pesan situs"

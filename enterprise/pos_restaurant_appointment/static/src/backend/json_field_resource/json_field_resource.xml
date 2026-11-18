@@ -2,13 +2,11 @@
 <templates xml:space="preserve">
     <t t-name="pos_restauramt_appointment.JsonFieldResource" t-inherit="web.CharField">
         <xpath expr="//t[@t-if='this.props.readonly']//span" position="replace">
-            <t t-set="details" t-value="this.timeAndPersonDetails"/>
-            <t t-if="details">
-                <t t-out="details.time"/>
-                <span class="text-muted ms-3 fst-italic">
-                    <t t-out="details.person"/>p
-                </span>
-            </t>
+            <t t-set="usage" t-value="this.usage"/>
+            <span t-if="usage" class="text-nowrap">
+                <t t-out="usage.start"/> - <t t-out="usage.stop"/>
+                <span class="text-muted ms-1 fst-italic">· <t t-out="usage.capacity"/>p</span>
+            </span>
         </xpath>
     </t>
 </templates>

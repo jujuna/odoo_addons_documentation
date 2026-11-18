@@ -1,8 +1,12 @@
 from datetime import date
+from freezegun import freeze_time
+from lxml import etree
 
 from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests import tagged
+
+from odoo.addons.l10n_be_hr_payroll.models.utils import to_eurocent
 
 from .common import TestPayrollCommon
 
@@ -304,6 +308,21 @@ class TestL10nBe273Xx(TestPayrollCommon):
         report.action_mark_as_done()
         self.assertEqual(report.state, 'done')
 
+    @freeze_time('2026-04-24')
+    def test_attribution_date_is_in_the_declared_period(self):
+        '''The attribution date is the end of the declared month, not the day the report is generated.'''
+        employee = self.employee_john
+
+        self._create_paid_payslip(employee, date(2026, 3, 1), date(2026, 3, 31))
+        self._create_profit_sharing_payslip(employee, date(2026, 3, 1), date(2026, 3, 31))
+
+        report = self._create_273_xx_report(year=2026, month='3', belcotax_reference='273XX-2026-03')
+        report.action_populate()
+        report.action_generate()
+        root = etree.fromstring(report.xml_file.content)
+        attribution_dates = [node.text for node in root.iter('{*}attributionDate')]
+        self.assertEqual(attribution_dates, ['2026-03-31', '2026-03-31'])
+
     def test_set_to_draft_clears_files(self):
         '''After generate, setting to draft should clear PDF/XML files and reset state.'''
         employee = self.employee_john
@@ -348,6 +367,92 @@ class TestL10nBe273Xx(TestPayrollCommon):
         self.assertEqual(ctx['default_origin_id'], report.id)
         # is_correction_needed should be reset
         self.assertFalse(report.is_correction_needed)
+
+    def test_correction_keeps_the_lines_of_its_origin(self):
+        '''Creating and cancelling a correction leaves the lines of the declared report untouched.'''
+        employee = self.employee_john
+
+        self._create_paid_payslip(employee, date(2026, 10, 1), date(2026, 10, 31))
+        self._create_profit_sharing_payslip(employee, date(2026, 10, 1), date(2026, 10, 31))
+
+        report = self._create_273_xx_report(year=2026, month='10', belcotax_reference='273XX-2026-10')
+        report.action_populate()
+        report.action_generate()
+        report.action_mark_as_done()
+        origin_lines = report.line_ids
+        self.assertEqual(len(origin_lines), 2)
+
+        correction_action = report.action_correct()
+        correction = self.env['l10n_be.273_xx'].with_context(**correction_action['context']).create({})
+        self.assertEqual(report.line_ids, origin_lines)
+        correction.action_populate()
+        self.assertEqual(report.line_ids, origin_lines)
+        self.assertEqual(correction.line_ids.payslip_id, origin_lines.payslip_id)
+
+        correction.action_cancel()
+        self.assertTrue(origin_lines.exists())
+        self.assertEqual(report.line_ids, origin_lines)
+
+        # The payslips stay declared by the original report
+        report_november = self._create_273_xx_report(year=2026, month='11')
+        with self.assertRaises(UserError):
+            report_november.action_populate()
+
+    def test_generate_with_payslips_declared_since_populate(self):
+        '''A report cannot declare the payslips another report declared since it was populated.'''
+        employee = self.employee_john
+
+        payslip_jan = self._create_paid_payslip(employee, date(2026, 1, 1), date(2026, 1, 31))
+        self._create_paid_payslip(employee, date(2026, 2, 1), date(2026, 2, 28))
+
+        report_jan = self._create_273_xx_report(year=2026, month='1', belcotax_reference='273XX-2026-01')
+        report_feb = self._create_273_xx_report(year=2026, month='2', belcotax_reference='273XX-2026-02')
+        report_jan.action_populate()
+        report_feb.action_populate()
+        self.assertIn(payslip_jan, report_feb.line_ids.payslip_id)
+
+        report_jan.action_generate()
+        with self.assertRaises(UserError):
+            report_feb.action_generate()
+
+        report_feb.action_populate()
+        self.assertNotIn(payslip_jan, report_feb.line_ids.payslip_id)
+        report_feb.action_generate()
+        self.assertEqual(report_feb.state, 'ready')
+
+    def test_download_xml_checks_the_niss(self):
+        '''The XML downloaded from the warning is checked as the one of the report.'''
+        employee = self.create_employee([{
+            'name': 'Employee Without NISS',
+            'company_id': self.belgian_company.id,
+            'contract_date_start': date(2026, 1, 1),
+            'ip_wage_rate': .25,
+        }])
+        employee.niss = False
+        self.create_and_validate_payslips(employees=employee, year=2026, months=[1])
+
+        report = self._create_273_xx_report(year=2026, month='1')
+        with self.assertRaises(UserError):
+            report.action_generate_xml_and_download_data()
+        self.assertFalse(report.xml_file)
+
+    def test_generate_refuses_negative_amounts(self):
+        '''A month holding only the refund of a declared month cannot be declared: its amounts are negative.'''
+        employee = self.employee_john
+        payslip_jan = self._create_paid_payslip(employee, date(2026, 1, 1), date(2026, 1, 31))
+        report_jan = self._create_273_xx_report(year=2026, month='1', belcotax_reference='273XX-2026-01')
+        report_jan.action_populate()
+        report_jan.action_generate()
+        report_jan.action_mark_as_done()
+
+        payslip_jan.refund_sheet()
+        report_feb = self._create_273_xx_report(year=2026, month='2')
+        report_feb.action_populate()
+        self.assertTrue(report_feb.line_273S_ids)
+        with self.assertRaises(UserError) as e:
+            report_feb.action_generate()
+        # The error of the schema validation tells which element is invalid
+        self.assertIn("Element '", str(e.exception))
 
     def test_cancel_clears_data(self):
         '''action_cancel should clear files, unlink payslips, and set state to cancelled.'''
@@ -564,6 +669,31 @@ class TestL10nBe273Xx(TestPayrollCommon):
         employees_reported = rendering_data['beneficiaries']
         self.assertEqual(len(employees_reported), 3, "Report should include 3 employees from company 1-2-3")
 
+    def test_one_beneficiary_per_person_across_branches(self):
+        # The same person employed by a company and its branch is one beneficiary of the 273S
+        companies = self.multibranch_company[:2]
+        niss = self.generate_fake_niss()
+        employees = self.create_employee([
+            {
+                "name": f'Employee {company.name}',
+                "company_id": company.id,
+                'contract_date_start': date(2026, 1, 1),
+                'niss': niss,
+                'ip_wage_rate': .25,
+            } for company in companies
+        ])
+        payslips = self.create_and_validate_payslips(employees=employees, year=2026, months=[1])
+        income = sum(payslips.line_ids.filtered(lambda line: line.code == 'IP').mapped('total'))
+
+        report = self.env['l10n_be.273_xx'].with_company(companies[0]).create({
+            'year': 2026,
+            'month': '1',
+        })
+        report.action_populate()
+        beneficiaries = report._get_rendering_data()['declaration_273S']['beneficiaries']
+        self.assertEqual(len(beneficiaries), 1)
+        self.assertAlmostEqual(beneficiaries[0]['gross_amount'], income, 2)
+
     def test_declared_amounts_come_from_the_mapping_codes(self):
         employee = self.create_employee([{
             'name': 'Employee IP',
@@ -615,6 +745,66 @@ class TestL10nBe273Xx(TestPayrollCommon):
         self.assertNotEqual(rendering_data['declaration']['tax_amount'], 0)
         self.assertEqual(len(rendering_data['beneficiaries']), 1)
         self.assertAlmostEqual(rendering_data['beneficiaries'][0]['gross_amount'], 0, 2)
+
+    def test_declared_gross_amount_is_not_rounded(self):
+        # The gross amount is declared to the cent, the fixed costs, the taxable amount and the personal social
+        # contributions on the IP (deducted from the taxable amount without being a cost) add up to it.
+        employee = self.create_employee([{
+            'name': 'Employee IP Odd Cent',
+            'company_id': self.belgian_company.id,
+            'contract_date_start': date(2026, 1, 1),
+            'niss': self.generate_fake_niss(),
+            'ip_wage_rate': .25,
+        }])
+        payslips = self.create_and_validate_payslips(employees=employee, year=2026, months=[1])
+        payslips.line_ids.filtered(lambda line: line.code == 'IP').total = 1234.57
+
+        report = self._create_273_xx_report(year=2026, month='1')
+        report.action_populate()
+        declaration = report._get_rendering_data_273S()['declaration']
+
+        self.assertAlmostEqual(declaration['gross_amount'], 1234.57, 2)
+        ip_onss = sum(payslips.line_ids.filtered(lambda line: line.code == 'ONSS.NO.WT').mapped('total'))
+        self.assertEqual(
+            to_eurocent(declaration['deductable_costs']['fixed']) + to_eurocent(declaration['taxable_amount'])
+            + to_eurocent(ip_onss),
+            to_eurocent(declaration['gross_amount']))
+
+    def test_pdf_beneficiary_tax_amount_is_positive(self):
+        # The PDF shows the withholding tax of each beneficiary as a positive amount, as the XML
+        employee = self.create_employee([{
+            'name': 'Employee IP PDF',
+            'company_id': self.belgian_company.id,
+            'contract_date_start': date(2026, 1, 1),
+            'niss': self.generate_fake_niss(),
+            'ip_wage_rate': .25,
+        }])
+        payslips = self.create_and_validate_payslips(employees=employee, year=2026, months=[1])
+        withholding = -sum(payslips.line_ids.filtered(lambda line: line.code == 'IP.DED').mapped('total'))
+        self.assertGreater(withholding, 0)
+
+        report = self._create_273_xx_report(year=2026, month='1')
+        report.action_populate()
+        html = str(self.env['ir.actions.report']._render_qweb_html(
+            'l10n_be_hr_payroll.action_report_ip_273S', report.ids, data=report._get_rendering_data())[0])
+        self.assertFalse('-%.2f' % withholding in html, "The withholding tax should not be negative")
+        self.assertTrue('%.2f' % withholding in html, "The withholding tax should be shown")
+
+    def test_beneficiaries_sorted_by_postal_code_and_name(self):
+        employees = self.create_employee([{
+            'name': name,
+            'company_id': self.belgian_company.id,
+            'contract_date_start': date(2026, 1, 1),
+            'niss': self.generate_fake_niss(),
+            'ip_wage_rate': .25,
+            'private_zip': zip_code,
+        } for name, zip_code in [('Beneficiary C', '1000'), ('Beneficiary A', '2000'), ('Beneficiary B', '1000')]])
+        self.create_and_validate_payslips(employees=employees, year=2026, months=[1])
+
+        report = self._create_273_xx_report(year=2026, month='1')
+        report.action_populate()
+        beneficiaries = report._get_rendering_data_273S()['beneficiaries']
+        self.assertEqual([b['employee'] for b in beneficiaries], [employees[2], employees[0], employees[1]])
 
     def test_adding_a_mapping_code_reports_it_without_a_code_change(self):
         employee = self.create_employee([{

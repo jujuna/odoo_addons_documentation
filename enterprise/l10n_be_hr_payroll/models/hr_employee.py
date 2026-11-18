@@ -83,7 +83,7 @@ class HrEmployee(models.Model):
     bus_transport_employee_kilometer = fields.Integer(readonly=False, related="version_id.bus_transport_employee_kilometer", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_be_dimona_planned_start_time = fields.Float(readonly=False, related="version_id.l10n_be_dimona_planned_start_time", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_be_dimona_planned_end_time = fields.Float(readonly=False, related="version_id.l10n_be_dimona_planned_end_time", inherited=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_be_flexi_hourly_wage = fields.Monetary(readonly=False, related="version_id.l10n_be_flexi_hourly_wage", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_be_flexi_hourly_wage = fields.Float(readonly=False, related="version_id.l10n_be_flexi_hourly_wage", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_be_flexi_monthly_wage = fields.Monetary(readonly=False, related="version_id.l10n_be_flexi_monthly_wage", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     bus_transport_periodicity = fields.Selection(readonly=False, related="version_id.bus_transport_periodicity", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     tram_transport_employee_amount = fields.Monetary(readonly=False, related="version_id.tram_transport_employee_amount", inherited=True, groups="hr_payroll.group_hr_payroll_user")
@@ -363,7 +363,12 @@ class HrEmployee(models.Model):
         names = re.sub(r"\([^()]*\)", "", self.name or '').strip().split()
         return ' '.join(names[:-1]), names[-1] if names else ''
 
-    def _get_last_year_variable_revenues(self, date_from=None, excluded_codes=None):
+    def _get_last_year_variable_revenues(self, date_from=None, excluded_codes=None, included_codes=None):
+        """ The variable revenues of the 12 months before date_from
+
+            :param excluded_codes: codes of the variable revenues to leave out
+            :param included_codes: codes of other salary rules to add to the variable revenues
+        """
         self.ensure_one()
         date_from = date_from or self.env.context.get('variable_revenue_date_from')
         payslips = self.env['hr.payslip'].search([
@@ -372,7 +377,9 @@ class HrEmployee(models.Model):
             ('date_from', '>=', date_from + relativedelta(months=-12, day=1)),
             ('date_from', '<=', date_from + relativedelta(months=-1, day=31)),
         ], order="date_from asc")
-        variable_revenue_line_codes = {'COMMISSION', 'COMMISSION_ADV', 'COM_LOSS_PH', 'COM_LOSS_SICK', 'SIMPLE_VARIABLE', 'DOUBLE_VARIABLE'}
+        variable_revenue_line_codes = set(self.env['hr.payslip']._l10n_be_get_variable_revenue_codes())
+        if included_codes:
+            variable_revenue_line_codes |= set(included_codes)
         if excluded_codes:
             variable_revenue_line_codes -= excluded_codes
         line_values = payslips._get_line_values(variable_revenue_line_codes, compute_sum=True)
@@ -438,14 +445,7 @@ class HrEmployee(models.Model):
 
             if self.l10n_be_joint_committee_id.egov3_code == '999':
                 self.l10n_be_dimona_category = False
-                self.l10n_be_worker_code_id = False
                 self.l10n_be_egov3_code = '999'
-
-    @api.onchange('employee_type_id')
-    def _onchange_employee_type_id_worker_code(self):
-        if self.country_code == 'BE' and self.l10n_be_worker_code_id.employee_type_ids \
-                and self.employee_type_id not in self.l10n_be_worker_code_id.employee_type_ids:
-            self.l10n_be_worker_code_id = False
 
     @api.onchange('l10n_be_salary_scale_id')
     def _onchange_salary_scale_id(self):
@@ -506,6 +506,11 @@ class HrEmployee(models.Model):
         Return a message when the Dimona periods of the employee do not tile exactly the
         same date ranges as their contract versions, or when the category or the joint
         committee declared in a Dimona IN differs from the matching version one.
+
+        Only the time from the company first payrun date is compared: a company starting
+        on Odoo fetches the whole Dimona history from the ONSS but usually does not encode
+        the past contracts. Periods and contracts ended before that date are ignored and
+        the ones running at that date are compared from that date.
         """
         self.ensure_one()
         periods = self.l10n_be_dimona_relation_id.period_ids.sorted('date_start')
@@ -513,6 +518,13 @@ class HrEmployee(models.Model):
         versions_by_contract = self.version_ids.filtered('contract_date_start').sorted('date_version').grouped(
             lambda v: (v.contract_date_start, v.contract_date_end))
         contracts = sorted(versions_by_contract.items(), key=lambda item: item[0][0])
+        first_payrun_date = self.company_id.first_payrun_date
+        if first_payrun_date:
+            periods = periods.filtered(lambda p: not p.date_end or p.date_end >= first_payrun_date)
+            contracts = [
+                ((date_start, date_end), versions) for (date_start, date_end), versions in contracts
+                if not date_end or date_end >= first_payrun_date
+            ]
         if not periods:
             return ''
         period_index = version_index = 0
@@ -522,8 +534,9 @@ class HrEmployee(models.Model):
         while period_index < len(periods) and version_index < len(contracts):
             period = periods[period_index]
             (contract_date_start, contract_date_end), contract_versions = contracts[version_index]
-            period_start = period_start or period.date_start
-            version_start = version_start or contract_date_start
+            # Periods and contracts running at the first payrun date are compared from that date.
+            period_start = period_start or max(period.date_start, first_payrun_date or period.date_start)
+            version_start = version_start or max(contract_date_start, first_payrun_date or contract_date_start)
             # An open ended period may only be covered by an open ended contract and vice versa.
             if period_start != version_start or bool(period.date_end) != bool(contract_date_end):
                 break
@@ -533,7 +546,11 @@ class HrEmployee(models.Model):
                 features = (declaration.content or {}).get('dimonaIn', {}).get('features', {})
                 # The ONSS returns the worker type upper cased, unlike the version category.
                 wrong_category = wrong_category or (features.get('workerType') or '').lower() != version.l10n_be_dimona_category
-                wrong_committee = wrong_committee or features.get('jointCommissionNumber') != version.l10n_be_joint_committee_id.egov3_code
+                # Compared with what Odoo would declare: only some committees are declared as such, the others as "XXX".
+                # The Dimona declared before sent the committee code as is, which the ONSS may have kept.
+                egov3_code = (version.l10n_be_joint_committee_id.egov3_code or '').upper()
+                expected_committees = {version._l10n_be_dimona_joint_committee_number(), egov3_code, egov3_code.split('.')[0]} - {''}
+                wrong_committee = wrong_committee or (features.get('jointCommissionNumber') or '').upper() not in expected_committees
             if period.date_end == contract_date_end:
                 # Both sides end together, jump to the next pair.
                 period_index += 1
@@ -883,9 +900,7 @@ class HrEmployee(models.Model):
         if not self.children:
             self.disabled_children_number = 0
 
-    @api.onchange('transport_mode_car', 'private_car_employee_kilometer', 'train_transport_employee_kilometer',
-        'bus_transport_employee_amount', 'tram_transport_employee_amount', 'metro_transport_employee_amount',
-        'bike_transport_employee_kilometer', 'new_bike')
+    @api.onchange('bus_transport_employee_amount', 'tram_transport_employee_amount', 'metro_transport_employee_amount')
     def _onchange_transport_mode(self):
         self.version_id._onchange_transport_mode()
 
@@ -909,7 +924,7 @@ class HrEmployee(models.Model):
         self.ensure_one()
         versions = super()._get_first_versions(date_limit)
         return versions.filtered(
-            lambda v: v.company_id.country_id.code != 'BE' or (v.company_id.country_id.code == 'BE' and not v.is_PFI())
+            lambda v: v.company_id.country_id.code != 'BE' or (v.company_id.country_id.code == 'BE' and not v.is_PFI() and v.contract_date_start)
         )
 
     def _create_public_holiday_allocations(self):
@@ -948,10 +963,19 @@ class HrEmployee(models.Model):
             ('public_holiday_id', 'in', public_holidays.ids),
         ])
         existing_pairs = {(rec.employee_id.id, rec.public_holiday_id.id) for rec in existing_allocations}
+        # The public holidays already compensated for the other employees (generate allocations wizard)
+        generated_holidays = self.env['hr.leave.allocation'].search([
+            ('public_holiday_id', 'in', public_holidays.ids),
+        ]).public_holiday_id
         allocations_vals = []
+        current_year = fields.Date.context_today(self).year
 
         for employee in eligible_employees:
             company_tz = ZoneInfo(employee.company_id.tz or self.env.user.tz or 'UTC')
+            # The public holidays of the year, or of the year the contract starts in if later (an employee
+            # hired from next January): the ones of the following years are compensated with the generate
+            # allocations wizard, once they are generated for the other employees too.
+            last_year = max([current_year] + [d.year for d in employee.version_ids.mapped('contract_date_start') if d])
             for leave in public_holidays:
                 if (employee.id, leave.id) in existing_pairs:
                     continue
@@ -960,6 +984,8 @@ class HrEmployee(models.Model):
 
                 leave_date_from = leave.date_from.astimezone(company_tz).date()
                 leave_date_to = leave.date_to.astimezone(company_tz).date()
+                if leave_date_to.year > last_year and leave not in generated_holidays:
+                    continue
 
                 employee_days = 0
                 for version in employee.version_ids.filtered('contract_date_start'):
@@ -1150,19 +1176,29 @@ class HrEmployee(models.Model):
             attest_worked_days = occ_versions._get_l10n_be_holiday_attest_worked_days(
                 occupation_start, occupation_end
             )
+            reference_calendar = base_version._get_reference_calendar()
             occupations.append({
                 'date_start': occupation_start,
                 'date_end': occupation_end,
                 'hours_per_week': float_round(base_version.resource_calendar_id.hours_per_week, 2),
                 'days_per_week': float_round(base_version.resource_calendar_id.days_per_week, 2),
-                'reference_hours_per_week': float_round(base_version.reference_calendar_id.hours_per_week, 2) if base_version.reference_calendar_id else 0,
+                'reference_hours_per_week': float_round(reference_calendar.hours_per_week, 2) if reference_calendar else 0,
                 'equivalent_days': attest_worked_days['equivalent_days'],
                 'senior_youth_leaves': attest_worked_days['senior_youth_leaves'],
                 'european_leaves': attest_worked_days['european_leaves'],
                 'paid_leaves': attest_worked_days['paid_leaves'],
+                'postponed_leaves': attest_worked_days['postponed_leaves'],
                 'non_equivalent_days': attest_worked_days['non_equivalent_days'],
                 'european_leaves_amount': attest_worked_days['european_leaves_amount']
             })
+        # Legal leave days covered by a previous employer's attestation (exercise year - 1) are
+        # consumed first, in date order, like the simple holiday pay recovery (HolPayRec).
+        attest_days_left = sum(
+            self.l10n_be_holiday_attest_ids.filtered(lambda a: a.year == year - 1).mapped("prev_days_earned"),
+        )
+        for occupation in occupations:
+            occupation["attest_paid_leaves"] = min(occupation["paid_leaves"], attest_days_left)
+            attest_days_left -= occupation["attest_paid_leaves"]
         return occupations
 
     def _l10n_be_get_last_year_average_variable_revenues(self, date_from):
@@ -1182,7 +1218,11 @@ class HrEmployee(models.Model):
             ('date_from', '>=', date_from + relativedelta(months=-12, day=1)),
             ('date_from', '<=', date_from + relativedelta(months=-1, day=31)),
         ], order="date_from asc")
-        variable_codes = ['COMMISSION', 'COMMISSION_ADV', 'SIMPLE_VARIABLE', 'DOUBLE_VARIABLE']
+        # the loss on commission on public holidays and sickness is not part of it
+        variable_codes = [
+            code for code in self.env['hr.payslip']._l10n_be_get_variable_revenue_codes()
+            if code not in ('COM_LOSS_PH', 'COM_LOSS_SICK')
+        ]
         line_values = payslips._get_line_values(variable_codes, compute_sum=True)
         total_amount = sum(line_values[code]['sum']['total'] for code in variable_codes)
         return total_amount / number_of_month if number_of_month else 0
@@ -1332,13 +1372,18 @@ class HrEmployee(models.Model):
         equivalent_worked_days = payslips_n1.worked_days_line_ids.filtered(
             lambda wd: not wd.is_paid and wd.code not in excluded_codes
         )
-        fictitious_remuneration_base = 0.0
+        fictitious_remuneration = 0.0
         for version, worked_days in equivalent_worked_days.grouped('version_id').items():
             days = sum(worked_days.mapped('number_of_days'))
-            fixed_monthly_salary = version._get_contract_wage()
-            fictitious_remuneration_base += days * (fixed_monthly_salary + variable_monthly_salary)
+            # the daily wage of the employee's own week (days a week, hourly wage), as l10n_be_daily_wage
+            days_per_week = version._l10n_be_get_days_per_week() or 5
+            if version.wage_type == 'hourly':
+                daily_wage = version.hourly_wage * version.resource_calendar_id.hours_per_day
+            else:
+                daily_wage = version._get_contract_wage() * 3 / 13 / days_per_week
+            fictitious_remuneration += days * (daily_wage + variable_monthly_salary * 3 / 13 / days_per_week)
 
-        return fictitious_remuneration_base * 3 / 13 / 5
+        return fictitious_remuneration
 
     def _get_payslips_for_year(self, reference_year, struct_codes):
         """
@@ -1362,19 +1407,22 @@ class HrEmployee(models.Model):
 
     def _get_average_rd_percentage(self, structure_code, use_date) -> float:
         """
-            Calculate average rd_percentage to use on 'date' based on the pay type (structure_code)
-
-            it's the weighted average of rd_percentage over
-            all versions in the concerned interval of time
-            interval depends on the structure
-            End Of Year Bonus, BeholN -> current year versions
-            Double Holiday, BeholN1 -> previous year versions
-            Termination -> ytd versions
+            The research share (rd_percentage) the research exemptions (274.32 / 33 / 34) apply to the withholding
+            tax of a pay type (structure_code), paid on ``use_date``: the average of the shares of the versions over
+            the period the pay is attached to, weighted by their days
+            - the bonuses (year-end premium BETHIRTEEN, warrants BEWARRANT, the bonuses of the monthly payslip) and
+              the exit holiday pay of the year (BEHOLN): the current year, until the departure (the period of
+              occupation of the year for a worker entered or left during the year);
+            - the double holiday pay (BEDOUBLE) and the exit holiday pay of the previous year (BEHOLN1): the
+              previous year, the period worked in it when incomplete, no exemption without service in it;
+            - the termination indemnity (BETERM): the twelve months before the departure (the period in service
+              when shorter);
+            - the salary: the share of the version of the month.
         """
         if not use_date:
             use_date = date.today()
 
-        if structure_code in ['BETHIRTEEN', 'BEHOLN']:
+        if structure_code in ['BETHIRTEEN', 'BEWARRANT', 'BEHOLN']:
             interval_start = date(use_date.year, 1, 1)
             interval_end = min(date(use_date.year, 12, 31), self.departure_date or date.max)
         elif structure_code in ['BEDOUBLE', 'BEHOLN1']:
@@ -1382,7 +1430,7 @@ class HrEmployee(models.Model):
             interval_end = date(use_date.year - 1, 12, 31)
         elif structure_code in ['BETERM']:
             departure_date = self.departure_date or use_date
-            interval_start = departure_date - relativedelta(years=1)
+            interval_start = departure_date - relativedelta(years=1) + relativedelta(days=1)
             interval_end = departure_date
         else:
             return self._get_version(use_date).rd_percentage
@@ -1391,6 +1439,7 @@ class HrEmployee(models.Model):
             lambda v: v.date_start
                 and v.date_start <= interval_end
                 and (not v.date_end or v.date_end >= interval_start)
+                and v.l10n_be_joint_committee_id.egov3_code != '999',
         )
 
         total_weight = 0.0
@@ -1470,6 +1519,12 @@ class HrEmployee(models.Model):
             ],
             'context': {'default_employee_id': self.id},
         }
+
+    def action_generate_termination_last_payslip(self):
+        self.ensure_one()
+        if not self.departure_id:
+            raise UserError(self.env._("You can't generate a last payslip for an employee without a departure."))
+        return self.departure_id.action_generate_termination_last_payslip()
 
     def action_generate_termination_payslip(self):
         self.ensure_one()
@@ -1585,12 +1640,11 @@ class HrEmployee(models.Model):
                         "l10n_be_company_seniority_months", "l10n_be_egov3_code"])
             res.one("l10n_be_salary_scale_id", ["name"])
 
-    @api.depends('company_id', 'company_id.l10n_be_dimona_environment')
+    @api.depends('company_id')
     def _compute_show_dimona_button(self):
         is_dev = self.env.user.has_group('base.group_no_one')
-        is_sandbox = self.company_id.l10n_be_dimona_environment == 'sandbox'
         for record in self:
-            record.show_dimona_button = is_dev or is_sandbox
+            record.show_dimona_button = is_dev or record.company_id.root_id.l10n_be_dimona_environment == 'sandbox'
 
     def _compute_l10n_be_long_sick_leave(self):
         matching_employees = self._get_l10n_be_versions_on_mutual_health()
@@ -1632,6 +1686,12 @@ class HrEmployee(models.Model):
 
     def _get_l10n_be_mobility_budget_amount_prorated(self, reference_date=None, year=None):
         """
+        The yearly mobility budget prorated to the calendar days of participation in the mobility budget system in
+        the year (art. 8, § 1, L 17.03.2019, circular 2024/C/16 n° 61-62): the sum over the versions with a mobility
+        budget of their yearly budget times their days in the year (bounded by the contract and the departure) over
+        the days of the year. It is the budget the worker is entitled to in the year, declared in zone 2134 of the
+        281.10 (box 13 f)) and of the 281.20 (box 19 b)).
+
         reference_date: if earlier than the end of the year, the last version is assumed to end at this date.
         year: year for which the prorated mobility budget is calculated. Defaults to the current year.
         """
@@ -1711,6 +1771,27 @@ class HrEmployee(models.Model):
             monthly_amounts[employee_id, payslip_date.year, payslip_date.month] += pillar_2_amount + pillar_3_amount
 
         return yearly_amounts, monthly_amounts
+
+    @api.model
+    def _get_employees_allocation_warning(self, reference_year):
+        """ The employees whose paid time off allocation of `reference_year` + 1 differs from the expected one,
+        once the December pay run of `reference_year` is closed. """
+        belgian_companies = self.env.companies.filtered(lambda c: c.country_id.code == 'BE')
+        is_december_run_done = bool(self.env['hr.payslip.run'].search_count([
+            ('company_id', 'in', belgian_companies.ids),
+            ('date_start', '<=', date(reference_year, 12, 31)),
+            ('date_end', '>=', date(reference_year, 12, 1)),
+            ('state', 'in', ('02_close', '03_paid')),
+        ]))
+        warning_records = self.env['hr.employee']
+        if is_december_run_done:
+            wizard = self.env['hr.payroll.alloc.paid.leave'].new({'year': str(reference_year)})
+            for employee, data in wizard._get_allocation_data().items():
+                expected_allocation = data.get('expected_paid_time_off_to_allocate', 0)
+                already_allocated = data.get('already_allocated_paid_time_off', 0)
+                if float_compare(expected_allocation, already_allocated, precision_digits=2) != 0:
+                    warning_records |= employee
+        return warning_records
 
 
 class HrEmployeePublic(models.Model):

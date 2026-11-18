@@ -5,10 +5,6 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-// Mirrors PROVISIONING_URI_SCHEME in voip/tools/linphone.py: the scheme
-// liblinphone claims so that following a link applies a provisioning document.
-const PROVISIONING_URI_SCHEME = "linphone-config:";
-
 const ROTATED_NOTIFICATION = "voip.linphone_provisioning/rotated";
 
 export class VoipLinphoneProvisioningQrCodeField extends Component {
@@ -38,9 +34,7 @@ export class VoipLinphoneProvisioningQrCodeField extends Component {
 
     /** Only where an installed Linphone can claim the scheme. */
     get deepLink() {
-        return isMobileOS()
-            ? `${PROVISIONING_URI_SCHEME}${this.value(this.props.urlField)}`
-            : false;
+        return isMobileOS() ? `linphone-config:${this.value(this.props.urlField)}` : false;
     }
 
     value(fieldName) {
@@ -64,6 +58,7 @@ export const voipLinphoneProvisioningQrCodeField = {
     component: VoipLinphoneProvisioningQrCodeField,
     displayName: _t("Linphone Provisioning QR Code"),
     supportedTypes: ["char"],
+    fieldDependencies: ({ options }) => [{ name: options.url_field, type: "char" }],
     supportedOptions: [
         {
             label: _t("Size"),

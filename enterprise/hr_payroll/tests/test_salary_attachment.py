@@ -53,9 +53,6 @@ class TestSalaryAttachment(TestPayslipBase):
 
     @freeze_time('2027-01-01')
     def test_attachment_inputs_with_same_code(self):
-        # Per-structure code unicity on hr.salary.rule means two attachments targeting the
-        # same rule now aggregate into a SINGLE payslip input line (was multiple lines per
-        # distinct input.type pre-refactor).
         attach_rule = self.env['hr.salary.rule'].create({
             'name': 'Allowance Attachment',
             'sequence': 99,
@@ -88,12 +85,114 @@ class TestSalaryAttachment(TestPayslipBase):
             date(2027, 1, 31)
         )
 
-        self.assertRecordValues(payslip.input_line_ids, [
-            {"code": "ALW.ATT", "salary_rule_id": attach_rule.id, "amount": 150},
-        ])
+        self.assertEqual(len(payslip.input_line_ids), 2)
+        self.assertCountEqual(payslip.input_line_ids.mapped('amount'), [100, 50])
+        self.assertCountEqual(payslip.input_line_ids.mapped('name'), ['Test Attachment 1', 'Test Attachment 2'])
+        attachment_lines = payslip.line_ids.filtered(lambda line: line.code == 'ALW.ATT')
+        self.assertEqual(len(attachment_lines), 2)
+        self.assertCountEqual(attachment_lines.mapped('total'), [100, 50])
+        self.assertCountEqual(
+            attachment_lines.mapped('name'),
+            ['Allowance Attachment - Test Attachment 1', 'Allowance Attachment - Test Attachment 2'],
+        )
         self.assertRecordValues(payslip.salary_attachment_ids, [
             {"salary_rule_id": attach_rule.id, "paid_amount": 100},
             {"salary_rule_id": attach_rule.id, "paid_amount": 50},
+        ])
+
+    @freeze_time('2027-01-01')
+    def test_attachment_input_without_payslip_description(self):
+        attachment = self.env['hr.salary.attachment'].create({
+            'employee_id': self.toto.id,
+            'salary_rule_id': self.attachement_type.id,
+            'date_start': date(2027, 1, 1),
+            'amount': 100,
+        })
+        payslip = self.action_pay_payslip(self.toto, date(2027, 1, 1), date(2027, 1, 31))
+        line = payslip.line_ids.filtered(lambda payslip_line: payslip_line.salary_rule_id == attachment.salary_rule_id)
+        self.assertEqual(line.name, attachment.salary_rule_id.name)
+
+    @freeze_time('2027-01-01')
+    def test_attachment_payslip_description_not_duplicated(self):
+        attachment = self.env['hr.salary.attachment'].create({
+            'employee_id': self.toto.id,
+            'description': 'Court order',
+            'salary_rule_id': self.attachement_type.id,
+            'date_start': date(2027, 1, 1),
+            'amount': 100,
+        })
+        payslip = self.action_pay_payslip(self.toto, date(2027, 1, 1), date(2027, 1, 31))
+        line = payslip.line_ids.filtered(lambda payslip_line: payslip_line.salary_rule_id == attachment.salary_rule_id)
+        self.assertEqual(line.name, f'{attachment.salary_rule_id.name} - {attachment.description}')
+
+    @freeze_time('2027-01-01')
+    def test_input_default_name_not_in_line_name(self):
+        # An input keeping the default name of its rule is not a payslip description
+        self.attachement_type.write({
+            'input_name': 'Seized amount',
+            'amount_python_compute': f"result = -inputs['{self.attachement_type.code}'].amount",
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.toto.id,
+            'date_from': date(2027, 1, 1),
+            'date_to': date(2027, 1, 31),
+            'input_line_ids': [Command.create({'salary_rule_id': self.attachement_type.id, 'amount': 100})],
+        })
+        self.assertEqual(payslip.input_line_ids.name, 'Seized amount')
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda payslip_line: payslip_line.salary_rule_id == self.attachement_type)
+        self.assertEqual(line.name, self.attachement_type.name)
+
+    @freeze_time('2027-01-01')
+    def test_ytd_of_several_attachment_lines(self):
+        # One line per attachment, each with a cumulative YTD: the YTD of the next payslip
+        # starts from the YTD of the code, not from the sum of the YTD of its lines
+        self.env['hr.salary.attachment'].create([{
+            'employee_id': self.toto.id,
+            'description': description,
+            'salary_rule_id': self.attachement_type.id,
+            'date_start': date(2027, 1, 1),
+            'amount': amount,
+            'is_recurring': True,
+        } for description, amount in (('First adjustment', 100), ('Second adjustment', 50))])
+        january = self.action_pay_payslip(self.toto, date(2027, 1, 1), date(2027, 1, 31))
+        january_lines = january.line_ids.filtered(lambda line: line.code == self.attachement_type.code).sorted('id')
+        self.assertEqual(january_lines.mapped('ytd'), [-100, -150])
+
+        february = self.env['hr.payslip'].create({
+            'employee_id': self.toto.id,
+            'date_from': date(2027, 2, 1),
+            'date_to': date(2027, 2, 28),
+        })
+        february.compute_sheet()
+        february_lines = february.line_ids.filtered(lambda line: line.code == self.attachement_type.code).sorted('id')
+        self.assertEqual(february_lines.mapped('ytd'), [-250, -300])
+
+    @freeze_time('2027-01-01')
+    def test_manual_edit_of_one_attachment_line(self):
+        self.env['hr.salary.attachment'].create([{
+            'employee_id': self.toto.id,
+            'description': description,
+            'salary_rule_id': self.attachement_type.id,
+            'date_start': date(2027, 1, 1),
+            'amount': amount,
+        } for description, amount in (('First adjustment', 100), ('Second adjustment', 300))])
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.toto.id,
+            'date_from': date(2027, 1, 1),
+            'date_to': date(2027, 1, 31),
+        })
+        payslip.compute_sheet()
+
+        def attachment_lines():
+            return payslip.line_ids.filtered(lambda line: line.code == self.attachement_type.code).sorted('id')
+
+        payslip.write({'line_ids': [Command.update(attachment_lines()[1].id, {'name': 'Renamed second'})]})
+        # The lines are recreated on each manual edit, the previous edit of the other line must stick
+        payslip.write({'line_ids': [Command.update(attachment_lines()[0].id, {'name': 'Renamed first', 'amount': -40})]})
+        self.assertRecordValues(attachment_lines(), [
+            {'name': 'Renamed first', 'total': -40, 'manually_modified': True},
+            {'name': 'Renamed second', 'total': -300, 'manually_modified': False},
         ])
 
     def test_salary_adjustment_multi_wizard(self):
@@ -224,6 +323,13 @@ class TestSalaryAttachment(TestPayslipBase):
         with self.assertRaises(UserError, msg='Should raise error when trying to pay more than remaining'):
             payslip2.action_payslip_paid()
 
+    def _set_attachment_inputs_total(self, payslip, total):
+        """Put ``total`` on the first input of the attachments (one input per attachment), the others at 0."""
+        first_input, *other_inputs = payslip.input_line_ids.filtered(lambda l: l.code == self.attachement_type.code)
+        first_input.amount = total
+        for input_line in other_inputs:
+            input_line.amount = 0
+
     @freeze_time('2027-01-01')
     def test_attachments_priority_a_eq_b(self):
         """Test two non-recurring attachments with same priority are paid pro-rata"""
@@ -252,9 +358,8 @@ class TestSalaryAttachment(TestPayslipBase):
             'employee_id': self.toto.id
         })
         payslip.compute_sheet()
-        # Manually set amount to 600
-        input_line = payslip.input_line_ids.filtered(lambda l: l.code == self.attachement_type.code)
-        input_line.amount = 600
+        # Manually set the total amount to 600
+        self._set_attachment_inputs_total(payslip, 600)
         payslip.compute_sheet()
         payslip.action_payslip_done()
         payslip.action_payslip_paid()
@@ -298,8 +403,7 @@ class TestSalaryAttachment(TestPayslipBase):
             'employee_id': self.toto.id
         })
         payslip.compute_sheet()
-        input_line = payslip.input_line_ids.filtered(lambda l: l.code == self.attachement_type.code)
-        input_line.amount = 300
+        self._set_attachment_inputs_total(payslip, 300)
         payslip.compute_sheet()
         payslip.action_payslip_done()
         payslip.action_payslip_paid()
@@ -337,8 +441,7 @@ class TestSalaryAttachment(TestPayslipBase):
             'employee_id': self.toto.id
         })
         payslip.compute_sheet()
-        input_line = payslip.input_line_ids.filtered(lambda l: l.code == self.attachement_type.code)
-        input_line.amount = 800
+        self._set_attachment_inputs_total(payslip, 800)
         payslip.compute_sheet()
         payslip.action_payslip_done()
         payslip.action_payslip_paid()
@@ -389,8 +492,7 @@ class TestSalaryAttachment(TestPayslipBase):
             'employee_id': self.toto.id
         })
         payslip.compute_sheet()
-        input_line = payslip.input_line_ids.filtered(lambda l: l.code == self.attachement_type.code)
-        input_line.amount = 1000
+        self._set_attachment_inputs_total(payslip, 1000)
         payslip.compute_sheet()
         payslip.action_payslip_done()
         payslip.action_payslip_paid()

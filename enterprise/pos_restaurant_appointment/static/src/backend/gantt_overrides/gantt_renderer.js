@@ -24,26 +24,4 @@ patch(POSAppointmentBookingGanttRenderer.prototype, {
             )
         );
     },
-    popoverButtons(record) {
-        const buttons = super.popoverButtons(record);
-        buttons.forEach((btn) => {
-            if (btn.type === "check_in") {
-                btn.onClick = async () => {
-                    await this._updateAppointmentStatus(record, "attended");
-                    if (!posmodel || record.appointment_type_schedule_based_on !== "resources") {
-                        return;
-                    }
-                    const resources = await this.orm.read(
-                        "appointment.resource",
-                        record.resource_ids,
-                        ["display_name"]
-                    );
-                    posmodel.showResourceAssignNotification(record, resources, {
-                        viewMode: "gantt",
-                    });
-                };
-            }
-        });
-        return buttons;
-    },
 });

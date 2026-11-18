@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import codecs
 import csv
 import itertools
 import zipfile
@@ -119,13 +120,13 @@ class TestDatevCSV(AccountTestInvoicingCommon):
                     'tax_ids': [(6, 0, self.tax_19.ids)],
                 }),
                 (0, None, {
-                    'name': 'Line Number 2',
+                    'name': 'The line name will be used for "Buchungstext". It should be trimmed to 60 characters',
                     'price_unit': 100,
                     'account_id': self.account_3400.id,
                     'tax_ids': [],
                 }),
                 (0, None, {
-                    'name': 'Line Number 3',
+                    'name': '"Buchungstext" should\nnot contain new line',
                     'price_unit': 100,
                     'account_id': self.account_4980.id,
                     'tax_ids': [(6, 0, self.tax_19.ids)],
@@ -136,7 +137,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.line_ids.flush_recordset()
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -144,9 +145,9 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         self.assertIn(['119,00', 'S', 'EUR', '34000000', str(move.partner_id.id + 700000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[0].name], data)
         self.assertIn(['100,00', 'S', 'EUR', '34000000', str(move.partner_id.id + 700000000),
-                       '', '112', move.name, move.invoice_line_ids[1].name], data)
+                       '', '112', move.name, move.invoice_line_ids[1].name[:60]], data)
         self.assertIn(['119,00', 'S', 'EUR', '49800000', str(move.partner_id.id + 700000000),
-                       self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[2].name], data)
+                       self.tax_19.l10n_de_datev_code, '112', move.name, '"Buchungstext" should not contain new line'], data)
 
     def test_datev_in_receipt(self):
         report = self.env.ref('account_reports.general_ledger_report')
@@ -186,7 +187,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
 
         account = move.l10n_de_datev_main_account_id
         with zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r') as zf:
-            reader = csv.reader(TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8"), delimiter=';', quotechar='"', quoting=2)
+            reader = csv.reader(TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig"), delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:][::-1]
         self.assertCountEqual([
             ['119,00', 'S', 'EUR', '34000000', str(account.code).ljust(8, '0'), self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[0].name],
@@ -218,7 +219,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.line_ids.flush_recordset()
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -258,7 +259,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.line_ids.flush_recordset()
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -296,7 +297,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         debit_account_code = str(pay.payment_method_line_id.payment_account_id.code).ljust(8, '0')
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -340,7 +341,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
         self.addCleanup(zf.close)
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.assertEqual(2, len(data), "csv should have 2 lines")
@@ -380,7 +381,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
 
         credit_account_code = str(pay.payment_method_line_id.payment_account_id.code).ljust(8, '0')
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -416,7 +417,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
         self.addCleanup(zf.close)
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[9], x[10], x[13]] for x in reader][2:]
         self.assertIn(['100,00', 'H', 'EUR', suspense_account_code, bank_account_code, '101',
@@ -464,7 +465,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         self.env.flush_all()
         file_dict = self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)
         zf = zipfile.ZipFile(BytesIO(file_dict['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -523,7 +524,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.line_ids.flush_recordset()
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -588,7 +589,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.action_post()
 
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[9], x[10], x[13]] for x in reader][2:]
         self.addCleanup(zf.close)
@@ -623,7 +624,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         self.env.flush_all()
         zf = zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r')
         self.addCleanup(zf.close)
-        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8")
+        f = TextIOWrapper(zf.open('EXTF_accounting_entries.csv'), "utf-8-sig")
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = list(reader)
         self.assertEqual(7, len(data), "csv should have 5 (+2 header) lines")
@@ -669,7 +670,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         move.action_post()
 
         with zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r') as zf, \
-                TextIOWrapper(zf.open('EXTF_customer_accounts.csv'), 'utf-8') as f:
+                TextIOWrapper(zf.open('EXTF_customer_accounts.csv'), 'utf-8-sig') as f:
             reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
             # first 2 rows are just headers and needn't be validated
             # first 2 columns are 'account' and 'name' and they are irrelevant to this test
@@ -692,6 +693,19 @@ class TestDatevCSV(AccountTestInvoicingCommon):
                     ["", "", "", "", "2", "", "BE", "0897223670", "CH"],
                 ],
             )
+
+    def test_datev_csv_utf8_bom(self):
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options({})
+        options['date'].update({
+            'date_from': '2020-01-01',
+            'date_to': '2020-12-31',
+        })
+        self._create_invoice_one_line(price_unit=100, invoice_date='2020-12-01', post=True)
+
+        with zipfile.ZipFile(BytesIO(self.env[report.custom_handler_model_name].l10n_de_datev_export_to_zip(options)['file_content']), 'r') as zf:
+            for file_name in ('EXTF_accounting_entries.csv', 'EXTF_customer_accounts.csv', 'EXTF_vendor_accounts.csv'):
+                self.assertTrue(zf.read(file_name).startswith(codecs.BOM_UTF8), file_name)
 
     def test_datev_out_invoice_payment_epd_rounding(self):
         ''' Test epd rounding error correction is applied also when exporting

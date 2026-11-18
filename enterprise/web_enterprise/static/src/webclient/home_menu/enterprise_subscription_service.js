@@ -103,7 +103,7 @@ export class SubscriptionManager {
         } else if (expirationDate !== oldDate) {
             this.lastRequestStatus = "success";
             this.expirationDate = deserializeDateTime(expirationDate);
-            if (this.daysLeft > 30) {
+            if (this.daysLeft > 31) {
                 this.notification.add(
                     _t(
                         "Thank you, your registration was successful! Your database is valid until %s.",

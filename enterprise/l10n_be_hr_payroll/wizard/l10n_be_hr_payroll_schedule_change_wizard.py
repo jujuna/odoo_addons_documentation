@@ -58,10 +58,12 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
     adapt_allocation = fields.Boolean(default=True)
     adapt_wage = fields.Boolean(default=True)
 
-    @api.depends('employee_id.resource_calendar_id.reference_calendar_id', 'structure_type_id.default_resource_calendar_id')
+    @api.depends('version_id.resource_calendar_id.reference_calendar_id', 'version_id.company_id.resource_calendar_id',
+                 'structure_type_id.default_resource_calendar_id')
     def _compute_full_resource_calendar_id(self):
         for wizard in self:
-            wizard.full_resource_calendar_id = wizard.employee_id.resource_calendar_id.reference_calendar_id or wizard.structure_type_id.default_resource_calendar_id
+            reference_calendar = wizard.version_id._get_reference_calendar() if wizard.version_id else False
+            wizard.full_resource_calendar_id = reference_calendar or wizard.structure_type_id.default_resource_calendar_id
 
     @api.depends('version_id', 'resource_calendar_id', 'date_start', 'date_end')
     def _compute_wages(self):
@@ -115,13 +117,13 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
                 'year': str(date_start.year - 1),
                 'employee_ids': leave_allocation.employee_id,
             })
-        if paid_leave_wizard.alloc_employee_ids:
-            alloc_employee = paid_leave_wizard.alloc_employee_ids[0]
-            new_allocation = max(0, alloc_employee.expected_paid_time_off_to_allocate - leave_allocation.leaves_taken)
-            new_allocation_hours = max(0, alloc_employee.expected_hours_to_allocate - leave_allocation.l10n_be_hours_taken)
-        else:
-            new_allocation = 0
-            new_allocation_hours = 0
+        alloc_employee = paid_leave_wizard.alloc_employee_ids[:1]
+        if not alloc_employee.expected_hours_to_allocate:
+            # No previous year to simulate (e.g. hired this year, with the days of the previous employer's
+            # certificate): an increase of the schedule keeps the allocation
+            return leave_allocation.number_of_days, leave_allocation.number_of_hours
+        new_allocation = max(0, alloc_employee.expected_paid_time_off_to_allocate - leave_allocation.leaves_taken)
+        new_allocation_hours = max(0, alloc_employee.expected_hours_to_allocate - leave_allocation.l10n_be_hours_taken)
 
         # There is a maximum that we should never pass, in theory we should never pass that limit
         # since we round down, but since the payroll officer will not be able to modify this values
@@ -143,6 +145,7 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
                 wizard.resource_calendar_id, date_start,
             )
 
+    @api.depends('version_id', 'date_start')
     def _compute_leave_allocation_id(self):
         employee_ids = self.version_id.employee_id.ids
         allocations = self.env["hr.leave.allocation"].search([
@@ -150,13 +153,15 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
             ("work_entry_type_id.country_code", "=", "BE"),
             ("employee_id", "in", employee_ids),
             ("state", "=", "validate"),
-        ], order="id")
+        ], order="date_from desc, id desc")
         allocations_by_employee = allocations.grouped("employee_id")
         for wizard in self:
+            # the allocation of the paid time off covering the start of the new schedule
+            date_start = wizard.date_start or fields.Date.today()
             allocation = allocations_by_employee.get(
                 wizard.version_id.employee_id,
                 self.env["hr.leave.allocation"],
-            )[:1]
+            ).filtered(lambda a: a.date_from <= date_start and (not a.date_to or a.date_to >= date_start))[:1]
 
             wizard.leave_allocation_id = allocation
             wizard.initial_time_off_allocation = allocation.number_of_days if allocation else 0
@@ -232,6 +237,11 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
 
     def action_validate(self):
         self.ensure_one()
+        if self.resource_calendar_id and self.resource_calendar_id._is_fully_flexible():
+            # A Belgian contract needs the hours of its schedule (_check_hours_per_week_required): no wage to propose
+            raise ValidationError(self.env._(
+                "The working schedule %(calendar)s is Undefined without any hours: set its 'Hours Per Week' "
+                "before changing the schedule of the employee.", calendar=self.resource_calendar_id.name))
         if self.date_end and self.date_start > self.date_end:
             raise ValidationError(self.env._('Start date must be earlier than end date.'))
         if self.date_start < self.version_id.contract_date_start:

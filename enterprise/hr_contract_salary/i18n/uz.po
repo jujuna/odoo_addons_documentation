@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-09-18 01:12+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
@@ -113,15 +113,14 @@ msgstr ""
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer
-#, fuzzy
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -138,42 +137,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <h2>Tabriklaymiz!</h2>\n"
-"    Quyidagi havolani bosish orqali o‘z ish haqi paketingizni sozlashingiz "
-"mumkin.<br/>\n"
-"    <t t-if=\"ctx.get('validity_end')\">\n"
-"        Havola <t t-out=\"ctx.get('validity_end')\"/> sanasigacha amal "
-"qiladi. </t>\n"
-"    <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"        <a t-att-href=\"'/salary_package/simulation/offer/%s%s' % (\n"
-"            ctx.get('offer_id'),\n"
-"            ('?token=' + ctx.get('access_token')) if ctx.get('access_token') "
-"else ''\n"
-"        )\" target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"            Paketingizni sozlash\n"
-"        </a>\n"
-"    </div>\n"
-"</div>"
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -192,7 +171,7 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
@@ -265,8 +244,8 @@ msgid ""
 "<span class=\"o_stat_value\">New</span>\n"
 "                        <span class=\"o_stat_text\">Offers</span>"
 msgstr ""
-"<span class=\"o_stat_value\">Yangi</span> <span class=\"o_stat_text\">"
-"Takliflar</span>"
+"<span class=\"o_stat_value\">Yangi</span> <span "
+"class=\"o_stat_text\">Takliflar</span>"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_thank_you
@@ -1031,9 +1010,9 @@ msgid ""
 "regarding the benefit."
 msgstr ""
 "Tizim yangi faoliyatni qachon yaratishini belgilang: - Imtiyoz "
-"o‘rnatilganda: Xodim imtiyozni birinchi marta olganida bir martalik "
-"yaratish - Imtiyoz o‘zgartirilganda: Imtiyozga oid har bir o‘zgarish uchun "
-"faoliyat yaratiladi."
+"o‘rnatilganda: Xodim imtiyozni birinchi marta olganida bir martalik yaratish "
+"- Imtiyoz o‘zgartirilganda: Imtiyozga oid har bir o‘zgarish uchun faoliyat "
+"yaratiladi."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__sign_frenquency
@@ -1767,6 +1746,11 @@ msgid "Job Title"
 msgstr "Ish o‘rni nomi"
 
 #. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
 #, fuzzy
 msgid "Languages"
@@ -2269,8 +2253,8 @@ msgid ""
 "<br><br>"
 msgstr ""
 "Takliflar xodimlarga oldindan belgilangan ma'lumotlar to‘plami bilan "
-"yuboriladi. Bu taklifni ko‘rib chiqish va muhokama qilish imkonini "
-"beradi.<br><br>"
+"yuboriladi. Bu taklifni ko‘rib chiqish va muhokama qilish imkonini beradi."
+"<br><br>"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3167,7 +3151,7 @@ msgstr "Tuzilma turi"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
+msgid "Sum of Benefits Values"
 msgstr ""
 
 #. module: hr_contract_salary
@@ -3201,6 +3185,12 @@ msgstr "Shablonlar"
 #, fuzzy
 msgid "Text"
 msgstr "Matn"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -3639,6 +3629,11 @@ msgid "id"
 msgstr "id"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3657,13 +3652,60 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: Ish taklifi - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: Ish taklifi - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
 msgstr ""
+
+#, fuzzy
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "    <h2>Tabriklaymiz!</h2>\n"
+#~ "    Quyidagi havolani bosish orqali o‘z ish haqi paketingizni "
+#~ "sozlashingiz mumkin.<br/>\n"
+#~ "    <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "        Havola <t t-out=\"ctx.get('validity_end')\"/> sanasigacha amal "
+#~ "qiladi. </t>\n"
+#~ "    <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "        <a t-att-href=\"'/salary_package/simulation/offer/%s%s' % (\n"
+#~ "            ctx.get('offer_id'),\n"
+#~ "            ('?token=' + ctx.get('access_token')) if "
+#~ "ctx.get('access_token') else ''\n"
+#~ "        )\" target=\"_blank\" t-attf-style=\"background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration: none; color: {{object.company_id.email_primary_color or "
+#~ "'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
+#~ "            Paketingizni sozlash\n"
+#~ "        </a>\n"
+#~ "    </div>\n"
+#~ "</div>"
 
 #, fuzzy
 #~ msgid ""

@@ -35,6 +35,26 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
         # George worked full year -> 250
         self.assertEqual(line.amount, 250.0)
 
+    def test_eco_vouchers_company_director(self):
+        # A company director (here a company executive under the joint committee 200) is not granted the
+        # eco-vouchers of the joint committee
+        director = self.create_employee({
+            'name': 'CP200 Director',
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'contract_date_start': date(2023, 1, 1),
+            'employee_type_id': self.env.ref('hr.contract_type_company_executive').id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': director.id,
+            'version_id': director.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertFalse(line.amount if line else 0.0)
+
     def test_eco_vouchers_cp200_part_time(self):
         # 50% work rate employee
         part_time_emp = self.create_employee({
@@ -313,6 +333,31 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
         line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
         self.assertAlmostEqual(line.amount, 250.0, places=2)
 
+    def test_eco_vouchers_individual_public_holidays_versions(self):
+        # The public holidays registered for the employee alone leave the theoretical working days of the whole
+        # reference period, whichever version they fall in: a full reference period split in versions still gets
+        # the full amount
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Public holiday",
+            'calendar_id': self.employee_test.resource_calendar_id.id,
+            'company_id': self.belgian_company.id,
+            'resource_id': self.employee_test.resource_id.id,
+            'date_from': datetime(day.year, day.month, day.day, 0, 0, 0),
+            'date_to': datetime(day.year, day.month, day.day, 23, 59, 59),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        } for day in (date(2025, 4, 21), date(2025, 5, 1), date(2025, 5, 29))])
+        version = self.employee_test.create_version({'date_version': date(2025, 1, 1)})
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'version_id': version.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertAlmostEqual(line.amount, 250.0, places=2)
+
     def test_eco_vouchers_partially_worked_days(self):
         # A day partly worked stays a working day: two hours of a reintegration journey (122.04, unpaid) on ten days
         # take none of them off the reference period, a whole day of it does
@@ -357,6 +402,45 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
         payslip.compute_sheet()
         line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
         self.assertFalse(line.amount if line else 0.0)
+
+    def test_eco_vouchers_cp302_flexi(self):
+        # The Horeca agreement grants the flexi-jobs too, on their days of work: 250 EUR / 260 per day
+        flexi = self.create_employee({
+            'name': 'CP302 Flexi',
+            'l10n_be_joint_committee_id': self.cp302.id,
+            'contract_date_start': date(2025, 10, 1),
+            'contract_date_end': date(2025, 12, 31),
+            'l10n_be_dimona_category': 'flx',
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp302_4').id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': flexi.id,
+            'version_id': flexi.version_id.id,
+            'date_from': date(2025, 12, 1),
+            'date_to': date(2025, 12, 31),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        # 1 October - 30 November 2025: 43 working days
+        self.assertAlmostEqual(line.amount, 250 * 43 / 260, places=2)
+
+    def test_eco_vouchers_cp200_student(self):
+        student = self.create_employee({
+            'name': 'CP200 Student',
+            'contract_date_start': date(2024, 1, 1),
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'l10n_be_dimona_category': 'stu',
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': student.id,
+            'version_id': student.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.assertFalse(payslip.line_ids.filtered(lambda line: line.code == 'ECOVOUCHERS'))
 
     def test_eco_vouchers_full_amount_cap(self):
         # A version planned day by day only schedules its own days: worked in full, it counts for the whole of its
@@ -423,6 +507,34 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
         # the calendar theoretically schedules over the reference period
         # Expected amount: 216 / 260 * 250 = 207.69...
         self.assertAlmostEqual(line.amount, 216 / 260 * 250, delta=1.0)
+
+    def test_eco_vouchers_other_company_public_holiday(self):
+        # A public holiday of another company of the database (here on a Monday of the reference period) is not one of
+        # the payslip's company: the theoretical working days stay 260
+        other_company = self.env['res.company'].create({'name': 'Other Country Company'})
+        self.env['resource.calendar.leaves'].create({
+            'name': "Other country's public holiday",
+            'company_id': other_company.id,
+            'date_from': datetime(2024, 9, 2, 0, 0, 0),
+            'date_to': datetime(2024, 9, 2, 23, 59, 59),
+        })
+        emp = self.create_employee({
+            'name': 'Departing CP200 Emp',
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'contract_date_start': date(2024, 1, 1),
+            'contract_date_end': date(2025, 3, 31),
+        })
+        emp.departure_date = date(2025, 3, 31)
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'date_from': date(2025, 3, 1),
+            'date_to': date(2025, 3, 31),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertAlmostEqual(line.amount, 216 / 260 * 250, places=2)
 
     def test_eco_vouchers_departing_no_double_pay(self):
         """
@@ -534,3 +646,67 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
             wizard_batch.line_ids.employee_id, self.employee_test,
             "With a batch context, only employees from that batch's payslips should be listed",
         )
+
+    def test_eco_vouchers_wizard_one_line_per_employee(self):
+        # The wizard lists the eco vouchers to order per employee: a refunded payslip cancels its
+        # eco vouchers, and the cancelled payslips of a batch are ignored.
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'version_id': self.employee_test.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS').total, 250)
+        payslip.refund_sheet()
+
+        other_emp = self.create_employee({
+            'name': 'Other Employee',
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'contract_date_start': date(2023, 1, 1),
+        })
+        other_payslips = self.env['hr.payslip'].create([{
+            'name': 'June Payslip Other %s' % i,
+            'employee_id': other_emp.id,
+            'version_id': other_emp.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        } for i in range(2)])
+        other_payslips.compute_sheet()
+        other_payslips.action_payslip_done()
+        other_amount = sum(other_payslips.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS').mapped('total'))
+
+        wizard = self.env['l10n.be.eco.vouchers.wizard'].with_company(self.belgian_company).create({
+            'company_id': self.belgian_company.id,
+            'reference_year': '2025',
+        })
+        self.assertRecordValues(wizard.line_ids, [{'employee_id': other_emp.id, 'amount': other_amount}])
+
+        batch = self.env['hr.payslip.run'].create({
+            'name': 'Batch',
+            'date_start': date(2025, 6, 1),
+            'date_end': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+            'structure_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+        })
+        batch_payslip = self.env['hr.payslip'].create({
+            'name': 'June Payslip (Batch)',
+            'employee_id': self.employee_test.id,
+            'version_id': self.employee_test.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+            'payslip_run_id': batch.id,
+        })
+        batch_payslip.compute_sheet()
+        batch_payslip.state = 'cancel'
+        wizard_batch = self.env['l10n.be.eco.vouchers.wizard'].with_company(self.belgian_company).with_context(
+            batch_id=batch.id
+        ).create({
+            'company_id': self.belgian_company.id,
+            'reference_year': '2025',
+        })
+        self.assertFalse(wizard_batch.line_ids)

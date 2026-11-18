@@ -59,12 +59,15 @@ class AccountFiscalYear(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         self.env.cr.cache.pop('cached_fiscalyears_by_company', None)
+        self.env.cr.cache.pop('res_currency_to_company_rates', None)
         return super().create(vals_list)
 
     def write(self, vals):
         self.env.cr.cache.pop('cached_fiscalyears_by_company', None)
+        self.env.cr.cache.pop('res_currency_to_company_rates', None)
         return super().write(vals)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_clear_fiscalyear_cache(self):
         self.env.cr.cache.pop('cached_fiscalyears_by_company', None)
+        self.env.cr.cache.pop('res_currency_to_company_rates', None)

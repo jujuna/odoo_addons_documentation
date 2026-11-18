@@ -41,13 +41,22 @@ class HrPayrollWarning(models.Model):
             ('date_start', '<=', date_start),
             ('date_end', '>=', date_end),
         ], limit=1)
-        return not covered and self._check_payslips_for_report(company, date_start, date_end)
+        return not covered and self._check_payslips_for_report(company.root_id, date_start, date_end)
+
+    def _l10n_be_get_first_payrun_date(self, company):
+        """First payrun date of the declarations of the root company: the one of the root company
+        or, when only set on its branches, the first one of them."""
+        first_payrun_dates = self.env['res.company'].sudo().search([
+            ('id', 'child_of', company.root_id.id),
+        ]).mapped('first_payrun_date')
+        return min(filter(None, first_payrun_dates), default=False)
 
     def _check_payslips_for_report(self, company, date_start, date_end, domain=None):
         payslips = self.env['hr.payslip']
         payslip_domain = Domain([
             ('state', 'in', ['paid', 'validated']),
-            ('company_id', '=', company.id),
+            # The declarations of the root company are for all its branches
+            ('company_id', 'child_of', company.id),
         ]) & payslips._l10n_be_get_fiscal_period_domain(date_start, date_end)
         # Warn only when the period really holds amounts to declare: a payslip may be attached to
         # it by its fiscal date while every one of its lines follows the pay period, or the other
@@ -71,7 +80,11 @@ class HrPayrollWarning(models.Model):
             existing_reports = self.env[model_name].search(domain)
             report_ids = existing_reports.ids
         if not report_ids:
-            new_report = self.env[model_name].create(vals)
+            # The declarations are made by the root company, also from its branches
+            report_model = self.env[model_name]
+            if vals.get('company_id'):
+                report_model = report_model.with_company(vals['company_id'])
+            new_report = report_model.create(vals)
             action_name = '27x' if report_name in ('273_xx', '274_xx') else report_name
             return {
                 'type': 'ir.actions.client',
@@ -183,8 +196,12 @@ class HrPayrollWarning(models.Model):
             return self.env._("Employees with work address missing ONSS code %(names)s", **kwargs)
         if text == "Employer category required to import ONSS rates.":
             return self.env._("Employer category required to import ONSS rates.")
+        if text == "Fixed-term contract under 2 months: it doesn't give right to the Impulsion plan.":
+            return self.env._("Fixed-term contract under 2 months: it doesn't give right to the Impulsion plan.")
         if text == 'Flexi-jobs at the employer already employing the worker in the quarter, to declare as an ordinary employment: %(names)s':
             return self.env._('Flexi-jobs at the employer already employing the worker in the quarter, to declare as an ordinary employment: %(names)s', **kwargs)
+        if text == "Generate Last Payslip":
+            return self.env._("Generate Last Payslip")
         if text == "Invalid license plates %(names)s":
             return self.env._("Invalid license plates %(names)s", **kwargs)
         if text == 'Invalid NISS for employees %(names)s':
@@ -195,8 +212,8 @@ class HrPayrollWarning(models.Model):
             return self.env._("Max 12 additional hours/month pay excess at +50% or +100%.")
         if text == "Meal vouchers exceed annual limit (%(max_count)s).":
             return self.env._("Meal vouchers exceed annual limit (%(max_count)s).", **kwargs)
-        if text == "Missing employer class for company: %(name)s.":
-            return self.env._("Missing employer class for company: %(name)s.", **kwargs)
+        if text == "Missing employer category for company: %(name)s.":
+            return self.env._("Missing employer category for company: %(name)s.", **kwargs)
         if text == "Missing NISS for employees %(names)s":
             return self.env._("Missing NISS for employees %(names)s", **kwargs)
         if text == "Missing ONSS company ID for company: %(name)s.":
@@ -209,12 +226,26 @@ class HrPayrollWarning(models.Model):
             return self.env._("Mobility Budget amount is below the minimum allowed value (%(amount).2f €).", **kwargs)
         if text == "Mobility expense payout (%(mobility_to_pay)s €) requires an active mobility budget.":
             return self.env._("Mobility expense payout (%(mobility_to_pay)s €) requires an active mobility budget.", **kwargs)
-        if text == "More than 2 days of sick time off without certificate have been taken this year (%(days)s days)":
-            return self.env._("More than 2 days of sick time off without certificate have been taken this year (%(days)s days)", **kwargs)
+        if text == "More than %(limit)s days of sick time off without certificate have been taken this year (%(days)s days)":
+            return self.env._("More than %(limit)s days of sick time off without certificate have been taken this year (%(days)s days)", **kwargs)
+        if text == "No Impulsion deduction: all the months of the right starting on %(start_date)s are used. Remove the plan from the employee.":
+            return self.env._("No Impulsion deduction: all the months of the right starting on %(start_date)s are used. Remove the plan from the employee.", **kwargs)
+        if text == "No Impulsion deduction: set a home city with a NIS code to check the residence in Wallonia.":
+            return self.env._("No Impulsion deduction: set a home city with a NIS code to check the residence in Wallonia.")
+        if text == "No Impulsion deduction: the employee was 25 or older on %(start_date)s at the start of the right.":
+            return self.env._("No Impulsion deduction: the employee was 25 or older on %(start_date)s at the start of the right.", **kwargs)
+        if text == "No Impulsion deduction: the home address is outside French-speaking Wallonia.":
+            return self.env._("No Impulsion deduction: the home address is outside French-speaking Wallonia.")
+        if text == "No Impulsion deduction: the Impulsion plans have ended. Remove the plan from the employee.":
+            return self.env._("No Impulsion deduction: the Impulsion plans have ended. Remove the plan from the employee.")
+        if text == "No Impulsion deduction: the right starts on %(start_date)s, after the last activation date. If it was granted earlier, add an information version with the grant date.":
+            return self.env._("No Impulsion deduction: the right starts on %(start_date)s, after the last activation date. If it was granted earlier, add an information version with the grant date.", **kwargs)
         if text == "Occupation days mismatch working schedule %(names)s":
             return self.env._("Occupation days mismatch working schedule %(names)s", **kwargs)
         if text == "Only one day of sick time off can be flagged without certificate":
             return self.env._("Only one day of sick time off can be flagged without certificate")
+        if text == "Postpone":
+            return self.env._("Postpone")
         if text == 'Refused flexi-jobs are declared as ordinary workers: set the worker code 015 or 495 on their contract and recompute their payslips: %(names)s':
             return self.env._('Refused flexi-jobs are declared as ordinary workers: set the worker code 015 or 495 on their contract and recompute their payslips: %(names)s', **kwargs)
         if text == "Salary below %(limit)s%(currency)s threshold transport benefit required.":
@@ -241,8 +272,8 @@ class HrPayrollWarning(models.Model):
             return self.env._("Set Employer Category")
         if text == "Start":
             return self.env._("Start")
-        if text == 'Students with more than 650 hours in the quarter: the hours above the yearly 650 hours are declared with the ordinary contributions: %(names)s':
-            return self.env._('Students with more than 650 hours in the quarter: the hours above the yearly 650 hours are declared with the ordinary contributions: %(names)s', **kwargs)
+        if text == 'Students with more than %(quota)s hours in the quarter: the hours above the yearly %(quota)s hours are declared with the ordinary contributions: %(names)s':
+            return self.env._('Students with more than %(quota)s hours in the quarter: the hours above the yearly %(quota)s hours are declared with the ordinary contributions: %(names)s', **kwargs)
         if text == "Submit":
             return self.env._("Submit")
         if text == "Sub-type":
@@ -257,16 +288,22 @@ class HrPayrollWarning(models.Model):
             return self.env._("The complementary indemnities (RCC, RCIC: worker codes 879, 883, 885) can't be declared by Odoo: declare them through the ONSS portal or your social secretariat: %(names)s", **kwargs)
         if text == 'The date of the start of the holidays of the manual workers (HolidayStartingDate) is mandatory in the declaration of the fourth quarter: add it to the declaration file before sending it.':
             return self.env._('The date of the start of the holidays of the manual workers (HolidayStartingDate) is mandatory in the declaration of the fourth quarter: add it to the declaration file before sending it.')
+        if text == "The employee contribution for ambulatory insurance cannot be higher than the total insurance amount.":
+            return self.env._("The employee contribution for ambulatory insurance cannot be higher than the total insurance amount.")
+        if text == "The employee contribution for hospitalization insurance cannot be higher than the total insurance amount.":
+            return self.env._("The employee contribution for hospitalization insurance cannot be higher than the total insurance amount.")
         if text == "The employee is under the legal minimum working age (18 years old)":
             return self.env._("The employee is under the legal minimum working age (18 years old)")
         if text == 'The exemption from work of these employees has no start date: %(names)s':
             return self.env._('The exemption from work of these employees has no start date: %(names)s', **kwargs)
+        if text == "The flexi-jobs are declared with the worker code 050 or 450, and only them: check the Dimona category and the worker code of the contracts of %(names)s":
+            return self.env._("The flexi-jobs are declared with the worker code 050 or 450, and only them: check the Dimona category and the worker code of the contracts of %(names)s", **kwargs)
         if text == 'The percentage of the increased hourly pay (PercentagePaid) of the reductions of the working time with an unpaid compensatory rest is mandatory: add it to the remuneration code 1 in the declaration file of %(names)s':
             return self.env._('The percentage of the increased hourly pay (PercentagePaid) of the reductions of the working time with an unpaid compensatory rest is mandatory: add it to the remuneration code 1 in the declaration file of %(names)s', **kwargs)
         if text == "The quarter isn't ended yet: it can only be declared from %(date)s.":
             return self.env._("The quarter isn't ended yet: it can only be declared from %(date)s.", **kwargs)
-        if text == "The student is under the legal minimum working age (15 years old)":
-            return self.env._("The student is under the legal minimum working age (15 years old)")
+        if text == "The employee is not set as driver or future driver of their company car":
+            return self.env._("The employee is not set as driver or future driver of their company car")
         if text == "Tax Forms 281, %(year)s":
             return self.env._("Tax Forms 281, %(year)s", **kwargs)
         if text == "Termination payslips missing notice period dates %(names)s":
@@ -279,6 +316,10 @@ class HrPayrollWarning(models.Model):
             return self.env._('The students (Dimona STU) must have the worker code 840 or 841, used only for them: %(names)s', **kwargs)
         if text == "The total number of meal vouchers for this year exceeds %(max_count)s":
             return self.env._("The total number of meal vouchers for this year exceeds %(max_count)s", **kwargs)
+        if text == "The unexperienced reduction (6340) declared differs from the payslips for %(count)s employees":
+            return self.env._("The unexperienced reduction (6340) declared differs from the payslips for %(count)s employees", **kwargs)
+        if text == "The working schedule is shorter than 10% of the reference full-time calendar. For a part-time contract, the legal minimum duration is 10%.":
+            return self.env._("The working schedule is shorter than 10% of the reference full-time calendar. For a part-time contract, the legal minimum duration is 10%.")
         if text == "There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't find a new job.":
             return self.env._("There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't find a new job.", **kwargs)
         if text == "Time types missing DMFA code %(names)s":

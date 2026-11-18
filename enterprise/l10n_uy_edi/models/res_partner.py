@@ -4,6 +4,7 @@ from odoo import models
 from odoo.exceptions import UserError
 from odoo.tools.partner_identifiers import TIN_CATEGORIES
 
+from odoo.addons.l10n_uy.tools.partner_identifiers import DGI_FOREIGN_COUNTRY_CODES
 
 UY_RUT_DGI_CODE = 2
 UY_FOREIGN_ID_DGI_CODE = 4  # Otro
@@ -18,7 +19,6 @@ UY_DGI_CODES = {
     'UY_DNI': 6,
     'UY_NIFE': 7,
 }
-DGI_FOREIGN_COUNTRY_CODES = {'AR', 'BR', 'CL', 'PY'}  # those countries must be handled specifically with DGI as per specification
 
 
 class ResPartner(models.Model):

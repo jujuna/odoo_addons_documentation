@@ -31,7 +31,14 @@ export const DocumentsModelMixin = (RelationalModel) =>
          * Also load the total file size
          * @override
          */
-        async load() {
+        async load(params = {}) {
+            // Empty order means "keep the previous order" for the web model
+            // If we don't have an order when we had one before, clear value set for Recent / Trash
+            const hasSearchOrderBy = !!params.orderBy?.length;
+            if (this.hadSearchOrderBy && !hasSearchOrderBy) {
+                params.orderBy = this.defaultOrderBy;
+            }
+            this.hadSearchOrderBy = hasSearchOrderBy;
             const selection = this.root?.selection;
             if (!this.originalSelection && selection && selection.length > 0) {
                 this.originalSelection = selection.map((rec) => rec.resId);

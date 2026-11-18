@@ -1127,13 +1127,14 @@ class MrpProduction(models.Model):
             to_update = self.filtered(lambda p: p.state == 'done')
             to_update._track_add({production.id: {'date_finished': production.date_finished} for production in to_update})
 
+        confirmed_productions = self.filtered(lambda p: p.state == 'confirmed') if 'date_start' in vals else self.env['mrp.production']
         res = super(MrpProduction, self).write(vals)
 
         for production in self:
             if 'date_start' in vals and not self.env.context.get('force_date', False):
                 if production.state in ['done', 'cancel']:
                     raise UserError(_('You cannot move a manufacturing order once it is cancelled or done.'))
-                if production.is_planned and vals.get('state') != 'progress':
+                if production.is_planned and vals.get('state') != 'progress' and not (production in confirmed_productions and production.state == 'progress'):
                     production._unplan_workorders()
             if vals.get('date_start'):
                 production.move_raw_ids.write({'date': production.date_start, 'date_deadline': production.date_start})
@@ -1957,7 +1958,7 @@ class MrpProduction(models.Model):
                     expected_qty = line.uom_id._compute_quantity(
                         line.product_qty * bom_factors[line.bom_id.id], move.uom_id)
                 picked_qty = sum(ml.uom_id._compute_quantity(ml.quantity, move.uom_id, round=False)
-                    for ml in move.move_line_ids)
+                    for ml in move.move_line_ids if ml.picked or not move._should_bypass_set_qty_producing())
                 if move.uom_id.compare(picked_qty, expected_qty):
                     issues.append((order, move.product_id, move.uom_id, move, picked_qty, expected_qty))
             # Once we've matched every orphaned BoM line we could match with orphaned moves, we consider
@@ -2435,7 +2436,7 @@ class MrpProduction(models.Model):
 
         self.workorder_ids.button_finish()
         for production in self.filtered(lambda p: not p.uom_id.is_zero(p.qty_producing)):
-            production.move_raw_ids.filtered(lambda m: not m.picked).picked = True
+            production.move_raw_ids.filtered(lambda m: not m.picked and not m._should_bypass_set_qty_producing()).picked = True
         productions_not_to_backorder._post_inventory(cancel_backorder=True)
         productions_to_backorder._post_inventory(cancel_backorder=True)
 

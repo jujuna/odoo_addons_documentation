@@ -2,6 +2,7 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore, posService } from "@point_of_sale/app/services/pos_store";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
+import { uuidv4, getColorScheme } from "@point_of_sale/utils";
 
 patch(posService, {
     dependencies: [...posService.dependencies, "iot_http"],
@@ -33,5 +34,19 @@ patch(PosStore.prototype, {
         } else {
             return super.showScreen(...arguments);
         }
+    },
+    openIotCustomerDisplay() {
+        if (!localStorage.getItem("device_uuid")) {
+            localStorage.setItem("device_uuid", uuidv4());
+        }
+        const deviceUuid = localStorage.getItem("device_uuid");
+        this.data.call("pos.config", "open_iot_customer_display", [
+            this.config.id,
+            deviceUuid,
+            getColorScheme(),
+        ]);
+    },
+    closeIotCustomerDisplay() {
+        this.data.call("pos.config", "close_iot_customer_display", [this.config.id]);
     },
 });

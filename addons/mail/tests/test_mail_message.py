@@ -3,6 +3,7 @@
 from odoo.addons.bus.tests.common import BusResult
 from odoo.addons.mail.models import mail_message as mail_message_module
 from odoo.addons.mail.tests import common
+from odoo.exceptions import UserError
 from odoo.tests import HttpCase, new_test_user, tagged, users
 
 from unittest.mock import patch
@@ -86,6 +87,26 @@ class TestMailMessage(common.MailCommon, HttpCase):
             self.assertEqual(messages.search(domain, limit=100), accessible)
             self.assertGreaterEqual(search_func.call_count, 4)
 
+    def test_mail_message_read_access_read_group_with_limit(self):
+        ids = []
+        ids += self._add_messages(self.company_2, "Inccessible notes", count=5, subject="Subject 1").ids
+        ids += self._add_messages(self.env.company, "Accessible notes", count=5, subject="Subject 2").ids
+        messages = (self.env["mail.message"]
+            .with_user(self.user_employee)
+            .with_context(allowed_company_ids=[self.env.company.id])
+        ).browse(ids)
+        accessible = messages._filtered_access('read')
+        self.assertEqual(len(accessible), 5)
+
+        with patch.object(mail_message_module, 'MAX_SEARCH_LIMIT', 5):
+            with self.assertRaisesRegex(UserError, "Please apply additional filters"):
+                messages.formatted_read_group(
+                    [("id", "in", ids)],
+                    ["subject"],
+                    ["id:count"],
+                    limit=100,
+                )
+
     @users("employee")
     def test_unlink_failure_message_notify_author(self):
         recipient = new_test_user(self.env(su=True), login="Bob", email="invalid_email_addr")
@@ -103,3 +124,31 @@ class TestMailMessage(common.MailCommon, HttpCase):
             ],
         ):
             message.unlink()
+
+    @users("employee")
+    def test_messaging_menu_initialize_counters(self):
+        self.authenticate(self.env.user.login, self.env.user.login)
+        partner = self.env.user.partner_id
+        values = {"model": "res.partner", "res_id": partner.id, "body": "Hey"}
+        bookmarked = self.env["mail.message"].create(
+            {**values, "bookmarked_partner_ids": [(4, partner.id)]},
+        )
+        notified = self.env["mail.message"].create({
+            **values,
+            "notification_ids": [(0, 0, {"res_partner_id": partner.id, "notification_type": "inbox"})],
+        })
+        self.env["mail.message"].create(values)
+        data = self.make_jsonrpc_request(
+            "/mail/store",
+            {"fetch_params": [[
+                "/mail/messaging_menu/initialize_counters",
+                {"filter_id_by_tab_id_by_record_type": {
+                    "mail.message": {"bookmark": None, "notification": "notification_unread"},
+                }},
+            ]]},
+        )
+        counter_ids_by_tab = {
+            tab["id"]: tab["init_counter_ids"] for tab in data["MessagingMenuTab"]
+        }
+        self.assertEqual(counter_ids_by_tab["bookmark"], bookmarked.ids)
+        self.assertEqual(counter_ids_by_tab["notification"], notified.ids)

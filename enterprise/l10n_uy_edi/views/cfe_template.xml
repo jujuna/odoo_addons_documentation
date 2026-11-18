@@ -61,6 +61,10 @@
         <Detalle>
             <Item t-foreach="item_detail" t-as="item_line">
                 <NroLinDet t-out="item_line['NroLinDet']"/>
+                <CodItem t-foreach="item_line.get('CodItem') or []" t-as="cod_item">
+                    <TpoCod t-out="cod_item['TpoCod']"/>
+                    <Cod t-out="cod_item['Cod']"/>
+                </CodItem>
                 <IndFact t-out="item_line['IndFact']"/>
                 <NomItem t-out="item_line['NomItem']"/>
                 <DscItem t-out="item_line['DscItem']"/>

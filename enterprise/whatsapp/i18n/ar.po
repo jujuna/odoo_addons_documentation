@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-10-22 10:30+0000\n"
+"POT-Creation-Date: 2026-11-13 17:48+0000\n"
+"PO-Revision-Date: 2026-11-10 08:13+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
 "Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/whatsapp/"
 "ar/>\n"
@@ -33,6 +33,18 @@ msgstr "تم إنشاء %(create_count)s، وتم تحديث %(update_count)s."
 #: code:addons/whatsapp/models/whatsapp_template.py:0
 msgid "%(template_name)s [%(account_name)s]"
 msgstr "%(template_name)s [%(account_name)s]"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid "%s (Archived)"
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid "%s (Draft)"
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
@@ -346,6 +358,8 @@ msgid ""
 "App Secret and Access Token are required unless the account was onboarded "
 "through OAuth."
 msgstr ""
+"يتطلب النظام إدخال المعرف السري للتطبيق ورمز الوصول لربط الحساب، إلا إذا تمت "
+"تهيئة الحساب وتفعيله مسبقاً من خلال المصادقة المباشرة عبر OAuth."
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__model_id
@@ -484,18 +498,18 @@ msgstr ""
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "Blocked Recipients"
-msgstr ""
+msgstr "المستلمون المحظورون"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__blocklist_count
 msgid "Blocklist Count"
-msgstr ""
+msgstr "عدد المُدرَجين في قائمة الحظر"
 
 #. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/models/whatsapp_account.py:0
 msgid "Blocklist of %(account_name)s"
-msgstr ""
+msgstr "قائمة الحظر الخاصة بـ %(account_name)s"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__blocklisted_phone_number_count
@@ -724,7 +738,7 @@ msgstr "قم بتهيئة حساب WhatsApp للأعمال"
 #. odoo-javascript
 #: code:addons/whatsapp/static/src/views/whatsapp_account_list/whatsapp_account_list_view.xml:0
 msgid "Connect"
-msgstr ""
+msgstr "ربط"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_account__state__connected
@@ -893,6 +907,8 @@ msgid ""
 "Disconnect this WhatsApp account? This will stop sending and receiving "
 "WhatsApp messages."
 msgstr ""
+"هل أنت متأكد من رغبتك في إلغاء ربط حساب واتساب هذا؟ يرجى ملاحظة أن هذا "
+"الإجراء سيعطل إمكانية إرسال الرسائل واستقبالها عبر المنصة بالكامل."
 
 #. module: whatsapp
 #: model:ir.model,name:whatsapp.model_discuss_channel
@@ -1030,6 +1046,8 @@ msgid ""
 "Enabling WhatsApp debug stops medias (pictures, videos, pdf, ...) from being "
 "received."
 msgstr ""
+"يرجى الانتباه إلى أن تشغيل وضع تصحيح الأخطاء لواتساب سيعطل استقبال ملفات "
+"الوسائط المتعددة مؤقتاً، بما في ذلك الصور ومقاطع الفيديو ومستندات PDF."
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__en
@@ -2090,7 +2108,7 @@ msgstr "Norwegian"
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_account__state__disconnected
 msgid "Not Connected"
-msgstr ""
+msgstr "غير متصل"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
@@ -2166,7 +2184,7 @@ msgstr ""
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_oauth_onboarded
 msgid "OAuth Onboarded"
-msgstr ""
+msgstr "تم إعداد المصادقة OAuth"
 
 #. module: whatsapp
 #. odoo-python
@@ -2271,7 +2289,7 @@ msgstr "معرف رقم الهاتف"
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_phone_registered
 msgid "Phone Registered"
-msgstr ""
+msgstr "تم تسجيل رقم الهاتف"
 
 #. module: whatsapp
 #. odoo-python
@@ -2339,7 +2357,7 @@ msgstr "معاينة القالب"
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__proxy_webhook_url
 msgid "Proxy Webhook URL"
-msgstr ""
+msgstr "Proxy Webhook URL"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__pa
@@ -2412,7 +2430,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/whatsapp/models/whatsapp_account.py:0
 msgid "Register Phone Number"
-msgstr ""
+msgstr "تسجيل رقم الهاتف"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
@@ -2566,6 +2584,8 @@ msgid ""
 "Sending still works, but the webhook is not pointing to Odoo, so incoming "
 "messages will not reach this database."
 msgstr ""
+"لا يزال الإرسال يعمل، ولكن الـ Webhook لا يشير إلى أودو، ولذلك لن تصل "
+"الرسائل الواردة إلى قاعدة البيانات هذه."
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_message__state__sent
@@ -2610,7 +2630,7 @@ msgstr "إجراء الخادم"
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__shared_webhook_secret
 msgid "Shared Webhook Secret"
-msgstr ""
+msgstr "Shared Webhook Secret"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__si_lk
@@ -2733,7 +2753,7 @@ msgstr "إرسال للموافقة"
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "Subscribe Webhook"
-msgstr ""
+msgstr "الاشتراك في Webhook"
 
 #. module: whatsapp
 #. odoo-python
@@ -3004,6 +3024,8 @@ msgid ""
 "The phone number is not registered and the webhook is not pointing to Odoo, "
 "so this account can neither send nor receive messages."
 msgstr ""
+"رقم الهاتف غير مسجل والـ Webhook لا يشير إلى أودو، ولذلك لا يمكن لهذا الحساب "
+"إرسال الرسائل أو استلامها."
 
 #. module: whatsapp
 #. odoo-python
@@ -3012,6 +3034,7 @@ msgid ""
 "The phone number is not registered, so this account can neither send nor "
 "receive messages."
 msgstr ""
+"رقم الهاتف غير مسجل، ولذلك لا يمكن لهذا الحساب إرسال الرسائل أو استلامها."
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__phone_number
@@ -3039,6 +3062,7 @@ msgstr "نفس رقم الهاتف موجود بالفعل"
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__shared_webhook_secret
 msgid "The secret used to validate incoming webhook calls from the proxy."
 msgstr ""
+"الرمز السري المستخدم للتحقق من صحة مكالمات الـ webhook الواردة من الوكيل."
 
 #. module: whatsapp
 #. odoo-javascript
@@ -3181,6 +3205,12 @@ msgstr "خطأ غير معروف"
 #: code:addons/whatsapp/tools/whatsapp_exception.py:0
 msgid "Unknown error when processing whatsapp request."
 msgstr "حدث خطأ غير معروف عند معالجة طلب whatsapp."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid "Unnamed (copy)"
+msgstr ""
 
 #. module: whatsapp
 #. odoo-javascript
@@ -3374,7 +3404,7 @@ msgstr "زيارة الموقع الإلكتروني"
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__wa_account_id
 msgid "Wa Account"
-msgstr ""
+msgstr "حساب واتساب"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__wa_interactive_id
@@ -3403,7 +3433,7 @@ msgstr "رسالة تحذير"
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_webhook_subscribed
 msgid "Webhook Subscribed"
-msgstr ""
+msgstr "تم الاشتراك في Webhook"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__webhook_verify_token

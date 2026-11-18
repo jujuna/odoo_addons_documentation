@@ -85,7 +85,8 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
             base_amount = self.env.company.currency_id.round(bill_data['tax_amount'] / (bill_data['tax_rate'] / 100))
 
             template_vals['bills'].append({
-                'name': bill_data['move_name'],
+                'name': bill_data['move_ref'] or bill_data['move_name'],
+                'designation': bill_data['designation'] or bill_data['move_ref'] or bill_data['move_name'],
                 'sequence': index,
                 'base_amount': base_amount * sign,
                 'tax_amount': bill_data['tax_amount'] * sign,
@@ -120,6 +121,7 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
             """
             SELECT
                 COALESCE(MIN(caba_origin_move.name), MIN(account_move_line__move_id.name)) AS move_name,
+                COALESCE(MIN(caba_origin_move.ref), MIN(account_move_line__move_id.ref)) AS move_ref,
                 SUM(account_move_line.balance) AS tax_amount,
                 CASE WHEN account_move_line__partner_id.country_id = %(ma_country_id)s
                     THEN account_move_line__partner_id.vat
@@ -128,10 +130,33 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
                 account_move_line__partner_id.name as partner_name,
                 account_move_line__partner_id.additional_identifiers->>'MA_ICE' AS partner_ice,
                 tax.amount AS tax_rate,
-                CASE WHEN MIN(caba_origin_move.id) IS NULL
-                    THEN NULL
-                    ELSE ARRAY_AGG(DISTINCT caba_payment.l10n_ma_reports_payment_method)
-                END AS payment_method,
+                COALESCE(
+                    ARRAY_AGG(DISTINCT caba_payment.l10n_ma_reports_payment_method)
+                        FILTER (WHERE caba_payment.l10n_ma_reports_payment_method IS NOT NULL),
+                    (
+                        SELECT ARRAY_AGG(DISTINCT pay.l10n_ma_reports_payment_method)
+                        FROM account_move__account_payment move_pay
+                        JOIN account_payment pay ON pay.id = move_pay.payment_id
+                        WHERE move_pay.invoice_id = COALESCE(MIN(caba_origin_move.id), MIN(account_move_line__move_id.id))
+                          AND pay.l10n_ma_reports_payment_method IS NOT NULL
+                    ),
+                    ARRAY[COALESCE(MIN(caba_origin_move.l10n_ma_reports_payment_method), MIN(account_move_line__move_id.l10n_ma_reports_payment_method))]
+                ) AS payment_method,
+                (
+                    SELECT STRING_AGG(COALESCE(NULLIF(aml_base.name, ''), %(product_name)s), ', ' ORDER BY aml_base.id)
+                    FROM account_move_line aml_base
+                    LEFT JOIN product_product pp ON pp.id = aml_base.product_id
+                    LEFT JOIN product_template pt ON pt.id = pp.product_tmpl_id
+                    WHERE aml_base.move_id = COALESCE(MIN(caba_origin_move.id), MIN(account_move_line__move_id.id))
+                      AND aml_base.display_type = 'product'
+                      AND EXISTS (
+                          SELECT 1
+                          FROM account_move_line_account_tax_rel aml_tax
+                          LEFT JOIN account_tax_filiation_rel tax_group ON tax_group.parent_tax = aml_tax.account_tax_id
+                          WHERE aml_tax.account_move_line_id = aml_base.id
+                            AND tax.id IN (aml_tax.account_tax_id, tax_group.child_tax)
+                      )
+                ) AS designation,
                 CASE WHEN MIN(caba_origin_move.id) IS NULL
                     THEN NULL -- We make the assumption it's not important to provide it if not using cash basis
                     ELSE GREATEST(MAX(account_move_line__move_id.date), MAX(caba_origin_move.date))
@@ -165,6 +190,7 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
             search_condition=report_query.where_clause,
             ma_country_id=self.env.ref('base.ma').id,
             inbound_types=tuple(self.env['account.move'].get_inbound_types()),
+            product_name=self.env['product.template']._field_to_sql('pt', 'name'),
         ))
 
         bill_data_list = self.env.cr.dictfetchall()

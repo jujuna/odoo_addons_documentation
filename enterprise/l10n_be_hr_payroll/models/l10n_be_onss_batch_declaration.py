@@ -153,7 +153,7 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
         # filename format: {prefix}.{type}.{expeditor}.{date}.{num_suite}.{env}.{file_number}[.{number_of_total_files}]
         self.ensure_one()
         date_str = fields.Date.context_today(self).strftime('%Y%m%d')
-        if not (onss_expeditor_number := self.company_id.onss_expeditor_number):
+        if not (onss_expeditor_number := self.company_id.root_id.onss_expeditor_number):
             raise UserError(self.env._('There is no defined expeditor number for the company.'))
         expeditor = (
             onss_expeditor_number.split('_')[3]
@@ -190,7 +190,7 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
         if self.has_blocking_issues and not self._skip_blocking_issues_check():
             raise UserError(self.env._("Fix the validation errors before creating the report."))
         filename_common = self._get_common_filename()
-        certificate_sudo = self.company_id.sudo().onss_certificate_id
+        certificate_sudo = self.company_id.root_id.sudo().onss_certificate_id
         if not certificate_sudo and self.environment != 'S' and not self.env.context.get('onss_skip_signature'):
             return {
                 'type': 'ir.actions.client',
@@ -216,7 +216,7 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
         self.signature_file = None
         self.signature_filename = None
         if not self.env.context.get('onss_skip_signature') and self.environment != 'S':
-            certificate_sudo = self.company_id.sudo().onss_certificate_id
+            certificate_sudo = self.company_id.root_id.sudo().onss_certificate_id
             if not certificate_sudo:
                 raise UserError(_('No Certificate defined on the Payroll Configuration'))
 
@@ -374,7 +374,7 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
             errors.append(self.env._("The signature file is missing. Please generate the declaration first."))
         if not self.go_file or not self.go_filename:
             errors.append(self.env._("The GO file is missing. Please generate the declaration first."))
-        if not self.company_id.onss_expeditor_number:
+        if not self.company_id.root_id.onss_expeditor_number:
             errors.append(self.env._("There is no defined expeditor number for the company."))
         if self.has_blocking_issues and not self._skip_blocking_issues_check():
             errors.append(self.env._("There are validation errors to fix."))

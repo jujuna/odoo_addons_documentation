@@ -301,3 +301,19 @@ class TestHrReferral(TestHrReferralBase):
 
         attachments = self.env[model].with_user(self.richard_user).search(action['domain'])
         self.assertNotIn(referred_attachment, attachments, "The referred applicant's attachment should not be accessible.")
+
+    def test_referral_settings_for_referral_admin(self):
+        """ The Referrals settings are shown to the Referrals administrators,
+        who reach them from the Referrals Settings menu, even without being
+        Employees administrators. """
+        referral_admin = self.env['res.users'].create({
+            'name': 'Referral Admin',
+            'login': 'referral_admin',
+            'group_ids': [
+                self.env.ref('base.group_system').id,
+                self.env.ref('hr_referral.group_hr_referral_manager').id,
+            ],
+        })
+        self.assertFalse(referral_admin.has_group('hr.group_hr_manager'))
+        arch = self.env['res.config.settings'].with_user(referral_admin).get_views([(False, 'form')])['views']['form']['arch']
+        self.assertIn('name="hr_referral_background"', arch)

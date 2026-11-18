@@ -11,9 +11,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-23 17:51+0000\n"
-"PO-Revision-Date: 2026-09-17 23:30+0000\n"
+"PO-Revision-Date: 2026-11-13 15:39+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-20/"
 "account_asset/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -34,30 +34,36 @@ msgid ""
 "Keeps track of depreciations, and creates corresponding journal entries.\n"
 "\n"
 msgstr ""
+"\n"
+"Управление активами\n"
+"===================\n"
+"Учет активов, принадлежащих компании или физическому лицу.\n"
+"Отслеживает амортизацию и формирует соответствующие бухгалтерские проводки.\n"
+"\n"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants cancelled."
-msgstr ""
+msgstr " Все варианты отменены."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants reopened."
-msgstr ""
+msgstr " Все варианты возобновлены."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants set to draft."
-msgstr ""
+msgstr " Все варианты переведены в черновик."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid " in journal %s"
-msgstr ""
+msgstr " в журнале %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -83,6 +89,8 @@ msgstr "# Проведенные записи по амортизации"
 msgid ""
 "%(asset)s does not depreciate, so no ledger depreciation can be based on it."
 msgstr ""
+"%(asset)s не амортизируется, поэтому на его основе нельзя рассчитать "
+"амортизацию в главной книге."
 
 #. module: account_asset
 #. odoo-python
@@ -100,13 +108,13 @@ msgstr "%(asset)s: Продаж"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(asset_name)s - %(journal_name)s"
-msgstr ""
+msgstr "%(asset_name)s – %(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(pause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(pause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
@@ -115,24 +123,26 @@ msgid ""
 "%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
 "(journal_name)s"
 msgstr ""
+"%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
+"(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(unpause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(unpause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant)s confirmed with %(model)s%(journal_message)s"
-msgstr ""
+msgstr "%(variant)s подтвержден с помощью %(model)s%(journal_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant_name)s Cancellation:"
-msgstr ""
+msgstr "Отмена варианта «%(variant_name)s»:"
 
 #. module: account_asset
 #. odoo-python
@@ -154,19 +164,19 @@ msgstr "%s: Амортизация"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "(Choose Account)"
-msgstr ""
+msgstr "(Выберите счет)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Asset Group)"
-msgstr ""
+msgstr "(Нет группы активов)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Root)"
-msgstr ""
+msgstr "(Нет корневого элемента)"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -177,18 +187,18 @@ msgstr "(вкл."
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid ", %(percent)g%% salvage "
-msgstr ""
+msgstr ", ликвидационная стоимость %(percent)g%%"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "- %(model)s%(journal_message)s"
-msgstr ""
+msgstr "- %(model)s%(journal_message)s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "<span invisible=\"method_mode != 'rate'\"> per</span>"
-msgstr ""
+msgstr "<span invisible=\"method_mode != 'rate'\"> за</span>"
 
 #. module: account_asset
 #. odoo-python
@@ -197,6 +207,8 @@ msgid ""
 "A Recovery Account is required on the depreciation model %(model)s: its "
 "journal %(journal)s belongs to the ledger %(ledger)s."
 msgstr ""
+"Для модели амортизации %(model)s требуется счет восстановления: его журнал %"
+"(journal)s относится к главной книге %(ledger)s."
 
 #. module: account_asset
 #. odoo-python
@@ -268,6 +280,12 @@ msgid ""
 "will begin from <strong>%(date)s</strong> using the depreciation parameters "
 "configured on the new account."
 msgstr ""
+"Бухгалтерская проводка перенесет стоимость актива со счета <strong><em>«%"
+"(old_account)s»</em></strong> на счет <strong><em>«%(new_account)s»</em></"
+"strong> <strong>%(date)s</strong>.<br/> Текущий актив будет закрыт, а вместо "
+"него будет создан новый с той же балансовой стоимостью.<br/> Начисление "
+"амортизации начнется с <strong>%(date)s</strong> по параметрам, настроенным "
+"для нового счета."
 
 #. module: account_asset
 #. odoo-python
@@ -276,6 +294,8 @@ msgid ""
 "A journal with a ledger is required to create a depreciation model in this "
 "context."
 msgstr ""
+"Для создания модели амортизации в этом контексте требуется журнал с главной "
+"книгой."
 
 #. module: account_asset
 #. odoo-python
@@ -284,6 +304,8 @@ msgid ""
 "A ledger sub-asset is closed together with its asset. Dispose of the asset "
 "instead."
 msgstr ""
+"Связанный субактив главной книги закрывается только вместе с основным "
+"активом. Оформите выбытие самого актива."
 
 #. module: account_asset
 #. odoo-python
@@ -307,6 +329,8 @@ msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
 msgstr ""
+"Счет «%(name)s» нельзя использовать для создания актива. Счет должен иметь "
+"тип «Основные средства»."
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_chart_template
@@ -326,6 +350,8 @@ msgid ""
 "Account used in the depreciation entries, to decrease the asset value. Value "
 "obtained from Fixed Asset Account."
 msgstr ""
+"Счет, используемый в периодических проводках для списания части стоимости "
+"актива на расходы. Значение подставляется из счета «Основные средства»."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_account__asset_expense_account_id
@@ -343,6 +369,8 @@ msgid ""
 "Account used in the periodical entries, to record a part of the asset as "
 "expense. Value obtained from Fixed Asset Account."
 msgstr ""
+"Счет, используемый в периодических проводках для списания части стоимости "
+"актива на расходы. Значение подставляется из счета «Основные средства»."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_asset_id
@@ -360,6 +388,8 @@ msgid ""
 "Account used to record the reversal of excess depreciation when statutory "
 "depreciation catches up or the asset is disposed of."
 msgstr ""
+"Счет, используемый для отражения сторнирования излишне начисленной "
+"амортизации, когда нормативная амортизация выравнивается или актив выбывает."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__gain_account_id
@@ -407,19 +437,19 @@ msgstr "Бухгалтерская отчетность"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__depreciation_account_id
 msgid "Accumulated Account"
-msgstr ""
+msgstr "Накопительный счет"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_depreciation_id
 msgid "Accumulated Depreciation"
-msgstr ""
+msgstr "Накопленная амортизация"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Accumulated Depreciation Account"
-msgstr ""
+msgstr "Счет накопленной амортизации"
 
 #. module: account_asset
 #. odoo-python
@@ -445,25 +475,25 @@ msgstr "Требуются действия"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "Activate"
-msgstr ""
+msgstr "Активировать"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation"
-msgstr ""
+msgstr "Активировать амортизацию"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation for: %(asset)s"
-msgstr ""
+msgstr "Активировать амортизацию для: %(asset)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation: %(asset)s"
-msgstr ""
+msgstr "Активировать амортизацию: %(asset)s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__active
@@ -476,7 +506,7 @@ msgstr "Активный"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Active Asset"
-msgstr ""
+msgstr "Действующий актив"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_ids
@@ -494,7 +524,7 @@ msgstr "Оформление задачи-исключения"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_plans_ids
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Планы дел"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_state
@@ -516,7 +546,7 @@ msgstr "Добавьте внутреннюю заметку"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "All companies"
-msgstr ""
+msgstr "Все компании"
 
 #. module: account_asset
 #. odoo-python
@@ -542,13 +572,15 @@ msgstr "Все строки должны быть опубликованы"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "Also closed: %(sub_assets)s. %(message)s"
-msgstr ""
+msgstr "Также закрыто: %(sub_assets)s. %(message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "An asset cannot have two variants linked to the same ledger"
 msgstr ""
+"У актива не может быть два варианта, связанных с одной и той же главной "
+"книгой"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__main_variant_parent_id
@@ -563,7 +595,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "An asset has been created for this move: %(link)s"
-msgstr ""
+msgstr "По этой проводке создан актив: %(link)s"
 
 #. module: account_asset
 #. odoo-python
@@ -574,7 +606,7 @@ msgstr "Для увеличения стоимости актива будет �
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Analytic"
-msgstr ""
+msgstr "Аналитика"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__analytic_distribution
@@ -591,7 +623,7 @@ msgstr "Аналитическая точность"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 msgid "Apply"
-msgstr ""
+msgstr "Применить"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -626,7 +658,7 @@ msgstr "Счет активов"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_properties_definition
 msgid "Asset Account Properties"
-msgstr ""
+msgstr "Свойства счета активов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_asset_counterpart_id
@@ -637,7 +669,7 @@ msgstr "Счет контрагента актива"
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_depreciation_expense_id
 msgid "Asset Expense Account"
-msgstr ""
+msgstr "Счет расходов по активам"
 
 #. module: account_asset
 #. odoo-python
@@ -682,7 +714,7 @@ msgstr "Дни приостановки активов"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__original_value
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__original_value
 msgid "Asset Value"
-msgstr ""
+msgstr "Стоимость актива"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_bank_statement_line__asset_value_change
@@ -700,7 +732,7 @@ msgstr "Стоимость активов"
 #: code:addons/account_asset/models/account_asset.py:0
 #: model:ir.model,name:account_asset.model_account_asset_variant
 msgid "Asset Variant"
-msgstr ""
+msgstr "Вариант актива"
 
 #. module: account_asset
 #. odoo-python
@@ -709,19 +741,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ids
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_variant_tree
 msgid "Asset Variants"
-msgstr ""
+msgstr "Варианты актива"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset cancelled.%(variant_message)s"
-msgstr ""
+msgstr "Актив отменен.%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset confirmed with:"
-msgstr ""
+msgstr "Актив подтвержден с:"
 
 #. module: account_asset
 #. odoo-python
@@ -733,7 +765,7 @@ msgstr "Созданный актив"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "Asset created from invoice: <b>%s</b>"
-msgstr ""
+msgstr "Актив создан на основании счета: <b>%s</b>"
 
 #. module: account_asset
 #. odoo-python
@@ -750,19 +782,19 @@ msgstr "Движение активов и бухгалтерский учет"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset paused. "
-msgstr ""
+msgstr "Актив приостановлен. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset reset to draft.%(variant_message)s"
-msgstr ""
+msgstr "Актив сброшен в черновик.%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset set to running.%(variant_message)s"
-msgstr ""
+msgstr "Актив переведён в статус «В работе».%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
@@ -780,13 +812,13 @@ msgstr "Актив продан: %s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset unpaused. "
-msgstr ""
+msgstr "Актив возобновлен. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "Asset updated from invoice: %s"
-msgstr ""
+msgstr "Актив обновлен на основе счета: %s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
@@ -815,7 +847,7 @@ msgstr "Активы"
 #. module: account_asset
 #: model:ir.module.module,shortdesc:base.module_account_asset
 msgid "Assets Management"
-msgstr ""
+msgstr "Управление активами"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_asset_report_handler
@@ -844,6 +876,8 @@ msgid ""
 "At least one Journal must be linked to a Ledger in order to create an asset "
 "depreciation"
 msgstr ""
+"Для создания амортизации актива как минимум один журнал должен быть связан с "
+"главной книгой"
 
 #. module: account_asset
 #. odoo-python
@@ -852,6 +886,8 @@ msgid ""
 "At least one asset (%s) couldn't be set as running because it lacks any "
 "required information"
 msgstr ""
+"Как минимум один актив (%s) не удалось перевести в состояние «В работе», так "
+"как отсутствует необходимая информация"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_attachment_count
@@ -862,7 +898,7 @@ msgstr "Количество вложений"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Based On"
-msgstr ""
+msgstr "На основании"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset_variant__prorata_computation_type__daily_computation
@@ -886,12 +922,12 @@ msgstr "Балансовая стоимость"
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_mode__duration
 msgid "By Duration"
-msgstr ""
+msgstr "По сроку службы"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_mode__rate
 msgid "By Rate"
-msgstr ""
+msgstr "По ставке"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__can_create_asset
@@ -901,7 +937,7 @@ msgstr "Может создавать активы"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
 msgid "Can Edit Asset Accounts"
-msgstr ""
+msgstr "Может редактировать счета активов"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -911,7 +947,7 @@ msgstr "Отмена актива"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Assets"
-msgstr ""
+msgstr "Отменить активы"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__cancelled
@@ -924,6 +960,8 @@ msgstr "Отменен"
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Cannot confirm current asset while main asset is not running"
 msgstr ""
+"Невозможно подтвердить текущий актив, пока основной актив не находится в "
+"статусе «В работе»"
 
 #. module: account_asset
 #. odoo-python
@@ -932,12 +970,16 @@ msgid ""
 "Cannot generate depreciation board for ledger variant before main asset "
 "variant"
 msgstr ""
+"Сначала необходимо сформировать график амортизации для основного варианта "
+"актива, а затем – для варианта регистра"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Cannot update a depreciation model being used by another company."
 msgstr ""
+"Невозможно обновить модель амортизации, которая используется другой "
+"компанией."
 
 #. module: account_asset
 #. odoo-python
@@ -946,6 +988,8 @@ msgid ""
 "Cannot update a depreciation model that has non-draft or non-cancelled "
 "assets."
 msgstr ""
+"Невозможно обновить модель амортизации, если к ней привязаны активы, не "
+"находящиеся в статусе «Черновик» или «Отменен»."
 
 #. module: account_asset
 #. odoo-python
@@ -979,6 +1023,15 @@ msgid ""
 "  * Declining then Straight Line: Like Declining but with a minimum "
 "depreciation value equal to the straight line value."
 msgstr ""
+"Выберите метод расчета суммы строк амортизации.\n"
+"  * Без амортизации\n"
+"  * Линейный: рассчитывается по формуле: Первоначальная стоимость / Срок "
+"амортизации\n"
+"  * Уменьшаемого остатка: рассчитывается по формуле: Остаточная стоимость * "
+"Коэффициент ускорения\n"
+"  * Уменьшаемого остатка с переходом на линейный: аналогично методу "
+"уменьшаемого остатка, но минимальная сумма амортизации не может быть меньше "
+"суммы по линейному методу."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_mode
@@ -987,6 +1040,8 @@ msgid ""
 "Choose whether the straight-line depreciation is driven by a duration or an "
 "annual rate."
 msgstr ""
+"Выберите, на основе чего рассчитывается линейная амортизация: по сроку "
+"службы или по годовой ставке."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__close
@@ -1066,7 +1121,7 @@ msgstr "Создать актив"
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_depreciation_model_form
 msgid "Create new depreciation model"
-msgstr ""
+msgstr "Создать новую модель амортизации"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__create_uid
@@ -1109,7 +1164,7 @@ msgstr "Текущий"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__current_selected_variant_id
 msgid "Current Selected Variant"
-msgstr ""
+msgstr "Текущий выбранный вариант"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -1125,7 +1180,7 @@ msgstr "Счет-Фактура Клиента"
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Daily Computation"
-msgstr ""
+msgstr "Ежедневный расчет"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__acquisition_date
@@ -1163,13 +1218,13 @@ msgstr "Фактор снижения"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_kanban
 msgid "Declining factor"
-msgstr ""
+msgstr "Коэффициент ускорения"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Declining then Linear"
-msgstr ""
+msgstr "Уменьшаемого остатка с переходом на линейный"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__degressive_then_linear
@@ -1179,19 +1234,19 @@ msgstr "Снижающаяся, затем прямая линия"
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_account__depreciation_model_id
 msgid "Default depreciation model to use on a vendor bill or a refund"
-msgstr ""
+msgstr "Модель амортизации по умолчанию для счета поставщика или возврата"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Demo Asset"
-msgstr ""
+msgstr "Демо-актив"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Demo Depreciation Model"
-msgstr ""
+msgstr "Демо-модель амортизации"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__value_residual
@@ -1218,7 +1273,7 @@ msgstr "Амортизированная сумма"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid "Depreciated at import"
-msgstr ""
+msgstr "Амортизировано при импорте"
 
 #. module: account_asset
 #. odoo-python
@@ -1251,7 +1306,7 @@ msgstr "Дата начисления амортизации"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Depreciation Expense Account"
-msgstr ""
+msgstr "Счет расходов на амортизацию"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__depreciation_move_ids
@@ -1283,29 +1338,29 @@ msgstr "Метод начисления амортизации"
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_tree
 msgid "Depreciation Model"
-msgstr ""
+msgstr "Модель амортизации"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Depreciation Model name"
-msgstr ""
+msgstr "Название модели амортизации"
 
 #. module: account_asset
 #: model:ir.actions.act_window,name:account_asset.action_account_depreciation_model_form
 #: model:ir.ui.menu,name:account_asset.menu_action_account_depreciation_model_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_tree
 msgid "Depreciation Models"
-msgstr ""
+msgstr "Модели амортизации"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_depreciation_model
 msgid "Depreciation Models for Assets"
-msgstr ""
+msgstr "Модели амортизации для активов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__method_rate
 msgid "Depreciation Rate"
-msgstr ""
+msgstr "Ставка амортизации"
 
 #. module: account_asset
 #: model:account.report,name:account_asset.assets_report
@@ -1321,7 +1376,7 @@ msgstr "График амортизации"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Depreciation activated from asset: %s"
-msgstr ""
+msgstr "Амортизация активирована для актива: %s"
 
 #. module: account_asset
 #. odoo-python
@@ -1330,6 +1385,8 @@ msgid ""
 "Depreciation activated. Asset value transferred from %(old_account)s to %"
 "(new_account)s."
 msgstr ""
+"Амортизация запущена. Стоимость актива перенесена со счета %(old_account)s "
+"на счет %(new_account)s."
 
 #. module: account_asset
 #. odoo-python
@@ -1355,21 +1412,23 @@ msgstr "Амортизационная проводка %(name)s сторнир�
 msgid ""
 "Depreciation model must contain journals that belong to an explicit ledger."
 msgstr ""
+"Модель амортизации должна содержать журналы, относящиеся к явно указанной "
+"главной книге."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__derived_asset_ids
 msgid "Derived Assets"
-msgstr ""
+msgstr "Производные активы"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__display_asset_accounts
 msgid "Display Asset Accounts"
-msgstr ""
+msgstr "Отображать счета активов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_move_line__display_depreciation_model
 msgid "Display Depreciation Model"
-msgstr ""
+msgstr "Отображать модель амортизации"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__display_name
@@ -1468,13 +1527,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Entries cancelled: %(cancelled_move_count)s"
-msgstr ""
+msgstr "Проводки отменены: %(cancelled_move_count)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Entries reversed: %(reversed_move_count)s"
-msgstr ""
+msgstr "Проводки сторнированы: %(reversed_move_count)s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
@@ -1487,7 +1546,7 @@ msgstr "Счет расходов"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
 msgid "Financial instruments"
-msgstr ""
+msgstr "Финансовые инструменты"
 
 #. module: account_asset
 #. odoo-python
@@ -1507,7 +1566,7 @@ msgstr "Основные средства"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Fixed asset account selected is not configured to create an asset."
-msgstr ""
+msgstr "Выбранный счет «Основные средства» не настроен для создания актива."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_follower_ids
@@ -1551,7 +1610,7 @@ msgstr "Прирост стоимости"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
-msgstr ""
+msgstr "Перейти к счету"
 
 #. module: account_asset
 #. odoo-python
@@ -1574,22 +1633,22 @@ msgstr "Валовый прирост стоимости"
 #. module: account_asset
 #: model:account.report,name:account_asset.account_grouped_assets_report
 msgid "Group by: Account"
-msgstr ""
+msgstr "Группировать по: Счет"
 
 #. module: account_asset
 #: model:account.report,name:account_asset.asset_grouped_assets_report
 msgid "Group by: Asset Group"
-msgstr ""
+msgstr "Группировать по: Группа активов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_multi_ledger_company
 msgid "Has Ledger"
-msgstr ""
+msgstr "Есть главная книга"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__has_locking_assets
 msgid "Has Locking Assets"
-msgstr ""
+msgstr "Содержит блокирующие активы"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__has_message
@@ -1654,12 +1713,12 @@ msgstr "Если отмечено, некоторые сообщения име�
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_id
 msgid "Import Account Depreciation"
-msgstr ""
+msgstr "Импорт накопленной амортизации по счету"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_expense_id
 msgid "Import Account Depreciation Expense"
-msgstr ""
+msgstr "Импорт расходов на амортизацию по счету"
 
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_asset_form
@@ -1690,7 +1749,7 @@ msgstr "Информационный текст"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
 msgid "Intangible assets"
-msgstr ""
+msgstr "Нематериальные активы"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1706,24 +1765,24 @@ msgstr "Является подписчиком"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_ledger_journal
 msgid "Is Ledger Journal"
-msgstr ""
+msgstr "Является журналом главной книги"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_ledger_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_ledger_variant
 msgid "Is Ledger Variant"
-msgstr ""
+msgstr "Является вариантом главной книги"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_main_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_main_variant
 msgid "Is Main Variant"
-msgstr ""
+msgstr "Является основным вариантом"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_name_custom
 msgid "Is Name Custom"
-msgstr ""
+msgstr "Пользовательское название"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__salvage_value
@@ -1775,12 +1834,15 @@ msgid ""
 "Journal used for asset creation. The value is stored per company, so a model "
 "shared across companies posts to the journal of the company using it."
 msgstr ""
+"Журнал, используемый для создания актива. Значение хранится отдельно для "
+"каждой компании, поэтому при использовании одной модели несколькими "
+"компаниями проводки создаются в журнале соответствующей компании."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Journals"
-msgstr ""
+msgstr "Журналы"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__write_uid
@@ -1810,27 +1872,27 @@ msgstr "Поздние Мероприятия"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger"
-msgstr ""
+msgstr "Главная книга"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__ledger_depreciation_model_ids
 msgid "Ledger Depreciation Model"
-msgstr ""
+msgstr "Модель амортизации в главной книге"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__ledger_group_ids
 msgid "Ledger Group"
-msgstr ""
+msgstr "Группа главной книги"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger Journal"
-msgstr ""
+msgstr "Журнал главной книги"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__journal_group_name
 msgid "Ledger group"
-msgstr ""
+msgstr "Группа главной книги"
 
 #. module: account_asset
 #. odoo-python
@@ -1861,17 +1923,17 @@ msgstr "Счет убытков"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Main Asset"
-msgstr ""
+msgstr "Основной актив"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_model_name
 msgid "Main Asset Model Name"
-msgstr ""
+msgstr "Название модели основного актива"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_parent_id
 msgid "Main Variant Parent"
-msgstr ""
+msgstr "Родительский элемент основного варианта"
 
 #. module: account_asset
 #. odoo-python
@@ -1883,7 +1945,7 @@ msgstr "Обязательный столбец. Здесь указываетс
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_type_icon
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Иконка Material (например, checklist)"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_has_error
@@ -1914,13 +1976,13 @@ msgstr "Метод"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__method_mode
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__method_mode
 msgid "Method Mode"
-msgstr ""
+msgstr "Режим расчета"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "Miscellaneous Operations"
-msgstr ""
+msgstr "Прочие операции"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_kanban
@@ -1954,12 +2016,12 @@ msgstr "Мониторинг амортизации"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__1
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__1
 msgid "Month"
-msgstr ""
+msgstr "Месяц"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_form_asset_inherit
 msgid "Multi-Ledgers"
-msgstr ""
+msgstr "Несколько главных книг"
 
 #. module: account_asset
 #. odoo-python
@@ -1996,12 +2058,16 @@ msgid ""
 "Name of depreciation model to be used with the asset, e.g. 5 year linear. "
 "Must exist in Odoo before importing."
 msgstr ""
+"Название модели амортизации, используемой для актива, например «Линейная 5 "
+"лет». Модель должна быть создана в Odoo до импорта."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/depreciation_ledger_wizard.py:0
 msgid "Need to set depreciation model to create new asset depreciation."
 msgstr ""
+"Чтобы создать новую амортизацию актива, необходимо указать модель "
+"амортизации."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__negative_revaluation
@@ -2022,12 +2088,12 @@ msgstr "Чистое значение прибыли или убытка от п
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "New Depreciation"
-msgstr ""
+msgstr "Новая амортизация"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__new_account_asset_id
 msgid "New Fixed Asset Account"
-msgstr ""
+msgstr "Новый счет основных средств"
 
 #. module: account_asset
 #. odoo-python
@@ -2036,6 +2102,8 @@ msgid ""
 "New bills added/modified will not update the non-draft asset's values. "
 "Please make sure this is what you want."
 msgstr ""
+"Новые или измененные счета поставщиков не повлияют на стоимость актива, если "
+"он уже выведен из статуса «Черновик». Подтвердите, если хотите продолжить."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__value_residual
@@ -2090,7 +2158,7 @@ msgstr "Нет Прората"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
-msgstr ""
+msgstr "Без амортизации"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__non_deductible_tax_value
@@ -2102,7 +2170,7 @@ msgstr "Налоговая стоимость, не подлежащая выч�
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__salvage_value_percent
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__salvage_value_percent
 msgid "Not Depreciable"
-msgstr ""
+msgstr "Не амортизируется"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__salvage_value
@@ -2126,7 +2194,7 @@ msgstr "Заметка"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Note: %s"
-msgstr ""
+msgstr "Примечание: %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_needaction_counter
@@ -2181,7 +2249,7 @@ msgstr "Количество недоставленных сообщений"
 #. odoo-python
 #: code:addons/account_asset/demo/account_demo.py:0
 msgid "Odoo Office"
-msgstr ""
+msgstr "Офис Odoo"
 
 #. module: account_asset
 #. odoo-python
@@ -2222,12 +2290,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__origin_asset_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Original Asset"
-msgstr ""
+msgstr "Исходный актив"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__original_move_lines_count
 msgid "Original Move Lines Count"
-msgstr ""
+msgstr "Количество исходных строк проводки"
 
 #. module: account_asset
 #. odoo-python
@@ -2264,7 +2332,7 @@ msgstr "Приостановлено Дата прората"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 msgid "Period"
-msgstr ""
+msgstr "Период"
 
 #. module: account_asset
 #. odoo-python
@@ -2273,6 +2341,8 @@ msgid ""
 "Please select a different fixed asset account than the one used on the "
 "current asset."
 msgstr ""
+"Выберите счет основных средств, отличный от того, который используется в "
+"текущем активе."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__positive_revaluation
@@ -2287,22 +2357,22 @@ msgstr "Размещенные записи"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
 msgid "Proceeds from financial instruments"
-msgstr ""
+msgstr "Поступления от финансовых инструментов"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
 msgid "Proceeds from sale of intangible assets"
-msgstr ""
+msgstr "Поступления от продажи нематериальных активов"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
 msgid "Proceeds from sale of property, plant and equipment"
-msgstr ""
+msgstr "Поступления от продажи основных средств"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
 msgid "Proceeds from sale of right-of-use assets"
-msgstr ""
+msgstr "Поступления от продажи активов в форме права пользования"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
@@ -2313,7 +2383,7 @@ msgstr "Свойства"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
 msgid "Property plant and equipment"
-msgstr ""
+msgstr "Основные средства"
 
 #. module: account_asset
 #. odoo-python
@@ -2331,17 +2401,17 @@ msgstr "Покупка"
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
 msgid "Purchase of financial instruments"
-msgstr ""
+msgstr "Приобретение финансовых инструментов"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
 msgid "Purchase of intangible assets"
-msgstr ""
+msgstr "Приобретение нематериальных активов"
 
 #. module: account_asset
 #: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
 msgid "Purchase of property, plant and equipment"
-msgstr ""
+msgstr "Приобретение основных средств"
 
 #. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
@@ -2351,7 +2421,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_mode__rate
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Rate"
-msgstr ""
+msgstr "Ставка"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__rating_ids
@@ -2370,7 +2440,7 @@ msgstr "Переоцените"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_recovery_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__recovery_account_id
 msgid "Recovery Account"
-msgstr ""
+msgstr "Счет корректировки амортизации"
 
 #. module: account_asset
 #. odoo-python
@@ -2384,7 +2454,7 @@ msgstr "Связанные активы"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Related Items"
-msgstr ""
+msgstr "Связанные элементы"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__related_purchase_value
@@ -2450,13 +2520,13 @@ msgstr "Продажа"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Same as the asset"
-msgstr ""
+msgstr "Как у актива"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "See new asset created: <b>%s</b>"
-msgstr ""
+msgstr "См. созданный новый актив: <b>%s</b>"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__select_invoice_line_id
@@ -2469,6 +2539,8 @@ msgid ""
 "Select a specific company to limit this model's use, or leave it empty to "
 "make this model available across all companies."
 msgstr ""
+"Выберите конкретную компанию, чтобы ограничить использование этой модели, "
+"или оставьте поле пустым, чтобы сделать модель доступной для всех компаний."
 
 #. module: account_asset
 #. odoo-python
@@ -2480,7 +2552,7 @@ msgstr "Продажа"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Set All to Draft"
-msgstr ""
+msgstr "Перевести все в черновик"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -2498,17 +2570,19 @@ msgid ""
 "Set when the name is entered manually, so that it is no longer regenerated "
 "from the model's configuration."
 msgstr ""
+"Устанавливается при вводе названия вручную, чтобы оно больше не "
+"перезаписывалось автоматически из настроек модели."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__show_duration
 msgid "Show Duration"
-msgstr ""
+msgstr "Показывать срок службы"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Show Gross Increases"
-msgstr ""
+msgstr "Показывать увеличение первоначальной стоимости"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
@@ -2568,7 +2642,7 @@ msgstr "Прямая линия"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Sub-Assets"
-msgstr ""
+msgstr "Субактивы"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__book_value
@@ -2597,6 +2671,10 @@ msgid ""
 "account %(dep_acc)s has been debited by %(dep_delta)s.\n"
 "This corresponds to %(move_count)s adjusted %(word)s."
 msgstr ""
+"Счет %(exp_acc)s кредитован на сумму %(exp_delta)s, а счет %(dep_acc)s "
+"дебетован на сумму %(dep_delta)s.\n"
+"\n"
+"Это соответствует %(move_count)s скорректированным %(word)s."
 
 #. module: account_asset
 #. odoo-python
@@ -2605,12 +2683,14 @@ msgid ""
 "The accumulated depreciation account (contra-asset account). Must exist in "
 "Odoo and be of \"Fixed Asset\" or \"Non-current Assets\" type."
 msgstr ""
+"Счет накопленной амортизации (контрактивный счет). Должен существовать в "
+"Odoo и быть типа «Основные средства» или «Внеоборотные активы»."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "The activation date cannot be before the asset's acquisition date."
-msgstr ""
+msgstr "Дата начала амортизации не может быть раньше даты приобретения актива."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_period
@@ -2651,6 +2731,10 @@ msgid ""
 "Assets\" type with depreciation model, accumulated depreciation, and "
 "depreciation expense account set."
 msgstr ""
+"Балансовый счет самого актива (например, «151000 Основные средства»). Должен "
+"существовать в Odoo, иметь тип «Основные средства» или «Внеоборотные активы"
+"», а также заполненные поля модели амортизации, счета накопленной "
+"амортизации и счета расходов на амортизацию."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__children_ids
@@ -2663,6 +2747,8 @@ msgstr "Дети - это прирост стоимости этого акти�
 msgid ""
 "The depreciated value on the last depreciation line for variant must be 0"
 msgstr ""
+"Амортизируемая стоимость в последней строке графика амортизации для варианта "
+"должна быть равна 0"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__invoice_ids
@@ -2692,12 +2778,16 @@ msgid ""
 "\"630000 Depreciation Expenses\"). Must exist in Odoo and be of "
 "\"Depreciation\" or \"Expense\" type."
 msgstr ""
+"Счет расходов для отражения периодических проводок амортизации (например, «"
+"630000 Расходы на амортизацию»). Должен существовать в Odoo и иметь тип «"
+"Амортизация» или «Расходы»."
 
 #. module: account_asset
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
 msgid "The fixed asset account differs from the account on the bill. Click"
 msgstr ""
+"Счет основных средств отличается от счета, указанного в документе. Нажмите"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
@@ -2705,6 +2795,8 @@ msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
 msgstr ""
+"Счет основных средств, на который переносится этот актив. Параметры "
+"амортизации этого счета будут применены к новому активу."
 
 #. module: account_asset
 #. odoo-python
@@ -2717,6 +2809,7 @@ msgstr "Оставшееся значение в последней строке
 #: code:addons/account_asset/models/account.py:0
 msgid "The same ledger cannot be linked multiple times on the same account."
 msgstr ""
+"Одну и ту же главную книгу нельзя привязать к одному счету несколько раз."
 
 #. module: account_asset
 #. odoo-python
@@ -2781,58 +2874,58 @@ msgstr "Увеличение стоимости для: %(asset)s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Value transferred from %(old_account)s to %(new_account)s."
-msgstr ""
+msgstr "Стоимость перенесена со счета %(old_account)s на счет %(new_account)s."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Variant"
-msgstr ""
+msgstr "Вариант"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s cancelled."
-msgstr ""
+msgstr "Вариант %(variant_name)s отменен."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s reset to draft."
-msgstr ""
+msgstr "Вариант %(variant_name)s возвращен в статус «Черновик»."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s set to running."
-msgstr ""
+msgstr "Вариант %(variant_name)s переведен в статус «В работе»."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_count
 msgid "Variant Count"
-msgstr ""
+msgstr "Количество вариантов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ledger_names
 msgid "Variant Ledger Names"
-msgstr ""
+msgstr "Названия главных книг вариантов"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__state
 msgid "Variant Status"
-msgstr ""
+msgstr "Статус варианта"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants paused: %s. "
-msgstr ""
+msgstr "Приостановленные варианты: %s. "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants resumed: %s. "
-msgstr ""
+msgstr "Возобновленные варианты: %s. "
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
@@ -2847,13 +2940,13 @@ msgstr "Количество активов с предупреждением"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__warning_sub_assets
 msgid "Warning Sub Assets"
-msgstr ""
+msgstr "Предупреждение о субактивах"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Warning for modifying bills for asset %s"
-msgstr ""
+msgstr "Предупреждение при изменении счетов поставщиков для актива %s"
 
 #. module: account_asset
 #. odoo-python
@@ -2867,6 +2960,9 @@ msgid ""
 "Whether an asset using this model is confirmed, on hold or closed, which "
 "freezes its depreciation configuration."
 msgstr ""
+"Указывает, находится ли актив, использующий эту модель, в статусе «"
+"Подтвержден», «Приостановлен» или «Закрыт», что блокирует изменение настроек "
+"амортизации."
 
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_asset_form
@@ -2876,13 +2972,13 @@ msgstr "В нашем шаблоне"
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_depreciation_ledger_wizard
 msgid "Wizard used to apply depreciations models on ledger assets"
-msgstr ""
+msgstr "Мастер для применения моделей амортизации к активам главной книги"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__12
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__12
 msgid "Year"
-msgstr ""
+msgstr "Год"
 
 #. module: account_asset
 #. odoo-javascript
@@ -2897,12 +2993,13 @@ msgstr ""
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can only activate a running asset that has a \"%s\" method."
 msgstr ""
+"Запустить амортизацию можно только для действующего актива с методом «%s»."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can't activate depreciation before the lock date."
-msgstr ""
+msgstr "Нельзя запустить амортизацию до даты закрытия периода."
 
 #. module: account_asset
 #. odoo-python
@@ -2927,13 +3024,15 @@ msgid ""
 "You cannot activate depreciation on an asset that has running gross "
 "increases. Please dispose of them first."
 msgstr ""
+"Нельзя запустить амортизацию для актива, у которого есть действующие "
+"увеличения первоначальной стоимости. Сначала оформите их выбытие."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "You cannot archive a record that has at least one variant that is not closed"
-msgstr ""
+msgstr "Нельзя архивировать запись, у которой хотя бы один вариант не закрыт"
 
 #. module: account_asset
 #. odoo-python
@@ -2957,7 +3056,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "You cannot change the state of an archived asset"
-msgstr ""
+msgstr "Нельзя изменить статус архивированного актива"
 
 #. module: account_asset
 #. odoo-python
@@ -2991,13 +3090,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "You cannot delete an asset variant that is in %s state."
-msgstr ""
+msgstr "Нельзя удалить вариант актива в статусе «%s»."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "You cannot dispose of a sub-asset before the lock date."
-msgstr ""
+msgstr "Нельзя оформить выбытие субактива до даты закрытия периода."
 
 #. module: account_asset
 #. odoo-python
@@ -3025,6 +3124,8 @@ msgid ""
 "You cannot update the account for asset '%s' because it is linked to journal "
 "items from multiple different accounts."
 msgstr ""
+"Нельзя изменить счет для актива «%s», так как он связан с элементами журнала "
+"из нескольких разных счетов."
 
 #. module: account_asset
 #. odoo-python
@@ -3036,13 +3137,13 @@ msgstr "account_asset_id"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_expense_id"
-msgstr ""
+msgstr "account_depreciation_expense_id"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_id"
-msgstr ""
+msgstr "account_depreciation_id"
 
 #. module: account_asset
 #. odoo-python
@@ -3054,7 +3155,7 @@ msgstr "acquisition_date"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "activate_depreciation"
-msgstr ""
+msgstr "activate_depreciation"
 
 #. module: account_asset
 #. odoo-python
@@ -3156,7 +3257,7 @@ msgstr "прибыль/убыток"
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
 msgid "here"
-msgstr ""
+msgstr "здесь"
 
 #. module: account_asset
 #. odoo-python
@@ -3168,7 +3269,7 @@ msgstr "потеря"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "model_id"
-msgstr ""
+msgstr "model_id"
 
 #. module: account_asset
 #. odoo-python
@@ -3191,13 +3292,13 @@ msgstr "пауза"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "per"
-msgstr ""
+msgstr "за"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_kanban
 msgid "per year"
-msgstr ""
+msgstr "в год"
 
 #. module: account_asset
 #. odoo-python
@@ -3226,13 +3327,13 @@ msgstr "продать"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "tax excl.)"
-msgstr ""
+msgstr "без налога)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
-msgstr ""
+msgstr "variant_ids.model_id"
 
 #~ msgid ""
 #~ "Journal Items of %(account)s should have a label in order to generate an "

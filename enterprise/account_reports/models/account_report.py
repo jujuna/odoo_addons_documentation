@@ -60,6 +60,18 @@ CURRENCIES_USING_LAKH = {'AFN', 'BDT', 'INR', 'MMK', 'NPR', 'PKR', 'LKR'}
 UNDISTR_LINE_NAME = _lt("Result Brought Forward")
 
 
+class ImageFontProxy:
+    __slots__ = ('__getlength',)
+
+    def __init__(self, font):
+        # getlength is dynamic (can be FreeTypeFont.getlength or ImageFont.getlength),
+        # thus we cannot use normal Proxy which resolves getlength statically
+        self.__getlength = font.getlength
+
+    def getlength(self, text):
+        return self.__getlength(text)
+
+
 class AccountReportAnnotation(models.Model):
     _name = 'account.report.annotation'
     _description = 'Account Report Annotation'
@@ -2505,7 +2517,8 @@ class AccountReport(models.Model):
 
         query = self.env['account.move.line'].with_context(
             date_from=date_from,
-            date_to=cta_date_to or date_to,
+            date_to=date_to,
+            cta_date_to=cta_date_to or date_to,
             currency_translation=self.currency_translation,
             allowed_company_ids=self.env['account.report'].get_report_company_ids(options),
         )._search(domain, bypass_access=True)
@@ -2654,6 +2667,11 @@ class AccountReport(models.Model):
         def convert_none(x):
             return x if x is not None and x is not False else ''
         return LINE_ID_HIERARCHY_DELIMITER.join(f'{convert_none(markup)}~{convert_none(model)}~{convert_none(value)}' for markup, model, value in current)
+
+    @api.model
+    def _get_line_id_ancestors(self, line_id):
+        segments = line_id.split(LINE_ID_HIERARCHY_DELIMITER)
+        return [LINE_ID_HIERARCHY_DELIMITER.join(segments[:i]) for i in range(1, len(segments))]
 
     @api.model
     def _build_parent_line_id(self, current):
@@ -2832,10 +2850,6 @@ class AccountReport(models.Model):
         return self.env['ir.model.data']._xmlid_lookup(view_xmlid)[1]
 
     def caret_option_open_general_ledger(self, options, params):
-        # When coming from a specific account, the unfold must only be retained
-        # on the specified account. Better performance and more ergonomic
-        # as it opens what client asked. And "Unfold All" is 1 clic away.
-        options["unfold_all"] = True
         general_ledger = self.env.ref('account_reports.general_ledger_report')
         account_id_to_search = self._get_res_id_from_line_id(params['line_id'], 'account.account')
         company_id_to_search = self._get_res_id_from_line_id(params['line_id'], 'res.company')
@@ -2857,8 +2871,25 @@ class AccountReport(models.Model):
             )
         gl_options = general_ledger.get_options(options)
         gl_options['not_reset_journals_filter'] = True  # prevents resetting the default journal group
-        gl_options['unfold_all'] = True
-        gl_options['filter_search_bar'] = search_content
+        general_ledger_line = self.env.ref('account_reports.general_ledger_custom_engine_line')
+        if (
+            account_id_to_search
+            and not gl_options.get('hierarchy')
+            and general_ledger_line._get_groupby(gl_options) == (general_ledger_line.groupby or general_ledger.groupby)
+        ):
+            gl_options['unfold_all'] = False
+            parent_line_id = general_ledger._get_generic_line_id(
+                'account.report.line',
+                general_ledger_line.id,
+            )
+            gl_options['unfolded_lines'] = [general_ledger._get_generic_line_id(
+                'account.account',
+                account_id_to_search,
+                markup={'groupby': 'account_id'},
+                parent_line_id=parent_line_id,
+            )]
+        else:
+            gl_options['unfold_all'] = True
 
         action_vals = self.env['ir.actions.actions']._for_xml_id('account_reports.action_account_report_general_ledger')
         action_vals['params'] = {
@@ -4135,6 +4166,17 @@ class AccountReport(models.Model):
 
     def _aggregation_compute_formula_result(self, col_group_options, expression, current_groupby, date_scope_eval_dict, parsed_terms, sum_children_formula_cache):
 
+        def apply_bounds(expression, subformula, unbounded_value, current_groupby=None):
+            try:
+                return self._aggregation_apply_bounds(col_group_options, subformula, unbounded_value, current_groupby)
+            except ValueError:
+                raise UserError(self.env._(
+                    'Invalid subformula in expression "%(expression)s" of line "%(line)s": %(subformula)s',
+                    expression=expression.label,
+                    line=expression.report_line_name,
+                    subformula=expression.subformula,
+                ))
+
         if expression.id in date_scope_eval_dict:
             expression_res = date_scope_eval_dict[expression.id]
             return expression_res['value'], expression_res['sublines_info']
@@ -4222,7 +4264,7 @@ class AccountReport(models.Model):
 
             bound_subformula = bound_term['bound_criterium'].replace('other_expr_', '')  # e.g. 'if_other_expr_above' => 'if_above'
             bound_params = bound_term['bound_params']
-            bounded_value = self._aggregation_apply_bounds(col_group_options, f"{bound_subformula}({bound_params})", criterium_val)
+            bounded_value = apply_bounds(expression, f"{bound_subformula}({bound_params})", criterium_val)
             if current_groupby:
                 formula_result = formula_result if bounded_value is not None else []
                 sublines_info = sublines_info if bounded_value is not None else {}
@@ -4230,7 +4272,7 @@ class AccountReport(models.Model):
                 formula_result *= int(bool(bounded_value is not None))
                 sublines_info = sublines_info and bounded_value is not None
         else:
-            bounded_value = self._aggregation_apply_bounds(col_group_options, expression.subformula, formula_result, current_groupby)
+            bounded_value = apply_bounds(expression, expression.subformula, formula_result, current_groupby)
             if current_groupby:
                 formula_result = bounded_value or []
                 sublines_info = sublines_info if bounded_value is not None else {}
@@ -4289,7 +4331,10 @@ class AccountReport(models.Model):
         # So an expression can't have bounds and be cross_reports, for simplicity.
         # To do that, just split the expression in two parts.
         if subformula and subformula.startswith('round'):
-            matches = re.match(r"round\((?P<precision>-?\d+)(,\s*(?P<rounding_method>(HALF-UP|HALF-DOWN|HALF-EVEN|UP|DOWN)))?\)", subformula)
+            matches = re.fullmatch(r"round\((?P<precision>-?\d+)(,\s*(?P<rounding_method>(HALF-UP|HALF-DOWN|HALF-EVEN|UP|DOWN)))?\)", subformula)
+            if not matches:
+                raise ValueError(f"Invalid subformula: {subformula}")
+
             precision_string = int(matches['precision'])
             rounding_method = matches['rounding_method'] or 'HALF-DOWN'
 
@@ -4307,6 +4352,9 @@ class AccountReport(models.Model):
                 r"(,(?P<currency_2>[A-Z]{3})\((?P<amount_2>[-]?\d+(\.\d+)?)\))?\)$",
                 subformula.replace(' ', '')
             )
+            if not match:
+                raise ValueError(f"Invalid subformula: {subformula}")
+
             group_values = match.groupdict()
 
             # Convert the provided bounds into company currency
@@ -4398,7 +4446,7 @@ class AccountReport(models.Model):
                 rslt[expression] = [] if current_groupby else {'result': expression.formula, 'has_sublines': False}
         return rslt
 
-    @snapshotable_engine(result_aggregators={'result': sum, 'has_sublines': max})
+    @snapshotable_engine(result_aggregators={'result': sum, 'has_sublines': max}, version=2)
     def _report_engine_tax_tags(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Report engine.
 
@@ -4532,6 +4580,7 @@ class AccountReport(models.Model):
             else:
                 non_batchable_domains_data.append((domain, formula, expressions))
 
+        cache = self.env.cr.cache.setdefault('report_batch_included_ids', {})
         rslt = {}
         for (batch_model, batch_aml_field), batch_domains in chain(batchable_domains_data.items(), (((None, None), [data]) for data in non_batchable_domains_data)):
             aml_domain = batch_domains[0][0] if not batch_model else None  # batch_domains contains only one element if there is not batch_model/batch_aml_field
@@ -4558,7 +4607,14 @@ class AccountReport(models.Model):
                 formula_rslt = []
                 totals_by_grouping_key = {}
 
-                batch_included_ids = self.env[batch_model].with_context(active_test=False).search(domain).ids if batch_model else [None]
+                if batch_model:
+                    key = (batch_model, str(domain), self.env.context)
+                    if key not in cache:
+                        cache[key] = self.env[batch_model].with_context(active_test=False).search(domain).ids
+                    batch_included_ids = cache[key]
+                else:
+                    batch_included_ids = [None]
+
                 for batch_included_id in batch_included_ids:
                     batch_res = results_by_batch_grouping_key.get(batch_included_id, []) if batch_included_id is not None else all_query_res
 
@@ -4653,7 +4709,7 @@ class AccountReport(models.Model):
 
         return rslt
 
-    @snapshotable_engine(result_aggregators={'sum': sum, 'impact': min, 'has_sublines': max}, sub_engine_of='_report_engine_account_codes', version=2)
+    @snapshotable_engine(result_aggregators={'sum': sum, 'impact': min, 'has_sublines': max}, sub_engine_of='_report_engine_account_codes', version=3)
     def _report_engine_account_codes_subengine(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Subengine of account_codes ; shoudln't be used separately. It always returns its results as a list, as if it was the result of a
         groupby computation, whatever the values of current_groupby.
@@ -4894,13 +4950,10 @@ class AccountReport(models.Model):
                 'debit': 0.0,
                 'credit': 0.0,
             }
-        block_end_date = None
-        if options.get('trial_balance_column_type') == 'initial_balance':
-            block_end_date = options['date']['date_to']
 
         equity_income_expense_domain = Domain([
             ('account_type', 'in', [
-                'equity', 'equity_unaffected', 'income', 'income_other',
+                'equity', 'equity_unaffected', 'equity_retained', 'income', 'income_other',
                 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other'
             ]),
         ])
@@ -4909,7 +4962,7 @@ class AccountReport(models.Model):
         query = self._get_report_query(
             options | {'forced_domain': list(combined_domain)},
             date_scope,
-            cta_date_to=block_end_date,
+            cta_date_to=options.get('cta_date_to'),
         )
 
         [(balance,)] = self.env.execute_query(query.select(
@@ -4928,7 +4981,7 @@ class AccountReport(models.Model):
         cta_line_name = self.env._("Cumulative Translation Adjustments")
 
         search_filter = options.get('filter_search_bar')
-        if search_filter and search_filter.lower() not in cta_line_name.lower():
+        if options.get('export_mode') == 'print' and search_filter and search_filter.lower() not in cta_line_name.lower():
             return None
 
         cumulative_translation_adjustment_line = defaultdict(dict)
@@ -6011,10 +6064,11 @@ class AccountReport(models.Model):
                 continue
 
             model, record_id = self._get_model_info_from_id(line.id)
-            if model == 'account.move.line' and record_id is not None:
-                aml_id_to_report_lines_map[record_id].append(line)
-            elif model in self._get_annotatable_models():
-                line.chatter = AccountReportLineChatterData(model=model, id=record_id)
+            if record_id is not None:
+                if model == 'account.move.line':
+                    aml_id_to_report_lines_map[record_id].append(line)
+                elif model in self._get_annotatable_models():
+                    line.chatter = AccountReportLineChatterData(model=model, id=record_id)
 
         aml_id_to_account_move_id = {
             line_data['id']: line_data['move_id']
@@ -6491,6 +6545,28 @@ class AccountReport(models.Model):
                 self._set_budget_column_comparisons(options, group_line_data)
 
             group_lines_by_keys[grouping_key] = group_line_data
+
+        # Add warning popup data to cells of default deferred accounts with discrepancies
+        # Checked only on mono-company
+        company_ids = self.get_report_company_ids(options)
+        if (
+            options.get('show_deferred_account_warning')
+            and groupby_model == 'account.account'
+            and len(company_ids) == 1
+        ):
+            company = self.env['res.company'].browse(company_ids)
+            deferred_account_ids = (company.deferred_expense_account_id | company.deferred_revenue_account_id).ids
+            for account_id, line in group_lines_by_keys.items():
+                if account_id not in deferred_account_ids:
+                    continue
+                for column in line.columns:
+                    if (
+                        column.expression_label == 'balance'
+                        and self._check_move_line_ids_without_deferral_entry(options=options, account_ids=[account_id], column_group_index=column.column_group_index)
+                    ):
+                        column.deferral_warning_popup_data = {
+                            'deferred_accounts_with_warning': [account_id],
+                        }
 
         draft_entries = {}  # move state used order to color the line if it's draft
         # Sort grouping keys in the right order and generate line names
@@ -6989,10 +7065,10 @@ class AccountReport(models.Model):
         for font_type in ('Reg', 'Bol', 'RegIta', 'BolIta'):
             try:
                 lato_path = f'web/static/fonts/lato/Lato-{font_type}-webfont.ttf'
-                fonts[font_type] = ImageFont.truetype(file_path(lato_path), 12)
+                fonts[font_type] = ImageFontProxy(ImageFont.truetype(file_path(lato_path), 12))
             except (OSError, FileNotFoundError):
                 # This won't give great result, but it will work.
-                fonts[font_type] = ImageFont.load_default()
+                fonts[font_type] = ImageFontProxy(ImageFont.load_default())
         return fonts
 
     def _inject_report_into_xlsx_sheet(self, options, workbook, sheet):
@@ -7491,7 +7567,8 @@ class AccountReport(models.Model):
 
         if not self.custom_handler_model_id:
             return []
-        if options.get('filter_search_bar') and options.get('filter_search_bar') not in str(UNDISTR_LINE_NAME).lower():
+        search_filter = options.get('filter_search_bar')
+        if options.get('export_mode') == 'print' and search_filter and search_filter.lower() not in str(UNDISTR_LINE_NAME).lower():
             return []
 
         unallocated_earnings_lines = defaultdict(dict)
@@ -8267,6 +8344,47 @@ class AccountReport(models.Model):
             for variant in available_variants
             if variant.root_report_id and variant.root_report_id.id in report_data_map
         ]
+
+    def _get_move_line_ids_without_deferral_entry_domain(self, options, account_ids, column_group_index=None):
+        if column_group_index is not None:
+            options = self._get_column_group_options(options, column_group_index)
+        return [
+            *self._get_options_domain(options, 'from_beginning'),
+            ('account_id', 'in', account_ids),
+            ('move_id.deferred_original_move_ids', '=', False),
+        ]
+
+    def _check_move_line_ids_without_deferral_entry(self, options, account_ids, column_group_index=None):
+        """ The sum of deferred lines without a deferral entry is non zero if
+            they have not all been reversed. """
+        move_line_ids_without_deferral_entry_sum = self.env['account.move.line']._read_group(
+            domain=self._get_move_line_ids_without_deferral_entry_domain(options, account_ids, column_group_index),
+            aggregates=['balance:sum'],
+        )[0][0]
+        return not self.env.company.currency_id.is_zero(move_line_ids_without_deferral_entry_sum)
+
+    def open_deferred_lines_without_deferral_entry(self, options, params):
+        deferred_lines_domain = self._get_move_line_ids_without_deferral_entry_domain(
+            options,
+            params['account_ids'],
+            params.get('column_group_index'),
+        )
+        move_ids_with_deferred_lines = self.env['account.move.line']._read_group(
+            domain=deferred_lines_domain,
+            groupby=['move_id'],
+            limit=2,
+        )
+        if len(move_ids_with_deferred_lines) == 1:
+            return move_ids_with_deferred_lines[0][0]._get_records_action()
+        return {
+            'name': _("Journal Items without Deferral Entry"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move.line',
+            'view_mode': 'list',
+            'target': 'current',
+            'views': [(self.env.ref('account.view_move_line_tree').id, 'list')],
+            'domain': deferred_lines_domain,
+        }
 
 
 class AccountReportLine(models.Model):

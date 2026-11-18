@@ -222,8 +222,8 @@
                                 <field name="quantity" force_save="1" optional="show" is_default_value="quantity == 1.0"/>
                                 <field name="rate" options="{'hide_trailing_zeros': True}" force_save="1" optional="show" is_default_value="rate == 100.0"/>
                                 <field name="salary_rule_id" groups="base.group_no_one" readonly="1" force_save="1" optional="hide"/>
-                                <!-- the style of the rule (bold, italic...) applies on the row -->
-                                <field name="salary_rule_id" widget="salary_rule_style" column_invisible="True" readonly="1"/>
+                                <!-- the style of the rule (bold, italic...) applies on the row, the column is hidden by the renderer -->
+                                <field name="salary_rule_id" widget="salary_rule_style" readonly="1"/>
                                 <field name="hide_amount" column_invisible="True"/>
                                 <field name="amount" force_save="1" optional="show" is_default_value="amount == total" invisible="hide_amount"/>
                                 <field name="total" readonly="not(amount == total and rate == 100.0 and quantity == 1.0)" force_save="1"/>

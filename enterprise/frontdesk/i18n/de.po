@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-10-16 07:33+0000\n"
+"POT-Creation-Date: 2026-11-13 17:47+0000\n"
+"PO-Revision-Date: 2026-11-09 06:50+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/frontdesk/"
 "de/>\n"
@@ -68,22 +68,22 @@ msgstr "22. Oktober 24 14:20:10"
 msgid ""
 "<div>\n"
 "                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
-"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
-"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
-"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
-"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
-"know you'll be there shortly.\n"
+"out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> "
+"<t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let "
+"them know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
 "                    <p>Guten Tag <t t-if=\"ctx.get('host_name')\"><t t-"
-"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
-"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
-"if=\"object.company\"> von <t t-out=\"object.company\"/></t> bittet um ein "
-"Treffen an folgendem Standort: <t t-out=\"object.station_id.name\"/>. Bitte "
-"benachrichtigen Sie die Person, dass Sie bald kommen.\n"
+"out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> "
+"<t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-"
+"if=\"object.company\"> von <t t-out=\"object.company\"></t></t> bittet um "
+"ein Treffen an folgendem Standort: <t t-out=\"object.station_id.name\"></t>. "
+"Bitte benachrichtigen Sie die Person, dass Sie bald kommen.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -279,6 +279,7 @@ msgstr "Schließen"
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Company"
 msgstr "Unternehmen"
 
@@ -664,11 +665,6 @@ msgid "No visitors yet. Let's add one!"
 msgstr "Noch keine Besucher. Fügen wir einen hinzu!"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify by Email"
-msgstr "Per E-Mail benachrichtigen"
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
 msgid "Notify by discuss"
 msgstr "Über Dialog benachrichtigen"
@@ -716,11 +712,6 @@ msgstr "Schalter öffnen"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Open Kiosk"
 msgstr "Kiosk öffnen"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
-msgid "Organization"
-msgstr "Organisation"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -803,10 +794,10 @@ msgstr "Verantwortliche"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid "Responsibles are notified if no host is selected."
+msgid ""
+"Responsibles are notified in Discuss of every check-in at this station, "
+"whether a host is selected or not."
 msgstr ""
-"Die Verantwortlichen werden benachrichtigt, wenn kein Gastgeber ausgewählt "
-"wurde."
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__host_selection
@@ -960,6 +951,7 @@ msgid "Visitor"
 msgstr "Besucher"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company
 msgid "Visitor Company"
 msgstr "Unternehmen des Gastes"
@@ -1079,6 +1071,12 @@ msgstr "z. B. john@company.com"
 
 #. module: frontdesk
 #. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "e.g. +1 123 456 789"
+msgstr "z. B. +1 123 456 789"
+
+#. module: frontdesk
+#. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "wurde informiert."
@@ -1100,6 +1098,40 @@ msgstr "Gastgeber sind"
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
 msgstr "wird sich bei Ihnen melden."
+
+#~ msgid "Notify by Email"
+#~ msgstr "Per E-Mail benachrichtigen"
+
+#~ msgid "Organization"
+#~ msgstr "Organisation"
+
+#~ msgid "Responsibles are notified if no host is selected."
+#~ msgstr ""
+#~ "Die Verantwortlichen werden benachrichtigt, wenn kein Gastgeber "
+#~ "ausgewählt wurde."
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+#~ "out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t "
+#~ "t-if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+#~ "if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+#~ "asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let "
+#~ "them know you'll be there shortly.\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <p>Guten Tag <t t-if=\"ctx.get('host_name')\"><t t-"
+#~ "out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t "
+#~ "t-if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+#~ "if=\"object.company\"> von <t t-out=\"object.company\"/></t> bittet um "
+#~ "ein Treffen an folgendem Standort: <t t-out=\"object.station_id.name\"/>. "
+#~ "Bitte benachrichtigen Sie die Person, dass Sie bald kommen.\n"
+#~ "                    </p>\n"
+#~ "                </div>\n"
+#~ "            "
 
 #~ msgid ""
 #~ "%(host_names)s must have a valid Phone to be informed about visitor "

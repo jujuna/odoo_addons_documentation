@@ -9,7 +9,7 @@
         <t t-set="is_any_total_discount_line" t-value="False"/>
         <t t-set="hide_price" t-value="doc.env['res.groups']._is_feature_enabled('planning.group_field_service_hide_price')"/>
         <t t-foreach="order.order_line" t-as="line">
-            <t t-set="is_intervention" t-value="line == doc.sale_line_id"/>
+            <t t-set="is_intervention" t-value="line == doc.sale_line_id or line.product_id.service_policy == 'delivered_timesheet'"/>
             <t t-set="use_qty_delivered" t-value="is_intervention and line.product_id.service_policy != 'ordered_prepaid'"/>
             <t t-if="use_qty_delivered">
                 <t t-set="final_subtotal" t-value="final_subtotal + line.delivered_price_subtotal"/>
@@ -47,7 +47,7 @@
                         <t t-set="current_subtotal" t-value="0"/>
 
                         <t t-foreach="order.order_line" t-as="line">
-                            <t t-set="is_intervention" t-value="line == doc.sale_line_id"/>
+                            <t t-set="is_intervention" t-value="line == doc.sale_line_id or line.product_id.service_policy == 'delivered_timesheet'"/>
                             <t t-set="use_qty_delivered" t-value="is_intervention and line.product_id.service_policy != 'ordered_prepaid'"/>
                             <t t-if="use_qty_delivered">
                                 <t t-set="is_total_discount" t-value="line.discount and line.price_unit != 0 and line.delivered_price_total == 0"/>

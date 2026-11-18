@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:58+0000\n"
-"PO-Revision-Date: 2026-10-08 15:34+0000\n"
+"POT-Creation-Date: 2026-11-06 17:58+0000\n"
+"PO-Revision-Date: 2026-10-27 13:33+0000\n"
 "Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/"
 "data_cleaning/th/>\n"
@@ -248,8 +248,7 @@ msgstr "ติดต่อ"
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__ref_merge_ir_act_server_id
 msgid ""
 "Contextual menu action that redirects to the deduplicate view of data_merge."
-msgstr ""
-"การดำเนินการของเมนูตามบริบทที่เปลี่ยนเส้นทางไปยังมุมมองที่ไม่ซ้ำของ data_merge"
+msgstr "การดำเนินการของเมนูตามบริบทที่เปลี่ยนเส้นทางไปยังมุมมองที่ไม่ซ้ำของ data_merge"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__country_id
@@ -446,6 +445,12 @@ msgid "Duplicates"
 msgstr "คัดลอก"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Duplicates Match Reasons"
+msgstr ""
+
+#. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_model.py:0
 msgid "Duplicates to Merge"
@@ -560,8 +565,7 @@ msgstr "ไอดี"
 msgid ""
 "If True, the generic data merge tool is available in the contextual menu of "
 "this model."
-msgstr ""
-"ถ้าเป็นจริง เครื่องมือผสานข้อมูลทั่วไปจะพร้อมใช้งานในเมนูตามบริบทของแบบโมเดลนี้"
+msgstr "ถ้าเป็นจริง เครื่องมือผสานข้อมูลทั่วไปจะพร้อมใช้งานในเมนูตามบริบทของแบบโมเดลนี้"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__is_contextual_merge_action
@@ -579,8 +583,8 @@ msgid ""
 "             that model and the generic data merge action should not be "
 "available on that model."
 msgstr ""
-"หากโมเดลมีวิธีการผสานแบบกำหนดเองอยู่แล้ว คลาสแอตทริบิวต์`_merge_disabled` จะถูกตั้งค่าเป็นจ"
-"ริงบน\n"
+"หากโมเดลมีวิธีการผสานแบบกำหนดเองอยู่แล้ว คลาสแอตทริบิวต์`_merge_disabled` "
+"จะถูกตั้งค่าเป็นจริงบน\n"
 "             โมเดลนั้นและการดำเนินการผสานข้อมูลทั่วไปไม่ควรมีอยู่ในโมเดล"
 
 #. module: data_cleaning
@@ -797,6 +801,12 @@ msgid "Months"
 msgstr "เดือน"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Moved Related Records"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__name
@@ -917,6 +927,12 @@ msgid "Records must be of the same model"
 msgstr "บันทึกต้องเป็นรุ่นเดียวกัน"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Retained and Removed Fields"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__rule_ids
 msgid "Rule"
 msgstr "กฎ"
@@ -929,7 +945,7 @@ msgstr "กฏ"
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action__html
 msgid "Scrap HTML"
-msgstr "เศษ HTML"
+msgstr "ลบ HTML"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
@@ -994,8 +1010,7 @@ msgstr "ช่องว่างที่ไม่จำเป็น"
 msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
-msgstr ""
-"ไม่ได้ติดตั้งโมดูล Python \"หมายเลขโทรศัพท์\" การฟอร์แมตโทรศัพท์จะไม่ทำงาน"
+msgstr "ไม่ได้ติดตั้งโมดูล Python \"หมายเลขโทรศัพท์\" การฟอร์แมตโทรศัพท์จะไม่ทำงาน"
 
 #. module: data_cleaning
 #. odoo-javascript
@@ -1096,14 +1111,49 @@ msgstr "สัปดาห์"
 msgid ""
 "Which spaces are trimmed by the rule. Leading, trailing, and successive "
 "spaces are considered superfluous."
-msgstr ""
-"ช่องว่างใดถูกตัดแต่งตามกฎ ช่องว่างนำหน้า ต่อท้าย และต่อเนื่องกันถือว่าไม่จำเป็น"
+msgstr "ช่องว่างใดถูกตัดแต่งตามกฎ ช่องว่างนำหน้า ต่อท้าย และต่อเนื่องกันถือว่าไม่จำเป็น"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_record.py:0
 msgid "You must select at least two %s in order to merge them."
 msgstr "คุณต้องเลือกอย่างน้อยสอง %sเพื่อที่จะรวมพวกมันเข้าด้วยกัน"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseMaster"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseRelations"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "collapseRuleValues"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.MasterExclusiveData"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.RelationsMergedData"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "data_cleaning.RuleValuesData"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate

@@ -314,9 +314,14 @@ class SaleOrderLine(models.Model):
             )
             for invoice_line in related_invoice_lines:
                 line_sign = amount_sign.get(invoice_line.move_id.move_type, 1)
-                qty_invoiced += line_sign * invoice_line.product_uom_id._compute_quantity(invoice_line.quantity, line.product_uom_id)
+                qty_invoiced += line_sign * line._get_subscription_invoice_line_qty(invoice_line)
             result[line.id] = qty_invoiced
         return result
+
+    def _get_subscription_invoice_line_qty(self, invoice_line):
+        """ Return the quantity of `invoice_line`, expressed in the UoM of the current line. """
+        self.ensure_one()
+        return invoice_line.product_uom_id._compute_quantity(invoice_line.quantity, self.product_uom_id)
 
     @api.depends('recurring_invoice', 'invoice_lines', 'invoice_lines.deferred_start_date', 'invoice_lines.deferred_end_date')
     def _compute_qty_invoiced(self):
@@ -493,8 +498,8 @@ class SaleOrderLine(models.Model):
             res.update({
                 'name': description,
                 'quantity': qty_to_invoice,
-                'deferred_start_date': new_period_start,
-                'deferred_end_date': new_period_stop,
+                'deferred_start_date': new_period_start if self.recurring_invoice else False,
+                'deferred_end_date': new_period_stop if self.recurring_invoice else False,
                 'subscription_id': parent_order_id,
             })
         elif self.order_id.is_subscription and not res.get('subscription_id'):
@@ -773,7 +778,7 @@ class SaleOrderLine(models.Model):
     # === PRICE COMPUTING HOOKS === #
 
     def _get_pricelist_price(self):
-        if self.recurring_invoice:
+        if self.recurring_invoice and not self.pricelist_item_id:
             return super()._get_pricelist_price() or self.price_unit
         return super()._get_pricelist_price()
 

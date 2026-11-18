@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:28+0000\n"
+"POT-Creation-Date: 2026-11-13 17:47+0000\n"
+"PO-Revision-Date: 2026-11-05 15:35+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "frontdesk/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -67,11 +67,11 @@ msgstr "22 lokakuu 24 14:20:10"
 msgid ""
 "<div>\n"
 "                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
-"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
-"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
-"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
-"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
-"know you'll be there shortly.\n"
+"out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> "
+"<t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let "
+"them know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -98,6 +98,8 @@ msgid ""
 "effortlessly check in and out while ensuring seamless notifications for "
 "hosts."
 msgstr ""
+"Kattava vastaanoton hallintajärjestelmä. Vieraat voivat kirjautua sisään ja "
+"ulos vaivattomasti, varmistaen samalla saumattomat ilmoitukset majoittajille."
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction
@@ -261,6 +263,7 @@ msgstr "Sulje"
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Company"
 msgstr "Yritys"
 
@@ -642,11 +645,6 @@ msgid "No visitors yet. Let's add one!"
 msgstr "Ei vielä kävijöitä. Lisätään sellainen!"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify by Email"
-msgstr ""
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
 msgid "Notify by discuss"
 msgstr "Ilmoita keskustelemalla"
@@ -694,11 +692,6 @@ msgstr "Avoin työpöytä"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Open Kiosk"
 msgstr "Avoin Itsepalvelupääte"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
-msgid "Organization"
-msgstr "Organisaatio"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -781,7 +774,9 @@ msgstr "Vastuuhenkilöt"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid "Responsibles are notified if no host is selected."
+msgid ""
+"Responsibles are notified in Discuss of every check-in at this station, "
+"whether a host is selected or not."
 msgstr ""
 
 #. module: frontdesk
@@ -842,7 +837,7 @@ msgstr ""
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Settings"
-msgstr ""
+msgstr "Asetukset"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -932,6 +927,7 @@ msgid "Visitor"
 msgstr "Vierailija"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company
 msgid "Visitor Company"
 msgstr "Vierailijayritys"
@@ -939,7 +935,7 @@ msgstr "Vierailijayritys"
 #. module: frontdesk
 #: model:ir.module.module,summary:base.module_frontdesk
 msgid "Visitor management system"
-msgstr ""
+msgstr "Vierailijoiden hallintajärjestelmä"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -1049,6 +1045,12 @@ msgstr "esim. john@yritys.fi"
 
 #. module: frontdesk
 #. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "e.g. +1 123 456 789"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "on informoitu."
@@ -1070,6 +1072,9 @@ msgstr "hostina ovat"
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
 msgstr "otamme sinuun yhteyttä."
+
+#~ msgid "Organization"
+#~ msgstr "Organisaatio"
 
 #~ msgid "Cancelled"
 #~ msgstr "Peruttu"

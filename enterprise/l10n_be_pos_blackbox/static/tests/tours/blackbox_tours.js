@@ -163,7 +163,7 @@ registry.category("web_tour.tours").add("test_l10n_be_pos_blackbox_sign_sale_bac
             BlackboxOracle.checkBlackboxRequestCounter({ M110_signSale: 1 }),
             // Restore the connection to the backend, in order to sync the offline order
             BlackboxUtil.setCanReachBackend(),
-            Chrome.isSynced(),
+            BlackboxUtil.waitForPaidOrdersSync(),
             BlackboxUtil.endTour(),
         ].flat(),
 });
@@ -217,7 +217,11 @@ registry
                 BlackboxUtil.confirmFdmErrorDialog(),
                 // Since the blackbox is unreachable, the order cannot be signed
                 BlackboxOracle.checkBlackboxRequestCounter({ M110_signSale: 0 }),
+                // Restore the backend and wait for the draft order to be synced before ending the tour
                 BlackboxUtil.setCanReachBackend(),
+                BlackboxUtil.waitBackendOnline(),
+                Chrome.flushPendingOrdersSync(),
+                Chrome.waitForOrdersSync(),
                 BlackboxUtil.setCanReachBlackbox(),
                 BlackboxUtil.endTour(),
             ].flat(),

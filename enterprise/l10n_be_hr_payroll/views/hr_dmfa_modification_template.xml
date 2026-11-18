@@ -64,7 +64,7 @@
    <template id="WorkerRecordUpdate">
         <WorkerRecordUpdate>
             <WorkerRecordUpdateAction>
-                <EmployerClass t-out="employer_class"/>
+                <EmployerClass t-out="worker.employer_class"/>
                 <WorkerCode t-out="worker.worker_code"/>
                 <NOSSQuarterStartingDate t-out="quarter_start"/>
                 <NOSSQuarterEndingDate t-out="quarter_end"/>
@@ -76,17 +76,17 @@
                 <t t-if="worker.local_unit_id != -1">
                     <LocalUnitID t-out="worker.local_unit_id"/>
                 </t>
-                <UpdateAction t-out="worker.state.worker_record_data[worker.worker_code]['update_action']"/> 
-                <t t-foreach="worker.state.worker_record_data[worker.worker_code]['occupations']" t-as="occupation">
+                <UpdateAction t-out="worker.state.worker_record_data[worker.state_key]['update_action']"/>
+                <t t-foreach="worker.state.worker_record_data[worker.state_key]['occupations']" t-as="occupation">
                     <t t-call="l10n_be_hr_payroll.OccupationUpdate"/>
                 </t>
-                <t t-foreach="worker.state.worker_record_data[worker.worker_code]['contributions']" t-as="contribution">
+                <t t-foreach="worker.state.worker_record_data[worker.state_key]['contributions']" t-as="contribution">
                     <t t-call="l10n_be_hr_payroll.WorkerContributionUpdate"/>
                 </t>
-                <t t-foreach="worker.state.worker_record_data[worker.worker_code]['deductions']" t-as="deduction">
+                <t t-foreach="worker.state.worker_record_data[worker.state_key]['deductions']" t-as="deduction">
                     <t t-call="l10n_be_hr_payroll.WorkerDeductionUpdate"/>
                 </t>
-                <t t-foreach="worker.state.worker_record_data[worker.worker_code]['student_contributions']" t-as="contribution">
+                <t t-foreach="worker.state.worker_record_data[worker.state_key]['student_contributions']" t-as="contribution">
                     <t t-call="l10n_be_hr_payroll.StudentContributionUpdate"/>
                 </t>
             </WorkerRecordUpdateAction>

@@ -46,6 +46,14 @@
                     </header>
                     <sheet>
                         <field name="form_281_50_count" invisible="1"/>
+                        <div class="alert alert-warning" role="alert" invisible="not form_281_50_missing_first_names">
+                            The first name of these natural persons can't be found in their name (e.g. "Doe, John"), the 281.50 will be sent without it:
+                            <field name="form_281_50_missing_first_names" class="fw-bold"/>
+                        </div>
+                        <div class="alert alert-warning" role="alert" invisible="not form_281_50_eu_vat_partners">
+                            These beneficiaries have a VAT number of another country of the European Economic Area: their invoices are usually not declared on a 281.50, check their 281.50 tag:
+                            <field name="form_281_50_eu_vat_partners" class="fw-bold"/>
+                        </div>
                         <group>
                             <group>
                                 <field name="sender_id" readonly="state == 'generated'"/>
@@ -91,6 +99,9 @@
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
+                        <div class="alert alert-warning" role="alert" invisible="not is_first_name_missing">
+                            The first name of this natural person can't be found in its name (e.g. "Doe, John"), the 281.50 will be sent without it.
+                        </div>
                         <group>
                             <group>
                                 <field name="partner_name" readonly="state == 'generated'"/>

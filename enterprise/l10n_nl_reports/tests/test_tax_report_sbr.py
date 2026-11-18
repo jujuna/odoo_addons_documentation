@@ -428,6 +428,37 @@ class TestNlTaxReportSBR(TestAccountReportsCommon):
         with self.assertRaises(RedirectWarning):
             _get_msg_identifier(options)
 
+    def test_xbrl_export_keeps_taxonomy(self):
+        """ Downloading still keeps the taxonomy of the period, so the
+        user can still generate reports for previous years. """
+        report = self.env.ref('l10n_nl.tax_report')
+        for date_from, date_to, expected_nt in [
+            ('2024-04-01', '2024-06-30', 'nt18'),
+            ('2025-04-01', '2025-06-30', 'nt19'),
+            ('2026-04-01', '2026-06-30', 'nt20'),
+        ]:
+            options = self._generate_options(report, fields.Date.from_string(date_from), fields.Date.from_string(date_to))
+            generated_xbrl = self.get_xml_tree_from_string(
+                self.env['l10n_nl_reports.tax.report.handler'].export_tax_report_to_xbrl(options)['file_content']
+            )
+            href = generated_xbrl.xpath("//*[local-name()='schemaRef']/@*[local-name()='href']")[0]
+            self.assertIn(expected_nt, href, "Printing a %s period must keep its own taxonomy (%s)" % (date_to[:4], expected_nt))
+
+    @freeze_time('2026-10-15')
+    def test_send_expired_period_tax_return(self):
+        """ Once the taxonomy of a period has expired (eg. 1th September 2026 for 2025 period), the
+        tax return can no longer be (the 2025 one is 2026-09-01) sent. """
+        report = self.env.ref('l10n_nl.tax_report')
+        date_from = fields.Date.from_string('2025-04-01')
+        date_to = fields.Date.from_string('2025-06-30')
+        options = self._generate_options(report, date_from, date_to)
+        wizard = self.env['l10n_nl_reports.sbr.tax.report.wizard']\
+            .with_context(default_date_from=date_from, default_date_to=date_to, options=options)\
+            .create({})
+
+        with self.assertRaises(UserError):
+            wizard.send_xbrl()
+
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 @skipIf(not os.getenv("NL_SBR_CERT"), "No SBR certificate")
@@ -459,8 +490,8 @@ class TestNlSBRFlow(TestAccountReportsCommon):
         self.env.company.l10n_nl_reports_sbr_cert_id = certificate
         self.env['ir.config_parameter'].sudo().set_str('l10n_nl_reports.sbr_mode', 'test')
 
-        date_from = fields.Date.from_string('2019-01-01')
-        date_to = fields.Date.from_string('2019-12-31')
+        date_from = fields.Date.from_string('2026-01-01')
+        date_to = fields.Date.from_string('2026-12-31')
         report = self.env.ref('l10n_nl.tax_report')
         options = self._generate_options(report, date_from, date_to)
 

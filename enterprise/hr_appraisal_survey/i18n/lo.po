@@ -3,14 +3,15 @@
 # * hr_appraisal_survey
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# Bone NI <bounkirdni@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:20+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Lao <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 17:48+0000\n"
+"PO-Revision-Date: 2026-10-28 09:34+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
 "hr_appraisal_survey/lo/>\n"
 "Language: lo\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +27,9 @@ msgid ""
 "This module adds an integration with Survey to ask feedbacks to any "
 "employee, based on a survey to fill.\n"
 msgstr ""
+"\n"
+"ໂມດູນນີ້ເພີ່ມການເຊື່ອມໂຍງກັບແບບສຳຫຼວດ ເພື່ອຂໍຄຳຄິດເຫັນຈາກພະນັກງານຄົນໃດກໍໄດ້ "
+"ໂດຍອີງໃສ່ແບບສຳຫຼວດທີ່ຕ້ອງຕື່ມ.\n"
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
@@ -35,12 +39,12 @@ msgstr ""
 #: model:mail.message.subtype,name:hr_appraisal_survey.mt_360_feedback
 #: model:survey.survey,title:hr_appraisal_survey.appraisal_360_feedback_template
 msgid "360 Feedback"
-msgstr ""
+msgstr "ຄຳຄິດເຫັນ 360 ອົງສາ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal_template__survey_template_ids
 msgid "360 Feedback Survey"
-msgstr ""
+msgstr "ແບບສຳຫຼວດຄຳຄິດເຫັນ 360 ອົງສາ"
 
 #. module: hr_appraisal_survey
 #: model:mail.template,body_html:hr_appraisal_survey.mail_template_appraisal_ask_feedback
@@ -49,18 +53,18 @@ msgid ""
 "\">\n"
 "                    Dear <t t-out=\"object.partner_id.name or "
 "'participant'\">[participant]</t>,\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    As part of our 360° feedback process, <t t-"
 "out=\"ctx.get('logged_user')\">[Current user]</t> would love\n"
 "                    to get your insights on <t t-out=\"ctx.get('employee')"
 "\">[the employee]</t>'s performance.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Your feedback is valuable in helping us recognize "
 "strengths and identify growth opportunities.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    It should only take a few minutes, and you can submit "
 "your feedback via the link below:\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <div style=\"text-align: center; margin: 24px 0;\">\n"
 "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
@@ -72,9 +76,9 @@ msgid ""
 "                    </div>\n"
 "                    Please complete the survey before <t t-"
 "out=\"ctx.get('deadline')\">[the specified deadline]</t>.\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    Thank you for your time and honesty!\n"
-"                    <br/>\n"
+"                    <br>\n"
 "                    <t t-if=\"ctx.get('user_body')\">\n"
 "                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
 "                            <t t-out=\"ctx.get('user_body')\">[Optional "
@@ -88,17 +92,17 @@ msgstr ""
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/>ໄປທີ່ການປະເມີນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "<span class=\"o_stat_text\">Feedbacks</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">ຄຳຄິດເຫັນ</span>"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "<span> / </span>"
-msgstr ""
+msgstr "<span> / </span>"
 
 #. module: hr_appraisal_survey
 #. odoo-python
@@ -107,31 +111,32 @@ msgid ""
 "A new 360 Feedback report has been completed for the appraisal of %"
 "(employee_name)s."
 msgstr ""
+"ບົດລາຍງານຄຳຄິດເຫັນ 360 ອົງສາໃໝ່ສຳລັບການປະເມີນຂອງ %(employee_name)s ໄດ້ສຳເລັດແລ້ວ."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_1
 msgid "Ability to cope with multidisciplinarity of team"
-msgstr ""
+msgstr "ຄວາມສາມາດໃນການເຮັດວຽກກັບທີມງານທີ່ມີຄວາມຫຼາກຫຼາຍດ້ານວິຊາຊີບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_6
 msgid "Ability to follow and complete work as instructed"
-msgstr ""
+msgstr "ຄວາມສາມາດໃນການປະຕິບັດຕາມ ແລະ ເຮັດວຽກໃຫ້ສຳເລັດຕາມຄຳແນະນຳ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_5
 msgid "Ability to manage planning resources, risks, budgets and deadlines"
-msgstr ""
+msgstr "ຄວາມສາມາດໃນການວາງແຜນຄຸ້ມຄອງຊັບພະຍາກອນ, ຄວາມສ່ຽງ, ງົບປະມານ ແລະ ກຳນົດເວລາ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_4
 msgid "About us"
-msgstr ""
+msgstr "ກ່ຽວກັບພວກເຮົາ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_1
 msgid "About you"
-msgstr ""
+msgstr "ກ່ຽວກັບທ່ານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_13
@@ -139,90 +144,92 @@ msgid ""
 "Adaptability: Ability to adapt oneself to organizational changes while "
 "keeping efficiency"
 msgstr ""
+"ຄວາມສາມາດໃນການປັບຕົວ: ຄວາມສາມາດໃນການປັບຕົວໃຫ້ເຂົ້າກັບການປ່ຽນແປງຂອງອົງກອນ "
+"ພ້ອມທັງຮັກສາປະສິດທິພາບໄວ້ໄດ້"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.actions.act_window,help:hr_appraisal_survey.survey_survey_action_appraisal
 msgid "Add a new survey"
-msgstr ""
+msgstr "ເພີ່ມແບບສຳຫຼວດໃໝ່"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Add feedback recipients..."
-msgstr ""
+msgstr "ເພີ່ມຜູ້ຮັບຄຳຄິດເຫັນ..."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_3
 msgid "Additional Comments"
-msgstr ""
+msgstr "ຄຳເຫັນເພີ່ມເຕີມ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_6
 msgid "Admit his/her mistakes"
-msgstr ""
+msgstr "ຍອມຮັບຂໍ້ຜິດພາດຂອງຕົນເອງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__allowed_survey_template_ids
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__allowed_survey_template_ids
 msgid "Allowed Survey Template"
-msgstr ""
+msgstr "ແມ່ແບບແບບສຳຫຼວດທີ່ອະນຸຍາດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_5
 msgid "Almost always"
-msgstr ""
+msgstr "ເກືອບຕະຫຼອດເວລາ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_11
 msgid "Analytical and synthetic mind"
-msgstr ""
+msgstr "ແນວຄິດວິເຄາະ ແລະ ສັງເຄາະ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__deadline
 msgid "Answer Deadline"
-msgstr ""
+msgstr "ກຳນົດເວລາຕອບ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__appraisal_id
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_user_input__appraisal_id
 #: model:ir.model.fields.selection,name:hr_appraisal_survey.selection__survey_survey__survey_type__appraisal
 msgid "Appraisal"
-msgstr ""
+msgstr "ການປະເມີນຜົນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
 msgid "Appraisal - Survey"
-msgstr ""
+msgstr "ການປະເມີນຜົນ - ແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
 msgid "Appraisal Employee"
-msgstr ""
+msgstr "ພະນັກງານທີ່ຖືກປະເມີນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_3
 msgid "Appraisal for Period"
-msgstr ""
+msgstr "ການປະເມີນສຳລັບໄລຍະເວລາ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "Appraisal of"
-msgstr ""
+msgstr "ການປະເມີນຂອງ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
 msgid "Appraisal: Ask Feedback new template"
-msgstr ""
+msgstr "ການປະເມີນຜົນ: ແມ່ແບບໃໝ່ສຳລັບການຂໍຄຳຄິດເຫັນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_survey__appraisal_manager_user_ids
 msgid "Appraisals Managers Users"
-msgstr ""
+msgstr "ຜູ້ໃຊ້ລະດັບຜູ້ຈັດການການປະເມີນຜົນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_5
 msgid "Appraiser"
-msgstr ""
+msgstr "ຜູ້ປະເມີນ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
@@ -233,109 +240,109 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "Ask Feedback"
-msgstr ""
+msgstr "ຂໍຄຳຄິດເຫັນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_appraisal_ask_feedback
 msgid "Ask Feedback for Appraisal"
-msgstr ""
+msgstr "ຂໍຄຳຄິດເຫັນສຳລັບການປະເມີນຜົນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__partner_feedback_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.view_hr_appraisal_tree
 msgid "Asked Feedback"
-msgstr ""
+msgstr "ຄຳຄິດເຫັນທີ່ໄດ້ຂໍ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "At the conclusion of the appraisal time period"
-msgstr ""
+msgstr "ເມື່ອສິ້ນສຸດໄລຍະເວລາການປະເມີນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "At the outset of the appraisal time period"
-msgstr ""
+msgstr "ເມື່ອເລີ່ມຕົ້ນໄລຍະເວລາການປະເມີນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__attachment_ids
 msgid "Attachments"
-msgstr ""
+msgstr "ໄຟລ໌ຄັດຕິດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__author_id
 msgid "Author"
-msgstr ""
+msgstr "ຜູ້ສ້າງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__body_has_template_value
 msgid "Body content is the same as the template"
-msgstr ""
+msgstr "ເນື້ອໃນຄືກັນກັບແມ່ແບບ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__can_edit_body
 msgid "Can Edit Body"
-msgstr ""
+msgstr "ສາມາດແກ້ໄຂເນື້ອໃນໄດ້"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_select_survey_view_form
 msgid "Choose Survey"
-msgstr ""
+msgstr "ເລືອກແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_3
 msgid "Collaborate effectively with others to achieve shared goals"
-msgstr ""
+msgstr "ຮ່ວມມືກັບຜູ້ອື່ນຢ່າງມີປະສິດທິຜົນເພື່ອບັນລຸເປົ້າໝາຍຮ່ວມກັນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_9
 msgid ""
 "Communication skills (written & verbally): clearness, concision, exactitude"
-msgstr ""
+msgstr "ທັກສະການສື່ສານ (ການຂຽນ ແລະ ການເວົ້າ): ຊັດເຈນ, ກະທັດຮັດ, ຖືກຕ້ອງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__completed_survey_count
 msgid "Completed Survey Count"
-msgstr ""
+msgstr "ຈຳນວນແບບສຳຫຼວດທີ່ຕອບສຳເລັດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_3
 msgid ""
 "Compliance to internal rules and processes (timesheets completion, etc.)"
-msgstr ""
+msgstr "ການປະຕິບັດຕາມກົດລະບຽບ ແລະ ຂະບວນການພາຍໃນ (ການຕື່ມໃບບັນທຶກເວລາ, ອື່ນໆ)"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_9
 msgid "Conclusion"
-msgstr ""
+msgstr "ສະຫຼຸບ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__body
 msgid "Contents"
-msgstr ""
+msgstr "ເນື້ອໃນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_2
 msgid "Create space for different ideas and options to be voiced"
-msgstr ""
+msgstr "ເປີດໂອກາດໃຫ້ມີການສະແດງຄວາມຄິດເຫັນ ແລະ ທາງເລືອກທີ່ແຕກຕ່າງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__create_uid
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "ສ້າງໂດຍ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__create_date
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__create_date
 msgid "Created on"
-msgstr ""
+msgstr "ສ້າງເມື່ອ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_14
 msgid "Creativity and forward looking aptitude"
-msgstr ""
+msgstr "ຄວາມຄິດສ້າງສັນ ແລະ ວິໄສທັດມອງໄປຂ້າງໜ້າ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -343,31 +350,33 @@ msgid ""
 "Critical or key elements of performance and professional development needs "
 "(if any), should also be noted at this time"
 msgstr ""
+"ອົງປະກອບຫຼັກ ຫຼື ສຳຄັນຂອງການປະຕິບັດງານ ແລະ ຄວາມຕ້ອງການໃນການພັດທະນາວິຊາຊີບ (ຖ້າມີ) "
+"ຄວນໄດ້ຮັບການບັນທຶກໄວ້ໃນເວລານີ້"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_8
 msgid "Customer commitment"
-msgstr ""
+msgstr "ຄວາມມຸ່ງໝັ້ນຕໍ່ລູກຄ້າ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_4
 msgid "Date of review"
-msgstr ""
+msgstr "ວັນທີທົບທວນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_7
 msgid "Decision making"
-msgstr ""
+msgstr "ການຕັດສິນໃຈ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_2
 msgid "Delegation: Ability to efficiently assign tasks to other people"
-msgstr ""
+msgstr "ການມອບໝາຍວຽກ: ຄວາມສາມາດໃນການມອບໝາຍວຽກໃຫ້ຜູ້ອື່ນຢ່າງມີປະສິດທິຜົນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
 msgid "Did not meet standards and expectations"
-msgstr ""
+msgstr "ບໍ່ໄດ້ມາດຕະຖານ ແລະ ບໍ່ບັນລຸຕາມຄວາມຄາດຫວັງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__display_name
@@ -378,99 +387,99 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_survey__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_user_input__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "ຊື່ສະແດງ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_10
 msgid "Do you have any comment to tell him/her in order to improve?"
-msgstr ""
+msgstr "ທ່ານມີຄຳແນະນຳຫຍັງແດ່ທີ່ຈະບອກລາວ ເພື່ອປັບປຸງໃຫ້ດີຂຶ້ນ?"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_hr_appraisal
 msgid "Employee Appraisal"
-msgstr ""
+msgstr "ການປະເມີນຜົນງານພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.survey,title:hr_appraisal_survey.appraisal_feedback_template
 msgid "Employee Appraisal Form"
-msgstr ""
+msgstr "ແບບຟອມການປະເມີນຜົນງານພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_hr_appraisal_template
 msgid "Employee Appraisal Template"
-msgstr ""
+msgstr "ແມ່ແບບການປະເມີນຜົນງານພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_5
 msgid "Employee Comments"
-msgstr ""
+msgstr "ຄຳຄິດເຫັນຂອງພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.survey,title:hr_appraisal_survey.opinion_form
 msgid "Employee Opinion Form"
-msgstr ""
+msgstr "ແບບຟອມຄວາມຄິດເຫັນຂອງພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_3
 msgid "Employee Performance in Key Areas"
-msgstr ""
+msgstr "ຜົນການປະຕິບັດງານຂອງພະນັກງານໃນດ້ານຫຼັກໆ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_2
 msgid "Enthusiasm & implication toward projects/assignments"
-msgstr ""
+msgstr "ຄວາມກະຕືລືລົ້ນ ແລະ ຄວາມເອົາໃຈໃສ່ຕໍ່ໂຄງການ/ວຽກທີ່ໄດ້ຮັບມອບໝາຍ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_template_view_form
 msgid "Every template allowed"
-msgstr ""
+msgstr "ອະນຸຍາດທຸກໆແມ່ແບບ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
 msgid "Exceeds standards and expectations"
-msgstr ""
+msgstr "ເກີນມາດຕະຖານ ແລະ ສູງກວ່າຄວາມຄາດຫວັງ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/hr_appraisal.py:0
 msgid "Feedback Surveys"
-msgstr ""
+msgstr "ແບບສຳຫຼວດຄຳຄິດເຫັນ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
 msgid "Fill the feedback form on survey"
-msgstr ""
+msgstr "ຕື່ມແບບຟອມຄຳຄິດເຫັນໃນແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "Go to the appraisal from"
-msgstr ""
+msgstr "ໄປທີ່ການປະເມີນຈາກ"
 
 #. module: hr_appraisal_survey
 #: model:mail.template,name:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid "HR: Ask Feedback 360"
-msgstr ""
+msgstr "HR: ຂໍຄຳຄິດເຫັນ 360 ອົງສາ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_5
 msgid "How does it feel to work with the employee? Is he/she ... "
-msgstr ""
+msgstr "ຮູ້ສຶກແນວໃດໃນການເຮັດວຽກກັບພະນັກງານຄົນນີ້? ລາວແມ່ນ... "
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug5
 msgid "I'm not from the company."
-msgstr ""
+msgstr "ຂ້ອຍບໍ່ໄດ້ມາຈາກບໍລິສັດນີ້."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug3
 msgid "I'm part of your management."
-msgstr ""
+msgstr "ຂ້ອຍແມ່ນສ່ວນໜຶ່ງຂອງຝ່າຍຄຸ້ມຄອງຂອງທ່ານ."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug4
 msgid "I'm referring to you."
-msgstr ""
+msgstr "ຂ້ອຍຂຶ້ນກັບທ່ານ."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__id
@@ -481,7 +490,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_survey__id
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_user_input__id
 msgid "ID"
-msgstr ""
+msgstr "ລະຫັດ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_4
@@ -489,21 +498,23 @@ msgid ""
 "Identify professional, performance, or project objectives you recommend for "
 "employee’s continued career development over the coming year."
 msgstr ""
+"ລະບຸເປົ້າໝາຍດ້ານວິຊາຊີບ, ຜົນງານ, ຫຼື ໂຄງການ "
+"ທີ່ທ່ານແນະນຳສຳລັບການສືບຕໍ່ພັດທະນາສາຍອາຊີບຂອງພະນັກງານໃນປີຕໍ່ໜ້າ."
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "If you need,"
-msgstr ""
+msgstr "ຖ້າທ່ານຕ້ອງການ,"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_5
 msgid "Initiative and self autonomy"
-msgstr ""
+msgstr "ຄວາມຄິດລິເລີ່ມ ແລະ ການເພິ່ງພາຕົນເອງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__is_mail_template_editor
 msgid "Is Editor"
-msgstr ""
+msgstr "ເປັນຕົວແກ້ໄຂ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -513,6 +524,9 @@ msgid ""
 "major employee responsibilities and corresponding benchmarks against which "
 "results will be evaluated."
 msgstr ""
+"ມັນເປັນຄວາມຮັບຜິດຊອບຮ່ວມກັນຂອງພະນັກງານ ແລະ ຫົວໜ້າງານ (ຜູ້ປະເມີນ) "
+"ໃນການສ້າງແຜນການເຮັດວຽກທີ່ເປັນໄປໄດ້ສຳລັບປີຕໍ່ໜ້າ, ລວມທັງຄວາມຮັບຜິດຊອບຫຼັກຂອງພະນັກງານ ແລະ "
+"ມາດຕະຖານການວັດແທກທີ່ກ່ຽວຂ້ອງ ເພື່ອນຳມາໃຊ້ປະເມີນຜົນ."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -521,23 +535,25 @@ msgid ""
 "input from the appropriate sources of feedback (internal and/or external "
 "customers, peers)."
 msgstr ""
+"ມັນເປັນຄວາມຮັບຜິດຊອບຫຼັກຂອງຫົວໜ້າງານ ໃນການຮວບຮວມຂໍ້ມູນທີ່ຈຳເປັນຈາກແຫຼ່ງຄຳຄິດເຫັນທີ່ເໝາະສົມ "
+"(ລູກຄ້າພາຍໃນ ແລະ/ຫຼື ພາຍນອກ, ເພື່ອນຮ່ວມງານ)."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__lang
 msgid "Language"
-msgstr ""
+msgstr "ພາສາ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__write_uid
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "ປັບປຸງຫຼ້າສຸດໂດຍ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__write_date
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "ປັບປຸງຫຼ້າສຸດເມື່ອ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_3
@@ -545,63 +561,65 @@ msgid ""
 "Leadership: create a challenging and motivating work environment aligned "
 "with the company's strategy"
 msgstr ""
+"ຄວາມເປັນຜູ້ນຳ: ສ້າງສະພາບແວດລ້ອມການເຮັດວຽກທີ່ທ້າທາຍ ແລະ ສ້າງແຮງຈູງໃຈ "
+"ໃຫ້ສອດຄ່ອງກັບຍຸດທະສາດຂອງບໍລິສັດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_4
 msgid "Leadership: sustain subordinates in their professional growth"
-msgstr ""
+msgstr "ຄວາມເປັນຜູ້ນຳ: ສະໜັບສະໜູນຜູ້ໃຕ້ບັງຄັບບັນຊາໃຫ້ມີການເຕີບໂຕໃນສາຍວິຊາຊີບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_1
 msgid "Listening well to others"
-msgstr ""
+msgstr "ຮັບຟັງຄວາມຄິດເຫັນຂອງຜູ້ອື່ນໄດ້ດີ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__template_id
 msgid "Mail Template"
-msgstr ""
+msgstr "ແມ່ແບບອີເມວ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "Mark as Done"
-msgstr ""
+msgstr "ໝາຍວ່າສຳເລັດ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
 msgid "Meet standards and expectations"
-msgstr ""
+msgstr "ບັນລຸມາດຕະຖານ ແລະ ຄວາມຄາດຫວັງ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_1
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_view_partner_tree
 msgid "Name"
-msgstr ""
+msgstr "ຊື່"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_1
 msgid "Never"
-msgstr ""
+msgstr "ບໍ່ເຄີຍ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "No surveys found for this appraisal."
-msgstr ""
+msgstr "ບໍ່ພົບແບບສຳຫຼວດສຳລັບການປະເມີນນີ້."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_1
 msgid "Objectives"
-msgstr ""
+msgstr "ເປົ້າໝາຍ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_4
 msgid "Often"
-msgstr ""
+msgstr "ເລື້ອຍໆ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Optional comment..."
-msgstr ""
+msgstr "ຄຳເຫັນເພີ່ມເຕີມ..."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_appraisal_ask_feedback__lang
@@ -611,102 +629,105 @@ msgid ""
 "usually be a placeholder expression that provides the appropriate language, "
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
+"ພາສາແປທາງເລືອກ (ລະຫັດ ISO) ທີ່ຈະເລືອກເມື່ອສົ່ງອີເມວ. ຖ້າບໍ່ໄດ້ຕັ້ງຄ່າ, ພາສາຂອງຄູ່ຄ້າຫຼັກຈະຖືກນຳໃຊ້. "
+"ສິ່ງນີ້ຄວນເປັນນິພົດ placeholder ທີ່ສະໜອງພາສາທີ່ເໝາະສົມ, ເຊັ່ນ: "
+"{{ object.partner_id.lang }}."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "Overall Purpose Of Employee Appraisal"
-msgstr ""
+msgstr "ຈຸດປະສົງລວມຂອງການປະເມີນຜົນງານພະນັກງານ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "Partner"
-msgstr ""
+msgstr "ຄູ່ຄ້າ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_user_input__requested_by
 msgid "Partner-related data of the user"
-msgstr ""
+msgstr "ຂໍ້ມູນທີ່ກ່ຽວຂ້ອງກັບຄູ່ຄ້າຂອງຜູ້ໃຊ້"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_4_2
 msgid "Personal Performance Objectives"
-msgstr ""
+msgstr "ເປົ້າໝາຍຜົນງານສ່ວນບຸກຄົນ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
 msgid "Please set an Answer Deadline in the future"
-msgstr ""
+msgstr "ກະລຸນາກຳນົດວັນໝົດກຳນົດຕອບໃນອະນາຄົດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_2
 msgid "Position Title"
-msgstr ""
+msgstr "ຕຳແໜ່ງງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_4_1
 msgid "Professional Development Objectives"
-msgstr ""
+msgstr "ເປົ້າໝາຍການພັດທະນາວິຊາຊີບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_4
 msgid "Professional Development and Performance Plan"
-msgstr ""
+msgstr "ແຜນການພັດທະນາວິຊາຊີບ ແລະ ຜົນການປະຕິບັດງານ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_4_3
 msgid "Project Objectives"
-msgstr ""
+msgstr "ເປົ້າໝາຍໂຄງການ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_12
 msgid "Promptness and attendance record"
-msgstr ""
+msgstr "ຄວາມກົງຕໍ່ເວລາ ແລະ ປະຫວັດການມາເຮັດວຽກ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_2
 msgid "Rarely"
-msgstr ""
+msgstr "ບໍ່ຄ່ອຍມີ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__partner_ids
 msgid "Recipients"
-msgstr ""
+msgstr "ຜູ້ຮັບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_7
 msgid "Recognize the contributions of teammates and peers"
-msgstr ""
+msgstr "ຮັບຮູ້ຜົນງານ ແລະ ການປະກອບສ່ວນຂອງເພື່ອນຮ່ວມທີມ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__render_model
 msgid "Rendering Model"
-msgstr ""
+msgstr "ໂມເດວການສະແດງຜົນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_user_input__requested_by
 msgid "Requested by"
-msgstr ""
+msgstr "ຮ້ອງຂໍໂດຍ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "Resend"
-msgstr ""
+msgstr "ສົ່ງຄືນໃໝ່"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "Resend all"
-msgstr ""
+msgstr "ສົ່ງຄືນໃໝ່ທັງໝົດ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "Responded:"
-msgstr ""
+msgstr "ຕອບແລ້ວ:"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_2
 msgid "Results"
-msgstr ""
+msgstr "ຜົນໄດ້ຮັບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_1
@@ -714,88 +735,90 @@ msgid ""
 "Results of the bottom-up survey and mitigation actions to face technical, "
 "organizational, structural and/or relational issues"
 msgstr ""
+"ຜົນຂອງແບບສຳຫຼວດຈາກລຸ່ມຂຶ້ນເທິງ ແລະ ມາດຕະການແກ້ໄຂເພື່ອຮັບມືກັບບັນຫາດ້ານເຕັກນິກ, ອົງກອນ, ໂຄງສ້າງ "
+"ແລະ/ຫຼື ການພົວພັນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "See Answers"
-msgstr ""
+msgstr "ເບິ່ງຄຳຕອບ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_select_survey_view_form
 msgid "See Results"
-msgstr ""
+msgstr "ເບິ່ງຜົນໄດ້ຮັບ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "See results"
-msgstr ""
+msgstr "ເບິ່ງຜົນໄດ້ຮັບ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_5
 msgid "Seek to understand the problem before working on a solution"
-msgstr ""
+msgstr "ພະຍາຍາມເຂົ້າໃຈບັນຫາກ່ອນທີ່ຈະລົງມືແກ້ໄຂ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_appraisal_select_survey
 msgid "Select survey type for an appraisal to show its results"
-msgstr ""
+msgstr "ເລືອກປະເພດແບບສຳຫຼວດສຳລັບການປະເມີນເພື່ອສະແດງຜົນໄດ້ຮັບ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Send"
-msgstr ""
+msgstr "ສົ່ງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_hr_appraisal__survey_ids
 msgid "Sent out surveys"
-msgstr ""
+msgstr "ແບບສຳຫຼວດທີ່ສົ່ງອອກແລ້ວ"
 
 #. module: hr_appraisal_survey
 #: model:mail.template,description:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid "Sent to employees to gather appraisal feedback"
-msgstr ""
+msgstr "ສົ່ງໃຫ້ພະນັກງານເພື່ອຮວບຮວມຄຳຄິດເຫັນການປະເມີນຜົນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
 msgid "Shared with everybody"
-msgstr ""
+msgstr "ແບ່ງປັນໃຫ້ທຸກຄົນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
 msgid "Show good judgment in decision making"
-msgstr ""
+msgstr "ສະແດງໃຫ້ເຫັນເຖິງການຕັດສິນໃຈທີ່ດີ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
 msgid "Significantly below standards and expectations"
-msgstr ""
+msgstr "ຕ່ຳກວ່າມາດຕະຖານ ແລະ ຄວາມຄາດຫວັງຢ່າງຫຼວງຫຼາຍ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
 msgid ""
 "Significantly exceeds standards and expectations required of the position"
-msgstr ""
+msgstr "ເກີນມາດຕະຖານ ແລະ ຄວາມຄາດຫວັງທີ່ກຳນົດໄວ້ສຳລັບຕຳແໜ່ງຢ່າງຫຼວງຫຼາຍ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_3
 msgid "Sometimes"
-msgstr ""
+msgstr "ບາງຄັ້ງ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__subject
 #: model:survey.question,title:hr_appraisal_survey.appraisal_3_1
 msgid "Subject"
-msgstr ""
+msgstr "ຫົວຂໍ້"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Subject..."
-msgstr ""
+msgstr "ຫົວຂໍ້..."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_3_2
 msgid "Supervisors only"
-msgstr ""
+msgstr "ສະເພາະຫົວໜ້າງານເທົ່ານັ້ນ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_survey_survey
@@ -803,39 +826,39 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__survey_ids
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_question_answer__survey_id
 msgid "Survey"
-msgstr ""
+msgstr "ແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/hr_appraisal.py:0
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "Survey Feedback"
-msgstr ""
+msgstr "ຄຳຄິດເຫັນຈາກແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__survey_input_ids
 msgid "Survey Inputs"
-msgstr ""
+msgstr "ຂໍ້ມູນຕອບແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_survey_question_answer
 msgid "Survey Label"
-msgstr ""
+msgstr "ປ້າຍກຳກັບແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__survey_template_id
 msgid "Survey Template"
-msgstr ""
+msgstr "ແມ່ແບບແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_survey__survey_type
 msgid "Survey Type"
-msgstr ""
+msgstr "ປະເພດແບບສຳຫຼວດ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_survey_user_input
 msgid "Survey User Input"
-msgstr ""
+msgstr "ການປ້ອນຂໍ້ມູນແບບສຳຫຼວດຂອງຜູ້ໃຊ້"
 
 #. module: hr_appraisal_survey
 #: model:mail.template,subject:hr_appraisal_survey.mail_template_appraisal_ask_feedback
@@ -843,6 +866,8 @@ msgid ""
 "Take part in {{ ctx.get('employee_id') and ctx['employee_id'].name or "
 "'this' }} appraisal"
 msgstr ""
+"ເຂົ້າຮ່ວມໃນການປະເມີນຜົນ {{ ctx.get('employee_id') and ctx['employee_id'].name or "
+"'this' }} appraisal"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_4
@@ -850,16 +875,18 @@ msgid ""
 "Team spirit: ability to work efficiently with peers, manage the conflicts "
 "with diplomacy"
 msgstr ""
+"ຈິດໃຈເຮັດວຽກເປັນທີມ: ຄວາມສາມາດໃນການເຮັດວຽກກັບເພື່ອນຮ່ວມງານຢ່າງມີປະສິດທິຜົນ, "
+"ຈັດການຄວາມຂັດແຍ່ງດ້ວຍຫຼັກການທູດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_10
 msgid "Technical skills regarding to the job requirements"
-msgstr ""
+msgstr "ທັກສະດ້ານເຕັກນິກທີ່ກ່ຽວຂ້ອງກັບຄວາມຕ້ອງການຂອງວຽກ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description_done:hr_appraisal_survey.appraisal_360_feedback_template
 msgid "Thanks a lot for your time and participation !"
-msgstr ""
+msgstr "ຂອບໃຈຫຼາຍໆສຳລັບເວລາ ແລະ ການມີສ່ວນຮ່ວມຂອງທ່ານ!"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
@@ -867,13 +894,15 @@ msgid ""
 "The appraiser should rate the employee’s major work accomplishments and "
 "performance according to the metric provided below:"
 msgstr ""
+"ຜູ້ປະເມີນຄວນໃຫ້ຄະແນນຜົນສຳເລັດຂອງວຽກຫຼັກ ແລະ ຜົນການປະຕິບັດງານຂອງພະນັກງານ "
+"ຕາມມາດຖານການວັດແທກທີ່ລະບຸໄວ້ລຸ່ມນີ້:"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
 "The employee may choose to offer comments or explanation regarding the "
 "completed review."
-msgstr ""
+msgstr "ພະນັກງານອາດຈະເລືອກໃຫ້ຄຳເຫັນ ຫຼື ຄຳອະທິບາຍກ່ຽວກັບການທົບທວນທີ່ສຳເລັດແລ້ວ."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -884,6 +913,10 @@ msgid ""
 "criterion. Once the form had been filled, the employee send it to their "
 "supervisor."
 msgstr ""
+"ພະນັກງານຈະມີຄວາມຮັບຜິດຊອບໃນການຕື່ມຮ່າງແບບຟອມການປະເມີນ ເພື່ອເປັນເຄື່ອງມືໃນການປະເມີນຕົນເອງ ແລະ "
+"ເປັນຈຸດເລີ່ມຕົ້ນສຳລັບການປະເມີນຂອງຫົວໜ້າງານ. "
+"ພະນັກງານສາມາດເພີ່ມຕົວຢ່າງຜົນສຳເລັດສຳລັບແຕ່ລະມາດຖານໄດ້. ເມື່ອຕື່ມແບບຟອມແລ້ວ, "
+"ພະນັກງານຈະສົ່ງມັນໃຫ້ຫົວໜ້າງານຂອງຕົນ."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -892,13 +925,15 @@ msgid ""
 "appraisal. The motivation of the evaluation is explained in the ad hoc "
 "fields."
 msgstr ""
+"ຫົວໜ້າງານຈະສັງເຄາະ ແລະ ຮວບຮວມຂໍ້ມູນທັງໝົດເຂົ້າໃນການປະເມີນທີ່ສຳເລັດສົມບູນ. "
+"ເຫດຜົນຂອງການປະເມີນຈະຖືກອະທິບາຍໄວ້ໃນຊ່ອງທີ່ກ່ຽວຂ້ອງ."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_hr_appraisal_template__survey_template_ids
 msgid ""
 "The survey templates available to choose from for the appraisals that use "
 "this template."
-msgstr ""
+msgstr "ແມ່ແບບແບບສຳຫຼວດທີ່ມີໃຫ້ເລືອກສຳລັບການປະເມີນທີ່ໃຊ້ແມ່ແບບນີ້."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_feedback_template
@@ -906,11 +941,13 @@ msgid ""
 "This survey allows you to give a feedback about your collaboration with an "
 "employee. Filling it helps us improving the appraisal process."
 msgstr ""
+"ແບບສຳຫຼວດນີ້ຊ່ວຍໃຫ້ທ່ານສາມາດໃຫ້ຄຳຄິດເຫັນກ່ຽວກັບການຮ່ວມມືກັບພະນັກງານ. "
+"ການຕອບແບບສຳຫຼວດນີ້ຈະຊ່ວຍໃຫ້ພວກເຮົາປັບປຸງຂະບວນການປະເມີນໃຫ້ດີຂຶ້ນ."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_15
 msgid "Time management: projects/tasks are completed on time"
-msgstr ""
+msgstr "ການຄຸ້ມຄອງເວລາ: ໂຄງການ/ວຽກຕ່າງໆ ສຳເລັດຕາມກຳນົດເວລາ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -918,43 +955,44 @@ msgid ""
 "To assist employees in their professional growth, through the identification "
 "of strengths and opportunities for development"
 msgstr ""
+"ເພື່ອຊ່ວຍເຫຼືອພະນັກງານໃນການເຕີບໂຕດ້ານວິຊາຊີບ ໂດຍຜ່ານການກຳນົດຈຸດແຂງ ແລະ ໂອກາດໃນການພັດທະນາ"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "To initiate a clear and open communication of performance expectations"
-msgstr ""
+msgstr "ເພື່ອເລີ່ມຕົ້ນການສື່ສານທີ່ຊັດເຈນ ແລະ ເປີດກວ້າງກ່ຽວກັບຄວາມຄາດຫວັງຂອງຜົນງານ"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__total_survey_count
 msgid "Total Survey Count"
-msgstr ""
+msgstr "ຈຳນວນແບບສຳຫຼວດທັງໝົດ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_5_1
 msgid ""
 "Use the following space to make any comments regarding the above performance "
 "evaluation."
-msgstr ""
+msgstr "ໃຊ້ພື້ນທີ່ຕໍ່ໄປນີ້ເພື່ອສະແດງຄຳຄິດເຫັນກ່ຽວກັບການປະເມີນຜົນງານຂ້າງເທິງ."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__user_body
 msgid "User Contents"
-msgstr ""
+msgstr "ເນື້ອໃນຂອງຜູ້ໃຊ້"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_survey__appraisal_manager_user_ids
 msgid "Users allowed to view the survey used in an appraisal"
-msgstr ""
+msgstr "ຜູ້ໃຊ້ທີ່ໄດ້ຮັບອະນຸຍາດໃຫ້ເບິ່ງແບບສຳຫຼວດທີ່ໃຊ້ໃນການປະເມີນຜົນ"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug1
 msgid "We're colleagues, for the same manager."
-msgstr ""
+msgstr "ພວກເຮົາເປັນເພື່ອນຮ່ວມງານກັນ, ຢູ່ໃຕ້ຫົວໜ້າດຽວກັນ."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug2
 msgid "We're colleagues, in different teams."
-msgstr ""
+msgstr "ພວກເຮົາເປັນເພື່ອນຮ່ວມງານກັນ, ຢູ່ຕ່າງທີມ."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_360_feedback_template
@@ -968,36 +1006,42 @@ msgid ""
 "                Your answers will be viewed only by the managers. This is "
 "not an anonymous survey."
 msgstr ""
+"ຍິນດີຕ້ອນຮັບສູ່ແບບສຳຫຼວດນີ້, <br><br>\n"
+"                ທ່ານໄດ້ຮັບການເຊື້ອເຊີນໃຫ້ເຂົ້າຮ່ວມໃນການປະເມີນ 360 ອົງສາ. ນີ້ແມ່ນແບບສຳຫຼວດສັ້ນໆ "
+"ທີ່ຈະຊ່ວຍໃຫ້ຜູ້ຈັດການໄດ້ຮັບຄຳຄິດເຫັນເພີ່ມເຕີມກ່ຽວກັບພະນັກງານຂອງພວກເຂົາ. \n"
+"                ໂດຍການທີ່ທ່ານໄດ້ຮ່ວມວຽກກັບລາວ, ທ່ານຄືຄົນທີ່ເໝາະສົມທີ່ສຸດທີ່ຈະແບ່ງປັນຄວາມຄິດເຫັນ "
+"ແລະ ອະທິບາຍເຖິງການຮ່ວມມືກັນທີ່ຜ່ານມາ.<br><br>\n"
+"                ຄຳຕອບຂອງທ່ານຈະຖືກເບິ່ງເຫັນສະເພາະຜູ້ຈັດການເທົ່ານັ້ນ. ນີ້ບໍ່ແມ່ນແບບສຳຫຼວດທີ່ປິດບັງຊື່."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_6
 msgid "What should he/she does in order to improve on his/her day-to-day job?"
-msgstr ""
+msgstr "ລາວຄວນເຮັດຫຍັງແດ່ເພື່ອປັບປຸງວຽກປະຈຳວັນຂອງລາວໃຫ້ດີຂຶ້ນ?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_7
 msgid "What's his/her greatest strength?"
-msgstr ""
+msgstr "ຈຸດແຂງທີ່ໂດດເດັ່ນທີ່ສຸດຂອງລາວແມ່ນຫຍັງ?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_8
 msgid "What's his/her greatest weakness?"
-msgstr ""
+msgstr "ຈຸດອ່ອນທີ່ສຸດຂອງລາວແມ່ນຫຍັງ?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_3
 msgid "What's the relation between the employee and you?"
-msgstr ""
+msgstr "ສາຍພົວພັນລະຫວ່າງພະນັກງານ ແລະ ທ່ານ ແມ່ນແນວໃດ?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_2
 msgid "What's your name?"
-msgstr ""
+msgstr "ທ່ານຊື່ຫຍັງ?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2
 msgid "Work Plan"
-msgstr ""
+msgstr "ແຜນການເຮັດວຽກ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.actions.act_window,help:hr_appraisal_survey.survey_survey_action_appraisal
@@ -1005,50 +1049,130 @@ msgid ""
 "You can create surveys used for appraisals. Design easily your appraisal,\n"
 "                send invitations and analyze answers."
 msgstr ""
+"ທ່ານສາມາດສ້າງແບບສຳຫຼວດທີ່ໃຊ້ສຳລັບການປະເມີນຜົນໄດ້. ອອກແບບການປະເມີນຂອງທ່ານໄດ້ຢ່າງງ່າຍດາຍ,\n"
+"                ສົ່ງຄຳເຊີນ ແລະ ວິເຄາະຄຳຕອບ."
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "You can't ask feedback for multiple appraisals at once."
-msgstr ""
+msgstr "ທ່ານບໍ່ສາມາດຂໍຄຳຄິດເຫັນສຳລັບການປະເມີນຫຼາຍລາຍການພ້ອມກັນໄດ້."
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "You can't select multiple feedback templates."
-msgstr ""
+msgstr "ທ່ານບໍ່ສາມາດເລືອກແມ່ແບບຄຳຄິດເຫັນຫຼາຍອັນໄດ້."
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "ask feedback"
-msgstr ""
+msgstr "ຂໍຄຳຄິດເຫັນ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "at the request of"
-msgstr ""
+msgstr "ຕາມການຮ້ອງຂໍຂອງ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_fill_form_start
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_page_print
-#, fuzzy
 msgid "for"
 msgstr "ສຳລັບ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "on"
-msgstr ""
+msgstr "ເມື່ອ"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "or"
-msgstr ""
+msgstr "ຫຼື"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "to a selection of colleagues you work with."
-msgstr ""
+msgstr "ເຖິງເພື່ອນຮ່ວມງານທີ່ທ່ານເລືອກເຊິ່ງເຮັດວຽກຮ່ວມກັບທ່ານ."
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+#~ "20px;\">\n"
+#~ "                    Dear <t t-out=\"object.partner_id.name or "
+#~ "'participant'\">[participant]</t>,\n"
+#~ "                    <br/>\n"
+#~ "                    As part of our 360° feedback process, <t t-"
+#~ "out=\"ctx.get('logged_user')\">[Current user]</t> would love\n"
+#~ "                    to get your insights on <t t-out=\"ctx.get('employee')"
+#~ "\">[the employee]</t>'s performance.\n"
+#~ "                    <br/>\n"
+#~ "                    Your feedback is valuable in helping us recognize "
+#~ "strengths and identify growth opportunities.\n"
+#~ "                    <br/>\n"
+#~ "                    It should only take a few minutes, and you can submit "
+#~ "your feedback via the link below:\n"
+#~ "                    <br/>\n"
+#~ "                    <div style=\"text-align: center; margin: 24px 0;\">\n"
+#~ "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
+#~ "style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                            Give your feedback\n"
+#~ "                        </a>\n"
+#~ "                    </div>\n"
+#~ "                    Please complete the survey before <t t-"
+#~ "out=\"ctx.get('deadline')\">[the specified deadline]</t>.\n"
+#~ "                    <br/>\n"
+#~ "                    Thank you for your time and honesty!\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-if=\"ctx.get('user_body')\">\n"
+#~ "                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
+#~ "                            <t t-out=\"ctx.get('user_body')\">[Optional "
+#~ "comment]</t>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+#~ "20px;\">\n"
+#~ "                    ຮຽນ <t t-out=\"object.partner_id.name or "
+#~ "'participant'\">[participant]</t>,\n"
+#~ "                    <br/>\n"
+#~ "                    ໃນຖານະສ່ວນໜຶ່ງຂອງຂະບວນການຄຳຄິດເຫັນ 360 ອົງສາຂອງພວກເຮົາ, <t t-"
+#~ "out=\"ctx.get('logged_user')\">[Current user]</t> ມີຄວາມຍິນດີ\n"
+#~ "                    ທີ່ຈະຂໍຄຳຄິດເຫັນຈາກທ່ານກ່ຽວກັບຜົນການປະຕິບັດວຽກງານຂອງ <t t-"
+#~ "out=\"ctx.get('employee')\">[the employee]</t>.\n"
+#~ "                    <br/>\n"
+#~ "                    ຄຳຄິດເຫັນຂອງທ່ານມີຄຸນຄ່າຫຼາຍໃນການຊ່ວຍໃຫ້ພວກເຮົາຮັບຮູ້ຈຸດແຂງ ແລະ "
+#~ "ຄົ້ນຫາໂອກາດໃນການພັດທະນາ.\n"
+#~ "                    <br/>\n"
+#~ "                    ການຕອບແບບສຳຫຼວດນີ້ຈະໃຊ້ເວລາພຽງບໍ່ເທົ່າໃດນາທີ ແລະ "
+#~ "ທ່ານສາມາດສົ່ງຄຳຄິດເຫັນຂອງທ່ານຜ່ານລິ້ງລຸ່ມນີ້:\n"
+#~ "                    <br/>\n"
+#~ "                    <div style=\"text-align: center; margin: 24px 0;\">\n"
+#~ "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
+#~ "style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+#~ "font-size:13px;\">\n"
+#~ "                            ສົ່ງຄຳຄິດເຫັນຂອງທ່ານ\n"
+#~ "                        </a>\n"
+#~ "                    </div>\n"
+#~ "                    ກະລຸນາຕອບແບບສຳຫຼວດໃຫ້ສຳເລັດກ່ອນ <t t-"
+#~ "out=\"ctx.get('deadline')\">[the specified deadline]</t>.\n"
+#~ "                    <br/>\n"
+#~ "                    ຂອບໃຈສຳລັບເວລາ ແລະ ຄວາມຈິງໃຈຂອງທ່ານ!\n"
+#~ "                    <br/>\n"
+#~ "                    <t t-if=\"ctx.get('user_body')\">\n"
+#~ "                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
+#~ "                            <t t-out=\"ctx.get('user_body')"
+#~ "\">[ຄຳເຫັນເພີ່ມເຕີມ]</t>\n"
+#~ "                        </div>\n"
+#~ "                    </t>\n"
+#~ "                </div>\n"
+#~ "            "
 
 #, fuzzy
 #~ msgid "Is Manager"

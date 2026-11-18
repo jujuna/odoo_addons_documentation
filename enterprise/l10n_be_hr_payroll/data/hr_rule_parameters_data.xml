@@ -398,6 +398,8 @@
         </record>
 
         <!-- LEAVE TYPES PER JOINT COMMITTEE WITH MAX DURATION -->
+        <!-- 128.05: the days 4 to 20 of the 20 days of birth leave, paid by the mutual insurance (the 3 first days, paid
+             by the employer, are 007.05) -->
         <record id="rule_parameter_leave_durations" model="hr.rule.parameter">
             <field name="name">Leave Durations by Joint Committee</field>
             <field name="code">leave_durations_by_jc</field>
@@ -409,7 +411,7 @@
             'CIRC_MARRIAGE': {'302': 2, '200': 3, None: 2},
             'CIRC_MARRIAGE_FAMILY': {'302': 1, '200': 1, None: 1},
             'CIRC_CHILD_CEREMONY': {'302': 1, '200': 1, None: 1},
-            '128.05': {'302': 20, '200': 20},
+            '128.05': {'302': 17, '200': 17, None: 17},
             'CIRC_CHILD_ADOPTION': {'302': 30, '200': 30},
             '007.21': {'302': 10, '200': 10, None: 10},
             'CIRC_DEATH_PARENT': {'302': 4, '200': 3, None: 3},
@@ -427,7 +429,7 @@
             'CIRC_MARRIAGE': {'302': 2, '200': 3, None: 2},
             'CIRC_MARRIAGE_FAMILY': {'302': 1, '200': 1, None: 1},
             'CIRC_CHILD_CEREMONY': {'302': 1, '200': 1, None: 1},
-            '128.05': {'302': 20, '200': 20},
+            '128.05': {'302': 17, '200': 17, None: 17},
             'CIRC_CHILD_ADOPTION': {'302': 30, '200': 30},
             '007.21': {'302': 10, '200': 12, None: 10},
             'CIRC_DEATH_PARENT': {'302': 4, '200': 5, None: 3},
@@ -1510,25 +1512,53 @@
             <field name="date_from" eval="datetime(2028, 1, 1).date()"/>
         </record>
 
+        <!-- Lump-sum costs of the intellectual property (art. 4, al. 1er, 1° AR/CIR 92): 50 % up to the first bracket,
+             25 % up to the second one, indexed amounts by income year (SPF Finances, explications de la déclaration
+             IPP, cadre VII, rubrique D, of the next tax year) -->
         <record id="rule_parameter_ip_first_bracket" model="hr.rule.parameter">
             <field name="name">IP: First deduction bracket</field>
             <field name="code">ip_deduction_bracket_1</field>
             <field name="country_id" ref="base.be"/>
         </record>
         <record id="rule_parameter_ip_first_bracket_2018" model="hr.rule.parameter.value">
-            <field name="parameter_value">15660</field>
+            <field name="parameter_value">15990</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
             <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_first_bracket_2019" model="hr.rule.parameter.value">
-            <field name="parameter_value">15990</field>
+            <field name="parameter_value">16320</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
             <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_first_bracket_2020" model="hr.rule.parameter.value">
-            <field name="parameter_value">16320</field>
+            <field name="parameter_value">16560</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
             <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_first_bracket_2021" model="hr.rule.parameter.value">
+            <field name="parameter_value">16680</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
+            <field name="date_from" eval="datetime(2021, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_first_bracket_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">17090</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_first_bracket_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">18720</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
+            <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_first_bracket_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">19480</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_first_bracket_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">20100</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_first_bracket"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_first_bracket_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">20590</field>
@@ -1542,19 +1572,44 @@
             <field name="country_id" ref="base.be"/>
         </record>
         <record id="rule_parameter_ip_second_bracket_2018" model="hr.rule.parameter.value">
-            <field name="parameter_value">31320</field>
+            <field name="parameter_value">31990</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
             <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_second_bracket_2019" model="hr.rule.parameter.value">
-            <field name="parameter_value">31990</field>
+            <field name="parameter_value">32640</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
             <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_second_bracket_2020" model="hr.rule.parameter.value">
-            <field name="parameter_value">32640</field>
+            <field name="parameter_value">33110</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
             <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_second_bracket_2021" model="hr.rule.parameter.value">
+            <field name="parameter_value">33360</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
+            <field name="date_from" eval="datetime(2021, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_second_bracket_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">34170</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_second_bracket_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">37450</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
+            <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_second_bracket_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">38970</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_second_bracket_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">40190</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_second_bracket"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_second_bracket_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">41180</field>
@@ -1573,11 +1628,28 @@
             <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
 
-        <!-- Yearly limit: above the average IP received during the 4 previous years, the IP is a regular remuneration -->
+        <!-- Yearly limit (art. 37, al. 2 CIR 92, indexed by income year): above it, and above the average IP received
+             during the 4 previous years, the IP is a regular remuneration. Since the income year 2023 (programme law of
+             26-12-2022): before, only the part above the limit was a regular remuneration, not modelled. -->
         <record id="rule_parameter_ip_limit" model="hr.rule.parameter">
             <field name="name">IP: Yearly Limit</field>
             <field name="code">ip_limit</field>
             <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_ip_limit_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">70220</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_limit"/>
+            <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_limit_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">73070</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_limit"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_ip_limit_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">75360</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_limit"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_ip_limit_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">77220</field>
@@ -1585,15 +1657,33 @@
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
-        <!-- Maximum share of the IP in the total remuneration (ONSS exemption and IP withholding tax) -->
+        <!-- Maximum share of the IP in the total remuneration (IP withholding tax): art. 37, al. 2
+             CIR 92, programme law of 26-12-2022, fully applicable since the income year 2024 (the transitional regime
+             of 2023, art. 551, § 2 CIR 92, with a share of 50 %, is not modelled) -->
         <record id="rule_parameter_ip_max_remuneration_share" model="hr.rule.parameter">
             <field name="name">IP: Maximum Share of the Total Remuneration</field>
             <field name="code">ip_max_remuneration_share</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_ip_max_remuneration_share_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.3</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_max_remuneration_share"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_ip_max_remuneration_share_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">0.3</field>
             <field name="rule_parameter_id" ref="rule_parameter_ip_max_remuneration_share"/>
+            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+        </record>
+        <!-- Maximum share of the IP exempt from ONSS (DmfA code 47), since 2026 -->
+        <record id="rule_parameter_ip_onss_max_remuneration_share" model="hr.rule.parameter">
+            <field name="name">IP: Maximum Share of the Total Remuneration Exempt from ONSS</field>
+            <field name="code">ip_onss_max_remuneration_share</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_ip_onss_max_remuneration_share_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.3</field>
+            <field name="rule_parameter_id" ref="rule_parameter_ip_onss_max_remuneration_share"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_private_car_taxable_threshold" model="hr.rule.parameter">
@@ -2241,10 +2331,20 @@
             <field name="rule_parameter_id" ref="rule_parameter_onss_restructuring_before_30"/>
             <field name="date_from" eval="datetime(2024, 7, 1).date()"/>
         </record>
+        <record id="rule_parameter_onss_restructuring_before_30_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">3744.63</field>
+            <field name="rule_parameter_id" ref="rule_parameter_onss_restructuring_before_30"/>
+            <field name="date_from" eval="datetime(2025, 4, 1).date()"/>
+        </record>
         <record id="rule_parameter_onss_restructuring_before_30_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">3819.52</field>
             <field name="rule_parameter_id" ref="rule_parameter_onss_restructuring_before_30"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_onss_restructuring_before_30_2026_7" model="hr.rule.parameter.value">
+            <field name="parameter_value">3895.91</field>
+            <field name="rule_parameter_id" ref="rule_parameter_onss_restructuring_before_30"/>
+            <field name="date_from" eval="datetime(2026, 7, 1).date()"/>
         </record>
 
         <record id="rule_parameter_onss_restructuring_after_30" model="hr.rule.parameter">
@@ -3608,6 +3708,11 @@
             <field name="code">l10n_be_wijninckx_contribution_rate</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_cp200_wijninckx_contribution_rate_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">3.0</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_wijninckx_contribution_rate"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_cp200_wijninckx_contribution_rate_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">12.5</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp200_wijninckx_contribution_rate"/>
@@ -3663,6 +3768,11 @@
             <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_per_km"/>
             <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
+        <record id="rule_parameter_cp200_cycle_reimbursement_per_km_2026_jan" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.27</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_per_km"/>
+            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_cp200_cycle_reimbursement_per_km_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">0.32</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_per_km"/>
@@ -3695,6 +3805,11 @@
             <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_max"/>
             <field name="date_from" eval="datetime(2022, 7, 1).date()"/>
         </record>
+        <record id="rule_parameter_cp200_cycle_reimbursement_max_2026_jan" model="hr.rule.parameter.value">
+            <field name="parameter_value">10.80</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_max"/>
+            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_cp200_cycle_reimbursement_max_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">12.8</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp200_cycle_reimbursement_max"/>
@@ -3705,6 +3820,14 @@
             <field name="name">BIK Phone - Amount</field>
             <field name="code">bik_phone_amount</field>
             <field name="country_id" ref="base.be"/>
+        </record>
+        <!-- the flat amounts of the devices put at the disposal of the employee since 1 January 2018 (Royal Decree of
+             13 December 2017): 72 EUR a year for a laptop, 36 EUR for a tablet or a smartphone, 60 EUR for an internet
+             connection, 48 EUR for a phone subscription -->
+        <record id="rule_parameter_bik_phone_amount_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">3</field>
+            <field name="rule_parameter_id" ref="rule_parameter_bik_phone_amount"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_bik_phone_amount_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">3</field>
@@ -3717,6 +3840,11 @@
             <field name="code">bik_laptop_amount</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_cp200_bik_laptop_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">6</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_bik_laptop"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_cp200_bik_laptop_2021" model="hr.rule.parameter.value">
             <field name="parameter_value">6</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp200_bik_laptop"/>
@@ -3727,6 +3855,11 @@
             <field name="name">BIK Tablet - Amount</field>
             <field name="code">bik_tablet_amount</field>
             <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_cp200_bik_tablet_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">3</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_bik_tablet"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_cp200_bik_tablet_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">3</field>
@@ -3783,6 +3916,11 @@
             <field name="description">The amount listed below is monthly based</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_bik_phone_subscription_amount_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">4</field>
+            <field name="rule_parameter_id" ref="rule_parameter_bik_phone_subscription_amount"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_bik_phone_subscription_amount_2019" model="hr.rule.parameter.value">
             <field name="parameter_value">4</field>
             <field name="rule_parameter_id" ref="rule_parameter_bik_phone_subscription_amount"/>
@@ -3794,6 +3932,11 @@
             <field name="code">bik_internet_amount</field>
             <field name="description">The amount listed below is monthly based</field>
             <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_bik_internet_amount_2018" model="hr.rule.parameter.value">
+            <field name="parameter_value">5</field>
+            <field name="rule_parameter_id" ref="rule_parameter_bik_internet_amount"/>
+            <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_bik_internet_amount_2019" model="hr.rule.parameter.value">
             <field name="parameter_value">5</field>
@@ -3935,6 +4078,16 @@
             <field name="parameter_value">0.4571</field>
             <field name="rule_parameter_id" ref="rule_parameter_representation_fees_car_travel_amount"/>
             <field name="date_from" eval="datetime(2026, 4, 1).date()"/>
+        </record>
+        <record id="rule_parameter_representation_fees_car_travel_amount_may_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.4841</field>
+            <field name="rule_parameter_id" ref="rule_parameter_representation_fees_car_travel_amount"/>
+            <field name="date_from" eval="datetime(2026, 5, 1).date()"/>
+        </record>
+        <record id="rule_parameter_representation_fees_car_travel_amount_june_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.5055</field>
+            <field name="rule_parameter_id" ref="rule_parameter_representation_fees_car_travel_amount"/>
+            <field name="date_from" eval="datetime(2026, 6, 1).date()"/>
         </record>
         <record id="rule_parameter_representation_fees_car_travel_amount_july_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">0.4440</field>
@@ -4094,26 +4247,10 @@
                 (6, 1), (9, 6), (12, 7), (15, 8), (18, 9),
                 (21, 10), (24, 11), (36, 12), (48, 13), (60, 15), (72, 18), (84, 21), (96, 24),
                 (108, 27), (120, 30), (132, 33), (144, 36), (156, 39), (168, 42), (180, 45), (192, 48),
-                (204, 51), (216, 54), (228, 57), (240, 60), (252, 62), (264, 63), (276, 64), (288, 65)
+                (204, 51), (99999999, 52)
             ]</field>
             <field name="rule_parameter_id" ref="rule_parameter_duration_notice_fired"/>
             <field name="date_from" eval="datetime(2026, 8, 1).date()"/>
-        </record>
-
-        <record id="rule_parameter_bike_reimbursement" model="hr.rule.parameter">
-            <field name="name">Bike reimbursement</field>
-            <field name="code">bike_reimbursement</field>
-            <field name="country_id" ref="base.be"/>
-        </record>
-        <record id="rule_parameter_bike_reimbursement_2019" model="hr.rule.parameter.value">
-            <field name="parameter_value">0.24</field>
-            <field name="rule_parameter_id" ref="rule_parameter_bike_reimbursement"/>
-            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
-        </record>
-        <record id="rule_parameter_bike_reimbursement_2026" model="hr.rule.parameter.value">
-            <field name="parameter_value">0.27</field>
-            <field name="rule_parameter_id" ref="rule_parameter_bike_reimbursement"/>
-            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
         <record id="rule_parameter_bike_exempt_reimbursement_per_km" model="hr.rule.parameter">
@@ -4121,12 +4258,24 @@
             <field name="code">bike_exempt_reimbursement_per_km</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_bike_exempt_reimbursement_per_km_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.35</field>
+            <field name="rule_parameter_id" ref="rule_parameter_bike_exempt_reimbursement_per_km"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <!-- "Avis aux débiteurs" of the 281.10 of 2025, box 14d: limit these allowances to 0.36 euro per kilometer -->
+        <record id="rule_parameter_bike_exempt_reimbursement_per_km_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">0.36</field>
+            <field name="rule_parameter_id" ref="rule_parameter_bike_exempt_reimbursement_per_km"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_bike_exempt_reimbursement_per_km_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">0.37</field>
             <field name="rule_parameter_id" ref="rule_parameter_bike_exempt_reimbursement_per_km"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
+        <!-- The yearly exempt amount of the bike allowances (per employer): the part above it is taxable -->
         <record id="rule_parameter_cp200_bike_maximum_reimbursement_yearly" model="hr.rule.parameter">
             <field name="name">Bike maximum reimbursement by year</field>
             <field name="code">bike_max_reimbursement_yearly_cp200</field>
@@ -4138,9 +4287,19 @@
             <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_cp200_bike_maximum_reimbursement_yearly_2024" model="hr.rule.parameter.value">
-            <field name="parameter_value">3700</field>
+            <field name="parameter_value">3500</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_yearly"/>
             <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_cp200_bike_maximum_reimbursement_yearly_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">3610</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_yearly"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_cp200_bike_maximum_reimbursement_yearly_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">3700</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_yearly"/>
+            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
         <record id="rule_parameter_cp302_bike_maximum_reimbursement_yearly" model="hr.rule.parameter">
@@ -4149,34 +4308,23 @@
             <field name="country_id" ref="base.be"/>
         </record>
         <record id="rule_parameter_cp302_bike_maximum_reimbursement_yearly_2019" model="hr.rule.parameter.value">
-            <field name="parameter_value">99999999999</field> <!-- No cap before 2026-->
+            <field name="parameter_value">99999999999</field> <!-- No cap before 2024-->
             <field name="rule_parameter_id" ref="rule_parameter_cp302_bike_maximum_reimbursement_yearly"/>
             <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_cp302_bike_maximum_reimbursement_yearly_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">3500</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp302_bike_maximum_reimbursement_yearly"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_cp302_bike_maximum_reimbursement_yearly_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">3610</field>
+            <field name="rule_parameter_id" ref="rule_parameter_cp302_bike_maximum_reimbursement_yearly"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_cp302_bike_maximum_reimbursement_yearly_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">3700</field>
             <field name="rule_parameter_id" ref="rule_parameter_cp302_bike_maximum_reimbursement_yearly"/>
-            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
-        </record>
-
-        <record id="rule_parameter_cp200_bike_maximum_reimbursement_daily" model="hr.rule.parameter">
-            <field name="name">CP200: Bike maximum reimbursement by day</field>
-            <field name="code">bike_max_reimbursement_daily_cp200</field>
-            <field name="country_id" ref="base.be"/>
-        </record>
-        <record id="rule_parameter_cp200_bike_maximum_reimbursement_daily_2019" model="hr.rule.parameter.value">
-            <field name="parameter_value">99999999999</field> <!-- No cap before 2022-->
-            <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_daily"/>
-            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
-        </record>
-        <record id="rule_parameter_cp200_bike_maximum_reimbursement_daily_2022" model="hr.rule.parameter.value">
-            <field name="parameter_value">8</field>
-            <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_daily"/>
-            <field name="date_from" eval="datetime(2022, 7, 1).date()"/>
-        </record>
-        <record id="rule_parameter_cp200_bike_maximum_reimbursement_daily_2026" model="hr.rule.parameter.value">
-            <field name="parameter_value">10.80</field>
-            <field name="rule_parameter_id" ref="rule_parameter_cp200_bike_maximum_reimbursement_daily"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
@@ -4232,6 +4380,8 @@
             <field name="date_from" eval="datetime(2026, 2, 1).date()"/>
         </record>
 
+        <!-- Distance tables (train, train 71.8%, private car): the value under the key n applies to the distances in
+             [n, next key[, the value of the last key to any longer distance, no value below the first key. -->
         <record id="rule_parameter_train_reimbursement" model="hr.rule.parameter">
             <field name="name">Train reimbursement</field>
             <field name="code">train_reimbursement</field>
@@ -4704,6 +4854,21 @@
             <field name="description">https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/other_specialcontributions/nonrecurrentcontributions.html</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_l10n_be_cct90_employer_onss_threshold_2022" model="hr.rule.parameter.value">
+            <field name="parameter_value">3558</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employer_onss_threshold"/>
+            <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_cct90_employer_onss_threshold_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">3948</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employer_onss_threshold"/>
+            <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_cct90_employer_onss_threshold_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">4020</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employer_onss_threshold"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_l10n_be_cct90_employer_onss_threshold_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">4164</field>
             <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employer_onss_threshold"/>
@@ -4720,10 +4885,20 @@
             <field name="code">cct90_employee_pp_threshold</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <record id="rule_parameter_l10n_be_cct90_employee_pp_threshold_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">3496</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employee_pp_threshold"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_l10n_be_cct90_employee_pp_threshold_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">3622</field>
             <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employee_pp_threshold"/>
             <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_cct90_employee_pp_threshold_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">3701</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_cct90_employee_pp_threshold"/>
+            <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
 
         <record id="rule_parameter_l10n_be_max_sal_privatecar_reimb" model="hr.rule.parameter">
@@ -5633,6 +5808,28 @@
             <field name="rule_parameter_id" ref="rule_parameter_horeca_occasional_withholding_tax_rate"/>
             <field name="date_from" eval="datetime(2018, 1, 1).date()"/>
         </record>
+        <!-- Yearly quota of the hours a student can work with the solidarity contribution (Student@work), counting the
+             hours actually worked only. Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/students.html -->
+        <record id="rule_parameter_student_hours_quota" model="hr.rule.parameter">
+            <field name="name">Students: Hours per Year (Quota)</field>
+            <field name="code">l10n_be_student_hours_quota</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_student_hours_quota_2017" model="hr.rule.parameter.value">
+            <field name="parameter_value">475</field>
+            <field name="rule_parameter_id" ref="rule_parameter_student_hours_quota"/>
+            <field name="date_from" eval="datetime(2017, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_student_hours_quota_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">600</field>
+            <field name="rule_parameter_id" ref="rule_parameter_student_hours_quota"/>
+            <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_student_hours_quota_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">650</field>
+            <field name="rule_parameter_id" ref="rule_parameter_student_hours_quota"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_cp_200_premium_pay_night_hourly_rate" model="hr.rule.parameter">
             <field name="name">Premium Pay - Night Hourly Rate</field>
             <field name="code">cp_200_premium_pay_night_hourly_rate</field>
@@ -5837,7 +6034,7 @@
 
         <record id="rule_parameter_flexi_cap_std_2000" model="hr.rule.parameter.value">
             <field name="rule_parameter_id" ref="rule_parameter_flexi_cap_standard"/>
-            <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
             <field name="parameter_value">12000.00</field>
         </record>
 
@@ -5902,6 +6099,11 @@
             <field name="rule_parameter_id" ref="rule_parameter_min_hourly_wage_flexi"/>
             <field name="parameter_value">11.87</field>
             <field name="date_from">2026-03-01</field>
+        </record>
+        <record id="rule_parameter_value_min_hourly_wage_flexi_2026_09" model="hr.rule.parameter.value">
+            <field name="rule_parameter_id" ref="rule_parameter_min_hourly_wage_flexi"/>
+            <field name="parameter_value">12.11</field>
+            <field name="date_from">2026-09-01</field>
         </record>
         <!-- CP302 Salary Scales - Joint Committee 302 (Horeca Sector) -->
         <record id="rule_parameter_cp302_salary_scales" model="hr.rule.parameter">
@@ -6911,6 +7113,11 @@
             <field name="rule_parameter_id" ref="rule_parameter_health_indice"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
+        <record id="rule_parameter_value_health_indice_2027" model="hr.rule.parameter.value">
+            <field name="parameter_value">193.27</field>
+            <field name="rule_parameter_id" ref="rule_parameter_health_indice"/>
+            <field name="date_from" eval="datetime(2027, 1, 1).date()"/>
+        </record>
 
         <record id="rule_parameter_fuel_coefficient" model="hr.rule.parameter">
             <field name="name">Fuel Coefficients</field>
@@ -6969,6 +7176,12 @@
             <field name="name">CO2 Fee Minimum Coefficient Greening</field>
             <field name="code">co2_fee_min_greening</field>
             <field name="country_id" ref="base.be"/>
+        </record>
+        <!-- the cars ordered from 1 July 2023 keep the ordinary minimum until the greening raises it from 2025 -->
+        <record id="rule_parameter_value_co2_fee_min_greening_2023" model="hr.rule.parameter.value">
+            <field name="parameter_value">20.83</field>
+            <field name="rule_parameter_id" ref="rule_parameter_co2_fee_min_greening"/>
+            <field name="date_from" eval="datetime(2023, 7, 1).date()"/>
         </record>
         <record id="rule_parameter_value_co2_fee_min_greening_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">23.41</field>
@@ -7048,6 +7261,11 @@
             <field name="rule_parameter_id" ref="rule_parameter_co2_reference_petrol_lpg"/>
             <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
         </record>
+        <record id="rule_parameter_value_co2_reference_petrol_lpg_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">78</field>
+            <field name="rule_parameter_id" ref="rule_parameter_co2_reference_petrol_lpg"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        </record>
         <record id="rule_parameter_value_co2_reference_petrol_lpg_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">71</field>
             <field name="rule_parameter_id" ref="rule_parameter_co2_reference_petrol_lpg"/>
@@ -7093,6 +7311,11 @@
             <field name="parameter_value">67</field>
             <field name="rule_parameter_id" ref="rule_parameter_co2_reference_diesel"/>
             <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_value_co2_reference_diesel_2024" model="hr.rule.parameter.value">
+            <field name="parameter_value">65</field>
+            <field name="rule_parameter_id" ref="rule_parameter_co2_reference_diesel"/>
+            <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
         </record>
         <record id="rule_parameter_value_co2_reference_diesel_2025" model="hr.rule.parameter.value">
             <field name="parameter_value">59</field>
@@ -7304,6 +7527,28 @@
             <field name="rule_parameter_id" ref="rule_parameter_l10n_be_elderly_reduction_cap_wallonia"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
         </record>
+        <record id="rule_parameter_value_l10n_be_elderly_reduction_cap_wallonia_2026_7" model="hr.rule.parameter.value">
+            <field name="parameter_value">18396.80</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_elderly_reduction_cap_wallonia"/>
+            <field name="date_from" eval="datetime(2026, 7, 1).date()"/>
+        </record>
+
+        <!-- The reference wage must be lower than the cap: the value is the highest wage allowed -->
+        <record id="rule_parameter_l10n_be_elderly_reduction_cap_wallonia_new_hires" model="hr.rule.parameter">
+            <field name="name">Elderly worker reduction: quarterly reference wage cap (Wallonia, engagements from 1 April 2026)</field>
+            <field name="code">l10n_be_elderly_reduction_cap_wallonia_new_hires</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_value_l10n_be_elderly_reduction_cap_wallonia_new_hires_2026_4" model="hr.rule.parameter.value">
+            <field name="parameter_value">13499.99</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_elderly_reduction_cap_wallonia_new_hires"/>
+            <field name="date_from" eval="datetime(2026, 4, 1).date()"/>
+        </record>
+        <record id="rule_parameter_value_l10n_be_elderly_reduction_cap_wallonia_new_hires_2026_7" model="hr.rule.parameter.value">
+            <field name="parameter_value">13769.99</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_elderly_reduction_cap_wallonia_new_hires"/>
+            <field name="date_from" eval="datetime(2026, 7, 1).date()"/>
+        </record>
 
         <!-- Belgian statutory pension age, used to resolve the 'pension'
              upper-bound sentinel in Wallonia elderly brackets. -->
@@ -7428,10 +7673,13 @@
             <field name="code">l10n_be_legal_index</field>
             <field name="country_id" ref="base.be"/>
         </record>
+        <!-- (rate, cap): the cap of the wage moderation ("index en centimes") only applies to the indexations from
+             1 June 2026, so not to the one of January 2026.
+             source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/pennyindex_wagemoderationcontribution.html -->
         <record id="rule_parameter_value_l10n_be_legal_index_2026" model="hr.rule.parameter.value">
             <field name="parameter_value">{
-                '200': (0.0221, 4000.0),
-                '302': (0.02189, 4000.0),
+                '200': (0.0221, False),
+                '302': (0.02189, False),
             }</field>
             <field name="rule_parameter_id" ref="rule_parameter_l10n_be_legal_index"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
@@ -7451,6 +7699,29 @@
             <field name="parameter_value">240</field>
             <field name="rule_parameter_id" ref="rule_parameter_l10n_be_voluntary_overtime_no_onss_threshold_cp200"/>
             <field name="date_from" eval="datetime(2026, 4, 1).date()"/>
+        </record>
+
+        <!-- Box 17 of the 281.10: the overtime of the hotel industry paid net (039.00, 039.05) is exempt within a yearly
+             limit of hours -->
+        <record id="rule_parameter_l10n_be_net_overtime_threshold_cp302_white_cash_register" model="hr.rule.parameter">
+            <field name="name">CP302: Net Overtime Threshold (White Cash Register)</field>
+            <field name="code">cp302_net_overtime_threshold_white_cash_register</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_l10n_be_net_overtime_threshold_cp302_white_cash_register_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">360</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_net_overtime_threshold_cp302_white_cash_register"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_net_overtime_threshold_cp302_not_white_cash_register" model="hr.rule.parameter">
+            <field name="name">CP302: Net Overtime Threshold (Not White Cash Register)</field>
+            <field name="code">cp302_net_overtime_threshold_not_white_cash_register</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_l10n_be_net_overtime_threshold_cp302_not_white_cash_register_2025" model="hr.rule.parameter.value">
+            <field name="parameter_value">300</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_net_overtime_threshold_cp302_not_white_cash_register"/>
+            <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
         </record>
 
         <record id="rule_parameter_l10n_be_voluntary_overtime_no_onss_threshold_cp302_white_cash_register" model="hr.rule.parameter">
@@ -7724,6 +7995,40 @@ employees above this threshold will be eligible from the 27th day of unemploymen
             )</field>
             <field name="rule_parameter_id" ref="rule_parameter_impulsion12_deduction"/>
             <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_l10n_be_impulsion_activation_permitted" model="hr.rule.parameter">
+            <field name="name">Impulsion Plan Activation Permitted</field>
+            <field name="code">l10n_be_impulsion_activation_permitted</field>
+            <field name="description">Whether an Impulsion plan granted on this date can be activated, read at the grant date. No new activation from 01/07/2026.</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_l10n_be_impulsion_activation_permitted_1980" model="hr.rule.parameter.value">
+            <field name="parameter_value">True</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_impulsion_activation_permitted"/>
+            <field name="date_from" eval="datetime(1980, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_impulsion_activation_permitted_2026" model="hr.rule.parameter.value">
+            <field name="parameter_value">False</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_impulsion_activation_permitted"/>
+            <field name="date_from" eval="datetime(2026, 7, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_l10n_be_impulsion_payment_permitted" model="hr.rule.parameter">
+            <field name="name">Impulsion Plan Payment Permitted</field>
+            <field name="code">l10n_be_impulsion_payment_permitted</field>
+            <field name="description">Whether the Impulsion plans are still deducted, read at the start of the payslip. No deduction from 01/01/2030.</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_l10n_be_impulsion_payment_permitted_1980" model="hr.rule.parameter.value">
+            <field name="parameter_value">True</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_impulsion_payment_permitted"/>
+            <field name="date_from" eval="datetime(1980, 1, 1).date()"/>
+        </record>
+        <record id="rule_parameter_l10n_be_impulsion_payment_permitted_2030" model="hr.rule.parameter.value">
+            <field name="parameter_value">False</field>
+            <field name="rule_parameter_id" ref="rule_parameter_l10n_be_impulsion_payment_permitted"/>
+            <field name="date_from" eval="datetime(2030, 1, 1).date()"/>
         </record>
 
         <!-- AKA: RMMMG (revenu mensuel minimum moyen garanti) -->
@@ -8047,25 +8352,27 @@ The Tax rate for Low Movable Income Withholding Tax.
         <field name="code">private_car_daily_reimbursement</field>
         <field name="country_id" ref="base.be"/>
     </record>
+    <!-- As the train tables: the value under the key n applies to the distances in [n, next key[, the value of the
+         last key to any longer distance (e.g. 31: 3.48, 34: 3.69 means 3.48 from 31 to 33 km). -->
     <record id="rule_parameter_value_private_car_daily_reimbursement_2026" model="hr.rule.parameter.value">
         <field name="rule_parameter_id" ref="rule_parameter_private_car_daily_reimbursement"/>
         <field name="date_from" eval="datetime(2026, 2, 1).date()"/>
         <field name="parameter_value">{
             "200": {
-                "1": 1.10, "2": 1.10, "3": 1.10, "4": 1.20, "5": 1.29, "6": 1.38, "7": 1.45, "8": 1.55, "9": 1.62, "10": 1.71,
-                "11": 1.80, "12": 1.87, "13": 1.96, "14": 2.03, "15": 2.12, "16": 2.19, "17": 2.28, "18": 2.38, "19": 2.45, "20": 2.54,
-                "21": 2.61, "22": 2.70, "23": 2.77, "24": 2.86, "25": 2.95, "26": 3.02, "27": 3.12, "28": 3.18, "29": 3.28, "30": 3.37,
-                "33": 3.48, "36": 3.69, "39": 3.90, "42": 4.11, "45": 4.32, "48": 4.50, "51": 4.71, "54": 4.85, "57": 5.01, "60": 5.15,
-                "65": 5.33, "70": 5.58, "75": 5.82, "80": 6.07, "85": 6.30, "90": 6.53, "95": 6.78, "100": 7.02, "105": 7.27, "110": 7.50,
-                "115": 7.75, "120": 7.98, "125": 8.22, "130": 8.47, "135": 8.70, "140": 8.95, "145": 9.18, "150": 9.44
+                1: 1.10, 2: 1.10, 3: 1.10, 4: 1.20, 5: 1.29, 6: 1.38, 7: 1.45, 8: 1.55, 9: 1.62, 10: 1.71,
+                11: 1.80, 12: 1.87, 13: 1.96, 14: 2.03, 15: 2.12, 16: 2.19, 17: 2.28, 18: 2.38, 19: 2.45, 20: 2.54,
+                21: 2.61, 22: 2.70, 23: 2.77, 24: 2.86, 25: 2.95, 26: 3.02, 27: 3.12, 28: 3.18, 29: 3.28, 30: 3.37,
+                31: 3.48, 34: 3.69, 37: 3.90, 40: 4.11, 43: 4.32, 46: 4.50, 49: 4.71, 52: 4.85, 55: 5.01, 58: 5.15,
+                61: 5.33, 66: 5.58, 71: 5.82, 76: 6.07, 81: 6.30, 86: 6.53, 91: 6.78, 96: 7.02, 101: 7.27, 106: 7.50,
+                111: 7.75, 116: 7.98, 121: 8.22, 126: 8.47, 131: 8.70, 136: 8.95, 141: 9.18, 146: 9.44
             },
             "302": {
-                "1": 1.54, "2": 1.54, "3": 1.54, "4": 1.68, "5": 1.81, "6": 1.94, "7": 2.04, "8": 2.17, "9": 2.26, "10": 2.39,
-                "11": 2.52, "12": 2.62, "13": 2.75, "14": 2.84, "15": 2.97, "16": 3.07, "17": 3.20, "18": 3.33, "19": 3.43, "20": 3.55,
-                "21": 3.65, "22": 3.78, "23": 3.88, "24": 4.01, "25": 4.14, "26": 4.23, "27": 4.36, "28": 4.46, "29": 4.59, "30": 4.72,
-                "33": 4.88, "36": 5.17, "39": 5.46, "42": 5.75, "45": 6.04, "48": 6.30, "51": 6.59, "54": 6.79, "57": 7.01, "60": 7.21,
-                "65": 7.47, "70": 7.82, "75": 8.14, "80": 8.50, "85": 8.82, "90": 9.15, "95": 9.50, "100": 9.82, "105": 10.18, "110": 10.50,
-                "115": 10.86, "120": 11.18, "125": 11.51, "130": 11.86, "135": 12.18, "140": 12.54, "145": 12.86, "150": 13.22
+                1: 1.54, 2: 1.54, 3: 1.54, 4: 1.68, 5: 1.81, 6: 1.94, 7: 2.04, 8: 2.17, 9: 2.26, 10: 2.39,
+                11: 2.52, 12: 2.62, 13: 2.75, 14: 2.84, 15: 2.97, 16: 3.07, 17: 3.20, 18: 3.33, 19: 3.43, 20: 3.55,
+                21: 3.65, 22: 3.78, 23: 3.88, 24: 4.01, 25: 4.14, 26: 4.23, 27: 4.36, 28: 4.46, 29: 4.59, 30: 4.72,
+                31: 4.88, 34: 5.17, 37: 5.46, 40: 5.75, 43: 6.04, 46: 6.30, 49: 6.59, 52: 6.79, 55: 7.01, 58: 7.21,
+                61: 7.47, 66: 7.82, 71: 8.14, 76: 8.50, 81: 8.82, 86: 9.15, 91: 9.50, 96: 9.82, 101: 10.18, 106: 10.50,
+                111: 10.86, 116: 11.18, 121: 11.51, 126: 11.86, 131: 12.18, 136: 12.54, 141: 12.86, 146: 13.22
             }
         }</field>
     </record>
@@ -8329,6 +8636,45 @@ The Tax rate for Low Movable Income Withholding Tax.
             <field name="parameter_value">{'200': {'months': 1}, '302': {'days': 0}}</field>
             <field name="rule_parameter_id" ref="rule_parameter_seniority_lost_period"/>
             <field name="date_from" eval="datetime(2012, 1, 1).date()"/>
+        </record>
+
+        <!-- Traffic fines of light infractions (1st and 2nd degree) the employer pays: exempt from the solidarity
+             contribution 889 up to this yearly amount per worker -->
+        <record id="rule_parameter_traffic_fines_light_exemption" model="hr.rule.parameter">
+            <field name="name">Traffic Fines: Yearly Exemption of the Light Infractions</field>
+            <field name="code">l10n_be_traffic_fines_light_exemption</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_traffic_fines_light_exemption_2014" model="hr.rule.parameter.value">
+            <field name="parameter_value">150</field>
+            <field name="rule_parameter_id" ref="rule_parameter_traffic_fines_light_exemption"/>
+            <field name="date_from" eval="datetime(2014, 1, 1).date()"/>
+        </record>
+
+        <!-- Joint committees whose year-end bonus is paid by a fund, not by the employer: not part of the termination
+             fees. The construction (124): fidelity stamps paid by Constructiv. -->
+        <record id="rule_parameter_year_end_bonus_paid_by_fund_joint_committees" model="hr.rule.parameter">
+            <field name="name">Joint Committees: Year-end Bonus Paid by a Fund</field>
+            <field name="code">l10n_be_year_end_bonus_paid_by_fund_joint_committees</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_year_end_bonus_paid_by_fund_joint_committees_2000" model="hr.rule.parameter.value">
+            <field name="parameter_value">['124']</field>
+            <field name="rule_parameter_id" ref="rule_parameter_year_end_bonus_paid_by_fund_joint_committees"/>
+            <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+        </record>
+
+        <!-- Structural reduction: the quarterly wage W of the 4th quarter of a worker whose year-end bonus is paid by a
+             third party (e.g. a subsistence security fund) is increased by 25% -->
+        <record id="rule_parameter_structural_reduction_fund_year_end_bonus_uplift" model="hr.rule.parameter">
+            <field name="name">Structural Reduction: Q4 Wage Uplift (Year-end Bonus Paid by a Fund)</field>
+            <field name="code">l10n_be_structural_reduction_fund_year_end_bonus_uplift</field>
+            <field name="country_id" ref="base.be"/>
+        </record>
+        <record id="rule_parameter_structural_reduction_fund_year_end_bonus_uplift_2000" model="hr.rule.parameter.value">
+            <field name="parameter_value">1.25</field>
+            <field name="rule_parameter_id" ref="rule_parameter_structural_reduction_fund_year_end_bonus_uplift"/>
+            <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
         </record>
     </data>
 </odoo>

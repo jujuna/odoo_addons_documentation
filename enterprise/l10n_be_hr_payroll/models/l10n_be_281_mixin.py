@@ -8,11 +8,10 @@ from lxml import etree
 from markupsafe import Markup
 from stdnum.be.vat import compact as vat_be_compact
 
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.fields import Domain
-from odoo.addons.l10n_be_hr_payroll.models.l10n_be_281_XX import COUNTRY_CODES
+from odoo.addons.l10n_be_hr_payroll.models.l10n_be_281_XX import COUNTRY_CODES, REPORT_CONFIG
 from odoo.addons.l10n_be_hr_payroll.models.utils import sum_values_by_group
-from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -37,32 +36,33 @@ class L10n_Be281_Mixin(models.AbstractModel):
     def _get_country_code(self, country):
         return self.declaration_id._get_country_code(country)
 
-    @api.model
-    def _check_employees_configuration(self, employees):
-        invalid_employees = employees.filtered(lambda e: not (e.company_id and e.company_id.street and e.company_id.zip and e.company_id.city and e.company_id.phone and e.company_id.vat))
-        if invalid_employees:
-            raise UserError(self.env._("The company is not correctly configured on your employees. Please be sure that the following pieces of information are set: street, zip, city, phone and vat") + '\n' + '\n'.join(invalid_employees.mapped('name')))
+    def _get_employee_configuration_errors(self, employee):
+        """Errors of the configuration of an employee preventing to declare them in the 281 forms.
 
-        invalid_employees = employees.filtered(
-            lambda e: not e.private_street or not e.private_zip or not e.private_city or not e.private_country_id)
-        if invalid_employees:
-            raise UserError(self.env._("The following employees don't have a valid private address (with a street, a zip, a city and a country):\n%s", '\n'.join(invalid_employees.mapped('name'))))
-
-        invalid_employees = employees.filtered(lambda emp: not emp.version_ids or not emp.version_id)
-        if invalid_employees:
-            raise UserError(self.env._('Some employee has no contract:\n%s', '\n'.join(invalid_employees.mapped('name'))))
-
-        invalid_employees = employees.filtered(lambda e: e.l10n_be_dimona_category != 'alt' and not e._is_niss_valid())
-        if invalid_employees:
-            raise UserError(self.env._('Invalid NISS number for those employees:\n %s', '\n'.join(invalid_employees.mapped('name'))))
-
-        invalid_employees = employees.filtered(lambda e: not e.l10n_be_legal_first_name or not e.l10n_be_legal_last_name)
-        if invalid_employees:
-            raise UserError(self.env._("The following employees don't have a legal first and last name defined:\n %s", '\n'.join(invalid_employees.mapped('name'))))
-
-        invalid_country_codes = employees.private_country_id.filtered(lambda c: c.code not in COUNTRY_CODES)
-        if invalid_country_codes:
-            raise UserError(self.env._('Unsupported country code %s. Please contact an administrator.', ', '.join(invalid_country_codes.mapped('code'))))
+        :return: list of translated messages, each naming the employee
+        """
+        errors = []
+        # The employees of the branches are declared by the root company
+        company = employee.company_id.root_id
+        if not (company and company.street and company.zip and company.city and company.phone and company.vat):
+            errors.append(self.env._(
+                "The company of employee %s is not correctly configured. Please be sure that the following "
+                "pieces of information are set: street, zip, city, phone and VAT", employee.name))
+        if not (employee.private_street and employee.private_zip and employee.private_city and employee.private_country_id):
+            errors.append(self.env._(
+                "Employee %s doesn't have a valid private address (with a street, a zip, a city and a country)",
+                employee.name))
+        elif employee.private_country_id.code not in COUNTRY_CODES:
+            errors.append(self.env._(
+                "Unsupported country code %(code)s for employee %(employee)s. Please contact an administrator.",
+                code=employee.private_country_id.code, employee=employee.name))
+        if not employee.version_ids or not employee.version_id:
+            errors.append(self.env._("Employee %s has no contract", employee.name))
+        if employee.l10n_be_dimona_category != 'alt' and not employee._is_niss_valid():
+            errors.append(self.env._("Invalid NISS number for employee %s", employee.name))
+        if not employee.l10n_be_legal_first_name or not employee.l10n_be_legal_last_name:
+            errors.append(self.env._("Employee %s doesn't have a legal first and last name defined", employee.name))
+        return errors
 
     def _get_declaration_period(self):
         year = int(self.declaration_id.year)
@@ -74,15 +74,15 @@ class L10n_Be281_Mixin(models.AbstractModel):
     def action_generate_declarations(self):
         self.line_ids.unlink()
         for sheet in self:
-            company_id = sheet.declaration_id.company_id
             all_payslips = self.env['hr.payslip'].search(Domain([
                 ('state', 'in', ['validated', 'paid']),
-                ('company_id', '=', company_id.id),
-                ('employee_id.l10n_be_dimona_category', '!=', 'alt'),
+                ('company_id', 'in', sheet.declaration_id.branch_ids.ids),
             ]) & self.env['hr.payslip']._l10n_be_get_fiscal_period_domain(*sheet._get_declaration_period()))
-            payslips = all_payslips.filtered(lambda p: not p.version_id.no_withholding_taxes)
-            sheet.declaration_id.payslip_ids |= payslips
+            payslips = all_payslips._l10n_be_filter_declared_withholding_taxes()
             sheet.declaration_id.untaxed_employee_ids = (all_payslips - payslips).employee_id
+            if sheet._include_untaxed_payslips():
+                payslips = all_payslips
+            sheet.declaration_id.payslip_ids |= payslips
             eligible_employees = self._get_eligible_employees(payslips)
             sheet.write({
                 'line_ids': [(0, 0, {
@@ -93,40 +93,87 @@ class L10n_Be281_Mixin(models.AbstractModel):
             })
         return True
 
+    def _include_untaxed_payslips(self):
+        # The payslips without withholding tax (cross-border workers, not the students) are left out of the forms by
+        # default
+        return False
+
     def _get_rendering_data(self, employees):
         self.ensure_one()
         self.declaration_id._check_company_configuration()
+        return self._get_employees_rendering_data(employees)
 
-        all_payslips = self.env['hr.payslip'].search(Domain([
-            ('state', 'in', ['validated', 'paid']),
-            ('employee_id', 'in', employees.ids),
-        ]) & self.env['hr.payslip']._l10n_be_get_fiscal_period_domain(*self._get_declaration_period()))
-        all_employees = all_payslips.employee_id
-        self._check_employees_configuration(all_employees)
+    def _get_employees_rendering_data(self, employees):
+        """Same as ``_get_rendering_data``, without checking the configuration of the company: the employees whose
+        configuration is invalid are left out of the forms and listed in ``employees_with_error``."""
+        self.ensure_one()
+        all_payslips = self._get_declared_payslips(employees)
 
         line_codes = self._get_line_codes()
         all_line_values = all_payslips._get_line_values(
             line_codes, vals_list=['total', 'quantity'], extra_domain=self._get_fiscal_line_domain())
-        employee_payslips = all_payslips.grouped('employee_id')
+        # The employees are numbered (zone 2009) in a stable order, whatever the employees rendered together
+        employee_payslips = dict(sorted(all_payslips.grouped('employee_id').items(), key=lambda item: item[0].id))
         return self._generate_employees_data(employee_payslips, all_line_values)
+
+    def _get_declared_payslips(self, employees):
+        return self.env['hr.payslip'].search(Domain([
+            ('state', 'in', ['validated', 'paid']),
+            ('employee_id', 'in', employees.ids),
+        ]) & self.env['hr.payslip']._l10n_be_get_fiscal_period_domain(*self._get_declaration_period()))
+
+    def _get_sequence_numbers(self):
+        """Sequence number (zone 2009) of the employees of the form, as in the XML file of the declaration: the
+        forms follow each other in the order of REPORT_CONFIG, the employees of a form by id.
+
+        The PDF of the employees, generated by batches, show the same number as the XML file (box 1).
+
+        :return: {employee: sequence number}
+        """
+        self.ensure_one()
+        declaration = self.declaration_id
+        offset = 0
+        for config in REPORT_CONFIG.values():
+            sheet = declaration[config['relation_field']][:1]
+            if sheet == self:
+                break
+            if declaration[config['include_field']] and declaration[config['count_field']]:
+                offset += len(sheet._get_declared_payslips(sheet.line_ids.employee_id).employee_id)
+        employees = self._get_declared_payslips(self.line_ids.employee_id).employee_id.sorted('id')
+        return {employee: offset + index for index, employee in enumerate(employees, start=1)}
 
     def _get_eligible_employees(self, payslips):
         # Return employees that should be included in the declaration.
         income_lines = self._get_income_lines()
         if not income_lines:
             return payslips.employee_id
+        return self.env['hr.employee'].union(
+            employee for employee, amounts in self._get_income_amounts(payslips, income_lines).items()
+            if self._has_declared_income(amounts)
+        )
+
+    def _get_income_amounts(self, payslips, income_lines):
+        """The amounts of the income lines of each employee, rounded to the cent.
+
+        :return: {employee: list of amounts}
+        """
         line_codes = self._get_line_codes()
         all_line_values = payslips._get_line_values(line_codes, extra_domain=self._get_fiscal_line_domain())
         employee_payslips = payslips.grouped('employee_id')
         mapped_totals_by_employee = sum_values_by_group(employee_payslips, all_line_values, line_codes)
+        # The income lines may read the values computed for the declaration, as when it is rendered
+        mapped_totals_by_employee = self._get_precomputed_employee_data(employee_payslips, all_line_values, mapped_totals_by_employee)
         evaluation_plan = income_lines._get_evaluation_plan()
-        eligible_employees = self.env['hr.employee']
+        income_amounts = {}
         for employee, slips in employee_payslips.items():
             line_values = mapped_totals_by_employee[employee]
             localdict = self._get_localdict(line_values, employee, slips, all_line_values)
-            if any(round(amount, 2) for amount in income_lines._evaluate_batch(localdict, evaluation_plan).values()):
-                eligible_employees |= employee
-        return eligible_employees
+            income_amounts[employee] = [
+                round(amount, 2) for amount in income_lines._evaluate_batch(localdict, evaluation_plan).values()]
+        return income_amounts
+
+    def _has_declared_income(self, amounts):
+        return any(amounts)
 
     def _get_income_lines(self):
         return self.env['l10n.be.281.mapping']
@@ -183,10 +230,17 @@ class L10n_Be281_Mixin(models.AbstractModel):
         self.ensure_one()
         base_employees_data = {}
         employees_with_error = {}
+        # The XML file numbers the forms of the whole declaration, the other renderings (PDF) take the same numbers
         sequence = self.env.context.get('starting_sequence', 0)
+        sequence_numbers = {} if 'starting_sequence' in self.env.context else self._get_sequence_numbers()
         for employee in employee_payslips:
             is_belgium = employee.private_country_id.code == 'BE'
             sequence += 1
+
+            configuration_errors = self._get_employee_configuration_errors(employee)
+            if configuration_errors:
+                employees_with_error[employee] = '\n'.join(configuration_errors)
+                continue
 
             postcode = employee.private_zip.strip() if is_belgium else '0'
             if len(postcode) > 4 or not postcode.isdecimal():
@@ -214,9 +268,9 @@ class L10n_Be281_Mixin(models.AbstractModel):
                 'entry_date': first_contract_date.strftime('%d-%m-%Y') if first_contract_date.year == year_end.year else '',
                 'departure_date': departure_date.strftime('%d-%m-%Y') if departure_date and first_contract_date < departure_date < year_end else '',
                 'f2002_inkomstenjaar': self.declaration_id.year,
-                'f2005_registratienummer': vat_be_compact(self.declaration_id.company_id.vat),
+                'f2005_registratienummer': vat_be_compact(self.declaration_id.company_id.vat or ''),
                 'f2008_typefiche': self._get_declaration_code().replace('.', ''),
-                'f2009_volgnummer': sequence,
+                'f2009_volgnummer': sequence_numbers.get(employee, sequence),
                 'f2011_nationaalnr': employee.niss,
                 'f2013_naam': last_name,
                 'f2015_adres': employee.private_street,
@@ -243,6 +297,11 @@ class L10n_Be281_Mixin(models.AbstractModel):
 
         year = self.declaration_id.year
         mapping_lines = self._get_mapping_lines(year)
+        # The zones of the form that the Belcotax schema of the year doesn't define (mapping rows of other years) are
+        # not declared in the XML file; the PDF of the form shows them empty
+        other_year_values = dict.fromkeys(set(self.env['l10n.be.281.mapping'].search([
+            ('declaration_code', '=', self._get_declaration_code()),
+        ]).mapped('tag')) - set(mapping_lines.mapped('tag')), 0)
         line_codes = self._get_line_codes()
         all_worked_days = {}
         if mapping_lines:
@@ -258,6 +317,7 @@ class L10n_Be281_Mixin(models.AbstractModel):
             valid_employee_payslips, all_worked_days, list(all_worked_days), 'number_of_days')
         mapped_totals_by_employee = self._get_precomputed_employee_data(employee_payslips, all_line_values, mapped_totals_by_employee)
         evaluation_plan = mapping_lines._get_evaluation_plan()
+        employees_warnings = {}
         for employee, payslips in employee_payslips.items():
             if employee not in base_employees_data:
                 continue
@@ -267,7 +327,9 @@ class L10n_Be281_Mixin(models.AbstractModel):
             localdict = self._get_localdict(
                 line_values, employee, payslips, all_line_values, worked_days=worked_days_by_employee[employee])
             sheet_values = mapping_lines._evaluate_batch(localdict, evaluation_plan)
-            employees_data.append({**base_employees_data[employee], **sheet_values})
+            if warnings := self._check_employee_values(sheet_values, evaluation_plan, line_values):
+                employees_warnings[employee] = warnings
+            employees_data.append({**other_year_values, **base_employees_data[employee], **sheet_values})
 
         control_tag = self._get_control_total_tag()
         withholding_tag = self._get_withholding_tag()
@@ -275,11 +337,87 @@ class L10n_Be281_Mixin(models.AbstractModel):
             'base_employees_data': base_employees_data,
             'employees_data': employees_data,
             'employees_with_error': employees_with_error,
+            'employees_warnings': employees_warnings,
             'sum_volgnummer': sum_2009,
             'sum_control_total': sum(sheet_values.get(control_tag, 0) for sheet_values in employees_data),
             'sum_withholding': sum(sheet_values.get(withholding_tag, 0) for sheet_values in employees_data),
             'mapping_lines': mapping_lines,
         }
+
+    def _check_employee_values(self, sheet_values, evaluation_plan, line_values):
+        """Fix in place the values of the form of an employee that Belcotax would refuse.
+
+        :return: list of warnings explaining what was changed, and what must be declared by hand
+        """
+        return []
+
+    def _deduct_negative_remuneration(self, remuneration, other_remuneration):
+        """Belcotax refuses a negative amount: a negative remuneration of box 6a (a year with only a correction) is
+        deducted from the other remunerations of box 6b, as far as they are positive.
+
+        :return: tuple (box 6a, box 6b, positive amount left out of both)
+        """
+        if remuneration >= 0:
+            return remuneration, other_remuneration, 0.0
+        deducted = min(-remuneration, max(other_remuneration, 0.0))
+        return 0.0, other_remuneration - deducted, -(remuneration + deducted)
+
+    def _reset_negative_amounts(self, sheet_values, evaluation_plan, days_tags=None):
+        """Belcotax refuses a negative amount: set the negative amounts to 0, the number of days declared with them
+        too, and total the control zones again.
+
+        :param days_tags: {amount tag: tag of its number of days}
+        :return: the zones set to 0
+        """
+        days_tags = days_tags or {}
+        reset_tags = [
+            tag for _mapping_line, tag, is_monetary, kind, _data in evaluation_plan
+            if is_monetary and kind != 'control' and sheet_values[tag] < 0
+        ]
+        for tag in reset_tags:
+            sheet_values[tag] = 0
+            if tag in days_tags:
+                sheet_values[days_tags[tag]] = 0
+        if reset_tags:
+            # The plan totals a control zone after the zones it totals
+            for _mapping_line, tag, _is_monetary, kind, control_tags in evaluation_plan:
+                if kind == 'control':
+                    sheet_values[tag] = sum(sheet_values[control_tag] for control_tag in control_tags)
+        return [tag.split('_')[1] for tag in reset_tags]
+
+    def _get_declaration_warnings(self):
+        """Warnings on the forms of the declared employees, see _check_employee_values. Only the forms that check
+        their values render them for it.
+
+        :return: list of messages
+        """
+        return []
+
+    def _get_employee_values_warnings(self, payslips):
+        """Warnings of _check_employee_values on the forms of the declared employees, and on the employees left out
+        of the declaration because all their amounts are negative (only the recovery of a previous year).
+
+        :param payslips: the payslips the eligibility of the form is computed on
+        """
+        self.ensure_one()
+        warnings = []
+        if self.line_ids:
+            rendering_data = self.with_context(round_281=False)._get_rendering_data(self.line_ids.employee_id)
+            warnings += [
+                self.env._("%(employee)s: %(warning)s", employee=employee.name, warning=warning)
+                for employee, employee_warnings in rendering_data['employees_warnings'].items()
+                for warning in employee_warnings
+            ]
+        income_lines = self._get_income_lines()
+        if income_lines and payslips:
+            warnings += [
+                self.env._(
+                    "%(employee)s: only negative amounts, no form: declare the recovered amounts by hand.",
+                    employee=employee.name)
+                for employee, amounts in self._get_income_amounts(payslips, income_lines).items()
+                if any(amounts) and not self._has_declared_income(amounts)
+            ]
+        return warnings
 
     def _get_pdf_report(self):
         return self.env.ref(f"l10n_be_hr_payroll.action_report_employee_{self._get_declaration_code().replace('.', '_')}")

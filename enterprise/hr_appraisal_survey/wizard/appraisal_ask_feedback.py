@@ -70,7 +70,10 @@ class AppraisalAskFeedback(models.TransientModel):
 
     @api.depends('appraisal_id')
     def _compute_allowed_survey_template_ids(self):
-        all_appraisal_templates = self.env['survey.survey'].search([('survey_type', '=', 'appraisal')])
+        all_appraisal_templates = self.env['survey.survey'].search([
+            ('survey_type', '=', 'appraisal'),
+            ('question_and_page_ids', 'any', [('is_page', '=', False)]),
+        ])
         for wizard in self:
             wizard.allowed_survey_template_ids = wizard.appraisal_id.appraisal_template_id.survey_template_ids or all_appraisal_templates
 
@@ -140,6 +143,7 @@ class AppraisalAskFeedback(models.TransientModel):
 
     def action_send(self):
         self.ensure_one()
+        self.survey_template_id.sudo().check_validity()
 
         if fields.Date.context_today(self) > self.deadline:
             raise UserError(_("Please set an Answer Deadline in the future"))

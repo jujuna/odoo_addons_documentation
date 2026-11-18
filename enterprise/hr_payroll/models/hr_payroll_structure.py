@@ -14,6 +14,14 @@ class HrPayrollStructure(models.Model):
 
     @api.model
     def _get_default_rule_ids(self):
+        """
+        Default value of ``rule_ids``: active copies of the rules of the archived
+        ``hr_payroll.default_structure`` (basic, gross, net, deductions, attachments...), set to
+        the company country. Structures declared in data files set ``rule_ids`` to ``[]`` to
+        avoid these copies.
+
+        :return: list of ``(0, 0, vals)`` commands
+        """
         default_structure = self.env.ref('hr_payroll.default_structure', False)
         if not default_structure or not (default_rules := default_structure.with_context(active_test=False).rule_ids):
             return []
@@ -21,6 +29,11 @@ class HrPayrollStructure(models.Model):
         return [(0, 0, vals) for vals in vals_list]
 
     def _get_domain_report(self):
+        """
+        Domain of the payslip templates selectable on the structure: QWeb PDF reports of
+        ``hr.payslip`` whose report name contains ``l10n_<company country code>``, or generic
+        ``hr_payroll`` reports.
+        """
         if self.env.company.country_code:
             return [
                 ('model', '=', 'hr.payslip'),
@@ -75,11 +88,15 @@ class HrPayrollStructure(models.Model):
 
     def _sync_properties_to_definition(self):
         """
-        Sync the version-side properties definition based on all active rules of the
-        structure that are marked input_usage_employee, whatever their condition type.
+        Rebuild ``version_properties_definition`` from the active rules flagged
+        ``input_usage_employee``, whatever their condition type.
 
-        Payslip-side properties are no longer used: per-payslip values now live as
-        hr.payslip.input rows pointing at the rule via salary_rule_id.
+        Each rule becomes a ``float`` property named after the rule code (label ``input_name``,
+        default ``_get_property_default_value()``, optional ``input_suffix``), grouped under one
+        separator per ``input_section`` (named ``separator_<section id>``, ordered by section
+        sequence). Rules without section are skipped. The values of these properties, entered in
+        ``hr.version.payroll_properties``, become input lines of the payslips. Per-payslip values
+        are ``hr.payslip.input`` lines pointing at the rule (``salary_rule_id``).
         """
         for struct in self:
             employee_input_rules = struct.rule_ids.filtered(

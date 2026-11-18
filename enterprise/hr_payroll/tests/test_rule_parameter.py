@@ -38,7 +38,7 @@ class TestRuleParameter(MailCase):
                 'parameter_value': str(year),
                 'date_from': date(year, 1, 1)
             })
-        cls.rule_values = cls.env['hr.rule.parameter.value'].create(values)
+        _2016, _2017, cls.value_2018, cls.value_2020 = cls.env["hr.rule.parameter.value"].create(values)
 
     @freeze_time(datetime(2019, 10, 10))
     def test_get_last_version(self):
@@ -48,6 +48,29 @@ class TestRuleParameter(MailCase):
     def test_get_middle_version(self):
         value = self.env['hr.rule.parameter']._get_parameter_from_code('test_param', date=date(2017, 5, 5))
         self.assertEqual(value, 2017, "It should get the 2017 version")
+
+    def test_unlink_value_clears_cache(self):
+        rule_parameter = self.env['hr.rule.parameter']
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 2020)
+        self.value_2020.unlink()
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 2018)
+
+    def test_create_write_value_clears_cache(self):
+        rule_parameter = self.env['hr.rule.parameter']
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2019, 5, 5)), 2018)
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 2020)
+        value_2021 = self.env['hr.rule.parameter.value'].create({
+            'rule_parameter_id': self.rule_parameter.id,
+            'parameter_value': '2021',
+            'date_from': date(2021, 1, 1),
+        })
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 2021)
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2022, 5, 5)), 2021)
+        value_2021.parameter_value = '42'
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 42)
+        value_2021.date_from = date(2022, 1, 1)
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2021, 5, 5)), 2020)
+        self.assertEqual(rule_parameter._get_parameter_from_code('test_param', date=date(2019, 5, 5)), 2018)
 
     def test_get_unexisting_version(self):
         with self.assertRaises(UserError):
@@ -202,4 +225,51 @@ _get_parameter_from_code() should always return the defined parameter_value,
 even if the return value has been modified by a caller at some point.
 This issue usually occurs when modifying cached mutable data.
             """,
+        )
+
+    def test_rule_parameter_cache(self):
+        other_rule_parameter = self.env["hr.rule.parameter"].create({
+            "name": "Other Parameter",
+            "code": "other_param",
+        })
+        self.assertEqual(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("test_param", date=date(2021, 1, 1)),
+            2020,
+        )
+
+        self.value_2020.parameter_value = "2021"
+        self.assertEqual(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("test_param", date=date(2021, 1, 1)),
+            2021,
+            "Writing a value should clear the cache",
+        )
+
+        self.value_2020.rule_parameter_id = other_rule_parameter
+        self.assertEqual(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("test_param", date=date(2021, 1, 1)),
+            2018,
+            "Moving a value to another parameter should clear the cache",
+        )
+
+        self.value_2018.unlink()
+        self.assertEqual(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("test_param", date=date(2021, 1, 1)),
+            2017,
+            "Deleting a value should clear the cache",
+        )
+
+        self.rule_parameter.code = "renamed"
+        self.assertIsNone(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("test_param", date=date(2021, 1, 1), raise_if_not_found=False),
+            "Renaming a parameter code should clear the cache",
+        )
+        self.assertEqual(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("renamed", date=date(2021, 1, 1)),
+            2017,
+        )
+
+        self.rule_parameter.unlink()
+        self.assertIsNone(
+            self.env["hr.rule.parameter"]._get_parameter_from_code("renamed", date=date(2021, 1, 1), raise_if_not_found=False),
+            "Deleting a parameter should clear the cache",
         )

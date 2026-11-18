@@ -6,14 +6,14 @@ class L10nBeSalaryScale(models.Model):
     _description = 'Salary Scale'
 
     name = fields.Char(required=True, translate=True)
-    l10n_be_joint_committee = fields.Many2one('l10n.be.joint.committee', string="Related Joint Committee", required=True)
+    l10n_be_joint_committee = fields.Many2one('l10n.be.joint.committee', string="Related Joint Committee")
     code = fields.Char(string="Code", required=True)
     description = fields.Char()
     dmfa_code = fields.Char(string="DMFA Code")
     egov3_code = fields.Char(string="eGov3 Code")
     employer_category_id = fields.Many2one(
         'l10n.be.employer.category', string="Employer Category",
-        domain="[('allowed_joint_committee_ids', 'any', [('id', '=', l10n_be_joint_committee)])]")
+        domain="[('allowed_joint_committee_ids', 'any', [('id', '=', l10n_be_joint_committee)])] if l10n_be_joint_committee else []")
 
     @api.depends('code', 'dmfa_code')
     @api.depends_context('formatted_display_name')

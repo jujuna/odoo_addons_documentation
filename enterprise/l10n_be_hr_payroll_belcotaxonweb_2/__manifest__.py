@@ -16,6 +16,7 @@ origin of each difference.
     'depends': ['l10n_be_hr_payroll'],
     'data': [
         'security/ir.access.csv',
+        'data/hr_payroll_warning_data.xml',
         'views/l10n_be_281_xx_withholding_check_views.xml',
         'views/l10n_be_281_xx_views.xml',
     ],

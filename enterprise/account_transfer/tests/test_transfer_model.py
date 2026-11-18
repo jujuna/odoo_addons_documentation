@@ -237,6 +237,15 @@ class TransferModelTestCase(AccountAutoTransferTestCase):
         start_date = self.transfer_model._determine_start_date()
         self.assertEqual(start_date, lock_date.replace(day=1), 'After setting a fiscal year lock date, start date should become the first day of the month of the lock date')
 
+        self.company.fiscalyear_lock_date = fields.Date.to_date('2019-10-31')
+        self.transfer_model.frequency = 'quarter'
+        start_date = self.transfer_model._determine_start_date()
+        self.assertEqual(start_date, fields.Date.to_date('2019-09-01'), 'Start date should be the first day of the quarter of the lock date')
+
+        self.transfer_model.frequency = 'year'
+        start_date = self.transfer_model._determine_start_date()
+        self.assertEqual(start_date, self.transfer_model.date_start, 'Lock date after the start date of the transfer model but within its first year')
+
     def test_get_next_move_date(self):
         experimentations = {
             'month': [

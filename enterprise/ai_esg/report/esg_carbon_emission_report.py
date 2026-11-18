@@ -54,7 +54,7 @@ class EsgCarbonEmissionReport(models.Model):
         self.ensure_one()
         emission_factor = self.env['esg.emission.factor'].browse(emission_factor_id)
         self.esg_emission_factor_id = emission_factor
-        return self.env._('Emission factor of emission line %(line_name)s updated to %(factor_name)s', line_name=self.name, factor_name=emission_factor.name)
+        return self.env._('Emission factor of emission line %(line_name)s updated to %(factor_name)s', line_name=self.display_name, factor_name=emission_factor.name)
 
     def _cron_ai_assign_emission_factors(self):
         auto_commit = not (config['test_enable'] or modules.module.current_test)

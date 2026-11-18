@@ -346,7 +346,7 @@ export class GanttModel extends Model {
      * @returns {boolean}
      */
     hasData() {
-        return Boolean(this.data.records.length);
+        return Boolean(this.data.records.length || this.data.eventsToSchedule.length);
     }
 
     /**

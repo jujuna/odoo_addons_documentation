@@ -89,4 +89,4 @@ class TestSignContract(SignRequestCommon, TestBelgiumCommon):
         with MockRequest(sign_request.env):
             controller._update_version_on_signature(sign_request_item_signer_2, version, offer)
 
-        self.assertEqual(version.car_id.driver_id, self.partner_2, "Car driver should be updated")
+        self.assertFalse(version.car_id.driver_id, "Car driver should not be updated")

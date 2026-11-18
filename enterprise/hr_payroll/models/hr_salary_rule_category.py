@@ -11,7 +11,7 @@ class HrSalaryRuleCategory(models.Model):
     name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
     parent_id = fields.Many2one('hr.salary.rule.category', string='Parent', index=True,
-        help="Linking a salary category to its parent is used only for the reporting purpose.",
+        help="The totals of the rules of this category are also added to its parent category (and its ancestors) during the payslip computation.",
         domain="['|', ('country_id', '=', False), ('country_id', '=', country_id)]")
     children_ids = fields.One2many('hr.salary.rule.category', 'parent_id', string='Children')
     note = fields.Html(string='Description')
@@ -37,6 +37,13 @@ class HrSalaryRuleCategory(models.Model):
     premium_percentage_hourly_rate = fields.Float(string="Percentage of Hourly Rate",
         help="Extra percentage of the worked time own hourly rate granted per hour of worked time carrying this premium pay.")
     active = fields.Boolean(string="Active", default=True)
+    premium_currency_id = fields.Many2one('res.currency', compute='_compute_premium_currency_id')
+
+    @api.depends('country_id')
+    @api.depends_context('company')
+    def _compute_premium_currency_id(self):
+        for category in self:
+            category.premium_currency_id = category.country_id.currency_id or self.env.company.currency_id
 
     def _compute_salary_rule_ids(self):
         for category in self:
@@ -79,11 +86,29 @@ class HrSalaryRuleCategory(models.Model):
         return codes
 
     def _sum_salary_rule_category(self, localdict, amount):
-        for category in self:
-            if category.parent_id:
-                localdict = category.parent_id._sum_salary_rule_category(localdict, amount)
-            localdict['categories'][category.code] += amount
+        """
+        Add ``amount`` to ``localdict['categories']`` for these categories and all their ancestors.
+
+        Called for each computed payslip line with the categories of its rule. Each category code
+        is credited once, even if it is reached through several categories of the rule: for a rule
+        with two categories sharing a parent, the parent receives ``amount`` once.
+
+        :param dict localdict: computation context of the payslip, modified in place
+        :param float amount: amount to add (the caller passes the difference with the previous
+            total of the same rule code, if any)
+        :return: ``localdict``
+        :rtype: dict
+        """
+        for code in self._get_codes_with_ancestors():
+            localdict['categories'][code] += amount
         return localdict
 
     def _get_seized_categories(self):
+        """
+        Hook returning the categories whose rules are seizures of salary, used to compute
+        ``hr.salary.attachment.is_seized``. Empty by default, overridden by localizations
+        (e.g. ``l10n_be_hr_payroll``).
+
+        :rtype: hr.salary.rule.category
+        """
         return self.browse()

@@ -121,16 +121,18 @@ class MarketingActivity(models.Model):
         if not whatsapp_activities:
             return non_whatsapp_stats
 
-        self.env["marketing.trace"].flush_model(["activity_id", "whatsapp_message_id", "participant_id"])
+        self.env["marketing.trace"].flush_model(["activity_id", "whatsapp_message_id", "participant_id", "state"])
         self.env["whatsapp.message"].flush_model(["state", "links_click_datetime"])
+        self.env["marketing.participant"].flush_model(["is_test"])
         self.env.cr.execute(SQL("""
             SELECT
                 trace.activity_id,
                 COUNT(wa_message.state) FILTER (WHERE wa_message.state in ('sent', 'delivered', 'read', 'replied')) AS total_sent,
                 COUNT(wa_message.state) FILTER (WHERE wa_message.state in ('read', 'replied')) AS total_open,
                 COUNT(wa_message.state) FILTER (WHERE wa_message.state in ('replied')) AS total_reply,
-                COUNT(wa_message.state) FILTER (WHERE wa_message.state in ('error')) AS rejected,
-                COUNT(wa_message.state) FILTER (WHERE wa_message.links_click_datetime is NOT NULL) AS total_click
+                COUNT(wa_message.state) FILTER (WHERE wa_message.links_click_datetime is NOT NULL) AS total_click,
+                COUNT(trace.state) FILTER (WHERE trace.state = 'processed') AS processed,
+                COUNT(trace.state) FILTER (WHERE trace.state = 'rejected') AS rejected
             FROM
                 marketing_trace AS trace
             LEFT JOIN

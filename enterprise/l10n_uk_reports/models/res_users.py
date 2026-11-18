@@ -7,6 +7,7 @@ from odoo import fields, models
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
+    # These fields are deprecated as of version 20.0
     l10n_uk_user_token = fields.Char('User Token', copy=False, groups='base.group_system',
                                      help="Is a token given by the Odoo server used to refresh the access token. ")
     l10n_uk_hmrc_vat_token = fields.Char("Oauth Access Token", copy=False, groups='base.group_system',
@@ -15,6 +16,7 @@ class ResUsers(models.Model):
                                                              help="When the access token expires, then it can be refreshed"
                                                                   "through the Odoo server with the user token. ")
 
+    # This function is deprecated as of version 20.0
     def hmrc_reset_tokens(self):
         self.ensure_one()
         self.env['hmrc.service']._clean_tokens(self)

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_edi_form" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="name">stock.picking.edi.form</field>
+        <field name="inherit_id" ref="l10n_cl_edi_stock.view_picking_edi_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='l10n_cl_delivery_guide_reason']" position="after">
+                <field name="l10n_cl_edi_departure_date" invisible="country_code != 'CL'" readonly='l10n_cl_dte_status'/>
+                <field name="l10n_cl_edi_arrival_date" invisible="country_code != 'CL'" readonly='l10n_cl_dte_status'/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='electronic_invoice']" position="attributes">
+                <attribute name="invisible">country_code != 'CL' and not l10n_latam_document_number</attribute>
+            </xpath>
+            <xpath expr="//field[@name='l10n_cl_sii_send_ident']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='electronic_invoice']" position="inside">
+                <group>
+                    <field name="l10n_cl_edi_transport_id" readonly='l10n_cl_dte_status'/>
+                    <field name="l10n_cl_edi_driver_id" readonly='l10n_cl_dte_status'/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

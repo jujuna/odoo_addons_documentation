@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.2alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 18:18+0000\n"
-"PO-Revision-Date: 2026-10-20 10:34+0000\n"
+"POT-Creation-Date: 2026-11-13 18:31+0000\n"
+"PO-Revision-Date: 2026-10-30 12:10+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "l10n_be_hr_payroll_account/de/>\n"
@@ -67,12 +67,6 @@ msgstr "Kontenplanvorlage"
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll_account.field_l10n_be_274_xx__move_id
 msgid "Accounting Entry"
 msgstr "Buchungseintrag"
-
-#. module: l10n_be_hr_payroll_account
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
-msgid "Adjustment Entry"
-msgstr "Berichtigungseintrag"
 
 #. module: l10n_be_hr_payroll_account
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll_account.field_res_config_settings__exemption_bachelor_account_id
@@ -137,27 +131,9 @@ msgid "Exemption Bachelor Capping Account"
 msgstr "Konto für Bachelor-Befreiungsdeckel"
 
 #. module: l10n_be_hr_payroll_account
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
-msgid "Exemption Capping for bachelors"
-msgstr "Befreiungsdeckel für Bachelor"
-
-#. module: l10n_be_hr_payroll_account
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll_account.field_res_company__exemption_doctor_master_account_id
 msgid "Exemption Doctor Master Account"
 msgstr "Befreiung Doktor-Master-Konto"
-
-#. module: l10n_be_hr_payroll_account
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
-msgid "Exemption for bachelors"
-msgstr "Befreiung für Bachelor"
-
-#. module: l10n_be_hr_payroll_account
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
-msgid "Exemption for doctors/civil engineers/masters"
-msgstr "Befreiung für Ärzte/Bauingenieure/Master"
 
 #. module: l10n_be_hr_payroll_account
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll_account.field_account_chart_template__id
@@ -171,31 +147,21 @@ msgid "ID"
 msgstr "ID"
 
 #. module: l10n_be_hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll_account.res_config_settings_view_form
-msgid ""
-"If checked, the company has a white cash register, which impacts the cap for "
-"CP302 extra hours."
-msgstr ""
-"Wenn diese Option aktiviert ist, verfügt das Unternehmen über ein "
-"Registrierkassensystem (weiße Kasse), was sich auf die Obergrenze für PK302-"
-"Überstunden auswirkt."
-
-#. module: l10n_be_hr_payroll_account
 #. odoo-javascript
 #: code:addons/l10n_be_hr_payroll_account/static/src/components/onss_payment_warning_action/onss_payment_warning_action.xml:0
 msgid "Initiate Payment"
 msgstr "Zahlung veranlassen"
 
 #. module: l10n_be_hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll_account.res_config_settings_view_form
-msgid "Journal Entries Accounts"
-msgstr "Konten der Journalbuchungen"
-
-#. module: l10n_be_hr_payroll_account
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
 msgid "Journal Entry"
 msgstr "Journalbuchung"
+
+#. module: l10n_be_hr_payroll_account
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll_account.res_config_settings_view_form
+msgid "Journal of the exemptions the payslips do not book (274 declaration)"
+msgstr ""
 
 #. module: l10n_be_hr_payroll_account
 #: model:hr.payroll.warning,description:l10n_be_hr_payroll_account.hr_payroll_warning_onss_payment
@@ -249,12 +215,12 @@ msgstr "LASS-Zahlungs %(year)s Q%(quarter)s"
 #. module: l10n_be_hr_payroll_account
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll_account.hr_payroll_warning_onss_payment
 msgid "Open"
-msgstr ""
+msgstr "Offen"
 
 #. module: l10n_be_hr_payroll_account
 #: model:ir.actions.server,name:l10n_be_hr_payroll_account.l10n_be_onss_payment_warning_action
 msgid "Open ONSS Payment"
-msgstr ""
+msgstr "LASS-Zahlung öffnen"
 
 #. module: l10n_be_hr_payroll_account
 #: model:ir.model,name:l10n_be_hr_payroll_account.model_account_payment
@@ -266,15 +232,6 @@ msgstr "Zahlung"
 #: model:ir.model,name:l10n_be_hr_payroll_account.model_hr_payroll_warning
 msgid "Payroll Warning"
 msgstr "Warnung für Personalabrechnung"
-
-#. module: l10n_be_hr_payroll_account
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
-msgid ""
-"Please define a default journal on the Salary Journal used in settings [%s]"
-msgstr ""
-"Bitte legen Sie in den Einstellungen [%s] ein Standardjournal für das "
-"Gehaltsjournal fest"
 
 #. module: l10n_be_hr_payroll_account
 #. odoo-python
@@ -295,7 +252,7 @@ msgstr "Journalposten buchen"
 #. odoo-javascript
 #: code:addons/l10n_be_hr_payroll_account/static/src/components/onss_payment_warning_action/onss_payment_warning_action.xml:0
 msgid "Provisions Paid"
-msgstr ""
+msgstr "Gezahlte Rückstellungen"
 
 #. module: l10n_be_hr_payroll_account
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll_account.field_res_company__exemption_journal_id
@@ -310,26 +267,41 @@ msgid "Settings"
 msgstr "Einstellungen"
 
 #. module: l10n_be_hr_payroll_account
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
+msgid ""
+"The payslips already booked all the withholding tax exemptions of the "
+"declaration."
+msgstr ""
+
+#. module: l10n_be_hr_payroll_account
 #. odoo-javascript
 #: code:addons/l10n_be_hr_payroll_account/static/src/components/onss_payment_warning_action/onss_payment_warning_action.xml:0
 msgid "To pay on account"
-msgstr ""
+msgstr "Auf das Konto zu zahlen"
 
 #. module: l10n_be_hr_payroll_account
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll_account/models/hr_payroll_warning.py:0
 msgid "Unpaid DMFA Reports"
-msgstr ""
+msgstr "Unbezahlte DMFA-Berichte"
 
 #. module: l10n_be_hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll_account.res_config_settings_view_form
-msgid "White Cash Register"
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
+msgid "Withholding Taxes"
 msgstr ""
 
 #. module: l10n_be_hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll_account.res_config_settings_view_form
 msgid "Withholding Taxes Exemption"
 msgstr "Befreiung von der Quellensteuer"
+
+#. module: l10n_be_hr_payroll_account
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll_account/models/l10n_be_274_XX.py:0
+msgid "Withholding Taxes Exemption %s"
+msgstr ""
 
 #. module: l10n_be_hr_payroll_account
 #. odoo-python
@@ -342,9 +314,44 @@ msgstr "Quellensteuerbefreiung für %s"
 #: code:addons/l10n_be_hr_payroll_account/static/src/components/onss_payment_warning_action/onss_payment_warning_action.xml:0
 msgid "before the end of the month to avoid late fees and a 7% late interests."
 msgstr ""
+"vor Ende des Monats, um Verzugsgebühren und 7-prozentige Verzugszinsen zu "
+"vermeiden."
 
 #. module: l10n_be_hr_payroll_account
 #. odoo-javascript
 #: code:addons/l10n_be_hr_payroll_account/static/src/components/onss_payment_warning_action/onss_payment_warning_action.xml:0
 msgid "of the NSSO,"
-msgstr ""
+msgstr "des LASS"
+
+#~ msgid "Adjustment Entry"
+#~ msgstr "Berichtigungseintrag"
+
+#~ msgid "Exemption Capping for bachelors"
+#~ msgstr "Befreiungsdeckel für Bachelor"
+
+#~ msgid "Exemption for bachelors"
+#~ msgstr "Befreiung für Bachelor"
+
+#~ msgid "Exemption for doctors/civil engineers/masters"
+#~ msgstr "Befreiung für Ärzte/Bauingenieure/Master"
+
+#~ msgid "Journal Entries Accounts"
+#~ msgstr "Konten der Journalbuchungen"
+
+#~ msgid ""
+#~ "Please define a default journal on the Salary Journal used in settings "
+#~ "[%s]"
+#~ msgstr ""
+#~ "Bitte legen Sie in den Einstellungen [%s] ein Standardjournal für das "
+#~ "Gehaltsjournal fest"
+
+#~ msgid ""
+#~ "If checked, the company has a white cash register, which impacts the cap "
+#~ "for CP302 extra hours."
+#~ msgstr ""
+#~ "Wenn diese Option aktiviert ist, verfügt das Unternehmen über ein "
+#~ "Registrierkassensystem (weiße Kasse), was sich auf die Obergrenze für "
+#~ "PK302-Überstunden auswirkt."
+
+#~ msgid "White Cash Register"
+#~ msgstr "Weiße Kasse"

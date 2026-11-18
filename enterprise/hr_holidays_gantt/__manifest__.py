@@ -7,6 +7,7 @@
     'category': 'Human Resources',
     'depends': ['base_import', 'hr_holidays', 'hr_gantt'],
     'auto_install': True,
+    'uninstall_hook': '_uninstall_hook',
     'data': [
         'views/hr_holidays_gantt_view.xml',
     ],

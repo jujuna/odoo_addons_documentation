@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_hmrc_settings_redirect" model="ir.actions.server">
+        <field name="name">HMRC Settings Redirect</field>
+        <field name="model_id" ref="base.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="code">action = model.hmrc_action_connect_callback()</field>
+    </record>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.l10n_uk_reports</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <app name="account" position="inside">
+                <block title="United Kingdom" invisible="country_code != 'GB'">
+                    <setting
+                        id="l10n_uk_vat_hmrc_settings"
+                        title="HMRC VAT Connection"
+                        help="Manage this company's connection to HMRC for VAT returns."
+                    >
+                        <separator string="Connect to HMRC"/>
+
+                        <field name="l10n_uk_hmrc_vat_token" invisible="1"/>
+
+                        <div class="content-group">
+
+                            <div class="alert alert-info mt8" role="alert" invisible="not l10n_uk_hmrc_vat_token">
+                                This company is connected to HMRC.
+                            </div>
+
+                            <button
+                                invisible="l10n_uk_hmrc_vat_token"
+                                name="hmrc_action_connect"
+                                type="object"
+                                string="Connect to HMRC"
+                                class="btn btn-link p-0"
+                            />
+
+                            <button
+                                invisible="not l10n_uk_hmrc_vat_token"
+                                name="hmrc_action_disconnect"
+                                type="object"
+                                string="Disconnect from HMRC"
+                                class="btn btn-link p-0"
+                            />
+                        </div>
+                    </setting>
+                </block>
+            </app>
+        </field>
+    </record>
+</odoo>

@@ -37,6 +37,7 @@
 
     <template id="eco_changes_body">
         <t t-set="d_desc" t-value="ctx.get('display_description')"/>
+        <t t-set="display_currency" t-value="eco.currency_id or eco.env.company.currency_id"/>
         <table class="table table-borderless">
             <t t-if="eco.bom_change_ids_on_line">
                 <t t-call="mrp_plm.eco_changes_components"/>
@@ -54,9 +55,9 @@
                 <td t-att-colspan="3 + (1 if d_desc else 0)"/>
                 <td class="text-end">
                     <strong t-att-class="total_class">
-                        <t t-if="total_cost &gt; 0">+ <span t-out="total_cost" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
-                        <t t-elif="total_cost &lt; 0">- <span t-out="abs(total_cost)" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
-                        <t t-else=""><span t-out="total_cost" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
+                        <t t-if="total_cost &gt; 0">+ <span t-out="total_cost" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
+                        <t t-elif="total_cost &lt; 0">- <span t-out="abs(total_cost)" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
+                        <t t-else=""><span t-out="total_cost" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
                     </strong>
                 </td>
             </tr>
@@ -89,8 +90,8 @@
                         </t>
                     </td>
                     <td class="text-end">
-                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
-                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
+                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
+                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
                     </td>
                 </tr>
             </t>
@@ -123,8 +124,8 @@
                         </t>
                     </td>
                     <td class="text-end">
-                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
-                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
+                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
+                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
                     </td>
                 </tr>
             </t>
@@ -163,8 +164,8 @@
                         </t>
                     </td>
                     <td class="text-end">
-                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
-                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': eco.currency_id}"/></t>
+                        <t t-if="line.cost_computed &gt; 0">+ <span t-out="line.cost_computed" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
+                        <t t-elif="line.cost_computed &lt; 0">- <span t-out="abs(line.cost_computed)" t-options="{'widget': 'monetary', 'display_currency': display_currency}"/></t>
                     </td>
                 </tr>
             </t>

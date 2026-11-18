@@ -32,6 +32,7 @@ export class WelcomePageMembers extends Component {
     setup() {
         this.barcodeService = useService("barcode");
         this.dialogService = useService("dialog");
+        this.notification = useService("notification");
         this.props.resetData();
         this.state = proxy({
             today: this.getCurrentTime(),
@@ -87,7 +88,12 @@ export class WelcomePageMembers extends Component {
             );
         } catch (error) {
             this.playSound("error");
-            throw error;
+            const message = error.data?.message || error.message;
+            this.notification.add(message, {
+                type: "warning",
+                autocloseDelay: 5000,
+            });
+            return;
         }
         if (partnerValues) {
             this.props.setVisitorData(

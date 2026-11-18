@@ -41,6 +41,21 @@ class TestWorkEntry(TestWorkEntryBase):
             'wage': 1000,
         })
 
+    def test_work_entries_values_from_dates(self):
+        """ Plain dates cover whole days in the version timezone. """
+        version = self.richard_emp.version_ids.filtered(lambda v: v.name == 'dodo')
+        self.assertEqual(version._get_tz(), 'Europe/Brussels')
+        vals_from_dates = version._get_work_entries_values(date(2015, 11, 2), date(2015, 11, 6))
+        vals_from_datetimes = version._get_work_entries_values(
+            datetime(2015, 11, 1, 23, 0, 0),  # 2015-11-02 00:00:00 in Brussels (UTC+1)
+            datetime(2015, 11, 6, 22, 59, 59, 999999),  # 2015-11-06 23:59:59.999999 in Brussels
+        )
+        self.assertEqual(vals_from_dates, vals_from_datetimes)
+        self.assertEqual(
+            sum((vals['date_stop'] - vals['date_start']).total_seconds() / 3600 for vals in vals_from_dates),
+            40,
+        )
+
     def test_work_entry_timezone(self):
         """ Test work entries with different timezone """
         hk_resource_calendar_id = self.env['resource.calendar'].create({
@@ -461,6 +476,13 @@ class TestWorkEntry(TestWorkEntryBase):
 
         self.assertTrue(export['url'])
         self.assertEqual(export['name'], 'Download Export')
+
+    def test_export_work_entries_duration_in_decimal_hours(self):
+        export = self.env['hr.export.work.entries'].create({})
+        duration_column = export._get_columns(self.env.company)[-1][1]
+        # 7h36
+        self.assertEqual(duration_column({'we_collection': {'duration': 7.6 * 3600}}), '7.6')
+        self.assertEqual(duration_column({'we_collection': {'duration': 8 * 3600}}), '8.0')
 
     def test_attendance_display_name_mixed_time_types(self):
         """

@@ -53,7 +53,7 @@ class Testl10nBeHrPayrollAccountUi(MockEmail, common.TestPayrollAccountCommon):
             self.assertTrue(new_version, 'A contract has been created')
             vehicle = self.env['fleet.vehicle'].search([('company_id', '=', self.company_id.id), ('model_id', '=', self.model_a3.id)])
             self.assertTrue(vehicle, 'A vehicle Exists')
-            self.assertEqual(vehicle.driver_id, new_employee_id.work_contact_id, 'Driver is set')
+            self.assertEqual(vehicle.future_driver_id, new_employee_id.work_contact_id, 'Future driver is set')
             self.assertEqual(vehicle.company_id, new_version.company_id, 'Vehicle is in the right company')
             self.assertEqual(vehicle, new_version.car_id, 'Car id is set properly')
             self.assertTrue(new_employee_id.active, 'Employee is now active')
@@ -96,9 +96,9 @@ class Testl10nBeHrPayrollAccountUi(MockEmail, common.TestPayrollAccountCommon):
             self.assertFalse(new_employee_id.active, 'Employee is not yet active')
 
             # Check Salary values after submit - must match the salary configurator values
-            self.assertEqual(new_version.wage, 2524.11, 'Wage does not match salary configurator')
-            self.assertEqual(new_version.final_yearly_costs, 56359.8, 'Employer Cost does not match salary configurator')
-            self.assertEqual(new_version.l10n_be_mobility_budget_amount_monthly, 508.19, 'Monthly Mobility Budget Amount does not match salary configurator')
+            self.assertEqual(new_version.wage, 2532.72, 'Wage does not match salary configurator')
+            self.assertEqual(new_version.final_yearly_costs, 53752.2, 'Employer Cost does not match salary configurator')
+            self.assertEqual(new_version.l10n_be_mobility_budget_amount_monthly, 509.92, 'Monthly Mobility Budget Amount does not match salary configurator')
 
         with freeze_time("2022-01-01 11:00:00"):
             self.start_tour("/odoo", 'hr_contract_salary_tour_hr_sign', login='admin', timeout=350)
@@ -109,6 +109,6 @@ class Testl10nBeHrPayrollAccountUi(MockEmail, common.TestPayrollAccountCommon):
             self.assertEqual(new_employee_id.version_id, new_version, 'New contract should be the employee active contract.')
 
             # Check Salary values after counter sign - must match the salary configurator values
-            self.assertEqual(new_employee_id.wage, 2524.11, 'Wage does not match salary configurator')
-            self.assertEqual(new_employee_id.final_yearly_costs, 56359.8, 'Employer Cost does not match salary configurator')
-            self.assertEqual(new_employee_id.l10n_be_mobility_budget_amount_monthly, 508.19, 'Monthly Mobility Budget Amount does not match salary configurator')
+            self.assertEqual(new_employee_id.wage, 2532.72, 'Wage does not match salary configurator')
+            self.assertEqual(new_employee_id.final_yearly_costs, 53752.2, 'Employer Cost does not match salary configurator')
+            self.assertEqual(new_employee_id.l10n_be_mobility_budget_amount_monthly, 509.92, 'Monthly Mobility Budget Amount does not match salary configurator')

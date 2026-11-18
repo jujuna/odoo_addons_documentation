@@ -52,10 +52,12 @@ class HrPayslipInput(models.Model):
 
     @api.depends('salary_rule_id')
     def _compute_name(self):
+        """Default the description to the ``input_name`` of the salary rule."""
         for line in self:
             line.name = line.salary_rule_id.input_name
 
     @api.depends('salary_rule_id')
     def _compute_amount(self):
+        """Default the amount to the ``input_default_value`` of the salary rule."""
         for line in self:
             line.amount = line.salary_rule_id.input_default_value

@@ -312,6 +312,7 @@ class AccountChartTemplate(models.AbstractModel):
         return {
             'account_fiscal_position_avatax_br': {
                 'name': 'Automatic Tax Mapping (Avalara Brazil)',
+                'name@pt': 'Mapeamento Automático de Imposto (Avalara Brasil)',
                 'l10n_br_is_avatax': True,
                 'country_id': self.env.ref('base.br').id,
             }

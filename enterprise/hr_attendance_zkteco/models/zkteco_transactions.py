@@ -61,7 +61,7 @@ class ZktecoTransactions(models.Model):
         for record in self:
             notes = []
             if not record.employee_id:
-                notes.append(self.env._("Employee is not linked, make sure to set the Zkteco ID on the related employees."))
+                notes.append(self.env._("Employee is not linked, make sure to set the ZKTeco Employee ID on the related employees."))
             if not record.punch_type:
                 notes.append(self.env._("This transaction uses an unsupported type. Please select a valid one."))
             if record.unmatched_checkout:

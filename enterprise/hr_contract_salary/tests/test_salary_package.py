@@ -271,6 +271,68 @@ class TestSalaryPackageItems(HttpCase):
             },
         )
 
+    def test_submit_salary_package_invalid_iban(self):
+        if 'account.account' not in self.env:
+            self.skipTest("The IBAN is only checked when account is installed")
+        contract = self.env['hr.version'].create({
+            'name': "Test Contract",
+            'wage': 1000,
+            'structure_type_id': self.structure_type.id,
+            'sign_template_id': self.template.id,
+            'contract_update_template_id': self.template.id,
+            'hr_responsible_id': self.env.ref('base.user_admin').id,
+        })
+        applicant = self.env["hr.applicant"].create({
+            "partner_name": "Test Applicant",
+            "email_from": "applicant@example.com",
+        })
+        salary_offer = self.env['hr.contract.salary.offer'].create([{
+            'contract_template_id': self.default_contract.id,
+            'employee_version_id': contract.id,
+            'applicant_id': applicant.id,
+            'sign_template_id': self.template.id,
+            'access_token': '42' * 10,
+        }])
+
+        def submit(account_number):
+            data = {
+                "params": {
+                    "offer_id": salary_offer.id,
+                    "benefits": {
+                        'version': {
+                            'wage': 1000,
+                            'final_yearly_costs': 1000,
+                        },
+                        'version_personal': {},
+                        'employee': {
+                            'name': 'New Employee',
+                            'private_email': 'new_employee@test.example.com',
+                            'employee_job_id': None,
+                            'department_id': None,
+                            'job_title': None,
+                        },
+                        'address': {},
+                        'bank_account': {'account_number': account_number},
+                    },
+                    "token": salary_offer.access_token,
+                },
+            }
+            return self.url_open("/salary_package/submit", json=data).json()['result']
+
+        # Wrong check digits, wrong length
+        for account_number in ('BE71 0961 2345 6768', 'BE71 0961 2345 676'):
+            result = submit(account_number)
+            self.assertEqual(result['error'], 1, account_number)
+            self.assertIn('IBAN', result['error_msg'])
+        self.assertFalse(self.env['res.partner.bank'].search([('account_number', 'like', 'BE71 0961')]))
+
+        # A number without country code is not an IBAN: not checked
+        self.assertEqual(submit('123456789')['error'], 0)
+        result = submit('be71 0961 2345 6769')
+        self.assertEqual(result['error'], 0)
+        version = self.env['hr.version'].browse(result['new_version_id'])
+        self.assertEqual(version.employee_id.bank_account_ids.sanitized_account_number, 'BE71096123456769')
+
     @mute_logger('odoo.http')
     def test_submit_salary_package_employee(self):
         # Create an offer for an employee

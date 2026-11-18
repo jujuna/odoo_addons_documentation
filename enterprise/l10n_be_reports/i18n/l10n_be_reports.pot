@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 18:26+0000\n"
-"PO-Revision-Date: 2026-10-16 18:26+0000\n"
+"POT-Creation-Date: 2026-11-13 18:31+0000\n"
+"PO-Revision-Date: 2026-11-13 18:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -82,6 +82,12 @@ msgstr ""
 msgid ""
 "\n"
 "Accounting reports for Belgium\n"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_325_form.py:0
+msgid " (no tag of these amounts)"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -214,12 +220,12 @@ msgid ""
 "                </p>\n"
 "                <p>\n"
 "                    Based on the documents and information received, the VAT return of <t t-out=\"object.company_id.name\">BE Company CoA</t>\n"
-"                    for period <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"/> has been submitted.\n"
+"                    for period <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"></t> has been submitted.\n"
 "                </p>\n"
 "                <p>\n"
-"                    It has been determined that an amount of <t t-out=\"format_amount(object.total_amount_to_pay, object.amount_to_pay_currency_id)\"/> remains payable.\n"
+"                    It has been determined that an amount of <t t-out=\"format_amount(object.total_amount_to_pay, object.amount_to_pay_currency_id)\"></t> remains payable.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -234,10 +240,10 @@ msgid ""
 "                    Dear <t t-out=\"object.company_id.name\">BE Company CoA</t>,\n"
 "                </p>\n"
 "                <p>\n"
-"                    Your upcoming <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"/> Advance Tax Payment is due on <t t-out=\"format_date(object.date_deadline) or ''\"/>\n"
+"                    Your upcoming <t t-out=\"object.type_id._get_period_name(object.company_id, object.date_from, object.date_to)\"></t> Advance Tax Payment is due on <t t-out=\"format_date(object.date_deadline) or ''\"></t>\n"
 "                    To avoid any penalties or interest charges, we recommend making the payment before this date.\n"
 "                </p>\n"
-"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"/>\n"
+"                <t t-call=\"l10n_be_reports.vat_payment_details_table\"></t>\n"
 "                <p>Kind regards,</p>\n"
 "                <p><t t-out=\"user.name\">Mitchell Admin</t></p>\n"
 "            </div>\n"
@@ -443,8 +449,8 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__paid_amount
 msgid ""
-"Amount paid during the reference year and the preceding year related to the "
-"total remuneration"
+"Amount paid during the reference year, including the amounts related to "
+"other years"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -617,6 +623,36 @@ msgid "BCE number"
 msgstr ""
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__atn
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - ATN\", VAT included and "
+"minus the contribution of the beneficiary: book the non-deductible VAT of "
+"the benefits on these accounts, and the contribution of the beneficiary as a"
+" credit on them."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__commissions
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Commissions\", excluding "
+"VAT: book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__exposed_expenses
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Exposed Expenses\", "
+"excluding VAT: book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__fees
+msgid ""
+"Balance of the expense accounts tagged \"281.50 - Fees\", excluding VAT: "
+"book the deductible VAT on the VAT accounts."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.actions.act_window,name:l10n_be_reports.action_account_journal_bank_reconciliation
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.view_bank_journals_list
 msgid "Bank Journals"
@@ -661,6 +697,11 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.module.module,shortdesc:base.module_l10n_be_reports
 msgid "Belgium - Accounting Reports"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__form_281_50_eu_vat_partners
+msgid "Beneficiaries with a VAT number of the EEA"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -878,6 +919,12 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_curr_exch_gap_justification
 msgid "Currency Discrepancy Justification"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Customers Without Country"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -1153,12 +1200,6 @@ msgid "Due By"
 msgstr ""
 
 #. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
-msgid "Duplicate VAT number"
-msgstr ""
-
-#. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_form_325__sender_lang_code__1
 msgid "Dutch"
 msgstr ""
@@ -1261,6 +1302,11 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_financial_prod_with_sp_tax_regime
 msgid "Financial Income with Special Tax Regime"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__is_first_name_missing
+msgid "First Name Missing"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -1837,12 +1883,6 @@ msgid "Investments"
 msgstr ""
 
 #. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/account_return.py:0
-msgid "Invoices Without Country"
-msgstr ""
-
-#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_is_follower
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__message_is_follower
 msgid "Is Follower"
@@ -2105,6 +2145,7 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_type__name
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_partner_vat_listing_without_country_view_list
 msgid "Name"
 msgstr ""
 
@@ -2121,6 +2162,11 @@ msgstr ""
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_is_natural_person
 msgid "Natural person"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__form_281_50_missing_first_names
+msgid "Natural persons without first name"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -2177,6 +2223,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "No customer without country"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "No duplicate VAT numbers"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -2605,7 +2657,15 @@ msgstr ""
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
-msgid "Review invoices having a customer with no country specified."
+msgid ""
+"Review customers sharing the same VAT number and set one of them as the main"
+" partner."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Review customers with no country specified."
 msgstr ""
 
 #. module: l10n_be_reports
@@ -3001,6 +3061,27 @@ msgid "The company responsible for sending the form."
 msgstr ""
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__is_first_name_missing
+msgid ""
+"The first name of a natural person (zone 2.114) is found in its name, after "
+"a comma (e.g. \"Doe, John\")"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_view_form
+msgid ""
+"The first name of these natural persons can't be found in their name (e.g. "
+"\"Doe, John\"), the 281.50 will be sent without it:"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_281_50_view_form
+msgid ""
+"The first name of this natural person can't be found in its name (e.g. "
+"\"Doe, John\"), the 281.50 will be sent without it."
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
 msgid "The following controls failed:"
@@ -3025,6 +3106,17 @@ msgstr ""
 msgid ""
 "The region where the company is located. This is used for annual report "
 "export."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_325_form.py:0
+msgid ""
+"The remunerations of the sportsmen and of the trainers of these beneficiaries exceed their commissions, fees, benefits in kind and expenses, which must include them:\n"
+"%(partners)s\n"
+"\n"
+"The accounts tagged for the sportsmen or the trainers must also have one of the tags of these amounts, and these amounts can't be negative. Accounts tagged for the sportsmen or the trainers:\n"
+"%(accounts)s"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -3070,6 +3162,14 @@ msgid ""
 "There are some inconsistencies in the partner-company association. The "
 "following partners should be accessible by their paired company: "
 "%(inconsistencies)s"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_view_form
+msgid ""
+"These beneficiaries have a VAT number of another country of the European "
+"Economic Area: their invoices are usually not declared on a 281.50, check "
+"their 281.50 tag:"
 msgstr ""
 
 #. module: l10n_be_reports

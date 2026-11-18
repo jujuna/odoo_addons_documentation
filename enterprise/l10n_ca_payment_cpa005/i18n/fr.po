@@ -4,14 +4,15 @@
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.2alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:10+0000\n"
-"PO-Revision-Date: 2026-09-18 04:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-06 18:23+0000\n"
+"PO-Revision-Date: 2026-11-12 13:39+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "l10n_ca_payment_cpa005/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -26,38 +27,41 @@ msgid ""
 "\n"
 "Export payments as CPA 005 files for use in Canada.\n"
 msgstr ""
+"\n"
+"Exporter les paiements sous forme de fichiers CPA 005 pour une utilisation "
+"au Canada.\n"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "- Please set a Bank Account on the journal configuration."
-msgstr ""
+msgstr "- Veuillez définir un compte bancaire dans la configuration du journal."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "- Please set a destination data center."
-msgstr ""
+msgstr "- Veuillez définir un centre de données de destination."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "- Please set an originator ID."
-msgstr ""
+msgstr "- Veuillez définir un identifiant de l'expéditeur."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
-msgid ""
-"- The Financial Institution ID Number on the company bank account needs to "
-"be set."
+msgid "- The Clearing Number on the company bank account needs to be set."
 msgstr ""
+"- Le numéro de compensation du compte bancaire de la société doit être "
+"renseigné."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "- The company bank account needs to be trusted."
-msgstr ""
+msgstr "- Le compte bancaire de la société doit être considéré comme fiable."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -65,12 +69,16 @@ msgstr ""
 msgid ""
 "- The company bank account number must be only digits and at most 12 digits."
 msgstr ""
+"- Le numéro de compte bancaire de la société doit être composé uniquement de "
+"chiffres et comporter au maximum 12 chiffres."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "- The destination data center must be a 5-digit numeric value."
 msgstr ""
+"- Le centre de données de destination doit être une valeur numérique à 5 "
+"chiffres."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_originator_id
@@ -78,6 +86,9 @@ msgid ""
 "10-digit code supplied by your bank. It is needed for generating a Canadian "
 "EFT file (CPA 005). Shared by Incoming and Outgoing Payments."
 msgstr ""
+"Code à 10 chiffres fourni par votre banque. Il est nécessaire pour générer "
+"un fichier TEF canadien (CPA 005). Il est commun aux paiements entrants et "
+"sortants."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_res_company__l10n_ca_cpa005_short_name
@@ -97,6 +108,9 @@ msgid ""
 "5-digit ID provided by your bank. It is needed for generating a Canadian EFT "
 "file (CPA 005). Shared by Incoming and Outgoing Payments."
 msgstr ""
+"Identifiant à 5 chiffres fourni par votre banque. Il est nécessaire pour "
+"générer un fichier TEF canadien (CPA 005). Il est commun aux paiements "
+"entrants et sortants."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_account_setup_bank_manual_config__l10n_ca_financial_institution_number
@@ -121,7 +135,7 @@ msgid ""
 "\">\n"
 "                        Dear <t t-out=\"object.partner_id.display_name or "
 "''\">Azure Interior</t>\n"
-"                        <br/><br/>\n"
+"                        <br><br>\n"
 "                        Please find attached your Pre-Authorized Debit (PAD) "
 "Agreement to sign, authorizing\n"
 "                        <t t-out=\"object.company_id.display_name or "
@@ -130,17 +144,41 @@ msgid ""
 "your invoices in accordance with the agreement.\n"
 "                        Do not hesitate to contact us if you have any "
 "questions.\n"
-"                        <br/>\n"
+"                        <br>\n"
 "                        Best regards,\n"
 "                        <t t-if=\"not is_html_empty(user.signature)\">\n"
-"                            <br/><br/>\n"
+"                            <br><br>\n"
 "                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature\">Mitchell Admin</t></div>\n"
+"quote=\"1\"><t t-out=\"user.signature\">Mitchell Admin</t></div>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Bonjour <t t-out=\"object.partner_id.display_name or "
+"''\">Azure Interior</t>\n"
+"                        <br><br>\n"
+"                        Veuillez trouver en pièce jointe votre accord de "
+"débit préautorisé (DPA) à signer, autorisant\n"
+"                        <t t-out=\"object.company_id.display_name or ''\">"
+"YourCompany</t>\n"
+"                        à débiter votre compte bancaire des montants dus sur "
+"vos factures conformément à cet accord.\n"
+"                        N'hésitez pas à nous contacter si vous avez des "
+"questions.\n"
+"                        <br>\n"
+"                        Cordialement,\n"
+"                        <t t-if=\"not is_html_empty(user.signature)\">\n"
+"                            <br><br>\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"><t t-out=\"user.signature\">Mitchell Admin</t></div>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -148,11 +186,13 @@ msgid ""
 "<span style=\"color: #64748b; font-size: 12px;\">Standard 005 PAD Mandate "
 "(Canada)</span>"
 msgstr ""
+"<span style=\"color: #64748b; font-size: 12px;\">Mandat de DPA selon la "
+"norme 005 (Canada)</span>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "<strong>Address:</strong><br/>"
-msgstr ""
+msgstr "<strong>Adresse :</strong><br/>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -160,11 +200,13 @@ msgid ""
 "<strong>Cancellation Right:</strong> You may revoke this agreement at any "
 "time by providing 5 days notice in writing or by phone."
 msgstr ""
+"<strong>Droit de résiliation :</strong> Vous pouvez révoquer cet accord à "
+"tout moment moyennant un préavis de 5 jours, par écrit ou par téléphone."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "<strong>Email:</strong>"
-msgstr ""
+msgstr "<strong>E-mail :</strong>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -172,21 +214,23 @@ msgid ""
 "<strong>Frequency:</strong> <span style=\"color: #475569; font-weight: bold; "
 "margin-left: 4px;\">Recurrent</span>"
 msgstr ""
+"<strong>Fréquence :</strong> <span style=\"color: #475569; font-weight: "
+"bold; margin-left: 4px;\">Récurrente</span>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "<strong>Name:</strong>"
-msgstr ""
+msgstr "<strong>Nom :</strong>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "<strong>PAD Category:</strong>"
-msgstr ""
+msgstr "<strong>Catégorie de DPA :</strong>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "<strong>Phone:</strong>"
-msgstr ""
+msgstr "<strong>Téléphone :</strong>"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -194,12 +238,14 @@ msgid ""
 "<strong>Pre-Notification Waiver:</strong> You agree to waive the standard "
 "Payments Canada 10-day advance pre-notification period."
 msgstr ""
+"<strong>Renonciation au préavis :</strong> Vous acceptez de renoncer au "
+"délai standard de préavis de 10 jours de Paiements Canada."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_direct_debit_mandate.py:0
 msgid "A CPA 005 PAD mandate requires a PAD category."
-msgstr ""
+msgstr "Un mandat de DPA CPA 005 nécessite une catégorie de DPA."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -208,6 +254,8 @@ msgid ""
 "A CPA 005 PAD mandate requires a customer bank account with a Financial "
 "Institution ID Number."
 msgstr ""
+"Un mandat de DPA CPA 005 nécessite un compte bancaire client doté d'un "
+"numéro d'identification de l'institution financière."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -216,18 +264,20 @@ msgid ""
 "A CPA 005 PAD mandate requires a customer bank account with a valid "
 "Financial Institution ID Number."
 msgstr ""
+"Un mandat de DPA CPA 005 nécessite un compte bancaire client doté d'un "
+"numéro d'identification de l'institution financière valide."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_direct_debit_mandate.py:0
 msgid "A CPA 005 PAD mandate requires a customer bank account."
-msgstr ""
+msgstr "Un mandat de DPA CPA 005 nécessite un compte bancaire client."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_direct_debit_mandate.py:0
 msgid "A CPA 005 PAD mandate requires a valid bank account number."
-msgstr ""
+msgstr "Un mandat de DPA CPA 005 nécessite un numéro de compte bancaire valide."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -250,7 +300,7 @@ msgstr "Un fichier TEF canadien ne peut pas contenir plusieurs devises (%s)."
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Account Number:"
-msgstr ""
+msgstr "Numéro de compte :"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_l10n_ca_cpa005_transaction_code__active
@@ -260,7 +310,7 @@ msgstr "Actif"
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model,name:l10n_ca_payment_cpa005.model_res_partner_bank
@@ -270,7 +320,7 @@ msgstr "Compte bancaire"
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Bank Name:"
-msgstr ""
+msgstr "Nom de la banque :"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -279,6 +329,8 @@ msgid ""
 "Bank account of both the payor and the payee must be set and made of at most "
 "12 digits."
 msgstr ""
+"Les comptes bancaires du payeur et du bénéficiaire doivent être renseignés "
+"et comporter au maximum 12 chiffres."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -287,11 +339,13 @@ msgid ""
 "Bank account's financial institution of both the payor and the payee must be "
 "set and made of 9 digits."
 msgstr ""
+"Les numéros des institutions financières des comptes bancaires du payeur et "
+"du bénéficiaire doivent être renseignés et comporter 9 chiffres."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Banking Institution Details"
-msgstr ""
+msgstr "Coordonnées de l'institution bancaire"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model,name:l10n_ca_payment_cpa005.model_account_batch_payment
@@ -301,28 +355,28 @@ msgstr "Paiement par lot"
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields.selection,name:l10n_ca_payment_cpa005.selection__account_direct_debit_mandate__l10n_ca_cpa005_pad_category__business
 msgid "Business (Commercial Activities)"
-msgstr ""
+msgstr "Entreprise (activités commerciales)"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/wizard/account_payment_register.py:0
 msgid "CPA 005 Direct Debit operates in CAD or USD."
-msgstr ""
+msgstr "Le prélèvement automatique CPA 005 fonctionne en CAD ou en USD."
 
 #. module: l10n_ca_payment_cpa005
 #: model:account.payment.method,name:l10n_ca_payment_cpa005.account_payment_method_cpa005
 msgid "CPA 005 Direct Deposit"
-msgstr ""
+msgstr "Dépôt direct CPA 005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:mail.template,name:l10n_ca_payment_cpa005.email_template_cpa005_pad_mandate
 msgid "CPA 005 PAD Agreement Sending"
-msgstr ""
+msgstr "Envoi de l'accord de DPA CPA 005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:account.payment.method,name:l10n_ca_payment_cpa005.account_payment_method_cpa005_pad
 msgid "CPA 005 Pre-Authorized Debit (PAD)"
-msgstr ""
+msgstr "Débit préautorisé (DPA) CPA 005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.actions.act_window,name:l10n_ca_payment_cpa005.action_l10n_ca_cpa005_transaction_code_tree
@@ -333,12 +387,12 @@ msgstr "Codes de transaction CPA/EFT"
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields.selection,name:l10n_ca_payment_cpa005.selection__account_direct_debit_mandate__mandate_type__cpa005_pad
 msgid "CPA005 PAD"
-msgstr ""
+msgstr "DPA CPA005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.module.module,shortdesc:base.module_l10n_ca_payment_cpa005
 msgid "CPA005 Payments"
-msgstr ""
+msgstr "Paiements CPA005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.ui.menu,name:l10n_ca_payment_cpa005.menu_l10n_ca_cpa005_root
@@ -372,7 +426,7 @@ msgstr "Société"
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/wizard/account_payment_register.py:0
 msgid "Configure Journal"
-msgstr ""
+msgstr "Configurer le journal"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_l10n_ca_cpa005_transaction_code__create_uid
@@ -392,7 +446,7 @@ msgstr "Centre de données de destination"
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model,name:l10n_ca_payment_cpa005.model_account_direct_debit_mandate
 msgid "Direct Debit Mandate"
-msgstr ""
+msgstr "Mandat de prélèvement automatique"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_batch_payment__display_name
@@ -416,12 +470,12 @@ msgstr "Code de transaction EFT/CPA"
 #. module: l10n_ca_payment_cpa005
 #: model:mail.template,description:l10n_ca_payment_cpa005.email_template_cpa005_pad_mandate
 msgid "Email requesting the customer to sign the PAD agreement attached"
-msgstr ""
+msgstr "E-mail demandant au client de signer l’accord de DPA joint"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "End Date:"
-msgstr ""
+msgstr "Date de fin :"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -430,11 +484,13 @@ msgid ""
 "Every payment initiated through the Canadian EFT service must carry a valid "
 "CPA code."
 msgstr ""
+"Chaque paiement effectué par le service TEF canadien doit comporter un code "
+"CPA valide."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.module.module,summary:base.module_l10n_ca_payment_cpa005
 msgid "Export payments as CPA 005 AFT files"
-msgstr ""
+msgstr "Exporter les paiements sous forme de fichiers AFT CPA 005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_fcn_sequence_id
@@ -456,7 +512,7 @@ msgstr "Numéro d'institution financière"
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "Go to Bank Account"
-msgstr ""
+msgstr "Accéder au compte bancaire"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -486,7 +542,7 @@ msgstr "ID"
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Institution ID:"
-msgstr ""
+msgstr "Identifiant de l'institution :"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -499,13 +555,13 @@ msgstr "Journal"
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_setup_bank_manual_config__l10n_ca_cpa005_institution_number
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_res_partner_bank__l10n_ca_cpa005_institution_number
 msgid "L10N Ca Cpa005 Institution Number"
-msgstr ""
+msgstr "Numéro d'institution L10N Ca Cpa005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_setup_bank_manual_config__l10n_ca_cpa005_transit_number
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_res_partner_bank__l10n_ca_cpa005_transit_number
 msgid "L10N Ca Cpa005 Transit Number"
-msgstr ""
+msgstr "Numéro de transit L10N Ca Cpa005"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_l10n_ca_cpa005_transaction_code__write_uid
@@ -539,12 +595,12 @@ msgstr ""
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_direct_debit_mandate__mandate_type
 msgid "Mandate Type"
-msgstr ""
+msgstr "Type de mandat"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Marc Demo"
-msgstr ""
+msgstr "Marc Demo"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_l10n_ca_cpa005_transaction_code__name
@@ -577,11 +633,15 @@ msgid ""
 "9999. If you need to adjust any details of the FCN go to Sequences in the "
 "Technical menu to adjust them."
 msgstr ""
+"Numéro de création de fichier (FCN) suivant à utiliser lors de la validation "
+"d’un paiement groupé TEF canadien entrant (DPA). Le FCN est une séquence à 4 "
+"chiffres de 0001 à 9999. Si vous devez modifier les paramètres du FCN, "
+"accédez aux Séquences dans le menu Technique."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_pad_fcn_number_next
 msgid "Next PAD File Creation Number (FCN)"
-msgstr ""
+msgstr "Numéro de création de fichier DPA suivant (FCN)"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_originator_id
@@ -591,32 +651,32 @@ msgstr "Identifiant de l'expéditeur"
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Originator Info"
-msgstr ""
+msgstr "Informations sur l'expéditeur"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_direct_debit_mandate__l10n_ca_cpa005_pad_category
 msgid "PAD Category"
-msgstr ""
+msgstr "Catégorie de DPA"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,field_description:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_pad_fcn_sequence_id
 msgid "PAD File Creation Number Sequence"
-msgstr ""
+msgstr "Séquence du numéro de création de fichier DPA"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "PAD Terms &amp; Scope of Agreement"
-msgstr ""
+msgstr "Conditions &amp; portée de l'accord de DPA"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "PAD1234"
-msgstr ""
+msgstr "PAD1234"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model,name:l10n_ca_payment_cpa005.model_account_payment_register
 msgid "Pay"
-msgstr ""
+msgstr "Payer"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model,name:l10n_ca_payment_cpa005.model_account_payment
@@ -631,17 +691,17 @@ msgstr "Mode de paiement"
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_account_direct_debit_mandate__l10n_ca_cpa005_pad_category
 msgid "Payments Canada PAD category, printed on the PAD agreement."
-msgstr ""
+msgstr "Catégorie de DPA de Paiements Canada, imprimée sur l'accord de DPA."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Payor Information"
-msgstr ""
+msgstr "Informations sur le payeur"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields.selection,name:l10n_ca_payment_cpa005.selection__account_direct_debit_mandate__l10n_ca_cpa005_pad_category__personal
 msgid "Personal (Utilities, Mortgage, ...)"
-msgstr ""
+msgstr "Particulier (services publics, prêt hypothécaire, ...)"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -650,8 +710,8 @@ msgid ""
 "Please fix the following issue(s) on the %(journal)s journal:\n"
 "%(errors)s"
 msgstr ""
-"Veuillez corriger le(s) problème(s) suivant(s) dans le journal %(journal)s "
-":\n"
+"Veuillez corriger le(s) problème(s) suivant(s) dans le journal %"
+"(journal)s :\n"
 "%(errors)s"
 
 #. module: l10n_ca_payment_cpa005
@@ -662,12 +722,16 @@ msgid ""
 "(journal)s journal:\n"
 "%(errors)s"
 msgstr ""
+"Veuillez corriger le(s) problème(s) suivant(s) sur le compte bancaire de la "
+"société défini dans le journal %(journal)s :\n"
+"%(errors)s"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/wizard/account_payment_register.py:0
 msgid "Please set a Bank Account on the journal configuration for %s."
 msgstr ""
+"Veuillez définir un compte bancaire dans la configuration du journal pour %s."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -680,7 +744,7 @@ msgstr ""
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Pre-Authorized Debit (PAD) Agreement"
-msgstr ""
+msgstr "Accord de débit préautorisé (DPA)"
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_account_payment__l10n_ca_cpa005_transaction_code_id
@@ -704,23 +768,27 @@ msgstr "Nom abrégé utilisé dans le TEF canadien"
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "Some bank accounts cannot be encoded in a Canadian CPA 005 file."
 msgstr ""
+"Certains comptes bancaires ne peuvent pas être encodés dans un fichier CPA "
+"005 canadien."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "Some due (collection) dates are outside the window allowed by CPA 005."
 msgstr ""
+"Certaines dates d’échéance (de prélèvement) sont en dehors de la période "
+"autorisée par la norme CPA 005."
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
 #: code:addons/l10n_ca_payment_cpa005/models/account_batch_payment.py:0
 msgid "Some payments have no EFT/CPA transaction code."
-msgstr ""
+msgstr "Certains paiements ne comportent pas de code de transaction TEF/CPA."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Start Date:"
-msgstr ""
+msgstr "Date de début :"
 
 #. module: l10n_ca_payment_cpa005
 #. odoo-python
@@ -742,6 +810,8 @@ msgid ""
 "The due date must be no more than 2 business days after the file date (%"
 "(file_date)s) and no more than 173 days before it."
 msgstr ""
+"La date d’échéance doit se situer au maximum 2 jours ouvrables après la date "
+"du fichier (%(file_date)s) et au maximum 173 jours avant celle-ci."
 
 #. module: l10n_ca_payment_cpa005
 #: model:ir.model.fields,help:l10n_ca_payment_cpa005.field_account_journal__l10n_ca_cpa005_fcn_sequence_id
@@ -761,21 +831,24 @@ msgid ""
 "EFT (Pre-Authorized Debit) files. The referenced sequence can be customized "
 "to suit the banks requirements."
 msgstr ""
+"Cette séquence est utilisée pour générer le numéro de création de fichier "
+"des fichiers TEF canadiens entrants (débits préautorisés). La séquence "
+"référencée peut être personnalisée selon les exigences de la banque."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Transit Number:"
-msgstr ""
+msgstr "Numéro de transit :"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "Validity Period"
-msgstr ""
+msgstr "Période de validité"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "You authorize"
-msgstr ""
+msgstr "Vous autorisez"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -786,16 +859,21 @@ msgid ""
 "To obtain more information on your recourse rights, contact your financial "
 "institution or visit"
 msgstr ""
+"Vous disposez de certains droits de recours si un débit n'est pas conforme à "
+"cet accord. Par exemple, vous avez le droit d'obtenir le remboursement de "
+"tout débit non autorisé ou non conforme à cet accord de DPA. Pour en savoir "
+"plus sur vos droits de recours, contactez votre institution financière ou "
+"consultez"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "YourCompany"
-msgstr ""
+msgstr "YourCompany"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "calendar days prior to the withdrawal."
-msgstr ""
+msgstr "jours civils avant le prélèvement."
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -803,6 +881,9 @@ msgid ""
 "may cancel this agreement upon 5 days notice. To obtain a sample "
 "cancellation form, contact your financial institution or visit"
 msgstr ""
+"peut résilier cet accord moyennant un préavis de 5 jours. Pour obtenir un "
+"modèle de formulaire de résiliation, contactez votre institution financière "
+"ou consultez"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
@@ -817,17 +898,29 @@ msgid ""
 "                                Delivery of the individual Invoice or Sales "
 "Order via email at least"
 msgstr ""
+"à débiter le compte bancaire\n"
+"                                indiqué ci-dessus des montants figurant sur "
+"les factures ou commandes clients impayées associées à votre compte.\n"
+"                                Les débits seront effectués automatiquement "
+"à la date d'échéance indiquée sur chaque document ou le jour ouvrable "
+"suivant. Vous confirmez\n"
+"                                être habilité à utiliser ce compte. Si "
+"aucune date de fin n'est précisée, vous devrez nous contacter pour mettre "
+"fin à son utilisation.\n"
+"                                L'envoi de chaque facture ou commande client "
+"par e-mail au moins"
 
 #. module: l10n_ca_payment_cpa005
 #: model_terms:ir.ui.view,arch_db:l10n_ca_payment_cpa005.cpa005_pad_mandate_form
 msgid "www.payments.ca"
-msgstr ""
+msgstr "www.payments.ca"
 
 #. module: l10n_ca_payment_cpa005
 #: model:mail.template,subject:l10n_ca_payment_cpa005.email_template_cpa005_pad_mandate
 msgid ""
 "{{ object.partner_id.display_name }} Pre-Authorized Debit (PAD) Agreement"
 msgstr ""
+"Accord de débit préautorisé (DPA) de {{ object.partner_id.display_name }}"
 
 #~ msgid "- Please set a destination data center on the %(journal)s journal."
 #~ msgstr ""

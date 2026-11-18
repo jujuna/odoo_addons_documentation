@@ -13,7 +13,7 @@ class TestInterCompanyPurchaseToSale(TestInterCompanyRulesCommonSOPO):
 
         cls.env['res.currency']._activate_group_multi_currency()
 
-    def generate_purchase_order(self, company, partner):
+    def generate_purchase_order(self, company, partner, analytic_distribution=None):
         """ Generate purchase order and confirm its state """
         purchase_order = Form(self.env['purchase.order'])
         purchase_order.partner_id = partner
@@ -26,6 +26,8 @@ class TestInterCompanyPurchaseToSale(TestInterCompanyRulesCommonSOPO):
                 line.product_id = self.product_consultant
                 line.price_unit = 450.0
                 line.discount = 10.0
+        if analytic_distribution:
+            purchase_order.order_line.analytic_distribution = analytic_distribution
 
         # Confirm Purchase order
         purchase_order.button_confirm()
@@ -229,3 +231,15 @@ class TestInterCompanyPurchaseToSale(TestInterCompanyRulesCommonSOPO):
             'company_id': self.company_b.id,
             'team_id': valid_sales_team.id,
         }])
+
+    def test_analytic_distribution_propagated_to_so(self):
+        """ Test that the analytic distribution of the PO line is copied to the generated SO line,
+        without the analytic accounts restricted to the PO company.
+        """
+        self.company_b.intercompany_generate_sales_orders = True
+        purchase_order = self.generate_purchase_order(self.company_a, self.company_b.partner_id, analytic_distribution={
+            f'{self.analytic_account_shared.id}': 60,
+            f'{self.analytic_account_company_a.id}': 40,
+        })
+        sale_order = self.env['sale.order'].with_company(self.company_b).search([('client_order_ref', '=', purchase_order.name)], limit=1)
+        self.assertEqual(sale_order.order_line.analytic_distribution, {str(self.analytic_account_shared.id): 60})

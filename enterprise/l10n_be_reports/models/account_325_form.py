@@ -24,6 +24,13 @@ def format_325_form_values(values):
 
 
 class L10n_BeForm325(models.Model):
+    """Form 325.50, the summary of the 281.50 of a debtor for a year.
+
+    The 281.50 are built from the accounting only: the journal items of the partners tagged "281.50" on the
+    accounts tagged for each amount. The commissions, fees and other remunerations of a self-employed beneficiary
+    (a sportsman, a consultant...) must be paid by a vendor bill or a payment booked on these accounts: an amount
+    paid by a payslip is a remuneration declared on the 281.10, 281.20 or 281.30 of the payroll, never on a 281.50.
+    """
     _name = "l10n_be.form.325"
     _description = "Represents a 325 form"
     _inherit = ['mail.thread']
@@ -175,6 +182,14 @@ class L10n_BeForm325(models.Model):
     )
     form_281_50_ids = fields.One2many('l10n_be.form.281.50', 'form_325_id', string='Forms 281.50')
     form_281_50_count = fields.Integer(string='Forms 281.50 count', compute='_compute_form_281_50_count')
+    form_281_50_missing_first_names = fields.Char(
+        string='Natural persons without first name',
+        compute='_compute_form_281_50_missing_first_names',
+    )
+    form_281_50_eu_vat_partners = fields.Char(
+        string='Beneficiaries with a VAT number of the EEA',
+        compute='_compute_form_281_50_eu_vat_partners',
+    )
     form_281_50_total_amount = fields.Monetary(
         string='Forms 281.50 total',
         compute='_compute_form_281_50_total_amount',
@@ -189,6 +204,25 @@ class L10n_BeForm325(models.Model):
     def _compute_form_281_50_count(self):
         for record in self:
             record.form_281_50_count = len(record.form_281_50_ids)
+
+    @api.depends('form_281_50_ids.is_first_name_missing', 'form_281_50_ids.partner_name')
+    def _compute_form_281_50_missing_first_names(self):
+        for record in self:
+            forms = record.form_281_50_ids.filtered('is_first_name_missing')
+            record.form_281_50_missing_first_names = ', '.join(name for name in forms.mapped('partner_name') if name)
+
+    @api.depends('form_281_50_ids.partner_id.vat', 'form_281_50_ids.partner_id.country_id')
+    def _compute_form_281_50_eu_vat_partners(self):
+        # The invoices of a supplier with a VAT number of another country of the European Economic Area are left out
+        # of the 281.50 (notice on the 281.50): only the partners and accounts tagged decide, so warn the user
+        eea_country_codes = set(self.env.ref('base.europe').country_ids.mapped('code')) | {'NO', 'IS', 'LI'}
+        for record in self:
+            partners = record.form_281_50_ids.partner_id.commercial_partner_id.filtered(
+                lambda p: p.vat and (
+                    p.vat[:2].upper() if p.vat[:2].isalpha() else p.country_id.code or ''
+                ) in eea_country_codes - {'BE'}
+            )
+            record.form_281_50_eu_vat_partners = ', '.join(partners.mapped('display_name'))
 
     @api.depends('form_281_50_ids')
     def _compute_form_281_50_total_amount(self):
@@ -314,6 +348,14 @@ class L10n_BeForm325(models.Model):
 
     @api.model
     def _get_remuneration_281_50_per_partner(self, partner_ids):
+        """Amounts of the 281.50 of each beneficiary, from the balances of the accounts tagged for each amount.
+
+        The amounts are taken as booked: the commissions, fees and expenses (2.060, 2.061, 2.063) are expected
+        without VAT, the deductible VAT being booked on the VAT accounts, while the benefits in kind (2.062) are
+        expected VAT included and minus the contribution of the beneficiary (notice on the 281.50): the
+        non-deductible VAT of a benefit is booked on its account, and the contribution of the beneficiary as a credit
+        on the same account.
+        """
         tag_281_50_commissions = self.env.ref('l10n_be_reports.account_tag_281_50_commissions')
         tag_281_50_fees = self.env.ref('l10n_be_reports.account_tag_281_50_fees')
         tag_281_50_atn = self.env.ref('l10n_be_reports.account_tag_281_50_atn')
@@ -364,20 +406,54 @@ class L10n_BeForm325(models.Model):
                 'trainer_remuneration': trainer_remuneration_per_partner.get(partner_id.id, 0.0),
             }
             for partner_id in partner_ids.sorted(lambda p: (p.zip, p.name))
+            # no 281.50 when the amounts don't exceed 250 euros per beneficiary for the year
             if (
-                self.currency_id.compare_amounts(paid_amount_per_partner.get(partner_id.id, 0.0), 250.0) >= 0
+                self.currency_id.compare_amounts(paid_amount_per_partner.get(partner_id.id, 0.0), 250.0) > 0
                 or self.currency_id.compare_amounts(sum([
                     commissions_per_partner.get(partner_id.id, 0.0),
                     fees_per_partner.get(partner_id.id, 0.0),
                     atn_per_partner.get(partner_id.id, 0.0),
                     exposed_expenses_per_partner.get(partner_id.id, 0.0),
-                    sportsman_remuneration_per_partner.get(partner_id.id, 0.0),
-                    trainer_remuneration_per_partner.get(partner_id.id, 0.0),
-                ]), 250.0) >= 0
+                    # the sportsman and trainer remunerations are already included in the amounts above
+                ]), 250.0) > 0
             )
         ]
-
+        self._check_sport_remunerations(amount_per_partner, account_281_50_tags)
         return amount_per_partner
+
+    def _check_sport_remunerations(self, amount_per_partner, account_281_50_tags):
+        """The remunerations of the sportsmen and of the trainers (2.066, 2.067) are part of the commissions, fees,
+        benefits in kind and expenses (2.064): Belcotax-on-web refuses a 281.50 where 2.066 + 2.067 > 2.064."""
+        invalid_values = [
+            values for values in amount_per_partner
+            if self.currency_id.compare_amounts(
+                values['sportsman_remuneration'] + values['trainer_remuneration'],
+                values['commissions'] + values['fees'] + values['atn'] + values['exposed_expenses'],
+            ) > 0
+        ]
+        if not invalid_values:
+            return
+        sport_tags = self.env.ref('l10n_be_reports.account_tag_281_50_sportsman_remuneration') \
+            + self.env.ref('l10n_be_reports.account_tag_281_50_trainer_remuneration')
+        sport_accounts = self.env['account.account'].search([('tag_ids', 'in', sport_tags.ids)])
+        partners = self.env['res.partner'].browse([values['partner_id'] for values in invalid_values])
+        # Translated out of the generator below: _() can't find the language from the frame of a generator expression
+        no_tag_label = self.env._(" (no tag of these amounts)")
+        raise UserError(self.env._(
+            "The remunerations of the sportsmen and of the trainers of these beneficiaries exceed their commissions, "
+            "fees, benefits in kind and expenses, which must include them:\n%(partners)s\n\n"
+            "The accounts tagged for the sportsmen or the trainers must also have one of the tags of these amounts, "
+            "and these amounts can't be negative. Accounts tagged for the sportsmen or the trainers:\n%(accounts)s",
+            partners='\n'.join(f"- {name}" for name in partners.mapped('display_name')),
+            accounts='\n'.join(
+                f"- {account.display_name}{'' if account.tag_ids & account_281_50_tags else no_tag_label}"
+                for account in sport_accounts),
+        ))
+
+    def _get_declared_company_ids(self):
+        # The 325 of a company declares the expenses of its branches, which share its BCE number
+        self.ensure_one()
+        return self.env['res.company'].search([('id', 'child_of', self.company_id.ids)]).ids
 
     def _get_balance_per_partner(self, partners, tag_ids):
         """Returns a dict such as {partner_id: expense_related_to_tag_ids}
@@ -404,7 +480,7 @@ class L10n_BeForm325(models.Model):
                AND line.account_id = ANY(%(accounts)s)
                AND line.date BETWEEN %(move_date_from)s AND %(move_date_to)s
                AND line.parent_state = 'posted'
-               AND line.company_id = %(company)s
+               AND line.company_id = ANY(%(company_ids)s)
                AND line.balance != 0
           GROUP BY COALESCE(move.commercial_partner_id, line.partner_id)
             -- negative number can't be reported and will result in a crash when generating the BOW file
@@ -414,17 +490,17 @@ class L10n_BeForm325(models.Model):
             'accounts': accounts.ids,
             'move_date_from': f'{self.reference_year}-01-01',
             'move_date_to': f'{self.reference_year}-12-31',
-            'company': self.env.company.id,
-            'decimal_places': self.env.company.currency_id.decimal_places,
+            'company_ids': self._get_declared_company_ids(),
+            'decimal_places': self.currency_id.decimal_places,
         })
         return dict(self.env.cr.fetchall())
 
     def _get_paid_amount_per_partner(self, partner_ids, tags):
-        """Get all paid amount per partner for a specific year and the previous year.
+        """Get all paid amount per partner during the reference year, whatever the date of the paid bill.
 
             :param partner_ids: Partner to compute paid amount.
             :param tags: Which tags to get paid amount for
-            :return: A dict of paid amount (for the specific year and the previous year) per partner.
+            :return: A dict of paid amount (during the reference year) per partner.
         """
         self.env.cr.execute("""
         WITH paid_expense_line AS (
@@ -440,9 +516,9 @@ class L10n_BeForm325(models.Model):
              WHERE account_tag_rel.account_account_tag_id = ANY(%(tag_ids)s)
                AND account.account_type IN ('liability_payable', 'asset_receivable')
                AND aml_payable.parent_state = 'posted'
-               AND aml_payable.company_id = %(company_id)s
-               AND aml_payable.date BETWEEN %(invoice_date_from)s AND %(invoice_date_to)s
-               AND aml_expense.date BETWEEN %(invoice_date_from)s AND %(invoice_date_to)s
+               AND aml_payable.company_id = ANY(%(company_ids)s)
+               -- the amounts paid during the reference year must be reported whatever the date of the bill: a bill
+               -- of any previous year, or of the next year for an advance
                AND COALESCE(move_payable.commercial_partner_id, aml_payable.partner_id) = ANY(%(partner_ids)s)
                AND aml_payable.balance != 0
         ),
@@ -453,23 +529,30 @@ class L10n_BeForm325(models.Model):
               FROM paid_expense_line
               JOIN account_move move ON paid_expense_line.move_id = move.id
               JOIN account_partial_reconcile apr ON paid_expense_line.payable_id = apr.credit_move_id OR paid_expense_line.payable_id = apr.debit_move_id
-              JOIN account_move_line aml_payment ON aml_payment.id = apr.debit_move_id
+              -- the payment is the other side of the reconciliation, the payment date is its date (the
+              -- reconciliation date is the date of the bill for an advance)
+              JOIN account_move_line aml_payment ON aml_payment.id = CASE
+                       WHEN apr.debit_move_id = paid_expense_line.payable_id THEN apr.credit_move_id
+                       ELSE apr.debit_move_id
+                   END
              WHERE aml_payment.parent_state = 'posted'
-               AND apr.max_date BETWEEN %(payment_date_from)s AND %(payment_date_to)s
+               AND aml_payment.date BETWEEN %(payment_date_from)s AND %(payment_date_to)s
           GROUP BY paid_expense_line.partner_id
         ),
         amount_send_to_expense_without_bill AS (
-            SELECT line.partner_id,
+            SELECT COALESCE(move.commercial_partner_id, line.partner_id) AS partner_id,
                    line.balance AS paid_amount
               FROM account_move_line AS line
+              JOIN account_move move ON move.id = line.move_id
               JOIN account_journal journal ON journal.id = line.journal_id
               JOIN account_account_account_tag account_tag_rel ON line.account_id = account_tag_rel.account_account_id
-             WHERE line.company_id = %(company_id)s
+             WHERE line.company_id = ANY(%(company_ids)s)
                AND journal.type IN ('bank', 'cash')
                AND line.parent_state = 'posted'
                AND account_tag_rel.account_account_tag_id = ANY(%(tag_ids)s)
                AND line.date BETWEEN %(payment_date_from)s AND %(payment_date_to)s
-               AND line.partner_id = ANY(%(partner_ids)s)
+               -- the payments to a contact of a company are the ones of the company, as for the bills
+               AND COALESCE(move.commercial_partner_id, line.partner_id) = ANY(%(partner_ids)s)
                AND line.balance != 0
         ),
         amount_paid AS (
@@ -481,11 +564,9 @@ class L10n_BeForm325(models.Model):
           FROM amount_paid AS sub
       GROUP BY sub.partner_id
         """, {
-            'company_id': self.company_id.id,
+            'company_ids': self._get_declared_company_ids(),
             'payment_date_from': f'{self.reference_year}-01-01',
             'payment_date_to': f'{self.reference_year}-12-31',
-            'invoice_date_from': f'{int(self.reference_year) - 1}-01-01',
-            'invoice_date_to': f'{self.reference_year}-12-31',
             'tag_ids': tags.ids,
             'partner_ids': partner_ids.ids,
             'decimal_places': self.currency_id.decimal_places,
@@ -608,6 +689,8 @@ class L10n_BeForm325(models.Model):
             'A1015': self.debtor_city,
             'A1016': ONSS_COUNTRY_CODE_MAPPING.get(self.debtor_country_id.code),
             'A1020': 1,
+            # national number of a debtor natural person, without BCE number (zone 1.005 is then empty)
+            'A1037': '' if self.debtor_bce_number else re.sub(r'\D', '', self.debtor_citizen_identification or ''),
             'Fiches28150': partner_281_50_forms,  # Official name from the XML
             'R8002': self.reference_year,
             'R8005': self.debtor_bce_number,

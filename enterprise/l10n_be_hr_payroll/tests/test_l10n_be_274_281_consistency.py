@@ -30,6 +30,7 @@ class TestL10nBe274281Consistency(TestPayrollCommon):
         cls.employees |= cls.create_employee_with_benefits({'name': 'Consistency Benefits', **address})
         cls.employees |= cls.create_employee({
             'name': 'Consistency Director',
+            'employee_type_id': cls.env.ref("hr.contract_type_company_executive").id,
             'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999').id,
             'wage': 5000.0,
             **address,

@@ -116,7 +116,7 @@ class PosEdiXmlUBLDian(models.AbstractModel):
                             '_text': refund_move.l10n_co_edi_cufe_cude_ref if refund_move else refund_order.l10n_co_edi_pos_cufe_cude_ref,
                             'schemeName': "CUFE-SHA384",
                         },
-                        'cbc:IssueDate': {'_text': refund_move.invoice_date.isoformat() if refund_move else refund_order.date_order.date().isoformat()},
+                        'cbc:IssueDate': {'_text': refund_move.invoice_date.isoformat() if refund_move else refund_order.date_order.replace(tzinfo=UTC).astimezone(ZoneInfo('America/Bogota')).date().isoformat()},
                     },
                 }
             )

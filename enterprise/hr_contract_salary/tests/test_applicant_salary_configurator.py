@@ -424,3 +424,77 @@ class TestSalaryConfiguratorForApplicant(HttpCase):
             content_2['result']['new_version_id'],
             "action_view_version() should redirect to the fully signed contract and not to the partially signed archived one",
         )
+
+    def _get_offer_submit_data(self, offer, job):
+        return {
+            "params": {
+                "offer_id": offer.id,
+                "benefits": {
+                    'version': {
+                        'wage': 1000,
+                        'final_yearly_costs': 12000,
+                    },
+                    'version_personal': {},
+                    'employee': {
+                        'name': 'New Employee',
+                        'private_email': 'new_employee@test.example.com',
+                        'employee_job_id': job.id,
+                        'department_id': None,
+                        'job_title': job.name,
+                    },
+                    'address': {},
+                    'bank_account': {},
+                },
+                "token": offer.access_token,
+            },
+        }
+
+    def test_offer_work_address(self):
+        lln_address, dubai_address = self.env['res.partner'].create([{
+            'name': 'Louvain-la-Neuve Office',
+            'type': 'other',
+            'parent_id': self.company_id.partner_id.id,
+        }, {
+            'name': 'Dubai Office',
+            'type': 'other',
+            'parent_id': self.company_id.partner_id.id,
+        }])
+        dubai_job = self.env['hr.job'].create({
+            'name': 'Developer Dubai',
+            'company_id': self.company_id.id,
+            'address_id': dubai_address.id,
+            'contract_template_id': self.senior_dev_contract.id,
+        })
+
+        # The employees keep their work address, even if the job location is elsewhere
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee Louvain-la-Neuve',
+            'company_id': self.company_id.id,
+            'address_id': lln_address.id,
+            'job_id': dubai_job.id,
+            'wage': 3000,
+            'date_version': '2022-01-01',
+            'contract_date_start': '2022-01-01',
+        })
+        offer = self.env['hr.contract.salary.offer'].create({
+            'employee_id': employee.id,
+            'employee_version_id': employee.version_id.id,
+            'contract_template_id': self.senior_dev_contract.id,
+            'employee_job_id': dubai_job.id,
+        })
+        self.authenticate('admin', 'admin')
+        content = self.url_open("/salary_package/submit", json=self._get_offer_submit_data(offer, dubai_job)).json()
+        new_version = self.env['hr.version'].browse(content['result']['new_version_id'])
+        self.assertEqual(employee.address_id, lln_address)
+        self.assertEqual(new_version.address_id, lln_address)
+
+        # The hired applicants work at the job location
+        applicant = self.env['hr.applicant'].create({
+            'partner_name': 'Applicant Dubai',
+            'job_id': dubai_job.id,
+        })
+        applicant.action_generate_offer()
+        offer = self.env['hr.contract.salary.offer'].search([('applicant_id', '=', applicant.id)])
+        content = self.url_open("/salary_package/submit", json=self._get_offer_submit_data(offer, dubai_job)).json()
+        new_version = self.env['hr.version'].browse(content['result']['new_version_id'])
+        self.assertEqual(new_version.address_id, dubai_address)

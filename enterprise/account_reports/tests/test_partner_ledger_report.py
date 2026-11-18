@@ -1254,3 +1254,25 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             options,
             currency_map={8: {'currency': other_currency}},
         )
+
+    def test_partner_ledger_period_uses_accounting_date(self):
+        """ Test that a bill is reported in the period of its accounting date """
+        partner = self.env['res.partner'].create({'name': 'Late Vendor'})
+        bill = self.init_invoice('in_invoice', partner=partner, invoice_date='2019-08-20', amounts=[1000.0], taxes=[])
+        bill.date = '2019-09-05'
+        bill.action_post()
+
+        options = self._generate_options(self.report, '2019-09-01', '2019-09-30', default_options={'unfold_all': True, 'test_unfold_all': True, 'partner_ids': partner.ids})
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                    Debit           Credit          Balance
+            [   0,                                         6,              7,             9],
+            [
+                ('Partner Ledger',                        '',         1000.0,       -1000.0),
+                (partner.name,                            '',         1000.0,       -1000.0),
+                (bill.name,                               '',         1000.0,       -1000.0),
+                ('Total ' + partner.name,                 '',         1000.0,       -1000.0),
+                ('Total Partner Ledger',                  '',         1000.0,       -1000.0),
+            ],
+            options,
+        )

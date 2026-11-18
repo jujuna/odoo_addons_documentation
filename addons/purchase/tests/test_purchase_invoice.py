@@ -5,12 +5,12 @@ from datetime import timedelta
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.exceptions import UserError
 from odoo.fields import Domain
-from odoo.tests import Form, tagged
-from odoo.tools import mute_logger
+from odoo.tests import Form, HttpCase, tagged
+from odoo.tools import mute_logger, float_round
 from odoo import Command, fields
 
 
-class TestPurchaseToInvoiceCommon(AccountTestInvoicingCommon):
+class TestPurchaseToInvoiceCommon(AccountTestInvoicingCommon, HttpCase):
 
     _test_user_groups = None  # FIXME list needed groups
 
@@ -308,6 +308,36 @@ class TestPurchaseToInvoice(TestPurchaseToInvoiceCommon):
         for line in purchase_order.order_line:
             self.assertEqual(line.qty_to_invoice, 0.0)
             self.assertEqual(line.qty_invoiced, 10)
+
+    def test_qty_invoiced_not_rounded_up(self):
+        """Test that the billed quantity converted from another unit of measure is not rounded up."""
+        uom_unit = self.env.ref('uom.product_uom_unit')
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({
+                'product_id': self.product_order.id,
+                'product_qty': 1.0,
+                'uom_id': self.env.ref('uom.product_uom_dozen').id,
+                'tax_ids': False,
+            })],
+        })
+        purchase_order.button_confirm()
+        po_line = purchase_order.order_line
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': fields.Date.today(),
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_order.id,
+                'quantity': 7.0,
+                'product_uom_id': uom_unit.id,
+                'purchase_line_id': po_line.id,
+                'tax_ids': False,
+            })],
+        })
+        bill.action_post()
+        precision = self.env['decimal.precision'].precision_get('Product Unit')
+        self.assertEqual(po_line.qty_invoiced, float_round(7 / 12, precision_digits=precision))
 
     def test_vendor_severals_bills_and_multicurrency(self):
         """
@@ -830,6 +860,65 @@ class TestPurchaseToInvoice(TestPurchaseToInvoiceCommon):
         self.assertEqual(analytic_account.purchase_order_count, 1)
         self.assertEqual(analytic_account.action_view_purchase_orders()['domain'], [['id', 'in', purchase_order.ids]])
 
+    def test_invoice_line_name_partner_specific_code_not_duplicated(self):
+        """Preserve an existing description containing a vendor-specific product code."""
+        self.env['product.supplierinfo'].create({
+            'partner_id': self.partner_a.id,
+            'product_tmpl_id': self.product_order.product_tmpl_id.id,
+            'product_code': 'CUSTOM-CODE',
+        })
+        po = self.init_purchase(partner=self.partner_a, confirm=True, products=[self.product_order])
+        # Existing descriptions may still contain the product name and code.
+        po.order_line.name = po.order_line._get_product_display_name()
+        self.assertIn('CUSTOM-CODE', po.order_line.name)
+        po.order_line.qty_received = 1
+
+        bill = self.env['account.move'].browse(po.action_create_invoice()['res_id'])
+        self.assertEqual(
+            bill.invoice_line_ids.name, po.order_line.name,
+            "Billing shouldn't duplicate the product name when the order line "
+            "already used a vendor-specific product code",
+        )
+
+    def test_invoice_line_name_standard_code_not_duplicated(self):
+        """A purchase order line created before the vendor has their own
+        product code keeps the standard product name. Billing must not
+        prepend the vendor-specific name added afterwards.
+        """
+        po = self.init_purchase(partner=self.partner_a, confirm=True, products=[self.product_order])
+        po.order_line.name = self.product_order.display_name
+        self.env['product.supplierinfo'].create({
+            'partner_id': self.partner_a.id,
+            'product_tmpl_id': self.product_order.product_tmpl_id.id,
+            'product_code': 'CUSTOM-CODE',
+        })
+        self.assertNotIn('CUSTOM-CODE', po.order_line.name)
+        po.order_line.qty_received = 1
+
+        bill = self.env['account.move'].browse(po.action_create_invoice()['res_id'])
+        self.assertEqual(bill.invoice_line_ids.name, po.order_line.name)
+
+    def test_invoice_line_name_expired_vendor_code_not_duplicated(self):
+        """Preserve an existing description using the selected seller's product code."""
+        self.env['product.supplierinfo'].create([{
+            'partner_id': self.partner_a.id,
+            'product_tmpl_id': self.product_order.product_tmpl_id.id,
+            'product_code': 'OLD',
+            'date_end': fields.Date.today() - timedelta(days=10),
+        }, {
+            'partner_id': self.partner_a.id,
+            'product_tmpl_id': self.product_order.product_tmpl_id.id,
+            'product_code': 'NEW',
+        }])
+        po = self.init_purchase(partner=self.partner_a, confirm=True, products=[self.product_order])
+        po.order_line.name = po.order_line._get_product_display_name()
+        self.assertIn('[NEW]', po.order_line.name)
+        self.assertNotIn('[OLD]', po.order_line.name)
+        po.order_line.qty_received = 1
+
+        bill = self.env['account.move'].browse(po.action_create_invoice()['res_id'])
+        self.assertEqual(bill.invoice_line_ids.name, po.order_line.name)
+
 
 @tagged('post_install', '-at_install')
 class TestInvoicePurchaseMatch(TestPurchaseToInvoiceCommon):
@@ -968,6 +1057,21 @@ class TestInvoicePurchaseMatch(TestPurchaseToInvoiceCommon):
             ['my_match_reference'], invoice.partner_id.id, invoice.amount_total, from_ocr=False)
 
         self.assertFalse(invoice.id in po.invoice_ids.ids)
+
+    def test_match_invoice_line_without_name(self):
+        """Test matching an invoice when an invoice line has no name"""
+        po = self.init_purchase(confirm=True, products=[self.product_order])
+        invoice = self.init_invoice(
+            'in_invoice',
+            partner=self.partner_a,
+            products=[self.product_order, self.service_order]
+        )
+
+        invoice.invoice_line_ids.filtered(lambda l: l.product_id == self.product_order).label = False
+        invoice._find_and_set_purchase_orders(
+            ['my_match_reference'], invoice.partner_id.id, invoice.amount_total, from_ocr=False)
+
+        self.assertEqual(invoice.invoice_line_ids.purchase_line_id, po.order_line)
 
     def test_po_match_from_ocr(self):
         po = self.init_purchase(confirm=True, products=[self.product_order, self.service_order])
@@ -1443,3 +1547,44 @@ class TestInvoicePurchaseMatch(TestPurchaseToInvoiceCommon):
         bill_matches.action_match_lines()
         self.assertEqual(po.invoice_ids, bill_1)
         self.assertEqual(po.order_line.product_id, bill_1.invoice_line_ids.product_id)
+
+    def test_purchase_order_section_duplicate(self):
+        """
+        Duplicating a section should copy all products without running onchanges to
+        recompute values such as product_qty
+        """
+        order = self.env['purchase.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [
+                Command.create({
+                    'name': 'Section 1',
+                    'display_type': 'line_section',
+                    'product_qty': 0.0,
+                }),
+                Command.create({
+                    'product_id': self.product_order.id,
+                    'name': self.product_order.name + "\nDesc Test ABC",
+                    'product_qty': 33.0,
+                }),
+            ]
+        })
+
+        admin = self.env.ref('base.user_admin')
+        admin.write({
+            'company_ids': [Command.link(order.company_id.id)],
+            'company_id': order.company_id.id,
+        })
+        self.start_tour(
+            f"/odoo/action-purchase.purchase_rfq/{order.id}",
+            'purchase_order_section_duplicate_tour',
+            login='admin',
+        )
+
+        sections = order.order_line.filtered(lambda l: l.display_type == 'line_section')
+        products = order.order_line.filtered(lambda l: not l.display_type)
+
+        self.assertEqual(len(sections), 2)
+        self.assertEqual(len(products), 2)
+        self.assertEqual(products[0].name, products[1].name)
+        self.assertEqual(products[0].product_qty, products[1].product_qty)
+        self.assertEqual(products[0].date_planned, products[1].date_planned)

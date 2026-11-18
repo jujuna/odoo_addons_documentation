@@ -15,6 +15,52 @@
         min-height: 0;
     }
 
+    // Both column headers are as tall as the search bar, their tallest
+    // control, so that they stay aligned whatever each one displays.
+    .o_aw_column_header {
+        min-height: add($input-height, add(map-get($spacers, 2) * 2, $border-width));
+    }
+
+    .o_aw_suggestions_header {
+        display: grid;
+        grid-template-areas: "title" "groupby" "search";
+        align-items: center;
+        gap: map-get($spacers, 2);
+
+        @include media-breakpoint-up(lg) {
+            // The search bar takes the free space, so it shrinks before the
+            // title or the buttons do.
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            grid-template-areas: "title search groupby";
+        }
+    }
+
+    .o_aw_suggestions_title {
+        grid-area: title;
+        justify-self: start;
+    }
+
+    .o_aw_search_bar {
+        grid-area: search;
+        min-width: 0;
+        padding-block: $input-padding-y;
+
+        @include media-breakpoint-up(lg) {
+            justify-self: end;
+            width: 18rem;
+            max-width: 100%;
+        }
+    }
+
+    .o_aw_search_input {
+        min-width: 0;
+        line-height: $input-line-height;
+    }
+
+    .o_aw_groupby {
+        grid-area: groupby;
+    }
+
     // Already defined in other modules. Should be elevated up at framework
     // level.
     .o_tabular_nums {
@@ -39,6 +85,11 @@
         .o_activity_watch_timesheet_right_tots {
             border-right: $border-width solid rgba(0,0,0,0);
         }
+        .o_activity_watch_drop_target.o_drag_hover {
+            border: 2px solid var(--info);
+            background-color: rgba(var(--info-rgb), 0.08);
+            box-shadow: inset 0 0 0 1px var(--info);
+        }
 
     }
 
@@ -59,6 +110,11 @@
             color: var(--body-color);
         }
 
+        &.o_dragged {
+            opacity: 1;
+            transform: none;
+        }
+
         .flag {
             display: none;
             i {
@@ -71,6 +127,13 @@
         // the same whether its top edge is drawn as a border or left as padding.
         &.o_aw_border_top_reserved {
             padding-top: var(--bs-list-group-border-width, 1px) !important;
+        }
+
+        .o_suggestions_suggestion_description {
+            // Mirror 'text-truncate' on all screen sizes
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         @include media-breakpoint-up(xl) {
@@ -88,13 +151,6 @@
 
             &:not(.o_isSelected):has(+ .o_suggestions_suggestion.o_isSelected) {
                 border-bottom-width: 0px;
-            }
-
-            .o_suggestions_suggestion_description {
-                // Mirror 'text-truncate', but on XL only.
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
 
             &:not(:hover):not(:focus-visible):not(:has(:focus-visible)) {

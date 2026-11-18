@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
 "PO-Revision-Date: 2026-10-18 13:27+0000\n"
 "Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
 "Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/"
@@ -24,8 +24,7 @@ msgstr ""
 msgid ""
 " If checked, any change on this information will trigger a new computation "
 "of the gross-->net salary."
-msgstr ""
-" ຖ້າເລືອກ, ທຸກການປ່ຽນແປງໃນຂໍ້ມູນນີ້ຈະເຮັດໃຫ້ມີການຄິດໄລ່ເງິນເດືອນລວມ-->ສຸດທິໃໝ່."
+msgstr " ຖ້າເລືອກ, ທຸກການປ່ຽນແປງໃນຂໍ້ມູນນີ້ຈະເຮັດໃຫ້ມີການຄິດໄລ່ເງິນເດືອນລວມ-->ສຸດທິໃໝ່."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_employee__signatures_count
@@ -105,10 +104,10 @@ msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations!</h2>\n"
 "                You can configure your salary package by clicking on the "
-"link below.<br/>\n"
+"link below.<br>\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
@@ -125,42 +124,22 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>ຂໍສະແດງຄວາມຍິນດີ!</h2>\n"
-"                ທ່ານສາມາດກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານໄດ້ໂດຍການກົດໃສ່ລິ້ງຂ້າງລຸ່ມນີ້.<br/>\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    ລິ້ງນີ້ຈະໝົດອາຍຸໃນວັນທີ <t t-out=\"ctx.get('validity_end')\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-att-href=\"'/salary_package/simulation/offer/%s%s' "
-"% (                             ctx.get('offer_id')"
-",                             ('?token=' + ctx.get('access_token')) if "
-"ctx.get('access_token') else ''                         )\" "
-"target=\"_blank\" t-attf-style=\"background-color: {"
-"{object.company_id.email_secondary_color or '#875A7B'}}; text-decoration: "
-"none; color: {{object.company_id.email_primary_color or '#FFFFFF'}}; "
-"padding: 8px 16px 8px 16px; border-radius: 5px;\">\n"
-"                        ກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານ\n"
-"                    </a>\n"
-"                </div>\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model:mail.template,body_html:hr_contract_salary.mail_template_send_offer_applicant
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                <h2>Congratulations, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+"out=\"object.applicant_id.partner_name\"></t>!</h2>\n"
 "                We are delighted to extend an offer for you to join <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
+"out=\"object.company_id.name\"></t>.<br>\n"
 "                We were thoroughly impressed with your background and can't "
-"wait to welcome you to the team.<br/><br/>\n"
+"wait to welcome you to the team.<br><br>\n"
 "                The next step is to customize your remuneration components, "
 "extra-legal benefits, and mobility choices through our interactive portal:\n"
 "                <t t-if=\"ctx.get('validity_end')\">\n"
 "                    The link will expire on <t t-"
-"out=\"ctx.get('validity_end')\"/>.\n"
+"out=\"ctx.get('validity_end')\"></t>.\n"
 "                </t>\n"
 "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
 "                    <a t-attf-href=\"/salary_package/simulation/offer/"
@@ -179,42 +158,11 @@ msgid ""
 "                    <li>Digitally sign your employment contract</li>\n"
 "                </ul>\n"
 "                If you have any questions regarding your offer or salary "
-"package, don't hesitate to ask us.<br/><br/>\n"
+"package, don't hesitate to ask us.<br><br>\n"
 "                Best regards,\n"
 "            </div>\n"
 "        "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                <h2>ຂໍສະແດງຄວາມຍິນດີ, <t t-"
-"out=\"object.applicant_id.partner_name\"/>!</h2>\n"
-"                ພວກເຮົາມີຄວາມຍິນດີຫຼາຍທີ່ຈະຍື່ນຂໍ້ສະເໜີໃຫ້ທ່ານເຂົ້າຮ່ວມງານກັບ <t t-"
-"out=\"object.company_id.name\"/>.<br/>\n"
-"                ພວກເຮົາມີຄວາມປະທັບໃຈໃນປະຫວັດຄວາມເປັນມາຂອງທ່ານ ແລະ ລໍຖ້າທີ່ຈະຕ້ອນຮັບທ່ານເຂົ້າ"
-"ສູ່ທີມງານຂອງພວກເຮົາ.<br/><br/>\n"
-"                ຂັ້ນຕອນຕໍ່ໄປແມ່ນການປັບແຕ່ງອົງປະກອບຄ່າຕອບແທນ, ສະຫວັດດີການເພີ່ມເຕີມ ແລະ ທາງເລື"
-"ອກການເດີນທາງຂອງທ່ານຜ່ານປະຕູລະບົບອອນລາຍຂອງພວກເຮົາ:\n"
-"                <t t-if=\"ctx.get('validity_end')\">\n"
-"                    ລິ້ງນີ້ຈະໝົດອາຍຸໃນວັນທີ <t t-out=\"ctx.get('validity_end')\"/>.\n"
-"                </t>\n"
-"                <div style=\"padding: 16px 0px 16px 0px;\">\n"
-"                    <a t-attf-href=\"/salary_package/simulation/offer/{"
-"{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" target=\"_blank\" "
-"t-attf-style=\"background-color: {{object.company_id.email_secondary_color "
-"or '#875A7B'}}; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px 8px "
-"16px; border-radius: 5px;\">ກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານ</a>\n"
-"                </div>\n"
-"                ຂັ້ນຕອນຕໍ່ໄປມີດັ່ງນີ້:\n"
-"                <ul>\n"
-"                    <li>ປັບແຕ່ງຊຸດເງິນເດືອນຕາມທີ່ຕ້ອງການໃນລະບົບຈຳລອງ</li>\n"
-"                    <li>ກວດກາບົດສະຫຼຸບຂໍ້ສະເໜີທີ່ສ້າງຂຶ້ນ</li>\n"
-"                    <li>ເຊັນສັນຍາແຮງງານແບບດິຈິຕອນ</li>\n"
-"                </ul>\n"
-"                ຖ້າທ່ານມີຄຳຖາມໃດໆກ່ຽວກັບຂໍ້ສະເໜີ ຫຼື ຊຸດເງິນເດືອນ, ທ່ານສາມາດສອບຖາມພວກເຮົາໄດ້ທັ"
-"ນທີ.<br/><br/>\n"
-"                ດ້ວຍຄວາມນັບຖື,\n"
-"            </div>\n"
-"        "
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_thank_you
@@ -308,8 +256,8 @@ msgid ""
 "                                    </span>"
 msgstr ""
 "<span>\n"
-"                                        ຊ່ອງຂໍ້ມູນນີ້ສາມາດແກ້ໄຂໄດ້ໂດຍຜູ້ດູແລລະບົບເທົ່ານັ້ນ, ກ"
-"ະລຸນາຕິດຕໍ່ພວກເຂົາຖ້າຕ້ອງການແກ້ໄຂຊ່ອງຂໍ້ມູນນີ້.\n"
+"                                        ຊ່ອງຂໍ້ມູນນີ້ສາມາດແກ້ໄຂໄດ້ໂດຍຜູ້ດູແລລະບົບເທົ່ານັ້ນ, "
+"ກະລຸນາຕິດຕໍ່ພວກເຂົາຖ້າຕ້ອງການແກ້ໄຂຊ່ອງຂໍ້ມູນນີ້.\n"
 "                                    </span>\n"
 "                                    <span "
 "invisible=\"requested_documents_fields_string\">\n"
@@ -339,8 +287,8 @@ msgid ""
 "A signatory role is unassigned. Please ensure there is a valid group or "
 "person assigned to each role."
 msgstr ""
-"ບົດບາດຜູ້ລົງລາຍເຊັນຍັງບໍ່ໄດ້ກຳນົດເທື່ອ. ກະລຸນາກວດສອບໃຫ້ແນ່ໃຈວ່າມີກຸ່ມ ຫຼື ບຸກຄົນທີ່ຖືກຕ້ອງຖືກກຳນົດໃຫ້ແຕ່ລະບົດ"
-"ບາດ."
+"ບົດບາດຜູ້ລົງລາຍເຊັນຍັງບໍ່ໄດ້ກຳນົດເທື່ອ. ກະລຸນາກວດສອບໃຫ້ແນ່ໃຈວ່າມີກຸ່ມ ຫຼື "
+"ບຸກຄົນທີ່ຖືກຕ້ອງຖືກກຳນົດໃຫ້ແຕ່ລະບົດບາດ."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -921,8 +869,8 @@ msgid ""
 "Default contract used to generate an offer. If empty, benefits will be taken "
 "from current contract of the employee/nothing for an applicant."
 msgstr ""
-"ສັນຍາເລີ່ມຕົ້ນທີ່ໃຊ້ເພື່ອສ້າງຂໍ້ສະເໜີ. ຖ້າຫວ່າງເປົ່າ, ລະບົບຈະດຶງສະຫວັດດີການຈາກສັນຍາປະຈຸບັນຂອງພະນັກງານ/ບໍ່"
-"ມີຫຍັງເລີຍສຳລັບຜູ້ສະໝັກ."
+"ສັນຍາເລີ່ມຕົ້ນທີ່ໃຊ້ເພື່ອສ້າງຂໍ້ສະເໜີ. ຖ້າຫວ່າງເປົ່າ, ລະບົບຈະດຶງສະຫວັດດີການຈາກສັນຍາປະຈຸບັນຂອງພະນັກງານ/"
+"ບໍ່ມີຫຍັງເລີຍສຳລັບຜູ້ສະໝັກ."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__sign_template_id
@@ -1060,8 +1008,8 @@ msgid ""
 "signatures related to the benefit. eg: A company car policy to approve if "
 "you choose a company car."
 msgstr ""
-"ເອກະສານທີ່ເລືອກຢູ່ນີ້ຈະຖືກຮ້ອງຂໍໃຫ້ພະນັກງານເຊັນເພີ່ມເຕີມກ່ຽວກັບສະຫວັດດີການດັ່ງກ່າວ. ຕົວຢ່າງ: ນະໂຍບາຍລົດ"
-"ປະຈຳຕຳແໜ່ງທີ່ຕ້ອງອະນຸມັດຖ້າທ່ານເລືອກຮັບລົດຂອງບໍລິສັດ."
+"ເອກະສານທີ່ເລືອກຢູ່ນີ້ຈະຖືກຮ້ອງຂໍໃຫ້ພະນັກງານເຊັນເພີ່ມເຕີມກ່ຽວກັບສະຫວັດດີການດັ່ງກ່າວ. ຕົວຢ່າງ: "
+"ນະໂຍບາຍລົດປະຈຳຕຳແໜ່ງທີ່ຕ້ອງອະນຸມັດຖ້າທ່ານເລືອກຮັບລົດຂອງບໍລິສັດ."
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -1184,8 +1132,8 @@ msgid ""
 "Enable this option to include this benefit in the employee’s salary "
 "configurator, allowing them to customize it."
 msgstr ""
-"ເປີດໃຊ້ຕົວເລືອກນີ້ເພື່ອລວມເອົາສະຫວັດດີການນີ້ໄວ້ໃນລະບົບກຳນົດຄ່າເງິນເດືອນຂອງພະນັກງານ, ເພື່ອໃຫ້ພວກເຂົາສາ"
-"ມາດປັບແຕ່ງເອງໄດ້."
+"ເປີດໃຊ້ຕົວເລືອກນີ້ເພື່ອລວມເອົາສະຫວັດດີການນີ້ໄວ້ໃນລະບົບກຳນົດຄ່າເງິນເດືອນຂອງພະນັກງານ, "
+"ເພື່ອໃຫ້ພວກເຂົາສາມາດປັບແຕ່ງເອງໄດ້."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -1295,9 +1243,9 @@ msgid ""
 "within the period of an existing contract for the employee, it will be "
 "treated as an amendment rather than a new contract."
 msgstr ""
-"ສຳລັບພະນັກງານ, ວັນທີເລີ່ມຕົ້ນສັນຍາຈະເປັນຕົວກຳນົດວ່າຂໍ້ສະເໜີນີ້ເປັນການສ້າງສັນຍາໃໝ່ ຫຼື ເປັນການດັດແກ້ສັນຍາທີ່"
-"ມີຢູ່ແລ້ວ. ຖ້າວັນທີເລີ່ມຕົ້ນທີ່ເລືອກຕົກຢູ່ໃນໄລຍະເວລາຂອງສັນຍາເດີມຂອງພະນັກງານ, ລະບົບຈະຖືວ່າເປັນການດັດແກ້ສັ"
-"ນຍາ ແທນທີ່ຈະເປັນສັນຍາໃໝ່."
+"ສຳລັບພະນັກງານ, ວັນທີເລີ່ມຕົ້ນສັນຍາຈະເປັນຕົວກຳນົດວ່າຂໍ້ສະເໜີນີ້ເປັນການສ້າງສັນຍາໃໝ່ ຫຼື "
+"ເປັນການດັດແກ້ສັນຍາທີ່ມີຢູ່ແລ້ວ. ຖ້າວັນທີເລີ່ມຕົ້ນທີ່ເລືອກຕົກຢູ່ໃນໄລຍະເວລາຂອງສັນຍາເດີມຂອງພະນັກງານ, "
+"ລະບົບຈະຖືວ່າເປັນການດັດແກ້ສັນຍາ ແທນທີ່ຈະເປັນສັນຍາໃໝ່."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_sidebar
@@ -1358,8 +1306,8 @@ msgid ""
 "HR Responsible %s should be a user of Sign when New Contract Document "
 "Template is specified"
 msgstr ""
-"ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ %s ຄວນເປັນຜູ້ໃຊ້ລະບົບລາຍເຊັນ (Sign) ເມື່ອມີການກຳນົດແບບຮ່າງເອກະສານສັນ"
-"ຍາໃໝ່"
+"ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ %s ຄວນເປັນຜູ້ໃຊ້ລະບົບລາຍເຊັນ (Sign) "
+"ເມື່ອມີການກຳນົດແບບຮ່າງເອກະສານສັນຍາໃໝ່"
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -1470,8 +1418,7 @@ msgstr "ຖ້າເລືອກ, ບາງຂໍ້ຄວາມມີຂໍ້�
 msgid ""
 "If checked, the value of this information will be computed in all "
 "information set as Monthly Total"
-msgstr ""
-"ຖ້າເລືອກ, ຄ່າຂອງຂໍ້ມູນນີ້ຈະຖືກຄິດໄລ່ເຂົ້າໃນທຸກຂໍ້ມູນທີ່ຕັ້ງເປັນຍອດລວມປະຈຳເດືອນ"
+msgstr "ຖ້າເລືອກ, ຄ່າຂອງຂໍ້ມູນນີ້ຈະຖືກຄິດໄລ່ເຂົ້າໃນທຸກຂໍ້ມູນທີ່ຕັ້ງເປັນຍອດລວມປະຈຳເດືອນ"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__always_show_description
@@ -1518,9 +1465,10 @@ msgid ""
 "annual time off (legal leaves)."
 msgstr ""
 "ນອກເໜືອຈາກວັນພັກຕາມກົດໝາຍແລ້ວ, ທ່ານສາມາດເລືອກມື້ພັກພິເສດໄດ້ສູງສຸດເຖິງ 30 ມື້.\n"
-"            ຈຳນວນມື້ພັກປະຈຳປີ (ວັນພັກຕາມກົດໝາຍ) ທີ່ທ່ານໄດ້ຮັບ ແມ່ນຂຶ້ນກັບຕາຕະລາງການເຮັດວຽກຂອງທ່"
-"ານໃນປີຜ່ານມາ. ການເຮັດວຽກເຕັມເວລາຕະຫຼອດ 12 ເດືອນຂອງປີຜ່ານມາພາຍໃຕ້ສັນຍາຂອງທ່ານ ຈະເຮັດໃຫ້ທ່ານມີ"
-"ສິດໄດ້ຮັບວັນພັກປະຈຳປີ (ວັນພັກຕາມກົດໝາຍ) ຈຳນວນ 20 ມື້."
+"            ຈຳນວນມື້ພັກປະຈຳປີ (ວັນພັກຕາມກົດໝາຍ) ທີ່ທ່ານໄດ້ຮັບ "
+"ແມ່ນຂຶ້ນກັບຕາຕະລາງການເຮັດວຽກຂອງທ່ານໃນປີຜ່ານມາ. ການເຮັດວຽກເຕັມເວລາຕະຫຼອດ 12 "
+"ເດືອນຂອງປີຜ່ານມາພາຍໃຕ້ສັນຍາຂອງທ່ານ ຈະເຮັດໃຫ້ທ່ານມີສິດໄດ້ຮັບວັນພັກປະຈຳປີ (ວັນພັກຕາມກົດໝາຍ) ຈຳນວນ "
+"20 ມື້."
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.personal.info.type,name:hr_contract_salary.hr_contract_salary_personal_info_type_emergency
@@ -1609,6 +1557,11 @@ msgstr "ຕຳແໜ່ງງານ"
 #: model:ir.model.fields,field_description:hr_contract_salary.field_hr_contract_salary_offer__job_title
 msgid "Job Title"
 msgstr "ຊື່ຕຳແໜ່ງງານ"
+
+#. module: hr_contract_salary
+#: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_benefit__uom__length_metric_system
+msgid "Kilometers"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__dropdown_selection__lang
@@ -1863,8 +1816,7 @@ msgstr "ບໍ່"
 msgid ""
 "No HR responsible defined on the job position. Please contact an "
 "administrator."
-msgstr ""
-"ຍັງບໍ່ໄດ້ກຳນົດຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນໃນຕຳແໜ່ງງານນີ້. ກະລຸນາຕິດຕໍ່ຜູ້ດູແລລະບົບ."
+msgstr "ຍັງບໍ່ໄດ້ກຳນົດຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນໃນຕຳແໜ່ງງານນີ້. ກະລຸນາຕິດຕໍ່ຜູ້ດູແລລະບົບ."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -1929,8 +1881,7 @@ msgstr "ບໍ່ມີການຮ້ອງຂໍລາຍເຊັນ"
 msgid ""
 "No signature template defined on the version. Please contact the HR "
 "responsible."
-msgstr ""
-"ຍັງບໍ່ໄດ້ກຳນົດແບບຮ່າງລາຍເຊັນໃນເວີຊັນນີ້. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ."
+msgstr "ຍັງບໍ່ໄດ້ກຳນົດແບບຮ່າງລາຍເຊັນໃນເວີຊັນນີ້. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2231,8 +2182,7 @@ msgstr "ຂໍ້ຄວາມຕົວຢ່າງ"
 msgid ""
 "Please note that this information may be inaccurate and should be used for "
 "reference only."
-msgstr ""
-"ກະລຸນາຮັບຊາບວ່າ ຂໍ້ມູນນີ້ອາດບໍ່ຖືກຕ້ອງຊັດເຈນ ແລະ ຄວນໃຊ້ເພື່ອເປັນການອ້າງອີງເທົ່ານັ້ນ."
+msgstr "ກະລຸນາຮັບຊາບວ່າ ຂໍ້ມູນນີ້ອາດບໍ່ຖືກຕ້ອງຊັດເຈນ ແລະ ຄວນໃຊ້ເພື່ອເປັນການອ້າງອີງເທົ່ານັ້ນ."
 
 #. module: hr_contract_salary
 #. odoo-javascript
@@ -2241,8 +2191,8 @@ msgid ""
 "Please note that this salary calculation is provided for reference purposes "
 "only and may not be fully accurate."
 msgstr ""
-"ກະລຸນາຮັບຊາບວ່າ ການຄິດໄລ່ເງິນເດືອນນີ້ແມ່ນສະໜອງໃຫ້ເພື່ອຈຸດປະສົງໃນການອ້າງອີງເທົ່ານັ້ນ ແລະ ອາດບໍ່ຖືກຕ້ອງຊັ"
-"ດເຈນທັງໝົດ."
+"ກະລຸນາຮັບຊາບວ່າ ການຄິດໄລ່ເງິນເດືອນນີ້ແມ່ນສະໜອງໃຫ້ເພື່ອຈຸດປະສົງໃນການອ້າງອີງເທົ່ານັ້ນ ແລະ "
+"ອາດບໍ່ຖືກຕ້ອງຊັດເຈນທັງໝົດ."
 
 #. module: hr_contract_salary
 #: model:sign.item.type,name:hr_contract_salary.sign_item_type_private_city
@@ -2565,8 +2515,8 @@ msgid ""
 "Select a contract template to auto-fill the contract form with predefined "
 "values. You can still edit the fields as needed after applying the template."
 msgstr ""
-"ເລືອກແບບຮ່າງສັນຍາເພື່ອຕື່ມຂໍ້ມູນລົງໃນແບບຟອມສັນຍາໂດຍອັດຕະໂນມັດດ້ວຍຄ່າທີ່ກຳນົດໄວ້ລ່ວງໜ້າ. ທ່ານຍັງສາມາດແ"
-"ກ້ໄຂຊ່ອງຂໍ້ມູນໄດ້ຕາມຕ້ອງການຫຼັງຈາກນຳໃຊ້ແບບຮ່າງ."
+"ເລືອກແບບຮ່າງສັນຍາເພື່ອຕື່ມຂໍ້ມູນລົງໃນແບບຟອມສັນຍາໂດຍອັດຕະໂນມັດດ້ວຍຄ່າທີ່ກຳນົດໄວ້ລ່ວງໜ້າ. "
+"ທ່ານຍັງສາມາດແກ້ໄຂຊ່ອງຂໍ້ມູນໄດ້ຕາມຕ້ອງການຫຼັງຈາກນຳໃຊ້ແບບຮ່າງ."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2603,16 +2553,15 @@ msgid ""
 "        "
 msgstr ""
 "ເລືອກສະເພາະເອກະສານທີ່ມີຜູ້ລົງລາຍເຊັນ 1 ຫຼື 2 ຄົນທີ່ແຕກຕ່າງກັນເທົ່ານັ້ນ.\n"
-"        ເອກະສານທີ່ມີຜູ້ລົງລາຍເຊັນ 1 ຄົນ ຈະຕ້ອງການພຽງແຕ່ລາຍເຊັນຂອງພະນັກງານ, ໃນຂະນະທີ່ເອກະສານ"
-"ທີ່ມີ 2 ຄົນ ຈະຕ້ອງການລາຍເຊັນທັງຈາກພະນັກງານ ແລະ ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ.\n"
+"        ເອກະສານທີ່ມີຜູ້ລົງລາຍເຊັນ 1 ຄົນ ຈະຕ້ອງການພຽງແຕ່ລາຍເຊັນຂອງພະນັກງານ, "
+"ໃນຂະນະທີ່ເອກະສານທີ່ມີ 2 ຄົນ ຈະຕ້ອງການລາຍເຊັນທັງຈາກພະນັກງານ ແລະ ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນ.\n"
 "        "
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__benefit_ids
 msgid ""
 "Select other Benefits that need to be selected to make this Benefit available"
-msgstr ""
-"ເລືອກສະຫວັດດີການອື່ນໆທີ່ຕ້ອງເລືອກກ່ອນ ເພື່ອໃຫ້ສະຫວັດດີການນີ້ສາມາດໃຊ້ງານໄດ້"
+msgstr "ເລືອກສະຫວັດດີການອື່ນໆທີ່ຕ້ອງເລືອກກ່ອນ ເພື່ອໃຫ້ສະຫວັດດີການນີ້ສາມາດໃຊ້ງານໄດ້"
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -2845,8 +2794,8 @@ msgstr "ປະເພດໂຄງສ້າງ"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_resume__value_type__sum
-msgid "Sum"
-msgstr "ຜົນລວມ"
+msgid "Sum of Benefits Values"
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:hr.contract.salary.resume,name:hr_contract_salary.hr_contract_salary_payroll_resume_gross_worker
@@ -2875,6 +2824,12 @@ msgstr "ແບບຮ່າງ"
 #: model:ir.model.fields.selection,name:hr_contract_salary.selection__hr_contract_salary_personal_info__display_type__text
 msgid "Text"
 msgstr "ຂໍ້ຄວາມ"
+
+#. module: hr_contract_salary
+#. odoo-python
+#: code:addons/hr_contract_salary/controllers/main.py:0
+msgid "The IBAN %s is not valid, please verify it."
+msgstr ""
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_offer__country_code
@@ -2918,15 +2873,13 @@ msgstr "ເອກະສານທີ່ຮ້ອງຂໍໃນປະຈຸບັ
 msgid ""
 "The display type of a benefit linked to a salary rule must be one of the "
 "following: %s"
-msgstr ""
-"ຮູບແບບການສະແດງຂອງສະຫວັດດີການທີ່ເຊື່ອມໂຍງກັບກົດລະບຽບເງິນເດືອນຕ້ອງເປັນໜຶ່ງໃນດັ່ງຕໍ່ໄປນີ້: %s"
+msgstr "ຮູບແບບການສະແດງຂອງສະຫວັດດີການທີ່ເຊື່ອມໂຍງກັບກົດລະບຽບເງິນເດືອນຕ້ອງເປັນໜຶ່ງໃນດັ່ງຕໍ່ໄປນີ້: %s"
 
 #. module: hr_contract_salary
 #: model:ir.model.fields,help:hr_contract_salary.field_hr_contract_salary_benefit__fold_res_field_id
 msgid ""
 "The field here needs to be set for this benefit to be folded by default."
-msgstr ""
-"ຊ່ອງຂໍ້ມູນຢູ່ນີ້ຈຳເປັນຕ້ອງຖືກຕັ້ງຄ່າເພື່ອໃຫ້ສະຫວັດດີການນີ້ພັບຢູ່ເປັນຄ່າເລີ່ມຕົ້ນ."
+msgstr "ຊ່ອງຂໍ້ມູນຢູ່ນີ້ຈຳເປັນຕ້ອງຖືກຕັ້ງຄ່າເພື່ອໃຫ້ສະຫວັດດີການນີ້ພັບຢູ່ເປັນຄ່າເລີ່ມຕົ້ນ."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -2970,8 +2923,7 @@ msgstr "ອາຍຸການໃຊ້ງານລິ້ງກຳນົດຄ່
 msgid ""
 "The type of activity that will be created automatically on the contract if "
 "this benefit is chosen by the employee."
-msgstr ""
-"ປະເພດກິດຈະກຳທີ່ຈະຖືກສ້າງຂຶ້ນໂດຍອັດຕະໂນມັດໃນສັນຍາ ຖ້າພະນັກງານເລືອກສະຫວັດດີການນີ້."
+msgstr "ປະເພດກິດຈະກຳທີ່ຈະຖືກສ້າງຂຶ້ນໂດຍອັດຕະໂນມັດໃນສັນຍາ ຖ້າພະນັກງານເລືອກສະຫວັດດີການນີ້."
 
 #. module: hr_contract_salary
 #. odoo-javascript
@@ -2979,8 +2931,7 @@ msgstr ""
 msgid ""
 "There is no defined payroll structure for your contract. Please contact a "
 "responsible for more information."
-msgstr ""
-"ຍັງບໍ່ມີການກຳນົດໂຄງສ້າງເງິນເດືອນສຳລັບສັນຍາຂອງທ່ານ. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບສຳລັບຂໍ້ມູນເພີ່ມເຕີມ."
+msgstr "ຍັງບໍ່ມີການກຳນົດໂຄງສ້າງເງິນເດືອນສຳລັບສັນຍາຂອງທ່ານ. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບສຳລັບຂໍ້ມູນເພີ່ມເຕີມ."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_diff_email_template
@@ -2992,8 +2943,7 @@ msgstr "ບໍ່ມີການປ່ຽນແປງໃດໆຕັ້ງແຕ
 msgid ""
 "They will review your contract.<br/> Feel free to contact them if you have "
 "any questions."
-msgstr ""
-"ພວກເຂົາຈະກວດກາສັນຍາຂອງທ່ານຄືນ.<br/> ທ່ານສາມາດຕິດຕໍ່ພວກເຂົາໄດ້ທັນທີຖ້າມີຄຳຖາມໃດໆ."
+msgstr "ພວກເຂົາຈະກວດກາສັນຍາຂອງທ່ານຄືນ.<br/> ທ່ານສາມາດຕິດຕໍ່ພວກເຂົາໄດ້ທັນທີຖ້າມີຄຳຖາມໃດໆ."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_view_employee_form_readonly
@@ -3012,8 +2962,7 @@ msgstr "ນີ້ແມ່ນຍອດລວມທີ່ຄິດໄລ່ສຳ
 #: code:addons/hr_contract_salary/controllers/main.py:0
 msgid ""
 "This link is invalid. Please contact the HR Responsible to get a new one..."
-msgstr ""
-"ລິ້ງນີ້ບໍ່ຖືກຕ້ອງ. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນເພື່ອຂໍລິ້ງໃໝ່..."
+msgstr "ລິ້ງນີ້ບໍ່ຖືກຕ້ອງ. ກະລຸນາຕິດຕໍ່ຜູ້ຮັບຜິດຊອບຝ່າຍບຸກຄະລາກອນເພື່ອຂໍລິ້ງໃໝ່..."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
@@ -3021,8 +2970,8 @@ msgid ""
 "This offer has been fully signed and can no longer be edited. However, you "
 "can still make changes to the Signed Contract if needed."
 msgstr ""
-"ຂໍ້ສະເໜີນີ້ຖືກເຊັນຄົບຖ້ວນແລ້ວ ແລະ ບໍ່ສາມາດແກ້ໄຂໄດ້ອີກ. ເຖິງຢ່າງໃດກໍຕາມ, ທ່ານຍັງສາມາດປ່ຽນແປງຂໍ້ມູນໃນສັນ"
-"ຍາທີ່ເຊັນແລ້ວໄດ້ຖ້າຈຳເປັນ."
+"ຂໍ້ສະເໜີນີ້ຖືກເຊັນຄົບຖ້ວນແລ້ວ ແລະ ບໍ່ສາມາດແກ້ໄຂໄດ້ອີກ. ເຖິງຢ່າງໃດກໍຕາມ, "
+"ທ່ານຍັງສາມາດປ່ຽນແປງຂໍ້ມູນໃນສັນຍາທີ່ເຊັນແລ້ວໄດ້ຖ້າຈຳເປັນ."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3198,8 +3147,7 @@ msgstr "ແມ່ນ"
 msgid ""
 "You cannot have multiple person responsible for the same role on contract "
 "signature template."
-msgstr ""
-"ທ່ານບໍ່ສາມາດມີຜູ້ຮັບຜິດຊອບຫຼາຍຄົນສຳລັບບົດບາດດຽວກັນໃນແບບຮ່າງລາຍເຊັນສັນຍາໄດ້."
+msgstr "ທ່ານບໍ່ສາມາດມີຜູ້ຮັບຜິດຊອບຫຼາຍຄົນສຳລັບບົດບາດດຽວກັນໃນແບບຮ່າງລາຍເຊັນສັນຍາໄດ້."
 
 #. module: hr_contract_salary
 #. odoo-python
@@ -3207,8 +3155,7 @@ msgstr ""
 msgid ""
 "You cannot have multiple person responsible for the same role on contract "
 "update signature template."
-msgstr ""
-"ທ່ານບໍ່ສາມາດມີຜູ້ຮັບຜິດຊອບຫຼາຍຄົນສຳລັບບົດບາດດຽວກັນໃນແບບຮ່າງລາຍເຊັນອັບເດດສັນຍາໄດ້."
+msgstr "ທ່ານບໍ່ສາມາດມີຜູ້ຮັບຜິດຊອບຫຼາຍຄົນສຳລັບບົດບາດດຽວກັນໃນແບບຮ່າງລາຍເຊັນອັບເດດສັນຍາໄດ້."
 
 #. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_personal_information
@@ -3258,6 +3205,11 @@ msgid "id"
 msgstr "id"
 
 #. module: hr_contract_salary
+#: model_terms:ir.ui.view,arch_db:hr_contract_salary.salary_package_benefits
+msgid "km"
+msgstr ""
+
+#. module: hr_contract_salary
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_salary.hr_contract_salary_offer_view_form_calculator
 msgid "month"
@@ -3275,11 +3227,132 @@ msgid ""
 "{{ object.company_id.name }}: Job Offer - "
 "{{ object.applicant_id.partner_name }}"
 msgstr ""
-"{{ object.company_id.name }}: ຂໍ້ສະເໜີວຽກ - {{ "
-"object.applicant_id.partner_name }}"
+"{{ object.company_id.name }}: ຂໍ້ສະເໜີວຽກ - "
+"{{ object.applicant_id.partner_name }}"
 
 #. module: hr_contract_salary
 #: model:mail.template,subject:hr_contract_salary.mail_template_send_offer
 msgid "{{ object.company_id.name }}: Job Offer - {{ object.employee_id.name }}"
-msgstr ""
-"{{ object.company_id.name }}: ຂໍ້ສະເໜີວຽກ - {{ object.employee_id.name }}"
+msgstr "{{ object.company_id.name }}: ຂໍ້ສະເໜີວຽກ - {{ object.employee_id.name }}"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations!</h2>\n"
+#~ "                You can configure your salary package by clicking on the "
+#~ "link below.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        Configure your package\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>ຂໍສະແດງຄວາມຍິນດີ!</h2>\n"
+#~ "                ທ່ານສາມາດກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານໄດ້ໂດຍການກົດໃສ່ລິ້ງຂ້າງລຸ່ມນີ້.<br/>\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    ລິ້ງນີ້ຈະໝົດອາຍຸໃນວັນທີ <t t-out=\"ctx.get('validity_end')\"/"
+#~ ">.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"'/salary_package/simulation/offer/"
+#~ "%s%s' % "
+#~ "(                             ctx.get('offer_id'),                             "
+#~ "('?token=' + ctx.get('access_token')) if ctx.get('access_token') else "
+#~ "''                         )\" target=\"_blank\" t-attf-"
+#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; text-decoration: none; color: "
+#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px "
+#~ "8px 16px; border-radius: 5px;\">\n"
+#~ "                        ກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານ\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>Congratulations, <t t-"
+#~ "out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+#~ "                We are delighted to extend an offer for you to join <t t-"
+#~ "out=\"object.company_id.name\"/>.<br/>\n"
+#~ "                We were thoroughly impressed with your background and "
+#~ "can't wait to welcome you to the team.<br/><br/>\n"
+#~ "                The next step is to customize your remuneration "
+#~ "components, extra-legal benefits, and mobility choices through our "
+#~ "interactive portal:\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    The link will expire on <t t-"
+#~ "out=\"ctx.get('validity_end')\"/>.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-attf-href=\"/salary_package/simulation/offer/"
+#~ "{{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" "
+#~ "target=\"_blank\" t-attf-style=\"background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration: none; color: {{object.company_id.email_primary_color or "
+#~ "'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;\">Configure "
+#~ "your package</a>\n"
+#~ "                </div>\n"
+#~ "                What to expect next:\n"
+#~ "                <ul>\n"
+#~ "                    <li>Tailor your package preferences in the simulator</"
+#~ "li>\n"
+#~ "                    <li>Review your generated offer summary</li>\n"
+#~ "                    <li>Digitally sign your employment contract</li>\n"
+#~ "                </ul>\n"
+#~ "                If you have any questions regarding your offer or salary "
+#~ "package, don't hesitate to ask us.<br/><br/>\n"
+#~ "                Best regards,\n"
+#~ "            </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                <h2>ຂໍສະແດງຄວາມຍິນດີ, <t t-"
+#~ "out=\"object.applicant_id.partner_name\"/>!</h2>\n"
+#~ "                ພວກເຮົາມີຄວາມຍິນດີຫຼາຍທີ່ຈະຍື່ນຂໍ້ສະເໜີໃຫ້ທ່ານເຂົ້າຮ່ວມງານກັບ <t t-"
+#~ "out=\"object.company_id.name\"/>.<br/>\n"
+#~ "                ພວກເຮົາມີຄວາມປະທັບໃຈໃນປະຫວັດຄວາມເປັນມາຂອງທ່ານ ແລະ "
+#~ "ລໍຖ້າທີ່ຈະຕ້ອນຮັບທ່ານເຂົ້າສູ່ທີມງານຂອງພວກເຮົາ.<br/><br/>\n"
+#~ "                ຂັ້ນຕອນຕໍ່ໄປແມ່ນການປັບແຕ່ງອົງປະກອບຄ່າຕອບແທນ, ສະຫວັດດີການເພີ່ມເຕີມ ແລະ "
+#~ "ທາງເລືອກການເດີນທາງຂອງທ່ານຜ່ານປະຕູລະບົບອອນລາຍຂອງພວກເຮົາ:\n"
+#~ "                <t t-if=\"ctx.get('validity_end')\">\n"
+#~ "                    ລິ້ງນີ້ຈະໝົດອາຍຸໃນວັນທີ <t t-out=\"ctx.get('validity_end')\"/"
+#~ ">.\n"
+#~ "                </t>\n"
+#~ "                <div style=\"padding: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-attf-href=\"/salary_package/simulation/offer/"
+#~ "{{ctx.get('offer_id')}}?token={{ctx.get('access_token')}}\" "
+#~ "target=\"_blank\" t-attf-style=\"background-color: "
+#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; text-"
+#~ "decoration: none; color: {{object.company_id.email_primary_color or "
+#~ "'#FFFFFF'}}; padding: 8px 16px 8px 16px; border-radius: 5px;"
+#~ "\">ກຳນົດຄ່າຊຸດເງິນເດືອນຂອງທ່ານ</a>\n"
+#~ "                </div>\n"
+#~ "                ຂັ້ນຕອນຕໍ່ໄປມີດັ່ງນີ້:\n"
+#~ "                <ul>\n"
+#~ "                    <li>ປັບແຕ່ງຊຸດເງິນເດືອນຕາມທີ່ຕ້ອງການໃນລະບົບຈຳລອງ</li>\n"
+#~ "                    <li>ກວດກາບົດສະຫຼຸບຂໍ້ສະເໜີທີ່ສ້າງຂຶ້ນ</li>\n"
+#~ "                    <li>ເຊັນສັນຍາແຮງງານແບບດິຈິຕອນ</li>\n"
+#~ "                </ul>\n"
+#~ "                ຖ້າທ່ານມີຄຳຖາມໃດໆກ່ຽວກັບຂໍ້ສະເໜີ ຫຼື ຊຸດເງິນເດືອນ, "
+#~ "ທ່ານສາມາດສອບຖາມພວກເຮົາໄດ້ທັນທີ.<br/><br/>\n"
+#~ "                ດ້ວຍຄວາມນັບຖື,\n"
+#~ "            </div>\n"
+#~ "        "
+
+#~ msgid "Sum"
+#~ msgstr "ຜົນລວມ"

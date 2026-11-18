@@ -337,6 +337,51 @@ registry.category("web_tour.tours").add("test_shop_floor", {
     ],
 });
 
+registry.category("web_tour.tours").add("test_shop_floor_deselect_overflowed_workcenters", {
+    steps: () => [
+        // Force the work centers bar to overflow regardless of the test browser's window size.
+        {
+            trigger: ".o_mrp_display_onboarding_button_container button.btn-primary",
+            run() {
+                const style = document.createElement("style");
+                style.textContent = ".o_work_centers_container { max-width: 150px !important; }";
+                document.head.appendChild(style);
+            },
+        },
+        ...stepUtils.openWorkcentersSelector(),
+        ...Array.from({ length: 5 }, (_, index) =>
+            stepUtils.addWorkcenterToDisplay(`Overflow Regression ${index}`)
+        ).flat(),
+        ...stepUtils.confirmWorkcentersSelection(),
+        { trigger: ".o_work_centers_container .dropdown:not(.d-none) .o_work_center_dropdown_toggle" },
+        {
+            trigger: ".o_work_centers_container .o_work_center_dropdown_toggle",
+            run: "click",
+        },
+        {
+            trigger: ".o_work_centers_container .dropdown-menu.show .o_work_center_add",
+            run: "click",
+        },
+        // Deselect the 1st and 3rd work centers (non-adjacent), matching the pattern that
+        // forces Owl to move an already-relocated overflow button during the keyed diff.
+        ...stepUtils.removeWorkcenterFromDisplay("Overflow Regression 0"),
+        ...stepUtils.removeWorkcenterFromDisplay("Overflow Regression 2"),
+        ...stepUtils.confirmWorkcentersSelection(),
+        { trigger: '.o_work_centers_container:not(:has(.o_work_center_btn:contains("Overflow Regression 0")))' },
+        { trigger: '.o_work_centers_container:not(:has(.o_work_center_btn:contains("Overflow Regression 2")))' },
+        // Open the overflow dropdown so its hidden buttons become visible for the checks below.
+        {
+            trigger: ".o_work_centers_container .dropdown:not(.d-none) .o_work_center_dropdown_toggle",
+            run: "click",
+        },
+        ...Array.from({ length: 5 }, (_, index) => index)
+            .filter((index) => ![0, 2].includes(index))
+            .map((index) => ({
+                trigger: `.o_work_centers_container .o_work_center_btn:contains("Overflow Regression ${index}")`,
+            })),
+    ],
+});
+
 registry.category("web_tour.tours").add("test_shop_floor_disable_serial_create", {
     steps: () => [
         ...stepUtils.openWorkcentersSelector(),
@@ -1236,6 +1281,52 @@ registry.category("web_tour.tours").add("test_shop_floor_unsynced_bom", {
         {
             content: "Check that there are no open work orders",
             trigger: ".o_nocontent_help",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_prefilled_lot_consumption", {
+    steps: () => [
+        ...stepUtils.openWorkcentersSelector(),
+        ...stepUtils.addWorkcenterToDisplay("Lovecenter"),
+        ...stepUtils.confirmWorkcentersSelection(),
+        ...stepUtils.clickOnWorkcenterButton("Lovecenter"),
+        // Edit the Comp 1 prefilled line from 5 to 6.
+        { trigger: ".o_mrp_record_line_indented:contains('C1-L1')", run: "click" },
+        { trigger: ".o_tablet_popups input.o_input:value(5)", run: "edit 6" },
+        { trigger: ".o_tablet_popups button:contains('Apply')", run: "click" },
+        {
+            content: "Check that Comp 1 consumes 6 out of 5",
+            trigger: ".o_mrp_record_line:contains('Comp 1') .o_mrp_record_line_qty:contains('6 / 5')",
+        },
+        // Remove one of the two Comp 2 prefilled lines.
+        { trigger: ".o_mrp_record_line_indented:contains('C2-L1')", run: "click" },
+        { trigger: ".o_tablet_popups input.o_input:value(3)" },
+        { trigger: ".o_tablet_popups button:contains('Remove')", run: "click" },
+        {
+            content: "Check that Comp 2 consumes 2 out of 5",
+            trigger: ".o_mrp_record_line:contains('Comp 2') .o_mrp_record_line_qty:contains('2 / 5')",
+        },
+        // Apply one of the two Comp 3 prefilled lines unchanged.
+        { trigger: ".o_mrp_record_line_indented:contains('C3-L1')", run: "click" },
+        { trigger: ".o_tablet_popups input.o_input:value(3)" },
+        { trigger: ".o_tablet_popups button:contains('Apply')", run: "click" },
+        {
+            content: "Wait for Comp 3 to be marked as consumed",
+            trigger: ".o_line_label.text-decoration-line-through:contains('Comp 3')",
+        },
+        {
+            content: "Check that Comp 3 consumes 5 out of 5",
+            trigger: ".o_mrp_record_line:contains('Comp 3') .o_mrp_record_line_qty:text('5')",
+        },
+        {
+            content: "Mark the work order as done",
+            trigger: ".o_mrp_display_record:has(.card-header:contains('Consume')) button:contains('Mark as Done')",
+            run: "click",
+        },
+        {
+            content: "Check that the done work order left the workcenter",
+            trigger: ".o_mrp_display_records:not(:has(.card-header:contains('Consume')))",
         },
     ],
 });

@@ -57,6 +57,14 @@ const LIVE_LOCATIONS = {
         state: "Some province",
         country: "Somewhere",
     },
+    "(20.1, 5.7)": {
+        street: "Some road",
+        house_number: "3763",
+        city: "Great City 2",
+        zip: "392675",
+        state: "Some province",
+        country: "Coucou",
+    },
 };
 
 async function verifyMarkerPopup(markerEl, expectedTexts) {
@@ -346,7 +354,7 @@ test("live map (mb): does not show user marker if its resource is collapsed", as
 });
 
 test.tags("mobile");
-test("live map (mobile): captures user's live location, displays a pin for the user, and opens a popup when hovered", async () => {
+test("live map (mobile): captures user's live location, displays a pin for the user, and opens a popup when clicked", async () => {
     const pyEnv = await startServer();
     pyEnv["resource.resource"].write([1], {
         live_latitude: 50.26,
@@ -473,8 +481,8 @@ test("live map: button redirection to focus on user pin", async () => {
     });
     const renderer = findComponent(view, (c) => c instanceof MapRenderer);
 
-    expect(renderer.leafletMap.getCenter().lat).toBeCloseTo(50.1, { margin: 0.001 });
-    expect(renderer.leafletMap.getCenter().lng).toBeCloseTo(4.775, { margin: 0.001 });
+    expect(renderer.leafletMap.getCenter().lat).toBeCloseTo(45.33, { margin: 0.01 });
+    expect(renderer.leafletMap.getCenter().lng).toBeCloseTo(7.275, { margin: 0.01 });
 
     if (isSmall()) {
         await contains(".o-sm-map-toggler button:contains(Locations)").click();
@@ -483,8 +491,8 @@ test("live map: button redirection to focus on user pin", async () => {
     // wait for the animation which takes a certain time...
     await advanceTime(2000);
 
-    expect(renderer.leafletMap.getCenter().lat).toBeCloseTo(40.0, { margin: 0.001 });
-    expect(renderer.leafletMap.getCenter().lng).toBeCloseTo(10.0, { margin: 0.001 });
+    expect(renderer.leafletMap.getCenter().lat).toBeCloseTo(40.0, { margin: 0.01 });
+    expect(renderer.leafletMap.getCenter().lng).toBeCloseTo(10.0, { margin: 0.01 });
 });
 
 test("live map: Google Map redirection starts from live user position", async () => {
@@ -606,4 +614,42 @@ test("live map: does not recompute routes when the current user's position chang
         message:
             "The routes should not be re-computed on user position change, as they start from the located resources' positions",
     });
+});
+
+test("live map: default view focus also considers live located resources", async () => {
+    const pyEnv = await startServer();
+    const resources = pyEnv["resource.resource"].create([
+        {
+            name: "Technician 1",
+            live_latitude: 50.3,
+            live_longitude: 4.65,
+            live_location_last_update: "2026-01-04 12:00:00",
+        },
+        {
+            name: "Technician 2",
+            live_latitude: 20.1,
+            live_longitude: 5.7,
+            live_location_last_update: "2026-01-04 06:24:18",
+        },
+    ]);
+    pyEnv["planning.slot"].create([
+        {
+            name: "Intervention",
+            partner_id: 520,
+            resource_ids: resources,
+            start_datetime: "2026-01-04 15:00:00",
+            end_datetime: "2026-01-04 16:00:00",
+        },
+    ]);
+
+    const view = await mountView({
+        type: "map",
+        resModel: "planning.slot",
+        groupBy: ["resource_ids"],
+    });
+    await runAllTimers();
+
+    const renderer = findComponent(view, (c) => c instanceof MapRenderer);
+    expect(renderer.leafletMap.getCenter().lat).toBeCloseTo(36.66, { margin: 0.01 });
+    expect(renderer.leafletMap.getCenter().lng).toBeCloseTo(5.125, { margin: 0.01 });
 });

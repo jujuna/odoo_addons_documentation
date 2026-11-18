@@ -43,7 +43,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         template_vals.update({
             'xmlns': 'urn:StandardAuditFile-Taxation-Financial:NO',
-            'file_version': '1.30',
+            'file_version': '1.40',
             'accounting_basis': 'A',
         })
         return template_vals

@@ -1689,6 +1689,7 @@ class TestCFDIInvoice(TestMxEdiCommon):
                     'country_id': mx.id,
                     'property_account_position_id': False,
                     'zip': '26670',
+                    'l10n_mx_edi_fiscal_regime': '603',
                 },
             },
             {
@@ -3987,3 +3988,28 @@ class TestCFDIInvoice(TestMxEdiCommon):
         self.assertRecordValues(payment, [{
             'l10n_mx_edi_payment_method_id': self.env.ref('l10n_mx_edi.payment_method_tarjeta_de_credito').id,
         }])
+
+    def test_cfdi_total_amount_with_negative_lines(self):
+        with self.mx_external_setup(self.frozen_today):
+            invoice = self._create_invoice_mx(
+                invoice_line_ids=[
+                    Command.create({
+                        'product_id': self.product.id,
+                        'price_unit': 0,
+                        'tax_ids': [Command.set(self.tax_16.ids)],
+                    }),
+                    Command.create({
+                        'product_id': self.product.id,
+                        'price_unit': 100,
+                        'tax_ids': [Command.set(self.tax_16.ids)],
+                    }),
+                    Command.create({
+                        'product_id': self.product.id,
+                        'price_unit': -5,
+                        'tax_ids': [Command.set(self.tax_16.ids)],
+                    })
+                ]
+            )
+            with self.with_mocked_pac_sign_success():
+                invoice._l10n_mx_edi_cfdi_invoice_try_send()
+            self._assert_invoice_cfdi(invoice, 'test_cfdi_right_taxes_total_inv')

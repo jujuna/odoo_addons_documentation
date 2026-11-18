@@ -673,6 +673,29 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         ]):
             invoice.action_post()
 
+    def test_13_foreign_customer_domestic_pickup(self):
+        """ A foreign customer with no CPF/CNPJ who buys in person and picks up the goods at the
+        establishment never has the goods leave the country, so this must be treated as a domestic
+        sale (idDest 1, regular ICMS) instead of an export (idDest 3), even though the customer is
+        still reported on the NF-e as a foreigner (idEstrangeiro / UF "EX" / cMun 9999999). """
+        invoice = self._create_invoice(
+            partner_id=self.foreign_partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[self._prepare_invoice_line(product_id=self.product)],
+        )
+        # The customer picks up the goods at the establishment in Curitiba/PR; they never leave Brazil.
+        invoice.partner_shipping_id = self.env.company.partner_id
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+
+        self.assertEqual(
+            payload['header']['goods'], {'idDest': 1},
+            "A foreign customer picking up goods domestically should be sold as a domestic sale (idDest 1), not an export.",
+        )
+        entity_address = payload['header']['locations']['entity']['address']
+        self.assertEqual(entity_address['state'], 'EX', "The customer should still be reported as a foreigner on the NF-e.")
+        self.assertEqual(entity_address['cityCode'], '9999999')
+
     def test_14_service_invoice_with_rendered_address(self):
         rio_city = self.env.ref("l10n_br.city_br_002")
         ncm_code_id = self.env.ref('l10n_br_avatax.service_1_07')

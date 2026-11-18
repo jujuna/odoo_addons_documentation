@@ -18,9 +18,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 02:01+0000\n"
+"PO-Revision-Date: 2026-11-10 11:35+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "documents_account/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -38,6 +38,11 @@ msgid ""
 "button on Accounting's reports allowing to save the report into the\n"
 "Documents app in the desired format(s).\n"
 msgstr ""
+"\n"
+"Siltamoduuli kirjanpidon ja asiakirjojen välillä. Mahdollistaa\n"
+"laskujen luomisen Asiakirjat-moduulista sekä lisää\n"
+"painikkeen kirjanpitoraportteihin, jonka avulla raportin voi tallentaa\n"
+"Asiakirjat-sovellukseen halutussa muodossa.\n"
 
 #. module: documents_account
 #. odoo-python
@@ -49,19 +54,19 @@ msgstr "\"Uusi päiväkirjamerkintä\" voidaan liittää vain asiakirjaan."
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "%(model_name)s"
-msgstr ""
+msgstr "%(model_name)s"
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "%(model_name)s (%(journal_name)s)"
-msgstr ""
+msgstr "%(model_name)s (%(journal_name)s)"
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "%(operation)s tag %(tag)s"
-msgstr ""
+msgstr "%(operation)s tunniste %(tag)s"
 
 #. module: documents_account
 #. odoo-javascript
@@ -90,7 +95,7 @@ msgstr "Tätä päiväkirjaa varten on jo olemassa asetus"
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_document__account_setting_ids
 msgid "Account Setting"
-msgstr ""
+msgstr "Tilin asetukset"
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
@@ -118,7 +123,7 @@ msgstr "Toiminto"
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_add_tag_ids
 #: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_add_tag_ids
 msgid "Add Tags"
-msgstr ""
+msgstr "Lisää tunnisteita"
 
 #. module: documents_account
 #. odoo-javascript
@@ -276,7 +281,7 @@ msgstr "Hyvityslasku"
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
 msgid "Customer Credit Note"
-msgstr ""
+msgstr "Asiakkaan hyvityslasku"
 
 #. module: documents_account
 #. odoo-python
@@ -321,7 +326,7 @@ msgstr "Dokumentti"
 #. module: documents_account
 #: model:ir.module.module,shortdesc:base.module_documents_account
 msgid "Documents - Accounting"
-msgstr ""
+msgstr "Asiakirjat - Kirjanpito"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_account_create_model
@@ -432,28 +437,28 @@ msgstr "ID"
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement
 msgid "Import Statement"
-msgstr ""
+msgstr "Tuo tiliote"
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 msgid "In Journal"
-msgstr ""
+msgstr "Päiväkirjassa"
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/account_move.py:0
 msgid "Invalid attachment ids: IDs must be integers."
-msgstr ""
+msgstr "Virheelliset liitetunnisteet: Tunnisteiden on oltava kokonaislukuja."
 
 #. module: documents_account
 #: model:documents.document,name:documents_account.documents_vendor_bill_inv_007
 msgid "Invoice-INV_2018_0007.pdf"
-msgstr ""
+msgstr "Invoice-INV_2018_0007.pdf"
 
 #. module: documents_account
 #: model:ir.module.module,summary:base.module_documents_account
 msgid "Invoices from Documents"
-msgstr ""
+msgstr "Laskut asiakirjoista"
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_account_journal
@@ -484,7 +489,7 @@ msgstr "Synkronoitavat päiväkirjat"
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 msgid "Keep in existing folder"
-msgstr ""
+msgstr "Pidä nykyisessä kansiossa"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__write_uid
@@ -538,7 +543,7 @@ msgstr "Liitetyt linkit"
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
 msgid "Misc Entry"
-msgstr ""
+msgstr "Muut kirjaukset"
 
 #. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_entry
@@ -549,13 +554,13 @@ msgstr "Sekalaiset toiminnot"
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "Move to %s"
-msgstr ""
+msgstr "Siirrä kohteeseen %s"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_folder_id
 #: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_folder_id
 msgid "Move to Folder"
-msgstr ""
+msgstr "Siirrä kansioon"
 
 #. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__state__documents_account_record_create
@@ -565,19 +570,19 @@ msgstr "Uusi päiväkirjamerkintä"
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 msgid "None"
-msgstr ""
+msgstr "Ei mitään"
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "Only one folder move is allowed per action."
-msgstr ""
+msgstr "Vain yksi kansion siirto on sallittu toimintoa kohden."
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "Only tag/folder updates are allowed as child actions."
-msgstr ""
+msgstr "Vain tunniste-/kansiopäivitykset ovat sallittuja alitoimintoina."
 
 #. module: documents_account
 #. odoo-javascript
@@ -594,13 +599,13 @@ msgstr "Ostokuitti"
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_remove_tag_ids
 #: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_remove_tag_ids
 msgid "Remove Tags"
-msgstr ""
+msgstr "Poista tunnisteet"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_account_bank_statement_line__suspense_statement_line_id
 #: model:ir.model.fields,field_description:documents_account.field_account_move__suspense_statement_line_id
 msgid "Request document from a bank transaction"
-msgstr ""
+msgstr "Pyydä asiakirjaa pankkitapahtumasta"
 
 #. module: documents_account
 #. odoo-javascript
@@ -703,7 +708,7 @@ msgstr "Toimittajan kuitit"
 #: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_refund
 msgid "Vendor Refund"
-msgstr ""
+msgstr "Tavarantoimittajan takaisinmaksu"
 
 #. module: documents_account
 #. odoo-python
@@ -733,7 +738,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_account/models/documents_document.py:0
 msgid "You can not create a journal entry from a folder."
-msgstr ""
+msgstr "Et voi luoda päiväkirjan kirjausta kansiosta."
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_res_config_settings__account_folder_id
@@ -743,7 +748,7 @@ msgstr "tilin oletuskansio"
 #. module: documents_account
 #: model:documents.document,name:documents_account.documents_vendor_bill_extract_ready_mat_document
 msgid "ready_mat.xml"
-msgstr ""
+msgstr "ready_mat.xml"
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_account_move_form_inherit_documents_account

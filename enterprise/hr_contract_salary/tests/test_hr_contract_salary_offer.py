@@ -4,6 +4,7 @@ from odoo import Command, fields
 from odoo.addons.hr_contract_salary.utils.hr_version import HR_VERSION_CTX_KEY
 from odoo.tests import TransactionCase, tagged, Form, new_test_user
 from datetime import date
+from freezegun import freeze_time
 
 
 @tagged('-at_install', 'post_install', 'salary')
@@ -268,3 +269,40 @@ class TestHrContractSalaryOffer(TransactionCase):
         self.assertEqual(offer_form.employee_id, self.employee)
         self.assertEqual(offer_form.contract_template_id, contract_template)
         self.assertEqual(offer_form.display_name, f"Offer for {self.employee.name}")
+
+    def test_cron_remove_simulation_offers(self):
+        """Only the simulation offers created more than one month ago are deleted."""
+        old_offer, recent_offer, offer = self.env['hr.contract.salary.offer'].create([{
+            'employee_id': self.employee.id,
+            'is_simulation_offer': is_simulation_offer,
+        } for is_simulation_offer in (True, True, False)])
+        self.env.cr.execute("""
+            UPDATE hr_contract_salary_offer
+               SET create_date = CASE WHEN id = %s THEN '2026-06-01'::timestamp ELSE '2026-03-01'::timestamp END
+             WHERE id IN %s
+        """, [recent_offer.id, (old_offer + recent_offer + offer)._ids])
+        (old_offer + recent_offer + offer).invalidate_recordset(['create_date', 'offer_create_date'])
+        with freeze_time('2026-06-15'):
+            self.env['hr.contract.salary.offer'].action_cron_remove_simulation_offers()
+        self.assertFalse(old_offer.exists())
+        self.assertTrue(recent_offer.exists())
+        self.assertTrue(offer.exists())
+
+    def test_employee_offer_values_structure_type(self):
+        """The default structure type of the employee offer is given by id in the context."""
+        action = self.employee.action_generate_offer()
+        self.assertEqual(action['context']['default_structure_type_id'], self.struct_type.id)
+
+    def test_half_sign_state_required_signatories_update(self):
+        """The half sign state requirement follows the signatories of the offer."""
+        offer = self.env['hr.contract.salary.offer'].create({
+            'employee_id': self.employee.id,
+        })
+        self.assertFalse(offer.sign_template_signatories_ids)
+        self.assertTrue(offer.is_half_sign_state_required)
+        offer.sign_template_signatories_ids = [Command.create({
+            'sign_role_id': self.env.ref('hr_sign.sign_item_role_employee_signatory').id,
+            'signatory': 'employee',
+            'order': 1,
+        })]
+        self.assertFalse(offer.is_half_sign_state_required)

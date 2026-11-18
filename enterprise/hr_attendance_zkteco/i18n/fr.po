@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
-"PO-Revision-Date: 2026-09-18 02:12+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-11-13 17:52+0000\n"
+"PO-Revision-Date: 2026-11-10 08:13+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "hr_attendance_zkteco/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "%(orphan_count)d non matched check-out transactions found."
-msgstr ""
+msgstr "%(orphan_count)d transactions de départ sans correspondance trouvées."
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__message_needaction
@@ -70,28 +70,24 @@ msgstr "Présence"
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__attendance_unlinked
 msgid "Attendance Unlinked"
-msgstr ""
+msgstr "Présence dissociée"
 
 #. module: hr_attendance_zkteco
 #: model:ir.module.module,shortdesc:base.module_hr_attendance_zkteco
 msgid "Attendances ZKTeco BioTime"
-msgstr ""
+msgstr "Présences ZKTeco BioTime"
 
 #. module: hr_attendance_zkteco
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
+#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
 msgid "BioTime"
 msgstr "BioTime"
 
 #. module: hr_attendance_zkteco
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__in_mode__biotime
-#: model:ir.model.fields.selection,name:hr_attendance_zkteco.selection__hr_attendance__out_mode__biotime
-msgid "Biotime"
-msgstr "Biotime"
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
-msgid "Biotime ID"
-msgstr "ID Biotime"
+msgid "BioTime ID"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
@@ -237,11 +233,9 @@ msgstr "L'employé %(employee_name)s a un départ à %(check_out)s sans arrivée
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid ""
-"Employee is not linked, make sure to set the Zkteco ID on the related "
-"employees."
+"Employee is not linked, make sure to set the ZKTeco Employee ID on the "
+"related employees."
 msgstr ""
-"L'employé n'est pas lié, assurez-vous de définir l'ID ZKTeco sur les "
-"employés concernés."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -254,17 +248,18 @@ msgstr "Échec de la récupération des terminaux depuis le serveur BioTime : %s
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "Failed to fetch transactions from BioTime server: %s"
 msgstr ""
+"Échec de la récupération des transactions depuis le serveur BioTime : %s"
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_list
 msgid "Fetch"
-msgstr ""
+msgstr "Récupérer"
 
 #. module: hr_attendance_zkteco
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "Fetch Complete"
-msgstr ""
+msgstr "Récupération terminée"
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_terminal_view_list
@@ -291,7 +286,7 @@ msgstr "URL complète du serveur ZKTeco bioTime"
 #: code:addons/hr_attendance_zkteco/models/zkteco_terminal.py:0
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "Go to Settings"
-msgstr ""
+msgstr "Accéder aux paramètres"
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_search
@@ -338,7 +333,7 @@ msgstr "Si coché, certains messages ont une erreur de livraison."
 
 #. module: hr_attendance_zkteco
 #: model:ir.module.module,summary:base.module_hr_attendance_zkteco
-msgid "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API"
+msgid "Integrate ZKTeco BioPro with attendances app via BioTime 8.5 & 9.0 API"
 msgstr ""
 
 #. module: hr_attendance_zkteco
@@ -371,17 +366,17 @@ msgstr "Emplacement"
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__manual_punch_type
 msgid "Manual Punch Type"
-msgstr ""
+msgstr "Type de pointage manuel"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_zkteco_transactions__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Icône Material Symbols, par ex. checklist"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model,name:hr_attendance_zkteco.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__message_has_error
@@ -509,6 +504,8 @@ msgid ""
 "Only attendance managers can fetch transactions from the ZKTeco BioTime "
 "server."
 msgstr ""
+"Seuls les gestionnaires des présences peuvent récupérer les transactions "
+"depuis le serveur ZKTeco BioTime."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -603,6 +600,8 @@ msgid ""
 "Re-fetched %(refetched)d transaction(s). %(failed)d could not be re-fetched "
 "from the BioTime server."
 msgstr ""
+"%(refetched)d transaction(s) récupérée(s) à nouveau. %(failed)d n’ont pas pu "
+"être récupérées à nouveau depuis le serveur BioTime."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -611,12 +610,15 @@ msgid ""
 "Re-fetched %(refetched)d transaction(s). %(failed)d could not be re-fetched; "
 "the BioTime server could not be reached for: %(companies)s."
 msgstr ""
+"%(refetched)d transaction(s) récupérée(s) à nouveau. %(failed)d n’ont pas pu "
+"être récupérées à nouveau ; le serveur BioTime était inaccessible pour : %"
+"(companies)s."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "Re-fetched %d transaction(s) from the BioTime server."
-msgstr ""
+msgstr "%d transaction(s) récupérée(s) à nouveau depuis le serveur BioTime."
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__activity_user_id
@@ -691,26 +693,28 @@ msgstr "Tester la connexion"
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_attendance__terminal_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
-msgid "The Biotime terminal in which the record is created from"
-msgstr "Le terminal Biotime à partir duquel l'enregistrement est créé"
+msgid "The BioTime terminal in which the record is created from"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_hr_work_location__zkteco_biotime_id
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_work_location_view_form_inherit
-msgid "The ID of the Location that is defined in the Biotime server"
-msgstr "L'ID de l'emplacement défini dans le serveur Biotime"
+msgid "The ID of the Location that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,help:hr_attendance_zkteco.field_zkteco_terminal__terminal_sn
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_terminal_view_form
-msgid "The ID of the terminal that is defined in the Biotime server"
-msgstr "L'ID du terminal défini dans le serveur Biotime"
+msgid "The ID of the terminal that is defined in the BioTime server"
+msgstr ""
 
 #. module: hr_attendance_zkteco
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "This transaction uses an unsupported type. Please select a valid one."
 msgstr ""
+"Cette transaction utilise un type non pris en charge. Veuillez sélectionner "
+"un type valide."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -719,6 +723,8 @@ msgid ""
 "This transaction was previously linked to an attendance record that no "
 "longer exists."
 msgstr ""
+"Cette transaction était auparavant liée à un enregistrement de présence qui "
+"n'existe plus."
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.res_config_settings_view_form
@@ -743,7 +749,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "Transactions have been fetched from the BioTime server."
-msgstr ""
+msgstr "Les transactions ont été récupérées depuis le serveur BioTime."
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__punch_type
@@ -760,7 +766,7 @@ msgstr "Type d'activité d'exception enregistrée."
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__unmatched_checkout
 msgid "Unmatched Checkout"
-msgstr ""
+msgstr "Départ sans correspondance"
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_search
@@ -784,6 +790,8 @@ msgid ""
 "You cannot delete a processed transaction that is linked to an attendance "
 "record. Delete the attendance record first."
 msgstr ""
+"Vous ne pouvez pas supprimer une transaction traitée liée à un "
+"enregistrement de présence. Supprimez d'abord l'enregistrement de présence."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -792,6 +800,8 @@ msgid ""
 "You cannot re-fetch a transaction that is linked to an attendance record. "
 "Delete the attendance record first."
 msgstr ""
+"Vous ne pouvez pas récupérer à nouveau une transaction liée à un "
+"enregistrement de présence. Supprimez d'abord l'enregistrement de présence."
 
 #. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.hr_attendance_view_form
@@ -830,7 +840,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_attendance_zkteco/models/zkteco_transactions.py:0
 msgid "ZKTeco BioTime is not configured for %s."
-msgstr ""
+msgstr "ZKTeco BioTime n'est pas configuré pour %s."
 
 #. module: hr_attendance_zkteco
 #. odoo-python
@@ -839,6 +849,13 @@ msgstr ""
 msgid ""
 "ZKTeco BioTime is not set up for %s yet. Configure the BioTime credentials "
 "in Settings to start syncing."
+msgstr ""
+"ZKTeco BioTime n'est pas encore configuré pour %s. Configurez les "
+"identifiants BioTime dans les paramètres pour démarrer la synchronisation."
+
+#. module: hr_attendance_zkteco
+#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
+msgid "ZKTeco BioTime: Fetch Transactions"
 msgstr ""
 
 #. module: hr_attendance_zkteco
@@ -872,6 +889,12 @@ msgid "ZKTeco Terminal"
 msgstr "Terminal ZKTeco"
 
 #. module: hr_attendance_zkteco
+#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
+#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
+msgid "ZKTeco Terminals"
+msgstr ""
+
+#. module: hr_attendance_zkteco
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_form
 msgid "ZKTeco Transaction"
 msgstr "Transaction ZKTeco"
@@ -884,11 +907,6 @@ msgstr "Transaction ZKTeco"
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.zkteco_transactions_view_search
 msgid "ZKTeco Transactions"
 msgstr "Transactions ZKTeco"
-
-#. module: hr_attendance_zkteco
-#: model:ir.actions.server,name:hr_attendance_zkteco.ir_cron_sync_attendance_ir_actions_server
-msgid "ZkTeco Biotime: Fetch Transactions"
-msgstr "ZkTeco Biotime : récupérer les transactions"
 
 #. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_hr_attendance__zkteco_checkin_transaction_id
@@ -941,12 +959,6 @@ msgid "Zkteco Server Url"
 msgstr "URL du serveur Zkteco"
 
 #. module: hr_attendance_zkteco
-#: model:ir.actions.act_window,name:hr_attendance_zkteco.zkteco_terminal_action
-#: model:ir.ui.menu,name:hr_attendance_zkteco.zkteco_terminal_menu
-msgid "Zkteco Terminals"
-msgstr ""
-
-#. module: hr_attendance_zkteco
 #: model:ir.model.fields,field_description:hr_attendance_zkteco.field_zkteco_transactions__zkteco_transaction_id
 msgid "Zkteco Transaction"
 msgstr "Transaction Zkteco"
@@ -966,3 +978,37 @@ msgstr "admin@example.com"
 #: model_terms:ir.ui.view,arch_db:hr_attendance_zkteco.res_config_settings_view_form
 msgid "https://biotime.example.com"
 msgstr "https://biotime.example.com"
+
+#~ msgid "Biotime"
+#~ msgstr "Biotime"
+
+#~ msgid "Biotime ID"
+#~ msgstr "ID Biotime"
+
+#~ msgid ""
+#~ "Employee is not linked, make sure to set the Zkteco ID on the related "
+#~ "employees."
+#~ msgstr ""
+#~ "L'employé n'est pas lié, assurez-vous de définir l'ID ZKTeco sur les "
+#~ "employés concernés."
+
+#~ msgid ""
+#~ "Integrate Zkteco BioPro with attendances app via BioTime 8.5 & 9.0 API"
+#~ msgstr ""
+#~ "Intégrer Zkteco BioPro à l'application Présences via l'API BioTime 8.5 et "
+#~ "9.0"
+
+#~ msgid "The Biotime terminal in which the record is created from"
+#~ msgstr "Le terminal Biotime à partir duquel l'enregistrement est créé"
+
+#~ msgid "The ID of the Location that is defined in the Biotime server"
+#~ msgstr "L'ID de l'emplacement défini dans le serveur Biotime"
+
+#~ msgid "The ID of the terminal that is defined in the Biotime server"
+#~ msgstr "L'ID du terminal défini dans le serveur Biotime"
+
+#~ msgid "ZkTeco Biotime: Fetch Transactions"
+#~ msgstr "ZkTeco Biotime : récupérer les transactions"
+
+#~ msgid "Zkteco Terminals"
+#~ msgstr "Terminaux Zkteco"

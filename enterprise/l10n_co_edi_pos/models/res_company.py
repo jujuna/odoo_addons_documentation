@@ -10,7 +10,10 @@ class ResCompany(models.Model):
     def _load_pos_data_fields(self, config_id):
         return super()._load_pos_data_fields(config_id) + ['l10n_co_edi_pos_dian_enabled']
 
-    @api.depends('account_fiscal_country_id.code')
+    @api.depends('account_fiscal_country_id.code', 'l10n_co_edi_certificate_ids')
     def _compute_l10n_co_edi_pos_dian_enabled(self):
         for company in self:
-            company.l10n_co_edi_pos_dian_enabled = company.account_fiscal_country_id.code == 'CO'
+            company.l10n_co_edi_pos_dian_enabled = (
+                company.account_fiscal_country_id.code == 'CO'
+                and bool(company.sudo().l10n_co_edi_certificate_ids)
+            )

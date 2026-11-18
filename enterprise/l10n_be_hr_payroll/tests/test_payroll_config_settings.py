@@ -1,12 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import io
+import zipfile
 from datetime import date
+from unittest.mock import MagicMock, patch
 
 from freezegun import freeze_time
 from psycopg2 import IntegrityError
 
 from odoo.exceptions import ValidationError
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 from odoo.tools import mute_logger
 
 from .common import TestBelgiumCommon
@@ -98,6 +101,17 @@ class TestL10nBePayrollConfigSettings(TestBelgiumCommon):
             self.category_00010.allowed_worker_code_ids,
         )
 
+    def test_employer_category_dmfa_codes(self):
+        """ Each shipped employer category has its own DmfA code (e.g. 229 for the wood trade, 230 for the
+            petroleum industry). """
+        categories = self.env['l10n.be.employer.category'].browse(self.env['ir.model.data'].search([
+            ('module', '=', 'l10n_be_hr_payroll'),
+            ('model', '=', 'l10n.be.employer.category'),
+        ]).mapped('res_id'))
+        dmfa_codes = categories.mapped('dmfa_code')
+        self.assertEqual(len(dmfa_codes), len(set(dmfa_codes)))
+        self.assertEqual(self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00229').dmfa_code, '229')
+
     def test_company_size_from_employees_when_configuring(self):
         """The configuration exists before the employees: opening the form defaults the size."""
         self.assertFalse(self.config.onss_importance_code)
@@ -163,6 +177,87 @@ class TestL10nBePayrollConfigSettings(TestBelgiumCommon):
         self.env.flush_all()
         triggers_after = self.env['ir.cron.trigger'].search_count([('cron_id', '=', cron.id)])
         self.assertGreater(triggers_after, triggers_before)
+
+    def test_onss_rates_cron_without_employer_category(self):
+        """The daily ONSS rates cron does nothing (and doesn't fail) while no employer category is set."""
+        self.env['payroll.config.settings'].sudo().with_context(active_test=False).search([]).l10n_be_employer_category_id = False
+        response = MagicMock(content=b'PK not a real zip')
+        with patch('odoo.addons.l10n_be_hr_payroll.wizard.l10n_be_onss_rates_import.requests.get', return_value=response) as get:
+            self.env['l10n.be.onss.rates.import.wizard']._cron_fetch_onss_rates()
+        get.assert_not_called()
+
+    def test_onss_rates_import_unpublished_quarter(self):
+        """An unpublished quarter is redirected by the ONSS to an HTML error page: nothing is imported."""
+        wizard = self.env['l10n.be.onss.rates.import.wizard'].create({'year': 2026, 'quarter': '4'})
+        response = MagicMock(status_code=200, content=b'<html>Page not found</html>')
+        with patch('odoo.addons.l10n_be_hr_payroll.wizard.l10n_be_onss_rates_import.requests.get', return_value=response), \
+                self.assertLogs('odoo.addons.l10n_be_hr_payroll.wizard.l10n_be_onss_rates_import', 'WARNING') as logs:
+            action = wizard.action_import_from_website()
+        self.assertIn('No ONSS rates ZIP available', logs.output[0])
+        self.assertFalse(wizard.onss_rates_file_ids)
+        self.assertEqual(action['params']['type'], 'warning')
+
+    def test_onss_rates_import_worker_codes_of_the_last_quarter(self):
+        """The worker codes allowed for an employer category are the ones of the most recent quarter imported."""
+        def combination_zip(year, quarter, worker_codes):
+            combinations = ''.join(
+                '<WorkerAndContributionComb><EmployerClass>000</EmployerClass>'
+                f'<WorkerCode>{code}</WorkerCode><ContributionWorkerCode>{code}</ContributionWorkerCode>'
+                '<OwednessCode>1</OwednessCode></WorkerAndContributionComb>'
+                for code in worker_codes)
+            content = io.BytesIO()
+            with zipfile.ZipFile(content, 'w', compression=zipfile.ZIP_DEFLATED) as zip_file:
+                zip_file.writestr(f'NOSSWorkerAndContributionComb_{year}_{quarter}.xml', f'<Root>{combinations}</Root>')
+            return content.getvalue()
+
+        category_000 = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00000')
+        self.env.company.current_payroll_config_id.l10n_be_employer_category_id = category_000
+        wizard = self.env['l10n.be.onss.rates.import.wizard'].create({})
+        # downloaded from the oldest quarter to the most recent one
+        for year, quarter, worker_codes in ((2025, 1, ['015']), (2026, 3, ['015', '495'])):
+            self.env['ir.attachment'].create({
+                'name': f'dmfa_rate_{year}_{quarter}.zip',
+                'res_model': wizard._name,
+                'res_id': wizard.id,
+                'raw': combination_zip(year, quarter, worker_codes),
+            })
+        wizard.action_import_files()
+        self.assertEqual(sorted(category_000.allowed_worker_code_ids.mapped('dmfa_code')), ['015', '495'])
+
+    def test_onss_rates_import_optional_and_invalid_content(self):
+        """The salary moderation rate is optional in the ONSS rates, and an invalid file is skipped."""
+        content = io.BytesIO()
+        with zipfile.ZipFile(content, 'w', compression=zipfile.ZIP_DEFLATED) as zip_file:
+            zip_file.writestr('NOSSContributionRate_2026_3.xml', (
+                '<Root><ContributionRate><Status>NEW</Status><EmployerClass>000</EmployerClass>'
+                '<WorkerCode>495</WorkerCode><ContributionType>0</ContributionType><PersonalRate>13.07</PersonalRate>'
+                '<EmployerRate>24.92</EmployerRate><TotalRate>37.99</TotalRate></ContributionRate></Root>'))
+            zip_file.writestr('NOSSWorkerAndContributionComb_2026_3.xml', '<Root><Unclosed></Root>')
+        self.env.company.current_payroll_config_id.l10n_be_employer_category_id = \
+            self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00000')
+        wizard = self.env['l10n.be.onss.rates.import.wizard'].create({})
+        self.env['ir.attachment'].create({
+            'name': 'dmfa_rate_2026_3.zip',
+            'res_model': wizard._name,
+            'res_id': wizard.id,
+            'raw': content.getvalue(),
+        })
+        with self.assertLogs('odoo.addons.l10n_be_hr_payroll.wizard.l10n_be_onss_rates_import', 'WARNING') as logs:
+            wizard.action_import_files()
+        self.assertEqual(len(logs.output), 1)
+        self.assertIn('Failed to parse the file NOSSWorkerAndContributionComb_2026_3.xml', logs.output[0])
+        rates = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_be_onss_rates_000_495_0', date(2026, 7, 1))
+        self.assertEqual(rates['salary_moderation_rate'], 0.0)
+        self.assertEqual(rates['total_rate'], 37.99)
+
+    @freeze_time('2026-05-15')
+    def test_onss_rates_fetch_each_quarter_once(self):
+        """Each quarter since the given one is downloaded once."""
+        Wizard = self.env.registry['l10n.be.onss.rates.import.wizard']
+        with patch.object(Wizard, '_download_file', autospec=True) as download, \
+                patch.object(Wizard, 'action_import_files', autospec=True):
+            self.env['l10n.be.onss.rates.import.wizard']._fetch_onss_rates_since(2026, 1)
+        self.assertEqual([call.args[1:] for call in download.call_args_list], [(2026, 1), (2026, 2)])
 
     def test_subcompany_inherits_company_level_fields(self):
         """Company payroll fields are inherited by a subcompany that hasn't set its own."""
@@ -283,3 +378,36 @@ class TestL10nBePayrollConfigSettings(TestBelgiumCommon):
         self.assertEqual(new_branch_config.l10n_be_revenue_code, 'RC999')
         self.assertEqual(new_branch_config.employee_accident_insurance_name, 'Branch Custom Insurance')
         self.assertEqual(new_branch_config.employee_accident_insurance_number, 'P-001')
+
+    def test_branch_form_saves_with_empty_parent_fields(self):
+        """A branch saves its configuration even when the fields copied from the parent are empty."""
+        branch = self.env['res.company'].create({
+            'name': 'BE Branch - Empty Parent Fields',
+            'country_id': self.env.ref('base.be').id,
+            'parent_id': self.be_company.id,
+        })
+        self.env['hr.employee'].with_company(branch).create({
+            'name': 'BE Branch Employee',
+            'company_id': branch.id,
+        })
+        branch_config = branch.current_payroll_config_id
+        # Clear the sector and the closure fund type too, since they have a default value.
+        branch_config.l10n_be_sector = False
+        branch_config.l10n_be_ffe_employer_type = False
+        self.assertTrue(branch.l10n_be_has_employees)
+
+        joint_committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        with Form(branch_config) as config_form:
+            config_form.l10n_be_employer_category_id = self.category_00010
+            config_form.l10n_be_main_joint_committee = joint_committee
+        self.assertEqual(branch_config.l10n_be_main_joint_committee, joint_committee)
+        self.assertFalse(branch_config.l10n_be_sector)
+
+    def test_parent_form_requires_sector(self):
+        """The parent company still has to fill in the sector of its own configuration."""
+        config_form = Form(self.config)
+        config_form.l10n_be_company_number = '0477472701'
+        config_form.l10n_be_main_joint_committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        config_form.l10n_be_sector = False
+        with self.assertRaisesRegex(AssertionError, 'l10n_be_sector'):
+            config_form.save()

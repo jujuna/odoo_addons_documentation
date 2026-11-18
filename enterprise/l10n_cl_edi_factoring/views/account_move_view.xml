@@ -35,7 +35,7 @@
             <field name="inherit_id" ref="l10n_cl_edi.view_invoice_form"/>
             <field name="arch" type="xml">
                 <button name="l10n_cl_verify_dte_status" position="after">
-                    <button name="action_l10n_cl_create_aec" type="object" invisible="l10n_latam_document_type_id_code not in ['33', '34', '46', '43'] or l10n_cl_dte_status != 'accepted' or payment_state == 'paid'"
+                    <button name="action_l10n_cl_create_aec" type="object" invisible="l10n_latam_document_type_id_code not in ['33', '34', '46', '43'] or l10n_cl_dte_status not in ['accepted', 'objected'] or payment_state == 'paid'"
                             string="⇒ Create AEC" class="oe_inline oe_link" groups="base.group_user"/>
                 </button>
                 <xpath expr="//header" position="after">

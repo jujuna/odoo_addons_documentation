@@ -122,6 +122,9 @@ class ResPartner(models.Model):
 
                     # We need to sync the data from the API with the records in database.
                     aliases = {result.get('Name') for result in query_result}
+                    # On the test environment, only keep the default alias as the others are never used.
+                    if self.env.company.l10n_tr_nilvera_use_test_env and 'urn:mail:defaultpk@nilvera.com' in aliases:
+                        aliases = {'urn:mail:defaultpk@nilvera.com'}
                     persisted_aliases = self.l10n_tr_nilvera_customer_alias_ids
                     # Find aliases to add (in query result but not in database).
                     aliases_to_add = aliases - set(persisted_aliases.mapped('name'))

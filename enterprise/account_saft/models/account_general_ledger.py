@@ -148,6 +148,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 account_move.invoice_date                   AS move_invoice_date,
                 account_move.invoice_origin                 AS move_invoice_origin,
                 account_move.statement_line_id              AS move_statement_line_id,
+                account_move.origin_payment_id              AS move_payment_id,
                 tax.id                                      AS tax_id,
                 %(tax_name)s                                AS tax_name,
                 tax.amount                                  AS tax_amount,
@@ -156,6 +157,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 journal.code                                AS journal_code,
                 %(journal_name)s                            AS journal_name,
                 journal.type                                AS journal_type,
+                journal.default_account_id                  AS journal_default_account_id,
                 account.account_type                        AS account_type,
                 %(account_code)s                            AS account_code,
                 currency.name                               AS currency_code,
@@ -216,6 +218,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                     'partner_id': line_vals['partner_id'],
                     'journal_type': line_vals['journal_type'],
                     'statement_line_id': line_vals['move_statement_line_id'],
+                    'payment_id': line_vals['move_payment_id'],
+                    'journal_default_account_id': line_vals['journal_default_account_id'],
                     'line_vals_list': [],
                 }
                 move_vals_map.setdefault(line_vals['move_id'], move_vals)

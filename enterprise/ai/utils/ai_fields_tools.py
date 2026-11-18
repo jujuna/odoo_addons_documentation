@@ -35,6 +35,10 @@ class UnresolvedQuery(UserError):
     pass
 
 
+class AIServiceError(UserError):
+    """The AI service failed to answer, not specific to the record."""
+
+
 def get_ai_value(record, field_descripiton, user_prompt, context_fields, allowed_values):
     """Query a LLM with the given prompt and return the cast value.
 
@@ -161,9 +165,11 @@ def get_ai_value(record, field_descripiton, user_prompt, context_fields, allowed
             usage="ai_field",
         )
     except requests.exceptions.Timeout:
-        raise UserError(record.env._("Oops, the request timed out."))
+        raise AIServiceError(record.env._("Oops, the request timed out."))
     except requests.exceptions.ConnectionError:
-        raise UserError(record.env._("Oops, the connection failed."))
+        raise AIServiceError(record.env._("Oops, the connection failed."))
+    except UserError as e:
+        raise AIServiceError(str(e)) from e
 
     if not response:
         raise UserError(record.env._("Oops, an unexpected error occurred."))
@@ -172,7 +178,7 @@ def get_ai_value(record, field_descripiton, user_prompt, context_fields, allowed
     except json.JSONDecodeError:
         raise UserError(record.env._("Oops, the response could not be processed."))
     if response.get('could_not_resolve'):
-        raise UnresolvedQuery(response.get('unresolved_cause'))
+        raise UnresolvedQuery(response.get('unresolved_cause') or record.env._("Oops, an unexpected error occurred."))
 
     return parse_ai_response(
         response.get('value'),

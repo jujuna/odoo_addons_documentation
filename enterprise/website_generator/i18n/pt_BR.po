@@ -4,16 +4,18 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2026.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:57+0000\n"
-"PO-Revision-Date: 2026-09-18 03:05+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:57+0000\n"
+"PO-Revision-Date: 2026-11-09 18:33+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/website_generator/pt_BR/>\n"
+"20/website_generator/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,11 +25,15 @@ msgstr ""
 
 #. module: website_generator
 #: model:ir.module.module,description:base.module_website_generator
+#, fuzzy
 msgid ""
 "\n"
 "Generates a new website in Odoo, with the goal of recreating an external "
 "website as close as possible.\n"
 msgstr ""
+"\n"
+"Gera um novo site no Odoo, com o objetivo de recriar um site externo o mais "
+"próximo possível.\n"
 
 #. module: website_generator
 #: model:mail.template,body_html:website_generator.email_template_website_scrapped
@@ -37,21 +43,21 @@ msgid ""
 "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 "
 "and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products and "
-"<t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</"
-"p>\n"
+"generated, and <t t-out=\"ctx.get('nbr_products_created')\"></t> products "
+"and <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog posts have been "
+"created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url') and "
 "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
 "0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) have "
-"been created.</p>\n"
+"generated and <t t-out=\"ctx.get('nbr_products_created')\"></t> product(s) "
+"have been created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url') and "
 "ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> Your website has been "
-"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have "
+"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog posts have "
 "been created.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('website_url')\">\n"
@@ -62,18 +68,18 @@ msgid ""
 "ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and "
 "ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-"
-"out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+"created <t t-out=\"ctx.get('nbr_products_created')\"></t> products and <t t-"
+"out=\"ctx.get('nbr_blogs_created')\"></t> blog posts.</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('nbr_products_created') and "
 "ctx.get('nbr_products_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_products_created')\"/> product(s).</p>\n"
+"created <t t-out=\"ctx.get('nbr_products_created')\"></t> product(s).</p>\n"
 "                    </t>\n"
 "                    <t t-elif=\"ctx.get('nbr_blogs_created') and "
 "ctx.get('nbr_blogs_created') &gt; 0\">\n"
 "                        <p><b>Great news!</b> The import tool successfully "
-"created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog post(s).</p>\n"
+"created <t t-out=\"ctx.get('nbr_blogs_created')\"></t> blog post(s).</p>\n"
 "                    </t>\n"
 "                    <t t-else=\"\">\n"
 "                        <p><b>Update:</b> We were unable to generate your "
@@ -106,7 +112,7 @@ msgid ""
 "            \n"
 "            <p>Thank you for choosing Odoo for your web integration!</p>\n"
 "            <p>Best regards,</p>\n"
-"            <br/>\n"
+"            <br>\n"
 "            <p>Odoo - The best open source website builder.</p>\n"
 "            </div>\n"
 "            "
@@ -115,77 +121,77 @@ msgstr ""
 "                    <t t-if=\"ctx.get('website_url') and ctx.get"
 "('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and "
 "ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
-"                       <p><b> Ótima notícia!</b> Seu site foi gerado, e <t t-"
-"out=\"ctx.get('nbr_products_created')\"/> produtos e <t t-out=\"ctx.get"
-"('nbr_blogs_created')\"/> posts de blog foram criados.</p>\n"
+"                        <p><b>Ótima notícia!</b> Seu site foi gerado e <t t-"
+"out=\"ctx.get('nbr_products_created')\"></t> produtos e <t t-out=\"ctx.get"
+"('nbr_blogs_created')\"></t> publicações de blog foram criados.</p>\n"
 "                    </t>\n"
-"                   <t t-elif=\"ctx.get('website_url') and ctx.get"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get"
 "('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
-"                        <p> <b> Ótima notícia!</b> Seu site foi gerado e <t "
-"t-out=\"ctx.get('nbr_products_created')\"/> produto(s) foram criados.</p>\n"
+"                        <p><b>Ótima notícia!</b> Seu site foi gerado e <t t-"
+"out=\"ctx.get('nbr_products_created')\"></t> produto(s) foram criados.</p>\n"
 "                    </t>\n"
-"                   <t t-elif=\"ctx.get('website_url') and ctx.get"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get"
 "('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
-"                        <p> <b> Ótima notícia!</b> Seu site foi gerado e <t "
-"t-out=\"ctx.get('nbr_blogs_created')\"/> posts de blog foram criados.</p>\n"
+"                        <p><b>Ótima notícia!</b> Seu site foi gerado e <t t-"
+"out=\"ctx.get('nbr_blogs_created')\"></t> publicações de blog foram "
+"criadas.</p>\n"
 "                    </t>\n"
-"                   <t t-elif=\"ctx.get('website_url')\">\n"
-"                        <p> <b> Ótima notícia!</b> Seu site foi gerado com "
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>Ótima notícia!</b> Seu site foi gerado com "
 "sucesso.</p>\n"
-"                    </t>   \n"
-"                   <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
 "('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get"
 "('nbr_blogs_created') &gt; 0\">\n"
-"                        <p> <b> Ótima notícia!</b> A ferramenta de "
-"importação criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"/> "
-"produtos e <t t-out=\"ctx.get('nbr_blogs_created')\"/> posts de blog.</p>\n"
+"                        <p><b>Ótima notícia!</b> A ferramenta de importação "
+"criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"></t> produtos "
+"e <t t-out=\"ctx.get('nbr_blogs_created')\"></t> publicações de blog.</p>\n"
 "                    </t>\n"
-"                   <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
 "('nbr_products_created') &gt; 0\">\n"
-"                        <p> <b> Ótima notícia!</b> A ferramenta de "
-"importação criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"/> "
-"produto(s).</p>\n"
+"                        <p><b>Ótima notícia!</b> A ferramenta de importação "
+"criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"></t> produto"
+"(s).</p>\n"
 "                    </t>\n"
-"                   <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get"
 "('nbr_blogs_created') &gt; 0\">\n"
-"                        <p> <b> Ótima notícia!</b> A ferramenta de "
-"importação criou com sucesso <t t-out=\"ctx.get('nbr_blogs_created')\"/> "
-"postagem(ns) de blog.</p>\n"
+"                        <p><b>Ótima notícia!</b> A ferramenta de importação "
+"criou com sucesso <t t-out=\"ctx.get('nbr_blogs_created')\"></t> publicação"
+"(ões) de blog.</p>\n"
 "                    </t>\n"
-"                   <t t-else=\"\">\n"
-"                        <p> <b> Atualização:</b> Não foi possível gerar seu "
+"                    <t t-else=\"\">\n"
+"                        <p><b>Atualização:</b> Não foi possível gerar seu "
 "site ou produtos desta vez.</p>\n"
-"                        <p>Isso pode acontecer por diversos motivos, tais "
+"                        <p>Isso pode acontecer por vários motivos, tais "
 "como:</p>\n"
 "                        <ul>\n"
-"                           <li> Mecanismos de proteção em seu site que "
+"                            <li>Mecanismos de proteção em seu site que "
 "impedem o acesso automatizado,</li>\n"
 "                            <li>Manutenção temporária ou disponibilidade "
 "limitada em nossos servidores,</li>\n"
-"                            <li>Código personalizado ou configurações em seu "
-"site que não são totalmente compatíveis com nosso processo.</li>\n"
+"                            <li>Código ou configurações personalizados em "
+"seu site que não são totalmente compatíveis com nosso processo.</li>\n"
 "                        </ul>\n"
-"                       <p> Sinta-se à vontade para tentar novamente mais "
+"                        <p>Sinta-se à vontade para tentar novamente mais "
 "tarde ou entre em contato conosco se o problema persistir — estamos aqui "
 "para ajudar!</p>\n"
 "                    </t>\n"
 "\n"
-"           <t t-if=\"ctx.get('website_url')\">\n"
-"                <p> Você pode acessar seu site clicando no botão abaixo:</p>"
-"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>Você pode acessar seu site clicando no botão abaixo:</p>\n"
 "                <div style=\"margin: 16px 0px 16px 0px;\">\n"
-"                   <a t-att-href=\"ctx.get('website_url')\" "
+"                    <a t-att-href=\"ctx.get('website_url')\" "
 "style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
-"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\"> \n"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                        Ir para o site\n"
-"                   </a>\n"
-"                </div> \n"
-"           </t>\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
 "            \n"
-"            <p> Obrigado por escolher o Odoo para sua integração web!</p>\n"
+"            <p>Obrigado por escolher o Odoo para sua integração web!</p>\n"
 "            <p>Atenciosamente,</p>\n"
-"            <br/>\n"
-"           <p> Odoo - O melhor construtor de sites de código aberto.</p>\n"
+"            <br>\n"
+"            <p>Odoo - O melhor construtor de sites de código aberto.</p>\n"
 "            </div>\n"
 "            "
 
@@ -207,46 +213,55 @@ msgstr "Falha na verificação da API"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "API Key is not valid"
-msgstr ""
+msgstr "A chave de API não é válida"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "API Key is valid."
-msgstr ""
+msgstr "A chave de API é válida."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid "API authentication not setup"
-msgstr ""
+msgstr "Autenticação de API não configurada"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid ""
 "API key has either expired, is invalid or there is no content to extract. "
 "Please provide a new API key."
 msgstr ""
+"A chave da API expirou, é inválida ou não há conteúdo para extrair. Forneça "
+"uma nova chave de API."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+#, fuzzy
 msgid "Adapting building blocks."
-msgstr ""
+msgstr "Adaptação de Building Blocks."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "Add your Ghost API key here"
-msgstr ""
+msgstr "Adicione sua chave da API Ghost aqui"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "Add your PrestaShop API key here"
-msgstr ""
+msgstr "Adicione sua chave de API do PrestaShop aqui"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__additional_urls
@@ -318,8 +333,9 @@ msgstr "Conectar via WooCommerce"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+#, fuzzy
 msgid "Copying your text."
-msgstr ""
+msgstr "Copiando seu texto."
 
 #. module: website_generator
 #. odoo-python
@@ -388,14 +404,18 @@ msgstr "Progresso da Geração"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "Ghost API Key"
-msgstr ""
+msgstr "Chave de API do Ghost"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "Ghost API detected, please provide an API key. For more info, visit:"
 msgstr ""
+"API do Ghost detectada, forneça uma chave de API. Para mais informações, "
+"visite:"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__id
@@ -430,7 +450,7 @@ msgstr "Importar suas páginas e produtos"
 #. module: website_generator
 #: model:ir.module.module,summary:base.module_website_generator
 msgid "Import a pre-existing website"
-msgstr ""
+msgstr "Importar site existente"
 
 #. module: website_generator
 #. odoo-javascript
@@ -464,8 +484,9 @@ msgstr "Rodapé importado"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+#, fuzzy
 msgid "Importing your colors and design."
-msgstr ""
+msgstr "Importando suas cores e design."
 
 #. module: website_generator
 #. odoo-javascript
@@ -586,8 +607,9 @@ msgstr "Número de páginas"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "Odoo's website import documentation"
-msgstr ""
+msgstr "Documentação de importação de site do Odoo"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__out_json_attachment_id
@@ -629,15 +651,19 @@ msgstr "Aguarde até que a verificação da API seja concluída."
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "PrestaShop API Key"
-msgstr ""
+msgstr "Chave de API do PrestaShop"
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid ""
 "PrestaShop API detected, please provide an API key. For more info, visit:"
 msgstr ""
+"API do PrestaShop detectada, forneça uma chave de API. Para mais "
+"informações, visite:"
 
 #. module: website_generator
 #. odoo-python
@@ -691,10 +717,13 @@ msgstr "Algo deu errado"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid ""
 "Something went wrong applying your API key. Please check your API key and "
 "try again."
 msgstr ""
+"Algo deu errado ao aplicar sua chave de API. Verifique sua chave de API e "
+"tente novamente."
 
 #. module: website_generator
 #. odoo-python
@@ -741,8 +770,11 @@ msgstr "O URL está acessível."
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "The number of pages is limited. If you need more, contact us at"
 msgstr ""
+"O número de páginas é limitado. Se precisar de mais, entre em contato "
+"conosco em"
 
 #. module: website_generator
 #. odoo-javascript
@@ -801,8 +833,9 @@ msgstr ""
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "The search for blogs API is done."
-msgstr ""
+msgstr "A busca pela API de blogs foi concluída."
 
 #. module: website_generator
 #. odoo-javascript
@@ -813,8 +846,9 @@ msgstr "A pesquisa pela API de produtos está concluída."
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+#, fuzzy
 msgid "This can take a few minutes."
-msgstr ""
+msgstr "Isso pode levar alguns minutos."
 
 #. module: website_generator
 #. odoo-javascript
@@ -848,8 +882,9 @@ msgstr "URL inacessível"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+#, fuzzy
 msgid "Uploading your images."
-msgstr ""
+msgstr "Carregando suas imagens."
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__version
@@ -917,7 +952,7 @@ msgstr "Site coletado"
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Website URL"
-msgstr ""
+msgstr "URL do site"
 
 #. module: website_generator
 #. odoo-python
@@ -934,67 +969,84 @@ msgstr "Site não suportado"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid ""
 "WooCommerce API detected, please authenticate to import WooCommerce Products."
 msgstr ""
+"API WooCommerce detectada, autentique-se para importar produtos WooCommerce."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "WordPress Blog API detected."
-msgstr ""
+msgstr "API de blog do WordPress detectada."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid "You must add a Ghost API key before trying to import Ghost Blogs."
 msgstr ""
+"Você deve adicionar uma chave de API do Ghost antes de tentar importar blogs "
+"do Ghost."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid ""
 "You must add a PrestaShop API key before trying to import PrestaShop "
 "products."
 msgstr ""
+"Você deve adicionar uma chave de API do PrestaShop antes de tentar importar "
+"produtos do PrestaShop."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+#, fuzzy
 msgid ""
 "You must authenticate the WooCommerce API before trying to import "
 "WooCommerce Products."
 msgstr ""
+"Você deve autenticar a API do WooCommerce antes de tentar importar produtos "
+"do WooCommerce."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+#, fuzzy
 msgid "You will be redirected once your website is ready."
-msgstr ""
+msgstr "Você será redirecionado quando seu site estiver pronto."
 
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "You will receive an"
-msgstr ""
+msgstr "Você receberá um"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
+#, fuzzy
 msgid "Your blogs have been imported!"
-msgstr ""
+msgstr "Seus blogs foram importados!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
+#, fuzzy
 msgid "Your new blogs and products are ready!"
-msgstr ""
+msgstr "Seus novos blogs e produtos estão prontos!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
+#, fuzzy
 msgid "Your new website and blogs are ready!"
-msgstr ""
+msgstr "Seu novo site e blogs estão prontos!"
 
 #. module: website_generator
 #. odoo-python
@@ -1011,14 +1063,16 @@ msgstr "Seu novo site está pronto!"
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
+#, fuzzy
 msgid "Your new website, blogs and products are ready!"
-msgstr ""
+msgstr "Seu novo site, blogs e produtos estão prontos!"
 
 #. module: website_generator
 #. odoo-python
 #: code:addons/website_generator/models/generator.py:0
+#, fuzzy
 msgid "Your products have been imported!"
-msgstr ""
+msgstr "Seus produtos foram importados!"
 
 #. module: website_generator
 #. odoo-javascript
@@ -1029,8 +1083,9 @@ msgstr "Sua solicitação foi enviada!"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+#, fuzzy
 msgid "Your website, now customizable effortless."
-msgstr ""
+msgstr "Seu site, agora personalizável sem esforço."
 
 #. module: website_generator
 #. odoo-javascript
@@ -1053,10 +1108,178 @@ msgstr "odoo.com/help"
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#, fuzzy
 msgid "once your website and/or products are ready."
-msgstr ""
+msgstr "assim que seu site e/ou produtos estiverem prontos."
 
 #. module: website_generator
 #: model:mail.template,subject:website_generator.email_template_website_scrapped
 msgid "{{ ctx.get('subject') }}"
 msgstr "{{ ctx.get('subject') }}"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "                    <t t-if=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+#~ "0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; "
+#~ "0\">\n"
+#~ "                        <p><b>Great news!</b> Your website has been "
+#~ "generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products "
+#~ "and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been "
+#~ "created.</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-elif=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+#~ "0\">\n"
+#~ "                        <p><b>Great news!</b> Your website has been "
+#~ "generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) "
+#~ "have been created.</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-elif=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p><b>Great news!</b> Your website has been "
+#~ "generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have "
+#~ "been created.</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-elif=\"ctx.get('website_url')\">\n"
+#~ "                        <p><b>Great news!</b> Your website has been "
+#~ "successfully generated.</p>\n"
+#~ "                    </t>    \n"
+#~ "                    <t t-elif=\"ctx.get('nbr_products_created') and "
+#~ "ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') "
+#~ "and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p><b>Great news!</b> The import tool "
+#~ "successfully created <t t-out=\"ctx.get('nbr_products_created')\"/> "
+#~ "products and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-elif=\"ctx.get('nbr_products_created') and "
+#~ "ctx.get('nbr_products_created') &gt; 0\">\n"
+#~ "                        <p><b>Great news!</b> The import tool "
+#~ "successfully created <t t-out=\"ctx.get('nbr_products_created')\"/> "
+#~ "product(s).</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-elif=\"ctx.get('nbr_blogs_created') and "
+#~ "ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p><b>Great news!</b> The import tool "
+#~ "successfully created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog "
+#~ "post(s).</p>\n"
+#~ "                    </t>\n"
+#~ "                    <t t-else=\"\">\n"
+#~ "                        <p><b>Update:</b> We were unable to generate your "
+#~ "website or products this time.</p>\n"
+#~ "                        <p>This may happen for a variety of reasons, such "
+#~ "as:</p>\n"
+#~ "                        <ul>\n"
+#~ "                            <li>Protection mechanisms on your website "
+#~ "preventing automated access,</li>\n"
+#~ "                            <li>Temporary maintenance or limited "
+#~ "availability on our servers,</li>\n"
+#~ "                            <li>Custom code or configurations on your "
+#~ "website that are not fully compatible with our process.</li>\n"
+#~ "                        </ul>\n"
+#~ "                        <p>Feel free to try again later or contact us if "
+#~ "the issue persists — we’re here to help!</p>\n"
+#~ "                    </t>\n"
+#~ "\n"
+#~ "            <t t-if=\"ctx.get('website_url')\">\n"
+#~ "                <p>You can access your website by clicking the button "
+#~ "below:</p>\n"
+#~ "                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+#~ "                    <a t-att-href=\"ctx.get('website_url')\" "
+#~ "style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+#~ "decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+#~ "                        Go to Website\n"
+#~ "                    </a>\n"
+#~ "                </div>\n"
+#~ "            </t>\n"
+#~ "            \n"
+#~ "            <p>Thank you for choosing Odoo for your web integration!</p>\n"
+#~ "            <p>Best regards,</p>\n"
+#~ "            <br/>\n"
+#~ "            <p>Odoo - The best open source website builder.</p>\n"
+#~ "            </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "                    <t t-if=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+#~ "0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; "
+#~ "0\">\n"
+#~ "                       <p><b> Ótima notícia!</b> Seu site foi gerado, e "
+#~ "<t t-out=\"ctx.get('nbr_products_created')\"/> produtos e <t t-"
+#~ "out=\"ctx.get('nbr_blogs_created')\"/> posts de blog foram criados.</p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-elif=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+#~ "0\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> Seu site foi gerado e "
+#~ "<t t-out=\"ctx.get('nbr_products_created')\"/> produto(s) foram criados.</"
+#~ "p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-elif=\"ctx.get('website_url') and "
+#~ "ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> Seu site foi gerado e "
+#~ "<t t-out=\"ctx.get('nbr_blogs_created')\"/> posts de blog foram criados.</"
+#~ "p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-elif=\"ctx.get('website_url')\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> Seu site foi gerado "
+#~ "com sucesso.</p>\n"
+#~ "                    </t>   \n"
+#~ "                   <t t-elif=\"ctx.get('nbr_products_created') and "
+#~ "ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') "
+#~ "and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> A ferramenta de "
+#~ "importação criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"/"
+#~ "> produtos e <t t-out=\"ctx.get('nbr_blogs_created')\"/> posts de blog.</"
+#~ "p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-elif=\"ctx.get('nbr_products_created') and "
+#~ "ctx.get('nbr_products_created') &gt; 0\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> A ferramenta de "
+#~ "importação criou com sucesso <t t-out=\"ctx.get('nbr_products_created')\"/"
+#~ "> produto(s).</p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-elif=\"ctx.get('nbr_blogs_created') and "
+#~ "ctx.get('nbr_blogs_created') &gt; 0\">\n"
+#~ "                        <p> <b> Ótima notícia!</b> A ferramenta de "
+#~ "importação criou com sucesso <t t-out=\"ctx.get('nbr_blogs_created')\"/> "
+#~ "postagem(ns) de blog.</p>\n"
+#~ "                    </t>\n"
+#~ "                   <t t-else=\"\">\n"
+#~ "                        <p> <b> Atualização:</b> Não foi possível gerar "
+#~ "seu site ou produtos desta vez.</p>\n"
+#~ "                        <p>Isso pode acontecer por diversos motivos, tais "
+#~ "como:</p>\n"
+#~ "                        <ul>\n"
+#~ "                           <li> Mecanismos de proteção em seu site que "
+#~ "impedem o acesso automatizado,</li>\n"
+#~ "                            <li>Manutenção temporária ou disponibilidade "
+#~ "limitada em nossos servidores,</li>\n"
+#~ "                            <li>Código personalizado ou configurações em "
+#~ "seu site que não são totalmente compatíveis com nosso processo.</li>\n"
+#~ "                        </ul>\n"
+#~ "                       <p> Sinta-se à vontade para tentar novamente mais "
+#~ "tarde ou entre em contato conosco se o problema persistir — estamos aqui "
+#~ "para ajudar!</p>\n"
+#~ "                    </t>\n"
+#~ "\n"
+#~ "           <t t-if=\"ctx.get('website_url')\">\n"
+#~ "                <p> Você pode acessar seu site clicando no botão abaixo:</"
+#~ "p>\n"
+#~ "                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+#~ "                   <a t-att-href=\"ctx.get('website_url')\" "
+#~ "style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+#~ "decoration: none; color: #fff; border-radius: 5px; font-size:13px;\"> \n"
+#~ "                        Ir para o site\n"
+#~ "                   </a>\n"
+#~ "                </div> \n"
+#~ "           </t>\n"
+#~ "            \n"
+#~ "            <p> Obrigado por escolher o Odoo para sua integração web!</"
+#~ "p>\n"
+#~ "            <p>Atenciosamente,</p>\n"
+#~ "            <br/>\n"
+#~ "           <p> Odoo - O melhor construtor de sites de código aberto.</p>\n"
+#~ "            </div>\n"
+#~ "            "

@@ -110,6 +110,11 @@ class TestDKReportCommon(TestAccountReportsCommon):
         options = cls._generate_options(report, '2021-01-01', '2021-12-31')
         return cls.env[report.custom_handler_model_name].l10n_dk_export_saft_to_xml(options)['file_content']
 
+    def _generate_2_0_xml(cls):
+        report = cls.env.ref('account_reports.general_ledger_report')
+        options = cls._generate_options(report, '2021-01-01', '2021-12-31')
+        return cls.env[report.custom_handler_model_name].l10n_dk_export_saft_2_0_to_xml(options)['file_content']
+
 
 @freeze_time('2022-01-01')
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -142,6 +147,62 @@ class TestDKReport(TestDKReportCommon):
 
         with tools.file_open("l10n_dk_reports/tests/xml/expected_test_saft_report.xml", "rb") as expected_xml:
             stringified_xml = self._generate_xml()
+            self.assertXmlTreeEqual(
+                self.get_xml_tree_from_string(stringified_xml),
+                self.get_xml_tree_from_string(expected_xml.read()),
+            )
+
+    def test_validate_dk_saft_2_0_report_values(self):
+        payable_account = self.env['account.chart.template'].ref("dk_coa_7440")
+        liability_account = self.env['account.chart.template'].ref("dk_coa_7350")
+        # Create a move without a partner but with a receivable line
+        move = self.env['account.move'].create({
+                'move_type': 'entry',
+                'invoice_date': '2021-03-01',
+                'date': '2021-03-01',
+                'partner_id': None,
+                'invoice_line_ids': [
+                    Command.create({
+                        'credit': 67.0,
+                        'account_id': payable_account.id,
+                    }),
+                    Command.create({
+                        'debit': 67.0,
+                        'account_id': liability_account.id,
+                    })
+                ],
+            })
+        move._post()
+
+        fixed_tax = self.env['account.tax'].create({
+            'name': 'DK fixed duty',
+            'amount_type': 'fixed',
+            'amount': 100.0,
+            'type_tax_use': 'sale',
+            'country_id': self.env.ref('base.dk').id,
+        })
+        fixed_tax_invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_date': '2021-05-01',
+            'date': '2021-05-01',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'quantity': 1.0,
+                    'price_unit': 500.0,
+                    'tax_ids': [Command.set(fixed_tax.ids)],
+                })
+            ],
+        })
+        fixed_tax_invoice.action_post()
+
+        self.env.flush_all()
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = self._generate_options(report, '2021-01-01', '2021-12-31')
+
+        with tools.file_open("l10n_dk_reports/tests/xml/expected_test_saft_2_0_report.xml", "rb") as expected_xml:
+            stringified_xml = self.env[report.custom_handler_model_name].l10n_dk_export_saft_2_0_to_xml(options)['file_content']
             self.assertXmlTreeEqual(
                 self.get_xml_tree_from_string(stringified_xml),
                 self.get_xml_tree_from_string(expected_xml.read()),
@@ -206,3 +267,7 @@ class TestDKReportXML(TestDKReportCommon):
     @test_xsd(url='https://erhvervsstyrelsen.dk/sites/default/files/2023-01/Danish_SAF-T_Financial_Schema_v_1_0_0.zip')
     def test_xml_validity(self):
         return self._generate_xml()
+
+    @test_xsd(url='https://git.erst.dk/standard-filformater/standard-filformater/-/raw/master/SAF-T/XSD/Danish_SAF-T_Financial_Schema_v_2_0.xml')
+    def test_xml_2_0_validity(self):
+        return self._generate_2_0_xml()

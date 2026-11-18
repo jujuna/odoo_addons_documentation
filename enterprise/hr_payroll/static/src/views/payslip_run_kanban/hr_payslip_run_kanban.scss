@@ -40,10 +40,8 @@
     }
 
     // Selected payrun card highlight when chatter panel is open
-    .o_payrun_kanban_container:has(.o_payrun_chatter_container) & {
-        .o_kanban_record:has(.o_payrun_chatter_icon [data-icon='close']) {
-            box-shadow: inset 0 0 0 $border-width $primary;
-        }
+    .o_kanban_record.o_payrun_kanban_record_selected {
+        box-shadow: inset 0 0 0 $border-width $primary;
     }
 }
 

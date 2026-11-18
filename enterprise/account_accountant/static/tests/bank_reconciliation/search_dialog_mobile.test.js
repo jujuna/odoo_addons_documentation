@@ -166,8 +166,6 @@ test("BankRecSelectCreateDialog kanban view single currency", async () => {
     await animationFrame();
 
     expect("div[name='remaining_amount']").toHaveText("Balance: $ 100.00");
-    await click("div.o_control_panel_navigation > button > i[data-icon='search']");
-    await animationFrame();
     expect("div.o_facet_values > small.o_facet_value").toHaveText("Jean Pierre");
     let articles = queryAll("article.o_kanban_record");
     expect(articles.length).toBe(3);

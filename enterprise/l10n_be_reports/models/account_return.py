@@ -4,6 +4,7 @@ from markupsafe import Markup
 
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
+from odoo.addons.account_reports.models.account_return import LIMIT_CHECK_ENTRIES
 from odoo.exceptions import UserError
 from odoo.tools import format_date
 from odoo.tools.translate import LazyTranslate
@@ -16,6 +17,12 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     def _get_start_date_elements(self, main_company):
+        if (
+            self == self.env.ref('l10n_be_reports.be_isoc_prepayment_return_type', raise_if_not_found=False)
+            and not self.with_company(main_company).sudo().deadline_start_date
+        ):
+            fy_start = main_company.compute_fiscalyear_dates(fields.Date.context_today(self))['date_from']
+            return fy_start.day, fy_start.month
         return super()._get_start_date_elements(main_company)
 
 
@@ -64,7 +71,11 @@ class AccountReturn(models.Model):
             return date_to + relativedelta(months=3)
 
         elif return_type_external_id == 'l10n_be_reports.be_isoc_prepayment_return_type':
-            return date_to + relativedelta(days=-9 if date_to.month == 12 else 10)
+            # https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1993082749&table_name=loi
+            # 10th of the month following each period, except the last period of the fiscal year: 20th of its last month
+            if date_to == company.compute_fiscalyear_dates(date_to)['date_to']:
+                return date_to.replace(day=20)
+            return date_to + relativedelta(days=10)
 
         elif return_type_external_id == 'account_reports.annual_corporate_tax_return_type' and company.account_fiscal_country_id.code == 'BE':
             return date_to + relativedelta(months=7)
@@ -224,34 +235,56 @@ class AccountReturn(models.Model):
             })
 
         if 'customer_without_country' not in check_codes_to_ignore:
-            domain = [
+            move_domain = [
                 ('company_id', 'in', self.company_ids.ids),
                 ('date', '<=', fields.Date.to_string(self.date_to)),
                 ('date', '>=', fields.Date.to_string(self.date_from)),
                 ('state', '=', 'posted'),
-                ('partner_id.country_id', '=', False),
                 ('move_type', 'in', self.env['account.move'].get_sale_types()),
             ]
-            no_country_moves_count = self.env['account.move'].search_count(domain, limit=21)
+            partner_domain = [
+                ('country_id', '=', False),
+                ('invoice_ids', 'any', move_domain),
+            ]
+            no_country_partners_count = self.env['res.partner'].with_context(active_test=False).search_count(partner_domain, limit=LIMIT_CHECK_ENTRIES)
+            view = self.env.ref('l10n_be_reports.res_partner_vat_listing_without_country_view_list', raise_if_not_found=False)
             action = {
                 'type': 'ir.actions.act_window',
-                'name': _("Invoices Without Country"),
+                'name': _("Customers Without Country"),
                 'view_mode': 'list',
-                'res_model': 'account.move',
-                'domain': domain,
-                'views': [[False, 'list'], [False, 'form']],
+                'res_model': 'res.partner',
+                'domain': partner_domain,
+                'views': [[view.id if view else False, 'list'], [False, 'form']],
+                'context': {'active_test': False},
             }
             check_vals = {
                 'name': _lt("No customer without country"),
-                'message': _lt("Review invoices having a customer with no country specified."),
+                'message': _lt("Review customers with no country specified."),
                 'code': 'customer_without_country',
-                'records_count': no_country_moves_count,
-                'records_model': self.env['ir.model']._get('account.move').id,
-                'result': 'anomaly' if no_country_moves_count else 'reviewed',
-                'action': action if no_country_moves_count else False,
+                'records_count': no_country_partners_count,
+                'records_model': self.env['ir.model']._get('res.partner').id,
+                'result': 'anomaly' if no_country_partners_count else 'reviewed',
+                'action': action if no_country_partners_count else False,
             }
 
             checks.append(check_vals)
+
+        if 'be_vat_listing_duplicate_partner_vat' not in check_codes_to_ignore:
+            options = self._get_closing_report_options()
+            duplicate_partner_ids = self.env['l10n_be.partner.vat.handler']._get_duplicate_vat_partners_ids(self.type_id.report_id, options)
+            duplicate_partners = self.env['res.partner'].browse(duplicate_partner_ids)
+            checks.append({
+                'name': _lt("No duplicate VAT numbers"),
+                'message': _lt("Review customers sharing the same VAT number and set one of them as the main partner."),
+                'code': 'be_vat_listing_duplicate_partner_vat',
+                'records_count': len(duplicate_partners),
+                'records_model': self.env['ir.model']._get('res.partner').id,
+                'result': 'anomaly' if duplicate_partners else 'reviewed',
+                'action': (
+                    self.env['account.ec.sales.report.handler.common']._get_duplicate_vat_partners(list(set(duplicate_partners.mapped('vat'))))
+                    if duplicate_partners else False
+                ),
+            })
 
         return checks
 

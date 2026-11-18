@@ -34,6 +34,7 @@
     'application': True,
     'assets': {
         'web.assets_backend': [
+            'equity/static/src/chatter/web/**/*.js',
             'equity/static/src/components/**/*.js',
             'equity/static/src/components/**/*.xml',
             'equity/static/src/components/**/*.scss',

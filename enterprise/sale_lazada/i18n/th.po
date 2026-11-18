@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-09-18 00:16+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
-"sale_lazada/th/>\n"
+"POT-Creation-Date: 2026-11-06 17:47+0000\n"
+"PO-Revision-Date: 2026-11-02 03:19+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/sale_lazada/"
+"th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,6 +38,17 @@ msgid ""
 "* FBM: Delivery information is fetched from Lazada, track and synchronize "
 "the stock level to Lazada.\n"
 msgstr ""
+"\n"
+"นำเข้าคำสั่งซื้อ Lazada ของคุณใน Odoo และซิงโครไนซ์การจัดส่ง\n"
+"============================================================\n"
+"\n"
+"ฟีเจอร์หลัก\n"
+"------------\n"
+"* นำเข้าคำสั่งซื้อจากหลายร้านค้า\n"
+"* คำสั่งซื้อจะถูกจับคู่กับสินค้า Odoo โดยอ้างอิงจากรหัสอ้างอิงภายใน (SKU ใน Lazada)\n"
+"* รองรับทั้ง Fulfillment by Lazada (FBL) และ Fulfillment by Merchant (FBM):\n"
+"* FBL: นำเข้าคำสั่งซื้อที่เสร็จสมบูรณ์\n"
+"* FBM: ข้อมูลการจัดส่งจะถูกดึงมาจาก Lazada เพื่อติดตามและซิงโครไนซ์ระดับสต็อกไปยัง Lazada\n"
 
 #. module: sale_lazada
 #: model:mail.template,body_html:sale_lazada.order_sync_failure
@@ -68,8 +79,8 @@ msgid ""
 msgstr ""
 "<div>\n"
 "                <p>การเชื่อมระบบของคำสั่งซื้อใน Lazada ที่มีเลขอ้างอิง <t t-"
-"out=\"ctx.get('lazada_order_ref') or ''\">REF</t> พบข้อผิดพลาดและไม่สามารถดำเนินก"
-"ารได้สำเร็จ</p>\n"
+"out=\"ctx.get('lazada_order_ref') or ''\">REF</t> "
+"พบข้อผิดพลาดและไม่สามารถดำเนินการได้สำเร็จ</p>\n"
 "                <p>จะไม่มีการเชื่อมต่อเกิดขึ้น จนกว่าคำสั่งซื้อใน Lazada จะถูกยกเลิก</p>\n"
 "                <p>เพื่อทำการกำหนดเวลาการเชื่อมต่อใหม่ ให้ดำเนินการดังนี้:\n"
 "                    </p><ol>\n"
@@ -145,10 +156,10 @@ msgid ""
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
 "                            <th><t t-out=\"', '.join(error['default_codes'])"
-"\"/></th>\n"
+"\"></t></th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
-"out=\"error['message']\"/>\n"
+"out=\"error['message']\"></t>\n"
 "                                <t t-else=\"\">An unknown error occurred "
 "during the synchronisation with Lazada.\n"
 "                                    Unfortunately you need to manually check "
@@ -163,68 +174,6 @@ msgid ""
 "            </div>\n"
 "        </body>"
 msgstr ""
-"<style>\n"
-"                .lazada_table {\n"
-"                    width: 100%;\n"
-"                    max-width: 900px;\n"
-"                    border-collapse: collapse;\n"
-"                }\n"
-"\n"
-"                .lazada_table th,\n"
-"                .lazada_table td {\n"
-"                    border: 1px solid #888;\n"
-"                }\n"
-"\n"
-"                .lazada_table th {\n"
-"                    white-space: nowrap;\n"
-"                }\n"
-"\n"
-"                .lazada_table thead th {\n"
-"                    padding: 0.5em 0.5em;\n"
-"                    text-align: center;\n"
-"                    border-bottom: 1px solid #888;\n"
-"                }\n"
-"\n"
-"                .lazada_table tbody th,\n"
-"                .lazada_table tbody td {\n"
-"                    padding: 0.5em 0.5em 1em;\n"
-"                    vertical-align: top;\n"
-"                }\n"
-"            </style>\n"
-"            <body><div>\n"
-"                <p>การซิงโครไนซ์คลังสินค้าสำหรับ Lazada Shop\n"
-"                    <b><t t-out=\"ctx.get('lazada_shop') or ''\">REF</t></b>"
-"\n"
-"                    พบข้อผิดพลาดบางประการและไม่สามารถดำเนินการให้เสร็จสมบูรณ์ได้</p>\n"
-"                <p>นี่คือข้อผิดพลาดที่ Lazada ส่งมา: </p>\n"
-"                <table class=\"lazada_table\">\n"
-"                    <thead>\n"
-"                        <tr>\n"
-"                            <th>รหัสอ้างอิงภายในของสินค้า</th>\n"
-"                            <th>ข้อความ</th>\n"
-"                        </tr>\n"
-"                    </thead>\n"
-"                    <tbody>\n"
-"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
-"as=\"error\">\n"
-"                            <th><t t-out=\"', '.join(error['default_codes'])"
-"\"/></th>\n"
-"                            <td>\n"
-"                                <t t-if=\"error['message']\" t-"
-"out=\"error['message']\"/>\n"
-"                                <t t-else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างก"
-"ารซิงโครไนซ์กับ Lazada\n"
-"                                    ขออภัย โปรดตรวจสอบจำนวนสินค้าที่มีอยู่สำหรับผลิตภัณฑ์"
-"ด้วยตนเองว่าถูกต้องหรือไม่\n"
-"                                    หากปัญหายังคงอยู่ กรุณาติดต่อ <a href=\"https://"
-"www.odoo.com/help/\">การสนับสนุน Odoo</a>\n"
-"                                </t>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        </body>"
 
 #. module: sale_lazada
 #: model:ir.model.constraint,message:sale_lazada.constraint_lazada_shop_unique_shop_extern_id_company
@@ -232,129 +181,121 @@ msgid ""
 "A shop with this external identifier already exists in this company. The "
 "same Lazada shop cannot be linked twice to the same company."
 msgstr ""
-"ร้านค้าที่มีตัวระบุภายนี้อยู่ในบริษัทนี้แล้ว ร้านค้า Lazada เดียวกันไม่สามารถเชื่อมโยงกับบริษัทเดียวกันได้"
-"สองครั้ง"
+"ร้านค้าที่มีตัวระบุภายนี้อยู่ในบริษัทนี้แล้ว ร้านค้า Lazada "
+"เดียวกันไม่สามารถเชื่อมโยงกับบริษัทเดียวกันได้สองครั้ง"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "API Credentials"
-msgstr ""
+msgstr "ข้อมูลรับรอง API"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "API Credentials & Tokens"
-msgstr ""
+msgstr "ข้อมูลรับรองและโทเค็น API"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__api_endpoint
 msgid "API Endpoint"
-msgstr ""
+msgstr "จุดเชื่อมต่อ API"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__access_token
-#, fuzzy
 msgid "Access Token"
 msgstr "โทเค็นการเข้าถึง"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__access_token_expiration_date
 msgid "Access Token Expiration Date"
-msgstr ""
+msgstr "วันหมดอายุของโทเค็นการเข้าถึง"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Access Tokens"
-msgstr ""
+msgstr "โทเค็นสำหรับการเข้าถึง"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__active
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_search
-#, fuzzy
 msgid "Active"
 msgstr "เปิดใช้งาน"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__synchronize_inventory
 msgid "Allow inventory synchronization"
-msgstr ""
+msgstr "อนุญาตให้ซิงโครนิไลซ์คลังสินค้า"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/controllers/onboarding.py:0
 msgid "An unexpected error occurred during authorization."
-msgstr ""
+msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิดระหว่างการให้สิทธิ์"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__app_key
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__app_key
 msgid "App Key"
-msgstr ""
+msgstr "รหัสประจำตัวของแอปพลิเคชัน (App Key)"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "App Key and App Secret are required for authorization."
-msgstr ""
+msgstr "จำเป็นต้องมี App Key และ App Secret เพื่อทำการยืนยันตัวตน"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__app_secret
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__app_secret
-#, fuzzy
 msgid "App Secret"
-msgstr "รหัสแอป"
+msgstr "App Secret"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
-#, fuzzy
 msgid "Archived"
 msgstr "เก็บถาวรแล้ว"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__canceled
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__canceled
-#, fuzzy
 msgid "Canceled"
 msgstr "ถูกยกเลิก"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__canceled
 msgid "Canceled on Lazada"
-msgstr ""
+msgstr "ถูกยกเลิกบน Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/utils.py:0
 msgid "Cannot determine the API endpoint for the operation."
-msgstr ""
+msgstr "ไม่สามารถระบุจุดปลายทาง API สำหรับการดำเนินการนี้ได้"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__company_id
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__company_id
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__company_id
-#, fuzzy
 msgid "Company"
 msgstr "บริษัท"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__confirmed
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__confirmed
-#, fuzzy
 msgid "Confirmed"
 msgstr "ยืนยันแล้ว"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_list
 msgid "Connect New Shop"
-msgstr ""
+msgstr "เชื่อมต่อร้านค้าใหม่"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
 msgid "Connect Shop"
-msgstr ""
+msgstr "เชื่อมต่อกับร้านค้า"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_res_partner
-#, fuzzy
 msgid "Contact"
 msgstr "ติดต่อ"
 
@@ -362,27 +303,26 @@ msgstr "ติดต่อ"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Could not allocate the shop identifier"
-msgstr ""
+msgstr "ไม่สามารถจัดสรรตัวระบุร้านค้าได้"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Could not find country with code %(code)s"
-msgstr ""
+msgstr "ไม่พบประเทศที่มีรหัส %(code)s"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_create_wizard
 msgid "Create Lazada Shop"
-msgstr ""
+msgstr "สร้างร้านค้า Lazada"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
 msgid "Create New Lazada Shop"
-msgstr ""
+msgstr "สร้างร้านค้า Lazada ใหม่"
 
 #. module: sale_lazada
 #: model:ir.model,website_form_label:sale_lazada.model_res_partner
-#, fuzzy
 msgid "Create a Customer"
 msgstr "สร้างลูกค้า"
 
@@ -391,7 +331,6 @@ msgstr "สร้างลูกค้า"
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__create_uid
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__create_uid
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__create_uid
-#, fuzzy
 msgid "Created by"
 msgstr "สร้างโดย"
 
@@ -400,32 +339,29 @@ msgstr "สร้างโดย"
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__create_date
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__create_date
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__create_date
-#, fuzzy
 msgid "Created on"
 msgstr "สร้างเมื่อ"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__team_id
 msgid "Default Sales Team"
-msgstr ""
+msgstr "ทีมการขายค่าเริ่มต้น"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__user_id
-#, fuzzy
 msgid "Default Salesperson"
-msgstr "ค่าเริ่มต้นพนักงานขาย"
+msgstr "พนักงานขายค่าเริ่มต้น"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__delivered
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__delivered
-#, fuzzy
 msgid "Delivered"
 msgstr "จัดส่งแล้ว"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__delivered
 msgid "Delivered on Lazada"
-msgstr ""
+msgstr "จัดส่งใน Lazada แล้ว"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__display_name
@@ -438,19 +374,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__display_name
-#, fuzzy
 msgid "Display Name"
-msgstr "แสดงชื่อ"
+msgstr "ชื่อที่ใช้แสดง"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.stock_picking_form
 msgid "Download Shipping Label (Lazada)"
-msgstr ""
+msgstr "ดาวน์โหลดฉลากการจัดส่ง (Lazada)"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__draft
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__draft
-#, fuzzy
 msgid "Draft"
 msgstr "ร่าง"
 
@@ -459,7 +393,7 @@ msgstr "ร่าง"
 msgid ""
 "Enable this to allow pushing the product inventory quantities from Odoo to "
 "Lazada."
-msgstr ""
+msgstr "เปิดใช้งานสิ่งนี้เพื่ออนุญาตให้ดันปริมาณคลังสินค้าจาก Odoo ไปยัง Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__synchronize_inventory
@@ -469,6 +403,10 @@ msgid ""
 "(Fulfilled by Merchant) items. This ensures your Lazada listings show "
 "accurate stock availability."
 msgstr ""
+"เปิดใช้งานตัวเลือกนี้เพื่อซิงค์ปริมาณคลังสินค้า Odoo ของคุณไปยัง Lazada โดยอัตโนมัติ "
+"เมื่อเปิดใช้งาน ระดับสต็อกสินค้าใน Odoo จะถูกส่งไปยัง Lazada สำหรับรายการ FBM "
+"(ดำเนินการโดยผู้ขาย) ซึ่งจะช่วยให้มั่นใจได้ว่ารายการสินค้า Lazada "
+"ของคุณจะแสดงความพร้อมของสต็อกที่ถูกต้องแม่นยำ"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__manage_fbl_inventory
@@ -579,8 +517,8 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"หากการขายถูกล็อก คุณจะไม่สามารถแก้ไขได้อีกต่อไป อย่างไรก็ตาม คุณจะยังสามารถออกใบแจ้งหนี้หรือจั"
-"ดส่งได้"
+"หากการขายถูกล็อก คุณจะไม่สามารถแก้ไขได้อีกต่อไป อย่างไรก็ตาม "
+"คุณจะยังสามารถออกใบแจ้งหนี้หรือจัดส่งได้"
 
 #. module: sale_lazada
 #: model:ir.module.module,summary:base.module_sale_lazada
@@ -653,14 +591,13 @@ msgstr ""
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__last_orders_sync_date
 msgid "Last Order Synchronization Date"
-msgstr ""
+msgstr "วันที่ซิงค์คำสั่งซื้อล่าสุด"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__write_uid
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__write_uid
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__write_uid
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__write_uid
-#, fuzzy
 msgid "Last Updated by"
 msgstr "อัปเดตครั้งล่าสุดโดย"
 
@@ -669,159 +606,158 @@ msgstr "อัปเดตครั้งล่าสุดโดย"
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__write_date
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__write_date
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__write_date
-#, fuzzy
 msgid "Last Updated on"
 msgstr "อัปเดตครั้งล่าสุดเมื่อ"
 
 #. module: sale_lazada
 #: model:ir.ui.menu,name:sale_lazada.root_menu
 msgid "Lazada"
-msgstr ""
+msgstr "Lazada"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
 msgid "Lazada API Credentials"
-msgstr ""
+msgstr "ข้อมูลรับรอง API ของ Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Lazada API rate limit reached. Please try again later."
-msgstr ""
+msgstr "ถึงขีดจำกัดอัตราการใช้งาน Lazada API แล้ว โปรดลองใหม่อีกครั้งภายหลัง"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_adjustment_product_product_template
 msgid "Lazada Amount Adjustment"
-msgstr ""
+msgstr "การปรับปรุงยอดเงิน Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_res_partner__lazada_buyer_extern_id
 #: model:ir.model.fields,field_description:sale_lazada.field_res_users__lazada_buyer_extern_id
 msgid "Lazada Buyer ID"
-msgstr ""
+msgstr "ID ผู้ซื้อ Lazada"
 
 #. module: sale_lazada
 #: model:ir.module.module,shortdesc:base.module_sale_lazada
 msgid "Lazada Connector"
-msgstr ""
+msgstr "ตัวเชื่อมต่อ Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Lazada FBL Stock - %(shop)s"
-msgstr ""
+msgstr "สต็อก FBL Lazada - %(shop)s"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_fulfillment_type
 msgid "Lazada Fulfillment Type"
-msgstr ""
+msgstr "ประเภทการจัดการคำสั่งซื้อของ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_item
 msgid "Lazada Item"
-msgstr ""
+msgstr "รายการ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__lazada_item_extern_id
 msgid "Lazada Item ID"
-msgstr ""
+msgstr "ID รายการ Lazada"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_item_list
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__lazada_item_ids
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_list
 msgid "Lazada Items"
-msgstr ""
+msgstr "รายการ Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Lazada Label"
-msgstr ""
+msgstr "ป้ายกำกับ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_label_attachment_ids
 msgid "Lazada Label Attachment"
-msgstr ""
+msgstr "ไฟล์แนบป้ายกำกับ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__lazada_oauth_state
 msgid "Lazada OAuth State"
-msgstr ""
+msgstr "สถานะ OAuth ของ Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Lazada Order %(lazada_order_ref)s at %(name)s"
-msgstr ""
+msgstr "คำสั่งซื้อ Lazada %(lazada_order_ref)s ที่ %(name)s"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_discount_product_product_template
 msgid "Lazada Order Discount"
-msgstr ""
+msgstr "ส่วนลดคำสั่งซื้อ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_order_item
 msgid "Lazada Order Item"
-msgstr ""
+msgstr "รายการสินค้าในคำสั่งซื้อ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__order_item_extern_id
 msgid "Lazada Order Item ID"
-msgstr ""
+msgstr "ID รายการสินค้าในคำสั่งซื้อ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order_line__lazada_order_item_ids
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_move__lazada_order_item_ids
 msgid "Lazada Order Items"
-msgstr ""
+msgstr "รายการสินค้าในคำสั่งซื้อ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__package_extern_id
 msgid "Lazada Package ID"
-msgstr ""
+msgstr "ID แพ็กเกจ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_package_status
 msgid "Lazada Package Status"
-msgstr ""
+msgstr "สถานะแพ็กเกจ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_order_ref
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_order_ref
 msgid "Lazada Reference"
-msgstr ""
+msgstr "การอ้างอิง Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__lazada_sku
 msgid "Lazada SKU"
-msgstr ""
+msgstr "Lazada SKU"
 
 #. module: sale_lazada
 #: model:product.template,name:sale_lazada.default_sale_product_product_template
 msgid "Lazada Sale"
-msgstr ""
+msgstr "การขาย Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__shop_extern_id
 msgid "Lazada Seller ID"
-msgstr ""
+msgstr "ID ผู้ขาย Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_shipping_product_product_template
 msgid "Lazada Shipping"
-msgstr ""
+msgstr "การจัดส่ง Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_shipping_allocate_type
 msgid "Lazada Shipping Allocate Type"
-msgstr ""
+msgstr "ประเภทการจัดสรรการจัดส่งของ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_shop
@@ -829,58 +765,57 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_search
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Lazada Shop"
-msgstr ""
+msgstr "ร้านค้า Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/controllers/onboarding.py:0
 msgid "Lazada Shop - %(name)s"
-msgstr ""
+msgstr "ร้านค้า Lazada - %(name)s"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_authorization_error
 msgid "Lazada Shop Authorization Error"
-msgstr ""
+msgstr "ข้อผิดพลาดในการอนุญาตสิทธิ์ร้านค้า Lazada"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_shop_create_wizard
 msgid "Lazada Shop Creation Wizard"
-msgstr ""
+msgstr "ตัวช่วยการสร้างร้านค้า Lazada"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_list
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_list
 msgid "Lazada Shops"
-msgstr ""
+msgstr "ร้านค้า Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_order_status
 msgid "Lazada Status"
-msgstr ""
+msgstr "สถานะ Lazada"
 
 #. module: sale_lazada
 #: model:mail.template,name:sale_lazada.inventory_sync_failure
 msgid "Lazada: Inventory Synchronization Failure"
-msgstr ""
+msgstr "Lazada: การเชื่อมคลังสินค้าล้มเหลว"
 
 #. module: sale_lazada
 #: model:mail.template,name:sale_lazada.order_sync_failure
 msgid "Lazada: Order Synchronization Failure"
-msgstr ""
+msgstr "Lazada: การเชื่อมคำสั่งซื้อล้มเหลว"
 
 #. module: sale_lazada
 #: model:ir.actions.server,name:sale_lazada.ir_cron_sync_lazada_inventory_ir_actions_server
 msgid "Lazada: sync inventory"
-msgstr ""
+msgstr "Lazada: เชื่อมคลังสินค้า"
 
 #. module: sale_lazada
 #: model:ir.actions.server,name:sale_lazada.ir_cron_sync_lazada_orders_ir_actions_server
 msgid "Lazada: sync orders"
-msgstr ""
+msgstr "Lazada: เชื่อมคำสั่งซื้อ"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.view_order_form
-#, fuzzy
 msgid "Lock"
 msgstr "ล็อก"
 
@@ -891,22 +826,22 @@ msgid ""
 "token expires after 30 days. If it expires, you'll need to re-authorize the "
 "connection by clicking the authorization button in the Lazada shop view."
 msgstr ""
+"โทเค็นรีเฟรชระยะยาวที่ใช้เพื่อขอโทเคนเข้าถึงใหม่โดยอัตโนมัติ โทเค็นนี้จะหมดอายุหลังจาก 30 วัน "
+"หากหมดอายุ คุณจะต้องยืนยันการเชื่อมต่อใหม่อีกครั้งโดยคลิกที่ปุ่มการอนุญาตในมุมมองร้านค้า Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__manual
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__manual
-#, fuzzy
 msgid "Manual"
 msgstr "ด้วยตัวเอง"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__manual
 msgid "Manual handling required"
-msgstr ""
+msgstr "ต้องดำเนินการด้วยตนเอง"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__name
-#, fuzzy
 msgid "Name"
 msgstr "ชื่อ"
 
@@ -914,67 +849,64 @@ msgstr "ชื่อ"
 #. odoo-python
 #: code:addons/sale_lazada/wizard/lazada_shop_create_wizard.py:0
 msgid "New Lazada Shop"
-msgstr ""
+msgstr "ร้านค้า Lazada ใหม่"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "No Lazada order item found to pack."
-msgstr ""
+msgstr "ไม่พบรายการคำสั่งซื้อ Lazada ที่ต้องแพ็ก"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "No Lazada order reference found."
-msgstr ""
+msgstr "ไม่พบการอ้างอิงคำสั่งซื้อ Lazada"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/utils.py:0
 msgid "No authorization code or refresh token found for shop %(shop_name)s."
-msgstr ""
+msgstr "ไม่พบรหัสการอนุญาตหรือเรฟรีชโทเค็นสำหรับร้านค้า %(shop_name)s"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_item.py:0
 msgid "Only FBM items can be synced to Lazada."
-msgstr ""
+msgstr "เฉพาะรายการ FBM เท่านั้นที่สามารถซิงค์ไปยัง Lazada ได้"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_item.py:0
 msgid "Only goods are supported with Lazada."
-msgstr ""
+msgstr "Lazada รองรับเฉพาะสินค้าเท่านั้น"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__order_count
-#, fuzzy
 msgid "Order Count"
-msgstr "จำนวนคำสั่ง"
+msgstr "จำนวนคำสั่งซื้อ"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Order Discount"
-msgstr ""
+msgstr "ส่วนลดคำสั่งซื้อ"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
-#, fuzzy
 msgid "Order Synchronization"
-msgstr "กาประสานข้อมูลคำสั่งซื้อ"
+msgstr "การเชื่อมคำสั่งซื้อ"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__order_ids
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
-#, fuzzy
 msgid "Orders"
-msgstr "คำสั่ง"
+msgstr "คำสั่งซื้อ"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.stock_picking_form
 msgid "Pack Lazada Package"
-msgstr ""
+msgstr "การแพ็กแพ็กเกจ Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__confirmed
@@ -984,70 +916,62 @@ msgstr ""
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__draft
 msgid "Package Pending on Lazada"
-msgstr ""
+msgstr "แพ็กเกจที่ยังไม่ดำเนินการบน Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__processing
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__processing
-#, fuzzy
 msgid "Processing"
 msgstr "กำลังดำเนินการ"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__product_id
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_search
-#, fuzzy
 msgid "Product"
 msgstr "สินค้า"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__product_tmpl_id
-#, fuzzy
 msgid "Product Template"
 msgstr "เทมเพลตสินค้า"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_product_product
-#, fuzzy
 msgid "Product Variant"
-msgstr "ตัวแปรสินค้า"
+msgstr "สินค้ารูปแบบย่อย"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Re-authorize Shop"
-msgstr ""
+msgstr "อนุมัติร้านค้าอีกครั้ง"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__processing
 msgid "Ready to Ship on Lazada"
-msgstr ""
+msgstr "พร้อมจัดส่งบน Lazada"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__refresh_token
-#, fuzzy
 msgid "Refresh Token"
-msgstr "รีเฟรชโทเคน"
+msgstr "รีเฟรชโทเค็น"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__refresh_token_expiration_date
 msgid "Refresh Token Expiration Date"
-msgstr ""
+msgstr "วันหมดอายุของรีเฟรชโทเค็น"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__sale_order_line_id
-#, fuzzy
 msgid "Sale Order Line"
 msgstr "รายการคำสั่งขาย"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_sale_order
-#, fuzzy
 msgid "Sales Order"
 msgstr "คำสั่งขาย"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_sale_order_line
-#, fuzzy
 msgid "Sales Order Line"
 msgstr "รายการคำสั่งขาย"
 
@@ -1055,44 +979,42 @@ msgstr "รายการคำสั่งขาย"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Shipping"
-msgstr ""
+msgstr "การจัดส่ง"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "การจัดส่ง: %(carrier)s"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__shop_id
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_search
-#, fuzzy
 msgid "Shop"
 msgstr "ร้านค้า"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Information"
-msgstr ""
+msgstr "ข้อมูลร้านค้า"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Name"
-msgstr ""
+msgstr "ชื่อร้านค้า"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__country_id
 msgid "Shop Region"
-msgstr ""
+msgstr "ภูมิภาคร้านค้า"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Settings"
-msgstr ""
+msgstr "การตั้งค่าร้านค้า"
 
 #. module: sale_lazada
 #: model:ir.ui.menu,name:sale_lazada.shops_menu
-#, fuzzy
 msgid "Shops"
 msgstr "ร้านค้า"
 
@@ -1395,3 +1317,131 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "e.g. Indonesian Shop"
 msgstr ""
+
+#~ msgid ""
+#~ "<style>\n"
+#~ "                .lazada_table {\n"
+#~ "                    width: 100%;\n"
+#~ "                    max-width: 900px;\n"
+#~ "                    border-collapse: collapse;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table th,\n"
+#~ "                .lazada_table td {\n"
+#~ "                    border: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table th {\n"
+#~ "                    white-space: nowrap;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table thead th {\n"
+#~ "                    padding: 0.5em 0.5em;\n"
+#~ "                    text-align: center;\n"
+#~ "                    border-bottom: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table tbody th,\n"
+#~ "                .lazada_table tbody td {\n"
+#~ "                    padding: 0.5em 0.5em 1em;\n"
+#~ "                    vertical-align: top;\n"
+#~ "                }\n"
+#~ "            </style>\n"
+#~ "            <body><div>\n"
+#~ "                <p>The synchronization of the inventory for Lazada Shop\n"
+#~ "                    <b><t t-out=\"ctx.get('lazada_shop') or ''\">REF</t></"
+#~ "b>\n"
+#~ "                    encountered some errors and was not completed.</p>\n"
+#~ "                <p>Here are the errors sent by Lazada: </p>\n"
+#~ "                <table class=\"lazada_table\">\n"
+#~ "                    <thead>\n"
+#~ "                        <tr>\n"
+#~ "                            <th>Product Internal Reference(s)</th>\n"
+#~ "                            <th>Message</th>\n"
+#~ "                        </tr>\n"
+#~ "                    </thead>\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+#~ "as=\"error\">\n"
+#~ "                            <th><t t-out=\"', "
+#~ "'.join(error['default_codes'])\"/></th>\n"
+#~ "                            <td>\n"
+#~ "                                <t t-if=\"error['message']\" t-"
+#~ "out=\"error['message']\"/>\n"
+#~ "                                <t t-else=\"\">An unknown error occurred "
+#~ "during the synchronisation with Lazada.\n"
+#~ "                                    Unfortunately you need to manually "
+#~ "check if the available quantity for the product is correct or not.\n"
+#~ "                                    If the problem persists, contact <a "
+#~ "href=\"https://www.odoo.com/help/\">Odoo support </a>.\n"
+#~ "                                </t>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        </body>"
+#~ msgstr ""
+#~ "<style>\n"
+#~ "                .lazada_table {\n"
+#~ "                    width: 100%;\n"
+#~ "                    max-width: 900px;\n"
+#~ "                    border-collapse: collapse;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table th,\n"
+#~ "                .lazada_table td {\n"
+#~ "                    border: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table th {\n"
+#~ "                    white-space: nowrap;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table thead th {\n"
+#~ "                    padding: 0.5em 0.5em;\n"
+#~ "                    text-align: center;\n"
+#~ "                    border-bottom: 1px solid #888;\n"
+#~ "                }\n"
+#~ "\n"
+#~ "                .lazada_table tbody th,\n"
+#~ "                .lazada_table tbody td {\n"
+#~ "                    padding: 0.5em 0.5em 1em;\n"
+#~ "                    vertical-align: top;\n"
+#~ "                }\n"
+#~ "            </style>\n"
+#~ "            <body><div>\n"
+#~ "                <p>การซิงโครไนซ์คลังสินค้าสำหรับ Lazada Shop\n"
+#~ "                    <b><t t-out=\"ctx.get('lazada_shop') or ''\">REF</t></"
+#~ "b>\n"
+#~ "                    พบข้อผิดพลาดบางประการและไม่สามารถดำเนินการให้เสร็จสมบูรณ์ได้</"
+#~ "p>\n"
+#~ "                <p>นี่คือข้อผิดพลาดที่ Lazada ส่งมา: </p>\n"
+#~ "                <table class=\"lazada_table\">\n"
+#~ "                    <thead>\n"
+#~ "                        <tr>\n"
+#~ "                            <th>รหัสอ้างอิงภายในของสินค้า</th>\n"
+#~ "                            <th>ข้อความ</th>\n"
+#~ "                        </tr>\n"
+#~ "                    </thead>\n"
+#~ "                    <tbody>\n"
+#~ "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+#~ "as=\"error\">\n"
+#~ "                            <th><t t-out=\"', "
+#~ "'.join(error['default_codes'])\"/></th>\n"
+#~ "                            <td>\n"
+#~ "                                <t t-if=\"error['message']\" t-"
+#~ "out=\"error['message']\"/>\n"
+#~ "                                <t t-"
+#~ "else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างการซิงโครไนซ์กับ Lazada\n"
+#~ "                                    ขออภัย "
+#~ "โปรดตรวจสอบจำนวนสินค้าที่มีอยู่สำหรับผลิตภัณฑ์ด้วยตนเองว่าถูกต้องหรือไม่\n"
+#~ "                                    หากปัญหายังคงอยู่ กรุณาติดต่อ <a "
+#~ "href=\"https://www.odoo.com/help/\">การสนับสนุน Odoo</a>\n"
+#~ "                                </t>\n"
+#~ "                            </td>\n"
+#~ "                        </tr>\n"
+#~ "                    </tbody>\n"
+#~ "                </table>\n"
+#~ "            </div>\n"
+#~ "        </body>"

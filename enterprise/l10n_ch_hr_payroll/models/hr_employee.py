@@ -32,7 +32,7 @@ class HrEmployee(models.Model):
         'enterpriseEducation': 'set default',
         'mandatorySchoolOnly': 'set default',
         'doctorate': 'set default'
-    }, default='mandatorySchoolOnly')
+    }, default=lambda self: 'mandatorySchoolOnly' if self.env.company.country_code == 'CH' else False)
 
     l10n_ch_legal_first_name = fields.Char(string="First Name", compute="_compute_l10n_ch_legal_name", store=True, readonly=False, tracking=True, groups="hr.group_hr_user")
     l10n_ch_legal_last_name = fields.Char(string="Last Name", compute="_compute_l10n_ch_legal_name", store=True, readonly=False, tracking=True, groups="hr.group_hr_user")

@@ -4,6 +4,8 @@ import os
 from lxml import etree
 from unittest.mock import patch
 
+from requests.exceptions import SSLError
+
 from odoo.tools import misc
 from odoo.tests.common import tagged
 from .common import TestL10nClEdiCommon, _check_with_xsd_patch, _is_valid_certificate
@@ -274,3 +276,16 @@ class TestL10nClDte(TestL10nClEdiCommon):
 
         response_parsed = etree.fromstring(sii_message)
         self.assertEqual(self.env['l10n_cl.edi.util']._analyze_sii_result(response_parsed), 'ask_for_status')
+
+    @patch('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util.L10n_ClEdiUtil._get_token_rest', return_value='token')
+    def test_rest_connection_error_reported(self, get_token_rest):
+        util = self.env['l10n_cl.edi.util'].with_context(cron_skip_connection_errs=True)
+        error = SSLError('certificate verify failed')
+        with patch('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util.requests.post', side_effect=error), \
+                self.assertLogs('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util', level='WARNING') as logs:
+            self.assertIsNone(util._send_xml_to_sii_rest('SIITEST', '76201224-3', 'dte.xml', b'<DTE/>', self.certificate))
+        self.assertIn('Sending DTE to SII failed due to: certificate verify failed', logs.output[0])
+        with patch('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util.requests.get', side_effect=error), \
+                self.assertLogs('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util', level='WARNING') as logs:
+            self.assertIsNone(util._get_send_status_rest('SIITEST', '123', '76201224-3', self.certificate))
+        self.assertIn('Ask for DTE status to SII failed due to: certificate verify failed', logs.output[0])

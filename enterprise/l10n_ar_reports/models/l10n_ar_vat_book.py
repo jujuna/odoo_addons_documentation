@@ -805,7 +805,7 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
                         aml.move_id,
                         COALESCE(amlact.code, cmpact.code, '0') AS activity,
                         %(operation_query)s AS operation_type,
-                        rprt.code as partner_responsibility_code,
+                        amrt.code as partner_responsibility_code,
                         btg.l10n_ar_vat_afip_code
                     FROM account_move_line aml
                     LEFT JOIN account_account acc ON aml.account_id = acc.id
@@ -813,8 +813,8 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
                     LEFT JOIN res_company cmp ON aml.company_id = cmp.id
                     LEFT JOIN l10n_ar_arca_activity cmpact ON cmp.l10n_ar_arca_activity_id = cmpact.id
                     LEFT JOIN account_account_account_tag aaat ON acc.id = aaat.account_account_id
-                    LEFT JOIN res_partner rp ON aml.partner_id = rp.id
-                    LEFT JOIN l10n_ar_afip_responsibility_type rprt ON rp.l10n_ar_afip_responsibility_type_id = rprt.id
+                    LEFT JOIN account_move am ON aml.move_id = am.id
+                    LEFT JOIN l10n_ar_afip_responsibility_type amrt ON am.l10n_ar_afip_responsibility_type_id = amrt.id
                     LEFT JOIN account_move_line_account_tax_rel amltr ON aml.id = amltr.account_move_line_id
                     LEFT JOIN account_tax bt ON amltr.account_tax_id = bt.id
                     LEFT JOIN account_tax_group btg ON bt.tax_group_id = btg.id

@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuditFile xmlns="urn:StandardAuditFile-Taxation-Financial:DK" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Header>
+		<AuditFileVersion>2.0</AuditFileVersion>
+		<AuditFileCountry>DK</AuditFileCountry>
+		<AuditFileDateCreated>2027-01-01</AuditFileDateCreated>
+		<DefaultCurrencyCode>DKK</DefaultCurrencyCode>
+	</Header>
+	<MasterFiles>
+		<GeneralLedgerAccounts>
+			<Account>
+				<AccountID>1010</AccountID>
+				<AccountDescription>Salg af varer og ydelser </AccountDescription>
+				<StandardAccountID>1010</StandardAccountID>
+				<AccountType>Sale</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+			<Account>
+				<AccountID>7680</AccountID>
+				<AccountDescription>Salgsmoms</AccountDescription>
+				<StandardAccountID>7680</StandardAccountID>
+				<AccountType>Liability</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+			<Account>
+				<AccountID>6190</AccountID>
+				<AccountDescription>Tilgodehavender fra salg og tjenesteydelser</AccountDescription>
+				<StandardAccountID>6190</StandardAccountID>
+				<AccountType>Asset</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+			<Account>
+				<AccountID>2240</AccountID>
+				<AccountDescription>Småanskaffelser over skattemæssig grænse for småaktiver</AccountDescription>
+				<StandardAccountID>2240</StandardAccountID>
+				<AccountType>Expense</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+			<Account>
+				<AccountID>7740</AccountID>
+				<AccountDescription>Købsmoms</AccountDescription>
+				<StandardAccountID>7740</StandardAccountID>
+				<AccountType>Liability</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+			<Account>
+				<AccountID>6480</AccountID>
+				<AccountDescription>Bankkonto</AccountDescription>
+				<StandardAccountID>6480</StandardAccountID>
+				<AccountType>Other</AccountType>
+				<OpeningDebitBalance>0</OpeningDebitBalance>
+			</Account>
+		</GeneralLedgerAccounts>
+		<Customers>
+			<Customer>
+				<CustomerID>DK-12345</CustomerID>
+				<Name>Skattestyrelsen</Name>
+				<Address>
+					<Country>DK</Country>
+				</Address>
+				<AccountID>54321</AccountID>
+			</Customer>
+			<Customer>
+				<CustomerID>Debitor 1</CustomerID>
+				<Name>Debitor 1</Name>
+				<Address>
+					<StreetName>Boulevarden 1</StreetName>
+					<City>Aalborg</City>
+					<PostalCode>9000</PostalCode>
+					<Country>DK</Country>
+				</Address>
+				<AccountID>54321</AccountID>
+			</Customer>
+		</Customers>
+		<Suppliers>
+			<Supplier>
+				<SupplierID>Leverandør 1</SupplierID>
+				<Name>Leverandør 1</Name>
+				<Address>
+					<StreetName>Vesterbro 1</StreetName>
+					<City>Aalborg</City>
+					<PostalCode>9000</PostalCode>
+					<Country>DK</Country>
+				</Address>
+				<AccountID>98765</AccountID>
+			</Supplier>
+		</Suppliers>
+		<TaxTable>
+			<TaxTableEntry>
+				<TaxType>VAT</TaxType>
+				<Description>VAT</Description>
+				<TaxCodeDetails>
+					<TaxCode>S25</TaxCode>
+					<StandardTaxCode>S1</StandardTaxCode>
+					<Description>Momspligtige salg (DK), 25% moms</Description>
+					<TaxPercentage>25</TaxPercentage>
+					<Country>DK</Country>
+				</TaxCodeDetails>
+				<TaxCodeDetails>
+					<TaxCode>S0</TaxCode>
+					<StandardTaxCode>S0</StandardTaxCode>
+					<Description>Momspligtige salg (DK) 0% moms</Description>
+					<TaxPercentage>0</TaxPercentage>
+					<Country>DK</Country>
+				</TaxCodeDetails>
+				<TaxCodeDetails>
+					<TaxCode>K25</TaxCode>
+					<StandardTaxCode>K1</StandardTaxCode>
+					<Description>Indgående moms (DK), fuld fradrag (100%)</Description>
+					<TaxPercentage>25</TaxPercentage>
+					<Country>DK</Country>
+				</TaxCodeDetails>
+				<TaxCodeDetails>
+					<TaxCode>K0</TaxCode>
+					<StandardTaxCode>K0</StandardTaxCode>
+					<Description>Momsfritaget køb, Ingen fradrag, ingen moms på køb</Description>
+					<TaxPercentage>0</TaxPercentage>
+					<Country>DK</Country>
+				</TaxCodeDetails>
+			</TaxTableEntry>
+		</TaxTable>
+	</MasterFiles>
+	<GeneralLedgerEntries>
+		<NumberOfEntries>2</NumberOfEntries>
+		<TotalDebit>60000</TotalDebit>
+		<TotalCredit>60000</TotalCredit>
+		<Journal>
+			<JournalID>SAF1</JournalID>
+			<Description>Butik Vesterbro</Description>
+			<Type>AR</Type>
+			<Transaction>
+				<TransactionID>1</TransactionID>
+				<Period>1</Period>
+				<PeriodYear>2023</PeriodYear>
+				<TransactionDate>2023-02-01</TransactionDate>
+				<Description>Faktura 1</Description>
+				<SystemEntryDate>2023-02-05</SystemEntryDate>
+				<GLPostingDate>2023-02-01</GLPostingDate>
+				<CustomerID>Debitor 1</CustomerID>
+				<SystemID>8462</SystemID>
+				<Line>
+					<RecordID>1</RecordID>
+					<AccountID>1010</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<CustomerID>Debitor 1</CustomerID>
+					<Description>Salg af konsulentydelser</Description>
+					<CreditAmount>
+						<Amount>32000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>32000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</CreditAmount>
+					<TaxInformation>
+						<TaxCode>S25</TaxCode>
+						<StandardTaxCode>S1</StandardTaxCode>
+						<StandardTaxCodeDescription>Momspligtige salg (DK), 25% moms</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>25</TaxPercentage>
+						<TaxBase>10</TaxBase>
+						<TaxBaseDescription>Timer</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>8000</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>8000</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+				<Line>
+					<RecordID>1</RecordID>
+					<AccountID>7680</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<CustomerID>Debitor 1</CustomerID>
+					<Description>Salg af konsulentydelser</Description>
+					<CreditAmount>
+						<Amount>8000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>8000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</CreditAmount>
+					<TaxInformation>
+						<TaxCode>S0</TaxCode>
+						<StandardTaxCode>S0</StandardTaxCode>
+						<StandardTaxCodeDescription>Momspligtige salg (DK), 0% moms</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>0</TaxPercentage>
+						<TaxBase>10</TaxBase>
+						<TaxBaseDescription>Timer</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>0</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>0</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+				<Line>
+					<RecordID>1</RecordID>
+					<AccountID>6190</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<CustomerID>Debitor 1</CustomerID>
+					<Description>Tilgodehavende fra faktura 1</Description>
+					<DebitAmount>
+						<Amount>40000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>40000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</DebitAmount>
+					<TaxInformation>
+						<TaxCode>S0</TaxCode>
+						<StandardTaxCode>S0</StandardTaxCode>
+						<StandardTaxCodeDescription>Momspligtige salg (DK) 0% moms</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>0</TaxPercentage>
+						<TaxBase>10</TaxBase>
+						<TaxBaseDescription>Timer</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>0</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>0</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+			</Transaction>
+		</Journal>
+		<Journal>
+			<JournalID>SAF2</JournalID>
+			<Description>Butik Vesterbro</Description>
+			<Type>AP</Type>
+			<Transaction>
+				<TransactionID>2</TransactionID>
+				<Period>2</Period>
+				<PeriodYear>2023</PeriodYear>
+				<TransactionDate>2023-02-01</TransactionDate>
+				<Description>POWER</Description>
+				<SystemEntryDate>2023-03-05</SystemEntryDate>
+				<GLPostingDate>2023-03-01</GLPostingDate>
+				<SupplierID>Leverandør 1</SupplierID>
+				<SystemID>8463</SystemID>
+				<Line>
+					<RecordID>2</RecordID>
+					<AccountID>2240</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<SupplierID>Leverandør 1</SupplierID>
+					<Description>Køb af PC</Description>
+					<DebitAmount>
+						<Amount>16000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>16000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</DebitAmount>
+					<TaxInformation>
+						<TaxCode>K25</TaxCode>
+						<StandardTaxCode>K1</StandardTaxCode>
+						<StandardTaxCodeDescription>Indgående moms (DK), fuld fradrag (100%)</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>25</TaxPercentage>
+						<TaxBase>1</TaxBase>
+						<TaxBaseDescription>STK</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>4000</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>4000</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+				<Line>
+					<RecordID>2</RecordID>
+					<AccountID>7740</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<Description>Moms på PC</Description>
+					<DebitAmount>
+						<Amount>4000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>4000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</DebitAmount>
+					<TaxInformation>
+						<TaxCode>K0</TaxCode>
+						<StandardTaxCode>K0</StandardTaxCode>
+						<StandardTaxCodeDescription>Momsfritaget køb, Ingen fradrag, ingen moms på køb</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>0</TaxPercentage>
+						<TaxBase>1</TaxBase>
+						<TaxBaseDescription>STK</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>0</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>0</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+				<Line>
+					<RecordID>2</RecordID>
+					<AccountID>6480</AccountID>
+					<Analysis>
+						<AnalysisType>Projekt</AnalysisType>
+						<AnalysisID>123-AER</AnalysisID>
+						<AnalysisAmount>
+							<Amount>100</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>100</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</AnalysisAmount>
+					</Analysis>
+					<Description>Bank 1</Description>
+					<CreditAmount>
+						<Amount>20000</Amount>
+						<CurrencyCode>DKK</CurrencyCode>
+						<CurrencyAmount>20000</CurrencyAmount>
+						<ExchangeRate>1.0</ExchangeRate>
+					</CreditAmount>
+					<TaxInformation>
+						<TaxCode>S0</TaxCode>
+						<StandardTaxCode>S0</StandardTaxCode>
+						<StandardTaxCodeDescription>Momsfritaget køb, Ingen fradrag, ingen moms på køb</StandardTaxCodeDescription>
+						<Country>DK</Country>
+						<TaxPercentage>0</TaxPercentage>
+						<TaxBase>1</TaxBase>
+						<TaxBaseDescription>STK</TaxBaseDescription>
+						<TaxAmount>
+							<Amount>0</Amount>
+							<CurrencyCode>DKK</CurrencyCode>
+							<CurrencyAmount>0</CurrencyAmount>
+							<ExchangeRate>1.0</ExchangeRate>
+						</TaxAmount>
+					</TaxInformation>
+				</Line>
+			</Transaction>
+		</Journal>
+	</GeneralLedgerEntries>
+</AuditFile>

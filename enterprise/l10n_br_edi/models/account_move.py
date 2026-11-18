@@ -565,7 +565,7 @@ class AccountMove(models.Model):
 
     def _l10n_br_edi_references_original_per_line(self):
         """Returns whether Avalara expects the original NF-e on each line rather than in the header."""
-        return self.move_type == "out_refund" and not self.l10n_br_is_service_transaction
+        return self.move_type in ("out_refund", "in_refund") and not self.l10n_br_is_service_transaction
 
     @api.model
     def _l10n_br_edi_normalize_access_key(self, access_key):

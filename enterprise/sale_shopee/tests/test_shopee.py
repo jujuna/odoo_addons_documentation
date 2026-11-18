@@ -431,6 +431,20 @@ class TestShopee(common.TestShopeeCommon):
             with self.assertRaises(SyncFailureError):
                 self.shop._sync_inventory(auto_commit=False)
 
+    def test_sync_failure_without_responsible_emails(self):
+        """A synchronization failure without recipient emails should only log a warning."""
+        responsible_users = self.shop.user_id | self.env.ref('base.user_admin')
+        responsible_users.write({'email': False})
+
+        with self.assertLogs(
+            'odoo.addons.sale_shopee.models.shopee_shop', level='WARNING'
+        ) as logs:
+            self.shop._handle_sync_failure(flow='inventory_sync', error_messages=[])
+        self.assertIn(
+            "Could not send synchronization failure email because no responsible user has an email address configured.",
+            "\n".join(logs.output),
+        )
+
     # --- Sync Pickings --- #
 
     @mute_logger("odoo.addons.sale_shopee.models.shopee_shop")

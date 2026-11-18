@@ -244,7 +244,8 @@ class HrLeaveAllocation(models.Model):
             elif (
                 allocation.work_entry_type_id == self.env.ref("hr_work_entry.l10n_be_work_entry_type_senior_time_off", raise_if_not_found=False)
                 and allocation.work_entry_type_id.country_id.code == "BE"
-                and emp._get_age(allocation.date_from) < 50
+                # 50 years old on 31 December of the holiday exercise (ONEM), as the youth holidays
+                and emp._get_age(date(allocation.date_from.year - 1, 12, 31)) < 50
             ):
                 allocation.eligibility_warning = self.env._(
                     "%(employee)s is not eligible for Senior Time Off.",
@@ -253,12 +254,51 @@ class HrLeaveAllocation(models.Model):
 
     def action_show_related_drs(self):
         self.ensure_one()
-        action = self.env['ir.actions.act_window']._for_xml_id('l10n_be_hr_payroll.action_drs')
+        action = self.env['l10n.be.drs'].action_list_view()
         action['domain'] = [('id', 'in', self.linked_drs_ids.ids)]
-        action['context'] = {'default_employee_id': self.employee_id.id}
+        action['context']['default_employee_id'] = self.employee_id.id
         if len(self.linked_drs_ids) == 1:
             action.update({
                 "views": [[False, "form"]],
                 "res_id": self.linked_drs_ids.id,
             })
         return action
+
+    def _l10n_be_simulate_accrual(self, days):
+        """ The accrual of these allocations at past days, for the payslip counters: the stored values (number_of_days,
+        nextcall...) are the ones of the last run of the accrual cron. The accrual plans are run again from the start
+        of the allocations, without writing, up to each day in increasing order, each run continuing the previous one.
+        Each run computes the time off taken at each accrual event: only call it for a few allocations.
+
+        :param days: the last days to process
+        :return: {day: {allocation: allocation_data}}, see _process_accrual_plans
+        """
+        allocations = self.sudo().filtered('accrual_plan_id')
+        allocations_data = {}
+        for allocation in allocations:
+            # the values of a reset accrual (see _get_init_accrual_plan_values), in the shape of _get_accrual_allocation_data
+            init_values = allocation._get_init_accrual_plan_values()
+            allocations_data[allocation] = {
+                'last_accrual': init_values['last_accrual'],
+                'lastcall': init_values['lastcall'],
+                'nextcall': init_values['nextcall'],
+                'carried_over_days_expiration_date': init_values['carried_over_days_expiration_date'],
+                'allocated_duration': allocation._convert_to_type_request_unit(init_values['number_of_days'], 'day'),
+                'yearly_accrued_duration': allocation._convert_to_type_request_unit(init_values['yearly_accrued_days'], 'day'),
+                'previous_carryover_allocated_duration': allocation._convert_to_type_request_unit(
+                    init_values['previous_carryover_number_of_days'], 'day'),
+                'leaves_taken': None,
+            }
+        data_by_day = {}
+        for day in sorted(set(days)):
+            if allocations_data:
+                allocations_data = allocations._process_accrual_plans(day, precomputed_allocations=allocations_data)
+            data_by_day[day] = allocations_data
+        return data_by_day
+
+    def _l10n_be_get_accrued_duration(self, allocation_data):
+        """ The time granted by this accrual allocation in the allocation_data of _l10n_be_simulate_accrual, in the
+        unit of measure of its type. """
+        self.ensure_one()
+        return self._convert_from_type_request_unit(
+            allocation_data['allocated_duration'], self.work_entry_type_id.unit_of_measure, allocation_data)

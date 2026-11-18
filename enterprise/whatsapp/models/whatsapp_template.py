@@ -379,13 +379,25 @@ class WhatsappTemplate(models.Model):
         for tmpl in self:
             tmpl.messages_count = messages_by_template.get(tmpl, 0)
 
-    @api.depends('name', 'wa_account_id')
+    @api.depends('active', 'name', 'status', 'wa_account_id')
     def _compute_display_name(self):
         for template in self:
-            template.display_name = _('%(template_name)s [%(account_name)s]',
-                                        template_name=template.name,
-                                        account_name=template.wa_account_id.name
-                                    ) if template.wa_account_id.name else template.name
+            if not template.name:
+                template.display_name = ''
+                continue
+
+            display_name = template.name
+            if template.wa_account_id.name:
+                display_name = _(
+                    '%(template_name)s [%(account_name)s]',
+                    template_name=display_name,
+                    account_name=template.wa_account_id.name,
+                )
+            if not template.active:
+                display_name = _('%s (Archived)', display_name)
+            elif template.status != 'approved':
+                display_name = _('%s (Draft)', display_name)
+            template.display_name = display_name
 
     @api.onchange('wa_account_id')
     def _onchange_wa_account_id(self):
@@ -424,6 +436,8 @@ class WhatsappTemplate(models.Model):
         values_list = super().copy_data(default=default)
 
         for values, template in zip(values_list, self):
+            if not values.get("name"):
+                values["name"] = _("Unnamed (copy)")
             if not values.get("template_name"):
                 values["template_name"] = f'{template.template_name}_copy'
             if template.variable_ids:

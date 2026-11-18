@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+from functools import cache
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
@@ -11,6 +12,13 @@ from odoo import SUPERUSER_ID
 from odoo.fields import Command
 from odoo.tests.common import TransactionCase
 from odoo.tools import file_open
+
+
+@cache
+def _read_onss_rates_json(folder, code):
+    """ Parse the ONSS rates test data once per process; returned as a string, never mutated. """
+    with file_open(f'l10n_be_hr_payroll/tests/data/{folder}/{code}.json') as f:
+        return str(json.load(f))
 
 
 class TestBelgiumCommon(TransactionCase):
@@ -26,8 +34,6 @@ class TestBelgiumCommon(TransactionCase):
             'l10n_be_main_joint_committee': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
         })
         cls.load_onss_rates()
-        cls.env['res.lang']._activate_lang('fr_BE')
-        cls.env.user.lang = 'fr_BE'
         # Activate the JC200 & JC302 & JC999
         jcs_to_activate = cls.env['l10n.be.joint.committee'].with_user(SUPERUSER_ID)\
             .with_context(active_test=False).search([('egov3_code', 'in', ('200', '302', '999'))])
@@ -44,47 +50,55 @@ class TestBelgiumCommon(TransactionCase):
     @classmethod
     def load_onss_rates(cls):
         def load(folder, codes):
-            cls.env['hr.rule.parameter'].with_user(SUPERUSER_ID).search([
+            RuleParameter = cls.env['hr.rule.parameter'].with_user(SUPERUSER_ID)
+            RuleParameter.search([
                 ('code', 'in', [f'l10n_be_{folder}_{code}' for code in codes])
             ]).unlink()
-            for code in codes:
-                rule_parameter = cls.env['hr.rule.parameter'].with_user(SUPERUSER_ID).create({
-                    'name': f'ONSS Rates: {code}',
-                    'code': f'l10n_be_{folder}_{code}',
-                    'country_id': cls.env.ref('base.be').id,
-                })
-                cls.env['hr.rule.parameter.value'].with_user(SUPERUSER_ID).create({
-                    'parameter_value': json.load(file_open(f'l10n_be_hr_payroll/tests/data/{folder}/{code}.json')),
-                    'rule_parameter_id': rule_parameter.id,
+            # One batched create: each create of hr.rule.parameter.value invalidates the ormcache
+            country_id = cls.env.ref('base.be').id
+            RuleParameter.create([{
+                'name': f'ONSS Rates: {code}',
+                'code': f'l10n_be_{folder}_{code}',
+                'country_id': country_id,
+                'parameter_version_ids': [Command.create({
+                    'parameter_value': _read_onss_rates_json(folder, code),
                     'date_from': date(2000, 1, 1),
-                })
+                })],
+            } for code in codes])
 
         load('onss_rates', [
             '010_015_1', '010_027_1', '010_253_0', '010_255_0', '010_256_0', '010_260_0', '010_260_3', '010_260_4',
             '010_260_5', '010_260_6', '010_260_7', '010_261_0', '010_439_0', '010_450_0', '010_484_0', '010_495_0',
-            '010_809_0', '010_809_2', '010_809_4', '010_809_5', '010_810_0', '010_811_0', '010_811_2', '010_812_1',
+            '010_809_0', '010_809_2', '010_809_4', '010_809_5', '010_810_0', '010_810_2', '010_811_0', '010_811_2', '010_812_1',
             '010_812_2', '010_812_3', '010_831_0', '010_840_0', '010_841_0', '010_847_0', '010_852_0', '010_855_0',
             '010_856_0', '010_857_0', '010_859_0', '010_863_0', '010_865_0', '010_868_0', '010_869_0', '010_878_0',
             '010_888_0', '010_889_0', '017_015_1', '017_253_0', '017_255_0', '017_256_0', '017_450_0', '017_484_0',
-            '017_495_0', '017_800_0', '017_800_2', '017_809_0', '017_809_4', '017_809_5', '017_810_0', '017_820_0', '017_820_5', '017_825_0',
+            '017_495_0', '017_800_0', '017_800_2', '017_809_0', '017_809_4', '017_809_5', '017_810_0', '017_810_2', '017_820_0', '017_820_5', '017_825_0',
             '017_825_8', '017_830_0', '017_830_5', '017_835_0', '017_835_1', '017_840_0', '017_841_0', '017_855_0',
             '017_859_0', '048_015_1', '048_253_0', '048_255_0', '048_256_0', '048_450_0', '048_484_0', '048_809_0',
-            '048_809_4', '048_809_5', '048_810_0', '048_825_1', '048_825_2', '048_835_0', '048_835_1', '048_835_8',
-            '048_840_0', '048_841_0', '048_855_0', '048_859_0', '010_046_1',
+            '048_809_4', '048_809_5', '048_810_0', '048_810_2', '048_825_1', '048_825_2', '048_835_0', '048_835_1', '048_835_8',
+            '048_840_0', '048_841_0', '048_855_0', '048_859_0', '010_046_1', '010_050_0',
             # employer category 317: Horeca occasional workers (extras)
             '317_011_1', '317_253_0', '317_255_0', '317_256_0', '317_260_0', '317_260_3', '317_260_4', '317_260_5',
             '317_260_6', '317_260_7', '317_261_0', '317_261_3', '317_261_4', '317_261_5', '317_261_6', '317_261_7',
             '317_809_2', '317_809_4', '317_810_2', '317_811_2', '317_820_0', '317_820_5', '317_847_0', '317_852_0',
             '317_856_0', '317_857_0', '317_859_0', '317_863_0', '317_868_0', '317_869_0', '317_888_0', '317_889_0',
             '317_496_0', '317_830_0', '317_830_5',
+            # employer category 024: construction (general structural work)
+            '024_015_1', '024_253_0', '024_255_0', '024_256_0', '024_809_0', '024_810_0', '024_810_2', '024_820_0', '024_820_5',
+            '024_826_0', '024_826_2', '024_855_0', '024_859_0',
         ])
         load('onss_combinations', [
             '010_015', '010_027', '010_046', '010_439', '010_484', '010_495', '017_015', '017_484', '017_495', '048_015', '048_484',
-            '317_011', '317_496',
+            '317_011', '317_496', '024_015',
         ])
 
 
 class TestPayrollCommon(TestBelgiumCommon):
+
+    # Only create the Belgian company, its calendars and Georges: no multi-branch company, no
+    # other employee (for the classes that don't use them)
+    _minimal_payroll_setup = False
 
     @classmethod
     def setUpClass(cls):
@@ -93,7 +107,8 @@ class TestPayrollCommon(TestBelgiumCommon):
             today = date.today()
 
             cls.belgian_company = cls.create_belgian_company()
-            cls.multibranch_company = cls.create_multibranch_company(depth=3)
+            if not cls._minimal_payroll_setup:
+                cls.multibranch_company = cls.create_multibranch_company(depth=3)
 
             cls.belgian_company.resource_calendar_id = cls.env['resource.calendar'].create({
                 'attendance_ids': [
@@ -264,6 +279,8 @@ class TestPayrollCommon(TestBelgiumCommon):
                 'resource_calendar_id': cls.resource_calendar_4_5.id,
                 'wage': 2500 * 4 / 5,
             })
+            if cls._minimal_payroll_setup:
+                return
 
             cls.employee_john = cls.create_employee_with_benefits({
                 'name': 'John Doe',
@@ -515,7 +532,8 @@ class TestPayrollCommon(TestBelgiumCommon):
 
     def generate_fake_niss(self):
         start_year = 1960
-        end_year = 2025
+        # Adult workers: an employee under 15 blocks the payslip validation
+        end_year = 2000
         year = randint(start_year, end_year)
         month = randint(1, 12)
         day = randint(1, 28)

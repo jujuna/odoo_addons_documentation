@@ -235,6 +235,20 @@ class TestCaseDocumentsBridgeHR(TestPayslipBase, TransactionCaseDocumentsHr):
         self.assertEqual(declaration.document_id.folder_id, payroll_folder,
                          "The declaration must be posted in the Payroll folder of its employee")
 
+    def test_hr_payroll_employee_declaration_state_generation_before_posting(self):
+        declaration = self.env['hr.payroll.employee.declaration'].create({
+            'res_model': 'hr.payslip',
+            'res_id': self.payslip.id,
+            'employee_id': self.employee.id,
+            'pdf_to_generate': True,
+            'pdf_to_post': True,
+        })
+        self.assertEqual(declaration.state, 'pdf_to_generate')
+        declaration.write({'pdf_to_generate': False, 'pdf_file': BinaryBytes(single_page_pdf)})
+        self.assertEqual(declaration.state, 'pdf_to_post')
+        declaration.declaration_error = 'Error'
+        self.assertEqual(declaration.state, 'error')
+
     def test_hr_payroll_employee_declaration_document_creation_simple(self):
         """Check that the employee is the owner of the declarations and that nobody else has access."""
         declaration = self.env['hr.payroll.employee.declaration'].create({

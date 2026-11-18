@@ -3,7 +3,9 @@
 from freezegun import freeze_time
 import time
 
+from odoo.exceptions import ValidationError
 from odoo.tests.common import tagged, TransactionCase
+from odoo.tools import format_datetime
 
 
 @tagged('jesaispas')
@@ -64,6 +66,21 @@ class TestHrAttendance(TransactionCase):
                 'check_out': time.strftime('%Y-%m-10 11:30'),
             })
 
+    def test_overlap_error_names_conflicting_check_in(self):
+        employee = self.env['hr.employee'].create({'name': "Overlap"})
+        existing = self.attendance.create({
+            'employee_id': employee.id,
+            'check_in': '2024-02-05 07:30:00',
+            'check_out': '2024-02-05 12:00:00',
+        })
+        with self.assertRaises(ValidationError) as error:
+            self.attendance.create({
+                'employee_id': employee.id,
+                'check_in': '2024-02-05 10:00:00',
+                'check_out': '2024-02-05 13:00:00',
+            })
+        self.assertIn(format_datetime(self.env, existing.check_in, dt_format=False), str(error.exception))
+
     @freeze_time("2024-02-05 11:00:00")
     def test_attendance_in_the_future(self):
         employee = self.env['hr.employee'].create({'name': "Test"})
@@ -86,9 +103,12 @@ class TestHrAttendance(TransactionCase):
         self.assertEqual(employee.attendance_state, 'checked_out')
 
     def test_time_format_attendance(self):
+        # on a working day of the employee: a weekend day or a day before the first version
+        # (created today) would be counted as overtime by the default time rule
+        self.test_employee.version_id.date_version = '2024-01-01'
         attendance_id = self.attendance.create({
             'employee_id': self.test_employee.id,
-            'check_in': time.strftime('%Y-%m-28 08:00'),
-            'check_out': time.strftime('%Y-%m-28 09:00'),
+            'check_in': '2024-02-05 08:00',  # a Monday
+            'check_out': '2024-02-05 09:00',
         })
         self.assertEqual(attendance_id.display_name, "A - 1h")

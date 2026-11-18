@@ -5,6 +5,7 @@ class SignRequest(models.Model):
     _inherit = 'sign.request'
 
     def cancel(self):
+        """Cancel the offers of the signature requests and delete the versions they created."""
         super().cancel()
         # sudo(), as not everyone has access to 'hr.contract.salary.offer'
         # but they should be able to cancel their sign request
